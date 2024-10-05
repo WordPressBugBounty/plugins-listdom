@@ -1,0 +1,9 @@
+.lsd-color-m-txt{color: ((dply_main_color)) !important;}
+.lsd-color-m-bg{background-color: ((dply_main_color)) !important;}
+.lsd-color-m-brd{border-color: ((dply_main_color)) !important;}
+.lsd-color-s-txt{color: ((dply_secondary_color)) !important;}
+.lsd-color-s-bg{background-color: ((dply_secondary_color)) !important;}
+.lsd-color-s-brd{border-color: ((dply_secondary_color)) !important;}
+.lsd-font-m{font-family: "((dply_main_font))", Arial, monospace;}
+.lsd-owl-carousel .owl-dots .owl-dot span{border-color: ((dply_main_color)) !important;}
+.lsd-owl-carousel .owl-dots .owl-dot.active span, .lsd-owl-carousel .owl-dots .owl-dot:hover span{background-color: ((dply_main_color)) !important;}

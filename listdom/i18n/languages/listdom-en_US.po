@@ -1,0 +1,6265 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Listdom\n"
+"POT-Creation-Date: 2024-09-03 15:40-0700\n"
+"PO-Revision-Date: 2024-09-03 15:40-0700\n"
+"Last-Translator: Totalery <info@totalery.com>\n"
+"Language-Team: Webilia <info@webilia.com>\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
+"X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e;_x;_ex;esc_attr__;"
+"esc_attr_e;esc_attr_x;_n;_nx\n"
+"X-Poedit-Basepath: ../..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: node_modules\n"
+"X-Poedit-SearchPathExcluded-1: .sass-cache\n"
+"X-Poedit-SearchPathExcluded-2: vendor\n"
+"X-Poedit-SearchPathExcluded-3: tests\n"
+"X-Poedit-SearchPathExcluded-4: bin\n"
+
+#: app/html/menus/addons/tpl.php:9
+msgid "Listdom Addons"
+msgstr ""
+
+#: app/html/menus/addons/tpl.php:11
+msgid ""
+"Listdom has one of the most complete addons designed for listing directory "
+"industry. You can freely use these addons to achieve what you want."
+msgstr ""
+
+#: app/html/menus/addons/tpl.php:17
+#, php-format
+msgid ""
+"It seems there is a problem to get list of addons from Webilia server. "
+"Please try again later or check our website at %s"
+msgstr ""
+
+#: app/html/menus/addons/tpl.php:38
+msgid "Download"
+msgstr ""
+
+#: app/html/menus/addons/tpl.php:40 app/includes/dummy.php:102
+#: app/includes/dummy.php:140
+msgid "Recommended"
+msgstr ""
+
+#: app/html/menus/addons/tpl.php:42 app/includes/lite.php:51
+#: app/includes/menus.php:68
+msgid "Documentation"
+msgstr ""
+
+#: app/html/menus/addons/tpl.php:55
+#, php-format
+msgid ""
+"Not sure which addon is suitable for your need? You can always send us an "
+"email at %s"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs.php:6 app/includes/shortcodes/dashboard.php:78
+#: app/includes/shortcodes/dashboard.php:236
+msgid "Dashboard"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:44
+#, php-format
+msgid ""
+"It appears that your license key has expired or is invalid. To continue "
+"using the %s addon, you will need to renew your existing license or obtain a "
+"new one. You can easily renew your license or get a new one from the %s "
+"website."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:55
+#, php-format
+msgid ""
+"To use %s addon you need to activate it first. If you don't have a valid "
+"license key or yours has expired, you can obtain one from the %s website."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:68
+msgid "License Key"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:77
+msgid ""
+"License Key / Purchase Code is required for functionality, auto update, and "
+"customer service!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:90
+#: app/html/menus/dashboard/tabs/activation.php:207
+#: app/html/menus/dashboard/tabs/activation.php:212
+msgid "Activate"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:93
+msgid "Get License Key"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:104
+#, php-format
+msgid ""
+"Please activate your license promptly. You have less than %1$s days "
+"remaining to activate %2$s; after that, %2$s will no longer be operational."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:113
+#, php-format
+msgid "License Key: %s"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:114
+msgid ""
+"This installation is activated so you will receive automatic updates on your "
+"website!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:118
+msgid "Manage Your Licenses"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:127
+msgid "Type deactivate here to confirm ..."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/activation.php:145
+#: app/html/menus/dashboard/tabs/activation.php:268
+#: app/html/menus/dashboard/tabs/activation.php:273
+msgid "Deactivate"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:9
+msgid ""
+"Added a design builder for creating flexible and visually appealing listing "
+"details pages."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:12
+msgid "Added Style 3 and Style 4 for listing details pages."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:15
+msgid "Added a slider type for the gallery element."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:18
+msgid "Added a new sort option based on listing visits."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:21
+msgid ""
+"Added duplicate listing, duplicate shortcode, duplicate notification, and "
+"duplicate search features."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:24
+msgid "Added a dedicated key for the Google Geocoding API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:27
+msgid "[PRO] Improved frontend dashboard configurations."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:30
+msgid ""
+"Improved the responsive view of skins, lightbox, and the frontend dashboard."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:33
+msgid "Improved search widget styles."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:36
+msgid "Enhanced the dummy data importer."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:39
+msgid "Fixed various UI issues."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:42
+msgid "Resolved some issues in search and filter widgets."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:48
+msgid "Fixed some visual issues."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:54
+#: app/html/menus/dashboard/tabs/changelog.php:156
+#: app/html/menus/dashboard/tabs/changelog.php:357
+#: app/html/menus/dashboard/tabs/changelog.php:468
+#: app/html/menus/dashboard/tabs/changelog.php:534
+#: app/html/menus/dashboard/tabs/changelog.php:578
+#: app/html/menus/dashboard/tabs/changelog.php:719
+msgid "Fixed some issues."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:60
+msgid ""
+"Added listing author role for ease of user management in frontend submission."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:63
+msgid "[PRO] Added lightbox option to listing link methods."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:66
+msgid "[PRO] Added maximum gallery images to the frontend listing submission."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:69
+msgid ""
+"[PRO] Added maximum description length to the frontend listing submission."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:72
+msgid "[PRO] Added maximum number of tags to the frontend listing submission."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:75
+msgid "Improved listdom interfaces in backend and frontend."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:78
+msgid "Improved loading of Google Maps API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:81
+msgid "Improved listdom settings menu."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:84
+msgid "Fixed some issues in trial and license activation."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:87
+msgid "Fixed an scroll issue in sortbar."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:90
+msgid ""
+"Fixed issue of not displaying the success and error messages in listdom "
+"dashboard."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:93
+msgid "Fixed an issue when latitude and / or longitude are wrong."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:99
+msgid "Added an option to disable contact form of owner element."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:102
+msgid "Improved listdom interfaces in WordPress backend."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:105
+msgid "Improved the license activation section."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:108
+msgid "Fixed an issue in single map skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:114
+msgid "[PRO] Added side by side skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:117
+msgid "Added sort by price option."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:120
+msgid "Added new icons for listdom and listings menus."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:123
+msgid "Improved listdom dashboard."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:126
+msgid "Improved the block editor integration."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:129
+msgid "Fixed some issues in listing details page."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:132
+msgid "Fixed an issue in assigning guest user to listing."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:135
+msgid "Fixed some issues in image slider mode of listing image."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:141
+msgid "Improved the server requirements."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:147
+msgid "Fixed some PHP issues in certain conditions."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:153
+msgid "Improved the image gallery slider."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:162
+msgid "Fixed some UI issues."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:168
+msgid "Rebranded to Webilia."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:171
+msgid "Fixed some PHP issues."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:177
+msgid "Added telegram to the social options."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:180
+msgid ""
+"Added left, right, and bottom positions for the search in the shortcode."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:183
+msgid ""
+"Added Hierarchy structure to the checkbox field of the search form builder."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:186
+msgid "Fixed an issue related to the empty values."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:192
+#: app/html/menus/dashboard/tabs/changelog.php:195
+#: app/html/menus/dashboard/tabs/changelog.php:267
+#: app/html/menus/dashboard/tabs/changelog.php:270
+#: app/html/menus/dashboard/tabs/changelog.php:330
+#: app/html/menus/dashboard/tabs/changelog.php:333
+#: app/html/menus/dashboard/tabs/changelog.php:336
+#: app/html/menus/dashboard/tabs/changelog.php:339
+#: app/html/menus/dashboard/tabs/changelog.php:364
+#: app/html/menus/dashboard/tabs/changelog.php:367
+#: app/html/menus/dashboard/tabs/changelog.php:370
+#: app/html/menus/dashboard/tabs/changelog.php:373
+#: app/html/menus/dashboard/tabs/changelog.php:410
+#: app/html/menus/dashboard/tabs/changelog.php:413
+#: app/html/menus/dashboard/tabs/changelog.php:416
+#: app/html/menus/dashboard/tabs/changelog.php:419
+#: app/html/menus/dashboard/tabs/changelog.php:459
+#: app/html/menus/dashboard/tabs/changelog.php:482
+#: app/html/menus/dashboard/tabs/changelog.php:513
+#: app/html/menus/dashboard/tabs/changelog.php:516
+#: app/html/menus/dashboard/tabs/changelog.php:519
+#: app/html/menus/dashboard/tabs/changelog.php:541
+#: app/html/menus/dashboard/tabs/changelog.php:544
+#: app/html/menus/dashboard/tabs/changelog.php:560
+#: app/html/menus/dashboard/tabs/changelog.php:563
+#: app/html/menus/dashboard/tabs/changelog.php:585
+#: app/html/menus/dashboard/tabs/changelog.php:607
+#: app/html/menus/dashboard/tabs/changelog.php:626
+#, php-format
+msgid "[ADDON] Released %s addon!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:192
+msgid "Network"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:195
+msgid "Ads"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:198
+msgid ""
+"[PRO] Added ability to display image slider in archive shortcodes instead of "
+"featured image."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:201
+msgid "Improved the listing translations."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:204
+msgid ""
+"Improved the compatibility with some third party plugins including page "
+"builder plugins."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:207
+msgid "Fixed some issues in multilingual websites."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:213
+msgid ""
+"[PRO] Added an ability to manage required fields for frontend submission."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:216
+msgid "[PRO] Added an ability to display radius field in search form."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:219
+msgid "[PRO] Added radius-dropdown method to radius search."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:222
+msgid "Added WhatsApp, tiktok, and youtube to the social networks."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:225
+msgid ""
+"Added infinite scroll pagination method to list, grid, listgrid, halfmap and "
+"table skins."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:228
+msgid "Disabled auto GPS when a geo request is made by user."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:231
+msgid "Improved the interface of filter options in shortcode builder."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:234
+msgid "Fixed some multilingual issues."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:237
+msgid "Fixed a compatibility issue with Avada theme."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:243
+msgid "Added new map routes to the API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:246
+msgid "Added an ability to disable marker click on maps."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:249
+msgid "Improved the map render time."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:252
+msgid "Disabled one finger drag in leaflet map for mobile devices."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:255
+msgid "Fixed an issue in search widget in some multilingual websites."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:258
+msgid "Fixed an issue in primary category."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:261
+msgid "Fixed an issue in marker lightbox."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:267
+msgid "Elementor Compatibility"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:270
+msgid "Divi Builder Compatibility"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:273
+msgid "Added webp image support."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:276
+msgid "[PRO] Added pagination to frontend dashboard."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:279
+msgid "[PRO] Fixed some issues in hierarchical dropdown."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:282
+msgid "Fixed an issue regarding style 1 of details page."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:288
+msgid "Added Instagram to social network options."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:291
+msgid "[PRO] Improved guest user listing submission."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:294
+msgid "Improved the social network options."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:297
+#: app/html/menus/dashboard/tabs/changelog.php:600
+#: app/html/menus/dashboard/tabs/changelog.php:619
+msgid "Fixed some PHP notices."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:300
+msgid "Fixed an issue in status change notification."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:306
+msgid "Added an option to change date format of date picker fields."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:309
+msgid "Added an option to disable \"Listing Link\" field."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:312
+msgid "Added HTML editor to the remark field."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:315
+msgid "Added an ability to switch languages in REST API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:318
+msgid "Added some new endpoints to the REST API for multilingual websites."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:321
+msgid "Fixed an issue regarding halfmap skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:324
+msgid "Fixed an issue in search module."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:330
+msgid "Franchise"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:333
+msgid "Compare"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:336
+msgid "APS"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:339
+msgid "Stats"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:342
+msgid "[PRO] Added an ability to disable image display per short-code."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:345
+msgid ""
+"[PRO] Added a feature to change the listing link method with normal, blank, "
+"and disabled options."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:348
+msgid "Added new notification for listing status update."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:351
+msgid "Added report abuse element."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:354
+msgid "Fixed some issues regarding schema feature."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:364
+msgid "ACF Integration"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:367
+msgid "Auction"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:370
+msgid "BuddyPress Integration"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:373
+msgid "KML"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:376
+msgid "Added price class feature."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:379
+msgid ""
+"Added an option to display human readable criteria to the search module."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:382
+msgid "Added an option to change the currency position."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:385
+msgid "Added style 3 to list, grid, listgrid, and halfmap skins."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:388
+msgid "Added style 5 to carousel skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:391
+msgid "Added style 4 to cover skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:394
+msgid "Added style 3 to masonry skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:397
+msgid "Added style 3 to table skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:400
+msgid "Added website field to contact details of listing and owner."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:403
+msgid "Disabled scroll wheel on leaflet map."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:410
+msgid "Booking"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:413
+msgid "Multiple Categories"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:416
+msgid "Advanced Icon"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:419
+msgid "Listing Visibility"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:422
+msgid ""
+"[PRO] Added an option to load locations and features in multiple dropdown "
+"instead of checkboxes in frontend dashboard."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:425
+msgid "[PRO] Added required option for the attribute fields."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:428
+msgid ""
+"Added a new feature to select some predefined terms in taxonomy fields of "
+"search builder."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:431
+msgid "Added list / grid switcher in the half map skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:434
+msgid "Added random sort option."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:437
+msgid "Added an option to manage zoom levels of GPS feature."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:440
+msgid "Added no listing message."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:443
+msgid "Improved the settings menu."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:446
+msgid "Fixed an issue of not having HTML codes in Notifications."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:449
+msgid "Fixed an issue in modal content."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:452
+msgid "Fixed an issue in featured image uploading for guest users."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:459
+msgid "Team"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:462
+msgid ""
+"Added an option to load listing details page into light-box on click of "
+"marker."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:465
+msgid "Improved the listdom icons."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:475
+msgid "Fixed some UI issues related to icons."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:482
+msgid "Rate & Review"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:485
+msgid "[PRO] Added radius search in search module."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:488
+msgid "Added compatibility with WP 2020 theme."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:491
+msgid "Applied many improvements."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:493
+msgid "Escaped all the translate-able strings based on their context."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:494
+msgid "Improved security by sanitizing inputs."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:495
+msgid "Escaped dynamic HTML tags."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:496
+msgid "Improved security of Embed feature."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:497
+msgid "Fixed some issues in loading CSS and JS assets."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:498
+msgid "Removed inline CSS and JS codes."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:499
+msgid "Improved the structure of listdom API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:503
+msgid "Fixed an issue in assigning listing to user after approving by admin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:506
+msgid "Fixed an issue in showing map element in style 1."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:513
+msgid "Labelize"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:516
+msgid "Subscriptions"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:519
+msgid "Paid Member Subscriptions Integration"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:522
+msgid ""
+"[PRO] Added hierarchical dropdown method for taxonomies in search builder."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:525
+msgid "Added some new endpoints to the API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:528
+msgid "Improved security of listdom and addons."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:531
+msgid "Fixed an issue in search builder regarding default values."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:541
+msgid "Claim"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:544
+msgid "Topup"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:547
+msgid ""
+"Added an ability to show all values of a certain attribute in the search "
+"builder."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:550
+msgid "Improved security of listdom."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:553
+msgid "Fixed an issue regarding showing all attributes in API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:560
+msgid "Favorites"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:563
+msgid "Rank"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:566
+msgid "[PRO] Added schema (Structured Data) feature to boost SEO."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:569
+msgid "Improved Listdom Restful API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:572
+msgid "Fixed some issues in permission of Restful API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:575
+msgid "Fixed an issue in search of text fields."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:585
+msgid "Mobile Application"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:588
+msgid "Added Listdom Restful API."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:591
+msgid ""
+"[PRO] Added embed code feature to submit videos, virtual tours etc. for "
+"certain listings!."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:594
+msgid "Fixed category hierarchy issue on attributes menu."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:597
+msgid "Fixed a conflict between Listdom and Elementor."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:607
+msgid "CSV"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:610
+msgid ""
+"[PRO] Added dashboard module controls so the modules can be disabled / "
+"enabled."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:613
+msgid "[PRO] Added ability to export and import listing gallery."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:616
+msgid ""
+"Fixed an issue in target page of search form when the shortcode loads in "
+"archive instead of singular page."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:626
+msgid "Advanced Map"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:629
+msgid "[PRO] Added advanced import and export system."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:632
+msgid "Fixed an issue in map search feature."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:639
+msgid "[PRO] Added hierarchical support for category taxonomy."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:642
+msgid "Added an dashboard notification system to manage the system emails."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:645
+msgid "Added HTML marker to leaflet."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:648
+msgid "Improved leaflet clustering for polygon, rectangle and poly-lines."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:651
+msgid "Fixed an issue in leaflet clustering."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:658
+msgid ""
+"[PRO] Added dashboard shortcode to add and manage listings from frontend."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:661
+msgid "[PRO] Added clustering feature for leaflet map."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:664
+msgid ""
+"Added search functionality to the shortcode builder for different skins."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:667
+msgid "Fixed some issues on search builder."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:670
+msgid "Fixed an issue in availability form."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:673
+msgid "Fixed an issue in warning of Google Maps API Key."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:676
+msgid "Fixed an issue in saving the attributes."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:679
+msgid "Fixed a query issue on skins."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:686
+msgid "Added multiple dropdown search methods."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:689
+msgid "Improved dummy data importer to import a default search form too."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:692
+msgid "Fixed some issues on settings page."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:699
+msgid "Added Advanced Search Builder"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:701
+msgid ""
+"Ability to create different search forms with different rows, styles and "
+"fields."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:702
+msgid "Added price field with options."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:703
+msgid "Added address field."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:704
+msgid "Added dropdown search method."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:705
+msgid "Added radio input search method."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:706
+msgid "Added checkboxes search method."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:707
+msgid "Added text input search method."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:708
+msgid "Added dropdown+ search method."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:709
+msgid "Added Min/Max input search method."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:713
+msgid "Added ability to hide email, fax, mobile, etc. in owner element."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:716
+msgid "Improved search widget to work with search builder!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:726
+msgid "[PRO] Improved design of GPS icon in map module."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:729
+msgid "Fixed some tiny issues."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:736
+msgid "[PRO] Improved activation and update process!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:743
+msgid "Added Shortcode Generator."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:745
+msgid ""
+"Ability to select shortcode skin from 10 different skins and many styles."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:746
+msgid ""
+"Ability to filter listings using category, tag, label, location, feature and "
+"author filter options!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:747
+msgid "Ability to select default order options."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:748
+msgid "Ability to disable / enable sort bar and its options!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:749
+msgid "Ability to select map provider per shortcode!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:750
+msgid "Added many configuration options to achieve your desired look and feel!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:754
+msgid "Added Listing Category."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:756
+msgid ""
+"Ability to select an icon for each category. The icon will show in category "
+"shortcodes and map markers."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:757
+msgid "Ability to select a color for each category. It use in markers."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:758
+msgid ""
+"Ability to select an image for each category. The image will show in "
+"category shortcodes."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:759
+msgid ""
+"Added ability to filter listings by one or multiple categories in the "
+"shortcode generator."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:763
+msgid "Added Hierarchical Listing Location."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:765
+msgid ""
+"Ability to select an image for each location. The image will show in "
+"location shortcodes."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:766
+msgid ""
+"Added ability to filter listings by one or multiple locations in the "
+"shortcode generator."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:770
+msgid "Added Listing Tags."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:773
+msgid "Added Listing Features."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:776
+msgid "Added Listing Labels."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:779
+msgid "[PRO] Added Attributes."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:781
+msgid ""
+"Ability to create personalized fields for listing using attributes feature."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:782
+msgid "Added ability to create attributes per category!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:786
+msgid "Fixed an issue in listing link."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:789
+msgid "Improved clustering feature of Google Maps."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/credits.php:6
+#, php-format
+msgid ""
+"Listdom is developed by %s Webilia is a modern web development and design "
+"company that focused on WordPress market. We develop modern and clean "
+"WordPress Plugins for different purposes. Webilia started its business since "
+"2013 and till now we had thousands of satisfied clients."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:12
+#, php-format
+msgid ""
+"%s of your installed products require activation. Please activate them as "
+"soon as possible using the license key you received upon purchase; "
+"otherwise, the functionality will cease."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:14
+#, php-format
+msgid ""
+"If you have misplaced your license key or are unable to locate it, please "
+"don't hesitate to contact %s. We are here to assist you."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:14
+msgid "Webilia Support"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:15
+#, php-format
+msgid ""
+"If, for any reason, you do not have a license key, you can obtain one from "
+"the %s."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:15
+msgid "Webilia Website"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:21
+msgid "Welcome to Listdom!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:22
+msgid "We’ve assembled some links to get you started:"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:25
+msgid "Get Started"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:26
+msgid "Check Documentation"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:27
+msgid "or,"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:27
+msgid "contact our support team!"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:30
+msgid "Next Steps"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:32
+msgid "Manage Categories"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:33
+msgid "Manage Locations"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:34
+msgid "Manage Attributes"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:38
+#: app/html/menus/settings/tabs/slugs.php:13 app/includes/ptypes/listing.php:90
+msgid "Listings"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:40
+msgid "Manage/Add Listings"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:41
+msgid "Manage/Add Shortcodes"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:42
+msgid "Configure the Listdom"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dashboard.php:66
+msgid "Changelog"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dummy-data.php:6 app/includes/dummy.php:34
+msgid "Dummy Data"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dummy-data.php:8
+msgid ""
+"Dummy data are pre-made sample search modules, categories, tags, labels, "
+"locations, shortcodes, pages etc. that you'll be able to remove them at "
+"anytime. Do you want to import them?"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dummy-data.php:13
+#: app/html/menus/dashboard/tabs/dummy-data.php:51
+#: app/html/menus/dashboard/tabs/dummy-data.php:56
+msgid "Import Dummy Data"
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/dummy-data.php:22
+msgid "Dummy Data imported completely."
+msgstr ""
+
+#: app/html/menus/dashboard/tpl.php:8
+#, php-format
+msgid "Listdom %s"
+msgstr ""
+
+#: app/html/menus/dashboard/tpl.php:8
+#, php-format
+msgid "Listdom Pro %s"
+msgstr ""
+
+#: app/html/menus/dashboard/tpl.php:15
+#, php-format
+msgid ""
+"Thanks for using %s. Listdom is a great plugin for creating directory and "
+"listing websites. With Listdom you can show the listings in different skins "
+"and views such as List, Grid, Half Map etc."
+msgstr ""
+
+#: app/html/menus/ix/mappings/manage.php:16
+msgid ""
+"There is no mapping template to manage yet. You can save the mappings during "
+"the import process and manage them here afterward."
+msgstr ""
+
+#: app/html/menus/ix/mappings/manage.php:23
+#, php-format
+msgid "Created at: %s"
+msgstr ""
+
+#: app/html/menus/ix/mappings/manage.php:28
+#: app/html/menus/ix/mappings/manage.php:57
+#: app/html/menus/ix/mappings/manage.php:69
+#: app/html/menus/settings/tabs/api.php:121
+msgid "Remove"
+msgstr ""
+
+#: app/html/menus/ix/tabs.php:6 app/html/menus/ix/tabs/json.php:15
+msgid "JSON"
+msgstr ""
+
+#: app/html/menus/ix/tabs/json.php:9
+msgid "JSON Import / Export"
+msgstr ""
+
+#: app/html/menus/ix/tabs/json.php:11
+msgid "Export"
+msgstr ""
+
+#: app/html/menus/ix/tabs/json.php:20 app/html/menus/ix/tabs/json.php:34
+#: app/html/menus/ix/tabs/json.php:121 app/html/menus/ix/tabs/json.php:137
+msgid "Import"
+msgstr ""
+
+#: app/html/menus/ix/tabs/json.php:40
+msgid "You should upload only JSON file exported from Listdom!"
+msgstr ""
+
+#: app/html/menus/ix/tabs/json.php:109
+msgid "Please wait ..."
+msgstr ""
+
+#: app/html/menus/ix/tabs/json.php:140
+msgid ""
+"An error occurred! Most probably maximum execution time reached so try "
+"increasing the maximum execution time of your server."
+msgstr ""
+
+#: app/html/menus/ix/tpl.php:8 app/includes/menus.php:65
+msgid "Import / Export"
+msgstr ""
+
+#: app/html/menus/ix/tpl.php:10
+msgid "Easily import and export listings in your preferred format!"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:8
+#: app/html/menus/settings/tabs/details-page.php:89
+#: app/html/menus/settings/tabs/general.php:17
+#: app/includes/api/resources/fields.php:34
+msgid "General"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:9
+#: app/html/menus/settings/tabs/archive-pages.php:10
+msgid "Archive Pages"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:10
+#: app/html/menus/settings/tabs/slugs.php:10
+msgid "Slugs"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:11
+msgid "Social"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:12
+#: app/html/menus/settings/tabs/styles.php:8
+msgid "Custom Styles"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:13
+msgid "Details Page"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:14 app/html/menus/settings/tabs/api.php:10
+msgid "API"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:17 app/includes/menus.php:66
+msgid "Addons"
+msgstr ""
+
+#: app/html/menus/settings/tabs/addons.php:15
+#: app/html/menus/settings/tabs/addons.php:51
+#: app/html/menus/settings/tabs/addons.php:57
+#: app/html/menus/settings/tabs/api.php:41
+#: app/html/menus/settings/tabs/api.php:144
+#: app/html/menus/settings/tabs/api.php:149
+#: app/html/menus/settings/tabs/archive-pages.php:102
+#: app/html/menus/settings/tabs/archive-pages.php:138
+#: app/html/menus/settings/tabs/archive-pages.php:144
+#: app/html/menus/settings/tabs/details-page.php:270
+#: app/html/menus/settings/tabs/details-page.php:306
+#: app/html/menus/settings/tabs/details-page.php:312
+#: app/html/menus/settings/tabs/general.php:733
+#: app/html/menus/settings/tabs/general.php:769
+#: app/html/menus/settings/tabs/general.php:775
+#: app/html/menus/settings/tabs/slugs.php:101
+#: app/html/menus/settings/tabs/slugs.php:137
+#: app/html/menus/settings/tabs/slugs.php:143
+#: app/html/menus/settings/tabs/social-networks.php:70
+#: app/html/menus/settings/tabs/social-networks.php:107
+#: app/html/menus/settings/tabs/social-networks.php:113
+#: app/html/menus/settings/tabs/styles.php:25
+#: app/html/menus/settings/tabs/styles.php:62
+#: app/html/menus/settings/tabs/styles.php:68 templates/dashboard/form.php:117
+msgid "Save"
+msgstr ""
+
+#: app/html/menus/settings/tabs/addons.php:20
+#: app/html/menus/settings/tabs/archive-pages.php:107
+#: app/html/menus/settings/tabs/details-page.php:275
+#: app/html/menus/settings/tabs/general.php:738
+#: app/html/menus/settings/tabs/slugs.php:106
+#: app/html/menus/settings/tabs/social-networks.php:76
+#: app/html/menus/settings/tabs/styles.php:31
+msgid "Options saved successfully."
+msgstr ""
+
+#: app/html/menus/settings/tabs/addons.php:21
+#: app/html/menus/settings/tabs/archive-pages.php:108
+#: app/html/menus/settings/tabs/details-page.php:276
+#: app/html/menus/settings/tabs/general.php:739
+#: app/html/menus/settings/tabs/slugs.php:107
+#: app/html/menus/settings/tabs/social-networks.php:77
+#: app/html/menus/settings/tabs/styles.php:32
+msgid "Error: Unable to save options."
+msgstr ""
+
+#: app/html/menus/settings/tabs/api.php:14
+msgid "API Tokens"
+msgstr ""
+
+#: app/html/menus/settings/tabs/api.php:16
+msgid ""
+"Do not remove a token if an application is using it because it will destroy "
+"the functionality of that application. Insert a descriptive name for any "
+"token."
+msgstr ""
+
+#: app/html/menus/settings/tabs/api.php:17
+#: app/html/menus/settings/tabs/api.php:68
+#: app/html/menus/settings/tabs/api.php:75
+msgid "Add Token"
+msgstr ""
+
+#: app/html/menus/settings/tabs/api.php:25
+msgid "Token Name"
+msgstr ""
+
+#: app/html/menus/settings/tabs/api.php:28
+msgid "Token Key"
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:13
+#: app/html/menus/settings/tabs/slugs.php:27
+#: app/includes/api/controllers/taxonomies.php:33
+#: app/includes/ptypes/listing.php:154 app/includes/taxonomies/location.php:43
+msgid "Location"
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:22
+#: app/html/menus/settings/tabs/archive-pages.php:39
+#: app/html/menus/settings/tabs/archive-pages.php:56
+#: app/html/menus/settings/tabs/archive-pages.php:73
+#: app/html/menus/settings/tabs/archive-pages.php:90
+msgid "Current Theme Style"
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:25
+#, no-php-format
+msgid ""
+"If your site theme doesn't support the Listdom location template, then "
+"Listdom uses its own template file which might not be 100% compatible with "
+"your theme."
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:30
+#: app/html/menus/settings/tabs/slugs.php:41
+#: app/includes/api/controllers/taxonomies.php:28
+#: app/includes/api/resources/fields.php:53
+#: app/includes/api/resources/fields.php:59 app/includes/dashboard.php:71
+#: app/includes/ix/array.php:94 app/includes/ptypes/listing.php:130
+#: app/includes/ptypes/listing/single.php:549
+#: app/includes/taxonomies/category.php:44
+#: app/includes/taxonomies/category.php:82 templates/dashboard/form.php:128
+msgid "Category"
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:42
+#, no-php-format
+msgid ""
+"If your site theme doesn't support the Listdom category template, then "
+"Listdom uses its own template file which might not be 100% compatible with "
+"your theme."
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:47
+#: app/html/menus/settings/tabs/slugs.php:55
+#: app/includes/api/controllers/taxonomies.php:38
+#: app/includes/taxonomies/tag.php:34
+msgid "Tag"
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:59
+#, no-php-format
+msgid ""
+"If your site theme doesn't support the Listdom tag template, then Listdom "
+"uses its own template file which might not be 100% compatible with your "
+"theme."
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:64
+#: app/html/menus/settings/tabs/slugs.php:69
+#: app/includes/api/controllers/taxonomies.php:43
+#: app/includes/taxonomies/feature.php:43
+msgid "Feature"
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:76
+#, no-php-format
+msgid ""
+"If your site theme doesn't support the Listdom feature template, then "
+"Listdom uses its own template file which might not be 100% compatible with "
+"your theme."
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:81
+#: app/html/menus/settings/tabs/slugs.php:83
+#: app/includes/api/controllers/taxonomies.php:48
+#: app/includes/taxonomies/label.php:39
+msgid "Label"
+msgstr ""
+
+#: app/html/menus/settings/tabs/archive-pages.php:93
+#, no-php-format
+msgid ""
+"If your site theme doesn't support the Listdom label template, then Listdom "
+"uses its own template file which might not be 100% compatible with your "
+"theme."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:11
+msgid "Default Layout"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:39
+msgid "Header 1"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:44
+msgid "Header 2"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:49
+msgid "Header 3"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:54
+msgid "Column 1"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:59
+msgid "Column 2"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:64
+msgid "Column 3"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:69
+msgid "Footer 1"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:74
+msgid "Footer 2"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:79
+msgid "Footer 3"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:92
+#: app/html/metaboxes/search/form.php:14
+#: app/html/metaboxes/shortcode/display-options/carousel.php:20
+#: app/html/metaboxes/shortcode/display-options/cover.php:19
+#: app/html/metaboxes/shortcode/display-options/grid.php:19
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:19
+#: app/html/metaboxes/shortcode/display-options/list.php:19
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:19
+#: app/html/metaboxes/shortcode/display-options/masonry.php:19
+#: app/html/metaboxes/shortcode/display-options/side.php:26
+#: app/html/metaboxes/shortcode/display-options/slider.php:19
+#: app/html/metaboxes/shortcode/display-options/table.php:19
+#: app/includes/element/gallery.php:98 app/includes/element/map.php:108
+#: app/includes/widgets/alllistings.php:97
+#: app/includes/widgets/simplemap.php:83
+msgid "Style"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:105
+msgid ""
+"You can rearrange and configure the page elements using the elements panel "
+"on the right side."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:112
+msgid ""
+"You can enable or disable elements and adjust their configuration using the "
+"panel on the right. The order of elements won’t be affected; they will "
+"appear in their designated positions if enabled."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:119
+msgid ""
+"You can adjust the configuration of elements using the panel on the right. "
+"Additionally, you can modify the position and order of elements using the "
+"design builder on the right side."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:125
+msgid "Theme Layout"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:138
+#, php-format
+msgid ""
+"If the website theme supports multiple layouts for %s, you can select your "
+"desired layout for listing details page. If you're not sure about this "
+"option, just select the Default Layout. Also, don't select an archive layout "
+"if your theme has added this option."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:138
+msgid "single pages"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:145
+#: app/html/menus/settings/tabs/details-page.php:149
+msgid "Display Options Per Listing"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:156
+#: app/html/menus/settings/tabs/general.php:452
+#: app/html/menus/settings/tabs/general.php:545
+#: app/html/metaboxes/shortcode/display-options/grid.php:212
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:242
+#: app/html/metaboxes/shortcode/display-options/list.php:198
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:231
+#: app/html/metaboxes/shortcode/display-options/side.php:85
+#: app/html/metaboxes/shortcode/display-options/table.php:59
+#: app/html/metaboxes/shortcode/map-controls.php:23
+#: app/html/metaboxes/shortcode/map-controls.php:33
+#: app/html/metaboxes/shortcode/map-controls.php:43
+#: app/html/metaboxes/shortcode/map-controls.php:55
+#: app/html/metaboxes/shortcode/map-controls.php:65
+#: app/html/metaboxes/shortcode/map-controls.php:81
+#: app/html/metaboxes/shortcode/map-controls.php:89 app/includes/base.php:1804
+#: app/includes/element/gallery.php:93 app/includes/element/map.php:65
+#: app/includes/element/map.php:120 app/includes/element/map.php:158
+#: app/includes/element/map.php:167 app/includes/form.php:347
+#: app/includes/widgets/alllistings.php:110
+msgid "Disabled"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:157
+msgid "Admin Only"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:158
+msgid "Admin & Listing Owner"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:164
+msgid ""
+"Select who has access to disable or enable the Elements for each listing and "
+"can select a certain Style for that."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:171 app/includes/base.php:191
+#: app/includes/options.php:261
+msgid "Comments"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:183
+#: app/html/menus/settings/tabs/general.php:364
+msgid "Configuration"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:184
+#: app/html/menus/settings/tabs/details-page.php:201
+#: app/includes/styles.php:133
+msgid "Design Builder"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:187
+msgid "Elements"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:204
+msgid "Box Method"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:208
+msgid "Whole Box"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:209
+msgid "Row Box"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:210
+msgid "Section Box"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:211
+msgid "Element Box"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:212
+msgid "No Box"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:218
+msgid "Title Alignment"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:222
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:156
+msgid "Left"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:223
+msgid "Center"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:224
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:157
+msgid "Right"
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:230
+msgid ""
+"You don't need to use all the sections. Use the sections that fit the design "
+"you want to create. To disable a section, simply leave all elements "
+"unchecked."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:231
+msgid "Please ensure that the total width of each row equals 4/4."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:232
+msgid ""
+"Elements will not appear on the frontend if they are disabled in the "
+"configuration tab or listing options."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:233
+msgid "The Map element can only be enabled once."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:234
+msgid ""
+"You can rearrange the order of elements in each section by simply dragging "
+"and dropping them."
+msgstr ""
+
+#: app/html/menus/settings/tabs/details-page.php:242
+msgid "Section Width"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:27
+msgid "Date Picker Format"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:35
+msgid "(Y-m-d)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:36
+msgid "(d-m-Y)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:37
+msgid "(Y/m/d)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:38
+msgid "(d/m/Y)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:39
+msgid "(Y.m.d)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:40
+msgid "(d.m.Y)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:48
+msgid "Time Picker Format"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:56
+msgid "24 Hours"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:57
+msgid "12 Hours (AM / PM)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:65
+#: app/html/metaboxes/listing/details.php:203 app/includes/dashboard.php:68
+msgid "Listing Custom Link"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:74
+msgid "You can disable the listing custom link field."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:79
+msgid "Currency Position"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:88
+msgid "Before ($100)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:89
+msgid "Before With Space ($ 100)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:90
+msgid "After (100$)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:91
+msgid "After With Space (100 $)"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:98
+msgid "Default Currency"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:107
+msgid "Select the default currency used in the listings."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:112
+msgid "No Listing Message"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:120 app/includes/skins.php:676
+msgid "No Listing Found!"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:123
+msgid ""
+"It will be displayed instead of the search results when nothing is found. "
+"You can insert a text, HTML, or shortcodes."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:130
+msgid "Map Module"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:140
+msgid "OpenStreetMap & Mapbox"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:143 app/includes/element/map.php:26
+msgid "Map"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:146
+msgid "Default Map Provider"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:155
+msgid "You can change the map provider in each shortcodes too."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:161
+msgid "Google Maps API key"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:170
+msgid ""
+"Google API Key is mandatory. Otherwise the Google Maps doesn't work. You can "
+"get an API key from the Google."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:179
+msgid "Mapbox Access Token"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:188
+#, php-format
+msgid ""
+"If you want to use mapbox tiles you can get one from %s website otherwise "
+"the OSM tiles will be loaded in the maps."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:196
+msgid "Default Zoom Level"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:208
+#: app/html/menus/settings/tabs/general.php:241
+msgid "It's for Google Maps in Add/Edit Map Objects menu."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:213
+msgid "GPS Zoom Level"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:217
+#, php-format
+msgid ""
+"Change map zoom level to %s after detecting the geo point by GPS if current "
+"zoom level was less or equal to %s"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:233
+msgid "Default Latitude"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:247
+msgid "Default Longitude"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:255
+msgid "It's for Google Maps in Add/Edit Listing menu."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:261
+msgid "Shape Display Options"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:268
+msgid "Fill Color"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:280
+msgid "Fill Opacity"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:292
+msgid "Border Color"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:304
+msgid "Border Opacity"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:316
+msgid "Border Weight"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:330
+msgid "Geo-point"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:334
+msgid "Google Geo-coding API key"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:343
+msgid ""
+"If you don't provide the latitude and longitude when editing a listing, "
+"Listdom will automatically attempt to convert the address into a geo-point "
+"using OSM and Google Geocoding APIs. To ensure this functionality works "
+"smoothly, avoid restricting your API key by domain, as it is used in the "
+"backend of your website. Instead, consider using IP restrictions for better "
+"security."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:351
+#: app/html/menus/settings/tabs/general.php:361
+msgid "Frontend Submission"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:367
+msgid "Page"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:377
+#, php-format
+msgid "Put %s shortcode into the page."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:382
+#: app/html/metaboxes/shortcode/display-options/masonry.php:43
+#: app/html/metaboxes/shortcode/filter-options.php:48
+#: app/includes/api/controllers/taxonomies.php:34
+#: app/includes/api/resources/fields.php:72
+#: app/includes/api/resources/fields.php:78 app/includes/dashboard.php:40
+#: app/includes/dashboard.php:73 app/includes/element/locations.php:26
+#: app/includes/ix/array.php:95 app/includes/ptypes/listing/single.php:470
+#: app/includes/search/builder.php:65 app/includes/taxonomies/location.php:40
+#: app/includes/taxonomies/location.php:42
+#: app/includes/widgets/taxonomycloud.php:54 app/includes/widgets/terms.php:54
+#: templates/dashboard/form.php:151
+msgid "Locations"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:383
+#: app/html/metaboxes/shortcode/display-options/masonry.php:44
+#: app/html/metaboxes/shortcode/filter-options.php:93
+#: app/includes/api/controllers/taxonomies.php:44
+#: app/includes/api/resources/fields.php:113
+#: app/includes/api/resources/fields.php:119 app/includes/dashboard.php:42
+#: app/includes/dashboard.php:74 app/includes/element/features.php:29
+#: app/includes/ix/array.php:97 app/includes/ptypes/listing/single.php:599
+#: app/includes/search/builder.php:81 app/includes/taxonomies/feature.php:40
+#: app/includes/taxonomies/feature.php:42
+#: app/includes/widgets/taxonomycloud.php:55 app/includes/widgets/terms.php:55
+#: templates/dashboard/form.php:182
+msgid "Features"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:394
+#: app/includes/search/builder.php:152 app/includes/search/builder.php:177
+msgid "Checkboxes"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:395
+#: app/includes/search/builder.php:150 app/includes/search/builder.php:167
+#: app/includes/search/builder.php:174 app/includes/search/builder.php:188
+msgid "Dropdown"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:406
+msgid "Gallery Method"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:413
+msgid "WordPress Media"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:414
+msgid "Simple Uploader"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:422
+msgid "Guest Submission"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:425
+#: app/html/menus/settings/tabs/general.php:654
+msgid "Status"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:435
+msgid "Enable listing submission for guest users!"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:441
+msgid "User Registration"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:450
+msgid "Once Approved"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:451
+msgid "Once Submitted"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:459
+msgid "Required Fields"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:476
+msgid "Restrictions"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:479
+msgid "Maximum Gallery Images"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:492
+msgid "Leave it empty for unlimited number of images"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:497
+msgid "Maximum Description Length"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:510
+msgid "Leave it empty for unlimited length"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:515
+msgid "Maximum Number of Tags"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:528
+msgid "Leave it empty for unlimited number of tags"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:532
+msgid "Modules"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:541
+#: app/html/metaboxes/shortcode/map-controls.php:82
+#: app/html/metaboxes/shortcode/map-controls.php:90
+#: app/includes/element/gallery.php:92 app/includes/element/map.php:120
+#: app/includes/element/map.php:158 app/includes/element/map.php:167
+#: app/includes/widgets/alllistings.php:109
+msgid "Enabled"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:543
+msgid "Editor + Admin"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:554
+#: app/includes/ptypes/shortcode.php:148
+msgid "Display Options"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:564
+msgid "Main Color"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:573
+msgid ""
+"Choose from one of predefined colors in order to match it with your theme "
+"and acheive your desired look."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:575
+#: app/html/menus/settings/tabs/general.php:600
+msgid "Or"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:577
+#: app/html/menus/settings/tabs/general.php:602
+msgid "Manually select your desired color."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:589
+msgid "Secondary Color"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:598
+msgid "Choose secondary color from one of predefined colors."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:614
+msgid "Main Font"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:623
+msgid "Use your theme / desired font if you don't like the default font."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:628
+msgid "Font Awesome Status"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:637
+msgid ""
+"Disable Listdom icon file (Font-awesome) if it's loaded by another third "
+"party!"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:644
+msgid "Google recaptcha"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:664
+msgid "Protect Listdom forms against spammer robots using Google reCAPTCHA V2."
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:670
+msgid "Site Key"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:683
+msgid "Secret Key"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:699
+msgid "Integrations"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:709
+msgid "Block Editor"
+msgstr ""
+
+#: app/html/menus/settings/tabs/general.php:718
+msgid "Enable block editor for listings"
+msgstr ""
+
+#: app/html/menus/settings/tabs/slugs.php:22
+#, php-format
+msgid ""
+"This option changes the listing page URL. For example if you set it to "
+"Markers, then the address of the listings will be %s."
+msgstr ""
+
+#: app/html/menus/settings/tabs/slugs.php:36
+msgid "It's for changing the location archive prefix."
+msgstr ""
+
+#: app/html/menus/settings/tabs/slugs.php:50
+msgid "It's for changing the category archive prefix."
+msgstr ""
+
+#: app/html/menus/settings/tabs/slugs.php:64
+msgid "It's for changing the tag archive prefix."
+msgstr ""
+
+#: app/html/menus/settings/tabs/slugs.php:78
+msgid "It's for changing the feature archive prefix."
+msgstr ""
+
+#: app/html/menus/settings/tabs/slugs.php:92
+msgid "It's for changing the label archive prefix."
+msgstr ""
+
+#: app/html/menus/settings/tabs/social-networks.php:12
+msgid "Social Networks"
+msgstr ""
+
+#: app/html/menus/settings/tabs/social-networks.php:16
+msgid "Profile"
+msgstr ""
+
+#: app/html/menus/settings/tabs/social-networks.php:17
+msgid "Archive"
+msgstr ""
+
+#: app/html/menus/settings/tabs/social-networks.php:18
+#: app/includes/ptypes/listing.php:155 templates/dashboard/form.php:60
+msgid "Details"
+msgstr ""
+
+#: app/html/menus/settings/tabs/social-networks.php:19
+#: templates/skins/table/tpl.php:55
+msgid "Contact"
+msgstr ""
+
+#: app/html/menus/settings/tpl.php:8 app/includes/menus.php:64
+msgid "Settings"
+msgstr ""
+
+#: app/html/menus/settings/tpl.php:10
+#, php-format
+msgid "Easily configure the %s to change its functionality and look."
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:9
+msgid "Additional Information"
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:12
+msgid "Job Title"
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:15
+msgid "It shows below your name on your profile information."
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:22
+#: app/html/metaboxes/listing/details.php:174
+#: app/html/metaboxes/listing/details.php:177
+#: app/includes/api/resources/fields.php:283
+#: app/includes/api/resources/fields.php:284 app/includes/dashboard.php:65
+#: app/includes/ix/array.php:88 templates/elements/owner.php:75
+msgid "Phone"
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:28 app/includes/element/owner.php:116
+#: templates/elements/owner.php:89
+msgid "Mobile"
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:31
+msgid "Please insert your mobile number."
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:35
+#: app/html/metaboxes/listing/details.php:182 app/includes/dashboard.php:66
+#: app/includes/element/owner.php:125 app/includes/ix/array.php:89
+#: templates/elements/owner.php:96
+msgid "Website"
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:37
+#: app/html/metaboxes/listing/details.php:185
+msgid "https://yourwebsite.com"
+msgstr ""
+
+#: app/html/metaboxes/author/form.php:41 app/includes/element/owner.php:134
+#: templates/elements/owner.php:103
+msgid "Fax"
+msgstr ""
+
+#: app/html/metaboxes/listing/address.php:39 app/includes/dashboard.php:58
+#: app/includes/element/address.php:26 app/includes/ix/array.php:83
+#: app/includes/ptypes/listing.php:129
+#: app/includes/ptypes/listing/single.php:455
+#: app/includes/search/builder.php:137 app/includes/widgets/simplemap.php:64
+#: templates/maps/upsert.php:36 templates/skins/table/tpl.php:46
+msgid "Address"
+msgstr ""
+
+#: app/html/metaboxes/listing/address.php:41 app/includes/ix/mapping.php:91
+#: templates/maps/upsert.php:38
+msgid "Listing Address"
+msgstr ""
+
+#: app/html/metaboxes/listing/address.php:46 templates/maps/upsert.php:43
+msgid "Map Center Latitude"
+msgstr ""
+
+#: app/html/metaboxes/listing/address.php:49 templates/maps/upsert.php:48
+msgid "Map Center Longitude"
+msgstr ""
+
+#: app/html/metaboxes/listing/address.php:59
+#, php-format
+msgid "You should insert Google Maps API key in %s menu first!"
+msgstr ""
+
+#: app/html/metaboxes/listing/address.php:59
+msgid "settings"
+msgstr ""
+
+#: app/html/metaboxes/listing/address.php:63 templates/maps/upsert.php:59
+msgid "Marker"
+msgstr ""
+
+#: app/html/metaboxes/listing/address.php:64 templates/maps/upsert.php:60
+msgid "Shape"
+msgstr ""
+
+#: app/html/metaboxes/listing/attributes.php:15
+msgid "No attribute are available."
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:51
+msgid "Submitter Request"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:57
+#: app/html/metaboxes/shortcode/sort-options.php:65
+#: app/includes/widgets/taxonomycloud.php:90
+msgid "Name"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:63
+#: app/html/metaboxes/listing/details.php:166
+#: app/html/metaboxes/listing/details.php:169
+#: app/includes/api/resources/fields.php:276
+#: app/includes/api/resources/fields.php:277
+#: app/includes/api/resources/fields.php:419 app/includes/dashboard.php:64
+#: app/includes/element/owner.php:107 app/includes/ix/array.php:87
+#: templates/dashboard/form.php:82 templates/elements/owner.php:82
+msgid "Email"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:67
+#: app/includes/api/resources/fields.php:426 templates/dashboard/form.php:100
+msgid "Message"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:78
+#: app/includes/api/resources/fields.php:201 app/includes/dashboard.php:34
+msgid "Price Options"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:82
+#: app/includes/api/resources/fields.php:207 app/includes/ix/array.php:82
+#: app/includes/ix/mapping.php:84
+msgid "Currency"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:94
+#: app/html/metaboxes/listing/details.php:97
+#: app/includes/api/resources/fields.php:214 app/includes/base.php:211
+#: app/includes/dashboard.php:60 app/includes/element/price.php:26
+#: app/includes/ix/array.php:79 app/includes/ix/mapping.php:63
+#: app/includes/ptypes/listing/single.php:724
+#: app/includes/search/builder.php:121 templates/skins/table/tpl.php:49
+msgid "Price"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:102
+#: app/html/metaboxes/listing/details.php:105
+#: app/includes/api/resources/fields.php:220 app/includes/dashboard.php:61
+msgid "Price (Max)"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:110
+#: app/includes/api/resources/fields.php:226 app/includes/dashboard.php:62
+#: app/includes/ix/array.php:81
+msgid "Price Description"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:113
+msgid "Per night, Per cup, ..."
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:118 app/includes/dashboard.php:63
+#: app/includes/search/builder.php:129
+msgid "Price Class"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:122
+msgid "$ (Cheap)"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:123
+msgid "$$ (Normal)"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:124
+msgid "$$$ (High)"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:125
+msgid "$$$$ (Ultra High)"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:136
+#: app/includes/api/resources/fields.php:259 app/includes/dashboard.php:35
+msgid "Work Hours"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:144
+#: app/includes/api/resources/fields.php:244
+msgid "9 - 18, 9 AM to 9 PM"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:150
+#: app/includes/api/resources/availability.php:37
+#: app/includes/api/resources/fields.php:251
+#: templates/elements/availability.php:34
+#: templates/elements/availability.php:49
+msgid "Off"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:162
+#: app/includes/api/resources/fields.php:270 app/includes/dashboard.php:36
+msgid "Contact Details"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:190 app/includes/dashboard.php:67
+#: app/includes/ix/array.php:90
+msgid "Contact Address"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:193
+msgid "Unit X, City, Zipcode State"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:206
+msgid "https://anothersite.com/listing-page/"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:210
+msgid ""
+"If you fill it, then it will be used to override the default listing details "
+"page link. You can use it for linking the listing to a custom internal or "
+"external address."
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:223
+#: app/includes/api/resources/fields.php:304 app/includes/dashboard.php:37
+#: app/includes/dashboard.php:59 app/includes/ix/array.php:91
+msgid "Remark"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:227
+#: app/includes/api/resources/fields.php:310
+#: app/includes/ptypes/listing/single.php:583
+msgid "Owner Message"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:236
+msgid ""
+"It will show to the visitors in a different style so you can use it as "
+"remark or an ad remark!"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:246
+#: app/includes/api/resources/fields.php:323
+#: app/includes/api/resources/fields.php:329 app/includes/dashboard.php:38
+#: app/includes/dashboard.php:69 app/includes/ix/array.php:93
+msgid "Gallery"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:248
+msgid "Add Images"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:249
+msgid "Remove All Images"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:279 app/includes/dashboard.php:70
+#: app/includes/element/embed.php:26
+msgid "Embed"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:281 templates/dashboard/manage.php:48
+msgid "Add"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:282
+msgid "Remove All Embed Codes"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:293
+#: app/html/metaboxes/listing/details.php:317
+#: app/html/metaboxes/search/params.php:47
+#: app/includes/api/resources/fields.php:40
+#: app/includes/api/resources/fields.php:348
+#: app/includes/api/resources/fields.php:349 app/includes/ix/array.php:75
+#: app/includes/ptypes/listing/single.php:771
+#: app/includes/widgets/alllistings.php:79 app/includes/widgets/search.php:57
+#: app/includes/widgets/shortcode.php:68 app/includes/widgets/simplemap.php:59
+#: app/includes/widgets/taxonomycloud.php:60 app/includes/widgets/terms.php:60
+#: templates/dashboard/form.php:43 templates/skins/table/tpl.php:43
+msgid "Title"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:294
+#: app/html/metaboxes/listing/details.php:318
+#: app/includes/api/resources/fields.php:355
+#: app/includes/api/resources/fields.php:356
+msgid "Code"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:299
+msgid "Remove From Featured"
+msgstr ""
+
+#: app/html/metaboxes/listing/details.php:301
+#: app/html/metaboxes/listing/details.php:322
+msgid "Add as Featured Video"
+msgstr ""
+
+#: app/html/metaboxes/notification/content.php:15
+#: app/includes/ptypes/notification.php:89
+msgid "Hook"
+msgstr ""
+
+#: app/html/metaboxes/notification/content.php:38
+msgid "Notification title will be used as email subject."
+msgstr ""
+
+#: app/html/metaboxes/notification/content.php:39
+msgid ""
+"Please assign your notification to the correct hook otherwise it won't work "
+"as expected!"
+msgstr ""
+
+#: app/html/metaboxes/notification/content.php:40
+#, php-format
+msgid ""
+"You can use %s of right side to insert dynamic data into the notification "
+"content and subject."
+msgstr ""
+
+#: app/html/metaboxes/notification/content.php:40
+msgid "#placeholders#"
+msgstr ""
+
+#: app/html/metaboxes/notification/content.php:41
+msgid "You can add custom recipients to the email using CC and BCC options."
+msgstr ""
+
+#: app/html/metaboxes/notification/content.php:42
+msgid "Shortcodes and HTML codes are allowed in the content."
+msgstr ""
+
+#: app/html/metaboxes/notification/content.php:43
+msgid "If you want to disable a notification, you can simply unpublish it."
+msgstr ""
+
+#: app/html/metaboxes/notification/recipients.php:28
+msgid "Original Recipient"
+msgstr ""
+
+#: app/html/metaboxes/notification/recipients.php:38
+#: app/html/metaboxes/notification/recipients.php:53
+#: app/html/metaboxes/notification/recipients.php:67
+msgid "Comma separated emails ..."
+msgstr ""
+
+#: app/html/metaboxes/notification/recipients.php:48
+msgid "CC Recipients"
+msgstr ""
+
+#: app/html/metaboxes/notification/recipients.php:62
+msgid "BCC Recipients"
+msgstr ""
+
+#: app/html/metaboxes/search/fields.php:35
+msgid ""
+"You can create as many rows as you like and put any number of the fields in "
+"each row."
+msgstr ""
+
+#: app/html/metaboxes/search/fields.php:36
+msgid "Drag the fields from \"Available Fields\" section into rows."
+msgstr ""
+
+#: app/html/metaboxes/search/fields.php:37
+#, php-format
+msgid ""
+"To put some fields in %s section you can put a \"More Options\" row above "
+"them."
+msgstr ""
+
+#: app/html/metaboxes/search/fields.php:37
+#: app/html/metaboxes/search/fields.php:46
+#: app/includes/shortcodes/search.php:125
+msgid "More Options"
+msgstr ""
+
+#: app/html/metaboxes/search/fields.php:45
+msgid "Add row"
+msgstr ""
+
+#: app/html/metaboxes/search/fields.php:71
+msgid "Available Fields"
+msgstr ""
+
+#: app/html/metaboxes/search/form.php:22 app/includes/base.php:1768
+msgid "Default"
+msgstr ""
+
+#: app/html/metaboxes/search/form.php:23
+msgid "Sidebar"
+msgstr ""
+
+#: app/html/metaboxes/search/form.php:32 app/html/metaboxes/search/form.php:59
+msgid "Results Page"
+msgstr ""
+
+#: app/html/metaboxes/search/form.php:42
+msgid ""
+"Select the page that you want to see the search and filter results there. "
+"The page should include a Listdom skin shortcode."
+msgstr ""
+
+#: app/html/metaboxes/search/form.php:48 app/html/metaboxes/search/form.php:59
+msgid "Target Shortcode"
+msgstr ""
+
+#: app/html/metaboxes/search/form.php:59
+msgid ""
+"If there are multiple shortcodes/widgets in your selected page, then you "
+"should specify the Target Shortcode too. Otherwise all of the shortcodes/"
+"widgets will be filtered! Note: Another way to connect this form to a skin "
+"shortcode is to choose this form on the desired shortcode setting."
+msgstr ""
+
+#: app/html/metaboxes/search/form.php:65
+msgid "Display Criteria"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:48
+msgid "Field Title"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:51
+msgid "Method"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:52
+msgid "Display Method"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:61
+msgid "Hide Empty Terms"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:62
+msgid "Only display those terms that have listings"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:63
+#: app/html/metaboxes/search/params.php:106
+#: app/html/metaboxes/search/params.php:122 app/includes/element.php:61
+#: app/includes/element/attributes.php:89
+#: app/includes/element/attributes.php:97 app/includes/element/features.php:97
+#: app/includes/element/features.php:105 app/includes/element/gallery.php:81
+#: app/includes/element/map.php:91 app/includes/element/owner.php:82
+#: app/includes/element/owner.php:91 app/includes/element/owner.php:102
+#: app/includes/element/owner.php:111 app/includes/element/owner.php:120
+#: app/includes/element/owner.php:129 app/includes/element/owner.php:138
+#: app/includes/widgets/taxonomycloud.php:75
+#: app/includes/widgets/taxonomycloud.php:82 app/includes/widgets/terms.php:75
+#: app/includes/widgets/terms.php:83 app/includes/widgets/terms.php:91
+msgid "Yes"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:64
+#: app/html/metaboxes/search/params.php:107
+#: app/html/metaboxes/search/params.php:123 app/includes/element.php:62
+#: app/includes/element/attributes.php:90
+#: app/includes/element/attributes.php:96 app/includes/element/features.php:98
+#: app/includes/element/features.php:104 app/includes/element/gallery.php:82
+#: app/includes/element/map.php:92 app/includes/element/owner.php:83
+#: app/includes/element/owner.php:91 app/includes/element/owner.php:102
+#: app/includes/element/owner.php:111 app/includes/element/owner.php:120
+#: app/includes/element/owner.php:129 app/includes/element/owner.php:138
+#: app/includes/widgets/taxonomycloud.php:74
+#: app/includes/widgets/taxonomycloud.php:83 app/includes/widgets/terms.php:74
+#: app/includes/widgets/terms.php:82 app/includes/widgets/terms.php:90
+msgid "No"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:70
+msgid "Placeholder"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:71
+msgid "Optional Placeholder"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:74
+msgid "Max Placeholder"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:75
+msgid "Optional Max Placeholder"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:79
+msgid "Default Value"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:80
+#: app/html/metaboxes/search/params.php:84
+msgid "Optional"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:83
+msgid "Max Default Value"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:88
+msgid "Radius (Meters)"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:89
+msgid "5000 means 5 KM"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:92
+msgid "Radius Values (Meters)"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:93
+msgid "100,200,500,1000,2000"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:96
+msgid "Radius Display Unit"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:98
+#: app/includes/shortcodes/search.php:650
+#: app/includes/shortcodes/search.php:676
+msgid "Meters"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:99
+msgid "Kilo Meters (KM)"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:100
+#: app/includes/shortcodes/search.php:692
+msgid "Miles"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:104
+msgid "Display Radius Field"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:112
+msgid "Min / Max / Increment"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:114
+msgid "Min"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:115
+msgid "Max"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:116
+msgid "Increment"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:120
+msgid "Thousands Separator"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:130
+msgid "Terms Method"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:131
+msgid "You can display certain rms if you like."
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:132
+msgid "Display All Terms"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:133
+msgid "Display Selected Terms"
+msgstr ""
+
+#: app/html/metaboxes/search/params.php:137
+msgid "Terms"
+msgstr ""
+
+#: app/html/metaboxes/search/row.php:14
+msgid "Search Buttons"
+msgstr ""
+
+#: app/html/metaboxes/search/shortcode.php:9
+msgid ""
+"To use this search and filter form, either insert this shortcode into any "
+"page, widget or select this form from the desired skin shortcode setting."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/default-sort.php:20
+msgid "Order By"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/default-sort.php:28
+msgid "Order"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/default-sort.php:30
+#: app/html/metaboxes/shortcode/sort-options.php:67
+msgid "Descending"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/default-sort.php:31
+#: app/html/metaboxes/shortcode/sort-options.php:68
+msgid "Ascending"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options.php:17
+#: app/includes/ptypes/shortcode.php:122
+msgid "Skin"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options.php:27
+msgid ""
+"Select the skin of the shortcode. Listing cards will be displyed in this "
+"skin."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options.php:31
+msgid ""
+"Because you're using a custom style, certain display options in the "
+"shortcode will be turned off. You can adjust them in the custom layout "
+"settings."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:15
+#, php-format
+msgid ""
+"Using the %s skin, you can show a carousel of the directories and listings "
+"in different styles."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:15
+#: app/includes/skins.php:609
+msgid "Carousel"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:35
+#: app/html/metaboxes/shortcode/display-options/grid.php:173
+#: app/html/metaboxes/shortcode/display-options/grid.php:196
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:202
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:226
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:191
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:215
+#: app/html/metaboxes/shortcode/display-options/masonry.php:62
+#: app/html/metaboxes/shortcode/display-options/masonry.php:82
+msgid "Listings Per Row"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:49
+#: app/html/metaboxes/shortcode/display-options/grid.php:187
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:217
+#: app/html/metaboxes/shortcode/display-options/list.php:173
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:206
+#: app/html/metaboxes/shortcode/display-options/masonry.php:53
+#: app/html/metaboxes/shortcode/display-options/side.php:61
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:123
+#: app/html/metaboxes/shortcode/display-options/slider.php:34
+#: app/html/metaboxes/shortcode/display-options/table.php:34
+#: app/includes/widgets/alllistings.php:115
+#: app/includes/widgets/taxonomycloud.php:96
+msgid "Limit"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:64
+#: app/html/metaboxes/shortcode/display-options/carousel.php:81
+#: app/html/metaboxes/shortcode/display-options/cover.php:51
+#: app/html/metaboxes/shortcode/display-options/cover.php:68
+#: app/html/metaboxes/shortcode/display-options/grid.php:222
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:252
+#: app/html/metaboxes/shortcode/display-options/list.php:208
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:241
+#: app/html/metaboxes/shortcode/display-options/masonry.php:98
+#: app/html/metaboxes/shortcode/display-options/slider.php:49
+#: app/html/metaboxes/shortcode/display-options/slider.php:66
+#: app/html/metaboxes/shortcode/display-options/table.php:69
+#: app/html/metaboxes/shortcode/display-options/table.php:86
+#: app/includes/api/resources/fields.php:290 app/includes/ix/mapping.php:112
+msgid "Listing Link"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:74
+#: app/html/metaboxes/shortcode/display-options/cover.php:61
+#: app/html/metaboxes/shortcode/display-options/grid.php:232
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:262
+#: app/html/metaboxes/shortcode/display-options/list.php:218
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:251
+#: app/html/metaboxes/shortcode/display-options/masonry.php:108
+#: app/html/metaboxes/shortcode/display-options/slider.php:59
+#: app/html/metaboxes/shortcode/display-options/table.php:79
+msgid "Link to listing detail page."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:88
+#: app/html/metaboxes/shortcode/display-options/grid.php:279
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:309
+#: app/html/metaboxes/shortcode/display-options/list.php:265
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:298
+#: app/html/metaboxes/shortcode/display-options/masonry.php:155
+msgid "Display Labels"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:97
+#: app/html/metaboxes/shortcode/display-options/grid.php:288
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:318
+#: app/html/metaboxes/shortcode/display-options/list.php:274
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:307
+#: app/html/metaboxes/shortcode/display-options/masonry.php:164
+msgid "Activate to display the listing labels on the image."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:102
+#: app/html/metaboxes/shortcode/display-options/grid.php:293
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:323
+#: app/html/metaboxes/shortcode/display-options/list.php:279
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:312
+#: app/html/metaboxes/shortcode/display-options/masonry.php:169
+msgid "Display Share Buttons"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/carousel.php:111
+#: app/html/metaboxes/shortcode/display-options/grid.php:302
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:332
+#: app/html/metaboxes/shortcode/display-options/list.php:288
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:321
+#: app/html/metaboxes/shortcode/display-options/masonry.php:178
+msgid "Activate to display the share buttons."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/cover.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show only 1 listing in a nice style. You can use "
+"multiple cover shortcodes in one page to show more listings."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/cover.php:14
+#: app/html/metaboxes/shortcode/display-options/grid.php:260
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:290
+#: app/html/metaboxes/shortcode/display-options/list.php:246
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:279
+#: app/html/metaboxes/shortcode/display-options/masonry.php:136
+msgid "Cover"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/cover.php:34
+#: app/includes/ptypes/listing.php:91
+msgid "Listing"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/cover.php:44
+msgid "You can select only the listings that have featured image."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show the directories and listings in a grid "
+"format. Also, you can include a map too."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:14
+msgid "Grid"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:34
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:34
+#: app/html/metaboxes/shortcode/display-options/list.php:34
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:34
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:19
+#: app/includes/element/map.php:96 app/includes/widgets/alllistings.php:84
+#: app/includes/widgets/simplemap.php:70
+msgid "Map Provider"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:53
+#: app/html/metaboxes/shortcode/display-options/list.php:53
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:53
+msgid "Position"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:61
+msgid "Show before the Grid view"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:62
+msgid "Show after the Grid view"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:70
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:51
+#: app/html/metaboxes/shortcode/display-options/list.php:70
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:70
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:36
+msgid "Map Style"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:83
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:64
+#: app/html/metaboxes/shortcode/display-options/list.php:83
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:83
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:49
+#: app/includes/widgets/alllistings.php:107
+msgid "Clustering"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:99
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:80
+#: app/html/metaboxes/shortcode/display-options/list.php:99
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:99
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:65
+msgid "Bubbles"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:115
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:96
+#: app/html/metaboxes/shortcode/display-options/list.php:115
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:115
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:81
+msgid "Marker/Shape On Click"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:123
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:104
+#: app/html/metaboxes/shortcode/display-options/list.php:123
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:123
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:89
+msgid "Open Infowindow"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:124
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:105
+#: app/html/metaboxes/shortcode/display-options/list.php:124
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:124
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:90
+msgid "Redirect to Listing Details Page"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:125
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:106
+#: app/html/metaboxes/shortcode/display-options/list.php:125
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:125
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:91
+msgid "Open Listing Details in a Lightbox"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:126
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:107
+#: app/html/metaboxes/shortcode/display-options/list.php:126
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:126
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:92
+msgid "None"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:130
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:111
+#: app/html/metaboxes/shortcode/display-options/list.php:130
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:130
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:96
+msgid ""
+"You can select to show an infowindow when someone clicks on a marker or "
+"shape on the map or open the listing details page directly. Also it's "
+"possible to show the details on a Lightbox without reloading the page."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:135
+#: app/html/metaboxes/shortcode/display-options/grid.php:147
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:116
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:128
+#: app/html/metaboxes/shortcode/display-options/list.php:135
+#: app/html/metaboxes/shortcode/display-options/list.php:147
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:135
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:147
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:101
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:113
+msgid "Map Search"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:145
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:126
+#: app/html/metaboxes/shortcode/display-options/list.php:145
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:145
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:111
+msgid "Provide ability to filter listings based on current map position."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:153
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:134
+#: app/html/metaboxes/shortcode/display-options/list.php:153
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:153
+msgid "Map Limit"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:162
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:143
+#: app/html/metaboxes/shortcode/display-options/list.php:162
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:162
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:132
+msgid ""
+"This option contrlos the number of the items showed on the map. If you "
+"increase the limit to more than 300, then the page may load pretty slow. We "
+"suggest you to use filter options to filter only the listings that you want "
+"to include in this shortcode."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:196
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:226
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:215
+#: app/html/metaboxes/shortcode/display-options/masonry.php:62
+#, php-format
+msgid ""
+"Number of the Listings per page. It should be a multiple of the %s option. "
+"For example if the %s is set to 3, then you should set the limit to 3, 6, 9, "
+"12, 30, etc."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:201
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:231
+#: app/html/metaboxes/shortcode/display-options/list.php:187
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:220
+#: app/html/metaboxes/shortcode/display-options/side.php:74
+#: app/html/metaboxes/shortcode/display-options/table.php:48
+msgid "Pagination Method"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:210
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:240
+#: app/html/metaboxes/shortcode/display-options/list.php:196
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:229
+#: app/html/metaboxes/shortcode/display-options/side.php:83
+#: app/html/metaboxes/shortcode/display-options/table.php:57
+msgid "Load More Button"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:211
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:241
+#: app/html/metaboxes/shortcode/display-options/list.php:197
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:230
+#: app/html/metaboxes/shortcode/display-options/side.php:84
+#: app/html/metaboxes/shortcode/display-options/table.php:58
+msgid "Infinite Scroll"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:215
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:245
+#: app/html/metaboxes/shortcode/display-options/list.php:201
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:234
+#: app/html/metaboxes/shortcode/display-options/side.php:88
+#: app/html/metaboxes/shortcode/display-options/table.php:62
+msgid "Choose how to load additional listings more than the default limit."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:237
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:267
+#: app/html/metaboxes/shortcode/display-options/list.php:223
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:256
+#: app/html/metaboxes/shortcode/display-options/masonry.php:113
+#: app/html/metaboxes/shortcode/display-options/side.php:95
+#: app/html/metaboxes/shortcode/display-options/side.php:112
+msgid "Display Image"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:247
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:277
+#: app/html/metaboxes/shortcode/display-options/list.php:233
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:266
+#: app/html/metaboxes/shortcode/display-options/masonry.php:123
+#: app/html/metaboxes/shortcode/display-options/side.php:105
+msgid "Display listing image."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:252
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:282
+#: app/html/metaboxes/shortcode/display-options/list.php:238
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:271
+#: app/html/metaboxes/shortcode/display-options/masonry.php:128
+msgid "Image Method"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:261
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:291
+#: app/html/metaboxes/shortcode/display-options/list.php:247
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:280
+#: app/html/metaboxes/shortcode/display-options/masonry.php:137
+#: app/html/metaboxes/shortcode/display-options/slider.php:14
+#: app/includes/element/gallery.php:105 app/includes/skins.php:610
+msgid "Slider"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:265
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:295
+#: app/html/metaboxes/shortcode/display-options/list.php:251
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:284
+#: app/html/metaboxes/shortcode/display-options/masonry.php:141
+msgid "Cover shows only featured image but slider shows all gallery images."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/grid.php:272
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:302
+#: app/html/metaboxes/shortcode/display-options/list.php:258
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:291
+#: app/html/metaboxes/shortcode/display-options/masonry.php:148
+msgid "Listing Link & Display Image"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show a List+Grid view of the listings beside a "
+"map."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:14
+msgid "Half Map"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:148
+msgid "Map Position"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:165
+msgid "Map Height"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:174
+msgid "Map height in pixels. Don't insert any unit like px, etc."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:184
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:173
+msgid "Default View"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:192
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:181
+#: app/includes/skins.php:603
+msgid "Grid View"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:193
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:182
+#: app/html/metaboxes/shortcode/display-options/masonry.php:67
+#: app/includes/skins.php:602
+msgid "List View"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:197
+msgid "Choose the default view of the listing cards."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/halfmap.php:212
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:201
+msgid "Set the count of the listing cards per row for the Grid view."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/list.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show the directories and listings in a list "
+"format. Also, you can include a map too."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/list.php:14
+#: app/includes/element/gallery.php:104
+msgid "List"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/list.php:61
+msgid "Show before the List view"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/list.php:62
+msgid "Show after the List view"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/list.php:182
+msgid "Number of the Listings per page."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show the directories and listings in either grid "
+"or list format with one shortcode. Also, you can include a map too."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:14
+msgid "List+Grid"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:61
+msgid "Show before the List + Grid view"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:62
+msgid "Show after the List + Grid view"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/listgrid.php:186
+msgid "Choose the default view of the shortcode."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/masonry.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show a Grid or List view of the listings with a "
+"handy filtering option above them."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/masonry.php:14
+msgid "Masonry"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/masonry.php:34
+msgid "Filter By"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/masonry.php:42
+#: app/html/metaboxes/shortcode/filter-options.php:20
+#: app/includes/api/controllers/taxonomies.php:29
+#: app/includes/element/categories.php:32 app/includes/search/builder.php:57
+#: app/includes/taxonomies/category.php:41
+#: app/includes/taxonomies/category.php:43
+#: app/includes/widgets/taxonomycloud.php:53 app/includes/widgets/terms.php:53
+msgid "Categories"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/masonry.php:45
+#: app/html/metaboxes/shortcode/filter-options.php:121
+#: app/includes/api/controllers/taxonomies.php:49
+#: app/includes/api/resources/fields.php:132
+#: app/includes/api/resources/fields.php:138 app/includes/dashboard.php:43
+#: app/includes/dashboard.php:75 app/includes/element/labels.php:27
+#: app/includes/ix/array.php:98 app/includes/ptypes/listing/single.php:706
+#: app/includes/search/builder.php:89 app/includes/taxonomies/label.php:36
+#: app/includes/taxonomies/label.php:38
+#: app/includes/widgets/taxonomycloud.php:56 app/includes/widgets/terms.php:56
+#: templates/dashboard/form.php:200
+msgid "Labels"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/masonry.php:77
+msgid "Display listings in the List view."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:14
+#, php-format
+msgid ""
+"Using the %s skin allows you to display a list of the directories and "
+"listings on one side and the details page on the other side."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:14
+msgid "Side by Side"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:20
+#: app/includes/skins/side.php:49
+msgid "Side by Side Skin"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:41
+msgid "Layout Width"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:49
+msgid "50-50 %"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:50
+msgid "45-55 %"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:51
+msgid "40-60 %"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:52
+msgid "35-65 %"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/side.php:53
+msgid "30-70 %"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show a simple and clean map with the directories "
+"and listings markers in your website."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/singlemap.php:14
+#: app/includes/skins.php:601
+msgid "Single Map"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/slider.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show a slider of the directories and istings in "
+"different styles."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/table.php:14
+#, php-format
+msgid ""
+"Using the %s skin, you can show your desired directories and listings in a "
+"clean table. It doesn't show any map."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/table.php:14
+msgid "Table"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/table.php:43
+msgid "Number of the Listings (table rows) per page"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:17
+msgid ""
+"Use the following options to filter the listings that you want to display "
+"with this shortcode"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:30
+msgid ""
+"If you don't want to filter the listings by category then don't select any "
+"option."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:58
+msgid ""
+"Leave all locations unchecked if you don't want to filter the listings by "
+"their location."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:76
+#: app/html/metaboxes/shortcode/filter-options.php:86
+#: app/includes/api/controllers/taxonomies.php:39
+#: app/includes/api/resources/fields.php:91
+#: app/includes/api/resources/fields.php:97 app/includes/dashboard.php:41
+#: app/includes/dashboard.php:72 app/includes/element/tags.php:26
+#: app/includes/ix/array.php:96 app/includes/ptypes/listing/single.php:753
+#: app/includes/search/builder.php:73 app/includes/taxonomies/tag.php:31
+#: app/includes/taxonomies/tag.php:33 app/includes/widgets/taxonomycloud.php:52
+#: app/includes/widgets/terms.php:52 templates/dashboard/form.php:169
+msgid "Tags"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:87
+msgid ""
+"Insert your desired tags separated by comma to filter the listings based on "
+"them. Leave empty to show the listings of all tags."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:103
+msgid ""
+"Don't select any option if you don't want to filter the listings by features."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:131
+msgid ""
+"Don't select any option if you don't want to filter the listings by labels."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:149
+msgid "Authors"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:159
+msgid ""
+"Don't select any option if you don't want to filter the listings by authors."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:168
+msgid "Type at-least 3 characters of author name ..."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/filter-options.php:169
+msgid "You can select multiple authors."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:18
+msgid "You can manage the map controls/buttons."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:21
+#: app/includes/element/map.php:127
+msgid "Zoom Control"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:28
+msgid ""
+"Displays \"+\" and \"-\" buttons for changing the zoom level of the map."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:31
+msgid "Map Type Control"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:38
+msgid "Allows the user to choose a map type."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:41
+msgid "Street View Control"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:48
+msgid ""
+"Contains a Pegman icon which can be dragged onto the map to enable Street "
+"View."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:53
+msgid "Draw Controls"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:60
+msgid "Contains some tools to draw a shape on the map to filter the listings."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:63
+msgid "GPS Control"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:70
+msgid ""
+"Asks users for their locations to show nearby listings. In some browsers it "
+"works only on secured websites with https."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:74
+msgid "Draw and GPS Controls"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:79
+#: app/includes/element/map.php:154
+msgid "Scale Control"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:84
+msgid ""
+"Displays a map scale element in the bottom of the map. This control is "
+"disabled by default."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:87
+msgid "Fullscreen Control"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/map-controls.php:92
+msgid ""
+"Offers the option to open the map in full screen mode. This control is "
+"enabled by default on mobile devices, and is disabled by default on the "
+"desktop."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/search.php:14 app/includes/ptypes/search.php:53
+#: app/includes/widgets/search.php:62
+msgid "Search Form"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/search.php:24
+msgid "Add a Search Form to this shortcode. It's disabled by default."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/search.php:29
+msgid "Search Form Position"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/search.php:37
+msgid "Show on top"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/search.php:38
+msgid "Show on bottom"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/search.php:39
+msgid "Show on left"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/search.php:40
+msgid "Show on right"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/search.php:41
+msgid "Show before the listings"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/shortcode.php:10
+msgid ""
+"Insert this shortcode inside your desired pages to show filtered listings "
+"with your selected skin and style."
+msgstr ""
+
+#: app/html/metaboxes/shortcode/sort-options.php:28
+msgid "Display"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/sort-options.php:66
+msgid "Default Order"
+msgstr ""
+
+#: app/includes/activation.php:53
+msgid "License Activation"
+msgstr ""
+
+#: app/includes/ajax.php:99 app/includes/ajax.php:151
+#: app/includes/notifications/dispatcher.php:65
+msgid "Security nonce is required."
+msgstr ""
+
+#: app/includes/ajax.php:102 app/includes/ajax.php:154
+#: app/includes/notifications/dispatcher.php:68
+msgid "Security nonce is invalid."
+msgstr ""
+
+#: app/includes/api/controller.php:68 app/includes/api/controller.php:79
+#: app/includes/api/controllers/map.php:150
+#: app/includes/api/controllers/map.php:161
+msgid "Invalid API Token!"
+msgstr ""
+
+#: app/includes/api/controller.php:71 app/includes/api/controllers/map.php:153
+msgid "Invalid User Token!"
+msgstr ""
+
+#: app/includes/api/controllers/images.php:40
+msgid "You're not authorized to upload images!"
+msgstr ""
+
+#: app/includes/api/controllers/images.php:56
+msgid "Image is required!"
+msgstr ""
+
+#: app/includes/api/controllers/images.php:65
+msgid "Invalid image extension! PNG, JPG and GIF images are allowed."
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:32
+#: app/includes/api/controllers/listings.php:140
+#: app/includes/api/controllers/listings.php:213
+#: app/includes/api/controllers/listings.php:247
+#: app/includes/api/controllers/listings.php:275
+#: app/includes/api/controllers/listings.php:329
+#: app/includes/api/controllers/map.php:35
+#: app/includes/api/controllers/map.php:76
+msgid "Listing not found!"
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:62
+#: app/includes/api/controllers/listings.php:152
+#: app/includes/api/controllers/push.php:34
+msgid "Listing title field is required!"
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:108
+#: app/includes/api/controllers/push.php:189
+msgid "The listing published."
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:109
+#: app/includes/api/controllers/push.php:190
+msgid "The listing submitted. It will publish as soon as possible."
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:131
+msgid "You're not authorized to edit this listing!"
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:204
+msgid "You're not authorized to trash this listing!"
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:238
+msgid "You're not authorized to delete this listing!"
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:286
+#: app/includes/api/controllers/listings.php:340
+msgid "Name, Email, Phone and Message fields are required!"
+msgstr ""
+
+#: app/includes/api/controllers/listings.php:292
+#: app/includes/api/controllers/listings.php:346
+#: app/includes/api/controllers/register.php:35
+msgid "Email is not valid!"
+msgstr ""
+
+#: app/includes/api/controllers/login.php:84
+msgid "User not found!"
+msgstr ""
+
+#: app/includes/api/controllers/password.php:30
+msgid "Password is too short! It should be at-least 6 characters."
+msgstr ""
+
+#: app/includes/api/controllers/password.php:36
+msgid "Password do not match with its confirmation."
+msgstr ""
+
+#: app/includes/api/controllers/password.php:79
+msgid "Enter a username or email address."
+msgstr ""
+
+#: app/includes/api/controllers/password.php:84
+#: app/includes/api/controllers/password.php:96
+msgid "There is no account with that username or email address."
+msgstr ""
+
+#: app/includes/api/controllers/password.php:109
+msgid "Someone has requested a password reset for the following account:"
+msgstr ""
+
+#: app/includes/api/controllers/password.php:110
+#, php-format
+msgid "Site Name: %s"
+msgstr ""
+
+#: app/includes/api/controllers/password.php:111
+#, php-format
+msgid "Username: %s"
+msgstr ""
+
+#: app/includes/api/controllers/password.php:112
+msgid "If this was a mistake, just ignore this email and nothing will happen."
+msgstr ""
+
+#: app/includes/api/controllers/password.php:113
+msgid "To reset your password, visit the following address:"
+msgstr ""
+
+#: app/includes/api/controllers/password.php:116
+#, php-format
+msgid "[%s] Password Reset"
+msgstr ""
+
+#: app/includes/api/controllers/register.php:32
+msgid "Email and Password are required!"
+msgstr ""
+
+#: app/includes/api/controllers/register.php:38
+msgid "Password should be at-least 6 characters!"
+msgstr ""
+
+#: app/includes/api/controllers/searchmodules.php:52
+msgid "Search module not found!"
+msgstr ""
+
+#: app/includes/api/controllers/taxonomies.php:53
+msgid "Attribute"
+msgstr ""
+
+#: app/includes/api/controllers/taxonomies.php:54
+#: app/includes/api/resources/fields.php:400 app/includes/dashboard.php:39
+#: app/includes/element/attributes.php:26 templates/dashboard/form.php:68
+msgid "Attributes"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:46 app/includes/ix/array.php:76
+#: app/includes/ptypes/listing/single.php:566
+msgid "Description"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:98 templates/dashboard/form.php:176
+msgid "Tag1,Tag2,Tag3"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:151
+#: app/includes/api/resources/fields.php:157 app/includes/dashboard.php:44
+#: app/includes/dashboard.php:76 app/includes/element/image.php:26
+#: app/includes/ix/mapping.php:154 templates/dashboard/form.php:218
+msgid "Featured Image"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:159
+msgid "You should upload image and send the attachment ID of image!"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:170
+#: app/includes/api/resources/fields.php:185 app/includes/dashboard.php:33
+#: templates/dashboard/form.php:52
+msgid "Address / Map"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:292
+msgid ""
+"If you fill it, then it will be used to override default details page link. "
+"You can use it for linking the listing to an external or custom page!"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:311
+msgid "Owner message to the visitors ..."
+msgstr ""
+
+#: app/includes/api/resources/fields.php:331
+msgid "You should upload images and send an array of attachment IDs!"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:342 app/includes/dashboard.php:45
+#: app/includes/ptypes/listing/single.php:676
+msgid "Embed Codes"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:420 templates/dashboard/form.php:83
+#: templates/elements/abuse.php:35 templates/elements/abuse.php:36
+#: templates/elements/owner.php:134 templates/elements/owner.php:135
+msgid "Your Email"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:427 templates/dashboard/form.php:101
+msgid "Message to Reviewer"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:437 templates/dashboard/form.php:88
+msgid "Full Name"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:438 templates/dashboard/form.php:89
+msgid "Please insert your full name"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:448 templates/dashboard/form.php:93
+msgid "Password"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:449 templates/dashboard/form.php:94
+msgid "Should be at-least 8 characters"
+msgstr ""
+
+#: app/includes/api/resources/fields.php:456 templates/dashboard/form.php:79
+msgid "To Reviewer"
+msgstr ""
+
+#: app/includes/base.php:42
+msgid "HTML file is empty!"
+msgstr ""
+
+#: app/includes/base.php:51
+msgid "HTML file is not exists! Check the file path please."
+msgstr ""
+
+#: app/includes/base.php:155
+msgid "Top Left"
+msgstr ""
+
+#: app/includes/base.php:156
+msgid "Top Center"
+msgstr ""
+
+#: app/includes/base.php:157
+msgid "Top Right"
+msgstr ""
+
+#: app/includes/base.php:158
+msgid "Left Top"
+msgstr ""
+
+#: app/includes/base.php:159
+msgid "Left Center"
+msgstr ""
+
+#: app/includes/base.php:160
+msgid "Left Bottom"
+msgstr ""
+
+#: app/includes/base.php:161
+msgid "Right Top"
+msgstr ""
+
+#: app/includes/base.php:162
+msgid "Right Center"
+msgstr ""
+
+#: app/includes/base.php:163
+msgid "Right Bottom"
+msgstr ""
+
+#: app/includes/base.php:164
+msgid "Bottom Left"
+msgstr ""
+
+#: app/includes/base.php:165
+msgid "Bottom Center"
+msgstr ""
+
+#: app/includes/base.php:166
+msgid "Bottom Right"
+msgstr ""
+
+#: app/includes/base.php:176 app/includes/options.php:246
+msgid "List Date"
+msgstr ""
+
+#: app/includes/base.php:181 app/includes/dashboard.php:54
+#: app/includes/element/title.php:26 app/includes/ix/mapping.php:37
+#: app/includes/options.php:251
+msgid "Listing Title"
+msgstr ""
+
+#: app/includes/base.php:186 app/includes/options.php:256
+msgid "Last Update"
+msgstr ""
+
+#: app/includes/base.php:196 app/includes/options.php:266
+msgid "Listing ID"
+msgstr ""
+
+#: app/includes/base.php:201
+msgid "Author"
+msgstr ""
+
+#: app/includes/base.php:206
+msgid "Random"
+msgstr ""
+
+#: app/includes/base.php:216 app/includes/options.php:271
+msgid "Most Viewed"
+msgstr ""
+
+#: app/includes/base.php:384
+#, php-format
+msgid "Activate to the %s first!"
+msgstr ""
+
+#: app/includes/base.php:384 app/includes/base.php:386
+#: app/includes/base.php:402 app/includes/base.php:403
+msgid "Listdom Pro"
+msgstr ""
+
+#: app/includes/base.php:385 app/includes/base.php:391
+#, php-format
+msgid "%s needed!"
+msgstr ""
+
+#: app/includes/base.php:385
+msgid "License activation"
+msgstr ""
+
+#: app/includes/base.php:386
+#, php-format
+msgid ""
+"You're using %s of listdom. You should activate the %s to enjoy all the "
+"features!"
+msgstr ""
+
+#: app/includes/base.php:386 app/includes/base.php:392
+msgid "Basic Version"
+msgstr ""
+
+#: app/includes/base.php:390
+#, php-format
+msgid "Upgrade to the %s first!"
+msgstr ""
+
+#: app/includes/base.php:390 app/includes/base.php:392
+#: app/includes/base.php:407 app/includes/base.php:408
+msgid "Pro Add-on"
+msgstr ""
+
+#: app/includes/base.php:391 app/includes/lite.php:42
+msgid "Upgrade"
+msgstr ""
+
+#: app/includes/base.php:392
+#, php-format
+msgid ""
+"You're using %s of listdom. You should upgrade to the %s to enjoy all "
+"features of listdom!"
+msgstr ""
+
+#: app/includes/base.php:402
+#, php-format
+msgid ""
+"%s are included in the pro add-on. You should activate the %s now to enjoy "
+"all the features!"
+msgstr ""
+
+#: app/includes/base.php:402 app/includes/base.php:403
+#: app/includes/base.php:407 app/includes/base.php:408
+msgid "This feature"
+msgstr ""
+
+#: app/includes/base.php:403
+#, php-format
+msgid ""
+"%s is included in the pro add-on. You should activate the %s now to enjoy "
+"all the features!"
+msgstr ""
+
+#: app/includes/base.php:407
+#, php-format
+msgid ""
+"%s are included in the pro add-on. You can upgrade to the %s now to enjoy "
+"all of the features of the Listdom!"
+msgstr ""
+
+#: app/includes/base.php:408
+#, php-format
+msgid ""
+"%s is included in the pro add-on. You can upgrade to the %s now to enjoy all "
+"of the features of the Listdom!"
+msgstr ""
+
+#: app/includes/base.php:635
+#, php-format
+msgid "%s from 5"
+msgstr ""
+
+#: app/includes/base.php:737
+msgid "Free"
+msgstr ""
+
+#: app/includes/base.php:1769
+msgid "Apple Maps Esque"
+msgstr ""
+
+#: app/includes/base.php:1770
+msgid "Blue Essence"
+msgstr ""
+
+#: app/includes/base.php:1771
+msgid "Blue Water"
+msgstr ""
+
+#: app/includes/base.php:1772
+msgid "CDO"
+msgstr ""
+
+#: app/includes/base.php:1773 app/includes/socials/facebook.php:23
+msgid "Facebook"
+msgstr ""
+
+#: app/includes/base.php:1774
+msgid "Intown Map"
+msgstr ""
+
+#: app/includes/base.php:1775
+msgid "Light Dream"
+msgstr ""
+
+#: app/includes/base.php:1776
+msgid "Midnight"
+msgstr ""
+
+#: app/includes/base.php:1777
+msgid "Pale Down"
+msgstr ""
+
+#: app/includes/base.php:1778
+msgid "Shades of Grey"
+msgstr ""
+
+#: app/includes/base.php:1779
+msgid "Subtle Grayscale"
+msgstr ""
+
+#: app/includes/base.php:1780
+msgid "Ultra Light"
+msgstr ""
+
+#: app/includes/base.php:1790
+msgid "Classic Bubbles"
+msgstr ""
+
+#: app/includes/base.php:1791
+msgid "Modern Bubbles"
+msgstr ""
+
+#: app/includes/base.php:1801
+msgid "Same Window"
+msgstr ""
+
+#: app/includes/base.php:1802
+msgid "New Window"
+msgstr ""
+
+#: app/includes/base.php:1803
+msgid "Open in Lightbox"
+msgstr ""
+
+#: app/includes/base.php:1812
+msgid "Lato"
+msgstr ""
+
+#: app/includes/base.php:1817
+msgid "Roboto"
+msgstr ""
+
+#: app/includes/base.php:1822
+msgid "Raleway"
+msgstr ""
+
+#: app/includes/base.php:1827
+msgid "Open Sans"
+msgstr ""
+
+#: app/includes/base.php:1832
+msgid "Poppins"
+msgstr ""
+
+#: app/includes/dashboard.php:55
+msgid "Listing Description"
+msgstr ""
+
+#: app/includes/dashboard.php:56
+msgid "Guest Email"
+msgstr ""
+
+#: app/includes/dashboard.php:57
+msgid "Guest Password"
+msgstr ""
+
+#: app/includes/dummy.php:52
+msgid "Beauty Salon"
+msgstr ""
+
+#: app/includes/dummy.php:53
+msgid "Cafe"
+msgstr ""
+
+#: app/includes/dummy.php:54
+msgid "Hospital"
+msgstr ""
+
+#: app/includes/dummy.php:55
+msgid "Hotel"
+msgstr ""
+
+#: app/includes/dummy.php:56
+msgid "Restaurant"
+msgstr ""
+
+#: app/includes/dummy.php:57
+msgid "Super Market"
+msgstr ""
+
+#: app/includes/dummy.php:78
+msgid "Florida"
+msgstr ""
+
+#: app/includes/dummy.php:79
+msgid "London"
+msgstr ""
+
+#: app/includes/dummy.php:80
+msgid "Los Angeles"
+msgstr ""
+
+#: app/includes/dummy.php:81
+msgid "New York"
+msgstr ""
+
+#: app/includes/dummy.php:82
+msgid "Paris"
+msgstr ""
+
+#: app/includes/dummy.php:83
+msgid "Rome"
+msgstr ""
+
+#: app/includes/dummy.php:84
+msgid "Madrid"
+msgstr ""
+
+#: app/includes/dummy.php:99 app/includes/dummy.php:160
+msgid "Discount"
+msgstr ""
+
+#: app/includes/dummy.php:100
+msgid "Easy Access"
+msgstr ""
+
+#: app/includes/dummy.php:101
+msgid "Parking Friendly"
+msgstr ""
+
+#: app/includes/dummy.php:117
+msgid "Free Wifi"
+msgstr ""
+
+#: app/includes/dummy.php:118
+msgid "Live Music"
+msgstr ""
+
+#: app/includes/dummy.php:119
+msgid "Valet"
+msgstr ""
+
+#: app/includes/dummy.php:137
+msgid "Exclusive"
+msgstr ""
+
+#: app/includes/dummy.php:138
+msgid "Hot Offer"
+msgstr ""
+
+#: app/includes/dummy.php:139
+msgid "Must See"
+msgstr ""
+
+#: app/includes/dummy.php:161
+msgid "Pets Allowed"
+msgstr ""
+
+#: app/includes/dummy.php:162
+msgid "Parking Capacity"
+msgstr ""
+
+#: app/includes/dummy.php:597
+#, php-format
+msgid "All Listings in %s Skin"
+msgstr ""
+
+#: app/includes/duplicate.php:61
+msgid "Duplicate This Item"
+msgstr ""
+
+#: app/includes/duplicate.php:61
+msgid "Duplicate"
+msgstr ""
+
+#: app/includes/duplicate.php:109
+msgid "Post duplicated successfully. Now you can modify the duplicated post."
+msgstr ""
+
+#: app/includes/duplicate.php:116
+msgid "You don't have access to duplicate this post!"
+msgstr ""
+
+#: app/includes/element.php:59 app/includes/element/attributes.php:87
+#: app/includes/element/features.php:95 app/includes/element/gallery.php:79
+#: app/includes/element/map.php:89 app/includes/element/owner.php:80
+msgid "Show Title"
+msgstr ""
+
+#: app/includes/element/abuse.php:26 app/includes/ptypes/listing/single.php:499
+msgid "Report Abuse"
+msgstr ""
+
+#: app/includes/element/attributes.php:61
+msgid "Attributes Element"
+msgstr ""
+
+#: app/includes/element/attributes.php:94 app/includes/element/features.php:102
+msgid "Show Icons"
+msgstr ""
+
+#: app/includes/element/availability.php:30 templates/skins/table/tpl.php:52
+msgid "Availability"
+msgstr ""
+
+#: app/includes/element/contact.php:26
+msgid "Contact Information"
+msgstr ""
+
+#: app/includes/element/content.php:26 app/includes/ix/mapping.php:43
+msgid "Listing Content"
+msgstr ""
+
+#: app/includes/element/content.php:45
+msgid "More"
+msgstr ""
+
+#: app/includes/element/embed.php:60
+msgid "Embed Element"
+msgstr ""
+
+#: app/includes/element/gallery.php:26
+msgid "Image Gallery"
+msgstr ""
+
+#: app/includes/element/gallery.php:86
+msgid "Lightbox"
+msgstr ""
+
+#: app/includes/element/infowindow.php:26
+msgid "Infowindow"
+msgstr ""
+
+#: app/includes/element/map.php:116
+msgid "Google Places"
+msgstr ""
+
+#: app/includes/element/map.php:136
+msgid "Map Type"
+msgstr ""
+
+#: app/includes/element/map.php:145
+msgid "Street View"
+msgstr ""
+
+#: app/includes/element/map.php:163
+msgid "Fullscreen"
+msgstr ""
+
+#: app/includes/element/owner.php:30 app/includes/ix/array.php:78
+msgid "Owner"
+msgstr ""
+
+#: app/includes/element/owner.php:87
+msgid "Contact Form"
+msgstr ""
+
+#: app/includes/element/owner.php:98
+msgid "Tel"
+msgstr ""
+
+#: app/includes/element/remark.php:26
+msgid "Remark / Owner Message"
+msgstr ""
+
+#: app/includes/element/share.php:30 app/includes/ptypes/listing/single.php:738
+msgid "Share"
+msgstr ""
+
+#: app/includes/element/video.php:26
+msgid "Featured Video"
+msgstr ""
+
+#: app/includes/element/video.php:60
+msgid "Featured Video Element"
+msgstr ""
+
+#: app/includes/entity/listing.php:53
+msgid "A valid Listing Category is required."
+msgstr ""
+
+#: app/includes/entity/listing.php:288
+msgid "Cheap"
+msgstr ""
+
+#: app/includes/entity/listing.php:294
+msgid "High"
+msgstr ""
+
+#: app/includes/entity/listing.php:300
+msgid "Ultra High"
+msgstr ""
+
+#: app/includes/entity/listing.php:306
+msgid "Normal"
+msgstr ""
+
+#: app/includes/form.php:228
+msgid "Upload/Select image"
+msgstr ""
+
+#: app/includes/form.php:229
+msgid "Remove image"
+msgstr ""
+
+#: app/includes/form.php:241
+msgid "Upload/Select file"
+msgstr ""
+
+#: app/includes/form.php:242
+msgid "Remove file"
+msgstr ""
+
+#: app/includes/form.php:597
+msgid "Hour"
+msgstr ""
+
+#: app/includes/form.php:604 app/includes/form.php:605
+#, php-format
+msgid "%d AM"
+msgstr ""
+
+#: app/includes/form.php:606 app/includes/form.php:607
+#, php-format
+msgid "%d PM"
+msgstr ""
+
+#: app/includes/form.php:616
+msgid "Minute"
+msgstr ""
+
+#: app/includes/hooks.php:183 app/includes/shortcodes/dashboard.php:471
+#: app/includes/shortcodes/dashboard.php:557
+msgid "You are not allowed to upload files!"
+msgstr ""
+
+#: app/includes/hooks.php:186 app/includes/shortcodes/dashboard.php:278
+#: app/includes/shortcodes/dashboard.php:474
+#: app/includes/shortcodes/dashboard.php:533
+#: app/includes/shortcodes/dashboard.php:560
+msgid "Security nonce is missing!"
+msgstr ""
+
+#: app/includes/hooks.php:192 app/includes/shortcodes/dashboard.php:281
+#: app/includes/shortcodes/dashboard.php:477
+#: app/includes/shortcodes/dashboard.php:536
+#: app/includes/shortcodes/dashboard.php:563
+msgid "Security nonce is not valid!"
+msgstr ""
+
+#: app/includes/hooks.php:200
+msgid "Please upload a file!"
+msgstr ""
+
+#: app/includes/hooks.php:251
+msgid "The files are uploaded!"
+msgstr ""
+
+#: app/includes/hooks.php:251 app/includes/shortcodes/dashboard.php:622
+msgid "An error occurred!"
+msgstr ""
+
+#: app/includes/integrations/be.php:60 app/includes/integrations/kc.php:56
+#: app/includes/integrations/vc.php:55 app/includes/menus.php:50
+#: app/includes/menus.php:59
+msgid "Listdom"
+msgstr ""
+
+#: app/includes/integrations/kc.php:57 app/includes/integrations/vc.php:59
+#: app/includes/ptypes/notification.php:108
+msgid "Content"
+msgstr ""
+
+#: app/includes/integrations/kc.php:62 app/includes/integrations/vc.php:65
+#: app/includes/ptypes/search.php:93 app/includes/ptypes/search.php:110
+#: app/includes/ptypes/shortcode.php:49 app/includes/ptypes/shortcode.php:121
+#: app/includes/ptypes/shortcode.php:143 app/includes/widgets/shortcode.php:73
+msgid "Shortcode"
+msgstr ""
+
+#: app/includes/integrations/kc.php:65 app/includes/integrations/vc.php:68
+msgid "Select one of predefined shortcodes."
+msgstr ""
+
+#: app/includes/ix/array.php:74
+msgid "ID"
+msgstr ""
+
+#: app/includes/ix/array.php:77
+msgid "Date"
+msgstr ""
+
+#: app/includes/ix/array.php:80 app/includes/ix/mapping.php:70
+msgid "Price Max"
+msgstr ""
+
+#: app/includes/ix/array.php:84
+msgid "Latitude"
+msgstr ""
+
+#: app/includes/ix/array.php:85
+msgid "Longitude"
+msgstr ""
+
+#: app/includes/ix/array.php:86
+msgid "Link"
+msgstr ""
+
+#: app/includes/ix/array.php:92 app/includes/taxonomies/category.php:137
+#: app/includes/taxonomies/category.php:197
+#: app/includes/taxonomies/category.php:264
+#: app/includes/taxonomies/location.php:82
+#: app/includes/taxonomies/location.php:98
+#: app/includes/taxonomies/location.php:141
+msgid "Image"
+msgstr ""
+
+#: app/includes/ix/mapping.php:30
+msgid "Unique ID"
+msgstr ""
+
+#: app/includes/ix/mapping.php:33
+msgid ""
+"It's required if you want to update the listings later. If you don't map it "
+"then listdom tries to update the existing listing with same title and "
+"content!"
+msgstr ""
+
+#: app/includes/ix/mapping.php:49
+msgid "Listing Date"
+msgstr ""
+
+#: app/includes/ix/mapping.php:52
+msgid "A date field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:56
+msgid "Listing Owner"
+msgstr ""
+
+#: app/includes/ix/mapping.php:59
+msgid ""
+"An email field should get mapped. If mapped then listdom will create a user "
+"if not exists and assign the listing to the user."
+msgstr ""
+
+#: app/includes/ix/mapping.php:66 app/includes/ix/mapping.php:73
+msgid "A numeric field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:77
+msgid "Price After"
+msgstr ""
+
+#: app/includes/ix/mapping.php:80 app/includes/ix/mapping.php:87
+#: app/includes/ix/mapping.php:94 app/includes/ix/mapping.php:143
+msgid "A text field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:98
+msgid "Listing Latitude"
+msgstr ""
+
+#: app/includes/ix/mapping.php:101
+msgid "A latitude field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:105
+msgid "Listing Longitude"
+msgstr ""
+
+#: app/includes/ix/mapping.php:108
+msgid "A longitude field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:115 app/includes/ix/mapping.php:136
+msgid "A URL field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:119
+msgid "Listing Email"
+msgstr ""
+
+#: app/includes/ix/mapping.php:122
+msgid "An email field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:126
+msgid "Listing Phone"
+msgstr ""
+
+#: app/includes/ix/mapping.php:129
+msgid "An phone field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:133
+msgid "Listing Website"
+msgstr ""
+
+#: app/includes/ix/mapping.php:140
+msgid "Listing Contact Address"
+msgstr ""
+
+#: app/includes/ix/mapping.php:147
+msgid "Listing Remark"
+msgstr ""
+
+#: app/includes/ix/mapping.php:150
+msgid "An text field should get mapped."
+msgstr ""
+
+#: app/includes/ix/mapping.php:157
+msgid "A URL field should get mapped. It should contain image URL."
+msgstr ""
+
+#: app/includes/ix/mapping.php:161 app/includes/ptypes/listing/single.php:661
+msgid "Listing Gallery"
+msgstr ""
+
+#: app/includes/ix/mapping.php:164
+msgid "A URL field should get mapped. It should contain URLs to images."
+msgstr ""
+
+#: app/includes/ix/mapping.php:168
+msgid "Listing Category"
+msgstr ""
+
+#: app/includes/ix/mapping.php:171
+msgid ""
+"A text field should get mapped. Listdom will create a category using the "
+"text if not exists and assign listing to that category."
+msgstr ""
+
+#: app/includes/ix/mapping.php:175
+msgid "Listing Locations"
+msgstr ""
+
+#: app/includes/ix/mapping.php:178
+msgid ""
+"A text field should get mapped. Listdom will create locations using the text "
+"if not exists and assign listing to locations."
+msgstr ""
+
+#: app/includes/ix/mapping.php:182
+msgid "Listing Tags"
+msgstr ""
+
+#: app/includes/ix/mapping.php:185
+msgid ""
+"A text field should get mapped. Listdom will create tags using the text if "
+"not exists and assign listing to tags."
+msgstr ""
+
+#: app/includes/ix/mapping.php:189
+msgid "Listing Features"
+msgstr ""
+
+#: app/includes/ix/mapping.php:192
+msgid ""
+"A text field should get mapped. Listdom will create features using the text "
+"if not exists and assign listing to features."
+msgstr ""
+
+#: app/includes/ix/mapping.php:196
+msgid "Listing Labels"
+msgstr ""
+
+#: app/includes/ix/mapping.php:199
+msgid ""
+"A text field should get mapped. Listdom will create labels using the text if "
+"not exists and assign listing to labels."
+msgstr ""
+
+#: app/includes/ix/mapping.php:222
+#, php-format
+msgid "A %s field should get mapped."
+msgstr ""
+
+#: app/includes/lite.php:52 app/includes/menus.php:69
+msgid "Support"
+msgstr ""
+
+#: app/includes/main.php:98
+msgid "Sunday"
+msgstr ""
+
+#: app/includes/main.php:99
+msgid "Monday"
+msgstr ""
+
+#: app/includes/main.php:100
+msgid "Tuesday"
+msgstr ""
+
+#: app/includes/main.php:101
+msgid "Wednesday"
+msgstr ""
+
+#: app/includes/main.php:102
+msgid "Thursday"
+msgstr ""
+
+#: app/includes/main.php:103
+msgid "Friday"
+msgstr ""
+
+#: app/includes/main.php:104
+msgid "Saturday"
+msgstr ""
+
+#: app/includes/map/provider.php:39 app/includes/map/provider.php:47
+msgid "Google Maps"
+msgstr ""
+
+#: app/includes/map/provider.php:46
+msgid "Leaflet (OpenStreetMap)"
+msgstr ""
+
+#: app/includes/menus.php:51 app/includes/menus.php:60
+msgid "Home"
+msgstr ""
+
+#: app/includes/menus.php:61 app/includes/ptypes/shortcode.php:48
+msgid "Shortcodes"
+msgstr ""
+
+#: app/includes/menus.php:62
+msgid "Search Builder"
+msgstr ""
+
+#: app/includes/menus.php:62
+msgid "Search and Filter Builder"
+msgstr ""
+
+#: app/includes/menus.php:63 app/includes/ptypes/notification.php:49
+msgid "Notifications"
+msgstr ""
+
+#: app/includes/menus/ix.php:88
+msgid "Security nonce missed!"
+msgstr ""
+
+#: app/includes/menus/ix.php:91
+msgid "Security nonce is invalid!"
+msgstr ""
+
+#: app/includes/menus/ix.php:96
+msgid "Please upload a file first!"
+msgstr ""
+
+#: app/includes/menus/ix.php:102
+msgid "Invalid file extension! Only JSON files are allowed."
+msgstr ""
+
+#: app/includes/menus/ix.php:112
+msgid "The file is uploaded! You can import the file now."
+msgstr ""
+
+#: app/includes/menus/ix.php:119
+msgid "An error occurred during uploading the file!"
+msgstr ""
+
+#: app/includes/menus/ix.php:160
+msgid "Listings imported successfully!"
+msgstr ""
+
+#: app/includes/menus/settings.php:269
+msgid "New Token"
+msgstr ""
+
+#: app/includes/notifications.php:41
+msgid "Contact Owner"
+msgstr ""
+
+#: app/includes/notifications.php:42 app/includes/ptypes/listing.php:95
+msgid "New Listing"
+msgstr ""
+
+#: app/includes/notifications.php:43
+msgid "Listing Status Changed"
+msgstr ""
+
+#: app/includes/notifications.php:44
+msgid "Abuse Report"
+msgstr ""
+
+#: app/includes/notifications.php:54
+msgid "Name field of the contact form"
+msgstr ""
+
+#: app/includes/notifications.php:55
+msgid "Email field of the contact form"
+msgstr ""
+
+#: app/includes/notifications.php:56
+msgid "Phone field of the contact form"
+msgstr ""
+
+#: app/includes/notifications.php:57 app/includes/notifications.php:82
+msgid "Sent message"
+msgstr ""
+
+#: app/includes/notifications.php:58 app/includes/notifications.php:66
+#: app/includes/notifications.php:76 app/includes/notifications.php:83
+msgid "Link to the listing"
+msgstr ""
+
+#: app/includes/notifications.php:61
+msgid "Status of new listing"
+msgstr ""
+
+#: app/includes/notifications.php:62 app/includes/notifications.php:72
+msgid "Listing creation date"
+msgstr ""
+
+#: app/includes/notifications.php:63 app/includes/notifications.php:73
+msgid "Title to the listing"
+msgstr ""
+
+#: app/includes/notifications.php:64 app/includes/notifications.php:74
+msgid "Name of listing owner"
+msgstr ""
+
+#: app/includes/notifications.php:65 app/includes/notifications.php:75
+msgid "Email or listing owner"
+msgstr ""
+
+#: app/includes/notifications.php:67
+msgid "Link to the listing manage page in WordPress backend"
+msgstr ""
+
+#: app/includes/notifications.php:70
+msgid "Previous Status"
+msgstr ""
+
+#: app/includes/notifications.php:71
+msgid "New Status"
+msgstr ""
+
+#: app/includes/notifications.php:79
+msgid "Name field of abuse form"
+msgstr ""
+
+#: app/includes/notifications.php:80
+msgid "Email field of abuse form"
+msgstr ""
+
+#: app/includes/notifications.php:81
+msgid "Phone field of abuse form"
+msgstr ""
+
+#: app/includes/notifications.php:86
+msgid "Current date while sending"
+msgstr ""
+
+#: app/includes/notifications.php:87
+msgid "Current time while sending"
+msgstr ""
+
+#: app/includes/notifications.php:88
+msgid "Current date & time while sending"
+msgstr ""
+
+#: app/includes/notifications.php:89
+msgid "Email of the website admin"
+msgstr ""
+
+#: app/includes/notifications.php:90
+msgid "Subject of the website"
+msgstr ""
+
+#: app/includes/notifications.php:91
+msgid "Home URL of the website"
+msgstr ""
+
+#: app/includes/notifications.php:92
+msgid "Description of the website"
+msgstr ""
+
+#: app/includes/notifications.php:93
+msgid ""
+"Link to the website. Subject of the website will be used as the link title"
+msgstr ""
+
+#: app/includes/notifications/dispatcher.php:42
+msgid "Your message sent successfully."
+msgstr ""
+
+#: app/includes/notifications/dispatcher.php:50
+msgid "Your report sent successfully."
+msgstr ""
+
+#: app/includes/notifications/dispatcher.php:62
+msgid "Invalid request!"
+msgstr ""
+
+#: app/includes/notifications/dispatcher.php:71
+msgid "Invalid email!"
+msgstr ""
+
+#: app/includes/notifications/dispatcher.php:74
+#: app/includes/shortcodes/dashboard.php:284
+msgid "Google recaptcha is invalid."
+msgstr ""
+
+#: app/includes/options.php:289
+msgid "Default API"
+msgstr ""
+
+#: app/includes/plugin/licensing.php:93
+msgid "License key is valid and your website activated successfully!"
+msgstr ""
+
+#: app/includes/plugin/licensing.php:94
+msgid ""
+"The license key is either invalid, expired, not meant for this product, or "
+"has reached its activation limit. Please verify the key or obtain a new one "
+"if needed."
+msgstr ""
+
+#: app/includes/plugin/licensing.php:95
+msgid "Something went wrong!"
+msgstr ""
+
+#: app/includes/plugin/licensing.php:96
+msgid ""
+"It seems your website cannot webilia.com server for validating the license "
+"key! Please consult with your host provider."
+msgstr ""
+
+#: app/includes/plugin/licensing.php:104
+msgid ""
+"The license key has been successfully removed, and your website is now "
+"deactivated."
+msgstr ""
+
+#: app/includes/plugin/licensing.php:120
+msgid ""
+"License deactivation error. Retry later or contact support. We apologize for "
+"any inconvenience."
+msgstr ""
+
+#: app/includes/ptypes.php:61
+msgid "Ready to start? Create your first listing here."
+msgstr ""
+
+#: app/includes/ptypes.php:62
+msgid "Create your first listing"
+msgstr ""
+
+#: app/includes/ptypes.php:68
+msgid ""
+"Use the shortcodes to show a list of your directories and listings on any "
+"page and with your desired skin and style."
+msgstr ""
+
+#: app/includes/ptypes.php:69
+msgid "Create your first shortcode"
+msgstr ""
+
+#: app/includes/ptypes.php:75
+msgid ""
+"You can create various search and filter forms by inserting different "
+"fields, rows etc.!"
+msgstr ""
+
+#: app/includes/ptypes.php:76
+msgid "Create your first search and filter form"
+msgstr ""
+
+#: app/includes/ptypes.php:82
+msgid "You can create various notifications to be sent in different hooks!"
+msgstr ""
+
+#: app/includes/ptypes.php:83
+msgid "Create your first notification"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:92 app/includes/shortcodes/dashboard.php:240
+msgid "Add Listing"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:93
+msgid "Add New Listing"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:94
+msgid "Edit Listing"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:96 app/includes/shortcodes/dashboard.php:449
+msgid "View Listing"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:97
+msgid "View Listings"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:98
+msgid "Search Listings"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:99
+msgid "No listings found!"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:100
+msgid "No listings found in Trash!"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:101
+msgid "All Listings"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:102
+msgid "Listing Archives"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:249
+msgid "Show all categories"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:263
+msgid "Show all locations"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:276
+msgid "Show all features"
+msgstr ""
+
+#: app/includes/ptypes/listing.php:289
+msgid "Show all labels"
+msgstr ""
+
+#: app/includes/ptypes/listing/single.php:484
+msgid "Author Info"
+msgstr ""
+
+#: app/includes/ptypes/listing/single.php:515
+msgid "Listing Details"
+msgstr ""
+
+#: app/includes/ptypes/listing/single.php:530
+msgid "Availability Time"
+msgstr ""
+
+#: app/includes/ptypes/listing/single.php:629
+msgid "See on the Map"
+msgstr ""
+
+#: app/includes/ptypes/listing/single.php:644
+msgid "Listing Image"
+msgstr ""
+
+#: app/includes/ptypes/listing/single.php:691
+msgid "Video"
+msgstr ""
+
+#: app/includes/ptypes/listing/single.php:800
+msgid "Contact Info"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:50
+msgid "Notification"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:51
+msgid "Add Notification"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:52
+msgid "Add New Notification"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:53
+msgid "Edit Notification"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:54
+msgid "New Notification"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:55
+msgid "View Notification"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:56
+msgid "View Notifications"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:57
+msgid "Search Notifications"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:58
+msgid "No notifications found!"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:59
+msgid "No notifications found in Trash!"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:60
+msgid "All Notifications"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:61
+msgid "Notification Archives"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:106
+msgid "Placeholders"
+msgstr ""
+
+#: app/includes/ptypes/notification.php:107
+msgid "Recipients"
+msgstr ""
+
+#: app/includes/ptypes/search.php:52
+msgid "Search and Filter Forms"
+msgstr ""
+
+#: app/includes/ptypes/search.php:54
+msgid "Add a New Form"
+msgstr ""
+
+#: app/includes/ptypes/search.php:55
+msgid "Add New Search Form"
+msgstr ""
+
+#: app/includes/ptypes/search.php:56
+msgid "Edit Search Form"
+msgstr ""
+
+#: app/includes/ptypes/search.php:57
+msgid "New Search Form"
+msgstr ""
+
+#: app/includes/ptypes/search.php:58
+msgid "View Search Form"
+msgstr ""
+
+#: app/includes/ptypes/search.php:59
+msgid "View Search Forms"
+msgstr ""
+
+#: app/includes/ptypes/search.php:60
+msgid "Search The Forms"
+msgstr ""
+
+#: app/includes/ptypes/search.php:61
+msgid "No search forms found!"
+msgstr ""
+
+#: app/includes/ptypes/search.php:62
+msgid "No search forms found in Trash!"
+msgstr ""
+
+#: app/includes/ptypes/search.php:63
+msgid "All Search Forms"
+msgstr ""
+
+#: app/includes/ptypes/search.php:64
+msgid "Search Form Archives"
+msgstr ""
+
+#: app/includes/ptypes/search.php:109
+msgid "Form"
+msgstr ""
+
+#: app/includes/ptypes/search.php:111
+msgid "Fields"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:50
+msgid "Add Shortcode"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:51
+msgid "Add New Shortcode"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:52
+msgid "Edit Shortcode"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:53
+msgid "New Shortcode"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:54
+msgid "View Shortcode"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:55
+msgid "View Shortcodes"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:56
+msgid "Search Shortcodes"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:57
+msgid "No shortcodes found!"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:58
+msgid "No shortcodes found in Trash!"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:59
+msgid "All Shortcodes"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:60
+msgid "Shortcode Archives"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:144 app/includes/shortcodes/search.php:146
+msgid "Search"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:145
+msgid "Default Sort"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:146
+msgid "Sort Options"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:147
+msgid "Map Controls"
+msgstr ""
+
+#: app/includes/ptypes/shortcode.php:149
+msgid "Filter Options"
+msgstr ""
+
+#: app/includes/search/builder.php:49
+msgid "Text Search"
+msgstr ""
+
+#: app/includes/search/builder.php:151 app/includes/search/builder.php:175
+msgid "Dropdown (Multiple Selection)"
+msgstr ""
+
+#: app/includes/search/builder.php:153 app/includes/search/builder.php:178
+msgid "Radio Buttons"
+msgstr ""
+
+#: app/includes/search/builder.php:154 app/includes/search/builder.php:157
+#: app/includes/search/builder.php:160 app/includes/search/builder.php:163
+#: app/includes/search/builder.php:176 app/includes/search/builder.php:181
+msgid "Text Input"
+msgstr ""
+
+#: app/includes/search/builder.php:166 app/includes/search/builder.php:171
+msgid "Number Input"
+msgstr ""
+
+#: app/includes/search/builder.php:168 app/includes/search/builder.php:184
+msgid "Dropdown+"
+msgstr ""
+
+#: app/includes/search/builder.php:185
+msgid "Min/Max Input"
+msgstr ""
+
+#: app/includes/search/builder.php:191
+msgid "Date Range Picker"
+msgstr ""
+
+#: app/includes/search/builder.php:199
+msgid "Hierarchical Dropdowns"
+msgstr ""
+
+#: app/includes/search/builder.php:200
+msgid "Radius Search"
+msgstr ""
+
+#: app/includes/search/builder.php:201
+msgid "Radius Search (Dropdown)"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:109
+msgid "Not found!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:116
+#, php-format
+msgid ""
+"Unfortunately you don't have permission to view this page. Please %s first."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:116
+msgid "login"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:170
+msgid "Unfortunately you don't have permission to create or edit listings."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:178
+msgid "Sorry! Selected post is not a listing."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:184
+msgid "Sorry! You don't have access to modify this listing."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:243
+msgid "Logout"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:301
+msgid "Please fill listing title field!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:304
+msgid "Please insert your email!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:308
+msgid "Please insert your password! It should be at-least 8 characters."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:352
+#, php-format
+msgid "At-least one value for %s field is required!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:353
+#, php-format
+msgid "%s field is required!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:362
+#, php-format
+msgid "You can only upload a maximum of %s gallery images. You've uploaded %s."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:368
+#, php-format
+msgid ""
+"The maximum length for listing content is %s characters. You've written %s "
+"characters."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:374
+#, php-format
+msgid "The maximum allowed tags is %s tags. You've added %s tags."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:449
+#, php-format
+msgid "The listing has been published. %s"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:450
+msgid ""
+"The listing has been submitted. It will be reviewed as soon as possible."
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:485
+#: app/includes/shortcodes/dashboard.php:571
+msgid "Please upload an image!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:493
+msgid "Only JPG and PNG images are allowed!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:503
+msgid "The image is uploaded!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:622
+msgid "The images are uploaded!"
+msgstr ""
+
+#: app/includes/shortcodes/search.php:188
+#, php-format
+msgid "Results %s %s"
+msgstr ""
+
+#: app/includes/shortcodes/search.php:602
+msgid "Any"
+msgstr ""
+
+#: app/includes/shortcodes/search.php:603
+msgid "$"
+msgstr ""
+
+#: app/includes/shortcodes/search.php:604
+msgid "$$"
+msgstr ""
+
+#: app/includes/shortcodes/search.php:605
+msgid "$$$"
+msgstr ""
+
+#: app/includes/shortcodes/search.php:606
+msgid "$$$$"
+msgstr ""
+
+#: app/includes/shortcodes/search.php:687
+msgid "KM"
+msgstr ""
+
+#: app/includes/shortcodes/simplemap.php:51
+msgid ""
+"The marker location couldn't find. Please specify address or lat/lng "
+"parameters."
+msgstr ""
+
+#: app/includes/shortcodes/taxonomy.php:46
+msgid "Taxonomy is invalid!"
+msgstr ""
+
+#: app/includes/shortcodes/taxonomy.php:60
+#, php-format
+msgid "Style is invalid! Valid styles are: %s"
+msgstr ""
+
+#: app/includes/shortcodes/terms.php:56
+msgid "Select Item"
+msgstr ""
+
+#: app/includes/skins.php:604
+msgid "Side by Side View"
+msgstr ""
+
+#: app/includes/skins.php:605
+msgid "List+Grid View"
+msgstr ""
+
+#: app/includes/skins.php:606
+msgid "Half Map / Split View"
+msgstr ""
+
+#: app/includes/skins.php:607
+msgid "Table View"
+msgstr ""
+
+#: app/includes/skins.php:608
+msgid "Masonry View"
+msgstr ""
+
+#: app/includes/skins.php:611
+msgid "Cover View"
+msgstr ""
+
+#: app/includes/skins/masonry.php:43
+msgid "All"
+msgstr ""
+
+#: app/includes/socials/facebook.php:29
+msgid "Share on Facebook"
+msgstr ""
+
+#: app/includes/socials/instagram.php:23
+msgid "Instagram"
+msgstr ""
+
+#: app/includes/socials/linkedin.php:23 app/includes/socials/linkedin.php:29
+msgid "Linkedin"
+msgstr ""
+
+#: app/includes/socials/pinterest.php:23
+msgid "Pinterest"
+msgstr ""
+
+#: app/includes/socials/pinterest.php:29
+msgid "Pin it"
+msgstr ""
+
+#: app/includes/socials/telegram.php:23
+msgid "Telegram"
+msgstr ""
+
+#: app/includes/socials/telegram.php:31
+msgid "Share in Telegram"
+msgstr ""
+
+#: app/includes/socials/tiktok.php:23
+msgid "Tiktok"
+msgstr ""
+
+#: app/includes/socials/twitter.php:23
+msgid "Twitter"
+msgstr ""
+
+#: app/includes/socials/twitter.php:29
+msgid "Tweet"
+msgstr ""
+
+#: app/includes/socials/whatsapp.php:23 app/includes/socials/whatsapp.php:34
+msgid "WhatsApp"
+msgstr ""
+
+#: app/includes/socials/youtube.php:23
+msgid "Youtube"
+msgstr ""
+
+#: app/includes/styles.php:36 app/includes/styles.php:47
+#: app/includes/styles.php:57 app/includes/styles.php:66
+#: app/includes/styles.php:75 app/includes/styles.php:84
+#: app/includes/styles.php:91 app/includes/styles.php:100
+#: app/includes/styles.php:109 app/includes/styles.php:120
+#: app/includes/styles.php:129
+msgid "Style 1"
+msgstr ""
+
+#: app/includes/styles.php:37 app/includes/styles.php:48
+#: app/includes/styles.php:58 app/includes/styles.php:67
+#: app/includes/styles.php:76 app/includes/styles.php:92
+#: app/includes/styles.php:101 app/includes/styles.php:110
+#: app/includes/styles.php:121 app/includes/styles.php:130
+msgid "Style 2"
+msgstr ""
+
+#: app/includes/styles.php:38 app/includes/styles.php:49
+#: app/includes/styles.php:59 app/includes/styles.php:68
+#: app/includes/styles.php:77 app/includes/styles.php:93
+#: app/includes/styles.php:102 app/includes/styles.php:111
+#: app/includes/styles.php:122
+msgid "Style 3"
+msgstr ""
+
+#: app/includes/styles.php:39 app/includes/styles.php:50
+#: app/includes/styles.php:112
+msgid "Style 4"
+msgstr ""
+
+#: app/includes/styles.php:40 app/includes/styles.php:113
+msgid "Style 5"
+msgstr ""
+
+#: app/includes/styles.php:131
+msgid "Style 3 - Slider Header"
+msgstr ""
+
+#: app/includes/styles.php:132
+msgid "Style 4 - User Directory"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:45
+msgid "All Categories"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:46
+msgid "Edit Category"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:47
+msgid "View Category"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:48
+msgid "Update Category"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:49
+msgid "Add New Category"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:50
+msgid "New Category Name"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:51
+msgid "Popular Categories"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:52
+msgid "Search Categories"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:53
+msgid "Separate categories with commas"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:54
+msgid "Add or remove categories"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:55
+msgid "Choose from the most used categories"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:56
+msgid "No categories found."
+msgstr ""
+
+#: app/includes/taxonomies/category.php:57
+msgid "← Back to Categories"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:58
+msgid "Parent Category"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:59
+msgid "Parent Category:"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:60
+msgid "No Categories"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:93
+msgid "Please select primary category."
+msgstr ""
+
+#: app/includes/taxonomies/category.php:118
+#: app/includes/taxonomies/category.php:170
+#: app/includes/taxonomies/category.php:265
+#: app/includes/taxonomies/feature.php:82
+#: app/includes/taxonomies/feature.php:113
+#: app/includes/taxonomies/feature.php:166
+msgid "Icon"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:124
+#: app/includes/taxonomies/category.php:178
+msgid "The icon is needed for listings' markers and some other sections."
+msgstr ""
+
+#: app/includes/taxonomies/category.php:127
+#: app/includes/taxonomies/label.php:78 app/includes/taxonomies/label.php:95
+msgid "Color"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:134
+#: app/includes/taxonomies/category.php:192
+msgid "It's listings' markers color."
+msgstr ""
+
+#: app/includes/taxonomies/category.php:143
+#: app/includes/taxonomies/category.php:205
+msgid "The image used for category views/shortcodes."
+msgstr ""
+
+#: app/includes/taxonomies/category.php:146
+#: app/includes/taxonomies/feature.php:90
+msgid "SEO Schema"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:148
+#: app/includes/taxonomies/category.php:211
+msgid "Schema Type"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:155
+#: app/includes/taxonomies/category.php:220
+msgid "Schema Item Type (https://schema.org/)"
+msgstr ""
+
+#: app/includes/taxonomies/category.php:183
+msgid "Marker Color"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:44
+msgid "All Features"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:45
+msgid "Edit Feature"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:46
+msgid "View Feature"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:47
+msgid "Update Feature"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:48
+msgid "Add New Feature"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:49
+msgid "New Feature Name"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:50
+msgid "Popular Features"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:51
+msgid "Search Features"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:52
+msgid "Separate features with commas"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:53
+msgid "Add or remove features"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:54
+msgid "Choose from the most used features"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:55
+msgid "No features found."
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:56
+msgid "← Back to Features"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:57
+msgid "Parent Feature"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:58
+msgid "Parent Feature:"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:59
+msgid "No Features"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:88
+#: app/includes/taxonomies/feature.php:121
+msgid "The icon will show on the website frontend next to the feature."
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:93
+#: app/includes/taxonomies/feature.php:127
+msgid "Schema Property"
+msgstr ""
+
+#: app/includes/taxonomies/feature.php:100
+#: app/includes/taxonomies/feature.php:136
+msgid "Schema Item Property (https://schema.org/)"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:40
+msgid "All Labels"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:41
+msgid "Edit Label"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:42
+msgid "View Label"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:43
+msgid "Update Label"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:44
+msgid "Add New Label"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:45
+msgid "New Label Name"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:46
+msgid "Popular Labels"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:47
+msgid "Search Labels"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:48
+msgid "Separate labels with commas"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:49
+msgid "Add or remove labels"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:50
+msgid "Choose from the most used labels"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:51
+msgid "No labels found."
+msgstr ""
+
+#: app/includes/taxonomies/label.php:52
+msgid "← Back to Labels"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:53
+msgid "Parent Label"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:54
+msgid "Parent Label:"
+msgstr ""
+
+#: app/includes/taxonomies/label.php:55
+msgid "No Labels"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:44
+msgid "All Locations"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:45
+msgid "Edit Location"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:46
+msgid "View Location"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:47
+msgid "Update Location"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:48
+msgid "Add New Location"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:49
+msgid "New Location Name"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:50
+msgid "Popular Locations"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:51
+msgid "Search Locations"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:52
+msgid "Separate locations with commas"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:53
+msgid "Add or remove locations"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:54
+msgid "Choose from the most used locations"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:55
+msgid "No locations found."
+msgstr ""
+
+#: app/includes/taxonomies/location.php:56
+msgid "← Back to Locations"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:57
+msgid "Parent Location"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:58
+msgid "Parent Location:"
+msgstr ""
+
+#: app/includes/taxonomies/location.php:59
+msgid "No Locations"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:35
+msgid "All Tags"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:36
+msgid "Edit Tag"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:37
+msgid "View Tag"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:38
+msgid "Update Tag"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:39
+msgid "Add New Tag"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:40
+msgid "New Tag Name"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:41
+msgid "Popular Tags"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:42
+msgid "Search Tags"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:43
+msgid "Separate tags with commas"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:44
+msgid "Add or remove tags"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:45
+msgid "Choose from the most used tags"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:46
+msgid "No tags found."
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:47
+msgid "← Back to Tags"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:48
+msgid "Parent Tag"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:49
+msgid "Parent Tag:"
+msgstr ""
+
+#: app/includes/taxonomies/tag.php:50
+msgid "No Tags"
+msgstr ""
+
+#: app/includes/upgrade.php:78
+msgid "Listdom Author"
+msgstr ""
+
+#: app/includes/user.php:42
+msgid "<strong>Error</strong>: Please enter a username."
+msgstr ""
+
+#: app/includes/user.php:45
+msgid ""
+"<strong>Error</strong>: This username is invalid because it uses illegal "
+"characters. Please enter a valid username."
+msgstr ""
+
+#: app/includes/user.php:48
+msgid ""
+"<strong>Error</strong>: This username is already registered. Please choose "
+"another one."
+msgstr ""
+
+#: app/includes/user.php:53
+msgid "<strong>Error</strong>: Sorry, that username is not allowed."
+msgstr ""
+
+#: app/includes/user.php:57
+msgid "<strong>Error</strong>: Please type your email address."
+msgstr ""
+
+#: app/includes/user.php:60
+msgid "<strong>Error</strong>: The email address isn&#8217;t correct."
+msgstr ""
+
+#: app/includes/user.php:63
+msgid ""
+"<strong>Error</strong>: This email is already registered. Please choose "
+"another one."
+msgstr ""
+
+#: app/includes/user.php:103
+#, php-format
+msgid ""
+"<strong>Error</strong>: Couldn&#8217;t register you&hellip; please contact "
+"the <a href=\"mailto:%s\">site admin</a>!"
+msgstr ""
+
+#: app/includes/widgets/alllistings.php:22
+msgid "(Listdom) All Listings"
+msgstr ""
+
+#: app/includes/widgets/alllistings.php:22
+msgid ""
+"Show all of your listings in a Map widget. If you like to filter listings, "
+"you should use Listdom Shortcode Widget."
+msgstr ""
+
+#: app/includes/widgets/search.php:23
+msgid "(Listdom) Search"
+msgstr ""
+
+#: app/includes/widgets/search.php:23
+msgid "A search form to filter listings!"
+msgstr ""
+
+#: app/includes/widgets/shortcode.php:22
+msgid "(Listdom) Shortcode"
+msgstr ""
+
+#: app/includes/widgets/shortcode.php:23
+msgid "Put desired Listdom shortcodes into a sidebar/widget area."
+msgstr ""
+
+#: app/includes/widgets/shortcode.php:79
+msgid ""
+"Your sidebar / widget area should be wide enough to show the shortcodes "
+"correctly. If the sidebar size is not wide then you should not use this "
+"widget."
+msgstr ""
+
+#: app/includes/widgets/shortcode.php:84
+msgid "Please create some shortcodes first!"
+msgstr ""
+
+#: app/includes/widgets/simplemap.php:22
+msgid "(Listdom) Simple Map"
+msgstr ""
+
+#: app/includes/widgets/simplemap.php:22
+msgid "Show a certain address on map."
+msgstr ""
+
+#: app/includes/widgets/simplemap.php:66
+msgid "The address that you want to show on the map!"
+msgstr ""
+
+#: app/includes/widgets/simplemap.php:93
+msgid "Location Name"
+msgstr ""
+
+#: app/includes/widgets/simplemap.php:94
+msgid "Our Office"
+msgstr ""
+
+#: app/includes/widgets/simplemap.php:98
+msgid "Map Zoom Level"
+msgstr ""
+
+#: app/includes/widgets/taxonomycloud.php:22
+msgid "(Listdom) Cloud"
+msgstr ""
+
+#: app/includes/widgets/taxonomycloud.php:23
+msgid "Put tag cloud of Listdom taxonomies into a sidebar/widget area."
+msgstr ""
+
+#: app/includes/widgets/taxonomycloud.php:65 app/includes/widgets/terms.php:65
+msgid "Taxonomy"
+msgstr ""
+
+#: app/includes/widgets/taxonomycloud.php:72 app/includes/widgets/terms.php:80
+msgid "Display Count"
+msgstr ""
+
+#: app/includes/widgets/taxonomycloud.php:80
+msgid "Hide Empty"
+msgstr ""
+
+#: app/includes/widgets/taxonomycloud.php:88 templates/elements/sortbar.php:36
+#: templates/elements/sortbar.php:39
+msgid "Sort By"
+msgstr ""
+
+#: app/includes/widgets/taxonomycloud.php:91
+msgid "Count"
+msgstr ""
+
+#: app/includes/widgets/terms.php:22
+msgid "(Listdom) Terms"
+msgstr ""
+
+#: app/includes/widgets/terms.php:23
+msgid ""
+"Put list or dropdown of Listdom taxonomies into a sidebar/widget area. Works "
+"exactly like WordPress Categories widget."
+msgstr ""
+
+#: app/includes/widgets/terms.php:72
+msgid "Display as Dropdown"
+msgstr ""
+
+#: app/includes/widgets/terms.php:88
+msgid "Hierarchical"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-fields-metabox"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid "#lsd_search_add_row"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid "#lsd_search_more_options"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-row-actions-delete"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-field-actions-delete"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-method"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-sandbox"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid "#lsd_search_available_fields"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-row"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-field-all-terms select"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid "strong"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid "#lsd_search_field_"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-field-terms"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid "#lsd_search_row_"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-sandbox > div"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid "<div class=\"lsd-search-row\" id=\"lsd_search_row_"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid ".lsd-search-more-options"
+msgstr ""
+
+#: assets/js/backend.min.js:1
+msgid "<div class=\"lsd-search-more-options\" id=\"lsd_search_row_"
+msgstr ""
+
+#: listdom.php:27
+#, php-format
+msgid ""
+"%s needs at-least PHP 7.0 or higher while your server PHP version is %s. "
+"Please contact your host provider and ask them to upgrade PHP of your server "
+"or change your host provider completely."
+msgstr ""
+
+#: listdom.php:42
+#, php-format
+msgid ""
+"%s needs at-least WordPress 4.0.0 or higher while your WordPress version is "
+"%s. Please update your WordPress to latest version first."
+msgstr ""
+
+#: templates/dashboard/form.php:232
+msgid "Remove Image"
+msgstr ""
+
+#: templates/dashboard/item.php:36
+msgid "View"
+msgstr ""
+
+#: templates/dashboard/item.php:41
+msgid "Edit"
+msgstr ""
+
+#: templates/dashboard/item.php:47
+msgid "Delete"
+msgstr ""
+
+#: templates/dashboard/manage.php:48
+#, php-format
+msgid "No listing found! %s your first listing now."
+msgstr ""
+
+#: templates/elements/abuse.php:23 templates/elements/abuse.php:24
+#: templates/elements/owner.php:122 templates/elements/owner.php:123
+msgid "Your Name"
+msgstr ""
+
+#: templates/elements/abuse.php:47 templates/elements/abuse.php:48
+#: templates/elements/owner.php:146 templates/elements/owner.php:147
+msgid "Your Phone"
+msgstr ""
+
+#: templates/elements/abuse.php:60
+msgid "Your message ..."
+msgstr ""
+
+#: templates/elements/abuse.php:61 templates/elements/owner.php:160
+msgid "Your Message"
+msgstr ""
+
+#: templates/elements/abuse.php:68 templates/elements/owner.php:167
+msgid "Send"
+msgstr ""
+
+#: templates/elements/owner.php:159
+msgid "I'm interested in ...."
+msgstr ""
+
+#: templates/maps/google.php:116
+msgid "Address from ..."
+msgstr ""
+
+#: templates/maps/google.php:121
+msgid "Your current location"
+msgstr ""
+
+#: templates/maps/google.php:126
+msgid "Get Directions"
+msgstr ""
+
+#: templates/paginations/loadmore.php:9
+msgid "Load More"
+msgstr ""
+
+#: templates/search/tpl.php:47
+#, php-format
+msgid "No filter specified for this search form. You can add some using %s."
+msgstr ""
+
+#: templates/search/tpl.php:47
+msgid "search builder"
+msgstr ""
+
+#: templates/single/style3.php:64 templates/single/style4.php:45
+#: templates/skins/carousel/style5/render.php:52
+#: templates/skins/cover/style4/render.php:27
+#: templates/skins/grid/style3/render.php:55
+#: templates/skins/halfmap/style3/render.php:52
+#: templates/skins/list/style3/render.php:54
+#: templates/skins/listgrid/style3/render.php:53
+#: templates/skins/masonry/style3/render.php:56
+#: templates/skins/slider/style5/render.php:26
+msgid "Verified"
+msgstr ""
+
+#: templates/single/style3.php:81 templates/single/style4.php:62
+msgid "Submit a Review"
+msgstr ""
+
+#: templates/skins/cover/style1/render.php:31
+#: templates/skins/cover/style2/render.php:30
+#: templates/skins/slider/style1/render.php:29
+#: templates/skins/slider/style2/render.php:29
+msgid "Read More"
+msgstr ""
+
+#: templates/taxonomy-shortcodes/carousel.php:42
+#: templates/taxonomy-shortcodes/clean.php:11
+#: templates/taxonomy-shortcodes/cloud.php:12
+#: templates/taxonomy-shortcodes/image.php:24
+#: templates/taxonomy-shortcodes/simple.php:12
+msgid "No item found!"
+msgstr ""

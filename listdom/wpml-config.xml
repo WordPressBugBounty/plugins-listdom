@@ -1,0 +1,15 @@
+<wpml-config>
+	<custom-types>
+		<custom-type translate="1">listdom-listing</custom-type>
+		<custom-type translate="1">listdom-notification</custom-type>
+		<custom-type translate="1">listdom-search</custom-type>
+	</custom-types>
+	<taxonomies>
+        <taxonomy translate="1">listdom-category</taxonomy>
+        <taxonomy translate="1">listdom-location</taxonomy>
+        <taxonomy translate="1">listdom-label</taxonomy>
+        <taxonomy translate="1">listdom-tag</taxonomy>
+        <taxonomy translate="1">listdom-feature</taxonomy>
+        <taxonomy translate="1">listdom-attribute</taxonomy>
+	</taxonomies>
+</wpml-config>
