@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Skins_Side')):
-
 /**
  * Listdom Skins Side by Side Class.
  *
  * @class LSD_Skins_Side
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Skins_Side extends LSD_Skins
 {
@@ -42,7 +40,7 @@ class LSD_Skins_Side extends LSD_Skins
     public function output()
     {
         // Pro is needed
-        if(LSD_Base::isLite())
+        if (LSD_Base::isLite())
         {
             return LSD_Base::alert(
                 LSD_Base::missFeatureMessage(
@@ -55,5 +53,3 @@ class LSD_Skins_Side extends LSD_Skins
         return parent::output();
     }
 }
-
-endif;

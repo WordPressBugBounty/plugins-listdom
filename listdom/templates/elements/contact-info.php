@@ -3,29 +3,44 @@
 defined('ABSPATH') || die();
 
 /** @var integer $post_id */
+/** @var array $args */
 
-$email = get_post_meta($post_id, 'lsd_email', true);
-$phone = get_post_meta($post_id, 'lsd_phone', true);
-$website = get_post_meta($post_id, 'lsd_website', true);
-$contact_address = get_post_meta($post_id, 'lsd_contact_address', true);
+$email = !isset($args['show_email']) || $args['show_email']
+    ? get_post_meta($post_id, 'lsd_email', true)
+    : '';
 
-$SN = new LSD_Socials();
-$networks = LSD_Options::socials();
+$phone = !isset($args['show_phone']) || $args['show_phone']
+    ? get_post_meta($post_id, 'lsd_phone', true)
+    : '';
+
+$website = !isset($args['show_website']) || $args['show_website']
+    ? get_post_meta($post_id, 'lsd_website', true)
+    : '';
+
+$contact_address = !isset($args['show_address']) || $args['show_address']
+    ? get_post_meta($post_id, 'lsd_contact_address', true)
+    : '';
 
 $socials = '';
-foreach($networks as $network=>$values)
+if(!isset($args['show_socials']) || $args['show_socials'])
 {
-    $obj = $SN->get($network, $values);
+    $SN = new LSD_Socials();
+    $networks = LSD_Options::socials();
 
-    // Social Network is not Enabled
-    if(!$obj || !$obj->option('listing')) continue;
+    foreach($networks as $network=>$values)
+    {
+        $obj = $SN->get($network, $values);
 
-    $link = get_post_meta($post_id, 'lsd_'.$obj->key(), true);
+        // Social Network is not Enabled
+        if(!$obj || !$obj->option('listing')) continue;
 
-    // Social Network is not filled
-    if(trim($link) == '') continue;
+        $link = get_post_meta($post_id, 'lsd_'.$obj->key(), true);
 
-    $socials .= '<li>'.$obj->listing($link).'</li>';
+        // Social Network is not filled
+        if(trim($link) == '') continue;
+
+        $socials .= '<li>'.$obj->listing($link).'</li>';
+    }
 }
 
 // No data

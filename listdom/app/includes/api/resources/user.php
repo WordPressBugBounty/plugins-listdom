@@ -2,28 +2,26 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Resources_User')):
-
 /**
  * Listdom API User Resource Class.
  *
  * @class LSD_API_Resources_User
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Resources_User extends LSD_API_Resource
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function get($user): array
     {
         // Get User by ID
-        if(is_numeric($user)) $user = get_user_by('id', $user);
+        if (is_numeric($user)) $user = get_user_by('id', $user);
 
         // Resource
         $resource = new LSD_API_Resource();
@@ -57,7 +55,7 @@ class LSD_API_Resources_User extends LSD_API_Resource
             'roles' => $user->roles,
             'capabilities' => $user->allcaps,
         ], $user);
-	}
+    }
 
     public static function minify($user): array
     {
@@ -72,5 +70,3 @@ class LSD_API_Resources_User extends LSD_API_Resource
         return $data;
     }
 }
-
-endif;

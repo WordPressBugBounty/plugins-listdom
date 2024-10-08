@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controller')):
-
 /**
  * Listdom API Controller Class.
  *
  * @class LSD_API_Controller
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controller extends LSD_API
 {
@@ -18,15 +16,15 @@ class LSD_API_Controller extends LSD_API
     protected $validate;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
         // Validation
         $this->validate = new LSD_API_Validation();
-	}
+    }
 
     public function getUserToken($user_id): string
     {
@@ -34,12 +32,12 @@ class LSD_API_Controller extends LSD_API
         update_user_meta($user_id, 'lsd_token', $token);
 
         return $token;
-	}
+    }
 
     public function revokeUserToken($user_id)
     {
         delete_user_meta($user_id, 'lsd_token');
-	}
+    }
 
     public function getLoginKey($user_id): string
     {
@@ -65,18 +63,18 @@ class LSD_API_Controller extends LSD_API
     public function permission(WP_REST_Request $request)
     {
         // Validate API Token
-        if(!$this->validate->APIToken($request, $request->get_header('lsd-token'))) return new WP_Error('invalid_api_token', esc_html__('Invalid API Token!', 'listdom'));
+        if (!$this->validate->APIToken($request, $request->get_header('lsd-token'))) return new WP_Error('invalid_api_token', esc_html__('Invalid API Token!', 'listdom'));
 
         // Validate User Token
-        if(!$this->validate->UserToken($request, $request->get_header('lsd-user'))) return new WP_Error('invalid_user_token', esc_html__('Invalid User Token!', 'listdom'));
+        if (!$this->validate->UserToken($request, $request->get_header('lsd-user'))) return new WP_Error('invalid_user_token', esc_html__('Invalid User Token!', 'listdom'));
 
         return true;
-	}
+    }
 
     public function guest(WP_REST_Request $request)
     {
         // Validate API Token
-        if(!$this->validate->APIToken($request, $request->get_header('lsd-token'))) return new WP_Error('invalid_api_token', esc_html__('Invalid API Token!', 'listdom'));
+        if (!$this->validate->APIToken($request, $request->get_header('lsd-token'))) return new WP_Error('invalid_api_token', esc_html__('Invalid API Token!', 'listdom'));
 
         // Set Current User if Token Provided
         $this->validate->UserToken($request, $request->get_header('lsd-user'));
@@ -93,7 +91,5 @@ class LSD_API_Controller extends LSD_API
         $wp->set_status($status);
 
         return $wp;
-	}
+    }
 }
-
-endif;

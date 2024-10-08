@@ -2,37 +2,35 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Taxonomies_Category')):
-
 /**
  * Listdom Category Taxonomy Class.
  *
  * @class LSD_Taxonomies_Category
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Taxonomies_Category extends LSD_Taxonomies
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register']);
         add_action('add_meta_boxes', [$this, 'register_metaboxes'], 5, 2);
 
-        add_action(LSD_Base::TAX_CATEGORY.'_add_form_fields', [$this, 'add_form']);
-        add_action(LSD_Base::TAX_CATEGORY.'_edit_form_fields', [$this, 'edit_form']);
-        add_action('created_'.LSD_Base::TAX_CATEGORY, [$this, 'save_metadata']);
-        add_action('edited_'.LSD_Base::TAX_CATEGORY, [$this, 'save_metadata']);
+        add_action(LSD_Base::TAX_CATEGORY . '_add_form_fields', [$this, 'add_form']);
+        add_action(LSD_Base::TAX_CATEGORY . '_edit_form_fields', [$this, 'edit_form']);
+        add_action('created_' . LSD_Base::TAX_CATEGORY, [$this, 'save_metadata']);
+        add_action('edited_' . LSD_Base::TAX_CATEGORY, [$this, 'save_metadata']);
 
-        add_filter('manage_edit-'.LSD_Base::TAX_CATEGORY.'_columns', [$this, 'filter_columns']);
-        add_filter('manage_'.LSD_Base::TAX_CATEGORY.'_custom_column', [$this, 'filter_columns_content'], 10, 3);
-        add_filter('manage_edit-'.LSD_Base::TAX_CATEGORY.'_sortable_columns', [$this, 'filter_sortable_columns']);
+        add_filter('manage_edit-' . LSD_Base::TAX_CATEGORY . '_columns', [$this, 'filter_columns']);
+        add_filter('manage_' . LSD_Base::TAX_CATEGORY . '_custom_column', [$this, 'filter_columns_content'], 10, 3);
+        add_filter('manage_edit-' . LSD_Base::TAX_CATEGORY . '_sortable_columns', [$this, 'filter_sortable_columns']);
     }
 
     public function register()
@@ -79,7 +77,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
 
     public function register_metaboxes()
     {
-        add_meta_box('lsd_metabox_category', esc_html__('Category', 'listdom').' '.LSD_Base::REQ_HTML, [$this, 'metabox_category'], LSD_Base::PTYPE_LISTING, 'side', 'low');
+        add_meta_box('lsd_metabox_category', esc_html__('Category', 'listdom') . ' ' . LSD_Base::REQ_HTML, [$this, 'metabox_category'], LSD_Base::PTYPE_LISTING, 'side', 'low');
     }
 
     public function metabox_category($post)
@@ -90,7 +88,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         // Security Nonce
         LSD_Form::nonce('lsd_listing_cpt', '_lsdnonce');
 
-        echo '<p>'.esc_html__('Please select primary category.', 'listdom').'</p>';
+        echo '<p>' . esc_html__('Please select primary category.', 'listdom') . '</p>';
         echo wp_dropdown_categories([
             'echo' => 0,
             'hide_empty' => 0,
@@ -143,7 +141,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
             <p class="description"><?php esc_html_e("The image used for category views/shortcodes.", 'listdom'); ?></p>
         </div>
         <div class="form-field">
-            <?php if(!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
+            <?php if (!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
             <?php else: ?>
                 <label for="lsd_schema"><?php esc_html_e('Schema Type', 'listdom'); ?></label>
                 <?php echo LSD_Form::url([
@@ -205,7 +203,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
                 <p class="description"><?php esc_html_e("The image used for category views/shortcodes.", 'listdom'); ?></p>
             </td>
         </tr>
-        <?php if($this->isPro()): ?>
+        <?php if ($this->isPro()): ?>
         <tr class="form-field">
             <th scope="row">
                 <label for="lsd_schema"><?php esc_html_e('Schema Type', 'listdom'); ?></label>
@@ -220,14 +218,14 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
                 <p class="description"><?php esc_html_e("Schema Item Type (https://schema.org/)", 'listdom'); ?></p>
             </td>
         </tr>
-        <?php endif; ?>
+    <?php endif; ?>
         <?php
     }
 
     public function save_metadata($term_id)
     {
         // It's quick edit
-        if(!isset($_POST['lsd_icon'])) return false;
+        if (!isset($_POST['lsd_icon'])) return false;
 
         $icon = sanitize_text_field($_POST['lsd_icon']);
         $color = isset($_POST['lsd_color']) ? sanitize_text_field($_POST['lsd_color']) : '';
@@ -272,7 +270,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
 
     public function filter_columns_content($content, $column_name, $term_id)
     {
-        switch($column_name)
+        switch ($column_name)
         {
             case 'image':
 
@@ -281,7 +279,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
 
             case 'icon':
 
-                $content = '<div class="lsd-preview-color" style="background-color: '.get_term_meta($term_id, 'lsd_color', true).'"><div class="lsd-icon-wrapper">'.LSD_Taxonomies::icon($term_id, 'fa-lg').'</div></div>';
+                $content = '<div class="lsd-preview-color" style="background-color: ' . get_term_meta($term_id, 'lsd_color', true) . '"><div class="lsd-icon-wrapper">' . LSD_Taxonomies::icon($term_id, 'fa-lg') . '</div></div>';
                 break;
 
             default:
@@ -291,5 +289,3 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         return $content;
     }
 }
-
-endif;

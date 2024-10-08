@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Notifications_Email_Prepare')):
-
 /**
  * Listdom Notifications Email Prepare Class.
  *
  * @class LSD_Notifications_Email_Prepare
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Notifications_Email_Prepare extends LSD_Notifications
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
@@ -33,9 +31,9 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
 
         // Listing Status Changed
         add_action('lsd_listing_report_abuse', [$this, 'abuse'], 10, 2);
-	}
+    }
 
-	public function contact($args)
+    public function contact($args)
     {
         return $this->form($args, 'lsd_contact_owner');
     }
@@ -50,7 +48,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         $mails = [];
 
         $notifications = $this->get('lsd_new_listing');
-        foreach($notifications as $notification)
+        foreach ($notifications as $notification)
         {
             $content = get_post_meta($notification->ID, 'lsd_content', true);
             $subject = get_the_title($notification);
@@ -59,7 +57,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             $original_to = get_post_meta($notification->ID, 'lsd_original_to', true);
 
             // Original Recipient
-            if($original_to) $to = get_bloginfo('admin_email');
+            if ($original_to) $to = get_bloginfo('admin_email');
             // Custom Recipient
             else $to = trim(get_post_meta($notification->ID, 'lsd_to', true), ', ');
 
@@ -67,7 +65,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             $bcc = trim(get_post_meta($notification->ID, 'lsd_bcc', true), ', ');
 
             // Specific Placeholders
-            foreach(['content', 'subject'] as $item)
+            foreach (['content', 'subject'] as $item)
             {
                 $$item = str_replace('#owner_name#', $owner_name, $$item);
                 $$item = str_replace('#owner_email#', $owner_email, $$item);
@@ -89,7 +87,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
     public function listing_status_changed($listing_id, $previous)
     {
         // Do not send anything for new listings
-        if($previous === 'new') return false;
+        if ($previous === 'new') return false;
 
         $owner_id = get_post_field('post_author', $listing_id);
         $owner_name = get_the_author_meta('display_name', $owner_id);
@@ -102,7 +100,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         $mails = [];
 
         $notifications = $this->get('lsd_listing_status_changed');
-        foreach($notifications as $notification)
+        foreach ($notifications as $notification)
         {
             $content = get_post_meta($notification->ID, 'lsd_content', true);
             $subject = get_the_title($notification);
@@ -111,7 +109,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             $original_to = get_post_meta($notification->ID, 'lsd_original_to', true);
 
             // Original Recipient
-            if($original_to) $to = get_the_author_meta('email', $owner_id);
+            if ($original_to) $to = get_the_author_meta('email', $owner_id);
             // Custom Recipient
             else $to = trim(get_post_meta($notification->ID, 'lsd_to', true), ', ');
 
@@ -119,7 +117,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             $bcc = trim(get_post_meta($notification->ID, 'lsd_bcc', true), ', ');
 
             // Specific Placeholders
-            foreach(['content', 'subject'] as $item)
+            foreach (['content', 'subject'] as $item)
             {
                 $$item = str_replace('#previous_status#', $status->label ?? '', $$item);
                 $$item = str_replace('#owner_name#', $owner_name, $$item);
@@ -159,7 +157,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         $mails = [];
 
         $notifications = $this->get($hook);
-        foreach($notifications as $notification)
+        foreach ($notifications as $notification)
         {
             $content = get_post_meta($notification->ID, 'lsd_content', true);
             $subject = get_the_title($notification);
@@ -168,9 +166,9 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             $original_to = get_post_meta($notification->ID, 'lsd_original_to', true);
 
             // Original Recipient
-            if($original_to)
+            if ($original_to)
             {
-                if($hook === 'lsd_listing_report_abuse') $to = get_bloginfo('admin_email');
+                if ($hook === 'lsd_listing_report_abuse') $to = get_bloginfo('admin_email');
                 else $to = get_the_author_meta('email', $owner_id);
             }
             // Custom Recipient
@@ -180,12 +178,12 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             $bcc = trim(get_post_meta($notification->ID, 'lsd_bcc', true), ', ');
 
             // Specific Placeholders
-            foreach(['content', 'subject'] as $item)
+            foreach (['content', 'subject'] as $item)
             {
                 $$item = str_replace('#name#', $name, $$item);
                 $$item = str_replace('#email#', $email, $$item);
                 $$item = str_replace('#phone#', $phone, $$item);
-                $$item = str_replace('#message#', '<i>'.nl2br($message).'</i>', $$item);
+                $$item = str_replace('#message#', '<i>' . nl2br($message) . '</i>', $$item);
             }
 
             $sender = new LSD_Notifications_Email_Sender();
@@ -210,5 +208,3 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         return $mails;
     }
 }
-
-endif;

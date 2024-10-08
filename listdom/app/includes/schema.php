@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Schema')):
-
 /**
  * Listdom Schema Class.
  *
  * @class LSD_Schema
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Schema extends LSD_Base
 {
@@ -28,9 +26,9 @@ class LSD_Schema extends LSD_Base
     private $schema;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
@@ -51,9 +49,9 @@ class LSD_Schema extends LSD_Base
 
     public function scope(): LSD_Schema
     {
-        if($this->pro) $this->schema[] = 'itemscope';
+        if ($this->pro) $this->schema[] = 'itemscope';
         return $this;
-	}
+    }
 
     /**
      * @param string $type
@@ -62,18 +60,18 @@ class LSD_Schema extends LSD_Base
      */
     public function type($type = null, $category = null): LSD_Schema
     {
-        if($this->pro)
+        if ($this->pro)
         {
-            if(!$type)
+            if (!$type)
             {
                 // Category Type
                 $t = isset($category->term_id) ? get_term_meta($category->term_id, 'lsd_schema', true) : '';
-                if(!trim($t)) $t = 'https://schema.org/LocalBusiness';
+                if (!trim($t)) $t = 'https://schema.org/LocalBusiness';
 
                 $type = $t;
             }
 
-            $this->schema[] = 'itemtype="'.esc_attr($type).'"';
+            $this->schema[] = 'itemtype="' . esc_attr($type) . '"';
         }
 
         return $this;
@@ -81,19 +79,19 @@ class LSD_Schema extends LSD_Base
 
     public function attr($name, $value): LSD_Schema
     {
-        if($this->pro) $this->schema[] = $name.'="'.esc_attr($value).'"';
+        if ($this->pro) $this->schema[] = $name . '="' . esc_attr($value) . '"';
         return $this;
     }
 
     public function meta($name, $value): LSD_Schema
     {
-        if($this->pro) $this->schema[] = '<meta itemprop="'.esc_attr($name).'" content="'.esc_attr($value).'">';
+        if ($this->pro) $this->schema[] = '<meta itemprop="' . esc_attr($name) . '" content="' . esc_attr($value) . '">';
         return $this;
     }
 
     public function prop($name): LSD_Schema
     {
-        if($this->pro) $this->schema[] = 'itemprop="'.esc_attr($name).'"';
+        if ($this->pro) $this->schema[] = 'itemprop="' . esc_attr($name) . '"';
         return $this;
     }
 
@@ -126,46 +124,44 @@ class LSD_Schema extends LSD_Base
     {
         return $this->prop('email');
     }
-	
-	public function description(): LSD_Schema
+
+    public function description(): LSD_Schema
     {
         return $this->prop('description');
     }
-	
-	public function jobTitle(): LSD_Schema
+
+    public function jobTitle(): LSD_Schema
     {
         return $this->prop('jobTitle');
     }
-	
-	public function faxNumber(): LSD_Schema
+
+    public function faxNumber(): LSD_Schema
     {
         return $this->prop('faxNumber');
     }
-	
-	public function openingHours(): LSD_Schema
+
+    public function openingHours(): LSD_Schema
     {
         return $this->prop('openingHours');
     }
-	
-	public function category(): LSD_Schema
+
+    public function category(): LSD_Schema
     {
         return $this->prop('category');
     }
-	
-	public function subjectOf(): LSD_Schema
+
+    public function subjectOf(): LSD_Schema
     {
         return $this->prop('subjectOf');
     }
-	
-	public function commentText(): LSD_Schema
+
+    public function commentText(): LSD_Schema
     {
         return $this->prop('commentText');
     }
-	
-	public function associatedMedia(): LSD_Schema
+
+    public function associatedMedia(): LSD_Schema
     {
         return $this->prop('associatedMedia');
     }
 }
-
-endif;

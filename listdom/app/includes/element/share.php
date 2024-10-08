@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Element_Share')):
-
 /**
  * Listdom Share Element Class.
  *
  * @class LSD_Element_Share
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Element_Share extends LSD_Element
 {
@@ -18,11 +16,11 @@ class LSD_Element_Share extends LSD_Element
     public $args;
 
     /**
-	 * Constructor method
+     * Constructor method
      * @param string $layout
      * @param array $args
-	 */
-	public function __construct(string $layout = 'full', array $args = [])
+     */
+    public function __construct(string $layout = 'full', array $args = [])
     {
         // Call the parent constructor
         parent::__construct();
@@ -30,11 +28,11 @@ class LSD_Element_Share extends LSD_Element
         $this->label = esc_html__('Share', 'listdom');
         $this->layout = $layout;
         $this->args = $args;
-	}
+    }
 
-	public function get($post_id = null)
+    public function get($post_id = null)
     {
-        if(is_null($post_id))
+        if (is_null($post_id))
         {
             global $post;
             $post_id = $post->ID;
@@ -53,5 +51,3 @@ class LSD_Element_Share extends LSD_Element
         );
     }
 }
-
-endif;

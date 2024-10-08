@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Login')):
-
 /**
  * Listdom API Login Controller Class.
  *
  * @class LSD_API_Controllers_Login
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controllers_Login extends LSD_API_Controller
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function perform(WP_REST_Request $request)
     {
@@ -31,11 +29,11 @@ class LSD_API_Controllers_Login extends LSD_API_Controller
         $response = wp_signon([
             'user_login' => $username,
             'user_password' => $password,
-            'remember' => false
+            'remember' => false,
         ], is_ssl());
 
         // Invalid Credentials
-        if(is_wp_error($response)) return $response;
+        if (is_wp_error($response)) return $response;
 
         // Trigger Action
         do_action('lsd_api_user_loggedin', $response->ID, $request);
@@ -47,9 +45,9 @@ class LSD_API_Controllers_Login extends LSD_API_Controller
                 'id' => $response->ID,
                 'token' => $this->getUserToken($response->ID),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
-	}
+    }
 
     public function key(WP_REST_Request $request)
     {
@@ -59,9 +57,9 @@ class LSD_API_Controllers_Login extends LSD_API_Controller
                 'success' => 1,
                 'key' => $this->getLoginKey(get_current_user_id()),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
-	}
+    }
 
     public function redirect(WP_REST_Request $request)
     {
@@ -73,14 +71,14 @@ class LSD_API_Controllers_Login extends LSD_API_Controller
             'meta_key' => 'lsd_login',
             'meta_value' => $key,
             'number' => 1,
-            'count_total' => false
+            'count_total' => false,
         ]);
 
         // User
         $user = reset($users);
 
         // Not Found!
-        if(!$user || !$user->ID) return $this->response([
+        if (!$user || !$user->ID) return $this->response([
             'data' => new WP_Error('404', esc_html__('User not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -92,11 +90,9 @@ class LSD_API_Controllers_Login extends LSD_API_Controller
 
         // Redirection URL
         $redirect_url = urldecode($request->get_param('redirect_url'));
-        if(!trim($redirect_url)) $redirect_url = get_home_url();
+        if (!trim($redirect_url)) $redirect_url = get_home_url();
 
         wp_redirect($redirect_url);
         exit;
-	}
+    }
 }
-
-endif;

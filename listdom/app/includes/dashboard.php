@@ -2,24 +2,22 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Dashboard')):
-
 /**
  * Listdom Dashboard Class.
  *
  * @class LSD_Dashboard
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Dashboard extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         // Dashboard Shortcode
@@ -42,7 +40,7 @@ class LSD_Dashboard extends LSD_Base
             ['label' => esc_html__('Features', 'listdom'), 'key' => 'features'],
             ['label' => esc_html__('Labels', 'listdom'), 'key' => 'labels'],
             ['label' => esc_html__('Featured Image', 'listdom'), 'key' => 'image'],
-            ['label' => esc_html__('Embed Codes', 'listdom'), 'key' => 'embed']
+            ['label' => esc_html__('Embed Codes', 'listdom'), 'key' => 'embed'],
         ];
 
         return apply_filters('lsd_dashboard_modules', $modules);
@@ -79,7 +77,7 @@ class LSD_Dashboard extends LSD_Base
         $SN = new LSD_Socials();
         $networks = LSD_Options::socials();
 
-        foreach($networks as $network=>$values)
+        foreach ($networks as $network => $values)
         {
             $obj = $SN->get($network, $values);
             $fields[$obj->key()] = ['label' => $obj->label(), 'module' => 'contact'];
@@ -88,5 +86,3 @@ class LSD_Dashboard extends LSD_Base
         return apply_filters('lsd_dashboard_fields', $fields);
     }
 }
-
-endif;

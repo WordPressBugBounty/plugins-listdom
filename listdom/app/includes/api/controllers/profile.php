@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Profile')):
-
 /**
  * Listdom API Profile Controller Class.
  *
  * @class LSD_API_Controllers_Profile
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controllers_Profile extends LSD_API_Controller
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function get(WP_REST_Request $request)
     {
@@ -26,7 +24,7 @@ class LSD_API_Controllers_Profile extends LSD_API_Controller
         $user = wp_get_current_user();
 
         // Invalid User
-        if(is_wp_error($user)) return $user;
+        if (is_wp_error($user)) return $user;
 
         // Response
         return $this->response([
@@ -34,9 +32,9 @@ class LSD_API_Controllers_Profile extends LSD_API_Controller
                 'success' => 1,
                 'user' => LSD_API_Resources_User::get($user),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
-	}
+    }
 
     public function update(WP_REST_Request $request)
     {
@@ -62,7 +60,7 @@ class LSD_API_Controllers_Profile extends LSD_API_Controller
             'ID' => $user_id,
             'first_name' => $first_name,
             'last_name' => $last_name,
-            'display_name' => trim($first_name.' '.$last_name),
+            'display_name' => trim($first_name . ' ' . $last_name),
             'description' => $description,
         ]);
 
@@ -85,9 +83,7 @@ class LSD_API_Controllers_Profile extends LSD_API_Controller
                 'success' => 1,
                 'user' => LSD_API_Resources_User::get($user_id),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 }
-
-endif;

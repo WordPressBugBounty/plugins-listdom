@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Notifications')):
-
 /**
  * Listdom Notifications Class.
  *
  * @class LSD_Notifications
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Notifications extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
@@ -33,7 +31,7 @@ class LSD_Notifications extends LSD_Base
         // Send Emails
         $EmailPrepare = new LSD_Notifications_Email_Prepare();
         $EmailPrepare->init();
-	}
+    }
 
     public static function get_notification_hooks()
     {
@@ -108,9 +106,7 @@ class LSD_Notifications extends LSD_Base
                     'key' => 'lsd_hook',
                     'value' => $hook,
                 ],
-            ]
+            ],
         ]);
     }
 }
-
-endif;

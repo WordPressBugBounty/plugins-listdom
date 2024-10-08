@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Options')):
-
 /**
  * Listdom Main Class.
  *
  * @class LSD_Options
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Options extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function settings(): array
     {
@@ -26,7 +24,7 @@ class LSD_Options extends LSD_Base
             get_option('lsd_settings', []),
             self::defaults()
         );
-	}
+    }
 
     public static function api(): array
     {
@@ -34,11 +32,19 @@ class LSD_Options extends LSD_Base
         $current = get_option('lsd_api', []);
 
         // Add if not exists
-        if(!is_array($current) or !isset($current['tokens'])) update_option('lsd_api', $defaults);
+        if (!is_array($current) or !isset($current['tokens'])) update_option('lsd_api', $defaults);
 
         return self::parse_args(
             $current,
             $defaults
+        );
+    }
+
+    public static function auth(): array
+    {
+        return self::parse_args(
+            get_option('lsd_auth', []),
+            self::defaults('auth')
         );
     }
 
@@ -58,10 +64,18 @@ class LSD_Options extends LSD_Base
         );
     }
 
+    public static function dummy(): array
+    {
+        return self::parse_args(
+            get_option('lsd_dummy', []),
+            self::defaults('dummy')
+        );
+    }
+
     public static function socials()
     {
         $socials = get_option('lsd_socials', []);
-        if(count($socials)) return $socials;
+        if (count($socials)) return $socials;
 
         return self::parse_args(
             $socials,
@@ -85,7 +99,7 @@ class LSD_Options extends LSD_Base
         );
 
         // Save Options
-        if(is_array($values))
+        if (is_array($values))
         {
             $addons[$addon] = $values;
 
@@ -98,12 +112,12 @@ class LSD_Options extends LSD_Base
 
     public static function defaults($option = 'settings')
     {
-        switch($option)
+        switch ($option)
         {
             case 'styles';
 
                 $defaults = [
-                    'CSS' => ''
+                    'CSS' => '',
                 ];
                 break;
 
@@ -189,15 +203,15 @@ class LSD_Options extends LSD_Base
                     'elements' => [
                         'labels' => ['enabled' => 1, 'show_title' => 0],
                         'image' => ['enabled' => 1, 'show_title' => 0],
-                        'gallery' => ['enabled' => 1, 'show_title' => 0],
                         'video' => ['enabled' => 0, 'show_title' => 0],
                         'title' => ['enabled' => 1, 'show_title' => 0],
                         'categories' => ['enabled' => 1, 'show_title' => 1],
                         'price' => ['enabled' => 1, 'show_title' => 0],
                         'tags' => ['enabled' => 1, 'show_title' => 1],
                         'content' => ['enabled' => 1, 'show_title' => 0],
+                        'gallery' => ['enabled' => 1, 'show_title' => 0],
                         'embed' => ['enabled' => 0, 'show_title' => 0],
-                        'attributes' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0],
+                        'attributes' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0, 'show_attribute_title' => 1],
                         'features' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0],
                         'contact' => ['enabled' => 1, 'show_title' => 1],
                         'remark' => ['enabled' => 1, 'show_title' => 0],
@@ -208,26 +222,26 @@ class LSD_Options extends LSD_Base
                         'owner' => ['enabled' => 1, 'show_title' => 0],
                         'share' => ['enabled' => 1, 'show_title' => 0],
                         'abuse' => ['enabled' => 0, 'show_title' => 0],
-                    ]
+                    ],
                 ];
 
                 break;
 
             case 'details_page_pattern':
 
-                $defaults = '{labels}{image}{gallery}{title}{categories}{price}{tags}{content}{embed}{attributes}{features}{contact}{remark}{locations}{address}{map}{availability}{owner}{share}';
+                $defaults = '{labels}{image}{title}{categories}{price}{tags}{content}{gallery}{embed}{attributes}{features}{contact}{remark}{locations}{address}{map}{availability}{owner}{share}';
                 break;
 
             case 'mapcontrols':
 
                 $defaults = [
-                    'zoom'=>'RIGHT_BOTTOM',
-                    'maptype'=>'TOP_LEFT',
-                    'streetview'=>'RIGHT_BOTTOM',
-                    'draw'=>'TOP_CENTER',
-                    'gps'=>'RIGHT_BOTTOM',
-                    'scale'=>'0',
-                    'fullscreen'=>'1',
+                    'zoom' => 'RIGHT_BOTTOM',
+                    'maptype' => 'TOP_LEFT',
+                    'streetview' => 'RIGHT_BOTTOM',
+                    'draw' => 'TOP_CENTER',
+                    'gps' => 'RIGHT_BOTTOM',
+                    'scale' => '0',
+                    'fullscreen' => '1',
                 ];
 
                 break;
@@ -237,9 +251,10 @@ class LSD_Options extends LSD_Base
                 $defaults = [
                     'default' => [
                         'orderby' => 'post_date',
-                        'order' => 'DESC'
+                        'order' => 'DESC',
                     ],
                     'display' => 1,
+                    'sort_style' => '',
                     'options' => [
                         'post_date' => [
                             'status' => '1',
@@ -271,7 +286,7 @@ class LSD_Options extends LSD_Base
                             'name' => esc_html__('Most Viewed', 'listdom'),
                             'order' => 'DESC',
                         ],
-                    ]
+                    ],
                 ];
 
                 break;
@@ -287,8 +302,80 @@ class LSD_Options extends LSD_Base
                     'tokens' => [
                         [
                             'name' => esc_html__('Default API', 'listdom'),
-                            'key' => LSD_Base::str_random(40)
+                            'key' => LSD_Base::str_random(40),
                         ],
+                    ],
+                ];
+                break;
+
+            case 'auth':
+
+                $defaults = [
+                    'auth' => [
+                        'switch_style' => 'both',
+                        'hide_login_form' => 0,
+                        'hide_register_form' => 0,
+                        'hide_forgot_password_form' => 0,
+                        'register_tab_label' => __('Register', 'listdom'),
+                        'register_link_label' => __('Not a member? Register.', 'listdom'),
+                        'login_tab_label' => __('Login', 'listdom'),
+                        'login_link_label' => __('Already a member? Login.', 'listdom'),
+                        'forgot_password_tab_label' => __('Forgot Password', 'listdom'),
+                        'forgot_password_link_label' => __('Forgot your password?', 'listdom'),
+                    ],
+                    'register' => [
+                        'redirect' => get_option('page_on_front') ?? 0,
+                        'username_label' => __('Username', 'listdom'),
+                        'username_placeholder' => __('Enter your username', 'listdom'),
+                        'password_label' => __('Password', 'listdom'),
+                        'password_placeholder' => __('Enter your password', 'listdom'),
+                        'email_label' => __('Email', 'listdom'),
+                        'email_placeholder' => __('Enter your email address', 'listdom'),
+                        'submit_label' => __('Register', 'listdom'),
+                        'login_after_register' => 1,
+                        'strong_password' => 1,
+                        'password_length' => 8,
+                        'contain_uppercase' => 1,
+                        'contain_lowercase' => 1,
+                        'contain_numbers' => 1,
+                        'contain_specials' => 1,
+                    ],
+                    'login' => [
+                        'redirect' => get_option('page_on_front') ?? 0,
+                        'username_label' => __('Username', 'listdom'),
+                        'password_label' => __('Password', 'listdom'),
+                        'username_placeholder' => __('Enter your username', 'listdom'),
+                        'password_placeholder' => __('Enter your password', 'listdom'),
+                        'remember_label' => __('Remember Me', 'listdom'),
+                        'submit_label' => __('Log In', 'listdom'),
+                    ],
+                    'forgot_password' => [
+                        'redirect' => get_option('page_on_front') ?? 0,
+                        'email_label' => __('Email', 'listdom'),
+                        'email_placeholder' => __('Enter your Email Address', 'listdom'),
+                        'submit_label' => __('Reset Password', 'listdom'),
+                    ],
+                    'account' => [
+                        'redirect' => get_option('page_on_front') ?? 0,
+                    ],
+                    'logout' => [
+                        'redirect' => get_option('page_on_front') ?? 0,
+                    ],
+                ];
+                break;
+
+            case 'dummy':
+                $defaults = [
+                    'dummy' => [
+                        'listings' => 1,
+                        'categories' => 1,
+                        'locations' => 1,
+                        'tags' => 1,
+                        'features' => 1,
+                        'labels' => 1,
+                        'shortcodes' => 1,
+                        'frontend_dashboard' => 1,
+                        'attributes' => 1
                     ]
                 ];
                 break;
@@ -433,4 +520,3 @@ class LSD_Options extends LSD_Base
     }
 }
 
-endif;

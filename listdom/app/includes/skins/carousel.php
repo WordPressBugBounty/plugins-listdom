@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Skins_Carousel')):
-
 /**
  * Listdom Skins Carousel Class.
  *
  * @class LSD_Skins_Carousel
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Skins_Carousel extends LSD_Skins
 {
@@ -29,8 +27,6 @@ class LSD_Skins_Carousel extends LSD_Skins
 
     public function query_meta(): array
     {
-        return [['key'=>'_thumbnail_id']];
+        return [['key' => '_thumbnail_id']];
     }
 }
-
-endif;

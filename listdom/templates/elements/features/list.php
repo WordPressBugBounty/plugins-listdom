@@ -3,11 +3,12 @@
 defined('ABSPATH') || die();
 
 /** @var int $post_id */
+/** @var int $list_style */
 
-$terms = wp_get_post_terms($post_id, LSD_Base::TAX_FEATURE, []);
+$terms = wp_get_post_terms($post_id, LSD_Base::TAX_FEATURE);
 if(!count($terms)) return '';
 ?>
-<ul>
+<ul class="lsd-features-style-<?php echo esc_attr($list_style); ?>">
     <?php foreach($terms as $term): ?>
     <?php
         $icon = LSD_Taxonomies::icon($term->term_id);

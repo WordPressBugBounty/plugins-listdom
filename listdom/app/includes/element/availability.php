@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Element_Availability')):
-
 /**
  * Listdom Availability Element Class.
  *
  * @class LSD_Element_Availability
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Element_Availability extends LSD_Element
 {
@@ -18,11 +16,11 @@ class LSD_Element_Availability extends LSD_Element
     public $day = null;
 
     /**
-	 * Constructor method
+     * Constructor method
      * @param boolean $oneday
      * @param int $day
-	 */
-	public function __construct($oneday = false, $day = null)
+     */
+    public function __construct($oneday = false, $day = null)
     {
         // Call the parent constructor
         parent::__construct();
@@ -30,11 +28,11 @@ class LSD_Element_Availability extends LSD_Element
         $this->label = esc_html__('Availability', 'listdom');
         $this->oneday = $oneday;
         $this->day = $day;
-	}
+    }
 
-	public function get($post_id = null)
+    public function get($post_id = null)
     {
-        if(is_null($post_id))
+        if (is_null($post_id))
         {
             global $post;
             $post_id = $post->ID;
@@ -53,5 +51,3 @@ class LSD_Element_Availability extends LSD_Element
         );
     }
 }
-
-endif;

@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Skins_Cover')):
-
 /**
  * Listdom Skins Cover Class.
  *
  * @class LSD_Skins_Cover
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Skins_Cover extends LSD_Skins
 {
@@ -36,5 +34,3 @@ class LSD_Skins_Cover extends LSD_Skins
         $this->args['post__in'] = [$this->post_id];
     }
 }
-
-endif;

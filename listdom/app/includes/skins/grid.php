@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Skins_Grid')):
-
 /**
  * Listdom Skins Grid Class.
  *
  * @class LSD_Skins_Grid
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Skins_Grid extends LSD_Skins
 {
@@ -32,5 +30,3 @@ class LSD_Skins_Grid extends LSD_Skins
         add_action('wp_ajax_nopriv_lsd_grid_sort', [$this, 'filter']);
     }
 }
-
-endif;

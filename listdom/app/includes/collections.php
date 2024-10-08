@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Collections')):
-
 /**
  * Listdom Collections.
  *
  * @class LSD_Collections
- * @version	1.0.0
+ * @version    1.0.0
  */
 abstract class LSD_Collections
 {
@@ -53,7 +51,7 @@ abstract class LSD_Collections
         $collections = $this->all();
 
         // Remove Requested Item
-        if(isset($collections[$key])) unset($collections[$key]);
+        if (isset($collections[$key])) unset($collections[$key]);
 
         // Save New Set
         $this->save($collections);
@@ -80,7 +78,7 @@ abstract class LSD_Collections
         $collections = $this->all();
 
         $options = [];
-        foreach($collections as $key => $item)
+        foreach ($collections as $key => $item)
         {
             $options[$key] = $item['name'];
         }
@@ -89,5 +87,3 @@ abstract class LSD_Collections
         return LSD_Form::select($args);
     }
 }
-
-endif;

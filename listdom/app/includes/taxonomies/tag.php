@@ -2,24 +2,22 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Taxonomies_Tag')):
-
 /**
  * Listdom Tag Taxonomy Class.
  *
  * @class LSD_Taxonomies_Tag
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Taxonomies_Tag extends LSD_Taxonomies
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register']);
@@ -54,7 +52,7 @@ class LSD_Taxonomies_Tag extends LSD_Taxonomies
             'show_in_rest' => false,
             'hierarchical' => false,
             'has_archive' => true,
-            'rewrite' => ['slug'=>LSD_Options::tag_slug()]
+            'rewrite' => ['slug' => LSD_Options::tag_slug()],
         ];
 
         register_taxonomy(
@@ -66,5 +64,3 @@ class LSD_Taxonomies_Tag extends LSD_Taxonomies
         register_taxonomy_for_object_type(LSD_Base::TAX_TAG, LSD_Base::PTYPE_LISTING);
     }
 }
-
-endif;

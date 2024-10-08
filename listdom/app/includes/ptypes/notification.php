@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_PTypes_Notification')):
-
 /**
  * Listdom Notification Post Types Class.
  *
  * @class LSD_PTypes_Notification
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_PTypes_Notification extends LSD_PTypes
 {
@@ -16,9 +14,9 @@ class LSD_PTypes_Notification extends LSD_PTypes
     protected $settings;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
@@ -26,14 +24,14 @@ class LSD_PTypes_Notification extends LSD_PTypes
 
         // Listdom Settings
         $this->settings = LSD_Options::settings();
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register_post_type']);
 
-        add_filter('manage_'.$this->PT.'_posts_columns', [$this, 'filter_columns']);
-        add_action('manage_'.$this->PT.'_posts_custom_column', [$this, 'filter_columns_content'], 10, 2);
+        add_filter('manage_' . $this->PT . '_posts_columns', [$this, 'filter_columns']);
+        add_action('manage_' . $this->PT . '_posts_custom_column', [$this, 'filter_columns_content'], 10, 2);
 
         add_action('add_meta_boxes', [$this, 'register_metaboxes'], 10, 2);
         add_action('save_post', [$this, 'save'], 10, 2);
@@ -41,7 +39,7 @@ class LSD_PTypes_Notification extends LSD_PTypes
         // Duplicate Notification
         new LSD_Duplicate($this->PT);
     }
-    
+
     public function register_post_type()
     {
         $args = [
@@ -74,7 +72,7 @@ class LSD_PTypes_Notification extends LSD_PTypes
                 'edit_others_posts' => 'manage_options',
                 'delete_posts' => 'manage_options',
                 'publish_posts' => 'manage_options',
-                'read_private_posts' => 'manage_options'
+                'read_private_posts' => 'manage_options',
             ],
         ];
 
@@ -92,7 +90,7 @@ class LSD_PTypes_Notification extends LSD_PTypes
 
     public function filter_columns_content($column_name, $post_id)
     {
-        if($column_name == 'hook')
+        if ($column_name == 'hook')
         {
             $hook = get_post_meta($post_id, 'lsd_hook', true);
             $hooks = LSD_Notifications::get_notification_hooks();
@@ -100,7 +98,7 @@ class LSD_PTypes_Notification extends LSD_PTypes
             echo $hooks[$hook] ?? 'N/A';
         }
     }
-    
+
     public function register_metaboxes()
     {
         add_meta_box('lsd_metabox_placeholders', esc_html__('Placeholders', 'listdom'), [$this, 'metabox_placeholders'], $this->PT, 'side');
@@ -129,16 +127,16 @@ class LSD_PTypes_Notification extends LSD_PTypes
     public function save($post_id, $post)
     {
         // It's not a notification
-        if($post->post_type !== $this->PT) return;
+        if ($post->post_type !== $this->PT) return;
 
         // Nonce is not set!
-        if(!isset($_POST['_lsdnonce'])) return;
+        if (!isset($_POST['_lsdnonce'])) return;
 
         // Nonce is not valid!
-        if(!wp_verify_nonce(sanitize_text_field($_POST['_lsdnonce']), 'lsd_notification_cpt')) return;
+        if (!wp_verify_nonce(sanitize_text_field($_POST['_lsdnonce']), 'lsd_notification_cpt')) return;
 
         // We don't need to do anything on post auto save
-        if(defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
 
         // Get Listdom Data
         $lsd = $_POST['lsd'] ?? [];
@@ -171,5 +169,3 @@ class LSD_PTypes_Notification extends LSD_PTypes
         update_post_meta($post_id, 'lsd_bcc', $bcc);
     }
 }
-
-endif;

@@ -2,14 +2,12 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_IX_Array')):
-
 /**
  * Listdom IX Array.
  * Used in CSV and Excel
  *
  * @class LSD_IX_Array
- * @version	1.0.0
+ * @version    1.0.0
  */
 abstract class LSD_IX_Array extends LSD_IX
 {
@@ -29,9 +27,9 @@ abstract class LSD_IX_Array extends LSD_IX
     protected $attributes;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
@@ -41,7 +39,7 @@ abstract class LSD_IX_Array extends LSD_IX
 
         // Attributes
         $this->attributes = LSD_Main::get_attributes();
-	}
+    }
 
     /**
      * Get Exportable listings
@@ -64,7 +62,7 @@ abstract class LSD_IX_Array extends LSD_IX
     /**
      * Get Columns
      * Used in Export
-     * 
+     *
      * @return array
      */
     public function columns(): array
@@ -98,21 +96,21 @@ abstract class LSD_IX_Array extends LSD_IX
             esc_html__('Labels', 'listdom-csv'),
         ];
 
-        foreach($this->networks as $network => $values)
+        foreach ($this->networks as $network => $values)
         {
             $obj = $this->SN->get($network, $values);
 
             // Social Network is not Enabled
-            if(!$obj || !$obj->option('listing')) continue;
+            if (!$obj || !$obj->option('listing')) continue;
 
             $columns[] = $obj->label();
         }
 
         // Add attributes to columns
-        foreach($this->attributes as $attribute)
+        foreach ($this->attributes as $attribute)
         {
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-            if($type == 'separator') continue;
+            if ($type == 'separator') continue;
 
             $columns[] = $attribute->name;
         }
@@ -166,31 +164,31 @@ abstract class LSD_IX_Array extends LSD_IX
         ];
 
         // Social Networks
-        foreach($this->networks as $network => $values)
+        foreach ($this->networks as $network => $values)
         {
             $obj = $this->SN->get($network, $values);
 
             // Social Network is not Enabled
-            if(!$obj || !$obj->option('listing')) continue;
+            if (!$obj || !$obj->option('listing')) continue;
 
-            $row[] = $metas['lsd_'.$obj->key()] ?? '';
+            $row[] = $metas['lsd_' . $obj->key()] ?? '';
         }
 
         // Add attributes to data
-        foreach($this->attributes as $attribute)
+        foreach ($this->attributes as $attribute)
         {
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-            if($type == 'separator') continue;
+            if ($type == 'separator') continue;
 
             // Available for All Categories?
             $all_categories = get_term_meta($attribute->term_id, 'lsd_all_categories', true);
-            if(trim($all_categories) == '') $all_categories = 1;
+            if (trim($all_categories) == '') $all_categories = 1;
 
             // Specific Categories
             $categories = get_term_meta($attribute->term_id, 'lsd_categories', true);
-            if($all_categories) $categories = [];
+            if ($all_categories) $categories = [];
 
-            if($all_categories or ($category_id and is_array($categories) and count($categories) and isset($categories[$category_id]) and $categories[$category_id])) $row[] = $metas['lsd_attribute_' . $attribute->term_id] ?? '';
+            if ($all_categories or ($category_id and is_array($categories) and count($categories) and isset($categories[$category_id]) and $categories[$category_id])) $row[] = $metas['lsd_attribute_' . $attribute->term_id] ?? '';
             else $row[] = '';
         }
 
@@ -208,9 +206,9 @@ abstract class LSD_IX_Array extends LSD_IX
     public function get_taxonomies_text($taxonomies, $taxonomy): string
     {
         $terms = [];
-        if(isset($taxonomies[$taxonomy]) and is_array($taxonomies[$taxonomy]) and count($taxonomies[$taxonomy]))
+        if (isset($taxonomies[$taxonomy]) and is_array($taxonomies[$taxonomy]) and count($taxonomies[$taxonomy]))
         {
-            foreach($taxonomies[$taxonomy] as $term) $terms[] = $term['name'];
+            foreach ($taxonomies[$taxonomy] as $term) $terms[] = $term['name'];
         }
 
         return implode(',', $terms);
@@ -229,7 +227,7 @@ abstract class LSD_IX_Array extends LSD_IX
 
         // Required Title
         $title = $mapped['post_title'] ?? '';
-        if(trim($title) == '') return [];
+        if (trim($title) == '') return [];
 
         // Building Listing Data
         $listing = [
@@ -245,31 +243,31 @@ abstract class LSD_IX_Array extends LSD_IX
             'meta' => [],
         ];
 
-        foreach($mapped as $key => $value)
+        foreach ($mapped as $key => $value)
         {
             // Taxonomy
-            if(in_array($key, $main->taxonomies()))
+            if (in_array($key, $main->taxonomies()))
             {
                 $listing['taxonomies'][$key] = [];
-                if(is_null($value) || trim($value) == '') continue;
+                if (is_null($value) || trim($value) == '') continue;
 
                 $values = explode(',', $value);
-                foreach($values as $v)
+                foreach ($values as $v)
                 {
-                    if(trim($v) == '') continue;
+                    if (trim($v) == '') continue;
                     $listing['taxonomies'][$key][] = ['name' => trim($v)];
                 }
             }
             // Attributes
-            elseif(strpos($key, 'lsd_attribute_') !== false)
+            else if (strpos($key, 'lsd_attribute_') !== false)
             {
                 $ex = explode('_', $key);
 
                 $id = $ex[2] ?? 0;
-                if(!$id) continue;
+                if (!$id) continue;
 
                 $term = get_term($id, LSD_Base::TAX_ATTRIBUTE);
-                if(is_wp_error($term)) continue;
+                if (is_wp_error($term)) continue;
 
                 // Add to Attributes
                 $listing['attributes'][] = [
@@ -280,10 +278,10 @@ abstract class LSD_IX_Array extends LSD_IX
                 ];
             }
             // ACF
-            elseif(strpos($key, 'lsd_acf_') !== false)
+            else if (strpos($key, 'lsd_acf_') !== false)
             {
                 $id = substr($key, strlen('lsd_acf_'));
-                if(!$id) continue;
+                if (!$id) continue;
 
                 // Add to Attributes
                 $listing['acf'][] = [
@@ -292,9 +290,9 @@ abstract class LSD_IX_Array extends LSD_IX
                 ];
             }
             // Meta
-            elseif(strpos($key, 'lsd_') !== false)
+            else if (strpos($key, 'lsd_') !== false)
             {
-                if(in_array($key, ['lsd_image', 'lsd_gallery'])) continue;
+                if (in_array($key, ['lsd_image', 'lsd_gallery'])) continue;
 
                 // Add to Meta Values
                 $listing['meta'][$key] = $value ? trim($value) : '';
@@ -304,5 +302,3 @@ abstract class LSD_IX_Array extends LSD_IX
         return [$listing, $mapped];
     }
 }
-
-endif;

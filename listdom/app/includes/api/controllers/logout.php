@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Logout')):
-
 /**
  * Listdom API Logout Controller Class.
  *
  * @class LSD_API_Controllers_Logout
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controllers_Logout extends LSD_API_Controller
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function perform(WP_REST_Request $request)
     {
@@ -28,16 +26,14 @@ class LSD_API_Controllers_Logout extends LSD_API_Controller
         $this->revokeUserToken($user_id);
 
         // Trigger Action
-        do_action('lsd_api_user_loggedout', $user_id, $request);
+        do_action('lsd_api_user_logged_out', $user_id, $request);
 
         // Response
         return $this->response([
             'data' => [
                 'success' => 1,
             ],
-            'status' => 200
+            'status' => 200,
         ]);
-	}
+    }
 }
-
-endif;

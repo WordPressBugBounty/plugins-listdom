@@ -2,24 +2,22 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Integrations_Elementor')):
-
 /**
  * Listdom Integrations Elementor Class.
  *
  * @class LSD_Integrations_Elementor
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Integrations_Elementor extends LSD_Integrations
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         // Register Widgets
@@ -34,5 +32,3 @@ class LSD_Integrations_Elementor extends LSD_Integrations
     {
     }
 }
-
-endif;

@@ -2,37 +2,35 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Search_Helper')):
-
 /**
  * Listdom Search Helper Class.
  *
  * @class LSD_Search_Helper
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Search_Helper extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function get_type_by_key($key)
     {
-        if(in_array($key, $this->taxonomies())) return 'taxonomy';
-        elseif(strpos($key, 'att') !== false)
+        if (in_array($key, $this->taxonomies())) return 'taxonomy';
+        else if (strpos($key, 'att') !== false)
         {
             $ex = explode('-', $key);
             return get_term_meta($ex[1], 'lsd_field_type', true);
         }
-        elseif($key == 'price') return 'price';
-        elseif($key == 'class') return 'class';
-        elseif($key == 'address') return 'address';
-        elseif($key == 'period') return 'period';
-        elseif(in_array($key, ['adults', 'children'])) return 'numeric';
+        else if ($key == 'price') return 'price';
+        else if ($key == 'class') return 'class';
+        else if ($key == 'address') return 'address';
+        else if ($key == 'period') return 'period';
+        else if (in_array($key, ['adults', 'children'])) return 'numeric';
 
         return 'textsearch';
     }
@@ -40,12 +38,12 @@ class LSD_Search_Helper extends LSD_Base
     public function get_terms_hierarchy(array &$elements, $parent_id = 0): array
     {
         $branch = [];
-        foreach($elements as $key => $element)
+        foreach ($elements as $key => $element)
         {
-            if($element['parent'] == $parent_id)
+            if ($element['parent'] == $parent_id)
             {
                 $children = $this->get_terms_hierarchy($elements, $key);
-                if($children) $element['children'] = $children;
+                if ($children) $element['children'] = $children;
 
                 $branch[$key] = $element;
                 unset($elements[$key]);
@@ -58,7 +56,7 @@ class LSD_Search_Helper extends LSD_Base
     public function get_terms($filter, $numeric = false, $hierarchy = false): array
     {
         $key = $filter['key'] ?? null;
-        if(in_array($key, $this->taxonomies()))
+        if (in_array($key, $this->taxonomies()))
         {
             $results = get_terms([
                 'taxonomy' => $key,
@@ -68,22 +66,22 @@ class LSD_Search_Helper extends LSD_Base
             ]);
 
             $terms = [];
-            foreach($results as $result) $terms[$result->term_id] = $hierarchy ? ['name' => $result->name, 'parent' => $result->parent] : $result->name;
+            foreach ($results as $result) $terms[$result->term_id] = $hierarchy ? ['name' => $result->name, 'parent' => $result->parent] : $result->name;
 
             return $hierarchy ? $this->get_terms_hierarchy($terms) : $terms;
         }
-        elseif(strpos($key, 'att') !== false)
+        else if (strpos($key, 'att') !== false)
         {
             $ex = explode('-', $key);
             $hide_empty = $filter['hide_empty'] ?? 1;
 
-            if($hide_empty)
+            if ($hide_empty)
             {
                 $order = "`meta_value`";
-                if($numeric) $order = "CAST(`meta_value` as unsigned)";
+                if ($numeric) $order = "CAST(`meta_value` as unsigned)";
 
                 $db = new LSD_db();
-                $results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_".esc_sql($ex[1])."' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY ".$order." ASC", 'loadColumn');
+                $results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($ex[1]) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
             }
             else
             {
@@ -92,7 +90,7 @@ class LSD_Search_Helper extends LSD_Base
             }
 
             $terms = [];
-            foreach($results as $result) $terms[$result] = $result;
+            foreach ($results as $result) $terms[$result] = $result;
 
             return $terms;
         }
@@ -105,10 +103,10 @@ class LSD_Search_Helper extends LSD_Base
         $names = explode(',', $name);
         $ids = '';
 
-        foreach($names as $name)
+        foreach ($names as $name)
         {
             $term = get_term_by('name', trim($name), $taxonomy);
-            $ids .= (isset($term->term_id) ? $term->term_id.',' : '');
+            $ids .= (isset($term->term_id) ? $term->term_id . ',' : '');
         }
 
         $ids = trim($ids, ', ');
@@ -117,22 +115,22 @@ class LSD_Search_Helper extends LSD_Base
 
     public function column($count, $buttons = false): array
     {
-        if($count <= 1)
+        if ($count <= 1)
         {
             $field_column = $buttons ? 'lsd-col-10' : 'lsd-col-12';
             $button_column = 'lsd-col-2';
         }
-        elseif($count == 2)
+        else if ($count == 2)
         {
             $field_column = $buttons ? 'lsd-col-5' : 'lsd-col-6';
             $button_column = 'lsd-col-2';
         }
-        elseif($count == 3)
+        else if ($count == 3)
         {
             $field_column = $buttons ? 'lsd-col-3' : 'lsd-col-4';
             $button_column = 'lsd-col-3';
         }
-        elseif($count == 4)
+        else if ($count == 4)
         {
             $field_column = $buttons ? 'lsd-col-2' : 'lsd-col-3';
             $button_column = 'lsd-col-4';
@@ -156,8 +154,8 @@ class LSD_Search_Helper extends LSD_Base
         $name = $args['name'] ?? 'sf-' . $key;
         $current = $args['current'] ?? null;
 
-        $output = '<select class="'.esc_attr($key).'" name="'.esc_attr($name).'" id="'.esc_attr($id).'" placeholder="'.esc_attr__($placeholder, 'listdom').'">';
-        $output .= '<option value="">'.esc_html__($placeholder, 'listdom').'</option>';
+        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '">';
+        $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
         $output .= $this->dropdown_options($filter, 0, $current);
         $output .= '</select>';
 
@@ -182,17 +180,17 @@ class LSD_Search_Helper extends LSD_Base
         $prefix = str_repeat('-', $level);
 
         $output = '';
-        foreach($terms as $term)
+        foreach ($terms as $term)
         {
             // Term is not in the predefined terms
-            if(!$all_terms and count($predefined_terms) and !isset($predefined_terms[$term->term_id])) continue;
+            if (!$all_terms and count($predefined_terms) and !isset($predefined_terms[$term->term_id])) continue;
 
-            $output .= '<option class="level-'.esc_attr($level).'" value="'.esc_attr($term->term_id).'" '.($current == $term->term_id ? 'selected="selected"' : '').'>'.esc_html(($prefix.(trim($prefix) ? ' ' : '').$term->name)).'</option>';
+            $output .= '<option class="level-' . esc_attr($level) . '" value="' . esc_attr($term->term_id) . '" ' . ($current == $term->term_id ? 'selected="selected"' : '') . '>' . esc_html(($prefix . (trim($prefix) ? ' ' : '') . $term->name)) . '</option>';
 
             $children = get_term_children($term->term_id, $key);
-            if(is_array($children) and count($children))
+            if (is_array($children) and count($children))
             {
-                $output .= $this->dropdown_options($filter, $term->term_id, $current, $level+1);
+                $output .= $this->dropdown_options($filter, $term->term_id, $current, $level + 1);
             }
         }
 
@@ -226,34 +224,34 @@ class LSD_Search_Helper extends LSD_Base
         ]);
 
         $hierarchy = [];
-        foreach($terms as $term)
+        foreach ($terms as $term)
         {
             // Term is not in the predefined terms
-            if(!$all_terms and count($predefined_terms) and !isset($predefined_terms[$term->term_id])) continue;
+            if (!$all_terms and count($predefined_terms) and !isset($predefined_terms[$term->term_id])) continue;
 
-            $level = count(LSD_Taxonomies::parents($term))+1;
+            $level = count(LSD_Taxonomies::parents($term)) + 1;
             $max_levels = max($max_levels, $level);
 
             // Term is not child of current parents
-            if($current and count($available_parents_for_childs) and $term->parent != 0 and $term->term_id != $current and !in_array($term->parent, $available_parents_for_childs))
+            if ($current and count($available_parents_for_childs) and $term->parent != 0 and $term->term_id != $current and !in_array($term->parent, $available_parents_for_childs))
             {
                 continue;
             }
 
-            if(!isset($hierarchy[$level])) $hierarchy[$level] = [];
+            if (!isset($hierarchy[$level])) $hierarchy[$level] = [];
             $hierarchy[$level][] = $term;
         }
 
-        $output = '<div class="lsd-hierarchical-dropdowns" id="'.esc_attr($id).'_wrapper" data-for="'.esc_attr($key).'" data-id="'.esc_attr($id).'" data-max-levels="'.esc_attr($max_levels).'" data-name="'.esc_attr($name).'" data-hide-empty="'.esc_attr($hide_empty).'">';
-        for($l = 1; $l <= $max_levels; $l++)
+        $output = '<div class="lsd-hierarchical-dropdowns" id="' . esc_attr($id) . '_wrapper" data-for="' . esc_attr($key) . '" data-id="' . esc_attr($id) . '" data-max-levels="' . esc_attr($max_levels) . '" data-name="' . esc_attr($name) . '" data-hide-empty="' . esc_attr($hide_empty) . '">';
+        for ($l = 1; $l <= $max_levels; $l++)
         {
             $level_terms = (isset($hierarchy[$l]) and is_array($hierarchy[$l])) ? $hierarchy[$l] : [];
             $placeholder = $placeholders[($l - 1)] ?? $placeholders[0];
 
-            $output .= '<select class="'.esc_attr($key).'" name="'.esc_attr($name).'" id="'.esc_attr($id.'_'.$l).'" placeholder="'.esc_attr__($placeholder, 'listdom').'" data-level="'.esc_attr($l).'">';
-            $output .= '<option value="">'.esc_html__($placeholder, 'listdom').'</option>';
+            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-level="' . esc_attr($l) . '">';
+            $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
 
-            foreach($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-'.esc_attr($level_term->parent).'" value="'.esc_attr($level_term->term_id).'" '.(($current == $level_term->term_id or in_array($level_term->term_id, $current_parents)) ? 'selected="selected"' : '').'>'.esc_html($level_term->name).'</option>';
+            foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id or in_array($level_term->term_id, $current_parents)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';
             $output .= '</select>';
         }
 
@@ -261,5 +259,3 @@ class LSD_Search_Helper extends LSD_Base
         return $output;
     }
 }
-
-endif;

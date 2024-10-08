@@ -4,31 +4,23 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Skins_Table $this */
 
+// Fields
+$fields = new LSD_Fields();
+$columns = isset($this->skin_options['columns']) && is_array($this->skin_options['columns']) && count($this->skin_options['columns'])
+    ? $this->skin_options['columns']
+    : $fields->get();
+
+// Listings
 $ids = $this->listings;
 ?>
-<?php foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
-	<tr class="lsd-listing" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
-		<td>
-			<h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
-                <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
-			</h3>
-		</td>
-		
-		<td class="lsd-listing-address" <?php echo lsd_schema()->address(); ?>>
-			<?php echo LSD_Kses::element($listing->get_address(false)); ?>
-		</td>
-		
-		<td <?php echo lsd_schema()->priceRange(); ?>>
-			<?php echo LSD_Kses::element($listing->get_price()); ?>
-		</td>
-		
-		<td>
-			<?php echo LSD_Kses::element($listing->get_availability(true)); ?>
-		</td>
-		
-		<td class="lsd-listing-phone" <?php echo lsd_schema()->telephone(); ?>>
-			<?php echo LSD_Kses::element($listing->get_phone()); ?>
-		</td>
-	</tr>
+<?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
+    <tr class="lsd-listing" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
+        <?php foreach ($columns as $key => $column): ?>
+            <?php if (isset($column['enabled']) && $column['enabled'] == '1'): ?>
+                <td class="lsd-listing-<?php echo $key; ?>" <?php echo $fields->schema($key); ?>>
+                    <?php echo $fields->content($key, $listing); ?>
+                </td>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </tr>
 <?php endforeach; ?>
-	

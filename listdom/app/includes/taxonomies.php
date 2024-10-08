@@ -2,24 +2,22 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Taxonomies')):
-
 /**
  * Listdom Taxonomies Class.
  *
  * @class LSD_Taxonomies
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Taxonomies extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         // Listing Category
@@ -49,22 +47,22 @@ class LSD_Taxonomies extends LSD_Base
         add_filter('template_include', [$this, 'template'], 99);
 
         // Listdom Archive Content
-        foreach($this->taxonomies() as $tax) add_action($tax.'_archive_content', [$this, 'content']);
+        foreach ($this->taxonomies() as $tax) add_action($tax . '_archive_content', [$this, 'content']);
     }
 
     public function redirect()
     {
-        foreach($this->taxonomies() as $tax)
+        foreach ($this->taxonomies() as $tax)
         {
-            if(!isset($_GET[$tax])) continue;
+            if (!isset($_GET[$tax])) continue;
 
             $term = (int) sanitize_text_field($_GET[$tax]);
-            if(!$term) continue;
+            if (!$term) continue;
 
             $url = get_term_link($term, $tax);
 
             // Redirect to Term Page
-            if(is_string($url))
+            if (is_string($url))
             {
                 wp_redirect($url);
                 exit;
@@ -80,55 +78,55 @@ class LSD_Taxonomies extends LSD_Base
     public function template($template)
     {
         // We're in an embed post
-        if(is_embed()) return $template;
+        if (is_embed()) return $template;
 
         // Listdom Settings
         $settings = LSD_Options::settings();
 
         // Listdom Location
-        if(is_tax(LSD_Base::TAX_LOCATION) and isset($settings['location_archive']) and trim($settings['location_archive']))
+        if (is_tax(LSD_Base::TAX_LOCATION) and isset($settings['location_archive']) and trim($settings['location_archive']))
         {
-            $file = 'taxonomy-'.LSD_Base::TAX_LOCATION.'.php';
+            $file = 'taxonomy-' . LSD_Base::TAX_LOCATION . '.php';
             $template = locate_template($file);
 
             // Listdom Template
-            if($template == '') $template = lsd_template($file);
+            if ($template == '') $template = lsd_template($file);
         }
         // Listdom Category
-        elseif(is_tax(LSD_Base::TAX_CATEGORY) and isset($settings['category_archive']) and trim($settings['category_archive']))
+        else if (is_tax(LSD_Base::TAX_CATEGORY) and isset($settings['category_archive']) and trim($settings['category_archive']))
         {
-            $file = 'taxonomy-'.LSD_Base::TAX_CATEGORY.'.php';
+            $file = 'taxonomy-' . LSD_Base::TAX_CATEGORY . '.php';
             $template = locate_template($file);
 
             // Listdom Template
-            if($template == '') $template = lsd_template($file);
+            if ($template == '') $template = lsd_template($file);
         }
         // Listdom Feature
-        elseif(is_tax(LSD_Base::TAX_FEATURE) and isset($settings['feature_archive']) and trim($settings['feature_archive']))
+        else if (is_tax(LSD_Base::TAX_FEATURE) and isset($settings['feature_archive']) and trim($settings['feature_archive']))
         {
-            $file = 'taxonomy-'.LSD_Base::TAX_FEATURE.'.php';
+            $file = 'taxonomy-' . LSD_Base::TAX_FEATURE . '.php';
             $template = locate_template($file);
 
             // Listdom Template
-            if($template == '') $template = lsd_template($file);
+            if ($template == '') $template = lsd_template($file);
         }
         // Listdom Tag
-        elseif(is_tax(LSD_Base::TAX_TAG) and isset($settings['tag_archive']) and trim($settings['tag_archive']))
+        else if (is_tax(LSD_Base::TAX_TAG) and isset($settings['tag_archive']) and trim($settings['tag_archive']))
         {
-            $file = 'taxonomy-'.LSD_Base::TAX_TAG.'.php';
+            $file = 'taxonomy-' . LSD_Base::TAX_TAG . '.php';
             $template = locate_template($file);
 
             // Listdom Template
-            if($template == '') $template = lsd_template($file);
+            if ($template == '') $template = lsd_template($file);
         }
         // Listdom Label
-        elseif(is_tax(LSD_Base::TAX_LABEL) and isset($settings['label_archive']) and trim($settings['label_archive']))
+        else if (is_tax(LSD_Base::TAX_LABEL) and isset($settings['label_archive']) and trim($settings['label_archive']))
         {
-            $file = 'taxonomy-'.LSD_Base::TAX_LABEL.'.php';
+            $file = 'taxonomy-' . LSD_Base::TAX_LABEL . '.php';
             $template = locate_template($file);
 
             // Listdom Template
-            if($template == '') $template = lsd_template($file);
+            if ($template == '') $template = lsd_template($file);
         }
 
         return $template;
@@ -143,33 +141,33 @@ class LSD_Taxonomies extends LSD_Base
         $q = get_queried_object();
 
         // It's not a taxonomy query
-        if(!isset($q->taxonomy) or !isset($q->term_id)) return;
+        if (!isset($q->taxonomy) or !isset($q->term_id)) return;
 
         $taxonomy = $q->taxonomy;
         $term_id = $q->term_id;
 
         // It's not an Listdom taxonomy
-        if(!in_array($taxonomy, $this->taxonomies())) return;
+        if (!in_array($taxonomy, $this->taxonomies())) return;
 
         // Listdom Settings
         $settings = LSD_Options::settings();
 
-        if($taxonomy == LSD_Base::TAX_LOCATION)
+        if ($taxonomy == LSD_Base::TAX_LOCATION)
         {
             $shortcode_id = (int) $settings['location_archive'];
             $filter = [LSD_Base::TAX_LOCATION => [$term_id]];
         }
-        elseif($taxonomy == LSD_Base::TAX_FEATURE)
+        else if ($taxonomy == LSD_Base::TAX_FEATURE)
         {
             $shortcode_id = (int) $settings['feature_archive'];
             $filter = [LSD_Base::TAX_FEATURE => [$term_id]];
         }
-        elseif($taxonomy == LSD_Base::TAX_CATEGORY)
+        else if ($taxonomy == LSD_Base::TAX_CATEGORY)
         {
             $shortcode_id = (int) $settings['category_archive'];
             $filter = [LSD_Base::TAX_CATEGORY => [$term_id]];
         }
-        elseif($taxonomy == LSD_Base::TAX_TAG)
+        else if ($taxonomy == LSD_Base::TAX_TAG)
         {
             $shortcode_id = (int) $settings['tag_archive'];
             $filter = [LSD_Base::TAX_TAG => $q->name];
@@ -182,21 +180,21 @@ class LSD_Taxonomies extends LSD_Base
 
         $LSD = new LSD_Shortcodes_Listdom();
         echo LSD_Kses::full($LSD->output([
-            'id'=>$shortcode_id
+            'id' => $shortcode_id,
         ], [
-            'lsd_filter'=>$filter
+            'lsd_filter' => $filter,
         ]));
     }
 
     public static function id($term, $taxonomy)
     {
-        if(is_array($term))
+        if (is_array($term))
         {
             $ids = [];
-            foreach($term as $t)
+            foreach ($term as $t)
             {
                 $term = get_term_by('name', $t, $taxonomy);
-                if($term and isset($term->term_id)) $ids[] = $term->term_id;
+                if ($term and isset($term->term_id)) $ids[] = $term->term_id;
             }
 
             return $ids;
@@ -210,13 +208,13 @@ class LSD_Taxonomies extends LSD_Base
 
     public static function name($term, $taxonomy)
     {
-        if(is_array($term))
+        if (is_array($term))
         {
             $names = [];
-            foreach($term as $t)
+            foreach ($term as $t)
             {
                 $term = get_term_by('term_id', $t, $taxonomy);
-                if($term and isset($term->name)) $names[] = $term->name;
+                if ($term and isset($term->name)) $names[] = $term->name;
             }
 
             return $names;
@@ -230,7 +228,7 @@ class LSD_Taxonomies extends LSD_Base
 
     public static function parents($term, $current = [])
     {
-        if($term->parent)
+        if ($term->parent)
         {
             $current[] = $term->parent;
             $current = LSD_Taxonomies::parents(get_term($term->parent), $current);
@@ -242,10 +240,8 @@ class LSD_Taxonomies extends LSD_Base
     public static function icon($term_id, $class = 'fa-fw')
     {
         $icon = get_term_meta($term_id, 'lsd_icon', true);
-        $HTML = trim($icon) ? '<i class="lsd-icon '.esc_attr($icon).' '.esc_attr($class).'" aria-hidden="true"></i>' : '';
+        $HTML = trim($icon) ? '<i class="lsd-icon ' . esc_attr($icon) . ' ' . esc_attr($class) . '" aria-hidden="true"></i>' : '';
 
         return apply_filters('lsd_term_icon', $HTML, $term_id, $class);
     }
 }
-
-endif;

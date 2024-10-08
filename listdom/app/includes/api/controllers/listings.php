@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Listings')):
-
 /**
  * Listdom API Listings Controller Class.
  *
  * @class LSD_API_Controllers_Listings
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controllers_Listings extends LSD_API_Controller
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function get(WP_REST_Request $request)
     {
@@ -28,7 +26,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $listing = get_post($id);
 
         // Not Found!
-        if(!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -45,7 +43,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
                 'success' => 1,
                 'listing' => LSD_API_Resources_Listing::get($id),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 
@@ -58,21 +56,21 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $post_content = $vars['content'] ?? '';
 
         // Listing Title is Required
-        if(!trim($post_title)) return $this->response([
+        if (!trim($post_title)) return $this->response([
             'data' => new WP_Error('400', esc_html__("Listing title field is required!", 'listdom')),
-            'status' => 400
+            'status' => 400,
         ]);
 
         // Post Status
         $status = 'pending';
-        if(current_user_can('publish_posts')) $status = 'publish';
+        if (current_user_can('publish_posts')) $status = 'publish';
 
         // Filter Listing Status
         $status = apply_filters('lsd_default_listing_status', $status, $vars);
         $status = apply_filters('lsd_api_listing_status', $status, $vars);
 
         // Create New Listing
-        $post = ['post_title'=>$post_title, 'post_content'=>$post_content, 'post_type'=>LSD_Base::PTYPE_LISTING, 'post_status'=>$status];
+        $post = ['post_title' => $post_title, 'post_content' => $post_content, 'post_type' => LSD_Base::PTYPE_LISTING, 'post_status' => $status];
         $id = wp_insert_post($post);
 
         // Tags
@@ -96,7 +94,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         set_post_thumbnail($id, $featured_image);
 
         // Publish Listing
-        if($status === 'publish' and get_post_status($id) !== 'published') wp_publish_post($id);
+        if ($status === 'publish' and get_post_status($id) !== 'published') wp_publish_post($id);
 
         // Sanitization
         array_walk_recursive($vars, 'sanitize_text_field');
@@ -105,7 +103,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $entity = new LSD_Entity_Listing($id);
         $entity->save($vars, true);
 
-        if($status === 'publish') $message = esc_html__('The listing published.', 'listdom');
+        if ($status === 'publish') $message = esc_html__('The listing published.', 'listdom');
         else $message = esc_html__('The listing submitted. It will publish as soon as possible.', 'listdom');
 
         // Trigger Action
@@ -118,7 +116,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
                 'message' => $message,
                 'listing' => LSD_API_Resources_Listing::get($id),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 
@@ -127,7 +125,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $id = $request->get_param('id');
 
         // Current User is not Authorized to Edit this Listing
-        if(!current_user_can('edit_post', $id)) return $this->response([
+        if (!current_user_can('edit_post', $id)) return $this->response([
             'data' => new WP_Error('401', esc_html__("You're not authorized to edit this listing!", 'listdom')),
             'status' => 401,
         ]);
@@ -136,7 +134,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $listing = get_post($id);
 
         // Not Found!
-        if(!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -148,12 +146,12 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $post_content = $vars['content'] ?? '';
 
         // Listing Title is Required
-        if(!trim($post_title)) return $this->response([
+        if (!trim($post_title)) return $this->response([
             'data' => new WP_Error('400', esc_html__("Listing title field is required!", 'listdom')),
-            'status' => 400
+            'status' => 400,
         ]);
 
-        wp_update_post(['ID'=>$id, 'post_title'=>$post_title, 'post_content'=>$post_content]);
+        wp_update_post(['ID' => $id, 'post_title' => $post_title, 'post_content' => $post_content]);
 
         // Tags
         $tags = isset($tax[LSD_Base::TAX_TAG]) ? sanitize_text_field($tax[LSD_Base::TAX_TAG]) : '';
@@ -191,7 +189,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
                 'success' => 1,
                 'listing' => LSD_API_Resources_Listing::get($id),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 
@@ -200,7 +198,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $id = $request->get_param('id');
 
         // Current User is not Authorized to Delete this Listing
-        if(!current_user_can('delete_post', $id)) return $this->response([
+        if (!current_user_can('delete_post', $id)) return $this->response([
             'data' => new WP_Error('401', esc_html__("You're not authorized to trash this listing!", 'listdom')),
             'status' => 401,
         ]);
@@ -209,7 +207,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $listing = get_post($id);
 
         // Not Found!
-        if(!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -223,9 +221,9 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Response
         return $this->response([
             'data' => [
-                'success' => 1
+                'success' => 1,
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 
@@ -234,7 +232,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $id = $request->get_param('id');
 
         // Current User is not Authorized to Delete this Listing
-        if(!current_user_can('delete_post', $id)) return $this->response([
+        if (!current_user_can('delete_post', $id)) return $this->response([
             'data' => new WP_Error('401', esc_html__("You're not authorized to delete this listing!", 'listdom')),
             'status' => 401,
         ]);
@@ -243,7 +241,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $listing = get_post($id);
 
         // Not Found!
-        if(!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -257,9 +255,9 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Response
         return $this->response([
             'data' => [
-                'success' => 1
+                'success' => 1,
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 
@@ -271,7 +269,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $listing = get_post($id);
 
         // Not Found!
-        if(!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -282,15 +280,15 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $message = $request->get_param('message');
 
         // Required
-        if(!trim($name) || !trim($email) || !trim($phone) || !trim($message)) return $this->response([
+        if (!trim($name) || !trim($email) || !trim($phone) || !trim($message)) return $this->response([
             'data' => new WP_Error('400', esc_html__("Name, Email, Phone and Message fields are required!", 'listdom')),
-            'status' => 400
+            'status' => 400,
         ]);
 
         // Email is not valid
-        if(!is_email($email)) return $this->response([
+        if (!is_email($email)) return $this->response([
             'data' => new WP_Error('400', esc_html__("Email is not valid!", 'listdom')),
-            'status' => 400
+            'status' => 400,
         ]);
 
         // Trigger Notification
@@ -311,9 +309,9 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Response
         return $this->response([
             'data' => [
-                'success' => 1
+                'success' => 1,
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 
@@ -325,7 +323,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $listing = get_post($id);
 
         // Not Found!
-        if(!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -336,15 +334,15 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $message = $request->get_param('message');
 
         // Required
-        if(!trim($name) || !trim($email) || !trim($phone) || !trim($message)) return $this->response([
+        if (!trim($name) || !trim($email) || !trim($phone) || !trim($message)) return $this->response([
             'data' => new WP_Error('400', esc_html__("Name, Email, Phone and Message fields are required!", 'listdom')),
-            'status' => 400
+            'status' => 400,
         ]);
 
         // Email is not valid
-        if(!is_email($email)) return $this->response([
+        if (!is_email($email)) return $this->response([
             'data' => new WP_Error('400', esc_html__("Email is not valid!", 'listdom')),
-            'status' => 400
+            'status' => 400,
         ]);
 
         // Trigger Notification
@@ -362,9 +360,9 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Response
         return $this->response([
             'data' => [
-                'success' => 1
+                'success' => 1,
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 
@@ -376,9 +374,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
                 'success' => 1,
                 'form' => LSD_API_Resources_Fields::grab(),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 }
-
-endif;

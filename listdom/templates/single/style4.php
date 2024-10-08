@@ -111,12 +111,13 @@ $rate_summary = $this->entity->get_rate_stars('summary');
 
         {auction}
         {booking}
-        {discussion}
         {application}
         {stats}
         {franchise}
 
         <?php if ($owner) echo LSD_Kses::form($owner); ?>
+
+        {discussion}
 
     </div>
 </div>

@@ -2,33 +2,31 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Styles')):
-
 /**
  * Listdom Styles Class.
  *
  * @class LSD_Styles
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Styles extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function render($skin)
     {
         do_action('lsd_styles_render', $skin);
-	}
+    }
 
     public static function filter($styles, $skin)
     {
         return apply_filters('lsd_styles', $styles, $skin);
-	}
+    }
 
     public static function carousel()
     {
@@ -37,7 +35,7 @@ class LSD_Styles extends LSD_Base
             'style2' => esc_html__('Style 2', 'listdom'),
             'style3' => esc_html__('Style 3', 'listdom'),
             'style4' => esc_html__('Style 4', 'listdom'),
-            'style5' => esc_html__('Style 5', 'listdom')
+            'style5' => esc_html__('Style 5', 'listdom'),
         ], 'carousel');
     }
 
@@ -110,7 +108,7 @@ class LSD_Styles extends LSD_Base
             'style2' => esc_html__('Style 2', 'listdom'),
             'style3' => esc_html__('Style 3', 'listdom'),
             'style4' => esc_html__('Style 4', 'listdom'),
-            'style5' => esc_html__('Style 5', 'listdom')
+            'style5' => esc_html__('Style 5', 'listdom'),
         ], 'slider');
     }
 
@@ -123,16 +121,22 @@ class LSD_Styles extends LSD_Base
         ], 'table');
     }
 
+    public static function detail_types()
+    {
+        return LSD_Styles::filter([
+            'premade' => esc_html__('Pre-Made Styles', 'listdom'),
+            'dynamic' => esc_html__('Design Builder', 'listdom'),
+        ], 'detail_types');
+    }
+
     public static function details()
     {
         return LSD_Styles::filter([
-            'style1' => esc_html__('Style 1', 'listdom'),
-            'style2' => esc_html__('Style 2', 'listdom'),
+            'style1' => esc_html__('Style 1 - Basic', 'listdom'),
+            'style2' => esc_html__('Style 2 - Sidebar', 'listdom'),
             'style3' => esc_html__('Style 3 - Slider Header', 'listdom'),
             'style4' => esc_html__('Style 4 - User Directory', 'listdom'),
             'dynamic' => esc_html__('Design Builder', 'listdom'),
         ], 'details');
     }
 }
-
-endif;

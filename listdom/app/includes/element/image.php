@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Element_Image')):
-
 /**
  * Listdom Image Element Class.
  *
  * @class LSD_Element_Image
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Element_Image extends LSD_Element
 {
@@ -16,19 +14,19 @@ class LSD_Element_Image extends LSD_Element
     public $label;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Featured Image', 'listdom');
-	}
+    }
 
     public function get($size, $post_id = null)
     {
-        if(is_null($post_id))
+        if (is_null($post_id))
         {
             global $post;
             $post_id = $post->ID;
@@ -51,7 +49,7 @@ class LSD_Element_Image extends LSD_Element
 
     public function cover($size = [350, 220], $post_id = null, $link_method = 'normal')
     {
-        if(is_null($post_id))
+        if (is_null($post_id))
         {
             global $post;
             $post_id = $post->ID;
@@ -74,7 +72,7 @@ class LSD_Element_Image extends LSD_Element
 
     public function slider($size = [350, 220], $post_id = null)
     {
-        if(is_null($post_id))
+        if (is_null($post_id))
         {
             global $post;
             $post_id = $post->ID;
@@ -95,5 +93,3 @@ class LSD_Element_Image extends LSD_Element
         );
     }
 }
-
-endif;

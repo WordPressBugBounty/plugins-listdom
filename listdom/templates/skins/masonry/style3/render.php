@@ -5,11 +5,15 @@ defined('ABSPATH') || die();
 /** @var LSD_Skins_Masonry $this */
 
 $ids = $this->listings;
-foreach($ids as $id)
-{
-    $listing = new LSD_Entity_Listing($id);
+$open = false;
 ?>
-<div class="lsd-col-<?php echo esc_attr((12 / $this->columns)); ?> <?php echo esc_attr($this->filters_classes($id)); ?>">
+<?php $i = 3; foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
+
+    <?php if($this->columns && $this->list_view && ($i % $this->columns) == 1): $open = true; ?>
+        <div class="lsd-row">
+    <?php endif; ?>
+
+    <div class="lsd-col-<?php echo ($this->list_view ? 12 : (12 / $this->columns)); ?> <?php echo esc_attr($this->filters_classes($id)); ?>">
     <div class="lsd-listing<?php if(!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
 
         <?php if($this->display_image): ?>
@@ -26,54 +30,80 @@ foreach($ids as $id)
             <?php endif; ?>
 
             <div class="lsd-listing-image-icons-wrapper">
-                <div class="lsd-listing-favorite">
-                    <?php echo LSD_Kses::element($listing->get_favorite_button()); ?>
-                </div>
-                <div class="lsd-listing-compare">
-                    <?php echo LSD_Kses::element($listing->get_compare_button()); ?>
-                </div>
+                <?php if($this->display_favorite_icon): ?>
+                    <div class="lsd-listing-favorite">
+                        <?php echo LSD_Kses::element($listing->get_favorite_button()); ?>
+                    </div>
+                <?php endif; ?>
+                <?php if($this->display_compare_icon): ?>
+                    <div class="lsd-listing-compare">
+                        <?php echo LSD_Kses::element($listing->get_compare_button()); ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
-            <div class="lsd-listing-availability">
-                <?php echo LSD_Kses::element($listing->get_availability(true)); ?>
-            </div>
-			
+            <?php if($this->display_availability): ?>
+                <div class="lsd-listing-availability">
+                    <?php echo LSD_Kses::element($listing->get_availability(true)); ?>
+                </div>
+			<?php endif; ?>
+
             <div class="lsd-listing-top-bar lsd-row">
                 <div class="lsd-col-8">
-                    <div class="lsd-listing-category">
-                        <?php echo LSD_Kses::element($listing->get_categories(true, false, 'text')); ?>
-                    </div>
+                    <?php if($this->display_categories): ?>
+                        <div class="lsd-listing-category">
+                            <?php echo LSD_Kses::element($listing->get_categories(true, false, 'text')); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="lsd-col-4">
-                    <div class="lsd-listing-price-class">
-                        <?php echo LSD_Kses::element($listing->get_price_class()); ?>
-                    </div>
+                    <?php if($this->display_price_class): ?>
+                        <div class="lsd-listing-price-class">
+                            <?php echo LSD_Kses::element($listing->get_price_class()); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
-            <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
-                <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
-                <?php echo ($listing->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="'.esc_attr__('Verified', 'listdom').'"></i>' : ''); ?>
-            </h3>
+            <?php if($this->display_title): ?>
+                <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
+                    <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
+                    <?php if($this->display_is_claimed): ?>
+                        <?php echo ($listing->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="'.esc_attr__('Verified', 'listdom').'"></i>' : ''); ?>
+                    <?php endif; ?>
+                </h3>
+            <?php endif; ?>
 
-            <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
-                <?php echo LSD_Kses::element($listing->get_excerpt(10, false)); ?>
-            </p>
+            <?php if($this->display_description): ?>
+                <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
+                    <?php echo LSD_Kses::element($listing->get_excerpt(10, false)); ?>
+                </p>
+            <?php endif; ?>
 
             <?php do_action('lsd_skins_after_content', $this, $listing); ?>
 
             <div class="lsd-listing-bottom-bar">
-                <?php echo LSD_Kses::element($listing->get_rate_stars('summary')); ?>
+                <?php if($this->display_review_stars): ?>
+                    <?php echo LSD_Kses::element($listing->get_rate_stars('summary')); ?>
+                <?php endif; ?>
 
-                <?php if($address = $listing->get_address(true)): ?>
-                <div class="lsd-listing-address" <?php echo lsd_schema()->address(); ?>>
-                    <?php echo LSD_Kses::element($address); ?>
-                </div>
+                <?php if($this->display_address): ?>
+                    <?php if($address = $listing->get_address(true)): ?>
+                    <div class="lsd-listing-address" <?php echo lsd_schema()->address(); ?>>
+                        <?php echo LSD_Kses::element($address); ?>
+                    </div>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
 
         </div>
     </div>
 </div>
-<?php
-}
+
+    <?php if($this->columns && $this->list_view && ($i % $this->columns) == 0): $open = false; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php $i++; endforeach; ?>
+    <?php /** Close the unclosed Row **/ if($this->columns && $open) echo '</div>';
+

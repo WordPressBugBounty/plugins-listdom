@@ -18,8 +18,13 @@ defined('ABSPATH') || die();
         <?php endif; ?>
 
 		<div class="welcome-panel-content lsd-mb-0">
-            <h2 class="lsd-mt-0"><?php esc_html_e('Welcome to Listdom!', 'listdom'); ?></h2>
-            <p class="about-description lsd-mt-0 lsd-mb-4"><?php esc_html_e('We’ve assembled some links to get you started:', 'listdom'); ?></p>
+            <div class="lsd-flex lsd-flex-row">
+                <div>
+                    <h2 class="lsd-mt-0"><?php esc_html_e('Welcome to Listdom!', 'listdom'); ?></h2>
+                    <p class="about-description lsd-mt-0 lsd-mb-4"><?php esc_html_e('We’ve assembled some links to get you started:', 'listdom'); ?></p>
+                </div>
+                <a class="button button-primary button-hero" href="<?php echo esc_url_raw(LSD_Base::getListdomWelcomeWizardUrl()); ?>"><?php esc_html_e('Start Welcome Wizard', 'listdom'); ?></a>
+            </div>
             <div class="welcome-panel-column-container">
                 <div class="welcome-panel-column">
                     <h3><?php esc_html_e('Get Started', 'listdom'); ?></h3>

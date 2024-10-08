@@ -2,25 +2,23 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Shortcodes_Terms')):
-
 /**
  * Listdom Terms Shortcode Class.
  *
  * @class LSD_Shortcodes_Terms
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Shortcodes_Terms extends LSD_Shortcodes
 {
     protected $atts = [];
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
@@ -31,7 +29,7 @@ class LSD_Shortcodes_Terms extends LSD_Shortcodes
     {
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom_terms');
-        if(trim($pre)) return $pre;
+        if (trim($pre)) return $pre;
 
         // Set the Attributes
         $this->atts = $atts;
@@ -46,11 +44,11 @@ class LSD_Shortcodes_Terms extends LSD_Shortcodes
         // Generate output
         ob_start();
 
-        switch($style)
+        switch ($style)
         {
             case 'dropdown':
 
-                echo '<form action="'.esc_url(home_url()).'" method="get" class="lsd-terms-dropdown">';
+                echo '<form action="' . esc_url(home_url()) . '" method="get" class="lsd-terms-dropdown">';
 
                 wp_dropdown_categories([
                     'show_option_none' => esc_html__('Select Item', 'listdom'),
@@ -59,7 +57,7 @@ class LSD_Shortcodes_Terms extends LSD_Shortcodes
                     'orderby' => 'name',
                     'hierarchical' => $hierarchical,
                     'show_count' => $show_count,
-                    'taxonomy' => $taxonomy
+                    'taxonomy' => $taxonomy,
                 ]);
 
                 echo '</form>';
@@ -69,13 +67,13 @@ class LSD_Shortcodes_Terms extends LSD_Shortcodes
 
                 echo '<ul>';
 
-                    wp_list_categories([
-                        'orderby' => 'name',
-                        'title_li' => '',
-                        'hierarchical' => $hierarchical,
-                        'show_count' => $show_count,
-                        'taxonomy' => $taxonomy
-                    ]);
+                wp_list_categories([
+                    'orderby' => 'name',
+                    'title_li' => '',
+                    'hierarchical' => $hierarchical,
+                    'show_count' => $show_count,
+                    'taxonomy' => $taxonomy,
+                ]);
 
                 echo '</ul>';
         }
@@ -83,5 +81,3 @@ class LSD_Shortcodes_Terms extends LSD_Shortcodes
         return LSD_Kses::form(ob_get_clean());
     }
 }
-
-endif;

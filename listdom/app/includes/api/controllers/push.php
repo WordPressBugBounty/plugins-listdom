@@ -2,8 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Push')):
-
 /**
  * Listdom API Push Controller Class.
  *
@@ -24,10 +22,10 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
     {
         $vars = $request->get_params();
 
-        $tax = (isset($vars['taxonomies']) and is_array($vars['taxonomies'])) ? $vars['taxonomies'] : [];
-        $attrs = (isset($vars['attrs']) and is_array($vars['attrs'])) ? $vars['attrs'] : [];
+        $tax = isset($vars['taxonomies']) && is_array($vars['taxonomies']) ? $vars['taxonomies'] : [];
+        $attrs = isset($vars['attrs']) && is_array($vars['attrs']) ? $vars['attrs'] : [];
         $post_title = isset($vars['title']) ? sanitize_text_field($vars['title']) : '';
-        $post_content = isset($vars['content']) ? $vars['content'] : '';
+        $post_content = $vars['content'] ?? '';
 
         // Listing Title is Required
         if(!trim($post_title)) return $this->response([
@@ -42,10 +40,10 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
         $post_id = isset($vars['id']) ? (int) $vars['id'] : null;
 
         // Post ID provided but not exists
-        if($post_id and !get_post($post_id)) $post_id = null;
+        if($post_id && !get_post($post_id)) $post_id = null;
 
         // Post ID not provided so search by title and type
-        if(!$post_id and $exists = post_exists($post_title, '', '', LSD_Base::PTYPE_LISTING)) $post_id = (int) $exists;
+        if(!$post_id && $exists = post_exists($post_title, '', '', LSD_Base::PTYPE_LISTING)) $post_id = (int) $exists;
 
         // IX Class
         $ix = new LSD_IX();
@@ -94,7 +92,7 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
             foreach($names as $name)
             {
                 $term = wp_create_term($name, $taxonomy);
-                if(is_array($term) and isset($term['term_id'])) $terms[] = (int) $term['term_id'];
+                if(is_array($term) && isset($term['term_id'])) $terms[] = (int) $term['term_id'];
             }
 
             wp_set_post_terms($id, $terms, $taxonomy);
@@ -125,7 +123,7 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
 
                 $term = wp_create_term($name, LSD_Base::TAX_ATTRIBUTE);
 
-                $term_id = (is_array($term) and isset($term['term_id'])) ? $term['term_id'] : null;
+                $term_id = is_array($term) && isset($term['term_id']) ? $term['term_id'] : null;
                 if(!$term_id) continue;
 
                 $value = $attr['value'] ?? '';
@@ -134,7 +132,7 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
                 $type = $attr['type'] ?? '';
                 if($type) update_term_meta($term_id, 'lsd_field_type', $type);
 
-                $values = (isset($attr['values']) and trim($attr['values'])) ? $attr['values'] : '';
+                $values = isset($attr['values']) && trim($attr['values']) ? $attr['values'] : '';
                 update_term_meta($term_id, 'lsd_values', $values);
 
                 $index = $attr['index'] ?? '1.00';
@@ -161,7 +159,7 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
         else delete_post_thumbnail($id);
 
         // Gallery
-        $gallery = (isset($vars['gallery']) and is_array($vars['gallery'])) ? $vars['gallery'] : [];
+        $gallery = isset($vars['gallery']) && is_array($vars['gallery']) ? $vars['gallery'] : [];
         if(count($gallery))
         {
             $images = [];
@@ -177,14 +175,14 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
         else update_post_meta($id, 'lsd_gallery', []);
 
         // Publish Listing
-        if($status === 'publish' and get_post_status($id) !== 'published') wp_publish_post($id);
+        if($status === 'publish' && get_post_status($id) !== 'published') wp_publish_post($id);
 
         // Sanitization
         array_walk_recursive($vars, 'sanitize_text_field');
 
         // Save the Data
         $entity = new LSD_Entity_Listing($id);
-        $entity->save($vars, true);
+        $entity->save($vars);
 
         if($status === 'publish') $message = esc_html__('The listing published.', 'listdom');
         else $message = esc_html__('The listing submitted. It will publish as soon as possible.', 'listdom');
@@ -206,5 +204,3 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
         ]);
     }
 }
-
-endif;

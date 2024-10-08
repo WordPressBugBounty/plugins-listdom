@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_IX_Mapping')):
-
 /**
  * Listdom IX Mapping Class.
  *
  * @class LSD_IX_Mapping
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_IX_Mapping extends LSD_IX
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function listdom_fields()
     {
@@ -198,24 +196,24 @@ class LSD_IX_Mapping extends LSD_IX
                 'mandatory' => false,
                 'description' => esc_html__("A text field should get mapped. Listdom will create labels using the text if not exists and assign listing to labels.", 'listdom'),
                 'default' => [$default, 'text'],
-            ]
+            ],
         ];
 
         // Social Networks
         $SN = new LSD_Socials();
 
         $networks = LSD_Options::socials();
-        foreach($networks as $network => $values)
+        foreach ($networks as $network => $values)
         {
             $obj = $SN->get($network, $values);
 
             // Social Network is not Enabled
-            if(!$obj || !$obj->option('listing')) continue;
+            if (!$obj || !$obj->option('listing')) continue;
 
             // Input Type
             $type = $obj->get_input_type();
 
-            $fields['lsd_'.$obj->key()] = [
+            $fields['lsd_' . $obj->key()] = [
                 'label' => esc_html($obj->label()),
                 'type' => $type,
                 'mandatory' => false,
@@ -227,12 +225,12 @@ class LSD_IX_Mapping extends LSD_IX
         // Attributes
         $attributes = LSD_Main::get_attributes();
 
-        foreach($attributes as $attribute)
+        foreach ($attributes as $attribute)
         {
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-            if($type == 'separator') continue;
+            if ($type == 'separator') continue;
 
-            $fields['lsd_attribute_'.$attribute->term_id] = [
+            $fields['lsd_attribute_' . $attribute->term_id] = [
                 'label' => $attribute->name,
                 'type' => in_array($type, ['number', 'email', 'url']) ? $type : 'text',
                 'mandatory' => false,
@@ -242,7 +240,7 @@ class LSD_IX_Mapping extends LSD_IX
 
         // Apply Filters
         return apply_filters('lsd_ix_listdom_fields', $fields);
-	}
+    }
 
     /**
      * @param string $file
@@ -254,7 +252,7 @@ class LSD_IX_Mapping extends LSD_IX
         $extension = strtolower(end($ex));
 
         $fields = [];
-        switch($extension)
+        switch ($extension)
         {
             case 'csv':
 
@@ -262,9 +260,9 @@ class LSD_IX_Mapping extends LSD_IX
                 $delimiter = $this->delimiter($file);
 
                 $row = fgetcsv($fh, 0, $delimiter);
-                if($row !== false)
+                if ($row !== false)
                 {
-                    foreach($row as $k => $v)
+                    foreach ($row as $k => $v)
                     {
                         $v = $this->unbom($v);
                         $fields[$k] = mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v));
@@ -279,7 +277,7 @@ class LSD_IX_Mapping extends LSD_IX
         }
 
         return $fields;
-	}
+    }
 
     /**
      * @param array $raw
@@ -289,13 +287,13 @@ class LSD_IX_Mapping extends LSD_IX
     public function map(array $raw, array $mappings): array
     {
         $mapped = [];
-        foreach($mappings as $key => $mapping)
+        foreach ($mappings as $key => $mapping)
         {
             $field = (isset($mapping['map']) and trim($mapping['map']) != '') ? $mapping['map'] : null;
             $default = (isset($mapping['default']) and trim($mapping['default']) != '') ? $mapping['default'] : null;
 
             // Not Mapped
-            if(is_null($field) && is_null($default)) continue;
+            if (is_null($field) && is_null($default)) continue;
 
             // Value
             $value = (!is_null($field) && isset($raw[$field]) && trim($raw[$field]) != '') ? $raw[$field] : $default;
@@ -308,12 +306,12 @@ class LSD_IX_Mapping extends LSD_IX
         }
 
         // Latitude & Longitude by Address
-        if((!isset($mapped['lsd_latitude']) or !isset($mapped['lsd_longitude'])) and isset($mapped['lsd_address']) and trim($mapped['lsd_address']))
+        if ((!isset($mapped['lsd_latitude']) or !isset($mapped['lsd_longitude'])) and isset($mapped['lsd_address']) and trim($mapped['lsd_address']))
         {
             $main = new LSD_Main();
             $geopoint = $main->geopoint($mapped['lsd_address']);
 
-            if(isset($geopoint[0]) and $geopoint[0] and isset($geopoint[1]) and $geopoint[1])
+            if (isset($geopoint[0]) and $geopoint[0] and isset($geopoint[1]) and $geopoint[1])
             {
                 $mapped['lsd_latitude'] = $geopoint[0];
                 $mapped['lsd_longitude'] = $geopoint[1];
@@ -325,9 +323,9 @@ class LSD_IX_Mapping extends LSD_IX
 
     public function unbom($text)
     {
-        $bom = pack('H*','EFBBBF');
+        $bom = pack('H*', 'EFBBBF');
 
-        $text = str_replace("\xEF\xBB\xBF",'', $text);
+        $text = str_replace("\xEF\xBB\xBF", '', $text);
         return preg_replace("/^$bom/", '', $text);
     }
 
@@ -339,7 +337,7 @@ class LSD_IX_Mapping extends LSD_IX
         $firstLine = fgets($handle);
         fclose($handle);
 
-        foreach($delimiters as $delimiter => &$count)
+        foreach ($delimiters as $delimiter => &$count)
         {
             $count = count(str_getcsv($firstLine, $delimiter));
         }
@@ -347,5 +345,3 @@ class LSD_IX_Mapping extends LSD_IX
         return array_search(max($delimiters), $delimiters);
     }
 }
-
-endif;

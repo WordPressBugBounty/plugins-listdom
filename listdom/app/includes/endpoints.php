@@ -2,24 +2,22 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Endpoints')):
-
 /**
  * Listdom Endpoints Class.
  *
  * @class LSD_Endpoints
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Endpoints extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register'], 20);
@@ -31,7 +29,7 @@ class LSD_Endpoints extends LSD_Base
         $endpoints = $this->get();
 
         // Register Endpoints
-        foreach($endpoints as $endpoint) add_rewrite_endpoint($endpoint, LSD_Base::EP_LISTING);
+        foreach ($endpoints as $endpoint) add_rewrite_endpoint($endpoint, LSD_Base::EP_LISTING);
     }
 
     public static function is($endpoint = null)
@@ -41,11 +39,11 @@ class LSD_Endpoints extends LSD_Base
         global $wp_query;
         $endpoints = LSD_Endpoints::get();
 
-        if(!$endpoint)
+        if (!$endpoint)
         {
-            foreach($endpoints as $e)
+            foreach ($endpoints as $e)
             {
-                if(isset($wp_query->query_vars[$e]))
+                if (isset($wp_query->query_vars[$e]))
                 {
                     $response = $e;
                     break;
@@ -54,7 +52,7 @@ class LSD_Endpoints extends LSD_Base
         }
         else
         {
-            if(in_array($endpoint, $endpoints) && isset($wp_query->query_vars[$endpoint])) $response = true;
+            if (in_array($endpoint, $endpoints) && isset($wp_query->query_vars[$endpoint])) $response = true;
         }
 
         return $response;
@@ -71,5 +69,3 @@ class LSD_Endpoints extends LSD_Base
         return apply_filters('lsd_listing_endpoints_output', $output, $endpoint);
     }
 }
-
-endif;

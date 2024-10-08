@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.0.0
 Requires PHP: 7.0
 Tested up to: 6.6.1
-Stable tag: 3.4.0
+Stable tag: 3.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,33 +32,31 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 **👉 Display Features with Fully Customizable Tools**
 
 *   Wonderful 80 different skins
-*   Display listings on the map with various styles
-*   Display listings in Half Map / Split views (See the demo)
-*   Display listings in List + Grid views (Contains a switch button)
-*   Display listings in List views
-*   Display listings in Grid views
-*   Display listings in Carousel views
-*   Display listings in Table views
-*   Display listings in Masonry views
-*   Display listings in Cover views
-*   Display listings in Slider views
+*   Display listings in List + Grid view (Contains a switch button)
+*   Display listings in List view
+*   Display listings in Grid view
+*   Display listings in Carousel view
+*   Display listings in Table view with customizable skins
+*   Display listings in Masonry view
+*   Display listings in Cover view
+*   Display listings in Slider view
+*   Different styles for views and skins
+*   Elements display options for each skin and style
 *   Display views anywhere with a powerful shortcode generator
 *   Use shortcodes in all page builders
 *   Assign multiple shortcodes to one page
-*   Practical sort module on all applicable skins
+*   Practical sort options (Title, Publish Date, Update Date, Comments, ID, Author, Random, Price, Most Viewed) on all applicable skins
 *   Ability to change default sort parameters
-*   Show listings on [Google Maps](https://demo.webilia.com/listdom/half-map-split-view/style-2-half-map-right-map/) based on their location with full map module options
-*   Show listing details as a modal box on the map
-*   Advanced marker clustering
+*   Dropdown and List sorting style
+*   Helpful dummy data to boost the start
 *   Override archive page design
 *   Font Awesome icons
 *   [Define colors for the skins as you wish](https://webilia.com/docs/listdom/settings/general-settings?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Define+colors+for+the+skins+as+you+wish)
 *   [Use predefined colors](https://webilia.com/docs/listdom/settings/general-settings?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Use+predefined+colors)
 *   Font manager
-*   [Stunning map styles](https://demo.webilia.com/listdom/single-map/) (Apple, Facebook, Ultralight, Dark and many more map styles)
 *   Several [skins and views](https://demo.webilia.com/listdom/skins/multiple-shortcodes/) on one page
-*   Different styles for views and skins
-*   Different styles for listing detail page
+*   4 Different pre-made styles for listing details page
+*   A built-in Design Builder to design the listing details page
 *   Custom color for settings
 *   Category filter option
 *   Location filter option
@@ -72,11 +70,21 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Available widgets for sidebars
 *   Show shortcodes with widgets
 
+**👉 Map Module with Plenty of Features**
+
+*   Display listings on the map with various styles
+*   Display listings in Half Map / Split views (See the demo)
+*   Show listings on [Google Maps](https://demo.webilia.com/listdom/half-map-split-view/style-2-half-map-right-map/) based on their location with full map module options
+*   Advanced marker clustering
+*   Show listing details as a modal box on the map
+*   [Stunning map styles](https://demo.webilia.com/listdom/single-map/) (Apple, Facebook, Ultralight, Dark and many more map styles)
+*   Address module and Google map support
+*   Address to location conversion feature
+
 **👉 Directory Management**
 
 *   Unlimited number of directories
 *   Image gallery module
-*   Address module and Google map support
 *   Advanced availability time module (Work hours and off days)
 *   Advanced price module
 *   Global and per listing currency manager
@@ -147,14 +155,17 @@ For users seeking additional features and capabilities for a [WordPress director
 
 **👉 Pro Add-on of The Listdom Classified Listing Plugin**
 
+*   Powerful login and register shortcodes
 *   Schema option
 *   Map GPS search
 *   [Listing frontend submission](https://demo.webilia.com/listdom/dashboard/)
+*   Image size limits on frontend listing submission
 *   Guest posting without user registration
 *   [Custom fields/attributes](https://webilia.com/docs/listdom/setting-up-listing/attributes?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+fields%2Fattributes)
 *   Search and filter by custom fields/attributes
 *   Hierarchy Categories
 *   Embed elements in listings
+*   Featured video for each listing
 *   [Advanced intractive map search feature](https://demo.webilia.com/listdom/skins/grid-view/style-1-map-first-grid-view)
 *   Radius search field
 *   Hierarchical dropdowns search field
@@ -162,6 +173,7 @@ For users seeking additional features and capabilities for a [WordPress director
 *   Listing cards link options and image status
 *   [OpenStreetMap](https://demo.webilia.com/listdom/single-map/openstreetmap/) (Display maps using OpenStreetMap with Leaflet.js - 100% free)
 *   Mapbox tiles support
+*   Change style and modules per category
 *   Change style and modules per listing
 *   JSON importer and exporter
 *   Display listings in Side-by-Side view
@@ -275,7 +287,7 @@ While Listdom and Listdomer both offer free versions, they also provide enhanced
 
 *   Gateways Direct Support
 *   Mailchimp Integration
-*   Login/Register Widget
+*   Chat Module
 *   And many more ...
 
 == Installation ==
@@ -328,7 +340,28 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 
 == Changelog ==
 
+= 3.5.0 =
+* [PRO] Introduced authentication features including login, registration, and password recovery.
+* [PRO] Added the option to customize the listing details layout per category.
+* [PRO] Implemented the ability to restrict image size in the frontend dashboard.
+* Introduced a table builder feature for the table skin.
+* Added numerous configurable display options across different skins.
+* Introduced a welcome setup wizard.
+* Added a new "Listdom Publisher" user role with the capability to publish listings.
+* Introduced an option to add the featured image to the gallery element.
+* Added the option to hide attribute titles within the attributes element.
+* Introduced a layout option for the features element.
+* Added a new option to customize the sort bar layout.
+* [PRO] Enhanced per-listing display options.
+* Streamlined the licensing and activation process.
+* Improved the search and filter form builder.
+* Optimized the dummy data importer.
+* Resolved display option issues in WP Multisite.
+* Addressed issues with pre-made layouts in listing details.
+* Fixed various UI and responsiveness issues.
+
 = 3.4.0 =
+* [ADDON] Released Connect addon!
 * Added a design builder for creating flexible and visually appealing listing details pages.
 * Added Style 3 and Style 4 for listing details pages.
 * Added a slider type for the gallery element.

@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Element_Report')):
-
 /**
  * Listdom Abuse Element Class.
  *
  * @class LSD_Element_Abuse
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Element_Abuse extends LSD_Element
 {
@@ -16,19 +14,19 @@ class LSD_Element_Abuse extends LSD_Element
     public $label;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Report Abuse', 'listdom');
-	}
+    }
 
     public function get($post_id = null)
     {
-        if(is_null($post_id))
+        if (is_null($post_id))
         {
             global $post;
             $post_id = $post->ID;
@@ -47,5 +45,3 @@ class LSD_Element_Abuse extends LSD_Element
         );
     }
 }
-
-endif;

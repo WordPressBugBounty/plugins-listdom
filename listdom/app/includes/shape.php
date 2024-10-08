@@ -2,27 +2,25 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Shape')):
-
 /**
  * Listdom Entity Class.
  *
  * @class LSD_Shape
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Shape extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function get(array $args = [])
     {
-        if(!count($args)) return false;
+        if (!count($args)) return false;
 
         $type = $args['type'];
         $paths = $args['paths'];
@@ -32,18 +30,18 @@ class LSD_Shape extends LSD_Base
         $boundaries = self::toBoundaries($paths);
 
         // Invalid Boundaries
-        if(!count($boundaries)) return false;
+        if (!count($boundaries)) return false;
 
         // Shape Data
         $shape = [];
         $shape['type'] = $type;
 
-        switch($type)
+        switch ($type)
         {
             case 'circle':
 
                 // Invalid Circle
-                if(!is_object($boundaries[0])) return false;
+                if (!is_object($boundaries[0])) return false;
 
                 $shape['center'] = $boundaries[0];
                 $shape['radius'] = $radius;
@@ -53,7 +51,7 @@ class LSD_Shape extends LSD_Base
             case 'rectangle':
 
                 // Invalid Rectangle
-                if(!is_object($boundaries[0]) or !is_object($boundaries[1])) return false;
+                if (!is_object($boundaries[0]) or !is_object($boundaries[1])) return false;
 
                 $shape['north'] = $boundaries[0]->lat;
                 $shape['east'] = $boundaries[0]->lng;
@@ -79,7 +77,7 @@ class LSD_Shape extends LSD_Base
         }
 
         return $shape;
-	}
+    }
 
     /**
      * @param string $paths
@@ -87,14 +85,14 @@ class LSD_Shape extends LSD_Base
      */
     public static function toBoundaries(string $paths): array
     {
-        if(!trim($paths)) return [];
+        if (!trim($paths)) return [];
 
         $boundaries = [];
 
         $ex1 = explode(')', trim($paths, ', '));
-        foreach($ex1 as $value)
+        foreach ($ex1 as $value)
         {
-            if(trim($value) == '') continue;
+            if (trim($value) == '') continue;
 
             $ex2 = explode(',', trim($value, '(), Latng'));
 
@@ -119,20 +117,18 @@ class LSD_Shape extends LSD_Base
         $first_point = null;
         $polygon = [];
 
-        foreach($points as $point)
+        foreach ($points as $point)
         {
             $geo = explode(',', trim($point, '(), '));
             $latlng = [trim($geo[0]), trim($geo[1])];
 
-            if(!$first_point) $first_point = $latlng;
+            if (!$first_point) $first_point = $latlng;
             $polygon[] = $latlng;
         }
 
         // Close the Polygon with first Point
-        if($first_point) $polygon[] = $first_point;
+        if ($first_point) $polygon[] = $first_point;
 
         return $polygon;
     }
 }
-
-endif;

@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Endpoints_Raw')):
-
 /**
  * Listdom Raw Endpoint Class.
  *
  * @class LSD_Endpoints_Raw
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Endpoints_Raw extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function output()
     {
@@ -26,7 +24,7 @@ class LSD_Endpoints_Raw extends LSD_Base
         $content = do_shortcode(wpautop($post->post_content));
 
         $body = (new LSD_PTypes_Listing_Single())->get($content);
-        $class = 'lsd-raw-page';
+        $class = 'lsd-iframe-page lsd-raw-page';
 
         // Generate output
         ob_start();
@@ -34,5 +32,3 @@ class LSD_Endpoints_Raw extends LSD_Base
         return ob_get_clean();
     }
 }
-
-endif;

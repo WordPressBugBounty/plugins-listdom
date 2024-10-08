@@ -2,32 +2,30 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Taxonomies_Label')):
-
 /**
  * Listdom Label Taxonomy Class.
  *
  * @class LSD_Taxonomies_Label
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Taxonomies_Label extends LSD_Taxonomies
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register']);
 
-        add_action(LSD_Base::TAX_LABEL.'_add_form_fields', [$this, 'add_form']);
-        add_action(LSD_Base::TAX_LABEL.'_edit_form_fields', [$this, 'edit_form']);
-        add_action('created_'.LSD_Base::TAX_LABEL, [$this, 'save_metadata']);
-        add_action('edited_'.LSD_Base::TAX_LABEL, [$this, 'save_metadata']);
+        add_action(LSD_Base::TAX_LABEL . '_add_form_fields', [$this, 'add_form']);
+        add_action(LSD_Base::TAX_LABEL . '_edit_form_fields', [$this, 'edit_form']);
+        add_action('created_' . LSD_Base::TAX_LABEL, [$this, 'save_metadata']);
+        add_action('edited_' . LSD_Base::TAX_LABEL, [$this, 'save_metadata']);
     }
 
     public function register()
@@ -77,10 +75,10 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
         <div class="form-field">
             <label for="lsd_color"><?php esc_html_e('Color', 'listdom'); ?></label>
             <?php echo LSD_Form::colorpicker([
-                'name'=>'lsd_color',
-                'id'=>'lsd_color',
-                'default'=>'#1d7ed3',
-                'value'=>'#1d7ed3',
+                'name' => 'lsd_color',
+                'id' => 'lsd_color',
+                'default' => '#1d7ed3',
+                'value' => '#1d7ed3',
             ]); ?>
         </div>
         <?php
@@ -96,10 +94,10 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
             </th>
             <td>
                 <?php echo LSD_Form::colorpicker([
-                    'name'=>'lsd_color',
-                    'id'=>'lsd_color',
-                    'default'=>'#1d7ed3',
-                    'value'=>$color,
+                    'name' => 'lsd_color',
+                    'id' => 'lsd_color',
+                    'default' => '#1d7ed3',
+                    'value' => $color,
                 ]); ?>
             </td>
         </tr>
@@ -109,9 +107,9 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
     public function save_metadata($term_id)
     {
         // It's quick edit
-        if(!isset($_POST['lsd_color'])) return false;
+        if (!isset($_POST['lsd_color'])) return;
 
-        $color = isset($_POST['lsd_color']) ? sanitize_text_field($_POST['lsd_color']) : '';
+        $color = sanitize_text_field($_POST['lsd_color']);
         update_term_meta($term_id, 'lsd_color', $color);
     }
 
@@ -123,5 +121,3 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
         ]);
     }
 }
-
-endif;

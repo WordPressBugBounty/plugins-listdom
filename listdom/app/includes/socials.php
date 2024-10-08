@@ -2,8 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Socials')):
-
 /**
  * Listdom Socials Class.
  *
@@ -48,7 +46,7 @@ class LSD_Socials extends LSD_Base
         $class = 'LSD_Socials_'.ucfirst($network);
 
         // Class doesn't exists
-        if(!class_exists($class)) return false;
+        if (!class_exists($class)) return false;
 
         // Return the object
         $obj = new $class();
@@ -148,7 +146,7 @@ class LSD_Socials extends LSD_Base
 
             echo '<div class="lsd-form-row">
                 <div class="lsd-col-3 lsd-text-right">
-                    <label for="lsd_'.$obj->key().'">'.$obj->label().(($dashboard and $dashboard->is_required($obj->key())) ? ' '.LSD_Base::REQ_HTML : '').'</label>
+                    <label for="lsd_'.$obj->key().'">'.$obj->label().($dashboard && $dashboard->is_required($obj->key()) ? ' '.LSD_Base::REQ_HTML : '').'</label>
                 </div>
                 <div class="lsd-col-9">
                     <input type="'.esc_attr($type).'" name="lsd[sc]['.$obj->key().']" id="lsd_'.$obj->key().'" placeholder="" value="'.($type === 'url' ? esc_url($value) : esc_attr($value)).'">
@@ -182,5 +180,3 @@ class LSD_Socials extends LSD_Base
         }
     }
 }
-
-endif;

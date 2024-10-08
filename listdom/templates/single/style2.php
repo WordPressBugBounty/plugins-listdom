@@ -32,8 +32,6 @@ $availability = isset($elements['availability']['enabled']) && $elements['availa
 <div class="lsd-row">
     <div class="lsd-col-8">
 
-        <?php if($video) echo LSD_Kses::rich($video); ?>
-
         <?php if($labels || $image): ?>
 		<div class="lsd-single-image-wrapper">
 			<?php
@@ -43,22 +41,23 @@ $availability = isset($elements['availability']['enabled']) && $elements['availa
 		</div>
         <?php endif; ?>
 
-		<?php if($gallery) echo LSD_Kses::element($gallery); ?>
 		<?php if($title) echo LSD_Kses::element($title); ?>
-		
+
 		<?php if($categories) echo LSD_Kses::element($categories); ?>
 		<?php if($price) echo LSD_Kses::element($price); ?>
 		<?php if($tags) echo LSD_Kses::element($tags); ?>
-			
+
 		<?php if($content) echo LSD_Kses::element($content); ?>
+        <?php if($gallery) echo LSD_Kses::element($gallery); ?>
+        <?php if($video) echo LSD_Kses::rich($video); ?>
 
         {ads}
 
         <?php if($embeds) echo LSD_Kses::rich($embeds); ?>
 		<?php if($attributes) echo LSD_Kses::element($attributes); ?>
-		
+
 		{acf}
-		
+
 		<?php if($remark) echo LSD_Kses::element($remark); ?>
 
         {franchise}
@@ -73,28 +72,27 @@ $availability = isset($elements['availability']['enabled']) && $elements['availa
         <?php endif; ?>
 
 		<?php if($map) echo LSD_Kses::form($map); ?>
-		
+
         {booking}
         {discussion}
-		
 		{application}
-		
+
 		<?php if($share) echo LSD_Kses::element($share); ?>
 
     </div>
     <div class="lsd-col-4 lsd-single-page-section-right-col lsd-flex lsd-flex-col lsd-flex-content-start lsd-flex-items-stretch lsd-gap-4">
-		
+
 		<?php if($owner) echo LSD_Kses::form($owner); ?>
 		<?php if($features) echo LSD_Kses::element($features); ?>
 
         {locallogic}
-		
+
 		<?php if($availability) echo LSD_Kses::element($availability); ?>
 		<?php if($contact_info) echo LSD_Kses::element($contact_info); ?>
 
         {team}
 
         <?php if($abuse) echo LSD_Kses::form($abuse); ?>
-		
+
     </div>
 </div>

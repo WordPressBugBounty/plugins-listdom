@@ -2,28 +2,26 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Integrations_VC')):
-
 /**
  * Listdom Integrations VC Class.
  *
  * @class LSD_Integrations_VC
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Integrations_VC extends LSD_Integrations
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         // Visual Composer is not installed
-        if(!function_exists('vc_map')) return false;
+        if (!function_exists('vc_map')) return false;
 
         add_action('vc_before_init', [$this, 'listdom']);
         return true;
@@ -41,15 +39,15 @@ class LSD_Integrations_VC extends LSD_Integrations
                         'singlemap',
                         'grid',
                         'list',
-                        'listgrid'
+                        'listgrid',
                     ],
-                    'compare' => 'IN'
-                ]
-            ]
+                    'compare' => 'IN',
+                ],
+            ],
         ]);
 
         $options = [];
-        foreach($shortcodes as $shortcode) $options[$shortcode->post_title] = $shortcode->ID;
+        foreach ($shortcodes as $shortcode) $options[$shortcode->post_title] = $shortcode->ID;
 
         vc_map([
             'name' => esc_html__('Listdom', 'listdom'),
@@ -65,11 +63,9 @@ class LSD_Integrations_VC extends LSD_Integrations
                     'heading' => esc_html__('Shortcode', 'listdom'),
                     'param_name' => 'id',
                     'value' => $options,
-                    'description' => esc_html__("Select one of predefined shortcodes.", 'listdom')
-                ]
-            ]
+                    'description' => esc_html__("Select one of predefined shortcodes.", 'listdom'),
+                ],
+            ],
         ]);
     }
 }
-
-endif;

@@ -2,28 +2,26 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Integrations_KC')):
-
 /**
  * Listdom Integrations KC Class.
  *
  * @class LSD_Integrations_KC
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Integrations_KC extends LSD_Integrations
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         // King Composer is not installed
-        if(!function_exists('kc_add_map')) return false;
+        if (!function_exists('kc_add_map')) return false;
 
         add_action('init', [$this, 'listdom']);
         return true;
@@ -41,15 +39,15 @@ class LSD_Integrations_KC extends LSD_Integrations
                         'singlemap',
                         'grid',
                         'list',
-                        'listgrid'
+                        'listgrid',
                     ],
-                    'compare' => 'IN'
-                ]
-            ]
+                    'compare' => 'IN',
+                ],
+            ],
         ]);
 
         $options = [];
-        foreach($shortcodes as $shortcode) $options[$shortcode->post_title] = $shortcode->ID;
+        foreach ($shortcodes as $shortcode) $options[$shortcode->post_title] = $shortcode->ID;
 
         kc_add_map([
             'listdom' => [
@@ -65,10 +63,8 @@ class LSD_Integrations_KC extends LSD_Integrations
                             'description' => esc_html__('Select one of predefined shortcodes.', 'listdom'),
                         ],
                     ],
-                ]
+                ],
             ],
         ]);
     }
 }
-
-endif;

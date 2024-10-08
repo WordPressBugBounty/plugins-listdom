@@ -7,6 +7,15 @@ defined('ABSPATH') || die();
 // Get HTML of Listings
 $listings_html = $this->listings_html();
 
+// Fields
+$fields = new LSD_Fields();
+
+$columns = isset($this->skin_options['columns']) && is_array($this->skin_options['columns']) && count($this->skin_options['columns'])
+	? $this->skin_options['columns']
+	: $fields->get();
+
+$titles = $fields->titles($columns);
+
 // Add List Skin JS codes to footer
 $assets = new LSD_Assets();
 $assets->footer('<script>
@@ -39,21 +48,13 @@ jQuery(document).ready(function()
 				<table class="lsd-listing-table">
 					<thead>
 						<tr class="lsd-listing-head">
-							<th>
-								<?php esc_html_e('Title', 'listdom'); ?>
-							</th>
-							<th>
-								<?php esc_html_e('Address', 'listdom'); ?> 
-							</th>
-							<th>
-								<?php esc_html_e('Price', 'listdom'); ?> 
-							</th>
-							<th>
-								<?php esc_html_e('Availability', 'listdom'); ?> 
-							</th>
-							<th>
-								<?php esc_html_e('Contact', 'listdom'); ?> 
-							</th>
+                            <?php foreach ($titles as $key => $title): ?>
+                                <?php if (isset($columns[$key]['enabled']) && $columns[$key]['enabled'] == '1'): ?>
+                                    <th>
+                                        <?php esc_html_e($title, 'listdom'); ?>
+                                    </th>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
 						</tr>
 					</thead>
 					<tbody>

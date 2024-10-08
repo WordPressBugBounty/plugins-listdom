@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Resources_Taxonomy')):
-
 /**
  * Listdom API Taxonomy Resource Class.
  *
  * @class LSD_API_Resources_Taxonomy
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Resources_Taxonomy extends LSD_API_Resource
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function get($id): array
     {
@@ -42,31 +40,31 @@ class LSD_API_Resources_Taxonomy extends LSD_API_Resource
         ];
 
         // Colors
-        if(isset($metas['lsd_color']))
+        if (isset($metas['lsd_color']))
         {
             $data['color'] = [
                 'bg' => $metas['lsd_color'],
-                'text' => $resource->get_text_color($metas['lsd_color'])
+                'text' => $resource->get_text_color($metas['lsd_color']),
             ];
         }
 
-        if(isset($metas['lsd_required'])) $data['required'] = $metas['lsd_required'];
-        if(isset($metas['lsd_editor'])) $data['editor'] = $metas['lsd_editor'];
-        if(isset($metas['lsd_icon'])) $data['icon'] = $metas['lsd_icon'];
-        if(isset($metas['lsd_symbol'])) $data['symbol'] = LSD_API_Resources_Image::get($metas['lsd_symbol']);
-        if(isset($metas['lsd_image'])) $data['image'] = LSD_API_Resources_Image::get($metas['lsd_image']);
-        if(isset($metas['lsd_schema'])) $data['schema'] = $metas['lsd_schema'];
+        if (isset($metas['lsd_required'])) $data['required'] = $metas['lsd_required'];
+        if (isset($metas['lsd_editor'])) $data['editor'] = $metas['lsd_editor'];
+        if (isset($metas['lsd_icon'])) $data['icon'] = $metas['lsd_icon'];
+        if (isset($metas['lsd_symbol'])) $data['symbol'] = LSD_API_Resources_Image::get($metas['lsd_symbol']);
+        if (isset($metas['lsd_image'])) $data['image'] = LSD_API_Resources_Image::get($metas['lsd_image']);
+        if (isset($metas['lsd_schema'])) $data['schema'] = $metas['lsd_schema'];
 
-        if(isset($metas['lsd_field_type'])) $data['field_type'] = $metas['lsd_field_type'];
-        if(isset($metas['lsd_index'])) $data['index'] = $metas['lsd_index'];
-        if(isset($metas['lsd_all_categories'])) $data['all_categories'] = $metas['lsd_all_categories'];
-        if(isset($metas['lsd_categories'])) $data['categories'] = $metas['lsd_categories'];
-        if(isset($metas['lsd_values']))
+        if (isset($metas['lsd_field_type'])) $data['field_type'] = $metas['lsd_field_type'];
+        if (isset($metas['lsd_index'])) $data['index'] = $metas['lsd_index'];
+        if (isset($metas['lsd_all_categories'])) $data['all_categories'] = $metas['lsd_all_categories'];
+        if (isset($metas['lsd_categories'])) $data['categories'] = $metas['lsd_categories'];
+        if (isset($metas['lsd_values']))
         {
             $values = explode(',', trim($metas['lsd_values'], ', '));
 
             $rendered = [];
-            foreach($values as $value)
+            foreach ($values as $value)
             {
                 $rendered[] = [
                     'key' => $value,
@@ -85,10 +83,10 @@ class LSD_API_Resources_Taxonomy extends LSD_API_Resource
         $items = [];
 
         $i = 0;
-        foreach($terms as $term)
+        foreach ($terms as $term)
         {
             $items[$i] = self::get($term['id']);
-            if(isset($term['childs'])) $items[$i]['childs'] = self::collection($term['childs']);
+            if (isset($term['childs'])) $items[$i]['childs'] = self::collection($term['childs']);
 
             $i++;
         }
@@ -115,19 +113,19 @@ class LSD_API_Resources_Taxonomy extends LSD_API_Resource
         ];
 
         // Colors
-        if(isset($metas['lsd_color']))
+        if (isset($metas['lsd_color']))
         {
             $data['color'] = [
                 'bg' => $metas['lsd_color'],
-                'text' => $resource->get_text_color($metas['lsd_color'])
+                'text' => $resource->get_text_color($metas['lsd_color']),
             ];
         }
 
-        if(isset($metas['lsd_required'])) $data['required'] = $metas['lsd_required'];
-        if(isset($metas['lsd_editor'])) $data['editor'] = $metas['lsd_editor'];
-        if(isset($metas['lsd_icon'])) $data['icon'] = $metas['lsd_icon'];
-        if(isset($metas['lsd_symbol'])) $data['symbol'] = LSD_API_Resources_Image::get($metas['lsd_symbol']);
-        if(isset($metas['lsd_image'])) $data['image'] = LSD_API_Resources_Image::get($metas['lsd_image']);
+        if (isset($metas['lsd_required'])) $data['required'] = $metas['lsd_required'];
+        if (isset($metas['lsd_editor'])) $data['editor'] = $metas['lsd_editor'];
+        if (isset($metas['lsd_icon'])) $data['icon'] = $metas['lsd_icon'];
+        if (isset($metas['lsd_symbol'])) $data['symbol'] = LSD_API_Resources_Image::get($metas['lsd_symbol']);
+        if (isset($metas['lsd_image'])) $data['image'] = LSD_API_Resources_Image::get($metas['lsd_image']);
 
         return apply_filters('lsd_api_resource_taxonomy', $data, $id);
     }
@@ -135,19 +133,19 @@ class LSD_API_Resources_Taxonomy extends LSD_API_Resource
     public static function listing($id)
     {
         $taxonomies = [];
-        foreach([
-            LSD_Base::TAX_CATEGORY,
-            LSD_Base::TAX_LABEL,
-            LSD_Base::TAX_LOCATION,
-            LSD_Base::TAX_FEATURE,
-            LSD_Base::TAX_TAG,
-        ] as $taxonomy)
+        foreach ([
+             LSD_Base::TAX_CATEGORY,
+             LSD_Base::TAX_LABEL,
+             LSD_Base::TAX_LOCATION,
+             LSD_Base::TAX_FEATURE,
+             LSD_Base::TAX_TAG,
+         ] as $taxonomy)
         {
             $terms = get_the_terms($id, $taxonomy);
-            if($terms and !is_wp_error($terms))
+            if ($terms and !is_wp_error($terms))
             {
                 $t = [];
-                foreach($terms as $term) $t[] = self::minify($term->term_id);
+                foreach ($terms as $term) $t[] = self::minify($term->term_id);
 
                 $taxonomies[$taxonomy] = $t;
             }
@@ -156,5 +154,3 @@ class LSD_API_Resources_Taxonomy extends LSD_API_Resource
         return $taxonomies;
     }
 }
-
-endif;

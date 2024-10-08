@@ -2,8 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_id')):
-
 /**
  * Listdom ID class.
  */
@@ -26,14 +24,14 @@ class LSD_id
     /**
      * Main LSD_id Instance.
      * Ensures only one instance of LSD_id is loaded or can be loaded.
+     * @return LSD_id
      * @since 1.0.0
      * @static
-     * @return LSD_id
      */
     public static function instance()
     {
         // Get an instance of Class
-        if(is_null(self::$instance)) self::$instance = new self();
+        if (is_null(self::$instance)) self::$instance = new self();
 
         // Return the instance
         return self::$instance;
@@ -49,21 +47,16 @@ class LSD_id
     public static function get($id)
     {
         $instance = self::instance();
-        if($instance->duplicated($id))
+        if ($instance->duplicated($id))
         {
             $id = $instance->unique();
+        }
 
-            $instance->add($id);
-            return $id;
-        }
-        else
-        {
-            $instance->add($id);
-            return $id;
-        }
+        $instance->add($id);
+        return $id;
     }
 
-    public function duplicated($id)
+    public function duplicated($id): bool
     {
         return in_array($id, self::$IDs);
     }
@@ -76,20 +69,18 @@ class LSD_id
     public function unique()
     {
         $id = mt_rand(1000, 9999);
-        if($this->duplicated($id)) $id = $this->unique();
+        if ($this->duplicated($id)) $id = $this->unique();
 
         return $id;
     }
 
-    public static function code($length = 10)
+    public static function code($length = 10): string
     {
         $keys = array_merge(range(0, 9), range('A', 'Z'), range('a', 'z'));
 
         $key = '';
-        for($i = 0; $i < $length; $i++) $key .= $keys[array_rand($keys)];
+        for ($i = 0; $i < $length; $i++) $key .= $keys[array_rand($keys)];
 
         return $key;
     }
 }
-
-endif;

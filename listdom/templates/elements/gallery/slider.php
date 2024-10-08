@@ -4,13 +4,14 @@ defined('ABSPATH') || die();
 
 /** @var array $params */
 /** @var int $post_id */
+/** @var LSD_Element_Gallery $this */
 
 $width = $params['width'] ?? 1920;
 $height = $params['height'] ?? 500;
 $lightbox = !isset($params['lightbox']) || $params['lightbox'];
+$include_thumbnail = $params['include_thumbnail'] ?? false;
 
-$gallery = get_post_meta($post_id, 'lsd_gallery', true);
-if (!is_array($gallery)) $gallery = [];
+$gallery = $this->get_gallery($post_id , $include_thumbnail);
 
 // There is no Gallery!
 if (!count($gallery)) return '';

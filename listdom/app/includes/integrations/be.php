@@ -2,33 +2,31 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Integrations_BE')):
-
 /**
  * Listdom Builder Block Editor Class.
  *
  * @class LSD_Integrations_BE
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Integrations_BE extends LSD_Integrations
 {
     private $settings;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
         // Listdom Settings
         $this->settings = LSD_Options::settings();
-	}
-    
+    }
+
     public function init()
     {
         // Block Editor is not Available!
-        if(!function_exists('register_block_type')) return;
+        if (!function_exists('register_block_type')) return;
 
         // Block Editor Category
         add_filter('block_categories_all', [$this, 'category'], 9999);
@@ -40,15 +38,15 @@ class LSD_Integrations_BE extends LSD_Integrations
         add_action('lsd_admin_assets', [$this, 'assets'], 9999);
 
         // Block Editor Status for Post Types
-        foreach(['listing', 'shortcode', 'search'] as $post_type)
+        foreach (['listing', 'shortcode', 'search'] as $post_type)
         {
-            add_filter('lsd_ptype_'.$post_type.'_args', [$this, 'enable_be'], 9999);
+            add_filter('lsd_ptype_' . $post_type . '_args', [$this, 'enable_be'], 9999);
         }
 
         // Block Editor Status for Taxonomies
-        foreach(['location', 'tag', 'feature', 'label'] as $taxonomy)
+        foreach (['location', 'tag', 'feature', 'label'] as $taxonomy)
         {
-            add_filter('lsd_taxonomy_'.$taxonomy.'_args', [$this, 'enable_be'], 9999);
+            add_filter('lsd_taxonomy_' . $taxonomy . '_args', [$this, 'enable_be'], 9999);
         }
     }
 
@@ -58,7 +56,7 @@ class LSD_Integrations_BE extends LSD_Integrations
             [[
                 'slug' => 'lsd.be.category',
                 'title' => esc_html__('Listdom', 'listdom'),
-                'icon' => 'list-view'
+                'icon' => 'list-view',
             ]],
             $categories
         );
@@ -70,7 +68,7 @@ class LSD_Integrations_BE extends LSD_Integrations
         $screen = get_current_screen();
 
         // It's Blockeditor
-        if(method_exists($screen, 'is_block_editor') && $screen->is_block_editor()) $include = true;
+        if (method_exists($screen, 'is_block_editor') && $screen->is_block_editor()) $include = true;
 
         return $include;
     }
@@ -81,7 +79,7 @@ class LSD_Integrations_BE extends LSD_Integrations
         $screen = get_current_screen();
 
         // Is it block editor page?
-        if(method_exists($screen, 'is_block_editor') && $screen->is_block_editor())
+        if (method_exists($screen, 'is_block_editor') && $screen->is_block_editor())
         {
             // Include Listdom Block Dependencies
             wp_enqueue_script(
@@ -106,7 +104,7 @@ class LSD_Integrations_BE extends LSD_Integrations
     public function enable_be($args)
     {
         // Block Editor Enabled for Listings
-        if(isset($this->settings['blockeditor_status']) && $this->settings['blockeditor_status'])
+        if (isset($this->settings['blockeditor_status']) && $this->settings['blockeditor_status'])
         {
             $args['show_in_rest'] = true;
         }
@@ -114,5 +112,3 @@ class LSD_Integrations_BE extends LSD_Integrations
         return $args;
     }
 }
-
-endif;

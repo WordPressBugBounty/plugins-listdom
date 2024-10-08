@@ -2,32 +2,30 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Entity_Listing')):
-
 /**
  * Listdom Listing Entity Class.
  *
  * @class LSD_Entity_Listing
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Entity_Listing extends LSD_Entity
 {
     public $post;
     public $schema;
 
-	public function __construct($post = null)
+    public function __construct($post = null)
     {
         // Call Parent Constructor
         parent::__construct();
 
         // Get the Post
         $this->post = get_post($post);
-	}
+    }
 
-	public function save(array $data = [], $trigger_actions = true)
+    public function save(array $data = [], $trigger_actions = true)
     {
         // Edit Locked?
-        if(get_post_meta($this->post->ID, 'lsd_lock_edit', true)) return;
+        if (get_post_meta($this->post->ID, 'lsd_lock_edit', true)) return;
 
         $category = isset($data['listing_category']) ? sanitize_text_field($data['listing_category']) : '';
         $term = $category ? get_term_by('term_id', $category, LSD_Base::TAX_CATEGORY) : null;
@@ -36,7 +34,7 @@ class LSD_Entity_Listing extends LSD_Entity
         $db = new LSD_db();
 
         // Category is valid
-        if(trim($category) && !empty($term) && !is_wp_error($term))
+        if (trim($category) && !empty($term) && !is_wp_error($term))
         {
             // Append Category
             $append = apply_filters('lsd_is_addcat_installed', false);
@@ -48,7 +46,7 @@ class LSD_Entity_Listing extends LSD_Entity
             update_post_meta($this->post->ID, 'lsd_primary_category', $term->term_id);
         }
         // A valid category is required!
-        elseif($trigger_actions)
+        else if ($trigger_actions)
         {
             LSD_Flash::add(esc_html__("A valid Listing Category is required.", 'listdom'), 'error');
         }
@@ -66,14 +64,14 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_longitude', $lng);
 
         // Listdom Data ID
-        $data_id = $db->select("SELECT `id` FROM `#__lsd_data` WHERE `id`='".esc_sql($this->post->ID)."'");
+        $data_id = $db->select("SELECT `id` FROM `#__lsd_data` WHERE `id`='" . esc_sql($this->post->ID) . "'");
 
         // Insert Geo Point on Listdom Table
-        if(!$data_id) $db->q("INSERT INTO `#__lsd_data` (`id`, `latitude`, `longitude`) VALUES ('".esc_sql($this->post->ID)."', '".$lat."', '".$lng."')");
-        else $db->q("UPDATE `#__lsd_data` SET `latitude`='".$lat."', `longitude`='".$lng."' WHERE `id`='".esc_sql($this->post->ID)."'");
+        if (!$data_id) $db->q("INSERT INTO `#__lsd_data` (`id`, `latitude`, `longitude`) VALUES ('" . esc_sql($this->post->ID) . "', '" . $lat . "', '" . $lng . "')");
+        else $db->q("UPDATE `#__lsd_data` SET `latitude`='" . $lat . "', `longitude`='" . $lng . "' WHERE `id`='" . esc_sql($this->post->ID) . "'");
 
         // Update Point Field
-        $db->q("UPDATE `#__lsd_data` SET `point`=Point(`latitude`, `longitude`) WHERE `id`='".esc_sql($this->post->ID)."'");
+        $db->q("UPDATE `#__lsd_data` SET `point`=Point(`latitude`, `longitude`) WHERE `id`='" . esc_sql($this->post->ID) . "'");
 
         // Shape
         update_post_meta($this->post->ID, 'lsd_shape_type', isset($data['shape_type']) ? sanitize_text_field($data['shape_type']) : '');
@@ -85,9 +83,9 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_attributes', $attributes);
 
         // Save attributes one by one
-        foreach($attributes as $key=>$attribute)
+        foreach ($attributes as $key => $attribute)
         {
-            update_post_meta($this->post->ID, 'lsd_attribute_'.$key, sanitize_text_field($attribute));
+            update_post_meta($this->post->ID, 'lsd_attribute_' . $key, sanitize_text_field($attribute));
         }
 
         // Listing Link
@@ -122,7 +120,7 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_embeds', ((isset($data['embeds']) and is_array($data['embeds'])) ? $this->indexify($data['embeds']) : []));
 
         // Guest Data
-        if(isset($data['guest_email']))
+        if (isset($data['guest_email']))
         {
             // Guest Email
             $guest_email = sanitize_email($data['guest_email']);
@@ -137,7 +135,7 @@ class LSD_Entity_Listing extends LSD_Entity
 
         // Create user and assign listing to new user
         $guest_email = get_post_meta($this->post->ID, 'lsd_guest_email', true);
-        if(is_email($guest_email) && $guest_registration === 'submission' && !$data_id)
+        if (is_email($guest_email) && $guest_registration === 'submission' && !$data_id)
         {
             LSD_User::listing(
                 $this->post->ID,
@@ -151,7 +149,7 @@ class LSD_Entity_Listing extends LSD_Entity
         do_action('lsd_listing_saved', $this->post, $data, !$data_id);
 
         // New Listing Action
-        if($trigger_actions && !$data_id) do_action('lsd_new_listing', $this->post->ID);
+        if ($trigger_actions && !$data_id) do_action('lsd_new_listing', $this->post->ID);
     }
 
     public function id(): int
@@ -183,12 +181,12 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->excerpt($this->post->ID, $limit, $read_more);
     }
 
-    public function get_features($method = 'list', $show_icons = true)
+    public function get_features($method = 'list', $show_icons = true, $list_style = 'per-row')
     {
         $element = new LSD_Element_Features($show_icons);
 
-        if($method === 'text') return $element->text($this->post->ID);
-        else return $element->get($this->post->ID);
+        if ($method === 'text') return $element->text($this->post->ID);
+        else return $element->get($this->post->ID, $list_style);
     }
 
     public function get_tags()
@@ -203,10 +201,10 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID);
     }
 
-    public function get_attributes($show_icons = false)
+    public function get_attributes($show_icons = false, $show_attribute_title = true)
     {
         $element = new LSD_Element_Attributes();
-        return $element->get($this->post->ID, $show_icons);
+        return $element->get($this->post->ID, $show_icons, $show_attribute_title);
     }
 
     public function get_map($args = [])
@@ -235,7 +233,7 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function get_image_module($shortcode, $size = [390, 260])
     {
-        if($shortcode->image_method === 'slider') return $this->get_image_slider($size);
+        if ($shortcode->image_method === 'slider') return $this->get_image_slider($size);
         else return $this->get_cover_image($size, $shortcode->get_listing_link_method());
     }
 
@@ -278,9 +276,9 @@ class LSD_Entity_Listing extends LSD_Entity
     public function get_price_class(): string
     {
         $class = (int) get_post_meta($this->post->ID, 'lsd_price_class', true);
-        if(!trim($class)) $class = 2;
+        if (!trim($class)) $class = 2;
 
-        switch($class)
+        switch ($class)
         {
             case 1:
 
@@ -307,7 +305,7 @@ class LSD_Entity_Listing extends LSD_Entity
                 break;
         }
 
-        return '<span title="'.esc_attr($label).'">'.$tag.'</span>';
+        return '<span title="' . esc_attr($label) . '">' . $tag . '</span>';
     }
 
     public function get_availability($oneday = false, $day = null)
@@ -319,17 +317,17 @@ class LSD_Entity_Listing extends LSD_Entity
     public function get_phone(): string
     {
         $phone = get_post_meta($this->post->ID, 'lsd_phone', true);
-        if(trim($phone) == '') return '';
+        if (trim($phone) == '') return '';
 
-        return '<i class="lsd-icon fas fa-phone-square-alt" aria-hidden="true"></i> '.esc_html($phone);
+        return '<i class="lsd-icon fas fa-phone-square-alt" aria-hidden="true"></i> ' . esc_html($phone);
     }
 
     public function get_email(): string
     {
         $email = get_post_meta($this->post->ID, 'lsd_email', true);
-        if(trim($email) == '') return '';
+        if (trim($email) == '') return '';
 
-        return '<i class="lsd-icon fa fa-envelope" aria-hidden="true"></i> '.esc_html($email);
+        return '<i class="lsd-icon fa fa-envelope" aria-hidden="true"></i> ' . esc_html($email);
     }
 
     public function get_owner($layout = 'details', $args = [])
@@ -362,8 +360,8 @@ class LSD_Entity_Listing extends LSD_Entity
         $icon = isset($category->term_id) ? LSD_Taxonomies::icon($category->term_id) : '';
         $bgcolor = isset($category->term_id) ? get_term_meta($category->term_id, 'lsd_color', true) : '';
 
-        $marker = '<div class="lsd-marker-container" style="background-color: '.esc_attr($bgcolor).'">
-            '.$icon.'
+        $marker = '<div class="lsd-marker-container" style="background-color: ' . esc_attr($bgcolor) . '">
+            ' . $icon . '
         </div>';
 
         // Apply Filters
@@ -397,15 +395,15 @@ class LSD_Entity_Listing extends LSD_Entity
     {
         // Primary Category
         $primary_id = get_post_meta($listing_id, 'lsd_primary_category', true);
-        if($primary_id)
+        if ($primary_id)
         {
             $term = get_term($primary_id);
-            if($term instanceof WP_Term) return $term;
+            if ($term instanceof WP_Term) return $term;
         }
 
         // Get the First Category
         $terms = wp_get_post_terms($listing_id, LSD_Base::TAX_CATEGORY);
-        if(!count($terms)) return null;
+        if (!count($terms)) return null;
 
         return $terms[0];
     }
@@ -416,12 +414,12 @@ class LSD_Entity_Listing extends LSD_Entity
         return get_term_meta($category->term_id, 'lsd_color', true);
     }
 
-    public function get_contact_info()
+    public function get_contact_info(array $args = [])
     {
         $element = new LSD_Element_Contact();
         $element->set_listing($this);
 
-        return $element->get($this->post->ID);
+        return $element->get($this->post->ID, $args);
     }
 
     public function get_favorite_button($type = 'heart')
@@ -498,7 +496,7 @@ class LSD_Entity_Listing extends LSD_Entity
     public function get_visits()
     {
         $visits = $this->get_meta('lsd_visits');
-        if(!$visits) $visits = apply_filters('lsd_listing_visits_start', 0);
+        if (!$visits) $visits = apply_filters('lsd_listing_visits_start', 0);
 
         return $visits;
     }
@@ -512,7 +510,7 @@ class LSD_Entity_Listing extends LSD_Entity
     public function get_contacts()
     {
         $contacts = $this->get_meta('lsd_contacts');
-        if(!$contacts) $contacts = apply_filters('lsd_listing_contacts_start', 0);
+        if (!$contacts) $contacts = apply_filters('lsd_listing_contacts_start', 0);
 
         return $contacts;
     }
@@ -520,15 +518,15 @@ class LSD_Entity_Listing extends LSD_Entity
     public function get_title_tag(string $method = 'normal'): string
     {
         // Link is Enabled
-        if(in_array($method, ['normal', 'blank', 'lightbox']))
+        if (in_array($method, ['normal', 'blank', 'lightbox']))
         {
             return '<a
-                data-listing-id="'.esc_attr($this->id()).'"
-                href="'.esc_url(get_the_permalink($this->id())).'"
-                '.($method === 'blank' ? 'target="_blank"' : '').'
-                '.($method === 'lightbox' ? 'data-listdom-lightbox' : '').'
-                '.lsd_schema()->url().'
-            >'.LSD_Kses::element($this->get_title()).'</a>';
+                data-listing-id="' . esc_attr($this->id()) . '"
+                href="' . esc_url(get_the_permalink($this->id())) . '"
+                ' . ($method === 'blank' ? 'target="_blank"' : '') . '
+                ' . ($method === 'lightbox' ? 'data-listdom-lightbox' : '') . '
+                ' . lsd_schema()->url() . '
+            >' . LSD_Kses::element($this->get_title()) . '</a>';
         }
         // Link is Disabled
         else return LSD_Kses::element($this->get_title());
@@ -537,10 +535,10 @@ class LSD_Entity_Listing extends LSD_Entity
     public function is($key = null): bool
     {
         // No Key
-        if(!trim($key)) return false;
+        if (!trim($key)) return false;
 
         // Claim Status
-        if($key === 'claimed')
+        if ($key === 'claimed')
         {
             return (boolean) get_post_meta($this->post->ID, 'lsd_claimed', true);
         }
@@ -556,8 +554,8 @@ class LSD_Entity_Listing extends LSD_Entity
             'posts_per_page' => $limit,
             'meta_query' => [[
                 'key' => 'lsd_parent',
-                'value' => $this->post->ID
-            ]]
+                'value' => $this->post->ID,
+            ]],
         ]);
     }
 
@@ -566,5 +564,3 @@ class LSD_Entity_Listing extends LSD_Entity
         return (boolean) count($this->get_children(1));
     }
 }
-
-endif;

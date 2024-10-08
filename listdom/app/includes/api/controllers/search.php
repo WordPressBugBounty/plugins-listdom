@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Search')):
-
 /**
  * Listdom API Search Controller Class.
  *
  * @class LSD_API_Controllers_Search
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controllers_Search extends LSD_API_Controller
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function my(WP_REST_Request $request)
     {
@@ -29,7 +27,7 @@ class LSD_API_Controllers_Search extends LSD_API_Controller
         $user = wp_get_current_user();
 
         // Invalid User
-        if(is_wp_error($user)) return $user;
+        if (is_wp_error($user)) return $user;
 
         // Skin Object
         $skin = new LSD_Skins_List();
@@ -38,8 +36,8 @@ class LSD_API_Controllers_Search extends LSD_API_Controller
         $skin->start([
             'lsd_filter' => [
                 'authors' => [$user->ID],
-                'status' => ['publish', 'pending', 'draft', 'future', 'private', 'trash', LSD_Base::STATUS_HOLD, LSD_Base::STATUS_EXPIRED]
-            ]
+                'status' => ['publish', 'pending', 'draft', 'future', 'private', 'trash', LSD_Base::STATUS_HOLD, LSD_Base::STATUS_EXPIRED],
+            ],
         ]);
 
         $skin->after_start();
@@ -60,9 +58,9 @@ class LSD_API_Controllers_Search extends LSD_API_Controller
                 'listings' => LSD_API_Resources_Listing::collection($skin->listings),
                 'pagination' => LSD_API_Resources_Listing::pagination($skin),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
-	}
+    }
 
     public function search(WP_REST_Request $request)
     {
@@ -70,7 +68,7 @@ class LSD_API_Controllers_Search extends LSD_API_Controller
         $vars = $request->get_params();
 
         // Set Params
-        foreach($vars as $key => $value) $_GET[$key] = $value;
+        foreach ($vars as $key => $value) $_GET[$key] = $value;
 
         // Skin Object
         $skin = new LSD_Skins_List();
@@ -95,9 +93,7 @@ class LSD_API_Controllers_Search extends LSD_API_Controller
                 'listings' => LSD_API_Resources_Listing::collection($skin->listings),
                 'pagination' => LSD_API_Resources_Listing::pagination($skin),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 }
-
-endif;

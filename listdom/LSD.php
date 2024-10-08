@@ -2,8 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('Listdom')):
-
 /**
  * Main Listdom Class.
  *
@@ -17,7 +15,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '3.4.0';
+    public $version = '3.5.0';
 
     /**
      * The single instance of the class.
@@ -32,15 +30,15 @@ final class Listdom
      *
      * Ensures only one instance of Listdom is loaded or can be loaded.
      *
+     * @return Listdom - Main instance.
+     * @see Listdom()
      * @since 1.0.0
      * @static
-     * @see Listdom()
-     * @return Listdom - Main instance.
      */
     public static function instance()
     {
         // Get an instance of Class
-        if(is_null(self::$instance)) self::$instance = new self();
+        if (is_null(self::$instance)) self::$instance = new self();
 
         // Return the instance
         return self::$instance;
@@ -76,32 +74,32 @@ final class Listdom
     private function define_constants()
     {
         // Listdom Absolute Path
-        if(!defined('LSD_ABSPATH')) define('LSD_ABSPATH', dirname(__FILE__));
+        if (!defined('LSD_ABSPATH')) define('LSD_ABSPATH', dirname(__FILE__));
 
         // Listdom Directory Name
-        if(!defined('LSD_DIRNAME')) define('LSD_DIRNAME', basename(LSD_ABSPATH));
+        if (!defined('LSD_DIRNAME')) define('LSD_DIRNAME', basename(LSD_ABSPATH));
 
         // Listdom Plugin Base Name
-        if(!defined('LSD_BASENAME')) define('LSD_BASENAME', plugin_basename(LSD_ABSPATH . '/listdom.php')); // listdom/listdom.php or listdom-pro/listdom.php
+        if (!defined('LSD_BASENAME')) define('LSD_BASENAME', plugin_basename(LSD_ABSPATH . '/listdom.php')); // listdom/listdom.php or listdom-pro/listdom.php
 
         // Listdom Version
-        if(!defined('LSD_VERSION')) define('LSD_VERSION', $this->version);
+        if (!defined('LSD_VERSION')) define('LSD_VERSION', $this->version);
 
         // Listdom Update Server
-        if(!defined('LSD_LICENSING_SERVER')) define('LSD_LICENSING_SERVER', 'https://api.webilia.com/licensing');
+        if (!defined('LSD_LICENSING_SERVER')) define('LSD_LICENSING_SERVER', 'https://api.webilia.com/licensing');
 
         // WordPress Upload Directory
         $upload_dir = wp_upload_dir();
 
         // Listdom Logs Directory
-        if(!defined('LSD_LOG_DIR')) define('LSD_LOG_DIR', $upload_dir['basedir'] . '/lsd-logs/');
+        if (!defined('LSD_LOG_DIR')) define('LSD_LOG_DIR', $upload_dir['basedir'] . '/lsd-logs/');
 
         // Listdom Upload Directory
-        if(!defined('LSD_UP_DIR')) define('LSD_UP_DIR', $upload_dir['basedir'] . '/listdom/');
+        if (!defined('LSD_UP_DIR')) define('LSD_UP_DIR', $upload_dir['basedir'] . '/listdom/');
 
         // Listdom Map Providers
-        if(!defined('LSD_MP_GOOGLE')) define('LSD_MP_GOOGLE', 'googlemap');
-        if(!defined('LSD_MP_LEAFLET')) define('LSD_MP_LEAFLET', 'leaflet');
+        if (!defined('LSD_MP_GOOGLE')) define('LSD_MP_GOOGLE', 'googlemap');
+        if (!defined('LSD_MP_LEAFLET')) define('LSD_MP_LEAFLET', 'leaflet');
     }
 
     /**
@@ -215,7 +213,7 @@ final class Listdom
         $statuses->init();
 
         // Initialize Lite Features
-        if($main->isLite())
+        if ($main->isLite())
         {
             $lite = new LSD_Lite();
             $lite->init();
@@ -244,7 +242,7 @@ final class Listdom
         $class_ex = explode('_', strtolower($class_name));
 
         // It's not a Listdom Class
-        if($class_ex[0] != 'lsd') return;
+        if ($class_ex[0] != 'lsd') return;
 
         // Drop Class Prefix
         $class_path = array_slice($class_ex, 1);
@@ -253,19 +251,17 @@ final class Listdom
         $file_path = LSD_ABSPATH . '/app/includes/' . implode('/', $class_path) . '.php';
 
         // We found the class!
-        if(file_exists($file_path)) require_once $file_path;
+        if (file_exists($file_path)) require_once $file_path;
     }
 }
-
-endif;
 
 /**
  * Main instance of Listdom.
  *
  * Returns the main instance of Listdom to prevent the need to use globals.
  *
- * @since  1.0.0
  * @return Listdom
+ * @since  1.0.0
  */
 function listdom()
 {

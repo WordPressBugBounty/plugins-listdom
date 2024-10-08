@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Resources_SearchModule')):
-
 /**
  * Listdom API Search Module Resource Class.
  *
  * @class LSD_API_Resources_SearchModule
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Resources_SearchModule extends LSD_API_Resource
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function get($id): array
     {
@@ -35,31 +33,31 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
         $metas = $resource->get_post_meta($id);
 
         // Form Values
-        $form = (isset($metas['lsd_form']) and is_array($metas['lsd_form'])) ? $metas['lsd_form'] : [];
+        $form = isset($metas['lsd_form']) && is_array($metas['lsd_form']) ? $metas['lsd_form'] : [];
 
         // Fields
-        $raw = (isset($metas['lsd_fields']) and is_array($metas['lsd_fields'])) ? $metas['lsd_fields'] : [];
+        $raw = isset($metas['lsd_fields']) && is_array($metas['lsd_fields']) ? $metas['lsd_fields'] : [];
 
         $fields = [];
-        foreach($raw as $r => $row)
+        foreach ($raw as $r => $row)
         {
             $filters = [];
-            if(isset($row['filters']) and is_array($row['filters']))
+            if (isset($row['filters']) and is_array($row['filters']))
             {
-                foreach($row['filters'] as $k => $f)
+                foreach ($row['filters'] as $k => $f)
                 {
                     $method = $f['method'] ?? 'dropdown';
 
                     // Filter Params
-                    $keys = ['sf-'.$f['key']];
+                    $keys = ['sf-' . $f['key']];
                     $values = [];
 
                     $type = $helper->get_type_by_key($f['key']);
-                    switch($type)
+                    switch ($type)
                     {
                         case 'taxonomy':
 
-                            if($method == 'dropdown-multiple' || $method == 'checkboxes') $keys = ['sf-'.$f['key'].'[]'];
+                            if ($method == 'dropdown-multiple' || $method == 'checkboxes') $keys = ['sf-' . $f['key'] . '[]'];
 
                             $controller = new LSD_API_Controllers_Taxonomies();
 
@@ -70,13 +68,13 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                         case 'text':
 
-                            $keys = ['sf-'.$f['key'].'-lk'];
+                            $keys = ['sf-' . $f['key'] . '-lk'];
                             break;
 
                         case 'number':
 
-                            $keys = ['sf-'.$f['key'].'-eq'];
-                            if($method == 'dropdown-plus') $keys = ['sf-'.$f['key'].'-grq'];
+                            $keys = ['sf-' . $f['key'] . '-eq'];
+                            if ($method == 'dropdown-plus') $keys = ['sf-' . $f['key'] . '-grq'];
 
                             $values = $helper->get_terms($f, true);
 
@@ -84,8 +82,8 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                         case 'dropdown':
 
-                            $keys = ['sf-'.$f['key'].'-eq'];
-                            if($method == 'dropdown-multiple' or $method == 'checkboxes') $keys = ['sf-'.$f['key'].'-in[]'];
+                            $keys = ['sf-' . $f['key'] . '-eq'];
+                            if ($method == 'dropdown-multiple' or $method == 'checkboxes') $keys = ['sf-' . $f['key'] . '-in[]'];
 
                             $values = $helper->get_terms($f, true);
 
@@ -93,12 +91,12 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                         case 'price':
 
-                            if($method == 'dropdown-plus') $keys = ['sf-att-'.$f['key'].'-grq'];
-                            elseif($method == 'mm-input')
+                            if ($method == 'dropdown-plus') $keys = ['sf-att-' . $f['key'] . '-grq'];
+                            else if ($method == 'mm-input')
                             {
                                 $keys = [
-                                    'sf-att-'.$f['key'].'-bt-min',
-                                    'sf-att-'.$f['key'].'-bt-max'
+                                    'sf-att-' . $f['key'] . '-bt-min',
+                                    'sf-att-' . $f['key'] . '-bt-max',
                                 ];
                             }
 
@@ -106,7 +104,7 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                         case 'address':
 
-                            $keys = ['sf-att-'.$f['key'].'-lk'];
+                            $keys = ['sf-att-' . $f['key'] . '-lk'];
                             break;
                     }
 
@@ -121,8 +119,8 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                 'type' => $row['type'] ?? 'row',
             ];
 
-            if(isset($row['filters'])) $fields[$r]['filters'] = $filters;
-            if(isset($row['buttons'])) $fields[$r]['buttons'] = $row['buttons'];
+            if (isset($row['filters'])) $fields[$r]['filters'] = $filters;
+            if (isset($row['buttons'])) $fields[$r]['buttons'] = $row['buttons'];
         }
 
         return apply_filters('lsd_api_resource_searchmodule', [
@@ -137,17 +135,15 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                     'shortcode' => $form['shortcode'] ?? null,
                 ],
                 'fields' => $fields,
-            ]
+            ],
         ], $id);
-	}
+    }
 
     public static function collection($ids): array
     {
         $items = [];
-        foreach($ids as $id) $items[] = self::get($id);
+        foreach ($ids as $id) $items[] = self::get($id);
 
         return $items;
     }
 }
-
-endif;

@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Shortcodes_Category')):
-
 /**
  * Listdom Category Shortcode Class.
  *
  * @class LSD_Shortcodes_Category
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Shortcodes_Category extends LSD_Shortcodes_Taxonomy
 {
@@ -19,17 +17,15 @@ class LSD_Shortcodes_Category extends LSD_Shortcodes_Taxonomy
     protected $valid_styles = ['image', 'simple', 'clean', 'carousel'];
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
         add_shortcode('listdom_category', [$this, 'output']);
-	}
+    }
 }
-
-endif;

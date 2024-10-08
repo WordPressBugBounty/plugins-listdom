@@ -53,6 +53,8 @@ jQuery(document).ready(function()
            <div class="lsd-col-9 lsd-search-sandbox">
                 <?php foreach($meta_fields as $i=>$row): $i = $i + 1; ?>
                 <div class="<?php echo ($row['type'] === 'more_options' ? 'lsd-search-more-options' : 'lsd-search-row'); ?>" id="lsd_search_row_<?php echo esc_attr($i); ?>" data-i="<?php echo esc_attr($i); ?>">
+                    <?php echo ($row['type'] === 'more_options' ? '<span class="lsd-search-more-options-label">'. esc_html__('Add the “More Options” fields in the row below', 'listdom') .'</span>' : ''); ?>
+
                     <input type="hidden" name="lsd[fields][<?php echo esc_attr($i); ?>][type]" value="<?php echo (isset($row['type']) and trim($row['type'])) ? $row['type'] : 'row'; ?>">
 
                     <div class="lsd-search-filters">
@@ -61,7 +63,7 @@ jQuery(document).ready(function()
 
                     <ul class="lsd-search-row-actions">
                         <li class="lsd-search-row-actions-sort lsd-row-handler"><i class="lsd-icon fas fa-arrows-alt"></i></li>
-                        <li class="lsd-search-row-actions-delete" data-confirm="0" data-i="<?php echo esc_attr($i); ?>"><i class="lsd-icon fas fa-trash-alt"></i></li>
+                        <li class="lsd-search-row-actions-delete lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Click twice to delete', 'listdom'); ?>" data-confirm="0" data-i="<?php echo esc_attr($i); ?>"><i class="lsd-icon fas fa-trash-alt"></i></li>
                     </ul>
                     <?php if($row['type'] == 'row') echo LSD_Kses::form($builder->row($row, $i)); ?>
                 </div>

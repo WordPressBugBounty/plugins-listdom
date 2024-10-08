@@ -2,24 +2,22 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Widgets')):
-
 /**
  * Listdom Widgets Class.
  *
  * @class LSD_Widgets
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Widgets extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         add_action('widgets_init', [$this, 'register']);
@@ -46,5 +44,3 @@ class LSD_Widgets extends LSD_Base
         register_widget('LSD_Widgets_SimpleMap');
     }
 }
-
-endif;

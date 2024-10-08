@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Skins_Masonry')):
-
 /**
  * Listdom Skins Masonry Class.
  *
  * @class LSD_Skins_Masonry
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Skins_Masonry extends LSD_Skins
 {
@@ -40,18 +38,18 @@ class LSD_Skins_Masonry extends LSD_Skins
 
     public function filters(): string
     {
-        $output = '<div class="lsd-masonry-filters"><a href="#" class="lsd-selected" data-filter="*">'.esc_html__('All', 'listdom').'<div class="lsd-border lsd-color-m-bg"></div></a>';
+        $output = '<div class="lsd-masonry-filters"><a href="#" class="lsd-selected" data-filter="*">' . esc_html__('All', 'listdom') . '<div class="lsd-border lsd-color-m-bg"></div></a>';
         $terms = get_terms($this->filter_by, [
             'hide_empty' => true,
             'include' => isset($this->atts[$this->filter_by]) && trim($this->atts[$this->filter_by]) ? $this->atts[$this->filter_by] : '',
         ]);
 
-        foreach($terms as $term)
+        foreach ($terms as $term)
         {
             // Current term doesn't have listing in current results
-            if(!$this->has_listing($term)) continue;
+            if (!$this->has_listing($term)) continue;
 
-            $output .= '<a href="#" data-filter=".lsd-t'.esc_attr($term->term_id).'">'.esc_html($term->name).'<div class="lsd-border lsd-color-m-bg"></div></a>';
+            $output .= '<a href="#" data-filter=".lsd-t' . esc_attr($term->term_id) . '">' . esc_html($term->name) . '<div class="lsd-border lsd-color-m-bg"></div></a>';
         }
 
         $output .= '</div>';
@@ -65,16 +63,16 @@ class LSD_Skins_Masonry extends LSD_Skins
             'hide_empty' => true,
         ]);
 
-        foreach($terms as $term) $output .= ' lsd-t'.esc_attr($term->term_id);
+        foreach ($terms as $term) $output .= ' lsd-t' . esc_attr($term->term_id);
         return trim($output);
     }
 
     public function has_listing($term): bool
     {
         $has = false;
-        foreach($this->listings as $id)
+        foreach ($this->listings as $id)
         {
-            if(has_term($term->term_id, $this->filter_by, $id))
+            if (has_term($term->term_id, $this->filter_by, $id))
             {
                 $has = true;
                 break;
@@ -84,5 +82,3 @@ class LSD_Skins_Masonry extends LSD_Skins
         return $has;
     }
 }
-
-endif;

@@ -2,54 +2,52 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_PTypes_Listing_Archive')):
-
 /**
  * Listdom Listing Post Types Archive Class.
  *
  * @class LSD_PTypes_Listing_Archive
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
 {
     protected $entity;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         // Call the parent constructor
         parent::__construct();
-	}
+    }
 
     public function hooks()
     {
         add_action('lsd_listings', [$this, 'do_listings'], 10, 3);
-	}
+    }
 
     public function unhook()
     {
-        remove_action('lsd_listings', [$this, 'do_listings'], 10);
+        remove_action('lsd_listings', [$this, 'do_listings']);
     }
-    
+
     public function render_map_objects($post_ids = [], $args = [])
     {
-        if(!is_array($post_ids)) return false;
+        if (!is_array($post_ids)) return false;
 
         // Marker onclick method
         $onclick = isset($args['onclick']) ? sanitize_text_field($args['onclick']) : 'infowindow';
 
         $objects = [];
-        foreach($post_ids as $post_id)
+        foreach ($post_ids as $post_id)
         {
             $entity = new LSD_Entity_Listing($post_id);
 
             // Include Listing?
-            if(!apply_filters('lsd_map_include_object', true, $entity)) continue;
+            if (!apply_filters('lsd_map_include_object', true, $entity)) continue;
 
             $object_type = get_post_meta($post_id, 'lsd_object_type', true);
-            if($object_type == 'marker')
+            if ($object_type == 'marker')
             {
                 $object = [];
                 $object['type'] = 'marker';
@@ -82,7 +80,7 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
             $object['longitude'] = (float) get_post_meta($post_id, 'lsd_longitude', true);
             $object['onclick'] = $onclick;
             $object['link'] = $onclick === 'redirect' ? get_the_permalink($post_id) : null;
-            $object['raw'] = $onclick === 'lightbox' ? trim(get_the_permalink($post_id), '/ ').'/raw' : null;
+            $object['raw'] = $onclick === 'lightbox' ? trim(get_the_permalink($post_id), '/ ') . '/raw' : null;
 
             // It's required
             $object['lsd'] = [];
@@ -98,5 +96,3 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
         include lsd_template('listings.php');
     }
 }
-
-endif;

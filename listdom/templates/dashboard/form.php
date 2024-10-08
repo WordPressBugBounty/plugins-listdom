@@ -12,6 +12,7 @@ $category = $entity->get_data_category();
 
 // Objects
 $postType = new LSD_PTypes_Listing();
+$gallery_max_size = $this->settings['submission_max_image_upload_size'] ?? '';
 
 // Add JS codes to footer
 $assets = new LSD_Assets();
@@ -223,9 +224,11 @@ jQuery(document).ready(function()
                                 $featured_image = wp_get_attachment_image_src($attachment_id, 'medium');
                                 if(isset($featured_image[0])) $featured_image = $featured_image[0];
                                 ?>
-                                <span id="lsd_dashboard_featured_image_preview"><?php echo (trim($featured_image) ? '<img src="'.esc_url($featured_image).'" />' : ''); ?></span>
+                                <div class="lsd-col-12" id="lsd_listing_featured_image_message"></div>
+                                <span id="lsd_dashboard_featured_image_preview"><?php echo trim($featured_image) ? '<img src="'.esc_url($featured_image).'" />' : ''; ?></span>
                                 <input type="hidden" id="lsd_featured_image" name="lsd[featured_image]" value="<?php echo esc_attr($attachment_id); ?>">
                                 <input type="file" id="lsd_featured_image_file">
+                                <p class="description"><?php sprintf(esc_html__('The uploaded image exceeds the maximum allowed size of %s KB.', 'listdom'), $gallery_max_size)?></p>
 
                                 <div class="lsd-dashboard-feature-image-remove-wrapper">
                                     <span id="lsd_featured_image_remove_button" class="lsd-remove-image-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo (trim($featured_image) ? '' : 'lsd-util-hide'); ?>">

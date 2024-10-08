@@ -2,14 +2,12 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_IX_Template')):
-
 /**
  * Listdom IX Template.
  * Used in CSV and Excel
  *
  * @class LSD_IX_Template
- * @version	1.0.0
+ * @version    1.0.0
  */
 abstract class LSD_IX_Template extends LSD_Collections
 {
@@ -22,10 +20,8 @@ abstract class LSD_IX_Template extends LSD_Collections
             'return_output' => true,
             'parameters' => [
                 'template' => $this,
-                'action' => $action
+                'action' => $action,
             ],
         ]);
     }
 }
-
-endif;

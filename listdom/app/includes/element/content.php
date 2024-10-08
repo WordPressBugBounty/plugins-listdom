@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Element_Content')):
-
 /**
  * Listdom Content Element Class.
  *
  * @class LSD_Element_Content
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Element_Content extends LSD_Element
 {
@@ -16,15 +14,15 @@ class LSD_Element_Content extends LSD_Element
     public $label;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Listing Content', 'listdom');
-	}
+    }
 
     public function get($content)
     {
@@ -37,12 +35,12 @@ class LSD_Element_Content extends LSD_Element
         $content = get_the_excerpt($post_id);
 
         // Post Content
-        if(trim($content) == 0) $content = strip_shortcodes(get_post_field('post_content', $post_id));
+        if (trim($content) == 0) $content = strip_shortcodes(get_post_field('post_content', $post_id));
 
         $words = explode(' ', strip_tags($content));
         $excerpt = array_slice($words, 0, $limit);
 
-        $HTML = implode(' ', $excerpt).(count($words) > $limit ? ' ...' : '').((count($words) > $limit and $read_more) ? ' <a href="'.get_the_permalink($post_id).'" class="lsd-excerpt-read-more lsd-color-m-txt">['.esc_html__('More', 'listdom').']</a>' : '');
+        $HTML = implode(' ', $excerpt) . (count($words) > $limit ? ' ...' : '') . ((count($words) > $limit and $read_more) ? ' <a href="' . get_the_permalink($post_id) . '" class="lsd-excerpt-read-more lsd-color-m-txt">[' . esc_html__('More', 'listdom') . ']</a>' : '');
 
         return $this->content(
             $HTML,
@@ -51,10 +49,8 @@ class LSD_Element_Content extends LSD_Element
                 'post_id' => $post_id,
                 'limit' => $limit,
                 'read_more' => $read_more,
-                'method' => 'excerpt'
+                'method' => 'excerpt',
             ]
         );
     }
 }
-
-endif;

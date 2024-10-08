@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Shortcodes_Listdom')):
-
 /**
  * Listdom Main Shortcode Class.
  *
  * @class LSD_Shortcodes_Listdom
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
@@ -34,7 +32,7 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom');
-        if(trim($pre)) return $pre;
+        if (trim($pre)) return $pre;
 
         return $this->skin($skin, $atts);
     }
@@ -65,7 +63,7 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
         $atts = apply_filters('lsd_shortcode_atts', $this->parse($shortcode_id, [
             'id' => $shortcode_id,
             'html_class' => 'lsd-widget lsd-shortcode-widget',
-            'widget' => true
+            'widget' => true,
         ]));
 
         $skin = $atts['lsd_display']['skin'] ?? $this->get_default_skin();
@@ -78,7 +76,7 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
         $atts = apply_filters('lsd_shortcode_atts', $this->parse($shortcode_id, [
             'id' => $shortcode_id,
             'html_class' => 'lsd-embed lsd-shortcode-embed',
-            'embed' => true
+            'embed' => true,
         ]));
 
         $skin = $atts['lsd_display']['skin'] ?? $this->get_default_skin();
@@ -88,21 +86,19 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 
     public function SKO($skin)
     {
-        if($skin === 'singlemap') $SKO = new LSD_Skins_Singlemap();
-        elseif($skin === 'list') $SKO = new LSD_Skins_List();
-        elseif($skin === 'grid') $SKO = new LSD_Skins_Grid();
-        elseif($skin === 'side') $SKO = new LSD_Skins_Side();
-        elseif($skin === 'listgrid') $SKO = new LSD_Skins_Listgrid();
-        elseif($skin === 'halfmap') $SKO = new LSD_Skins_Halfmap();
-        elseif($skin === 'table') $SKO = new LSD_Skins_Table();
-        elseif($skin === 'cover') $SKO = new LSD_Skins_Cover();
-        elseif($skin === 'carousel') $SKO = new LSD_Skins_Carousel();
-        elseif($skin === 'slider') $SKO = new LSD_Skins_Slider();
-        elseif($skin === 'masonry') $SKO = new LSD_Skins_Masonry();
+        if ($skin === 'singlemap') $SKO = new LSD_Skins_Singlemap();
+        else if ($skin === 'list') $SKO = new LSD_Skins_List();
+        else if ($skin === 'grid') $SKO = new LSD_Skins_Grid();
+        else if ($skin === 'side') $SKO = new LSD_Skins_Side();
+        else if ($skin === 'listgrid') $SKO = new LSD_Skins_Listgrid();
+        else if ($skin === 'halfmap') $SKO = new LSD_Skins_Halfmap();
+        else if ($skin === 'table') $SKO = new LSD_Skins_Table();
+        else if ($skin === 'cover') $SKO = new LSD_Skins_Cover();
+        else if ($skin === 'carousel') $SKO = new LSD_Skins_Carousel();
+        else if ($skin === 'slider') $SKO = new LSD_Skins_Slider();
+        else if ($skin === 'masonry') $SKO = new LSD_Skins_Masonry();
         else $SKO = new LSD_Skins_Singlemap();
 
         return $SKO;
     }
 }
-
-endif;

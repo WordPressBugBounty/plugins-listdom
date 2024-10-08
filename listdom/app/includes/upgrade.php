@@ -2,28 +2,26 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Upgrade')):
-
 /**
  * Listdom Upgrade Class.
  *
  * @class LSD_Upgrade
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Upgrade extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         // Plugin is not installed yet!
-        if(!get_option('lsd_settings', 0)) return;
+        if (!get_option('lsd_settings', 0)) return;
 
         // Run the Upgrade
         add_action('wp_loaded', [$this, 'upgrade']);
@@ -34,24 +32,25 @@ class LSD_Upgrade extends LSD_Base
         $version = get_option('lsd_version', '1.0.0');
 
         // It's updated to latest version
-        if(version_compare($version, LSD_VERSION, '>=')) return;
+        if (version_compare($version, LSD_VERSION, '>=')) return;
 
         // Update to latest version
         update_option('lsd_version', LSD_VERSION);
 
         // Run the updates one by one
-        if(version_compare($version, '1.2.1', '<')) $this->v121();
-        if(version_compare($version, '1.7.0', '<')) $this->v170();
-        if(version_compare($version, '1.8.0', '<')) $this->v180();
-        if(version_compare($version, '1.9.0', '<')) $this->v190();
-        if(version_compare($version, '2.0.0', '<')) $this->v200();
-        if(version_compare($version, '2.2.0', '<')) $this->v220();
-        if(version_compare($version, '2.4.0', '<')) $this->v240();
-        if(version_compare($version, '2.5.1', '<')) $this->v251();
-        if(version_compare($version, '3.2.0', '<')) $this->v320();
-        if(version_compare($version, '3.3.0', '<')) $this->v330();
-        if(version_compare($version, '3.3.1', '<')) $this->v331();
-        if(version_compare($version, '3.4.0', '<')) $this->v340();
+        if (version_compare($version, '1.2.1', '<')) $this->v121();
+        if (version_compare($version, '1.7.0', '<')) $this->v170();
+        if (version_compare($version, '1.8.0', '<')) $this->v180();
+        if (version_compare($version, '1.9.0', '<')) $this->v190();
+        if (version_compare($version, '2.0.0', '<')) $this->v200();
+        if (version_compare($version, '2.2.0', '<')) $this->v220();
+        if (version_compare($version, '2.4.0', '<')) $this->v240();
+        if (version_compare($version, '2.5.1', '<')) $this->v251();
+        if (version_compare($version, '3.2.0', '<')) $this->v320();
+        if (version_compare($version, '3.3.0', '<')) $this->v330();
+        if (version_compare($version, '3.3.1', '<')) $this->v331();
+        if (version_compare($version, '3.4.0', '<')) $this->v340();
+        if (version_compare($version, '3.5.0', '<')) $this->v350();
     }
 
     private function socials()
@@ -72,10 +71,23 @@ class LSD_Upgrade extends LSD_Base
         $db->q("DELETE FROM `#__options` WHERE `option_name` LIKE '%lsd_product_validation_%'");
     }
 
-    private function role()
+    private function roles()
     {
         remove_role('listdom_author');
         add_role('listdom_author', __('Listdom Author', 'listdom'), [
+            'read' => true,
+            'edit_posts' => true,
+            'delete_posts' => true,
+            'delete_published_posts' => true,
+            'edit_published_posts' => true,
+            'edit_listings' => true,
+            'delete_listings' => true,
+            'edit_listing' => true,
+            'upload_files' => true,
+        ]);
+
+        remove_role('listdom_publisher');
+        add_role('listdom_publisher', __('Listdom Publisher', 'listdom'), [
             'read' => true,
             'edit_posts' => true,
             'delete_posts' => true,
@@ -151,11 +163,11 @@ class LSD_Upgrade extends LSD_Base
         // Taxonomies
         $taxonomies = [
             LSD_Base::TAX_CATEGORY,
-            LSD_Base::TAX_FEATURE
+            LSD_Base::TAX_FEATURE,
         ];
 
         // Add Attributes to Taxonomies
-        if($this->isPro()) $taxonomies[] = LSD_Base::TAX_ATTRIBUTE;
+        if ($this->isPro()) $taxonomies[] = LSD_Base::TAX_ATTRIBUTE;
 
         // Icons to be Replaced
         $icons = [
@@ -484,7 +496,7 @@ class LSD_Upgrade extends LSD_Base
         ];
 
         // Update Icons
-        foreach($taxonomies as $taxonomy)
+        foreach ($taxonomies as $taxonomy)
         {
             // All Terms
             $terms = get_terms([
@@ -493,13 +505,13 @@ class LSD_Upgrade extends LSD_Base
                 'number' => '', // Return All Terms
             ]);
 
-            foreach($terms as $term)
+            foreach ($terms as $term)
             {
                 $icon = get_term_meta($term->term_id, 'lsd_icon', true);
-                if(!trim($icon)) continue;
+                if (!trim($icon)) continue;
 
                 // Use New Icon
-                if(isset($icons[$icon])) update_term_meta($term->term_id, 'lsd_icon', $icons[$icon]);
+                if (isset($icons[$icon])) update_term_meta($term->term_id, 'lsd_icon', $icons[$icon]);
             }
         }
     }
@@ -509,10 +521,10 @@ class LSD_Upgrade extends LSD_Base
         // Add Primary Category Meta
         $listings = get_posts([
             'post_type' => LSD_Base::PTYPE_LISTING,
-            'posts_per_page' => '-1'
+            'posts_per_page' => '-1',
         ]);
 
-        foreach($listings as $listing)
+        foreach ($listings as $listing)
         {
             $category = LSD_Entity_Listing::get_primary_category($listing->ID);
             add_post_meta($listing->ID, 'lsd_primary_category', ($category ? $category->term_id : null), true);
@@ -524,10 +536,10 @@ class LSD_Upgrade extends LSD_Base
         // Add Price Class
         $listings = get_posts([
             'post_type' => LSD_Base::PTYPE_LISTING,
-            'posts_per_page' => '-1'
+            'posts_per_page' => '-1',
         ]);
 
-        foreach($listings as $listing) add_post_meta($listing->ID, 'lsd_price_class', 2, true);
+        foreach ($listings as $listing) add_post_meta($listing->ID, 'lsd_price_class', 2, true);
     }
 
     private function v200()
@@ -602,7 +614,7 @@ class LSD_Upgrade extends LSD_Base
         $installed_at = get_option('lsd_installation_time', null);
 
         // Validate Time
-        if(!$installed_at) $installed_at = current_time('timestamp');
+        if (!$installed_at) $installed_at = current_time('timestamp');
 
         // Update New Option
         update_option('lsd_installed_at', $installed_at);
@@ -613,7 +625,7 @@ class LSD_Upgrade extends LSD_Base
 
     private function v330()
     {
-        $this->role();
+        $this->roles();
     }
 
     private function v331()
@@ -624,8 +636,11 @@ class LSD_Upgrade extends LSD_Base
 
     private function v340()
     {
-        $this->role();
+        $this->roles();
+    }
+
+    private function v350()
+    {
+        $this->roles();
     }
 }
-
-endif;

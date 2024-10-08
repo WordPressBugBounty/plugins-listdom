@@ -41,6 +41,8 @@ $dashboard = LSD_Payload::get('dashboard');
 // Gallery Method
 $gallery_method = $dashboard ? ($this->settings['submission_gallery_method'] ?? 'wp') : 'wp';
 if(!is_user_logged_in()) $gallery_method = 'uploader';
+
+$gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_size'] ?? '') : '';
 ?>
 <div class="lsd-metabox">
 
@@ -251,6 +253,9 @@ if(!is_user_logged_in()) $gallery_method = 'uploader';
         </div>
         <?php if(($gallery_method === 'uploader')): ?>
         <div class="lsd-form-row">
+            <?php if($dashboard && trim($gallery_max_size)): ?>
+            <p class="description"><?php echo sprintf(esc_html__('Maximum Allowed Image Size: %s KB', 'listdom'), $gallery_max_size); ?></p>
+            <?php endif; ?>
             <div class="lsd-col-12" id="lsd_listing_gallery_uploader_message"></div>
             <input type="file" class="lsd-util-hide" id="lsd_listing_gallery_uploader" multiple data-for="#lsd_listing_gallery" data-name="lsd[_gallery][]">
         </div>

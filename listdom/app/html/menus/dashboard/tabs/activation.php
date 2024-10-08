@@ -22,8 +22,9 @@ defined('ABSPATH') || die();
         );
 
         $trial = $valid === 2;
+        $grace = $valid === 3;
     ?>
-    <div class="lsd-accordion-title <?php echo $valid === 1 ? 'lsd-activation-valid' : ''; ?>">
+    <div class="lsd-accordion-title <?php echo $valid === 1 ? 'lsd-activation-valid' : ($valid === 3 ? 'lsd-activation-grace' : ''); ?>">
         <div class="lsd-flex lsd-flex-row lsd-py-2">
             <h3><?php echo esc_html($product['name']); ?><i class="lsd-icon fa fa-check lsd-ml-3"></i><i class="lsd-icon fa fa-window-close lsd-ml-3"></i></h3>
             <div class="lsd-accordion-icons">
@@ -37,7 +38,7 @@ defined('ABSPATH') || die();
             <div class="lsd-form-row lsd-activation-guide">
                 <div class="lsd-col-12">
                     <?php
-                    if(trim($license_key))
+                    if(trim($license_key) && $valid === 0)
                     {
                         echo $this->alert(
                             sprintf(
@@ -48,13 +49,24 @@ defined('ABSPATH') || die();
                             'error'
                         );
                     }
-                    else
+                    elseif($valid === 0)
                     {
                         echo $this->alert(
                             sprintf(
                                 esc_html__("To use %s addon you need to activate it first. If you don't have a valid license key or yours has expired, you can obtain one from the %s website.", 'listdom'),
                                 '<strong>'.$product['name'].'</strong>',
                                 '<a href="'.$this->getWebiliaShopURL().'" target="_blank"><strong>Webilia</strong></a>'
+                            ),
+                            'warning'
+                        );
+                    }
+                    elseif($grace)
+                    {
+                        echo $this->alert(
+                            sprintf(
+                                esc_html__('There seems to be an issue verifying your license, which may be due to a connection problem between our server and yours, or because your license has expired. You are now in a 7-day grace period. If your license is expired, please renew or activate your license within the next %s days to avoid any disruption in using %s. If you believe this is an error, kindly check your server connection or contact Webilia support for assistance.', 'listdom'),
+                                '<strong style="color: red;">'.esc_html(LSD_Licensing::remainingGracePeriod($prefix)).'</strong>',
+                                '<strong>'.esc_html($product['name']).'</strong>'
                             ),
                             'warning'
                         );
@@ -172,6 +184,7 @@ jQuery('.lsd-activation-form').on('submit', function(event)
     // DOM Elements
     const $alert = jQuery(`#${key}_activation_alert`);
     const $button = jQuery(`#${key}_activation_button`);
+    const $badge = jQuery('.lsd-wrap .update-plugins .update-count');
 
     // Remove Existing Alert
     $alert.removeClass('lsd-error lsd-success lsd-alert').html('');
@@ -195,8 +208,15 @@ jQuery('.lsd-activation-form').on('submit', function(event)
 
                 const $panel = $alert.closest('.lsd-accordion-panel');
 
-                $panel.addClass('lsd-activation-valid');
-                $panel.prev().addClass('lsd-activation-valid');
+                $panel.removeClass('lsd-activation-grace').addClass('lsd-activation-valid');
+                $panel.prev().removeClass('lsd-activation-grace').addClass('lsd-activation-valid');
+
+                // New Badge
+                const new_badge = parseInt($badge.html()) - 1;
+
+                // Update Badges
+                if(new_badge > 0) jQuery('.update-plugins .update-count').html(new_badge);
+                else jQuery('.update-plugins').remove();
             }
             else
             {
@@ -256,8 +276,8 @@ jQuery('.lsd-deactivation-form').on('submit', function(event)
 
                 const $panel = $alert.closest('.lsd-accordion-panel');
 
-                $panel.removeClass('lsd-activation-valid');
-                $panel.prev().removeClass('lsd-activation-valid');
+                $panel.removeClass('lsd-activation-grace').removeClass('lsd-activation-valid');
+                $panel.prev().removeClass('lsd-activation-grace').removeClass('lsd-activation-valid');
             }
             else
             {

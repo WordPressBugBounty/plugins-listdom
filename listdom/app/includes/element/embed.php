@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Element_Embed')):
-
 /**
  * Listdom Embed Element Class.
  *
  * @class LSD_Element_Embed
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Element_Embed extends LSD_Element
 {
@@ -16,22 +14,22 @@ class LSD_Element_Embed extends LSD_Element
     public $label;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Embed', 'listdom');
-	}
+    }
 
-	public function get($post_id = null)
+    public function get($post_id = null)
     {
         // Disabled in Lite
-        if($this->isLite()) return false;
+        if ($this->isLite()) return false;
 
-        if(is_null($post_id))
+        if (is_null($post_id))
         {
             global $post;
             $post_id = $post->ID;
@@ -53,11 +51,11 @@ class LSD_Element_Embed extends LSD_Element
     public function form($data = [])
     {
         // Disabled in Lite
-        if($this->isLite()) return '<div class="lsd-form-row">
+        if ($this->isLite()) return '<div class="lsd-form-row">
             <div class="lsd-col-12 lsd-handler">
-                <input type="hidden" name="lsd[elements]['.esc_attr($this->key).']" />
-                <input type="hidden" name="lsd[elements]['.esc_attr($this->key).'][enabled]" value="0" />
-                '.$this->missFeatureMessage(esc_html__('Embed Element', 'listdom')).'
+                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . ']" />
+                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . '][enabled]" value="0" />
+                ' . $this->missFeatureMessage(esc_html__('Embed Element', 'listdom')) . '
             </div>
         </div>';
 
@@ -65,4 +63,3 @@ class LSD_Element_Embed extends LSD_Element
     }
 }
 
-endif;

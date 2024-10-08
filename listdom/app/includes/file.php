@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_File')):
-
 /**
  * Listdom File Class.
  *
  * @class LSD_File
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_File extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function read($path)
     {
@@ -50,14 +48,14 @@ class LSD_File extends LSD_Base
         $request = wp_remote_get($url, [
             'sslverify' => false,
             'timeout' => 15,
-            'body' => $body
+            'body' => $body,
         ]);
 
         $code = wp_remote_retrieve_response_code($request);
-        if($code !== 200) return false;
+        if ($code !== 200) return false;
 
         $type = wp_remote_retrieve_header($request, 'content-type');
-        if(!$type) return false;
+        if (!$type) return false;
 
         return wp_remote_retrieve_body($request);
     }
@@ -65,23 +63,23 @@ class LSD_File extends LSD_Base
     public static function upload($file)
     {
         // Include the function
-        if(!function_exists('wp_handle_upload')) require_once ABSPATH.'wp-admin/includes/file.php';
+        if (!function_exists('wp_handle_upload')) require_once ABSPATH . 'wp-admin/includes/file.php';
 
         $uploaded = wp_handle_upload($file, ['test_form' => false]);
-        if($uploaded && !isset($uploaded['error']))
+        if ($uploaded && !isset($uploaded['error']))
         {
             $attachment = [
                 'post_mime_type' => $uploaded['type'],
                 'post_title' => '',
                 'post_content' => '',
-                'post_status' => 'inherit'
+                'post_status' => 'inherit',
             ];
 
             // Add as Attachment
             $attachment_id = wp_insert_attachment($attachment, $uploaded['file']);
 
             // Update Metadata
-            require_once ABSPATH.'wp-admin/includes/image.php';
+            require_once ABSPATH . 'wp-admin/includes/image.php';
             wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $uploaded['file']));
 
             return $attachment_id;
@@ -90,5 +88,3 @@ class LSD_File extends LSD_Base
         return 0;
     }
 }
-
-endif;

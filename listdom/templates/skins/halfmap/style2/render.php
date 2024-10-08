@@ -30,15 +30,23 @@ $open = false;
                 </div>
                 <?php endif; ?>
 
-				<?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
+                <?php if($this->display_review_stars): ?>
+				    <?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
+                <?php endif;?>
 
                 <div class="lsd-listing-title-wrapper">
-                    <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
-                        <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
-                    </h3>
+                    <?php if($this->display_title): ?>
+                        <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
+                            <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
+                        </h3>
+                    <?php endif; ?>
                     <div class="lsd-listing-icons-wrapper">
-                        <?php echo LSD_Kses::element($listing->get_favorite_button()); ?>
-                        <?php echo LSD_Kses::element($listing->get_compare_button()); ?>
+                        <?php if($this->display_favorite_icon): ?>
+                            <?php echo LSD_Kses::element($listing->get_favorite_button()); ?>
+                        <?php endif;?>
+                        <?php if($this->display_compare_icon):?>
+                            <?php echo LSD_Kses::element($listing->get_compare_button()); ?>
+                        <?php endif;?>
                     </div>
                 </div>
 
@@ -46,32 +54,38 @@ $open = false;
 				
 				<div class="lsd-listing-price-categories">
 				
-					<?php if($listing->get_price()): ?>
+					<?php if($listing->get_price() && $this->display_price): ?>
 					<div class="lsd-listing-price lsd-color-m-bg <?php echo esc_attr($listing->get_text_class()); ?>" <?php echo lsd_schema()->priceRange(); ?>>
 						<?php echo LSD_Kses::element($listing->get_price()); ?>
 					</div>
 					<?php endif; ?>
-					
-					<div class="lsd-listing-categories">
-						<?php echo LSD_Kses::element($listing->get_categories()); ?>
-					</div>
+
+                    <?php if($this->display_categories): ?>
+                        <div class="lsd-listing-categories">
+                            <?php echo LSD_Kses::element($listing->get_categories()); ?>
+                        </div>
+                    <?php endif;?>
 					
 				</div>
-				
-				<div class="lsd-listing-availability">
-					<?php echo LSD_Kses::element($listing->get_availability(true)); ?>
-				</div>
-				
+
+                <?php if($this->display_availability):?>
+                    <div class="lsd-listing-availability">
+                        <?php echo LSD_Kses::element($listing->get_availability(true)); ?>
+                    </div>
+				<?php endif;?>
+
 				<div class="lsd-listing-bottom-bar">
 					<?php if($this->display_share_buttons): ?>
 						<div class="lsd-listing-share">
 							<?php echo LSD_Kses::element($listing->get_share_buttons()); ?>
 						</div>
 					<?php endif; ?>
-					
-					<div class="lsd-listing-locations">
-						<?php echo LSD_Kses::element($listing->get_locations()); ?>
-					</div>
+
+                    <?php if($this->display_location): ?>
+                        <div class="lsd-listing-locations">
+                            <?php echo LSD_Kses::element($listing->get_locations()); ?>
+                        </div>
+                    <?php endif;?>
                 </div>
 				
             </div>

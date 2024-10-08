@@ -7,6 +7,9 @@ defined('ABSPATH') || die();
 // Get Sort Options
 $options = isset($this->sorts['options']) && is_array($this->sorts['options']) ? $this->sorts['options'] : [];
 
+// Sort Style
+$sort_style = $this->sorts['sort_style'] ?? '';
+
 // Filter Enabled Options
 $enableds = [];
 foreach($options as $key => $option)
@@ -20,7 +23,7 @@ foreach($options as $key => $option)
 // No Enabled Option
 if(!count($enableds)) return '';
 ?>
-<div class="lsd-view-sortbar-wrapper">
+<div class="lsd-view-sortbar-wrapper<?php echo $sort_style ? ' lsd-sort-style-'. esc_attr($sort_style) : ''; ?>">
 	<ul class="lsd-sortbar-list">
 		<?php foreach($enableds as $key => $option): ?>
 		<li data-orderby="<?php echo esc_attr($key); ?>" data-order="<?php echo ($this->orderby == $key ? ($this->order == 'DESC' ? 'ASC' : 'DESC') : (isset($option['sort']) ? esc_attr($option['sort']) : 'DESC')); ?>" class="<?php echo ($this->orderby == $key ? 'lsd-active' : ''); ?>">

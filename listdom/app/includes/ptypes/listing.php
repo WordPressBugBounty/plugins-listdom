@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_PTypes_Listing')):
-
 /**
  * Listdom Listing Post Types Class.
  *
  * @class LSD_PTypes_Listing
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_PTypes_Listing extends LSD_PTypes
 {
@@ -17,9 +15,9 @@ class LSD_PTypes_Listing extends LSD_PTypes
     protected $details_page_options;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
@@ -30,14 +28,14 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
         // Details Page options
         $this->details_page_options = LSD_Options::details_page();
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register_post_type']);
 
-        add_filter('manage_'.$this->PT.'_posts_columns', [$this, 'filter_columns']);
-        add_action('manage_'.$this->PT.'_posts_custom_column', [$this, 'filter_columns_content'], 10, 2);
+        add_filter('manage_' . $this->PT . '_posts_columns', [$this, 'filter_columns']);
+        add_action('manage_' . $this->PT . '_posts_custom_column', [$this, 'filter_columns_content'], 10, 2);
 
         // Search Options
         add_action('restrict_manage_posts', [$this, 'add_filters']);
@@ -79,7 +77,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
         add_action('icl_make_duplicate', [$this, 'icl_duplicate'], 10, 4);
         add_action('icl_pro_translation_saved', [$this, 'wpml_pro_translation_saved'], 10, 3);
     }
-    
+
     public function register_post_type()
     {
         $supports = apply_filters('lsd_ptype_listing_supports', ['title', 'editor', 'thumbnail', 'author']);
@@ -108,7 +106,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
             'supports' => $supports,
             'rewrite' => [
                 'slug' => LSD_Options::slug(),
-                'ep_mask' => LSD_Base::EP_LISTING
+                'ep_mask' => LSD_Base::EP_LISTING,
             ],
             'menu_icon' => $icon,
             'menu_position' => 27,
@@ -136,19 +134,19 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function filter_columns_content($column_name, $post_id)
     {
-        if($column_name == 'category')
+        if ($column_name == 'category')
         {
             // Primary Category
             $category = LSD_Entity_Listing::get_primary_category($post_id);
 
-            echo $category && isset($category->name) ? '<strong>'.esc_html($category->name).'</strong>' : '';
+            echo $category && isset($category->name) ? '<strong>' . esc_html($category->name) . '</strong>' : '';
         }
-        elseif($column_name == 'address')
+        else if ($column_name == 'address')
         {
             echo esc_html(get_post_meta($post_id, 'lsd_address', true));
         }
     }
-    
+
     public function register_metaboxes()
     {
         add_meta_box('lsd_metabox_address', esc_html__('Location', 'listdom'), [$this, 'metabox_address'], $this->PT, 'normal', 'high');
@@ -173,29 +171,29 @@ class LSD_PTypes_Listing extends LSD_PTypes
     public function save($post_id, $post)
     {
         // It's not a listing
-        if($post->post_type !== $this->PT) return;
+        if ($post->post_type !== $this->PT) return;
 
         // Nonce is not set!
-        if(!isset($_POST['_lsdnonce'])) return;
+        if (!isset($_POST['_lsdnonce'])) return;
 
         // Nonce is not valid!
-        if(!wp_verify_nonce(sanitize_text_field($_POST['_lsdnonce']), 'lsd_listing_cpt')) return;
+        if (!wp_verify_nonce(sanitize_text_field($_POST['_lsdnonce']), 'lsd_listing_cpt')) return;
 
         // We don't need to do anything on post auto save
-        if(defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
 
         // Get Listdom Data
         $lsd = $_POST['lsd'] ?? [];
 
         // Gallery
-        if(isset($lsd['_gallery']) and is_array($lsd['_gallery']))
+        if (isset($lsd['_gallery']) and is_array($lsd['_gallery']))
         {
             $lsd['gallery'] = $lsd['_gallery'];
             unset($lsd['_gallery']);
         }
 
         // Embeds
-        if(isset($lsd['_embeds']) and is_array($lsd['_embeds']))
+        if (isset($lsd['_embeds']) and is_array($lsd['_embeds']))
         {
             $lsd['embeds'] = $lsd['_embeds'];
             unset($lsd['_embeds']);
@@ -215,15 +213,15 @@ class LSD_PTypes_Listing extends LSD_PTypes
         $post = get_post($post_id);
 
         // It's not a listing
-        if($post->post_type != LSD_Base::PTYPE_LISTING) return false;
+        if ($post->post_type != LSD_Base::PTYPE_LISTING) return false;
 
         $db = new LSD_db();
-        return $db->q("DELETE FROM `#__lsd_data` WHERE `id`=".esc_sql($post_id), 'DELETE');
+        return $db->q("DELETE FROM `#__lsd_data` WHERE `id`=" . esc_sql($post_id), 'DELETE');
     }
 
     public function status($new_status, $old_status, $post)
     {
-        if($post->post_type === $this->PT and $new_status !== $old_status)
+        if ($post->post_type === $this->PT and $new_status !== $old_status)
         {
             do_action('lsd_listing_status_changed', $post->ID, $old_status, $new_status);
         }
@@ -231,7 +229,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function filter_link($url, $post)
     {
-        if(LSD_Base::PTYPE_LISTING == get_post_type($post))
+        if (LSD_Base::PTYPE_LISTING == get_post_type($post))
         {
             $link = get_post_meta($post->ID, 'lsd_link', true);
             return (trim($link) and filter_var($link, FILTER_VALIDATE_URL)) ? $link : $url;
@@ -242,10 +240,10 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function add_filters($post_type)
     {
-        if($post_type != $this->PT) return;
+        if ($post_type != $this->PT) return;
 
         $taxonomy = LSD_Base::TAX_CATEGORY;
-        if(wp_count_terms($taxonomy)) wp_dropdown_categories([
+        if (wp_count_terms($taxonomy)) wp_dropdown_categories([
             'show_option_all' => esc_html__('Show all categories', 'listdom'),
             'taxonomy' => $taxonomy,
             'name' => $taxonomy,
@@ -259,7 +257,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
         ]);
 
         $taxonomy = LSD_Base::TAX_LOCATION;
-        if(wp_count_terms($taxonomy)) wp_dropdown_categories([
+        if (wp_count_terms($taxonomy)) wp_dropdown_categories([
             'show_option_all' => esc_html__('Show all locations', 'listdom'),
             'taxonomy' => $taxonomy,
             'name' => $taxonomy,
@@ -272,7 +270,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
         ]);
 
         $taxonomy = LSD_Base::TAX_FEATURE;
-        if(wp_count_terms($taxonomy)) wp_dropdown_categories([
+        if (wp_count_terms($taxonomy)) wp_dropdown_categories([
             'show_option_all' => esc_html__('Show all features', 'listdom'),
             'taxonomy' => $taxonomy,
             'name' => $taxonomy,
@@ -285,7 +283,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
         ]);
 
         $taxonomy = LSD_Base::TAX_LABEL;
-        if(wp_count_terms($taxonomy)) wp_dropdown_categories([
+        if (wp_count_terms($taxonomy)) wp_dropdown_categories([
             'show_option_all' => esc_html__('Show all labels', 'listdom'),
             'taxonomy' => $taxonomy,
             'name' => $taxonomy,
@@ -301,9 +299,9 @@ class LSD_PTypes_Listing extends LSD_PTypes
     public function filters_join($join)
     {
         global $pagenow, $wpdb;
-        if(is_admin() && $pagenow == 'edit.php' && !empty($_GET['post_type']) && $_GET['post_type'] == $this->PT && !empty($_GET['s']) && filter_var($_GET['s'], FILTER_VALIDATE_EMAIL))
+        if (is_admin() && $pagenow == 'edit.php' && !empty($_GET['post_type']) && $_GET['post_type'] == $this->PT && !empty($_GET['s']) && filter_var($_GET['s'], FILTER_VALIDATE_EMAIL))
         {
-            $join .= 'LEFT JOIN '.$wpdb->postmeta.' ON '.$wpdb->posts.'.ID = '.$wpdb->postmeta.'.post_id ';
+            $join .= 'LEFT JOIN ' . $wpdb->postmeta . ' ON ' . $wpdb->posts . '.ID = ' . $wpdb->postmeta . '.post_id ';
         }
 
         return $join;
@@ -312,9 +310,9 @@ class LSD_PTypes_Listing extends LSD_PTypes
     public function filters_where($where)
     {
         global $pagenow, $wpdb;
-        if(is_admin() && $pagenow == 'edit.php' && !empty($_GET['post_type']) && $_GET['post_type'] == $this->PT && !empty($_GET['s']) && filter_var($_GET['s'], FILTER_VALIDATE_EMAIL))
+        if (is_admin() && $pagenow == 'edit.php' && !empty($_GET['post_type']) && $_GET['post_type'] == $this->PT && !empty($_GET['s']) && filter_var($_GET['s'], FILTER_VALIDATE_EMAIL))
         {
-            $where = preg_replace("/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*('[^']+')\s*\)/", "(" . $wpdb->posts . ".`post_title` LIKE $1) OR (".$wpdb->postmeta.".`meta_key`='lsd_guest_email' AND ".$wpdb->postmeta.".`meta_value` LIKE $1)", $where);
+            $where = preg_replace("/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*('[^']+')\s*\)/", "(" . $wpdb->posts . ".`post_title` LIKE $1) OR (" . $wpdb->postmeta . ".`meta_key`='lsd_guest_email' AND " . $wpdb->postmeta . ".`meta_value` LIKE $1)", $where);
         }
 
         return $where;
@@ -325,8 +323,8 @@ class LSD_PTypes_Listing extends LSD_PTypes
         $master = get_post($master_post_id);
         $target = get_post($id);
 
-        if($master->post_type !== $this->PT) return;
-        if($target->post_type !== $this->PT) return;
+        if ($master->post_type !== $this->PT) return;
+        if ($target->post_type !== $this->PT) return;
 
         $primary_category_id = get_post_meta($master_post_id, 'lsd_primary_category', true);
         $target_category_id = apply_filters('wpml_object_id', $primary_category_id, LSD_Base::TAX_CATEGORY, true, $lang);
@@ -339,19 +337,19 @@ class LSD_PTypes_Listing extends LSD_PTypes
         /** @var TranslationManagement $iclTranslationManagement */
         global $iclTranslationManagement;
 
-        $master_post_id = NULL;
-        if(is_object($job) and $iclTranslationManagement)
+        $master_post_id = null;
+        if (is_object($job) and $iclTranslationManagement)
         {
             $element_type_prefix = $iclTranslationManagement->get_element_type_prefix_from_job($job);
             $original_post = $iclTranslationManagement->get_post($job->original_doc_id, $element_type_prefix);
 
-            if($original_post) $master_post_id = $original_post->ID;
+            if ($original_post) $master_post_id = $original_post->ID;
         }
 
-        if(!$master_post_id) return;
+        if (!$master_post_id) return;
 
         // Target Language
-        $lang_options = apply_filters('wpml_post_language_details', NULL, $new_post_id);
+        $lang_options = apply_filters('wpml_post_language_details', null, $new_post_id);
         $lang = is_array($lang_options) && isset($lang_options['language_code']) ? $lang_options['language_code'] : '';
 
         // Duplicate Content
@@ -367,7 +365,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
     public function assign_user($listing_id, $old_status, $new_status)
     {
         // Only run when listing is published
-        if($new_status !== 'publish') return;
+        if ($new_status !== 'publish') return;
 
         // Registration Method
         $guest_registration = $this->settings['submission_guest_registration'] ?? 'approval';
@@ -376,7 +374,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
         $guest_email = get_post_meta($listing_id, 'lsd_guest_email', true);
 
         // Create and Assign User
-        if(is_email($guest_email) && $guest_registration === 'approval')
+        if (is_email($guest_email) && $guest_registration === 'approval')
         {
             // Guest Name
             $fullname = (string) get_post_meta($listing_id, 'lsd_guest_fullname', true);
@@ -392,13 +390,13 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
         // Assign User if already not assigned. We need to keep this in case
         // the guest registration method is set to submission
-        if(is_email($guest_email))
+        if (is_email($guest_email))
         {
             $user = get_user_by_email($guest_email);
             $owner_id = (int) get_post_field('post_author', $listing_id);
 
             // Owner is different
-            if($user && $user->ID !== $owner_id) LSD_Main::assign($listing_id, $user->ID);
+            if ($user && $user->ID !== $owner_id) LSD_Main::assign($listing_id, $user->ID);
         }
     }
 
@@ -407,17 +405,16 @@ class LSD_PTypes_Listing extends LSD_PTypes
         $post = get_post($post_id);
 
         // Listing Post Type
-        if($post && $post->post_type === $this->PT)
+        if ($post && $post->post_type === $this->PT)
         {
             // Details Page options
             $options = LSD_Options::details_page();
 
             // Comments are disabled globally for listings
-            if(isset($options['general']['comments']) && !$options['general']['comments']) return false;
+            if (isset($options['general']['comments']) && !$options['general']['comments']) return false;
         }
 
         return $comments_open;
     }
 }
 
-endif;

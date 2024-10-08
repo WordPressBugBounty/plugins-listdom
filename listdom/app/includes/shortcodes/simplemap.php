@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Shortcodes_Simplemap')):
-
 /**
  * Listdom Simplemap Shortcode Class.
  *
  * @class LSD_Shortcodes_Simplemap
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Shortcodes_Simplemap extends LSD_Shortcodes
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
@@ -29,7 +27,7 @@ class LSD_Shortcodes_Simplemap extends LSD_Shortcodes
     {
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom_simplemap');
-        if(trim($pre)) return $pre;
+        if (trim($pre)) return $pre;
 
         $lat = isset($atts['lat']) ? (float) $atts['lat'] : 0;
         $lng = isset($atts['lng']) ? (float) $atts['lng'] : 0;
@@ -38,17 +36,17 @@ class LSD_Shortcodes_Simplemap extends LSD_Shortcodes
         $title = $atts['title'] ?? $address;
 
         // Convert the Address to geo point
-        if((!$lat || !$lng) && trim($address))
+        if ((!$lat || !$lng) && trim($address))
         {
             $main = new LSD_Main();
             $geopoint = $main->geopoint($address);
 
-            if(isset($geopoint[0])) $lat = $geopoint[0];
-            if(isset($geopoint[1])) $lng = $geopoint[1];
+            if (isset($geopoint[0])) $lat = $geopoint[0];
+            if (isset($geopoint[1])) $lng = $geopoint[1];
         }
 
         // Return an error if the marker location couldn't find!
-        if(!$lat || !$lng) return $this->alert(esc_html__("The marker location couldn't find. Please specify address or lat/lng parameters.", 'listdom'));
+        if (!$lat || !$lng) return $this->alert(esc_html__("The marker location couldn't find. Please specify address or lat/lng parameters.", 'listdom'));
 
         $assets = new LSD_Assets();
 
@@ -79,17 +77,15 @@ class LSD_Shortcodes_Simplemap extends LSD_Shortcodes
                     'type' => 'marker',
                     'latitude' => $lat,
                     'longitude' => $lng,
-                    'marker' => '<img src="'.esc_url($icon).'">',
-                    'infowindow' => '<div class="lsd-infowindow-wrapper"><div class="lsd-infowindow-container">'.esc_html($title).'</div></div>',
+                    'marker' => '<img src="' . esc_url($icon) . '">',
+                    'infowindow' => '<div class="lsd-infowindow-wrapper"><div class="lsd-infowindow-container">' . esc_html($title) . '</div></div>',
                     'onclick' => 'infowindow',
                     'lsd' => [
                         'x_offset' => $atts['x_offset'] ?? 0,
                         'y_offset' => $atts['y_offset'] ?? -40,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 }
-
-endif;

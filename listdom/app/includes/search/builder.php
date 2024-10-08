@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Search_Builder')):
-
 /**
  * Listdom Search Builder Class.
  *
  * @class LSD_Search_Builder
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Search_Builder extends LSD_Base
 {
@@ -18,23 +16,23 @@ class LSD_Search_Builder extends LSD_Base
     public $helper;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
         $this->helper = new LSD_Search_Helper();
-	}
+    }
 
     public function getAvailableFields($existingFields = [])
     {
         $existings = [];
-        foreach($existingFields as $row)
+        foreach ($existingFields as $row)
         {
-            if(!isset($row['filters'])) continue;
+            if (!isset($row['filters'])) continue;
 
-            foreach($row['filters'] as $key=>$data)
+            foreach ($row['filters'] as $key => $data)
             {
                 $existings[] = $key;
             }
@@ -43,7 +41,7 @@ class LSD_Search_Builder extends LSD_Base
         $fields = [];
 
         // Text Search
-        if(!in_array('s', $existings)) $fields[] = [
+        if (!in_array('s', $existings)) $fields[] = [
             'type' => 'textsearch',
             'key' => 's',
             'title' => esc_html__('Text Search', 'listdom'),
@@ -51,7 +49,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Category Taxonomy
-        if(!in_array(LSD_Base::TAX_CATEGORY, $existings)) $fields[] = [
+        if (!in_array(LSD_Base::TAX_CATEGORY, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_CATEGORY,
             'title' => esc_html__('Categories', 'listdom'),
@@ -59,7 +57,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Location Taxonomy
-        if(!in_array(LSD_Base::TAX_LOCATION, $existings)) $fields[] = [
+        if (!in_array(LSD_Base::TAX_LOCATION, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_LOCATION,
             'title' => esc_html__('Locations', 'listdom'),
@@ -67,7 +65,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Tag Taxonomy
-        if(!in_array(LSD_Base::TAX_TAG, $existings)) $fields[] = [
+        if (!in_array(LSD_Base::TAX_TAG, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_TAG,
             'title' => esc_html__('Tags', 'listdom'),
@@ -75,7 +73,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Feature Taxonomy
-        if(!in_array(LSD_Base::TAX_FEATURE, $existings)) $fields[] = [
+        if (!in_array(LSD_Base::TAX_FEATURE, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_FEATURE,
             'title' => esc_html__('Features', 'listdom'),
@@ -83,7 +81,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Label Taxonomy
-        if(!in_array(LSD_Base::TAX_LABEL, $existings)) $fields[] = [
+        if (!in_array(LSD_Base::TAX_LABEL, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_LABEL,
             'title' => esc_html__('Labels', 'listdom'),
@@ -91,19 +89,19 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Attributes
-        if($this->isPro())
+        if ($this->isPro())
         {
             // Attributes
             $attributes = LSD_Main::get_attributes();
 
-            foreach($attributes as $attribute)
+            foreach ($attributes as $attribute)
             {
                 $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-                $key = 'att-'.$attribute->term_id;
+                $key = 'att-' . $attribute->term_id;
 
                 // Skip URL, Email and Separator Fields
-                if(in_array($type, ['url', 'email', 'separator'])) continue;
-                if(in_array($key, $existings)) continue;
+                if (in_array($type, ['url', 'email', 'separator'])) continue;
+                if (in_array($key, $existings)) continue;
 
                 $fields[] = [
                     'type' => 'attribute',
@@ -115,7 +113,7 @@ class LSD_Search_Builder extends LSD_Base
         }
 
         // Price
-        if(!in_array('price', $existings)) $fields[] = [
+        if (!in_array('price', $existings)) $fields[] = [
             'type' => 'price',
             'key' => 'price',
             'title' => esc_html__('Price', 'listdom'),
@@ -123,7 +121,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Price Class
-        if(!in_array('class', $existings)) $fields[] = [
+        if (!in_array('class', $existings)) $fields[] = [
             'type' => 'class',
             'key' => 'class',
             'title' => esc_html__('Price Class', 'listdom'),
@@ -131,7 +129,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Address
-        if(!in_array('address', $existings)) $fields[] = [
+        if (!in_array('address', $existings)) $fields[] = [
             'type' => 'address',
             'key' => 'address',
             'title' => esc_html__('Address', 'listdom'),
@@ -140,7 +138,7 @@ class LSD_Search_Builder extends LSD_Base
 
         // Apply Filters
         return apply_filters('lsd_search_fields', $fields, $existings, $this);
-	}
+    }
 
     public function getFieldMethods($type, $key = '')
     {
@@ -154,7 +152,7 @@ class LSD_Search_Builder extends LSD_Base
                 'text-input' => esc_html__('Text Input', 'listdom'),
             ],
             'textsearch' => [
-                'text-input' => esc_html__('Text Input', 'listdom')
+                'text-input' => esc_html__('Text Input', 'listdom'),
             ],
             'text' => [
                 'text-input' => esc_html__('Text Input', 'listdom'),
@@ -193,9 +191,9 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Pro Methods
-        if($this->isPro())
+        if ($this->isPro())
         {
-            if(in_array($key, [LSD_Base::TAX_CATEGORY, LSD_Base::TAX_LOCATION]))
+            if (in_array($key, [LSD_Base::TAX_CATEGORY, LSD_Base::TAX_LOCATION]))
                 $methods['taxonomy']['hierarchical'] = esc_html__('Hierarchical Dropdowns', 'listdom');
             $methods['address']['radius'] = esc_html__('Radius Search', 'listdom');
             $methods['address']['radius-dropdown'] = esc_html__('Radius Search (Dropdown)', 'listdom');
@@ -205,7 +203,7 @@ class LSD_Search_Builder extends LSD_Base
         $methods = apply_filters('lsd_search_field_methods', $methods);
 
         return $methods[$type] ?? [];
-	}
+    }
 
     public function params($key, $data, $index)
     {
@@ -222,9 +220,9 @@ class LSD_Search_Builder extends LSD_Base
                 'i' => $index,
                 'methods' => $methods,
                 'helper' => $this->helper,
-            ]
+            ],
         ]);
-	}
+    }
 
     public function row($row, $index)
     {
@@ -234,9 +232,7 @@ class LSD_Search_Builder extends LSD_Base
             'parameters' => [
                 'row' => $row,
                 'i' => $index,
-            ]
+            ],
         ]);
     }
 }
-
-endif;

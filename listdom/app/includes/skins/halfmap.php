@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Skins_Halfmap')):
-
 /**
  * Listdom Skins Half Map Class.
  *
  * @class LSD_Skins_Halfmap
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Skins_Halfmap extends LSD_Skins
 {
@@ -50,5 +48,3 @@ class LSD_Skins_Halfmap extends LSD_Skins
         $this->default_view = isset($_POST['view']) ? sanitize_text_field($_POST['view']) : $this->default_view;
     }
 }
-
-endif;

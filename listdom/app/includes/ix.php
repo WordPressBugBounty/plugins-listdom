@@ -2,8 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_IX')):
-
 /**
  * Listdom Import / Export class.
  */
@@ -31,7 +29,7 @@ class LSD_IX extends LSD_Base
         ]);
 
         $data = [];
-        foreach($listings as $listing)
+        foreach ($listings as $listing)
         {
             // Force to Array
             $listing = (array) $listing;
@@ -40,21 +38,21 @@ class LSD_IX extends LSD_Base
             $listing_id = $listing['ID'];
 
             // Remove Useless Keys
-            foreach([
-                'ID', 'comment_count', 'comment_status', 'filter', 'guid',
-                'menu_order', 'ping_status', 'pinged', 'to_ping', 'post_content_filtered',
-                'post_parent', 'post_mime_type'
-            ] as $key) unset($listing[$key]);
+            foreach ([
+                 'ID', 'comment_count', 'comment_status', 'filter', 'guid',
+                 'menu_order', 'ping_status', 'pinged', 'to_ping', 'post_content_filtered',
+                 'post_parent', 'post_mime_type',
+             ] as $key) unset($listing[$key]);
 
             $metas = $this->get_post_meta($listing_id);
 
             // Remove Useless Keys
-            foreach($metas as $key => $value)
+            foreach ($metas as $key => $value)
             {
-                if(in_array($key, [
-                    '_edit_last', '_edit_lock', '_thumbnail_id',
-                    'lsd_attributes', 'lsd_gallery',
-                ]) or strpos($key, 'lsd_attribute_') !== false) unset($metas[$key]);
+                if (in_array($key, [
+                        '_edit_last', '_edit_lock', '_thumbnail_id',
+                        'lsd_attributes', 'lsd_gallery',
+                    ]) or strpos($key, 'lsd_attribute_') !== false) unset($metas[$key]);
             }
 
             // Meta Values
@@ -89,7 +87,7 @@ class LSD_IX extends LSD_Base
         $ex = explode('.', $file);
         $extension = strtolower(end($ex));
 
-        switch($extension)
+        switch ($extension)
         {
             case 'json':
 
@@ -109,7 +107,7 @@ class LSD_IX extends LSD_Base
     public function collection($listings): array
     {
         $ids = [];
-        foreach($listings as $listing)
+        foreach ($listings as $listing)
         {
             $ids[] = $this->save($listing);
         }
@@ -131,19 +129,19 @@ class LSD_IX extends LSD_Base
         ];
 
         // Don't Duplicate the Listing by Unique ID
-        if(isset($listing['unique_id']) && $listing['unique_id'])
+        if (isset($listing['unique_id']) && $listing['unique_id'])
         {
             $db = new LSD_db();
-            $exists = $db->select("SELECT `post_id` FROM `#__postmeta` WHERE `meta_value`='".esc_sql($listing['unique_id'])."' AND `meta_key`='lsd_sys_unique_id'", 'loadResult');
+            $exists = $db->select("SELECT `post_id` FROM `#__postmeta` WHERE `meta_value`='" . esc_sql($listing['unique_id']) . "' AND `meta_key`='lsd_sys_unique_id'", 'loadResult');
 
             // Perform Duplicate Detection with ID or Not.
             $id_duplicate_detection = apply_filters('lsd_ix_id_duplicate_detection', false);
 
             // Detect Duplicate using ID
-            if(!$exists && $id_duplicate_detection)
+            if (!$exists && $id_duplicate_detection)
             {
                 $p = get_post($listing['unique_id']);
-                if($p && is_object($p) && isset($p->ID) && $p->post_type === LSD_Base::PTYPE_LISTING) $exists = $p->ID;
+                if ($p && is_object($p) && isset($p->ID) && $p->post_type === LSD_Base::PTYPE_LISTING) $exists = $p->ID;
             }
         }
         // Don't Duplicate the Listing by Title and Content
@@ -152,19 +150,19 @@ class LSD_IX extends LSD_Base
             $exists = post_exists($listing['post_title'], $listing['post_content'] ?? '', '', LSD_Base::PTYPE_LISTING);
         }
 
-        if($exists) $post['ID'] = $exists;
+        if ($exists) $post['ID'] = $exists;
 
         // Insert User
-        if(isset($listing['post_author']) and trim($listing['post_author']) and is_email($listing['post_author']))
+        if (isset($listing['post_author']) and trim($listing['post_author']) and is_email($listing['post_author']))
         {
             $email = sanitize_email($listing['post_author']);
 
             $exists = email_exists($email);
-            if($exists) $post['post_author'] = $exists;
+            if ($exists) $post['post_author'] = $exists;
             else
             {
                 $user_id = register_new_user($email, $email);
-                if(!is_wp_error($user_id)) $post['post_author'] = $user_id;
+                if (!is_wp_error($user_id)) $post['post_author'] = $user_id;
             }
         }
 
@@ -176,40 +174,40 @@ class LSD_IX extends LSD_Base
 
         // Import Taxonomies
         $taxonomies = (isset($listing['taxonomies']) and is_array($listing['taxonomies'])) ? $listing['taxonomies'] : [];
-        foreach($taxonomies as $taxonomy => $terms)
+        foreach ($taxonomies as $taxonomy => $terms)
         {
             $t = [];
-            foreach($terms as $term)
+            foreach ($terms as $term)
             {
                 $exists = term_exists($term['name'], $taxonomy);
 
-                if(is_array($exists) and isset($exists['term_id'])) $term_id = (int) $exists['term_id'];
+                if (is_array($exists) and isset($exists['term_id'])) $term_id = (int) $exists['term_id'];
                 else
                 {
                     // Create Term
                     $wpt = wp_insert_term($term['name'], $taxonomy, [
                         'description' => $term['description'] ?? '',
                         'parent' => $term['parent'] ?? 0,
-                        'slug' => $term['slug'] ?? ''
+                        'slug' => $term['slug'] ?? '',
                     ]);
 
                     // An Error Occurred
-                    if(!is_array($wpt)) continue;
+                    if (!is_array($wpt)) continue;
 
                     // Term ID
                     $term_id = (int) $wpt['term_id'];
 
                     // Import Term Meta
-                    if(isset($term['meta']) and is_array($term['meta']) and count($term['meta']))
+                    if (isset($term['meta']) and is_array($term['meta']) and count($term['meta']))
                     {
-                        foreach($term['meta'] as $key => $value) update_term_meta($term_id, $key, $value);
+                        foreach ($term['meta'] as $key => $value) update_term_meta($term_id, $key, $value);
                     }
 
                     // Import Image
-                    if(isset($term['image']) and trim($term['image']))
+                    if (isset($term['image']) and trim($term['image']))
                     {
                         $attachment_id = $this->attach($term['image']);
-                        if($attachment_id) update_term_meta($term_id, 'lsd_image', $attachment_id);
+                        if ($attachment_id) update_term_meta($term_id, 'lsd_image', $attachment_id);
                     }
                 }
 
@@ -220,54 +218,54 @@ class LSD_IX extends LSD_Base
         }
 
         // Import Image
-        if(isset($listing['image']) and trim($listing['image']))
+        if (isset($listing['image']) and trim($listing['image']))
         {
             $attachment_id = $this->attach(trim($listing['image']));
-            if($attachment_id) set_post_thumbnail($post_id, $attachment_id);
+            if ($attachment_id) set_post_thumbnail($post_id, $attachment_id);
         }
 
         // Import Gallery
         $gallery = [];
-        if(isset($listing['gallery']) and is_array($listing['gallery']) and count($listing['gallery']))
+        if (isset($listing['gallery']) and is_array($listing['gallery']) and count($listing['gallery']))
         {
-            foreach($listing['gallery'] as $image)
+            foreach ($listing['gallery'] as $image)
             {
                 $attachment_id = $this->attach(trim($image));
-                if($attachment_id) $gallery[] = $attachment_id;
+                if ($attachment_id) $gallery[] = $attachment_id;
             }
         }
 
         // Import Attributes
         $attributes = [];
-        if(isset($listing['attributes']) and is_array($listing['attributes']) and count($listing['attributes']))
+        if (isset($listing['attributes']) and is_array($listing['attributes']) and count($listing['attributes']))
         {
-            foreach($listing['attributes'] as $attribute)
+            foreach ($listing['attributes'] as $attribute)
             {
                 $term = $attribute['term'] ?? [];
-                if(!is_array($term) or !count($term)) continue;
+                if (!is_array($term) or !count($term)) continue;
 
                 $exists = term_exists($term['name'], LSD_Base::TAX_ATTRIBUTE);
 
-                if(is_array($exists) and isset($exists['term_id'])) $term_id = (int) $exists['term_id'];
+                if (is_array($exists) and isset($exists['term_id'])) $term_id = (int) $exists['term_id'];
                 else
                 {
                     // Create Term
                     $wpt = wp_insert_term($term['name'], LSD_Base::TAX_ATTRIBUTE, [
                         'description' => $term['description'] ?? '',
                         'parent' => $term['parent'] ?? 0,
-                        'slug' => $term['slug'] ?? ''
+                        'slug' => $term['slug'] ?? '',
                     ]);
 
                     // An Error Occurred
-                    if(!is_array($wpt)) continue;
+                    if (!is_array($wpt)) continue;
 
                     // Term ID
                     $term_id = (int) $wpt['term_id'];
 
                     // Import Term Meta
-                    if(isset($term['meta']) and is_array($term['meta']) and count($term['meta']))
+                    if (isset($term['meta']) and is_array($term['meta']) and count($term['meta']))
                     {
-                        foreach($term['meta'] as $key => $value) update_term_meta($term_id, $key, $value);
+                        foreach ($term['meta'] as $key => $value) update_term_meta($term_id, $key, $value);
                     }
                 }
 
@@ -313,18 +311,18 @@ class LSD_IX extends LSD_Base
         $SN = new LSD_Socials();
 
         $networks = LSD_Options::socials();
-        foreach($networks as $network => $values)
+        foreach ($networks as $network => $values)
         {
             $obj = $SN->get($network, $values);
 
             // Social Network is Disabled or Data Not Available
-            if(!$obj || !isset($metas['lsd_'.$obj->key()])) continue;
+            if (!$obj || !isset($metas['lsd_' . $obj->key()])) continue;
 
             // Save Social Network Data
-            $data['sc'][$obj->key()] = $metas['lsd_'.$obj->key()];
+            $data['sc'][$obj->key()] = $metas['lsd_' . $obj->key()];
         }
 
-        if(isset($metas['lsd_guest_email']))
+        if (isset($metas['lsd_guest_email']))
         {
             $data['guest_email'] = sanitize_email($metas['lsd_guest_email']);
             $data['guest_fullname'] = isset($metas['lsd_guest_fullname']) ? sanitize_email($metas['lsd_guest_fullname']) : '';
@@ -335,7 +333,7 @@ class LSD_IX extends LSD_Base
         $entity->save($data, false);
 
         // Save the Unique ID
-        if(isset($listing['unique_id']) and $listing['unique_id']) update_post_meta($post_id, 'lsd_sys_unique_id', $listing['unique_id']);
+        if (isset($listing['unique_id']) and $listing['unique_id']) update_post_meta($post_id, 'lsd_sys_unique_id', $listing['unique_id']);
 
         // New Listing Imported
         do_action('lsd_listing_imported', $post_id, $listing);
@@ -348,17 +346,17 @@ class LSD_IX extends LSD_Base
         $attributes = [];
 
         $values = get_post_meta($post_id, 'lsd_attributes', true);
-        if(!is_array($values)) $values = [];
+        if (!is_array($values)) $values = [];
 
-        foreach($values as $id => $value)
+        foreach ($values as $id => $value)
         {
             $term = (array) get_term($id);
 
             // Remove Useless Keys
-            foreach([
-                'count', 'filter', 'term_group',
-                'term_id', 'term_taxonomy_id',
-            ] as $key) unset($term[$key]);
+            foreach ([
+                 'count', 'filter', 'term_group',
+                 'term_id', 'term_taxonomy_id',
+             ] as $key) unset($term[$key]);
 
             // Meta Values
             $term['meta'] = $this->get_term_meta($id);
@@ -378,19 +376,19 @@ class LSD_IX extends LSD_Base
     {
         $taxonomies = [];
 
-        foreach([
-            LSD_Base::TAX_CATEGORY,
-            LSD_Base::TAX_LABEL,
-            LSD_Base::TAX_LOCATION,
-            LSD_Base::TAX_FEATURE,
-            LSD_Base::TAX_TAG,
-        ] as $taxonomy)
+        foreach ([
+             LSD_Base::TAX_CATEGORY,
+             LSD_Base::TAX_LABEL,
+             LSD_Base::TAX_LOCATION,
+             LSD_Base::TAX_FEATURE,
+             LSD_Base::TAX_TAG,
+         ] as $taxonomy)
         {
             $terms = get_the_terms($post_id, $taxonomy);
-            if($terms and !is_wp_error($terms))
+            if ($terms and !is_wp_error($terms))
             {
                 $t = [];
-                foreach($terms as $term)
+                foreach ($terms as $term)
                 {
                     // Force to Array
                     $term = (array) $term;
@@ -399,16 +397,16 @@ class LSD_IX extends LSD_Base
                     $term_id = $term['term_id'];
 
                     // Remove Useless Keys
-                    foreach([
-                        'count', 'filter',
-                        'term_group', 'term_taxonomy_id',
-                    ] as $key) unset($term[$key]);
+                    foreach ([
+                         'count', 'filter',
+                         'term_group', 'term_taxonomy_id',
+                     ] as $key) unset($term[$key]);
 
                     // Metas
                     $metas = $this->get_term_meta($term_id);
 
                     // Image
-                    if(isset($metas['lsd_image']))
+                    if (isset($metas['lsd_image']))
                     {
                         $term['image'] = wp_get_attachment_url($metas['lsd_image']);
                         unset($metas['lsd_image']);
@@ -429,13 +427,13 @@ class LSD_IX extends LSD_Base
     public function get_gallery($post_id): array
     {
         $value = get_post_meta($post_id, 'lsd_gallery', true);
-        if(!is_array($value)) $value = [];
+        if (!is_array($value)) $value = [];
 
         $gallery = [];
-        foreach($value as $attachment_id)
+        foreach ($value as $attachment_id)
         {
             $image = wp_get_attachment_url($attachment_id);
-            if(!$image) continue;
+            if (!$image) continue;
 
             $gallery[] = $image;
         }
@@ -446,13 +444,13 @@ class LSD_IX extends LSD_Base
     public function attach($image)
     {
         // Already imported
-        if($attachment_id = LSD_Main::get_post_id_by_meta('lsd_imported_from', $image)) return $attachment_id;
+        if ($attachment_id = LSD_Main::get_post_id_by_meta('lsd_imported_from', $image)) return $attachment_id;
 
         // Image is already exist in website
-        if($attachment_id = attachment_url_to_postid($image)) return $attachment_id;
+        if ($attachment_id = attachment_url_to_postid($image)) return $attachment_id;
 
         $buffer = LSD_File::download($image);
-        if(!$buffer) return false;
+        if (!$buffer) return false;
 
         return $this->attach_by_buffer($buffer, basename($image), $image);
     }
@@ -472,7 +470,7 @@ class LSD_IX extends LSD_Base
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => basename($file),
             'post_content' => '',
-            'post_status' => 'inherit'
+            'post_status' => 'inherit',
         ];
 
         $attachment_id = wp_insert_attachment($attachment, $file);
@@ -485,5 +483,3 @@ class LSD_IX extends LSD_Base
         return $attachment_id;
     }
 }
-
-endif;

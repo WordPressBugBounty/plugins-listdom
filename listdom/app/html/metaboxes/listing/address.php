@@ -36,8 +36,8 @@ $shape = LSD_Shape::get([
 
     <div class="lsd-object-type-address">
         <div class="lsd-form-row">
-            <label for="lsd_object_type_address" class="lsd-address-label lsd-col-12"><?php esc_html_e('Address', 'listdom'); ?></label>
             <div class="lsd-col-12">
+                <label for="lsd_object_type_address" class="lsd-address-label"><?php esc_html_e('Address', 'listdom'); ?></label>
                 <input type="text" name="lsd[address]" id="lsd_object_type_address" placeholder="<?php esc_attr_e('Listing Address', 'listdom'); ?>" value="<?php echo esc_attr($address); ?>">
             </div>
         </div>

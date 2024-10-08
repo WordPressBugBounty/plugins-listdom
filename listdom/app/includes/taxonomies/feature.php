@@ -2,36 +2,34 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Taxonomies_Feature')):
-
 /**
  * Listdom Feature Taxonomy Class.
  *
  * @class LSD_Taxonomies_Feature
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Taxonomies_Feature extends LSD_Taxonomies
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register']);
 
-        add_action(LSD_Base::TAX_FEATURE.'_add_form_fields', [$this, 'add_form']);
-        add_action(LSD_Base::TAX_FEATURE.'_edit_form_fields', [$this, 'edit_form']);
-        add_action('created_'.LSD_Base::TAX_FEATURE, [$this, 'save_metadata']);
-        add_action('edited_'.LSD_Base::TAX_FEATURE, [$this, 'save_metadata']);
+        add_action(LSD_Base::TAX_FEATURE . '_add_form_fields', [$this, 'add_form']);
+        add_action(LSD_Base::TAX_FEATURE . '_edit_form_fields', [$this, 'edit_form']);
+        add_action('created_' . LSD_Base::TAX_FEATURE, [$this, 'save_metadata']);
+        add_action('edited_' . LSD_Base::TAX_FEATURE, [$this, 'save_metadata']);
 
-        add_filter('manage_edit-'.LSD_Base::TAX_FEATURE.'_columns', [$this, 'filter_columns']);
-        add_filter('manage_'.LSD_Base::TAX_FEATURE.'_custom_column', [$this, 'filter_columns_content'], 10, 3);
-        add_filter('manage_edit-'.LSD_Base::TAX_FEATURE.'_sortable_columns', [$this, 'filter_sortable_columns']);
+        add_filter('manage_edit-' . LSD_Base::TAX_FEATURE . '_columns', [$this, 'filter_columns']);
+        add_filter('manage_' . LSD_Base::TAX_FEATURE . '_custom_column', [$this, 'filter_columns_content'], 10, 3);
+        add_filter('manage_edit-' . LSD_Base::TAX_FEATURE . '_sortable_columns', [$this, 'filter_sortable_columns']);
     }
 
     public function register()
@@ -81,25 +79,25 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
         <div class="form-field">
             <label for="lsd_icon"><?php esc_html_e('Icon', 'listdom'); ?></label>
             <?php echo LSD_Form::iconpicker([
-                'name'=>'lsd_icon',
-                'id'=>'lsd_icon',
-                'value'=>'',
+                'name' => 'lsd_icon',
+                'id' => 'lsd_icon',
+                'value' => '',
             ]); ?>
             <p class="description"><?php esc_html_e("The icon will show on the website frontend next to the feature.", 'listdom'); ?></p>
         </div>
-        <?php if(!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
-        <?php else: ?>
+        <?php if (!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
+    <?php else: ?>
         <div class="form-field">
             <label for="lsd_itemprop"><?php esc_html_e('Schema Property', 'listdom'); ?></label>
             <?php echo LSD_Form::text([
-                'name'=>'lsd_itemprop',
-                'id'=>'lsd_itemprop',
-                'value'=>'',
-                'placeholder'=>'additionalProperty',
+                'name' => 'lsd_itemprop',
+                'id' => 'lsd_itemprop',
+                'value' => '',
+                'placeholder' => 'additionalProperty',
             ]); ?>
             <p class="description"><?php esc_html_e("Schema Item Property (https://schema.org/)", 'listdom'); ?></p>
         </div>
-        <?php endif; ?>
+    <?php endif; ?>
         <?php
     }
 
@@ -114,24 +112,24 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
             </th>
             <td>
                 <?php echo LSD_Form::iconpicker([
-                    'name'=>'lsd_icon',
-                    'id'=>'lsd_icon',
-                    'value'=>$icon,
+                    'name' => 'lsd_icon',
+                    'id' => 'lsd_icon',
+                    'value' => $icon,
                 ]); ?>
                 <p class="description"><?php esc_html_e("The icon will show on the website frontend next to the feature.", 'listdom'); ?></p>
             </td>
         </tr>
-        <?php if($this->isPro()): ?>
+        <?php if ($this->isPro()): ?>
         <tr class="form-field">
             <th scope="row">
                 <label for="lsd_itemprop"><?php esc_html_e('Schema Property', 'listdom'); ?></label>
             </th>
             <td>
                 <?php echo LSD_Form::text([
-                    'name'=>'lsd_itemprop',
-                    'id'=>'lsd_itemprop',
-                    'value'=>$itemprop,
-                    'placeholder'=>'additionalProperty',
+                    'name' => 'lsd_itemprop',
+                    'id' => 'lsd_itemprop',
+                    'value' => $itemprop,
+                    'placeholder' => 'additionalProperty',
                 ]); ?>
                 <p class="description"><?php esc_html_e("Schema Item Property (https://schema.org/)", 'listdom'); ?></p>
             </td>
@@ -143,10 +141,10 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
     public function save_metadata($term_id)
     {
         // It's quick edit
-        if(!isset($_POST['lsd_icon'])) return false;
+        if (!isset($_POST['lsd_icon'])) return;
 
-        $icon = isset($_POST['lsd_icon']) ? sanitize_text_field($_POST['lsd_icon']) : '';
-        $itemprop = (isset($_POST['lsd_itemprop']) and trim($_POST['lsd_itemprop'])) ? esc_url_raw($_POST['lsd_itemprop']) : '';
+        $icon = sanitize_text_field($_POST['lsd_icon']);
+        $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? esc_url_raw($_POST['lsd_itemprop']) : '';
 
         update_term_meta($term_id, 'lsd_icon', $icon);
         update_term_meta($term_id, 'lsd_itemprop', $itemprop);
@@ -154,9 +152,9 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
 
     public function filter_columns($columns)
     {
-        $name = isset($columns['name']) ? $columns['name'] : null;
-        $slug = isset($columns['slug']) ? $columns['slug'] : null;
-        $posts = isset($columns['posts']) ? $columns['posts'] : null;
+        $name = $columns['name'] ?? '';
+        $slug = $columns['slug'] ?? '';
+        $posts = $columns['posts'] ?? '';
 
         unset($columns['name']);
         unset($columns['description']);
@@ -173,7 +171,7 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
 
     public function filter_columns_content($content, $column_name, $term_id)
     {
-        switch($column_name)
+        switch ($column_name)
         {
             case 'icon':
 
@@ -187,5 +185,3 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
         return $content;
     }
 }
-
-endif;

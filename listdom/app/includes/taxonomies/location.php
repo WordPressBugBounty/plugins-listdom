@@ -2,36 +2,34 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Taxonomies_Location')):
-
 /**
  * Listdom Location Taxonomy Class.
  *
  * @class LSD_Taxonomies_Location
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Taxonomies_Location extends LSD_Taxonomies
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register']);
 
-        add_action(LSD_Base::TAX_LOCATION.'_add_form_fields', [$this, 'add_form']);
-        add_action(LSD_Base::TAX_LOCATION.'_edit_form_fields', [$this, 'edit_form']);
-        add_action('created_'.LSD_Base::TAX_LOCATION, [$this, 'save_metadata']);
-        add_action('edited_'.LSD_Base::TAX_LOCATION, [$this, 'save_metadata']);
+        add_action(LSD_Base::TAX_LOCATION . '_add_form_fields', [$this, 'add_form']);
+        add_action(LSD_Base::TAX_LOCATION . '_edit_form_fields', [$this, 'edit_form']);
+        add_action('created_' . LSD_Base::TAX_LOCATION, [$this, 'save_metadata']);
+        add_action('edited_' . LSD_Base::TAX_LOCATION, [$this, 'save_metadata']);
 
-        add_filter('manage_edit-'.LSD_Base::TAX_LOCATION.'_columns', [$this, 'filter_columns']);
-        add_filter('manage_'.LSD_Base::TAX_LOCATION.'_custom_column', [$this, 'filter_columns_content'], 10, 3);
-        add_filter('manage_edit-'.LSD_Base::TAX_LOCATION.'_sortable_columns', [$this, 'filter_sortable_columns']);
+        add_filter('manage_edit-' . LSD_Base::TAX_LOCATION . '_columns', [$this, 'filter_columns']);
+        add_filter('manage_' . LSD_Base::TAX_LOCATION . '_custom_column', [$this, 'filter_columns_content'], 10, 3);
+        add_filter('manage_edit-' . LSD_Base::TAX_LOCATION . '_sortable_columns', [$this, 'filter_sortable_columns']);
     }
 
     public function register()
@@ -81,9 +79,9 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
         <div class="form-field">
             <label for="lsd_image"><?php esc_html_e('Image', 'listdom'); ?></label>
             <?php echo LSD_Form::imagepicker([
-                'name'=>'lsd_image',
-                'id'=>'lsd_image',
-                'value'=>'',
+                'name' => 'lsd_image',
+                'id' => 'lsd_image',
+                'value' => '',
             ]); ?>
         </div>
         <?php
@@ -99,9 +97,9 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
             </th>
             <td>
                 <?php echo LSD_Form::imagepicker([
-                    'name'=>'lsd_image',
-                    'id'=>'lsd_image',
-                    'value'=>$image,
+                    'name' => 'lsd_image',
+                    'id' => 'lsd_image',
+                    'value' => $image,
                 ]); ?>
             </td>
         </tr>
@@ -111,7 +109,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
     public function save_metadata($term_id): bool
     {
         // It's quick edit
-        if(!isset($_POST['lsd_image'])) return false;
+        if (!isset($_POST['lsd_image'])) return false;
 
         $image = sanitize_text_field($_POST['lsd_image']);
         update_term_meta($term_id, 'lsd_image', $image);
@@ -129,9 +127,9 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
 
     public function filter_columns($columns)
     {
-        $name = $columns['name'] ?? null;
-        $slug = $columns['slug'] ?? null;
-        $posts = $columns['posts'] ?? null;
+        $name = $columns['name'] ?? '';
+        $slug = $columns['slug'] ?? '';
+        $posts = $columns['posts'] ?? '';
 
         unset($columns['name']);
         unset($columns['description']);
@@ -148,7 +146,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
 
     public function filter_columns_content($content, $column_name, $term_id)
     {
-        switch($column_name)
+        switch ($column_name)
         {
             case 'image':
 
@@ -162,5 +160,3 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
         return $content;
     }
 }
-
-endif;

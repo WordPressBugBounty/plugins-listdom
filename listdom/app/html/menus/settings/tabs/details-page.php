@@ -2,10 +2,14 @@
 // no direct access
 defined('ABSPATH') || die();
 
+/** @var LSD_Menus_Settings $this */
+
 $details_page = LSD_Options::details_page();
 $styles = LSD_Styles::details();
+$detail_types = LSD_Styles::detail_types();
 
 $current_style = $details_page['general']['style'] ?? 'style1';
+$current_detail_type = $details_page['general']['detail_type'] ?? 'premade';
 
 $templates = [];
 $templates[''] = esc_html__('Default Layout', 'listdom');
@@ -89,6 +93,18 @@ $sections = [
                 <h3><?php esc_html_e('General', 'listdom'); ?></h3>
                 <div class="lsd-form-row">
                     <div class="lsd-col-6"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Style Category', 'listdom'),
+                        'for' => 'lsd_details_page_style',
+                    ]); ?></div>
+                    <div class="lsd-col-6"><?php echo LSD_Form::select([
+                        'id' => 'lsd_details_page_detail_type',
+                        'name' => 'lsd[general][detail_type]',
+                        'value' => $current_detail_type,
+                        'options' => $detail_types,
+                    ]); ?></div>
+                </div>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-6"><?php echo LSD_Form::label([
                         'title' => esc_html__('Style', 'listdom'),
                         'for' => 'lsd_details_page_style',
                     ]); ?></div>
@@ -120,6 +136,30 @@ $sections = [
                         </p>
                     </div>
                 </div>
+
+                <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-my-3">
+                    <?php if(!class_exists('LSDADDELM_Base')): ?>
+                        <p class="lsd-alert lsd-warning lsd-my-0">
+                            <?php echo sprintf(
+                                esc_html__('Activate the Listdom %s add-on to design new styles with Elementor Page Builder', 'listdom'),
+                                '<a href="' . LSD_Base::getAddonURL('Elementor') . '"><strong>' . esc_html__('Elementor', 'listdom') . '</strong></a>'
+                            ); ?>
+                        </p>
+                    <?php endif; ?>
+                    <?php if(!class_exists('LSDADDDIV_Base')): ?>
+                        <p class="lsd-alert lsd-warning lsd-my-0">
+                            <?php echo sprintf(
+                                esc_html__('Activate the Listdom %s add-on to design new styles with Divi Builder.', 'listdom'),
+                                '<a href="' . LSD_Base::getAddonURL('Divi') . '"><strong>' . esc_html__('Divi', 'listdom') . '</strong></a>'
+                            ); ?>
+                        </p>
+                    <?php elseif (class_exists('ET_Builder_Element')): ?>
+                        <p class="lsd-alert lsd-info lsd-my-0">
+                            <?php echo esc_html__('You can design and manage styles with Divi builder in Divi → Theme Builder.', 'listdom'); ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
+
                 <div class="lsd-form-row">
                     <div class="lsd-col-6"><?php echo LSD_Form::label([
                         'title' => esc_html__('Theme Layout', 'listdom'),
@@ -139,12 +179,44 @@ $sections = [
                         </p>
                     </div>
                 </div>
+                <?php if($this->isLite()): ?>
                 <div class="lsd-form-row">
-                    <?php if($this->isLite()): ?>
+                    <div class="lsd-col-12">
+                        <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Display Options Per Category', 'listdom')), 'warning'); ?>
+                    </div>
+                </div>
+                <?php else: ?>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-6"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Display Options Per Category', 'listdom'),
+                        'for' => 'lsd_dispc',
+                    ]); ?></div>
+                    <div class="lsd-col-6"><?php echo LSD_Form::select([
+                        'id' => 'lsd_dispc',
+                        'name' => 'lsd[general][dispc]',
+                        'options' => [
+                            0 => esc_html__('Disabled', 'listdom'),
+                            1 => esc_html__('Enabled', 'listdom'),
+                        ],
+                        'value' => $details_page['general']['dispc'] ?? 0,
+                    ]); ?></div>
+                </div>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-12">
+                        <p class="description">
+                            <?php echo esc_html__("When enabled, you can assign a unique single listing style to each category.", 'listdom'); ?>
+                        </p>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if($this->isLite()): ?>
+                <div class="lsd-form-row">
                     <div class="lsd-col-12">
                         <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Display Options Per Listing', 'listdom')), 'warning'); ?>
                     </div>
-                    <?php else: ?>
+                </div>
+                <?php else: ?>
+                <div class="lsd-form-row">
                     <div class="lsd-col-6"><?php echo LSD_Form::label([
                         'title' => esc_html__('Display Options Per Listing', 'listdom'),
                         'for' => 'lsd_displ',
@@ -159,13 +231,15 @@ $sections = [
                         ],
                         'value' => $details_page['general']['displ'] ?? 0,
                     ]); ?></div>
+                </div>
+                <div class="lsd-form-row">
                     <div class="lsd-col-12">
                         <p class="description">
                             <?php echo esc_html__("Select who has access to disable or enable the Elements for each listing and can select a certain Style for that.", 'listdom'); ?>
                         </p>
                     </div>
-                    <?php endif; ?>
                 </div>
+                <?php endif; ?>
                 <div class="lsd-form-row">
                     <div class="lsd-col-6"><?php echo LSD_Form::label([
                         'title' => esc_html__('Comments', 'listdom'),
@@ -228,7 +302,6 @@ $sections = [
                     <div class="lsd-alert lsd-info">
                         <ul class="lsd-unordered lsd-m-0 lsd-ml-4">
                             <li><?php esc_html_e("You don't need to use all the sections. Use the sections that fit the design you want to create. To disable a section, simply leave all elements unchecked.", 'listdom'); ?></li>
-                            <li><?php esc_html_e("Please ensure that the total width of each row equals 4/4.", 'listdom'); ?></li>
                             <li><?php esc_html_e("Elements will not appear on the frontend if they are disabled in the configuration tab or listing options.", 'listdom'); ?></li>
                             <li><?php esc_html_e('The Map element can only be enabled once.', 'listdom'); ?></li>
                             <li><?php esc_html_e('You can rearrange the order of elements in each section by simply dragging and dropping them.', 'listdom'); ?></li>

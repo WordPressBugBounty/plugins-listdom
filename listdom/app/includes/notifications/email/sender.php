@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Notifications_Email_Sender')):
-
 /**
  * Listdom Notifications Email Sender Class.
  *
  * @class LSD_Notifications_Email_Sender
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Notifications_Email_Sender extends LSD_Notifications
 {
@@ -21,12 +19,12 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
     public $listing_id = null;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function boot($id): LSD_Notifications_Email_Sender
     {
@@ -38,7 +36,7 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
     {
         $this->to = $this->toArray($to);
         return $this;
-	}
+    }
 
     public function cc($cc): LSD_Notifications_Email_Sender
     {
@@ -91,7 +89,7 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
         do_action('lsd_email_notification_sent', $this->id, $this->listing_id);
 
         return $response;
-	}
+    }
 
     public function html(): string
     {
@@ -115,14 +113,14 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
 
         $date = current_time($date_format);
         $time = current_time($time_format);
-        $datetime = trim($date.' '.$time);
+        $datetime = trim($date . ' ' . $time);
 
         $status = new stdClass();
         $publish_date = '';
         $listing_title = '';
 
         // Listing Option
-        if($this->listing_id)
+        if ($this->listing_id)
         {
             $listing = get_post($this->listing_id);
             $status = get_post_status_object($listing->post_status);
@@ -130,13 +128,13 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
             $listing_title = get_the_title($listing);
         }
 
-        foreach(['subject', 'content'] as $item)
+        foreach (['subject', 'content'] as $item)
         {
             // Website Placeholders
             $this->{$item} = str_replace('#site_name#', $site_name, $this->{$item});
             $this->{$item} = str_replace('#site_url#', $site_url, $this->{$item});
             $this->{$item} = str_replace('#site_description#', $site_description, $this->{$item});
-            $this->{$item} = str_replace('#site_link#', '<a href="'.esc_url($site_url).'">'.esc_html($site_name).'</a>', $this->{$item});
+            $this->{$item} = str_replace('#site_link#', '<a href="' . esc_url($site_url) . '">' . esc_html($site_name) . '</a>', $this->{$item});
             $this->{$item} = str_replace('#admin_email#', $admin_email, $this->{$item});
 
             // Date & Time Placeholders
@@ -145,14 +143,14 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
             $this->{$item} = str_replace('#datetime#', $datetime, $this->{$item});
 
             // Listing Placeholders
-            if($this->listing_id)
+            if ($this->listing_id)
             {
                 $this->{$item} = str_replace('#listing_title#', $listing_title, $this->{$item});
                 $this->{$item} = str_replace('#listing_status#', $status->label, $this->{$item});
                 $this->{$item} = str_replace('#listing_date#', $publish_date, $this->{$item});
 
-                $this->{$item} = str_replace('#listing_link#', '<a href="'.get_permalink($this->listing_id).'">'.get_the_title($this->listing_id).'</a>', $this->{$item});
-                $this->{$item} = str_replace('#admin_link#', '<a href="'.$this->get_edit_post_link($this->listing_id).'">'.get_the_title($this->listing_id).'</a>', $this->{$item});
+                $this->{$item} = str_replace('#listing_link#', '<a href="' . get_permalink($this->listing_id) . '">' . get_the_title($this->listing_id) . '</a>', $this->{$item});
+                $this->{$item} = str_replace('#admin_link#', '<a href="' . $this->get_edit_post_link($this->listing_id) . '">' . get_the_title($this->listing_id) . '</a>', $this->{$item});
             }
         }
 
@@ -168,10 +166,10 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
         $headers[] = 'Content-Type: text/html; charset=UTF-8';
 
         // CC
-        foreach($this->cc as $cc) if(is_email($cc)) $headers[] = 'Cc: '.$cc;
+        foreach ($this->cc as $cc) if (is_email($cc)) $headers[] = 'Cc: ' . $cc;
 
         // BCC
-        foreach($this->bcc as $bcc) if(is_email($bcc)) $headers[] = 'Bcc: '.$bcc;
+        foreach ($this->bcc as $bcc) if (is_email($bcc)) $headers[] = 'Bcc: ' . $bcc;
 
         // Apply Filters
         return apply_filters('lsd_email_headers', $headers);
@@ -187,9 +185,7 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
 
     private function toArray($string)
     {
-        if(is_array($string)) return $string;
+        if (is_array($string)) return $string;
         else return explode(',', trim($string, ', '));
     }
 }
-
-endif;

@@ -32,7 +32,7 @@ $th_separator = $data['th_separator'] ?? 1;
 <div class="lsd-search-field" id="lsd_search_field_<?php echo esc_attr($i); ?>_<?php echo esc_attr($key); ?>" data-row="<?php echo esc_attr($i); ?>" data-key="<?php echo esc_attr($key); ?>">
     <ul class="lsd-search-field-actions">
         <li class="lsd-search-field-actions-sort lsd-field-handler" data-key="<?php echo esc_attr($key); ?>"><i class="lsd-icon fas fa-arrows-alt"></i></li>
-        <li class="lsd-search-field-actions-delete" data-confirm="0" data-i="<?php echo esc_attr($i); ?>" data-key="<?php echo esc_attr($key); ?>"><i class="lsd-icon fas fa-trash-alt"></i></li>
+        <li class="lsd-search-field-actions-delete lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Click twice to delete', 'listdom'); ?>" data-confirm="0" data-i="<?php echo esc_attr($i); ?>" data-key="<?php echo esc_attr($key); ?>"><i class="lsd-icon fas fa-trash-alt"></i></li>
     </ul>
     <div class="lsd-row">
         <div class="lsd-col-9">

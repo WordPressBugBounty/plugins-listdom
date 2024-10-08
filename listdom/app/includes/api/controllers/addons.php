@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Addons')):
-
 /**
  * Listdom API Addons Controller Class.
  *
  * @class LSD_API_Controllers_Addons
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controllers_Addons extends LSD_API_Controller
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function get(WP_REST_Request $request)
     {
@@ -28,9 +26,7 @@ class LSD_API_Controllers_Addons extends LSD_API_Controller
                 'success' => 1,
                 'addons' => LSD_API_Resources_Addon::all(),
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 }
-
-endif;

@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Shortcodes_Taxonomy')):
-
 /**
  * Listdom Taxonomy Shortcode Class.
  *
  * @class LSD_Shortcodes_Taxonomy
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
 {
@@ -22,15 +20,15 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
     protected $hierarchical = false;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
         // Unique ID
         $this->id = LSD_id::get(mt_rand(100, 999));
-	}
+    }
 
     public function init()
     {
@@ -40,10 +38,10 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
     {
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-tax-terms');
-        if(trim($pre)) return $pre;
+        if (trim($pre)) return $pre;
 
         // If taxonomy is invalid
-        if(!trim($this->TX)) return $this->alert(esc_html__('Taxonomy is invalid!', 'listdom'), 'warning');
+        if (!trim($this->TX)) return $this->alert(esc_html__('Taxonomy is invalid!', 'listdom'), 'warning');
 
         // Shortcode attributes
         $this->atts = is_array($atts) ? $atts : [];
@@ -52,10 +50,10 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         $style = $this->atts['style'] ?? $this->default_style;
 
         // The style is invalid!
-        if(!in_array($style, $this->valid_styles))
+        if (!in_array($style, $this->valid_styles))
         {
             $valid_styles = '';
-            foreach($this->valid_styles as $valid_style) $valid_styles .= '<strong>'.esc_html($valid_style).'</strong>, ';
+            foreach ($this->valid_styles as $valid_style) $valid_styles .= '<strong>' . esc_html($valid_style) . '</strong>, ';
 
             return $this->alert(sprintf(esc_html__('Style is invalid! Valid styles are: %s', 'listdom'), trim($valid_styles, ', ')), 'warning');
         }
@@ -70,7 +68,7 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         $this->terms = $this->get_terms($parent);
 
         // Output
-        switch($style)
+        switch ($style)
         {
             case 'image';
                 $output = $this->image();
@@ -101,7 +99,7 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         $args['hide_empty'] = $this->atts['hide_empty'] ?? false;
 
         // Filter by Parent
-        if(is_null($parent) && isset($this->atts['parent']) && trim($this->atts['parent']) != '')
+        if (is_null($parent) && isset($this->atts['parent']) && trim($this->atts['parent']) != '')
         {
             $parent = $this->atts['parent'];
 
@@ -109,20 +107,20 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
              * Client inserted term name instead of term ID
              * So we should convert it to ID first
              **/
-            if(!is_numeric($parent))
+            if (!is_numeric($parent))
             {
                 $term = get_term_by('name', $parent, $this->TX);
-                if(isset($term->term_id)) $parent = $term->term_id;
+                if (isset($term->term_id)) $parent = $term->term_id;
             }
         }
 
-        if(!is_null($parent)) $args['parent'] = $parent;
+        if (!is_null($parent)) $args['parent'] = $parent;
 
         // Term IDs
-        if(isset($this->atts['ids']) && trim($this->atts['ids'])) $args['include'] = explode(',', $this->atts['ids']);
+        if (isset($this->atts['ids']) && trim($this->atts['ids'])) $args['include'] = explode(',', $this->atts['ids']);
 
         // Filter by Keyword
-        if(isset($this->atts['search']) && trim($this->atts['search'])) $args['search'] = $this->atts['search'];
+        if (isset($this->atts['search']) && trim($this->atts['search'])) $args['search'] = $this->atts['search'];
 
         // Order Options
         $args['orderby'] = $this->atts['orderby'] ?? 'name';
@@ -167,5 +165,3 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         return LSD_Kses::element(ob_get_clean());
     }
 }
-
-endif;

@@ -2,36 +2,34 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_IX_Mapping_Default')):
-
 /**
  * Listdom IX Mapping Default Value Class.
  *
  * @class LSD_IX_Mapping_Default
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_IX_Mapping_Default
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
-	}
+    }
 
     public function date($args)
     {
         echo LSD_Form::input([
             'name' => $args['name'],
-            'id' => 'lsd_ix_mapping_field_'.$args['key'].'_default',
+            'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
         ], 'date');
-	}
+    }
 
     public function text($args)
     {
         echo LSD_Form::text([
             'name' => $args['name'],
-            'id' => 'lsd_ix_mapping_field_'.$args['key'].'_default',
+            'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
         ]);
     }
 
@@ -39,7 +37,7 @@ class LSD_IX_Mapping_Default
     {
         echo LSD_Form::input([
             'name' => $args['name'],
-            'id' => 'lsd_ix_mapping_field_'.$args['key'].'_default',
+            'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
         ], 'number');
     }
 
@@ -47,7 +45,7 @@ class LSD_IX_Mapping_Default
     {
         echo LSD_Form::input([
             'name' => $args['name'],
-            'id' => 'lsd_ix_mapping_field_'.$args['key'].'_default',
+            'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
         ], 'email');
     }
 
@@ -55,7 +53,7 @@ class LSD_IX_Mapping_Default
     {
         echo LSD_Form::input([
             'name' => $args['name'],
-            'id' => 'lsd_ix_mapping_field_'.$args['key'].'_default',
+            'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
         ], 'url');
     }
 
@@ -63,7 +61,7 @@ class LSD_IX_Mapping_Default
     {
         echo LSD_Form::input([
             'name' => $args['name'],
-            'id' => 'lsd_ix_mapping_field_'.$args['key'].'_default',
+            'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
         ], 'tel');
     }
 
@@ -71,10 +69,8 @@ class LSD_IX_Mapping_Default
     {
         echo LSD_Form::currency([
             'name' => $args['name'],
-            'id' => 'lsd_ix_mapping_field_'.$args['key'].'_default',
+            'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'show_empty' => true,
         ]);
     }
 }
-
-endif;

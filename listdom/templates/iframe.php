@@ -11,6 +11,9 @@ defined('ABSPATH') || die();
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php wp_head(); ?>
+    <style>
+        @media screen { html { margin-top: 0 !important; } }
+    </style>
 </head>
 <body <?php body_class($class); ?>>
     <?php wp_body_open(); ?>

@@ -2,40 +2,38 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Widgets_TaxonomyCloud')):
-
 /**
  * Listdom Widgets Ta Class.
  *
  * @class LSD_Widgets_TaxonomyCloud
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Widgets_TaxonomyCloud extends WP_Widget
 {
     public $LSD;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct('LSD_Widgets_TaxonomyCloud', esc_html__('(Listdom) Cloud', 'listdom'), [
-            'description' => esc_html__('Put tag cloud of Listdom taxonomies into a sidebar/widget area.', 'listdom')
+            'description' => esc_html__('Put tag cloud of Listdom taxonomies into a sidebar/widget area.', 'listdom'),
         ]);
 
         // Listdom Object
         $this->LSD = new LSD_Widgets();
-	}
+    }
 
     public function widget($args, $instance)
     {
         // Before Widget
-        echo ($args['before_widget'] ?? '');
+        echo($args['before_widget'] ?? '');
 
         // Print the widget title
-        if(!empty($instance['title']))
+        if (!empty($instance['title']))
         {
-            echo ($args['before_title'] ?? '').apply_filters('widget_title', $instance['title']).($args['after_title'] ?? '');
+            echo ($args['before_title'] ?? '') . apply_filters('widget_title', $instance['title']) . ($args['after_title'] ?? '');
         }
 
         // Print the output
@@ -43,8 +41,8 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
         echo LSD_Kses::full($shortcode->output($instance));
 
         // After Widget
-        echo ($args['after_widget'] ?? '');
-	}
+        echo($args['after_widget'] ?? '');
+    }
 
     public function form($instance)
     {
@@ -57,44 +55,44 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
         ];
 
         echo '<p class="lsd-widget-row">
-            <label for="'.$this->get_field_id('title').'">'.esc_html__('Title', 'listdom').'</label>
-            <input class="widefat" type="text" id="'.$this->get_field_id('title').'" name="'.$this->get_field_name('title').'" value="'.(isset($instance['title']) ? esc_attr($instance['title']) : '').'" />
+            <label for="' . $this->get_field_id('title') . '">' . esc_html__('Title', 'listdom') . '</label>
+            <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '" />
         </p>';
 
         echo '<p class="lsd-widget-row">
-                <label for="'.$this->get_field_id('taxonomy').'">'.esc_html__('Taxonomy', 'listdom').'</label>
-                <select class="widefat" name="'.$this->get_field_name('taxonomy').'" id="'.$this->get_field_id('taxonomy').'">';
+                <label for="' . $this->get_field_id('taxonomy') . '">' . esc_html__('Taxonomy', 'listdom') . '</label>
+                <select class="widefat" name="' . $this->get_field_name('taxonomy') . '" id="' . $this->get_field_id('taxonomy') . '">';
 
-        foreach($taxonomies as $taxonomy=>$label) echo '<option value="'.$taxonomy.'"'.((isset($instance['taxonomy']) and $instance['taxonomy'] == $taxonomy) ? ' selected="selected"' : '').'>'.$label.'</option>';
+        foreach ($taxonomies as $taxonomy => $label) echo '<option value="' . $taxonomy . '"' . ((isset($instance['taxonomy']) and $instance['taxonomy'] == $taxonomy) ? ' selected="selected"' : '') . '>' . $label . '</option>';
         echo '</select></p>';
 
         echo '<p class="lsd-widget-row">
-            <label for="'.$this->get_field_id('show_count').'">'.esc_html__('Display Count', 'listdom').'</label>
-            <select class="widefat" name="'.$this->get_field_name('show_count').'" id="'.$this->get_field_id('show_count').'">
-                <option value="0">'.esc_html__('No', 'listdom').'</option>
-                <option value="1"'.((isset($instance['show_count']) and $instance['show_count'] == 1) ? ' selected="selected"' : '').'>'.esc_html__('Yes', 'listdom').'</option>
+            <label for="' . $this->get_field_id('show_count') . '">' . esc_html__('Display Count', 'listdom') . '</label>
+            <select class="widefat" name="' . $this->get_field_name('show_count') . '" id="' . $this->get_field_id('show_count') . '">
+                <option value="0">' . esc_html__('No', 'listdom') . '</option>
+                <option value="1"' . ((isset($instance['show_count']) and $instance['show_count'] == 1) ? ' selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
             </select>
         </p>';
 
         echo '<p class="lsd-widget-row">
-            <label for="'.$this->get_field_id('hide_empty').'">'.esc_html__('Hide Empty', 'listdom').'</label>
-            <select class="widefat" name="'.$this->get_field_name('hide_empty').'" id="'.$this->get_field_id('hide_empty').'">
-                <option value="1">'.esc_html__('Yes', 'listdom').'</option>
-                <option value="0"'.((isset($instance['hide_empty']) and $instance['hide_empty'] == 0) ? ' selected="selected"' : '').'>'.esc_html__('No', 'listdom').'</option>
+            <label for="' . $this->get_field_id('hide_empty') . '">' . esc_html__('Hide Empty', 'listdom') . '</label>
+            <select class="widefat" name="' . $this->get_field_name('hide_empty') . '" id="' . $this->get_field_id('hide_empty') . '">
+                <option value="1">' . esc_html__('Yes', 'listdom') . '</option>
+                <option value="0"' . ((isset($instance['hide_empty']) and $instance['hide_empty'] == 0) ? ' selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
             </select>
         </p>';
 
         echo '<p class="lsd-widget-row">
-            <label for="'.$this->get_field_id('orderby').'">'.esc_html__('Sort By', 'listdom').'</label>
-            <select class="widefat" name="'.$this->get_field_name('orderby').'" id="'.$this->get_field_id('orderby').'">
-                <option value="name">'.esc_html__('Name', 'listdom').'</option>
-                <option value="count"'.((isset($instance['orderby']) and $instance['orderby'] == 'count') ? ' selected="selected"' : '').'>'.esc_html__('Count', 'listdom').'</option>
+            <label for="' . $this->get_field_id('orderby') . '">' . esc_html__('Sort By', 'listdom') . '</label>
+            <select class="widefat" name="' . $this->get_field_name('orderby') . '" id="' . $this->get_field_id('orderby') . '">
+                <option value="name">' . esc_html__('Name', 'listdom') . '</option>
+                <option value="count"' . ((isset($instance['orderby']) and $instance['orderby'] == 'count') ? ' selected="selected"' : '') . '>' . esc_html__('Count', 'listdom') . '</option>
             </select>
         </p>';
 
         echo '<p class="lsd-widget-row">
-            <label for="'.$this->get_field_id('limit').'">'.esc_html__('Limit', 'listdom').'</label>
-            <input class="widefat" type="number" id="'.$this->get_field_id('limit').'" name="'.$this->get_field_name('limit').'" value="'.(isset($instance['limit']) ? esc_attr($instance['limit']) : 24).'" />
+            <label for="' . $this->get_field_id('limit') . '">' . esc_html__('Limit', 'listdom') . '</label>
+            <input class="widefat" type="number" id="' . $this->get_field_id('limit') . '" name="' . $this->get_field_name('limit') . '" value="' . (isset($instance['limit']) ? esc_attr($instance['limit']) : 24) . '" />
         </p>';
     }
 
@@ -111,5 +109,3 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
         return $instance;
     }
 }
-
-endif;

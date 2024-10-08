@@ -2,24 +2,22 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Integrations')):
-
 /**
  * Listdom Integrations Class.
  *
  * @class LSD_Integrations
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Integrations extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         // Elementor Integration
@@ -43,5 +41,3 @@ class LSD_Integrations extends LSD_Base
         $kc->init();
     }
 }
-
-endif;

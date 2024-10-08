@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Compatibility')):
-
 /**
  * Listdom Compatibility Class.
  *
  * @class LSD_Compatibility
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Compatibility extends LSD_Base
 {
@@ -19,17 +17,17 @@ class LSD_Compatibility extends LSD_Base
     public $body_classes = [];
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
         // Add Taxonomy Template Filters
-        foreach([
+        foreach ([
             LSD_Base::TAX_LOCATION,
             LSD_Base::TAX_CATEGORY,
             LSD_Base::TAX_TAG,
@@ -37,14 +35,14 @@ class LSD_Compatibility extends LSD_Base
             LSD_Base::TAX_LABEL,
         ] as $TX)
         {
-            add_filter($TX.'_html_tag', [$this, 'tx_html_tag']);
-            add_filter($TX.'_show_title', [$this, 'tx_show_title']);
-            add_filter($TX.'_html_id', [$this, 'tx_html_id']);
-            add_filter($TX.'_html_class', [$this, 'tx_html_class']);
+            add_filter($TX . '_html_tag', [$this, 'tx_html_tag']);
+            add_filter($TX . '_show_title', [$this, 'tx_show_title']);
+            add_filter($TX . '_html_id', [$this, 'tx_html_id']);
+            add_filter($TX . '_html_class', [$this, 'tx_html_class']);
         }
 
         // Body Class
-        add_filter( 'body_class', [$this, 'body_class']);
+        add_filter('body_class', [$this, 'body_class']);
 
         // Init the Theme Compatibility
         add_action('init', [$this, 'theme_compatibility']);
@@ -55,7 +53,7 @@ class LSD_Compatibility extends LSD_Base
         // WP Template
         $template = get_template();
 
-        switch($template)
+        switch ($template)
         {
             case 'logitrans':
 
@@ -102,25 +100,25 @@ class LSD_Compatibility extends LSD_Base
 
     public function tx_html_tag($tag)
     {
-        if(trim($this->tx_html_tag)) return $this->tx_html_tag;
+        if (trim($this->tx_html_tag)) return $this->tx_html_tag;
         else return $tag;
     }
 
     public function tx_show_title($title_status)
     {
-        if(!is_null($this->tx_title_status)) return $this->tx_title_status;
+        if (!is_null($this->tx_title_status)) return $this->tx_title_status;
         else return $title_status;
     }
 
     public function tx_html_id($id)
     {
-        if(trim($this->tx_html_id)) return $this->tx_html_id;
+        if (trim($this->tx_html_id)) return $this->tx_html_id;
         else return $id;
     }
 
     public function tx_html_class($class)
     {
-        if(is_array($this->tx_html_class) and count($this->tx_html_class)) return $class.' '.implode(' ', $this->tx_html_class);
+        if (is_array($this->tx_html_class) and count($this->tx_html_class)) return $class . ' ' . implode(' ', $this->tx_html_class);
         else return $class;
     }
 
@@ -130,11 +128,9 @@ class LSD_Compatibility extends LSD_Base
         $template = get_template();
 
         // Listdom Classes
-        $listdom = array_merge($this->body_classes, ['lsd-theme-'.strtolower($template)]);
+        $listdom = array_merge($this->body_classes, ['lsd-theme-' . strtolower($template)]);
 
         // Merge Classes
         return array_merge($classes, $listdom);
     }
 }
-
-endif;

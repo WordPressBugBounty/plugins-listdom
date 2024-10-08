@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Map')):
-
 /**
  * Listdom API Map Controller Class.
  *
  * @class LSD_API_Controllers_Map
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controllers_Map extends LSD_API_Controller
 {
@@ -16,12 +14,12 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
     protected $settings;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function single(WP_REST_Request $request)
     {
@@ -31,7 +29,7 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
         $listing = get_post($id);
 
         // Not Found!
-        if(!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -72,7 +70,7 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
         $listing = get_post($id);
 
         // Not Found!
-        if($id and (!$listing or ($listing and isset($listing->post_type) and $listing->post_type !== LSD_Base::PTYPE_LISTING))) return $this->response([
+        if ($id && (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING))) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -103,7 +101,7 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
         $vars = $request->get_params();
 
         // Set Params
-        foreach($vars as $key => $value) $_GET[$key] = $value;
+        foreach ($vars as $key => $value) $_GET[$key] = $value;
 
         // Skin Object
         $skin = new LSD_Skins_List();
@@ -120,7 +118,7 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
 
         // Fetch the listings
         $listings = $skin->search([
-            'posts_per_page' => isset($vars['maplimit']) && $vars['maplimit'] > 0 ? $vars['maplimit'] : 300
+            'posts_per_page' => isset($vars['maplimit']) && $vars['maplimit'] > 0 ? $vars['maplimit'] : 300,
         ]);
 
         // Include Map Assets
@@ -147,10 +145,10 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
     public function permission(WP_REST_Request $request)
     {
         // Validate API Token
-        if(!$this->validate->APIToken($request, $request->get_param('lsd-token'))) return new WP_Error('invalid_api_token', esc_html__('Invalid API Token!', 'listdom'));
+        if (!$this->validate->APIToken($request, $request->get_param('lsd-token'))) return new WP_Error('invalid_api_token', esc_html__('Invalid API Token!', 'listdom'));
 
         // Validate User Token
-        if(!$this->validate->UserToken($request, $request->get_param('lsd-user'))) return new WP_Error('invalid_user_token', esc_html__('Invalid User Token!', 'listdom'));
+        if (!$this->validate->UserToken($request, $request->get_param('lsd-user'))) return new WP_Error('invalid_user_token', esc_html__('Invalid User Token!', 'listdom'));
 
         return true;
     }
@@ -158,7 +156,7 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
     public function guest(WP_REST_Request $request)
     {
         // Validate API Token
-        if(!$this->validate->APIToken($request, $request->get_param('lsd-token'))) return new WP_Error('invalid_api_token', esc_html__('Invalid API Token!', 'listdom'));
+        if (!$this->validate->APIToken($request, $request->get_param('lsd-token'))) return new WP_Error('invalid_api_token', esc_html__('Invalid API Token!', 'listdom'));
 
         // Set Current User if Token Provided
         $this->validate->UserToken($request, $request->get_param('lsd-user'));
@@ -166,5 +164,3 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
         return true;
     }
 }
-
-endif;

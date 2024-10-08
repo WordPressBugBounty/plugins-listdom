@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Shortcodes_TaxonomyCloud')):
-
 /**
  * Listdom Taxonomy Cloud Shortcode Class.
  *
  * @class LSD_Shortcodes_TaxonomyCloud
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
 {
@@ -16,12 +14,12 @@ class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
     protected $terms = [];
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
@@ -32,7 +30,7 @@ class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
     {
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom_cloud');
-        if(trim($pre)) return $pre;
+        if (trim($pre)) return $pre;
 
         // Set the Attributes
         $this->atts = $atts;
@@ -57,7 +55,7 @@ class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
         $args['hide_empty'] = $this->atts['hide_empty'] ?? false;
 
         // Filter by Parent
-        if(isset($this->atts['parent']) && trim($this->atts['parent']))
+        if (isset($this->atts['parent']) && trim($this->atts['parent']))
         {
             $parent = $this->atts['parent'];
 
@@ -65,26 +63,26 @@ class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
              * Client inserted term name instead of term ID
              * So we should convert it to ID first
              **/
-            if(!is_numeric($parent))
+            if (!is_numeric($parent))
             {
                 $term = get_term_by('name', $parent, $TX);
-                if(isset($term->term_id)) $parent = $term->term_id;
+                if (isset($term->term_id)) $parent = $term->term_id;
             }
 
             $args['parent'] = $parent;
         }
 
         // Term IDs
-        if(isset($this->atts['ids']) && trim($this->atts['ids'])) $args['object_ids'] = explode(',', $this->atts['ids']);
+        if (isset($this->atts['ids']) && trim($this->atts['ids'])) $args['object_ids'] = explode(',', $this->atts['ids']);
 
         // Filter by Keyword
-        if(isset($this->atts['search']) && trim($this->atts['search'])) $args['search'] = $this->atts['search'];
+        if (isset($this->atts['search']) && trim($this->atts['search'])) $args['search'] = $this->atts['search'];
 
         // Order Options
         $args['orderby'] = $this->atts['orderby'] ?? 'name';
 
-        if(isset($this->atts['order'])) $args['order'] = $this->atts['order'];
-        else if($args['orderby'] == 'name') $args['order'] = 'ASC';
+        if (isset($this->atts['order'])) $args['order'] = $this->atts['order'];
+        else if ($args['orderby'] == 'name') $args['order'] = 'ASC';
         else $args['order'] = 'DESC';
 
         // Limit Options
@@ -95,4 +93,3 @@ class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
     }
 }
 
-endif;

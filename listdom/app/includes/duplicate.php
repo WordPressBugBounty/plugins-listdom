@@ -1,9 +1,6 @@
 <?php
 // no direct access
-// no direct access
 defined('ABSPATH') || die();
-
-if (!class_exists('LSD_Duplicate')):
 
 /**
  * Listdom Duplicate Data Class.
@@ -116,13 +113,10 @@ class LSD_Duplicate
             LSD_Flash::add(esc_html__("You don't have access to duplicate this post!", 'listdom'), 'success');
 
             $url = wp_get_referer();
-            if(!$url) $url = admin_url();
+            if (!$url) $url = admin_url();
         }
 
         wp_redirect($url);
         exit;
     }
 }
-
-endif;
-

@@ -2,24 +2,22 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Author')):
-
 /**
  * Listdom Author Class.
  *
  * @class LSD_Author
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Author extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
-    
+    }
+
     public function init()
     {
         add_action('show_user_profile', [$this, 'form']);
@@ -35,10 +33,10 @@ class LSD_Author extends LSD_Base
         include $this->include_html_file('metaboxes/author/form.php', ['return_path' => true]);
     }
 
-    public function save($user_id)
+    public function save($user_id): bool
     {
         // No Access
-        if(!current_user_can('edit_user', $user_id)) return false;
+        if (!current_user_can('edit_user', $user_id)) return false;
 
         // Job Title
         update_user_meta($user_id, 'lsd_job_title', sanitize_text_field($_POST['lsd_job_title']));
@@ -61,5 +59,3 @@ class LSD_Author extends LSD_Base
         return true;
     }
 }
-
-endif;

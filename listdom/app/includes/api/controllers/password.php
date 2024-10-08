@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Controllers_Password')):
-
 /**
  * Listdom API Forgot Controller Class.
  *
  * @class LSD_API_Controllers_Password
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Controllers_Password extends LSD_API_Controller
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function update(WP_REST_Request $request)
     {
@@ -26,15 +24,15 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         $password_confirmation = $request->get_param('password_confirmation');
 
         // Password is Too Short
-        if(strlen($password) < 6) return $this->response([
+        if (strlen($password) < 6) return $this->response([
             'data' => new WP_Error('400', esc_html__("Password is too short! It should be at-least 6 characters.", 'listdom')),
-            'status' => 400
+            'status' => 400,
         ]);
 
         // Password do not Match
-        if($password != $password_confirmation) return $this->response([
+        if ($password != $password_confirmation) return $this->response([
             'data' => new WP_Error('400', esc_html__("Password do not match with its confirmation.", 'listdom')),
-            'status' => 400
+            'status' => 400,
         ]);
 
         // Update Password
@@ -48,7 +46,7 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
             'data' => [
                 'success' => 1,
             ],
-            'status' => 200
+            'status' => 200,
         ]);
     }
 
@@ -58,30 +56,30 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         $response = $this->send($username);
 
         // Invalid Username
-        if(is_wp_error($response)) return $response;
+        if (is_wp_error($response)) return $response;
 
         // Response
         return $this->response([
             'data' => [
                 'success' => (int) $response,
             ],
-            'status' => 200
+            'status' => 200,
         ]);
-	}
+    }
 
-	public function send($username)
+    public function send($username)
     {
         $user = null;
         $errors = new WP_Error();
 
-        if(empty($username) or !is_string($username))
+        if (empty($username) or !is_string($username))
         {
             $errors->add('empty_username', esc_html__('Enter a username or email address.', 'listdom'));
         }
-        elseif(strpos($username, '@'))
+        else if (strpos($username, '@'))
         {
             $user = get_user_by('email', sanitize_email(trim(wp_unslash($username))));
-            if(empty($user)) $errors->add('invalid_email', esc_html__('There is no account with that username or email address.', 'listdom'));
+            if (empty($user)) $errors->add('invalid_email', esc_html__('There is no account with that username or email address.', 'listdom'));
         }
         else
         {
@@ -89,9 +87,9 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
             $user = get_user_by('login', $login);
         }
 
-        if($errors->has_errors()) return $errors;
+        if ($errors->has_errors()) return $errors;
 
-        if(!$user)
+        if (!$user)
         {
             $errors->add('invalidcombo', esc_html__('There is no account with that username or email address.', 'listdom'));
             return $errors;
@@ -101,12 +99,12 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         $user_email = $user->user_email;
         $key = get_password_reset_key($user);
 
-        if(is_wp_error($key)) return $key;
+        if (is_wp_error($key)) return $key;
 
-        if(is_multisite()) $site_name = get_network()->site_name;
+        if (is_multisite()) $site_name = get_network()->site_name;
         else $site_name = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
-        $message  = esc_html__('Someone has requested a password reset for the following account:') . "\r\n\r\n";
+        $message = esc_html__('Someone has requested a password reset for the following account:') . "\r\n\r\n";
         $message .= sprintf(esc_html__('Site Name: %s'), $site_name) . "\r\n\r\n";
         $message .= sprintf(esc_html__('Username: %s'), $user_login) . "\r\n\r\n";
         $message .= esc_html__('If this was a mistake, just ignore this email and nothing will happen.') . "\r\n\r\n";
@@ -120,5 +118,3 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         return wp_mail($user_email, wp_specialchars_decode($title), $message);
     }
 }
-
-endif;

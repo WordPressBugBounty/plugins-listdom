@@ -494,6 +494,24 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Maximum Image Size Allowed', 'listdom'),
+                    'for' => 'lsd_settings_submission_max_image_upload_size',
+                ]); ?></div>
+                <div class="lsd-col-4">
+                    <?php echo LSD_Form::number([
+                        'id' => 'lsd_settings_submission_max_image_upload_size',
+                        'value' => $settings['submission_max_image_upload_size'] ?? '',
+                        'name' => 'lsd[submission_max_image_upload_size]',
+                        'attributes' => [
+                            'min' => 0,
+                            'step' => 10
+                        ]
+                    ]); ?>
+                    <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited size of images. The size is in KB", 'listdom'); ?></p>
+                </div>
+            </div>
+            <div class="lsd-form-row">
+                <div class="lsd-col-2"><?php echo LSD_Form::label([
                     'title' => esc_html__('Maximum Description Length', 'listdom'),
                     'for' => 'lsd_settings_submission_max_description_length',
                 ]); ?></div>

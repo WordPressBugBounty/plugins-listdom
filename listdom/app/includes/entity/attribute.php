@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Entity_Attribute')):
-
 /**
  * Listdom Attribute Entity Class.
  *
  * @class LSD_Entity_Attribute
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Entity_Attribute extends LSD_Base
 {
@@ -19,17 +17,17 @@ class LSD_Entity_Attribute extends LSD_Base
      * LSD_Entity_Attribute constructor.
      * @param $term_id
      */
-	public function __construct($term_id)
+    public function __construct($term_id)
     {
         parent::__construct();
 
         $this->term_id = $term_id;
         $this->type = get_term_meta($this->term_id, 'lsd_field_type', true);
     }
-    
+
     public function render($data, $args = [])
     {
-        switch($this->type)
+        switch ($this->type)
         {
             case 'number':
 
@@ -37,15 +35,15 @@ class LSD_Entity_Attribute extends LSD_Base
 
             case 'email':
 
-                return '<a href="mailto:'.esc_attr($data).'">'.esc_html($data).'</a>';
+                return '<a href="mailto:' . esc_attr($data) . '">' . esc_html($data) . '</a>';
 
             case 'url':
 
-                return '<a href="'.esc_attr($data).'">'.esc_html($data).'</a>';
+                return '<a href="' . esc_attr($data) . '">' . esc_html($data) . '</a>';
 
             case 'separator':
 
-                return '<div class="lsd-separator">'.esc_html($data).'</div>';
+                return '<div class="lsd-separator">' . esc_html($data) . '</div>';
 
             case 'textarea':
 
@@ -68,10 +66,8 @@ class LSD_Entity_Attribute extends LSD_Base
     public static function schema($term_id)
     {
         $itemprop = get_term_meta($term_id, 'lsd_itemprop', true);
-        if(!trim($itemprop)) return null;
+        if (!trim($itemprop)) return null;
 
         return lsd_schema()->prop(esc_url($itemprop));
     }
 }
-
-endif;

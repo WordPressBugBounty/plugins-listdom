@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Resources_Fields')):
-
 /**
  * Listdom API Fields Resource Class.
  *
  * @class LSD_API_Resources_Fields
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Resources_Fields extends LSD_API_Resource
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function grab()
     {
@@ -45,8 +43,8 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'method' => 'editor',
                         'label' => esc_html__('Description', 'listdom'),
                         'required' => false,
-                    ]
-                ]
+                    ],
+                ],
             ],
             'category' => [
                 'section' => [
@@ -59,13 +57,13 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'label' => esc_html__('Category', 'listdom'),
                         'values' => LSD_API_Resources_Taxonomy::collection($taxonomies->hierarchy(LSD_Base::TAX_CATEGORY)),
                         'required' => true,
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
         // Locations
-        if(self::is_enabled('locations'))
+        if (self::is_enabled('locations'))
         {
             $form['locations'] = [
                 'section' => [
@@ -73,18 +71,18 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 ],
                 'fields' => [
                     'locations' => [
-                        'key' => 'taxonomies['.LSD_Base::TAX_LOCATION.']',
+                        'key' => 'taxonomies[' . LSD_Base::TAX_LOCATION . ']',
                         'method' => 'checkboxes',
                         'label' => esc_html__('Locations', 'listdom'),
                         'values' => LSD_API_Resources_Taxonomy::collection($taxonomies->hierarchy(LSD_Base::TAX_LOCATION)),
                         'required' => false,
                     ],
-                ]
+                ],
             ];
         }
 
         // Tags
-        if(self::is_enabled('tags'))
+        if (self::is_enabled('tags'))
         {
             $form['tags'] = [
                 'section' => [
@@ -92,7 +90,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 ],
                 'fields' => [
                     'tags' => [
-                        'key' => 'taxonomies['.LSD_Base::TAX_TAG.']',
+                        'key' => 'taxonomies[' . LSD_Base::TAX_TAG . ']',
                         'method' => 'textarea',
                         'label' => esc_html__('Tags', 'listdom'),
                         'placeholder' => esc_html__('Tag1,Tag2,Tag3', 'listdom'),
@@ -101,12 +99,12 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         ),
                         'required' => false,
                     ],
-                ]
+                ],
             ];
         }
 
         // Features
-        if(self::is_enabled('features'))
+        if (self::is_enabled('features'))
         {
             $form['features'] = [
                 'section' => [
@@ -114,18 +112,18 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 ],
                 'fields' => [
                     'features' => [
-                        'key' => 'taxonomies['.LSD_Base::TAX_FEATURE.']',
+                        'key' => 'taxonomies[' . LSD_Base::TAX_FEATURE . ']',
                         'method' => 'checkboxes',
                         'label' => esc_html__('Features', 'listdom'),
                         'values' => LSD_API_Resources_Taxonomy::collection($taxonomies->hierarchy(LSD_Base::TAX_FEATURE)),
                         'required' => false,
                     ],
-                ]
+                ],
             ];
         }
 
         // Labels
-        if(self::is_enabled('labels'))
+        if (self::is_enabled('labels'))
         {
             $form['labels'] = [
                 'section' => [
@@ -133,18 +131,18 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 ],
                 'fields' => [
                     'labels' => [
-                        'key' => 'taxonomies['.LSD_Base::TAX_LABEL.']',
+                        'key' => 'taxonomies[' . LSD_Base::TAX_LABEL . ']',
                         'method' => 'checkboxes',
                         'label' => esc_html__('Labels', 'listdom'),
                         'values' => LSD_API_Resources_Taxonomy::collection($taxonomies->hierarchy(LSD_Base::TAX_LABEL)),
                         'required' => false,
                     ],
-                ]
+                ],
             ];
         }
 
         // Featured Image
-        if(self::is_enabled('image'))
+        if (self::is_enabled('image'))
         {
             $form['image'] = [
                 'section' => [
@@ -158,12 +156,12 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'required' => false,
                         'developer' => esc_html__('You should upload image and send the attachment ID of image!', 'listdom'),
                     ],
-                ]
+                ],
             ];
         }
 
         // Address & Map
-        if(self::is_enabled('address'))
+        if (self::is_enabled('address'))
         {
             $form['address'] = [
                 'section' => [
@@ -186,15 +184,15 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'required' => false,
                         'developer' => 'GET /listings/<id>/map-upsert',
                     ],
-                ]
+                ],
             ];
         }
 
         // Price
-        if(self::is_enabled('price'))
+        if (self::is_enabled('price'))
         {
             $currencies = [];
-            foreach(LSD_Base::get_currencies() as $symbol=>$currency) $currencies[$currency] = $symbol;
+            foreach (LSD_Base::get_currencies() as $symbol => $currency) $currencies[$currency] = $symbol;
 
             $form['price'] = [
                 'section' => [
@@ -226,27 +224,27 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'label' => esc_html__('Price Description', 'listdom'),
                         'required' => false,
                     ],
-                ]
+                ],
             ];
         }
 
         // Availability
-        if(self::is_enabled('availability'))
+        if (self::is_enabled('availability'))
         {
             $ava_fields = [];
-            foreach(LSD_Main::get_weekdays() as $weekday)
+            foreach (LSD_Main::get_weekdays() as $weekday)
             {
                 $daycode = $weekday['code'];
-                $ava_fields['ava_'.$daycode.'_hour'] = [
-                    'key' => 'ava['.$daycode.'][hours]',
+                $ava_fields['ava_' . $daycode . '_hour'] = [
+                    'key' => 'ava[' . $daycode . '][hours]',
                     'method' => 'text-input',
                     'label' => esc_html__($weekday['day'], 'listdom'),
                     'placeholder' => esc_html__('9 - 18, 9 AM to 9 PM', 'listdom'),
                     'required' => false,
                 ];
 
-                $ava_fields['ava_'.$daycode.'_off'] = [
-                    'key' => 'ava['.$daycode.'][off]',
+                $ava_fields['ava_' . $daycode . '_off'] = [
+                    'key' => 'ava[' . $daycode . '][off]',
                     'method' => 'checkbox',
                     'label' => esc_html__('Off', 'listdom'),
                     'values' => [0, 1],
@@ -258,12 +256,12 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 'section' => [
                     'title' => esc_html__('Work Hours', 'listdom'),
                 ],
-                'fields' => $ava_fields
+                'fields' => $ava_fields,
             ];
         }
 
         // Contact
-        if(self::is_enabled('contact'))
+        if (self::is_enabled('contact'))
         {
             $form['contact'] = [
                 'section' => [
@@ -292,12 +290,12 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'guide' => esc_html__('If you fill it, then it will be used to override default details page link. You can use it for linking the listing to an external or custom page!', 'listdom'),
                         'required' => false,
                     ],
-                ]
+                ],
             ];
         }
 
         // Remark
-        if(self::is_enabled('remark'))
+        if (self::is_enabled('remark'))
         {
             $form['remark'] = [
                 'section' => [
@@ -311,12 +309,12 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'placeholder' => esc_html__('Owner message to the visitors ...', 'listdom'),
                         'required' => false,
                     ],
-                ]
+                ],
             ];
         }
 
         // Gallery
-        if(self::is_enabled('gallery'))
+        if (self::is_enabled('gallery'))
         {
             $form['gallery'] = [
                 'section' => [
@@ -330,12 +328,12 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'required' => false,
                         'developer' => esc_html__('You should upload images and send an array of attachment IDs!', 'listdom'),
                     ],
-                ]
+                ],
             ];
         }
 
         // Embed
-        if(self::is_enabled('embed'))
+        if (self::is_enabled('embed'))
         {
             $form['embeds'] = [
                 'section' => [
@@ -356,36 +354,36 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'placeholder' => esc_html__('Code', 'listdom'),
                         'required' => false,
                     ],
-                ]
+                ],
             ];
         }
 
         // Attributes
-        if(self::is_enabled('attributes') and $resource->isPro())
+        if (self::is_enabled('attributes') and $resource->isPro())
         {
             // Attributes
             $terms = LSD_Main::get_attributes();
 
             $attributes = [];
-            foreach($terms as $term)
+            foreach ($terms as $term)
             {
                 $type = get_term_meta($term->term_id, 'lsd_field_type', true);
-                if(in_array($type, ['text', 'number', 'email', 'url'])) $type = $type.'-input';
+                if (in_array($type, ['text', 'number', 'email', 'url'])) $type = $type . '-input';
 
                 // Get all category status
                 $all_categories = get_term_meta($term->term_id, 'lsd_all_categories', true);
-                if(trim($all_categories) == '') $all_categories = 1;
+                if (trim($all_categories) == '') $all_categories = 1;
 
                 // Get specific categories
                 $categories = get_term_meta($term->term_id, 'lsd_categories', true);
-                if($all_categories || !is_array($categories)) $categories = [];
+                if ($all_categories || !is_array($categories)) $categories = [];
 
                 $values = [];
                 $values_str = get_term_meta($term->term_id, 'lsd_values', true);
-                if(trim($values_str)) foreach(explode(',', trim($values_str, ', ')) as $value) $values[$value] = $value;
+                if (trim($values_str)) foreach (explode(',', trim($values_str, ', ')) as $value) $values[$value] = $value;
 
                 $attributes[$term->term_id] = [
-                    'key' => 'attributes['.$term->term_id.']',
+                    'key' => 'attributes[' . $term->term_id . ']',
                     'method' => $type,
                     'label' => $term->name,
                     'values' => $values,
@@ -399,7 +397,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 'section' => [
                     'title' => esc_html__('Attributes', 'listdom'),
                 ],
-                'fields' => $attributes
+                'fields' => $attributes,
             ];
         }
 
@@ -407,7 +405,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         $settings = LSD_Options::settings();
 
         // Guest Fields
-        if(isset($settings['submission_guest']) && $settings['submission_guest'])
+        if (isset($settings['submission_guest']) && $settings['submission_guest'])
         {
             // Registration Method
             $guest_registration = $settings['submission_guest_registration'] ?? 'approval';
@@ -429,7 +427,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 ],
             ];
 
-            if($guest_registration)
+            if ($guest_registration)
             {
                 $guest_fields['guest_fullname'] = [
                     'key' => 'guest_fullname',
@@ -440,7 +438,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 ];
             }
 
-            if($guest_registration === 'submission')
+            if ($guest_registration === 'submission')
             {
                 $guest_fields['guest_password'] = [
                     'key' => 'guest_password',
@@ -456,32 +454,30 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                     'title' => esc_html__('To Reviewer', 'listdom'),
                     'guest' => true,
                 ],
-                'fields' => $guest_fields
+                'fields' => $guest_fields,
             ];
         }
 
         return apply_filters('lsd_api_resource_fields', $form);
-	}
+    }
 
-    public static function is_enabled($module)
+    public static function is_enabled($module): bool
     {
         // Listdom Options
         $settings = LSD_Options::settings();
 
         // Option not Found!
-        if(!isset($settings['submission_module'])) return true;
+        if (!isset($settings['submission_module'])) return true;
 
         // Module not Found!
-        if(!isset($settings['submission_module'][$module])) return true;
+        if (!isset($settings['submission_module'][$module])) return true;
 
         // Module is disabled
-        if(!$settings['submission_module'][$module]) return false;
+        if (!$settings['submission_module'][$module]) return false;
 
         // Module is enabled only for admin and editor
-        if($settings['submission_module'][$module] == 2 and !current_user_can('edit_others_pages')) return false;
+        if ($settings['submission_module'][$module] == 2 and !current_user_can('edit_others_pages')) return false;
 
         return true;
     }
 }
-
-endif;

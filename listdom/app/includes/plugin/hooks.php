@@ -2,86 +2,84 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Plugin_Hooks')):
-
 /**
  * Listdom Plugin Hooks Class.
  *
  * @class LSD_Plugin_Hooks
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Plugin_Hooks
 {
     /**
-	 * The single instance of the class.
-	 *
-	 * @var LSD_Plugin_Hooks
-	 * @since 1.0.0
-	 */
-	protected static $instance = null;
+     * The single instance of the class.
+     *
+     * @var LSD_Plugin_Hooks
+     * @since 1.0.0
+     */
+    protected static $instance = null;
 
-	public $main;
-	public $db;
+    public $main;
+    public $db;
 
     /**
-	 * Listdom Plugin Hooks Instance.
-	 *
-	 * @since 1.0.0
-	 * @static
-	 * @return LSD_Plugin_Hooks
-	 */
-	public static function instance()
+     * Listdom Plugin Hooks Instance.
+     *
+     * @return LSD_Plugin_Hooks
+     * @since 1.0.0
+     * @static
+     */
+    public static function instance()
     {
         // Get an instance of Class
-		if(is_null(self::$instance)) self::$instance = new self();
-        
+        if (is_null(self::$instance)) self::$instance = new self();
+
         // Return the instance
-		return self::$instance;
-	}
-    
+        return self::$instance;
+    }
+
     /**
-	 * Constructor method
-	 */
-	protected function __construct()
+     * Constructor method
+     */
+    protected function __construct()
     {
         register_activation_hook(LSD_BASENAME, [$this, 'activate']);
-		register_deactivation_hook(LSD_BASENAME, [$this, 'deactivate']);
-		register_uninstall_hook(LSD_BASENAME, ['LSD_Plugin_Hooks', 'uninstall']);
-        
+        register_deactivation_hook(LSD_BASENAME, [$this, 'deactivate']);
+        register_uninstall_hook(LSD_BASENAME, ['LSD_Plugin_Hooks', 'uninstall']);
+
         // Main Class
         $this->main = new LSD_Main();
-        
+
         // DB Class
         $this->db = new LSD_db();
-	}
-    
+    }
+
     /**
      * Runs on plugin activation
      * @param bool $network
      */
     public function activate(bool $network = false)
-	{
+    {
         // Redirect user to Listdom Dashboard
         add_option('lsd_activation_redirect', true);
 
         $current_blog_id = get_current_blog_id();
-        
+
         // Plugin activated only for one blog
-        if(!function_exists('is_multisite') || !is_multisite()) $network = false;
-        if(!$network)
+        if (!function_exists('is_multisite') || !is_multisite()) $network = false;
+        if (!$network)
         {
             $this->install($current_blog_id);
 
             // Add WordPress flush rewrite rules in to do list
             LSD_RewriteRules::todo();
-            
+
             // Don't run rest of the function
             return;
         }
 
         // Plugin activated for all blogs
         $blogs = $this->db->select("SELECT `blog_id` FROM `#__blogs`", 'loadColumn');
-        foreach($blogs as $blog_id)
+        foreach ($blogs as $blog_id)
         {
             switch_to_blog($blog_id);
             $this->install($blog_id);
@@ -91,8 +89,8 @@ class LSD_Plugin_Hooks
 
         // Add WordPress flush rewrite rules in to do list
         LSD_RewriteRules::todo();
-	}
-    
+    }
+
     /**
      * Install the plugin on s certain blog
      * @param int $blog_id
@@ -120,7 +118,7 @@ class LSD_Plugin_Hooks
         add_option('lsd_details_page_pattern', $details_page_pattern);
 
         // DB Update
-        if($this->main->is_db_update_required())
+        if ($this->main->is_db_update_required())
         {
             $this->db_update();
         }
@@ -148,38 +146,38 @@ class LSD_Plugin_Hooks
             INDEX `latitude` (`latitude`,`longitude`)
         ) $charset_collate;";
 
-        require_once ABSPATH.'wp-admin/includes/upgrade.php';
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
         update_option('lsd_db_version', LSD_Base::DB_VERSION);
     }
-    
+
     /**
      * Runs on plugin deactivation
      * @param bool $network
      */
     public function deactivate(bool $network = false)
-	{
+    {
         /**
          * Refresh WordPress rewrite rules
          * We cannot use LSD_RewriteRules here because plugin is deactivated and it won't run
          */
         flush_rewrite_rules();
-	}
-    
+    }
+
     /**
      * Runs on plugin uninstallation
      */
     public static function uninstall()
-	{
+    {
         // DB Class
         $db = new LSD_db();
-        
+
         // Getting current blog
         $current_blog_id = get_current_blog_id();
 
         // Single WordPress Installation
-        if(!function_exists('is_multisite') || !is_multisite())
+        if (!function_exists('is_multisite') || !is_multisite())
         {
             self::purge($current_blog_id);
 
@@ -188,19 +186,19 @@ class LSD_Plugin_Hooks
              * We cannot use LSD_RewriteRules here because plugin is removed and it won't run
              */
             flush_rewrite_rules();
-            
+
             // Don't run rest of the function
             return;
         }
 
         // WordPress is multisite, so we should purge the plugin from all blogs
         $blogs = $db->select("SELECT `blog_id` FROM `#__blogs`", 'loadColumn');
-        foreach($blogs as $blog_id)
+        foreach ($blogs as $blog_id)
         {
             switch_to_blog($blog_id);
             self::purge($blog_id);
         }
-        
+
         // Switch back to current blog
         switch_to_blog($current_blog_id);
 
@@ -209,8 +207,8 @@ class LSD_Plugin_Hooks
          * We cannot use LSD_RewriteRules here because plugin is removed and it won't run
          */
         flush_rewrite_rules();
-	}
-    
+    }
+
     /**
      * Remove Listdom from a blog
      * @param int $blog_id
@@ -221,7 +219,7 @@ class LSD_Plugin_Hooks
         $delete = apply_filters('lsd_purge_options', true);
 
         // Listdom Deleted
-        if($delete)
+        if ($delete)
         {
             delete_option('lsd_activation_redirect');
             delete_option('lsd_settings');
@@ -236,5 +234,3 @@ class LSD_Plugin_Hooks
         }
     }
 }
-
-endif;

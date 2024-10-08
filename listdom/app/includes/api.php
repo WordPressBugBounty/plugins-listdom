@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API')):
-
 /**
  * Listdom API Class.
  *
  * @class LSD_API
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API extends LSD_Base
 {
@@ -21,16 +19,16 @@ class LSD_API extends LSD_Base
     protected $db;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
         // DB Library
         $this->db = new LSD_db();
-	}
-    
+    }
+
     public function init()
     {
         add_action('rest_api_init', [$this, 'language'], 20);
@@ -45,11 +43,9 @@ class LSD_API extends LSD_Base
         $locale = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null;
 
         // No Locale
-        if(!$locale) return;
+        if (!$locale) return;
 
         // Switch the Language
         LSD_i18n::set($locale);
     }
 }
-
-endif;

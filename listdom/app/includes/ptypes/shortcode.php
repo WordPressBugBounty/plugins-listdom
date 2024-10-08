@@ -2,34 +2,32 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_PTypes_Shortcode')):
-
 /**
  * Listdom Shortcode Post Types Class.
  *
  * @class LSD_PTypes_Shortcode
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_PTypes_Shortcode extends LSD_PTypes
 {
     public $PT;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
         $this->PT = LSD_Base::PTYPE_SHORTCODE;
-	}
-    
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register_post_type']);
 
-        add_filter('manage_'.$this->PT.'_posts_columns', [$this, 'filter_columns']);
-        add_action('manage_'.$this->PT.'_posts_custom_column', [$this, 'filter_columns_content'], 10, 2);
+        add_filter('manage_' . $this->PT . '_posts_columns', [$this, 'filter_columns']);
+        add_action('manage_' . $this->PT . '_posts_custom_column', [$this, 'filter_columns_content'], 10, 2);
 
         add_action('restrict_manage_posts', [$this, 'skin_dropdown'], 10, 1);
         add_filter('parse_query', [$this, 'filter_by_skin']);
@@ -40,7 +38,7 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         // Duplicate Shortcode
         new LSD_Duplicate($this->PT);
     }
-    
+
     public function register_post_type()
     {
         $args = [
@@ -73,7 +71,7 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
                 'edit_others_posts' => 'manage_options',
                 'delete_posts' => 'manage_options',
                 'publish_posts' => 'manage_options',
-                'read_private_posts' => 'manage_options'
+                'read_private_posts' => 'manage_options',
             ],
         ];
 
@@ -82,13 +80,14 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
 
     public function skin_dropdown($post_type)
     {
-        if($post_type !== $this->PT) return;
+        if ($post_type !== $this->PT) return;
 
         $selected = isset($_GET['skin']) && $_GET['skin'] ? $_GET['skin'] : '';
         echo LSD_Form::skins([
             'id' => 'lsd_shortcode_filter_skin',
             'name' => 'skin',
             'value' => $selected,
+            'empty_label' => 'All Skins',
             'show_empty' => true,
         ]);
     }
@@ -96,17 +95,17 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
     public function filter_by_skin($query)
     {
         global $pagenow, $typenow;
-    
-        if($typenow === $this->PT && $pagenow == 'edit.php')
+
+        if ($typenow === $this->PT && $pagenow == 'edit.php')
         {
-            if(isset($_GET['skin']) && $_GET['skin'] !== '')
+            if (isset($_GET['skin']) && $_GET['skin'] !== '')
             {
                 $query->query_vars['meta_query'] = [
                     [
                         'key' => 'lsd_skin',
                         'value' => sanitize_text_field($_GET['skin']),
-                        'compare' => '='
-                    ]
+                        'compare' => '=',
+                    ],
                 ];
             }
         }
@@ -127,14 +126,14 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
 
     public function filter_columns_content($column_name, $post_id)
     {
-        if($column_name == 'shortcode')
+        if ($column_name == 'shortcode')
         {
-            echo '[listdom id="'.esc_attr($post_id).'"]';
+            echo '[listdom id="' . esc_attr($post_id) . '"]';
         }
-        elseif($column_name == 'skin')
+        else if ($column_name == 'skin')
         {
             $display = get_post_meta($post_id, 'lsd_display', true);
-            echo (is_array($display) and isset($display['skin'])) ? '<strong>'.esc_html($display['skin']).'</strong>' : '-----';
+            echo (is_array($display) and isset($display['skin'])) ? '<strong>' . esc_html($display['skin']) . '</strong>' : '-----';
         }
     }
 
@@ -194,16 +193,16 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
     public function save($post_id, $post)
     {
         // It's not a shortcode
-        if($post->post_type !== $this->PT) return;
+        if ($post->post_type !== $this->PT) return;
 
         // Nonce is not set!
-        if(!isset($_POST['_lsdnonce'])) return;
+        if (!isset($_POST['_lsdnonce'])) return;
 
         // Nonce is not valid!
-        if(!wp_verify_nonce(sanitize_text_field($_POST['_lsdnonce']), 'lsd_shortcode_cpt')) return;
+        if (!wp_verify_nonce(sanitize_text_field($_POST['_lsdnonce']), 'lsd_shortcode_cpt')) return;
 
         // We don't need to do anything on post auto save
-        if(defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
 
         // Get Listdom Data
         $lsd = $_POST['lsd'] ?? [];
@@ -235,5 +234,3 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         update_post_meta($post_id, 'lsd_sorts', $sorts);
     }
 }
-
-endif;

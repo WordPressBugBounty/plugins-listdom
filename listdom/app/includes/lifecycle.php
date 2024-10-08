@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_LifeCycle')):
-
 /**
  * Listdom Life Cycle Class.
  *
  * @class LSD_LifeCycle
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_LifeCycle extends LSD_Base
 {
@@ -16,27 +14,27 @@ class LSD_LifeCycle extends LSD_Base
     public static $content_printed = false;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public function init()
     {
-        add_filter('body_class', function($class)
+        add_filter('body_class', function ($class)
         {
             self::setBodyStarted(true);
             return $class;
         });
 
-        add_action('wp_body_open', function()
+        add_action('wp_body_open', function ()
         {
             self::setBodyStarted(true);
         });
 
-        if(function_exists('wp_is_block_theme') && wp_is_block_theme())
+        if (function_exists('wp_is_block_theme') && wp_is_block_theme())
         {
             self::setBodyStarted(true);
         }
@@ -62,5 +60,3 @@ class LSD_LifeCycle extends LSD_Base
         return apply_filters('lsd_lifecycle_is_content_printed', self::$content_printed);
     }
 }
-
-endif;

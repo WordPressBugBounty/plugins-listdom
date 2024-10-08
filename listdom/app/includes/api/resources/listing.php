@@ -2,23 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_API_Resources_Listing')):
-
 /**
  * Listdom API Listing Resource Class.
  *
  * @class LSD_API_Resources_Listing
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_API_Resources_Listing extends LSD_API_Resource
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function get($id): array
     {
@@ -37,8 +35,8 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
         $currency = $metas['lsd_currency'] ?? null;
 
         $price = $resource->render_price($min_price, $currency);
-        if($max_price) $price .= ' - '.$resource->render_price($max_price, $currency);
-        if($text_price) $price .= ' / '.$text_price;
+        if ($max_price) $price .= ' - ' . $resource->render_price($max_price, $currency);
+        if ($text_price) $price .= ' / ' . $text_price;
 
         // Media
         $thumbnail_id = get_post_thumbnail_id($listing);
@@ -94,12 +92,12 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
             ],
             'user' => LSD_API_Resources_User::minify($listing->post_author),
         ], $id);
-	}
+    }
 
     public static function collection($ids): array
     {
         $items = [];
-        foreach($ids as $id) $items[] = self::get($id);
+        foreach ($ids as $id) $items[] = self::get($id);
 
         return $items;
     }
@@ -140,8 +138,8 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
         $previous_page = ($current_page - 1);
         $next_page = $skin->next_page;
 
-        if($current_page >= $total_pages) $next_page = null;
-        if($current_page <= 1) $previous_page = null;
+        if ($current_page >= $total_pages) $next_page = null;
+        if ($current_page <= 1) $previous_page = null;
 
         return apply_filters('lsd_api_resource_pagination', [
             'found_listings' => $found,
@@ -153,5 +151,3 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
         ], $skin);
     }
 }
-
-endif;

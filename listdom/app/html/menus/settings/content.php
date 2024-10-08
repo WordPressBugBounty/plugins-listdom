@@ -39,6 +39,11 @@ switch($this->tab)
         $this->include_html_file('menus/settings/tabs/api.php');
         break;
 
+    case 'auth':
+
+        $this->include_html_file('menus/settings/tabs/auth.php');
+        break;
+
     default:
 
         $this->include_html_file('menus/settings/tabs/general.php');

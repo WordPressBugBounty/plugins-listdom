@@ -49,7 +49,10 @@ foreach($terms as $term)
     <?php else: ?>
         <?php if($i == 0): ?><div class="lsd-row"><?php endif; ?>
         <div class="lsd-col-6" <?php echo LSD_Entity_Attribute::schema($attribute->term_id); ?>>
-            <span class="lsd-attr-key"><?php if(isset($show_icons) && $show_icons): ?><span class="lsd-attr-icon"><?php echo LSD_Kses::element($att->icon()); ?></span><?php endif; ?><?php echo esc_html($attribute->name); ?>: </span>
+            <span class="lsd-attr-key">
+                <?php if(isset($show_icons) && $show_icons): ?><span class="lsd-attr-icon"><?php echo LSD_Kses::element($att->icon()); ?></span><?php endif; ?>
+                <?php if(isset($show_attribute_title) && $show_attribute_title): echo esc_html($attribute->name); ?>: <?php endif; ?>
+            </span>
             <span class="lsd-attr-value"><?php echo LSD_Kses::element($att->render($post_attributes[$key])); ?></span>
         </div>
         <?php if($i == 1): ?></div><?php endif; ?>

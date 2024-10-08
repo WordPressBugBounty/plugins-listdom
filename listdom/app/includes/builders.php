@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Builders')):
-
 /**
  * Listdom Page Builders Class.
  *
  * @class LSD_Builders
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Builders extends LSD_Base
 {
@@ -23,21 +21,21 @@ class LSD_Builders extends LSD_Base
     private $listing;
 
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
 
         $this->single = null;
         $this->listing = null;
-	}
+    }
 
     public function single($single): LSD_Builders
     {
         $this->single = $single;
         return $this;
-	}
+    }
 
     public function listing(LSD_Entity_Listing $listing): LSD_Builders
     {
@@ -82,5 +80,3 @@ class LSD_Builders extends LSD_Base
         return str_replace(']]>', ']]&gt;', $content);
     }
 }
-
-endif;

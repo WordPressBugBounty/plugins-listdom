@@ -2,13 +2,11 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Kses')):
-
 /**
  * Listdom Kses Class.
  *
  * @class LSD_Kses
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Kses extends LSD_Base
 {
@@ -64,7 +62,13 @@ class LSD_Kses extends LSD_Base
         'accept-charset' => 1,
         'viewBox' => 1,
         'd' => 1,
-        'xmlns' => 1
+        'xmlns' => 1,
+        'points' => 1,
+        'fill' => 1,
+        'stroke' => 1,
+        'stroke-width' => 1,
+        'stroke-linecap' => 1,
+        'stroke-linejoin' => 1,
     ];
 
     static $schema_attr = [
@@ -87,7 +91,7 @@ class LSD_Kses extends LSD_Base
 
     public static function page($html): string
     {
-        if(is_null(self::$allowed_html_page))
+        if (is_null(self::$allowed_html_page))
         {
             $allowed = wp_kses_allowed_html('post');
             self::$allowed_html_page = apply_filters('lsd_kses_tags', $allowed, 'page');
@@ -98,7 +102,7 @@ class LSD_Kses extends LSD_Base
 
     public static function form($html): string
     {
-        if(is_null(self::$allowed_html_form))
+        if (is_null(self::$allowed_html_form))
         {
             $allowed = wp_kses_allowed_html('post');
             self::$allowed_html_form = apply_filters('lsd_kses_tags', $allowed, 'form');
@@ -109,7 +113,7 @@ class LSD_Kses extends LSD_Base
 
     public static function element($html): string
     {
-        if(is_null(self::$allowed_html_element))
+        if (is_null(self::$allowed_html_element))
         {
             $allowed = wp_kses_allowed_html('post');
             self::$allowed_html_element = apply_filters('lsd_kses_tags', $allowed, 'element');
@@ -125,7 +129,7 @@ class LSD_Kses extends LSD_Base
      */
     public static function rich($html): string
     {
-        if(is_null(self::$allowed_html_rich))
+        if (is_null(self::$allowed_html_rich))
         {
             $allowed = wp_kses_allowed_html('post');
             self::$allowed_html_rich = apply_filters('lsd_kses_tags', $allowed, 'rich');
@@ -141,7 +145,7 @@ class LSD_Kses extends LSD_Base
      */
     public static function embed($html): string
     {
-        if(is_null(self::$allowed_html_embed))
+        if (is_null(self::$allowed_html_embed))
         {
             self::$allowed_html_embed = apply_filters('lsd_kses_tags', [], 'embed');
         }
@@ -157,7 +161,7 @@ class LSD_Kses extends LSD_Base
      */
     public static function full($html): string
     {
-        if(is_null(self::$allowed_html_full))
+        if (is_null(self::$allowed_html_full))
         {
             $allowed = wp_kses_allowed_html('post');
             self::$allowed_html_full = apply_filters('lsd_kses_tags', $allowed, 'full');
@@ -168,13 +172,13 @@ class LSD_Kses extends LSD_Base
 
     public function styles($styles)
     {
-        if(!in_array('display', $styles)) $styles[] = 'display';
+        if (!in_array('display', $styles)) $styles[] = 'display';
         return $styles;
     }
 
     public static function tags($tags, $context)
     {
-        if(in_array($context, ['form', 'page', 'full']))
+        if (in_array($context, ['form', 'page', 'full']))
         {
             $tags['form'] = self::$allowed_attrs;
             $tags['label'] = self::$allowed_attrs;
@@ -187,25 +191,24 @@ class LSD_Kses extends LSD_Base
             $tags['fieldset'] = self::$allowed_attrs;
             $tags['output'] = self::$allowed_attrs;
             $tags['svg'] = self::$allowed_attrs;
+            $tags['polygon'] = self::$allowed_attrs;
             $tags['path'] = self::$allowed_attrs;
         }
 
-        if(in_array($context, ['embed', 'rich', 'full']))
+        if (in_array($context, ['embed', 'rich', 'full']))
         {
-            if(!isset($tags['iframe'])) $tags['iframe'] = self::$allowed_attrs;
+            if (!isset($tags['iframe'])) $tags['iframe'] = self::$allowed_attrs;
         }
 
-        if($context === 'full')
+        if ($context === 'full')
         {
-            if(!isset($tags['style'])) $tags['style'] = self::$allowed_attrs;
-            if(!isset($tags['script'])) $tags['script'] = self::$allowed_attrs;
+            if (!isset($tags['style'])) $tags['style'] = self::$allowed_attrs;
+            if (!isset($tags['script'])) $tags['script'] = self::$allowed_attrs;
         }
 
         // Add Schema Attributes
-        if(LSD_Base::isPro()) foreach($tags as $tag => $attr) $tags[$tag] = array_merge($attr, self::$schema_attr);
+        if (LSD_Base::isPro()) foreach ($tags as $tag => $attr) $tags[$tag] = array_merge($attr, self::$schema_attr);
 
         return $tags;
     }
 }
-
-endif;

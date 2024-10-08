@@ -2,42 +2,40 @@
 // no direct access
 defined('ABSPATH') || die();
 
-if(!class_exists('LSD_Query')):
-
 /**
  * Listdom Query Class.
  *
  * @class LSD_Query
- * @version	1.0.0
+ * @version    1.0.0
  */
 class LSD_Query extends LSD_Base
 {
     /**
-	 * Constructor method
-	 */
-	public function __construct()
+     * Constructor method
+     */
+    public function __construct()
     {
         parent::__construct();
-	}
+    }
 
     public static function attribute($key, $value)
     {
         list($id, $type) = explode('-', $key);
 
-        if($id == 'address') $field = 'lsd_address';
-        elseif($id == 'price') $field = 'lsd_price';
-        elseif($id == 'class') $field = 'lsd_price_class';
-        else $field = 'lsd_attribute_'.$id;
+        if ($id == 'address') $field = 'lsd_address';
+        else if ($id == 'price') $field = 'lsd_price';
+        else if ($id == 'class') $field = 'lsd_price_class';
+        else $field = 'lsd_attribute_' . $id;
 
         $query = [];
-        switch($type)
+        switch ($type)
         {
             case 'eq':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
-                    'compare' => '='
+                    'key' => $field,
+                    'value' => $value,
+                    'compare' => '=',
                 ];
 
                 break;
@@ -45,9 +43,9 @@ class LSD_Query extends LSD_Base
             case 'neq':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
-                    'compare' => '!='
+                    'key' => $field,
+                    'value' => $value,
+                    'compare' => '!=',
                 ];
 
                 break;
@@ -55,10 +53,10 @@ class LSD_Query extends LSD_Base
             case 'gr':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
+                    'key' => $field,
+                    'value' => $value,
                     'compare' => '>',
-                    'type' => 'NUMERIC'
+                    'type' => 'NUMERIC',
                 ];
 
                 break;
@@ -66,10 +64,10 @@ class LSD_Query extends LSD_Base
             case 'grq':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
+                    'key' => $field,
+                    'value' => $value,
                     'compare' => '>=',
-                    'type' => 'NUMERIC'
+                    'type' => 'NUMERIC',
                 ];
 
                 break;
@@ -77,10 +75,10 @@ class LSD_Query extends LSD_Base
             case 'lw':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
+                    'key' => $field,
+                    'value' => $value,
                     'compare' => '<',
-                    'type' => 'NUMERIC'
+                    'type' => 'NUMERIC',
                 ];
 
                 break;
@@ -88,10 +86,10 @@ class LSD_Query extends LSD_Base
             case 'lwq':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
+                    'key' => $field,
+                    'value' => $value,
                     'compare' => '<=',
-                    'type' => 'NUMERIC'
+                    'type' => 'NUMERIC',
                 ];
 
                 break;
@@ -99,9 +97,9 @@ class LSD_Query extends LSD_Base
             case 'lk':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
-                    'compare' => 'LIKE'
+                    'key' => $field,
+                    'value' => $value,
+                    'compare' => 'LIKE',
                 ];
 
                 break;
@@ -109,9 +107,9 @@ class LSD_Query extends LSD_Base
             case 'nlk':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
-                    'compare' => 'NOT LIKE'
+                    'key' => $field,
+                    'value' => $value,
+                    'compare' => 'NOT LIKE',
                 ];
 
                 break;
@@ -119,12 +117,12 @@ class LSD_Query extends LSD_Base
             case 'in':
 
                 // Force to Array
-                if(!is_array($value)) $value = [$value];
+                if (!is_array($value)) $value = [$value];
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
-                    'compare' => 'IN'
+                    'key' => $field,
+                    'value' => $value,
+                    'compare' => 'IN',
                 ];
 
                 break;
@@ -132,12 +130,12 @@ class LSD_Query extends LSD_Base
             case 'nin':
 
                 // Force to Array
-                if(!is_array($value)) $value = [$value];
+                if (!is_array($value)) $value = [$value];
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => $value,
-                    'compare' => 'NOT IN'
+                    'key' => $field,
+                    'value' => $value,
+                    'compare' => 'NOT IN',
                 ];
 
                 break;
@@ -145,10 +143,10 @@ class LSD_Query extends LSD_Base
             case 'bt':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => explode(':', $value),
+                    'key' => $field,
+                    'value' => explode(':', $value),
                     'type' => 'NUMERIC',
-                    'compare' => 'BETWEEN'
+                    'compare' => 'BETWEEN',
                 ];
 
                 break;
@@ -156,9 +154,9 @@ class LSD_Query extends LSD_Base
             case 'nbt':
 
                 $query = [
-                    'key'     => $field,
-                    'value'   => explode(':', $value),
-                    'compare' => 'NOT BETWEEN'
+                    'key' => $field,
+                    'value' => explode(':', $value),
+                    'compare' => 'NOT BETWEEN',
                 ];
 
                 break;
@@ -166,8 +164,8 @@ class LSD_Query extends LSD_Base
             case 'ex':
 
                 $query = [
-                    'key'     => $field,
-                    'compare' => 'EXISTS'
+                    'key' => $field,
+                    'compare' => 'EXISTS',
                 ];
 
                 break;
@@ -175,8 +173,8 @@ class LSD_Query extends LSD_Base
             case 'nex':
 
                 $query = [
-                    'key'     => $field,
-                    'compare' => 'NOT EXISTS'
+                    'key' => $field,
+                    'compare' => 'NOT EXISTS',
                 ];
 
                 break;
@@ -185,5 +183,3 @@ class LSD_Query extends LSD_Base
         return count($query) ? $query : false;
     }
 }
-
-endif;
