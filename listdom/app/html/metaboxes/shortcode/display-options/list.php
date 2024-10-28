@@ -340,7 +340,7 @@ $missAddonMessages = [];
         ]); ?>
     </div>
 </div>
-<div class="lsd-form-group lsd-form-row-map-needed <?php echo ((isset($list['map_provider']) and $list['map_provider']) ? '' : 'lsd-util-hide'); ?>" id="lsd_display_options_skin_list_map_options">
+<div class="lsd-form-group lsd-form-row-map-needed <?php echo isset($list['map_provider']) && $list['map_provider'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_list_map_options">
     <div class="lsd-form-row">
         <div class="lsd-col-2"><?php echo LSD_Form::label([
             'title' => esc_html__('Position', 'listdom'),

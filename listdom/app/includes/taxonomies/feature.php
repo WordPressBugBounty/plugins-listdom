@@ -92,7 +92,6 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
             <?php echo LSD_Form::text([
                 'name' => 'lsd_itemprop',
                 'id' => 'lsd_itemprop',
-                'value' => '',
                 'placeholder' => 'additionalProperty',
             ]); ?>
             <p class="description"><?php esc_html_e("Schema Item Property (https://schema.org/)", 'listdom'); ?></p>
@@ -144,7 +143,7 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
         if (!isset($_POST['lsd_icon'])) return;
 
         $icon = sanitize_text_field($_POST['lsd_icon']);
-        $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? esc_url_raw($_POST['lsd_itemprop']) : '';
+        $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? sanitize_text_field($_POST['lsd_itemprop']) : '';
 
         update_term_meta($term_id, 'lsd_icon', $icon);
         update_term_meta($term_id, 'lsd_itemprop', $itemprop);

@@ -55,7 +55,7 @@ jQuery(document).ready(function()
 {
     listdom_add_googlemaps_callbacks(function()
     {
-        var lsdMap = jQuery("#lsd_map'.$id.'").listdomGoogleMaps(
+        const lsdMap = jQuery("#lsd_map'.$id.'").listdomGoogleMaps(
         {
             latitude: "'.$latitude.'",
             longitude: "'.$longitude.'",
@@ -66,7 +66,7 @@ jQuery(document).ready(function()
             args: "'.http_build_query(['args'=>$args], '', '&').'",
             richmarker: "'.$assets->lsd_asset_url('packages/richmarker/richmarker.min.js').'",
             infobox: "'.$assets->lsd_asset_url('js/infobox.min.js').'",
-            clustering: '.((isset($args['clustering']) && $args['clustering']) ? '"'.$assets->lsd_asset_url('packages/clusterer/markerclusterer.min.js').'"' : 'false').',
+            clustering: '.(isset($args['clustering']) && $args['clustering'] ? '"'.$assets->lsd_asset_url('packages/clusterer/markerclusterer.min.js').'"' : 'false').',
             clustering_images: "'.$assets->lsd_asset_url(isset($args['clustering_images']) && trim($args['clustering_images']) ? $args['clustering_images'] : 'img/cluster1/m').'",
             styles: '.(trim($style) != '' ? $assets->get_googlemap_style($style) : "''").',
             mapcontrols: '.json_encode($mapcontrols, JSON_NUMERIC_CHECK).',
@@ -91,8 +91,8 @@ jQuery(document).ready(function()
                 status: '.($direction ? 'true' : 'false').',
                 destination:
                 {
-                    latitude: "'.((isset($objects[0]['latitude'])) ? $objects[0]['latitude'] : 0).'",
-                    longitude: "'.((isset($objects[0]['longitude'])) ? $objects[0]['longitude'] : 0).'",
+                    latitude: "'.($objects[0]['latitude'] ?? 0).'",
+                    longitude: "'.($objects[0]['longitude'] ?? 0).'",
                 },
                 start_marker: "'.apply_filters('lsd_direction_start_icon', $assets->lsd_asset_url('img/markers/green.png')).'",
                 end_marker: "'.apply_filters('lsd_direction_end_icon', $assets->lsd_asset_url('img/markers/red.png')).'"

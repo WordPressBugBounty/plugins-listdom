@@ -147,7 +147,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
                 <?php echo LSD_Form::url([
                     'name' => 'lsd_schema',
                     'id' => 'lsd_schema',
-                    'value' => 'https://schema.org/LocalBusiness',
+                    'value' => '',
                     'placeholder' => 'https://schema.org/LocalBusiness',
                 ]); ?>
                 <p class="description"><?php esc_html_e("Schema Item Type (https://schema.org/)", 'listdom'); ?></p>

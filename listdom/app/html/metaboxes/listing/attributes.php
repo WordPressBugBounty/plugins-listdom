@@ -51,20 +51,26 @@ if(!is_array($raw)) $raw = [];
             </div>
             <?php endif; ?>
             <div class="lsd-col-<?php echo ($type != 'separator' ? '9' : '12'); ?>">
-                <?php
+                <?php $data_required = $required ? 1 : 0;
                     if($type == 'dropdown') echo LSD_Form::select([
                         'id'=>'lsd_listing_attributes'.$attribute->term_id,
                         'options'=>$options,
                         'name'=>'lsd[attributes]['.$attribute->term_id.']',
                         'required'=>$required,
-                        'value'=>get_post_meta($post->ID, 'lsd_attribute_'.$attribute->term_id, true)
+                        'value'=>get_post_meta($post->ID, 'lsd_attribute_'.$attribute->term_id, true),
+                        'attributes' => [
+                            'data-required' => $data_required
+                        ]
                     ]);
                     elseif($type == 'textarea' and !$editor) echo LSD_Form::textarea([
                         'id'=>'lsd_listing_attributes'.$attribute->term_id,
                         'name'=>'lsd[attributes]['.$attribute->term_id.']',
                         'required'=>$required,
                         'rows'=>8,
-                        'value'=>get_post_meta($post->ID, 'lsd_attribute_'.$attribute->term_id, true)
+                        'value'=>get_post_meta($post->ID, 'lsd_attribute_'.$attribute->term_id, true),
+                        'attributes' => [
+                            'data-required' => $data_required
+                        ]
                     ]);
                     elseif($type == 'textarea' and $editor) echo LSD_Form::editor([
                         'id'=>'lsd_listing_attributes'.$attribute->term_id,
@@ -79,7 +85,10 @@ if(!is_array($raw)) $raw = [];
                         'id'=>'lsd_listing_attributes'.$attribute->term_id,
                         'name'=>'lsd[attributes]['.$attribute->term_id.']',
                         'required'=>$required,
-                        'value'=>get_post_meta($post->ID, 'lsd_attribute_'.$attribute->term_id, true)
+                        'value'=>get_post_meta($post->ID, 'lsd_attribute_'.$attribute->term_id, true),
+                        'attributes' => [
+                            'data-required' => $data_required
+                        ]
                     ], $type);
                 ?>
             </div>

@@ -50,8 +50,8 @@ $th_separator = $data['th_separator'] ?? 1;
             <div class="lsd-search-field-param">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_method"><?php esc_html_e('Method', 'listdom'); ?></label>
                 <select class="widefat lsd-search-method" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][method]" title="<?php esc_attr_e('Display Method', 'listdom'); ?>">
-                    <?php foreach($methods as $method=>$method_title): ?>
-                    <option value="<?php echo esc_attr($method); ?>" <?php echo ((isset($data['method']) and $data['method'] == $method) ? 'selected="selected"' : ''); ?>><?php echo esc_html($method_title); ?></option>
+                    <?php foreach($methods as $method => $method_title): ?>
+                    <option value="<?php echo esc_attr($method); ?>" <?php echo isset($data['method']) && $data['method'] === $method ? 'selected="selected"' : ''; ?>><?php echo esc_html($method_title); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

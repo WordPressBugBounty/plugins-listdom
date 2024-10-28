@@ -104,8 +104,8 @@ class LSD_Widgets_Alllistings extends WP_Widget
         echo '<p class="lsd-widget-row lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
             <label for="' . $this->get_field_id('clustering') . '">' . esc_html__('Clustering', 'listdom') . '</label>
             <select class="widefat" id="' . $this->get_field_id('clustering') . '" name="' . $this->get_field_name('clustering') . '">
-                <option value="1" ' . ((isset($instance['clustering']) and $instance['clustering'] == '1') ? 'selected="selected"' : '') . '>' . esc_html__('Enabled', 'listdom') . '</option>
-                <option value="0" ' . ((isset($instance['clustering']) and $instance['clustering'] == '0') ? 'selected="selected"' : '') . '>' . esc_html__('Disabled', 'listdom') . '</option>
+                <option value="1" ' . (isset($instance['clustering']) && $instance['clustering'] == '1' ? 'selected="selected"' : '') . '>' . esc_html__('Enabled', 'listdom') . '</option>
+                <option value="0" ' . (isset($instance['clustering']) && $instance['clustering'] == '0' ? 'selected="selected"' : '') . '>' . esc_html__('Disabled', 'listdom') . '</option>
             </select>
         </p>';
 

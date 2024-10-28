@@ -585,7 +585,7 @@ class LSD_Base
         foreach ($terms as $term)
         {
             $output .= '<li>';
-            $output .= '<input type="checkbox" name="' . esc_attr($name) . '[' . esc_attr($term->term_id) . ']" id="lsd_categories_' . esc_attr($id_prefix . $term->term_id) . '" value="1" ' . ((isset($current[$term->term_id]) and $current[$term->term_id]) ? 'checked="checked"' : '') . '><label for="lsd_categories_' . esc_attr($id_prefix . $term->term_id) . '">' . esc_html($term->name) . '</label>';
+            $output .= '<input type="checkbox" name="' . esc_attr($name) . '[' . esc_attr($term->term_id) . ']" id="lsd_categories_' . esc_attr($id_prefix . $term->term_id) . '" value="1" ' . (isset($current[$term->term_id]) && $current[$term->term_id] ? 'checked="checked"' : '') . '><label for="lsd_categories_' . esc_attr($id_prefix . $term->term_id) . '">' . esc_html($term->name) . '</label>';
 
             $children = get_term_children($term->term_id, $taxonomy);
             if (is_array($children) and count($children))
@@ -755,7 +755,7 @@ class LSD_Base
 
         $thousand_separator = ',';
         $decimal_separator = '.';
-        $currency_sign_position = ((isset($settings['currency_position']) and trim($settings['currency_position'])) ? $settings['currency_position'] : 'before');
+        $currency_sign_position = isset($settings['currency_position']) && trim($settings['currency_position']) ? $settings['currency_position'] : 'before';
 
         // Force to double
         if (is_string($price)) $price = (double) $price;
@@ -1978,5 +1978,17 @@ class LSD_Base
         {
             return lsd_template('empty.php');
         });
+    }
+
+    public static function remove_protocols(string $url = ''): string
+    {
+        // Remove Protocols
+        $url = str_replace('http://', '', $url);
+        $url = str_replace('https://', '', $url);
+        $url = str_replace('tel:', '', $url);
+        $url = str_replace('mailto:', '', $url);
+
+        // Return
+        return trim($url, '/ ');
     }
 }

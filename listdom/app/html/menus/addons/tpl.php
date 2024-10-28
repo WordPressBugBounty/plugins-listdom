@@ -20,11 +20,11 @@ $addons = $this->get();
         <div class="lsd-grid lsd-g-3-columns">
             <?php foreach($addons as $addon): ?>
             <?php
-                $basename = ((isset($addon->basename) and trim($addon->basename)) ? $addon->basename : null);
+                $basename = isset($addon->basename) && trim($addon->basename) ? $addon->basename : null;
                 if(!$basename) continue;
 
                 $installed = is_plugin_active($basename);
-                $recommended = (isset($addon->recommended) and $addon->recommended);
+                $recommended = isset($addon->recommended) && $addon->recommended;
 
                 $classes = ($recommended ? 'lsd-addons-recommended ' : '').($installed ? 'lsd-addons-installed ' : '');
                 $description = strlen($addon->promotional) > 192 ? substr($addon->promotional, 0, 192).' ...' : $addon->promotional;

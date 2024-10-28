@@ -98,7 +98,7 @@ class LSD_Skins extends LSD_Base
     public function start($atts)
     {
         $this->atts = apply_filters('lsd_skins_atts', $atts);
-        $this->id = LSD_id::get((isset($this->atts['id']) ? sanitize_text_field($this->atts['id']) : mt_rand(100, 999)));
+        $this->id = LSD_id::get(isset($this->atts['id']) ? sanitize_text_field($this->atts['id']) : mt_rand(100, 999));
 
         // Skin Options
         $this->skin_options = $this->atts['lsd_display'][$this->skin] ?? [];

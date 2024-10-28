@@ -17,7 +17,6 @@ foreach(get_page_templates() as $label => $tpl) $templates[$tpl] = $label;
 
 // Dynamic Style
 $box_method = $details_page['builder']['box_method'] ?? '1';
-$title_align = $details_page['builder']['title_align'] ?? 'center';
 
 $head1_elements = $details_page['builder']['head1']['elements'] ?? [];
 $head2_elements = $details_page['builder']['head2']['elements'] ?? [];
@@ -287,18 +286,6 @@ $sections = [
                             </select>
                         </div>
                     </div>
-                    <div class="lsd-form-row lsd-mb-4">
-                        <div class="lsd-col-2 lsd-flex lsd-flex-content-end lsd-flex-align-items-center">
-                            <label for="lsd-dynamic-title-align"><?php echo esc_html__('Title Alignment', 'listdom'); ?></label>
-                        </div>
-                        <div class="lsd-col-2">
-                            <select class="lsd-mt-2" name="lsd[builder][title_align]" id="lsd-dynamic-title-align">
-                                <option value="left" <?php echo $title_align === 'left' ? 'selected' : ''; ?>><?php esc_html_e('Left', 'listdom'); ?></option>
-                                <option value="center" <?php echo $title_align === 'center' ? 'selected' : ''; ?>><?php esc_html_e('Center', 'listdom'); ?></option>
-                                <option value="right" <?php echo $title_align === 'right' ? 'selected' : ''; ?>><?php esc_html_e('Right', 'listdom'); ?></option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="lsd-alert lsd-info">
                         <ul class="lsd-unordered lsd-m-0 lsd-ml-4">
                             <li><?php esc_html_e("You don't need to use all the sections. Use the sections that fit the design you want to create. To disable a section, simply leave all elements unchecked.", 'listdom'); ?></li>
@@ -345,8 +332,8 @@ $sections = [
                     'class' => 'button button-hero button-primary'
 				]); ?>
                 <div>
-                    <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e("Options saved successfully.", 'listdom'); ?></p>
-                    <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e("Error: Unable to save options.", 'listdom'); ?></p>
+                    <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
+                    <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
                 </div>
 			</div>
         </div>
@@ -364,10 +351,14 @@ jQuery('#lsd_settings_form').on('submit', function(e)
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
-    $success.addClass('lsd-util-hide');
-    $error.addClass('lsd-util-hide');
 
-    const settings = jQuery("#lsd_settings_form").serialize();
+    // Loading Wrapper
+    const loading = (new ListdomLoadingWrapper());
+
+    // Loading
+    loading.start();
+
+    const settings = jQuery(this).serialize();
     jQuery.ajax(
     {
         type: "POST",
@@ -377,13 +368,17 @@ jQuery('#lsd_settings_form').on('submit', function(e)
         {
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
-            $success.removeClass('lsd-util-hide');
+
+            // Unloading
+            loading.stop($success, 2000);
         },
         error: function()
         {
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
-            $error.removeClass('lsd-util-hide');
+
+            // Unloading
+            loading.stop($error, 2000);
         }
     });
 });

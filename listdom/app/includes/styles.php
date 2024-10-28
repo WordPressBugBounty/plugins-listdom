@@ -139,4 +139,12 @@ class LSD_Styles extends LSD_Base
             'dynamic' => esc_html__('Design Builder', 'listdom'),
         ], 'details');
     }
+
+    public static function infowindow()
+    {
+        return LSD_Styles::filter([
+            'style1' => esc_html__('Style 1', 'listdom'),
+            'style2' => esc_html__('Style 2', 'listdom'),
+        ], 'infowindow');
+    }
 }

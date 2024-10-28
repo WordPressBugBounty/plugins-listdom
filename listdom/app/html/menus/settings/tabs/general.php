@@ -364,7 +364,7 @@ $settings = LSD_Options::settings();
             <h3 class="lsd-mb-4 lsd-mt-0"><?php esc_html_e('Configuration', 'listdom'); ?></h3>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Page', 'listdom'),
+                    'title' => esc_html__('Dashboard Page', 'listdom'),
                     'for' => 'lsd_settings_submission_page',
                 ]); ?></div>
                 <div class="lsd-col-4">
@@ -377,6 +377,39 @@ $settings = LSD_Options::settings();
                     <p class="description"><?php echo sprintf(esc_html__("Put %s shortcode into the page.", 'listdom'), '<code>[listdom-dashboard]</code>'); ?></p>
                 </div>
             </div>
+
+            <?php if($this->isPro()): ?>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Independent Add Listing Form', 'listdom'),
+                        'for' => 'lsd_settings_add_listing_page_status',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::switcher([
+                            'id' => 'lsd_settings_add_listing_page_status',
+                            'value' => $settings['add_listing_page_status'] ?? 0,
+                            'name' => 'lsd[add_listing_page_status]',
+                            'toggle' => '#lsd_settings_add_listing_page_status_options'
+                        ]); ?>
+                        <p class="description"><?php esc_html_e("Enable to have a independent add listing page ", 'listdom'); ?></p>
+                    </div>
+                </div>
+                <div id="lsd_settings_add_listing_page_status_options" class="lsd-form-row  <?php echo ((isset($settings['add_listing_page_status']) and $settings['add_listing_page_status']) ? '' : 'lsd-util-hide'); ?>">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Add Listing Page', 'listdom'),
+                        'for' => 'lsd_settings_add_listing_page',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::pages([
+                            'id' => 'lsd_settings_add_listing_page',
+                            'value' => $settings['add_listing_page'] ?? null,
+                            'name' => 'lsd[add_listing_page]',
+                            'show_empty' => true,
+                        ]); ?>
+                        <p class="description"><?php echo sprintf(esc_html__("Put %s shortcode into the page.", 'listdom'), '<code>[listdom-add-listing]</code>'); ?></p>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php foreach([
                 LSD_Base::TAX_LOCATION => esc_html__('Locations'),
@@ -435,7 +468,7 @@ $settings = LSD_Options::settings();
                     <p class="description lsd-mb-2"><?php esc_html_e("Enable listing submission for guest users!", 'listdom'); ?></p>
                 </div>
             </div>
-            <div id="lsd_settings_submission_guest_options" class="lsd-mt-3 <?php echo ((isset($settings['submission_guest']) and $settings['submission_guest']) ? '' : 'lsd-util-hide'); ?>">
+            <div id="lsd_settings_submission_guest_options" class="lsd-mt-3 <?php echo isset($settings['submission_guest']) && $settings['submission_guest'] ? '' : 'lsd-util-hide'; ?>">
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
                         'title' => esc_html__('User Registration', 'listdom'),
@@ -462,9 +495,9 @@ $settings = LSD_Options::settings();
                     <ul class="lsd-boxed-list">
                         <?php foreach($dashboard->fields() as $f => $field): ?>
                         <li class="lsd-d-inline-block">
-                            <label class="<?php echo ((isset($field['always_enabled']) and $field['always_enabled']) ? 'lsd-always-enabled' : ''); ?>">
+                            <label class="<?php echo isset($field['always_enabled']) && $field['always_enabled'] ? 'lsd-always-enabled' : ''; ?>">
                                 <input type="hidden" name="lsd[submission_fields][<?php echo esc_attr($f); ?>][required]" value="0">
-                                <input type="checkbox" name="lsd[submission_fields][<?php echo esc_attr($f); ?>][required]" value="1" <?php echo (((isset($settings['submission_fields']) and isset($settings['submission_fields'][$f]) and $settings['submission_fields'][$f]['required'] == 1) or (isset($field['always_enabled']) and $field['always_enabled'])) ? 'checked' : ''); ?> <?php echo ((isset($field['always_enabled']) and $field['always_enabled']) ? 'disabled' : ''); ?>>
+                                <input type="checkbox" name="lsd[submission_fields][<?php echo esc_attr($f); ?>][required]" value="1" <?php echo (isset($settings['submission_fields'][$f]) && $settings['submission_fields'][$f]['required'] == 1) || (isset($field['always_enabled']) && $field['always_enabled']) ? 'checked' : ''; ?> <?php echo isset($field['always_enabled']) && $field['always_enabled'] ? 'disabled' : ''; ?>>
                                 <?php echo esc_html($field['label']); ?>
                             </label>
                         </li>
@@ -555,11 +588,11 @@ $settings = LSD_Options::settings();
                 ]); ?></div>
                 <div class="lsd-col-4">
                     <div class="lsd-radio-toggle lsd-mb-1">
-                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="1" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_1" <?php echo ((isset($settings['submission_module']) and isset($settings['submission_module'][$module['key']]) and $settings['submission_module'][$module['key']] == 1) ? 'checked="checked"' : ''); ?>>
+                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="1" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_1" <?php echo isset($settings['submission_module'][$module['key']]) && $settings['submission_module'][$module['key']] == 1 ? 'checked="checked"' : ''; ?>>
                         <label for="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_1"><?php esc_html_e('Enabled', 'listdom'); ?></label>
-                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="2" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_2" <?php echo ((isset($settings['submission_module']) and isset($settings['submission_module'][$module['key']]) and $settings['submission_module'][$module['key']] == 2) ? 'checked="checked"' : ''); ?>>
+                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="2" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_2" <?php echo isset($settings['submission_module'][$module['key']]) && $settings['submission_module'][$module['key']] == 2 ? 'checked="checked"' : ''; ?>>
                         <label for="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_2"><?php esc_html_e('Editor + Admin', 'listdom'); ?></label>
-                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="0" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_0" <?php echo ((isset($settings['submission_module']) and (!isset($settings['submission_module'][$module['key']]) or !$settings['submission_module'][$module['key']])) ? 'checked="checked"' : ''); ?>>
+                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="0" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_0" <?php echo isset($settings['submission_module']) && (!isset($settings['submission_module'][$module['key']]) || !$settings['submission_module'][$module['key']]) ? 'checked="checked"' : ''; ?>>
                         <label for="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_0"><?php esc_html_e('Disabled', 'listdom'); ?></label>
                     </div>
                 </div>
@@ -682,7 +715,7 @@ $settings = LSD_Options::settings();
                     <p class="description"><?php esc_html_e("Protect Listdom forms against spammer robots using Google reCAPTCHA V2.", 'listdom'); ?></p>
                 </div>
             </div>
-            <div id="lsd_settings_grecaptcha_options" <?php echo ((isset($settings['grecaptcha_status']) and $settings['grecaptcha_status']) ? '' : 'style="display: none;"'); ?>>
+            <div id="lsd_settings_grecaptcha_options" <?php echo isset($settings['grecaptcha_status']) && $settings['grecaptcha_status'] ? '' : 'style="display: none;"'; ?>>
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
                         'title' => esc_html__('Site Key', 'listdom'),
@@ -753,16 +786,15 @@ $settings = LSD_Options::settings();
                     'class' => 'button button-hero button-primary',
 				]); ?>
                 <div>
-                    <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e("Options saved successfully.", 'listdom'); ?></p>
-                    <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e("Error: Unable to save options.", 'listdom'); ?></p>
+                    <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
+                    <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
                 </div>
 			</div>
         </div>
     </form>
 </div>
 <script>
-jQuery('#lsd_settings_form').on('submit', function(e)
-{
+jQuery('#lsd_settings_form').on('submit', function(e) {
     e.preventDefault();
 
     // Elements
@@ -772,10 +804,14 @@ jQuery('#lsd_settings_form').on('submit', function(e)
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
-    $success.addClass('lsd-util-hide');
-    $error.addClass('lsd-util-hide');
 
-    const settings = jQuery("#lsd_settings_form").serialize();
+    // Loading Wrapper
+    const loading = (new ListdomLoadingWrapper());
+
+    // Loading
+    loading.start();
+
+    const settings = jQuery(this).serialize();
     jQuery.ajax(
     {
         type: "POST",
@@ -785,13 +821,17 @@ jQuery('#lsd_settings_form').on('submit', function(e)
         {
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
-            $success.removeClass('lsd-util-hide');
+
+            // Unloading
+            loading.stop($success, 2000);
         },
         error: function()
         {
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
-            $error.removeClass('lsd-util-hide');
+
+            // Unloading
+            loading.stop($error, 2000);
         }
     });
 });

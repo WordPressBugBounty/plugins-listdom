@@ -66,8 +66,8 @@ class LSD_Entity_Attribute extends LSD_Base
     public static function schema($term_id)
     {
         $itemprop = get_term_meta($term_id, 'lsd_itemprop', true);
-        if (!trim($itemprop)) return null;
+        if (!trim($itemprop)) return '';
 
-        return lsd_schema()->prop(esc_url($itemprop));
+        return lsd_schema()->prop($itemprop);
     }
 }

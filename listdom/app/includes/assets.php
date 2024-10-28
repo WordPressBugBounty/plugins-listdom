@@ -316,7 +316,7 @@ class LSD_Assets extends LSD_Base
         else $dependencies[] = 'lsd-frontend';
 
         // Enqueue the API
-        wp_enqueue_script('googlemaps', '//maps.googleapis.com/maps/api/js?loading=async&libraries=places,drawing&callback=listdom_googlemaps_callback' . ((isset($settings['googlemaps_api_key']) and trim($settings['googlemaps_api_key'])) ? '&key=' . urlencode($settings['googlemaps_api_key']) : ''), $dependencies);
+        wp_enqueue_script('googlemaps', '//maps.googleapis.com/maps/api/js?loading=async&libraries=places,drawing&callback=listdom_googlemaps_callback' . (isset($settings['googlemaps_api_key']) && trim($settings['googlemaps_api_key']) ? '&key=' . urlencode($settings['googlemaps_api_key']) : ''), $dependencies);
 
         return true;
     }

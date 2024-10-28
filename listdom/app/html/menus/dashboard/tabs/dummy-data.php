@@ -138,8 +138,8 @@ $missFeatureMessages = [];
         </div>
         <div class="lsd-util-hide" id="lsd_success_message">
             <div class="lsd-form-row lsd-mt-3">
-                <div class="lsd-col-12">
-                    <?php echo LSD_Base::alert(esc_html__('Dummy Data imported completely.', 'listdom'), 'success'); ?>
+                <div class="lsd-col-12 ">
+                    <p class="lsd-util-hide lsd-dummy-data-message"><?php esc_html_e("Dummy Data imported completely.", 'listdom'); ?></p>
                 </div>
             </div>
         </div>
@@ -150,13 +150,19 @@ jQuery('#lsd_dummy_data_form').on('submit', function(event)
 {
     event.preventDefault();
 
-    // Hide Message
-    jQuery('#lsd_success_message').addClass('lsd-util-hide');
+    const $alert = jQuery(".lsd-dummy-data-message");
+    const $button = jQuery("#lsd_dummy_data_save_button");
 
     // Add loading Class to the button
-    jQuery("#lsd_dummy_data_save_button").addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
+    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
 
-    const dummy = jQuery("#lsd_dummy_data_form").serialize();
+    // Loading Wrapper
+    const loading = (new ListdomLoadingWrapper());
+
+    // Loading
+    loading.start();
+
+    const dummy = jQuery(this).serialize();
     jQuery.ajax(
     {
         type: "POST",
@@ -164,16 +170,22 @@ jQuery('#lsd_dummy_data_form').on('submit', function(event)
         data: "action=lsd_dummy&" + dummy,
         success: function()
         {
-            // Show Message
-            jQuery('#lsd_success_message').removeClass('lsd-util-hide');
+            // hide Message
+            $alert.removeClass('lsd-util-hide');
+
+            // Unloading
+            loading.stop($alert, 2000);
 
             // Remove loading Class from the button
-            jQuery("#lsd_dummy_data_save_button").removeClass('loading').html("<?php echo esc_js(esc_attr__('Import Dummy Data', 'listdom')); ?>");
+            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Import Dummy Data', 'listdom')); ?>");
         },
         error: function()
         {
+            // Unloading
+            loading.stop();
+
             // Remove loading Class from the button
-            jQuery("#lsd_dummy_data_save_button").removeClass('loading').html("<?php echo esc_js(esc_attr__('Import Dummy Data', 'listdom')); ?>");
+            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Import Dummy Data', 'listdom')); ?>");
         }
     });
 });

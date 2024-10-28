@@ -21,6 +21,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     public $listings;
     public $post;
     public $limit;
+    public $form_type;
 
     /**
      * @var WP_Query
@@ -420,11 +421,21 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Create New Listing
         if ($id <= 0)
         {
-            $post = ['post_title' => $post_title, 'post_content' => $post_content, 'post_type' => LSD_Base::PTYPE_LISTING, 'post_status' => $status];
-            $id = wp_insert_post($post);
+            $id = wp_insert_post([
+                'post_title' => $post_title,
+                'post_content' => $post_content,
+                'post_type' => LSD_Base::PTYPE_LISTING,
+                'post_status' => $status
+            ]);
         }
 
-        wp_update_post(['ID' => $id, 'post_title' => $post_title, 'post_content' => $post_content]);
+        // Update Listing
+        wp_update_post([
+            'ID' => $id,
+            'post_title' => $post_title,
+            'post_name' => sanitize_title($post_title),
+            'post_content' => $post_content
+        ]);
 
         // Tags
         if ($this->is_enabled('tags'))

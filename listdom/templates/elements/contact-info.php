@@ -71,7 +71,7 @@ if(!$email && !$phone && !$website && !$contact_address && !$socials) return '';
         <li>
             <strong><i class="lsd-icon fas fa-link"></i></strong>
             <span>
-                <a href="<?php echo esc_url($website); ?>"><?php echo esc_html(trim($website, '/ ')); ?></a>
+                <a href="<?php echo esc_url($website); ?>"><?php echo esc_html(LSD_Base::remove_protocols($website)); ?></a>
             </span>
         </li>
         <?php endif; ?>

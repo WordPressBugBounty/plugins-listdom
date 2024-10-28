@@ -35,7 +35,7 @@ jQuery(document).ready(function()
         <?php if($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module()); ?>
 
         <div class="lsd-masonry-view-listings-wrapper">
-            <div class="lsd-listing-wrapper lsd-row">
+            <div class="lsd-listing-wrapper lsd-columns-<?php echo esc_attr($this->columns); ?>">
                 <?php echo LSD_Kses::full($listings_html); ?>
             </div>
         </div>

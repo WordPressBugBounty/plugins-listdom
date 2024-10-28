@@ -62,7 +62,7 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         $this->hierarchical = isset($this->atts['hierarchical']) && $this->atts['hierarchical'];
 
         // Parent
-        $parent = $this->hierarchical ? ((isset($this->atts['parent']) && trim($this->atts['parent']) != '') ? $this->atts['parent'] : 0) : null;
+        $parent = $this->hierarchical ? (isset($this->atts['parent']) && trim($this->atts['parent']) != '' ? $this->atts['parent'] : 0) : null;
 
         // Terms
         $this->terms = $this->get_terms($parent);

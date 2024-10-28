@@ -108,7 +108,7 @@ $settings = LSD_Options::settings();
                         ]); ?>
                     </div>
                 </div>
-                <div id="lsd_settings_grecaptcha_options" <?php echo((isset($settings['grecaptcha_status']) and $settings['grecaptcha_status']) ? '' : 'style="display: none;"'); ?>>
+                <div id="lsd_settings_grecaptcha_options" <?php echo isset($settings['grecaptcha_status']) && $settings['grecaptcha_status'] ? '' : 'style="display: none;"'; ?>>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Site Key', 'listdom'),
@@ -159,10 +159,11 @@ $settings = LSD_Options::settings();
 jQuery('#lsd_settings_quick_save_button').on('click', function (e)
 {
     e.preventDefault();
+    const $welcomeWizard = jQuery(".lsd-welcome-wizard");
 
     // Loading Styles
-    jQuery(".lsd-welcome-wizard").addClass('lsd-loading');
-    jQuery('head').append('<style>.lsd-loading:after { content: "\\f7d9" !important; }</style>');
+    $welcomeWizard.addClass('lsd-loading-wrapper');
+    jQuery('head').append('<style>.lsd-loading-wrapper:after { content: "\\f7d9" !important; }</style>');
 
     const settings = jQuery("#lsd_quick_settings_form").serialize();
     jQuery.ajax(
@@ -173,13 +174,13 @@ jQuery('#lsd_settings_quick_save_button').on('click', function (e)
         success: function ()
         {
             // Loading Styles
-            jQuery(".lsd-welcome-wizard").removeClass('lsd-loading');
+            $welcomeWizard.removeClass('lsd-loading-wrapper');
             handleStepNavigation(3);
         },
         error: function ()
         {
             // Loading Styles
-            jQuery(".lsd-welcome-wizard").removeClass('lsd-loading');
+            $welcomeWizard.removeClass('lsd-loading-wrapper');
         }
     });
 });

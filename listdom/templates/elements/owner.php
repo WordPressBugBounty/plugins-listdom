@@ -95,7 +95,7 @@ $current_id = get_current_user_id();
                 <?php if($display_website && isset($user['lsd_website'][0]) && trim($user['lsd_website'][0])): ?>
                 <div class="lsd-owner-website" title="<?php esc_attr_e('Website', 'listdom'); ?>">
                     <i class="lsd-icon fas fa-link"></i>
-                    <a href="<?php echo esc_url($user['lsd_website'][0]); ?>"><?php echo esc_html($user['lsd_website'][0]); ?></a>
+                    <a href="<?php echo esc_url($user['lsd_website'][0]); ?>"><?php echo esc_html(LSD_Base::remove_protocols($user['lsd_website'][0])); ?></a>
                 </div>
                 <?php endif; ?>
 

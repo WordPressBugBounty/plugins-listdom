@@ -5,10 +5,7 @@ defined('ABSPATH') || die();
 /** @var LSD_Skins_Side $this */
 
 $ids = $this->listings;
-foreach($ids as $id)
-{
-    $listing = new LSD_Entity_Listing($id);
-?>
+foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
 <div
     data-listing-id="<?php echo esc_attr($listing->id()); ?>"
     data-url="<?php echo esc_url(get_the_permalink($listing->id())); ?>"
@@ -59,5 +56,4 @@ foreach($ids as $id)
     </div>
 
 </div>
-<?php
-}
+<?php endforeach;

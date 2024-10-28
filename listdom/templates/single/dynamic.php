@@ -6,8 +6,6 @@ defined('ABSPATH') || die();
 
 // Box Method
 $box_method = $this->details_page_options['builder']['box_method'] ?? '1';
-$title_align = $this->details_page_options['builder']['title_align'] ?? 'center';
-
 $head1_elements = $this->details_page_options['builder']['head1']['elements'] ?? [];
 $head2_elements = $this->details_page_options['builder']['head2']['elements'] ?? [];
 $head3_elements = $this->details_page_options['builder']['head3']['elements'] ?? [];
@@ -39,7 +37,7 @@ $foot2 = $this->section($foot2_elements);
 $foot3 = $this->section($foot3_elements);
 ?>
 <div
-    class="lsd-dynamic-sections lsd-dynamic-box-method-<?php echo sanitize_html_class($box_method); ?> lsd-dynamic-title-align-<?php echo sanitize_html_class($title_align); ?>"
+    class="lsd-dynamic-sections lsd-dynamic-box-method-<?php echo sanitize_html_class($box_method); ?>"
 >
     <?php if(trim($head1) || trim($head2) || trim($head3)): ?>
         <div class="lsd-dynamic-section-header">

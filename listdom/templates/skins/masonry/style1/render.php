@@ -1,19 +1,13 @@
--<?php
+<?php
 // no direct access
 defined('ABSPATH') || die();
 
 /** @var LSD_Skins_Masonry $this */
 
 $ids = $this->listings;
-$open = false;
 ?>
-<?php $i = 3; foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
-
-    <?php if($this->columns && $this->list_view && ($i % $this->columns) == 1): $open = true; ?>
-        <div class="lsd-row">
-    <?php endif; ?>
-
-    <div class="lsd-col-<?php echo ($this->list_view ? 12 : (12 / $this->columns)); ?> <?php echo esc_attr($this->filters_classes($id)); ?>">
+<?php foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
+    <div class="<?php echo esc_attr($this->filters_classes($id)); ?>">
         <div class="lsd-listing<?php if(!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
             <?php if($this->display_image): ?>
             <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
@@ -78,10 +72,4 @@ $open = false;
             </div>
         </div>
     </div>
-
-    <?php if($this->columns && $this->list_view && ($i % $this->columns) == 0): $open = false; ?>
-        </div>
-    <?php endif; ?>
-
-<?php $i++; endforeach; ?>
-<?php /** Close the unclosed Row **/ if($this->columns && $this->list_view && $open) echo '</div>';
+<?php endforeach;

@@ -89,35 +89,35 @@ class LSD_Entity_Listing extends LSD_Entity
         }
 
         // Listing Link
-        update_post_meta($this->post->ID, 'lsd_link', ((isset($data['link']) and filter_var($data['link'], FILTER_VALIDATE_URL)) ? esc_url_raw($data['link']) : ''));
+        update_post_meta($this->post->ID, 'lsd_link', isset($data['link']) && filter_var($data['link'], FILTER_VALIDATE_URL) ? esc_url_raw($data['link']) : '');
 
         // Price Options
-        update_post_meta($this->post->ID, 'lsd_price', (isset($data['price']) ? sanitize_text_field($data['price']) : 0));
-        update_post_meta($this->post->ID, 'lsd_price_max', (isset($data['price_max']) ? sanitize_text_field($data['price_max']) : 0));
-        update_post_meta($this->post->ID, 'lsd_price_after', (isset($data['price_after']) ? sanitize_text_field($data['price_after']) : ''));
-        update_post_meta($this->post->ID, 'lsd_price_class', (isset($data['price_class']) ? sanitize_text_field($data['price_class']) : 2));
-        update_post_meta($this->post->ID, 'lsd_currency', (isset($data['currency']) ? sanitize_text_field($data['currency']) : 'USD'));
+        update_post_meta($this->post->ID, 'lsd_price', isset($data['price']) ? sanitize_text_field($data['price']) : 0);
+        update_post_meta($this->post->ID, 'lsd_price_max', isset($data['price_max']) ? sanitize_text_field($data['price_max']) : 0);
+        update_post_meta($this->post->ID, 'lsd_price_after', isset($data['price_after']) ? sanitize_text_field($data['price_after']) : '');
+        update_post_meta($this->post->ID, 'lsd_price_class', isset($data['price_class']) ? sanitize_text_field($data['price_class']) : 2);
+        update_post_meta($this->post->ID, 'lsd_currency', isset($data['currency']) ? sanitize_text_field($data['currency']) : 'USD');
 
         // Availability
         update_post_meta($this->post->ID, 'lsd_ava', ($data['ava'] ?? []));
 
         // Contact Details
-        update_post_meta($this->post->ID, 'lsd_email', (isset($data['email']) ? sanitize_email($data['email']) : ''));
-        update_post_meta($this->post->ID, 'lsd_phone', (isset($data['phone']) ? sanitize_text_field($data['phone']) : ''));
-        update_post_meta($this->post->ID, 'lsd_website', (isset($data['website']) ? esc_url($data['website']) : ''));
-        update_post_meta($this->post->ID, 'lsd_contact_address', (isset($data['contact_address']) ? sanitize_text_field($data['contact_address']) : ''));
+        update_post_meta($this->post->ID, 'lsd_email', isset($data['email']) ? sanitize_email($data['email']) : '');
+        update_post_meta($this->post->ID, 'lsd_phone', isset($data['phone']) ? sanitize_text_field($data['phone']) : '');
+        update_post_meta($this->post->ID, 'lsd_website', isset($data['website']) ? esc_url($data['website']) : '');
+        update_post_meta($this->post->ID, 'lsd_contact_address', isset($data['contact_address']) ? sanitize_text_field($data['contact_address']) : '');
 
         // Remark
-        update_post_meta($this->post->ID, 'lsd_remark', ($data['remark'] ?? ''));
+        update_post_meta($this->post->ID, 'lsd_remark', $data['remark'] ?? '');
 
         // Display Options
-        update_post_meta($this->post->ID, 'lsd_displ', ($data['displ'] ?? []));
+        update_post_meta($this->post->ID, 'lsd_displ', $data['displ'] ?? []);
 
         // Gallery
-        update_post_meta($this->post->ID, 'lsd_gallery', (isset($data['gallery']) ? array_map('sanitize_text_field', $data['gallery']) : []));
+        update_post_meta($this->post->ID, 'lsd_gallery', isset($data['gallery']) ? array_map('sanitize_text_field', $data['gallery']) : []);
 
         // Embeds
-        update_post_meta($this->post->ID, 'lsd_embeds', ((isset($data['embeds']) and is_array($data['embeds'])) ? $this->indexify($data['embeds']) : []));
+        update_post_meta($this->post->ID, 'lsd_embeds', isset($data['embeds']) && is_array($data['embeds']) ? $this->indexify($data['embeds']) : []);
 
         // Guest Data
         if (isset($data['guest_email']))

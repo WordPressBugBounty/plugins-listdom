@@ -342,7 +342,7 @@ $missAddonMessages = [];
         ]); ?>
     </div>
 </div>
-<div class="lsd-form-group lsd-form-row-map-needed <?php echo ((isset($listgrid['map_provider']) and $listgrid['map_provider']) ? '' : 'lsd-util-hide'); ?>" id="lsd_display_options_skin_listgrid_map_options">
+<div class="lsd-form-group lsd-form-row-map-needed <?php echo isset($listgrid['map_provider']) && $listgrid['map_provider'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_listgrid_map_options">
     <div class="lsd-form-row">
         <div class="lsd-col-2"><?php echo LSD_Form::label([
             'title' => esc_html__('Position', 'listdom'),

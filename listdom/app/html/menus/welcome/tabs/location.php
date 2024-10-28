@@ -132,10 +132,11 @@ jQuery(document).ready(function ($)
 jQuery('#lsd_settings_location_save_button').on('click', function (e)
 {
     e.preventDefault();
+    const $welcomeWizard = jQuery(".lsd-welcome-wizard");
 
     // Loading Styles
-    jQuery(".lsd-welcome-wizard").addClass('lsd-loading');
-    jQuery('head').append('<style>.lsd-loading:after { content: "\\f279" !important; }</style>');
+    $welcomeWizard.addClass('lsd-loading-wrapper');
+    jQuery('head').append('<style>.lsd-loading-wrapper:after { content: "\\f279" !important; }</style>');
 
     const settings = jQuery("#lsd_settings_form").serialize();
     jQuery.ajax(
@@ -146,13 +147,13 @@ jQuery('#lsd_settings_location_save_button').on('click', function (e)
         success: function ()
         {
             // Loading Styles
-            jQuery(".lsd-welcome-wizard").removeClass('lsd-loading');
+            $welcomeWizard.removeClass('lsd-loading-wrapper');
             handleStepNavigation(2);
         },
         error: function ()
         {
             // Loading Styles
-            jQuery(".lsd-welcome-wizard").removeClass('lsd-loading');
+            $welcomeWizard.removeClass('lsd-loading-wrapper');
         }
     });
 });

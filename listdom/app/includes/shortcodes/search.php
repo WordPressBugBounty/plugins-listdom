@@ -280,7 +280,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             // Term is not in the predefined terms
             if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$key])) continue;
 
-            $render .= '<li ' . ((isset($term['children']) && $term['children']) ? ' class="children"' : '') . '>';
+            $render .= '<li ' . (isset($term['children']) && $term['children'] ? ' class="children"' : '') . '>';
 
             if ($render_type === 'checkboxes') $render .= '<label class="lsd-search-checkbox-label"><input type="checkbox" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" value="' . esc_attr($key) . '" ' . (in_array($key, $current) ? 'checked="checked"' : '') . '>' . esc_html($term["name"]) . '</label>';
             if (isset($term['children']) && $term['children']) $render .= $this->field_taxonomy_hierarchy($name, $current, $all_terms, $predefined_terms, $term['children'], $render_type);

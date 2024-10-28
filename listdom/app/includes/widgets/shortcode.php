@@ -71,7 +71,7 @@ class LSD_Widgets_Shortcode extends WP_Widget
                 <label for="' . $this->get_field_id('shortcode_id') . '">' . esc_html__('Shortcode', 'listdom') . '</label>
                 <select class="widefat" name="' . $this->get_field_name('shortcode_id') . '" id="' . $this->get_field_id('shortcode_id') . '"><option value="">-----</option>';
 
-            foreach ($shortcodes as $shortcode) echo '<option value="' . $shortcode->ID . '"' . ((isset($instance['shortcode_id']) and $instance['shortcode_id'] == $shortcode->ID) ? ' selected="selected"' : '') . '>' . $shortcode->post_title . '</option>';
+            foreach ($shortcodes as $shortcode) echo '<option value="' . $shortcode->ID . '"' . (isset($instance['shortcode_id']) && $instance['shortcode_id'] == $shortcode->ID ? ' selected="selected"' : '') . '>' . $shortcode->post_title . '</option>';
 
             echo '</select>
                 <p class="description lsd-p-0">' . esc_html__('Your sidebar / widget area should be wide enough to show the shortcodes correctly. If the sidebar size is not wide then you should not use this widget.', 'listdom') . '</p>

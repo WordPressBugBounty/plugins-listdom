@@ -108,7 +108,7 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
     // Show Alert
     $alert.html(listdom_alertify("<?php echo esc_js(esc_attr__('Please wait ...', 'listdom')); ?>", 'lsd-info'));
 
-    const data = jQuery("#lsd_ix_listdom_import_form").serialize();
+    const data = jQuery(this).serialize();
     jQuery.ajax(
     {
         type: "POST",

@@ -138,11 +138,12 @@ $dummy = LSD_Options::dummy();
 jQuery('#lsd_dummy_data_form').on('submit', function (event)
 {
     event.preventDefault();
+    const $welcomeWizard = jQuery(".lsd-welcome-wizard");
 
-    jQuery(".lsd-welcome-wizard").addClass('lsd-loading');
-    jQuery('head').append('<style>.lsd-loading:after { content: "\\f56e" !important; }</style>');
+    $welcomeWizard.addClass('lsd-loading-wrapper');
+    jQuery('head').append('<style>.lsd-loading-wrapper:after { content: "\\f56e" !important; }</style>');
 
-    const dummy = jQuery("#lsd_dummy_data_form").serialize();
+    const dummy = jQuery(this).serialize();
     jQuery.ajax(
     {
         type: "POST",
@@ -150,12 +151,12 @@ jQuery('#lsd_dummy_data_form').on('submit', function (event)
         data: "action=lsd_dummy&" + dummy,
         success: function ()
         {
-            jQuery(".lsd-welcome-wizard").removeClass('lsd-loading');
+            $welcomeWizard.removeClass('lsd-loading-wrapper');
             handleStepNavigation(4);
         },
         error: function ()
         {
-            jQuery(".lsd-welcome-wizard").removeClass('lsd-loading');
+            $welcomeWizard.removeClass('lsd-loading-wrapper');
         }
     });
 });

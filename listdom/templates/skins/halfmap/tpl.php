@@ -37,7 +37,7 @@ jQuery(document).ready(function()
     </div>
     <?php endif; ?>
 
-    <div class="lsd-row">
+    <div class="lsd-halfmap-view-map-list-wrapper lsd-row">
         <div class="lsd-halfmap-view-map-section-wrapper lsd-col-6">
             <?php echo lsd_map($this->search(['posts_per_page' => $this->map_limit]), [
                 'provider' => $this->map_provider,

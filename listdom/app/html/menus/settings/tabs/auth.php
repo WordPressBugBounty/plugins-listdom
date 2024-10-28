@@ -655,8 +655,8 @@ $auth = LSD_Options::auth();
                     'class' => 'button button-hero button-primary',
                 ]); ?>
                 <div>
-                    <p class="lsd-util-hide lsd-auth-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e("Options saved successfully.", 'listdom'); ?></p>
-                    <p class="lsd-util-hide lsd-auth-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e("Error: Unable to save options.", 'listdom'); ?></p>
+                    <p class="lsd-util-hide lsd-auth-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
+                    <p class="lsd-util-hide lsd-auth-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
                 </div>
             </div>
         </div>
@@ -675,24 +675,34 @@ jQuery('#lsd_auth_form').on('submit', function (e)
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
-    $success.addClass('lsd-util-hide');
-    $error.addClass('lsd-util-hide');
 
-    const auth = jQuery("#lsd_auth_form").serialize();
+    // Loading Wrapper
+    const loading = (new ListdomLoadingWrapper());
+
+    // Loading
+    loading.start();
+
+    const auth = jQuery(this).serialize();
     jQuery.ajax(
     {
         type: "POST",
         url: ajaxurl,
         data: "action=lsd_save_auth&" + auth,
-        success: function () {
+        success: function()
+        {
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
-            $success.removeClass('lsd-util-hide');
+
+            // Unloading
+            loading.stop($success, 2000);
         },
-        error: function () {
+        error: function()
+        {
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
-            $error.removeClass('lsd-util-hide');
+
+            // Unloading
+            loading.stop($error, 2000);
         }
     });
 });

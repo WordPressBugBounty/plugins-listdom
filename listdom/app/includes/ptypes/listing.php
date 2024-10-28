@@ -80,7 +80,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function register_post_type()
     {
-        $supports = apply_filters('lsd_ptype_listing_supports', ['title', 'editor', 'thumbnail', 'author']);
+        $supports = apply_filters('lsd_ptype_listing_supports', ['title', 'editor', 'thumbnail', 'author', 'excerpt']);
         $icon = $this->lsd_asset_url('img/listings-icon.svg');
 
         $args = [

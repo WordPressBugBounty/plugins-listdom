@@ -3,6 +3,45 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v3.6.0 <span>October 27th, 2024</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added a shortcode for an independent "Add Listing" form.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added responsive view support for the "Side by Side" skin.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Introduced support for listing excerpts.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Enabled featured image display in style 3 of listing details.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved the listing contact element.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Refined the settings loader style in the Listdom backend.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Enhanced the structure of "Masonry" and "Halfmap" skins for better performance and usability.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Resolved an issue in the Frontend Dashboard.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Fixed several issues related to listing schema.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Corrected various issues within the search module.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Addressed UI and responsiveness issues across different views.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed certain issues with required attributes in listings editors.', 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v3.5.0 <span>October 6th, 2024</span></h2>
     <ul class="lsd-changelog">
         <li>
@@ -30,7 +69,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('Introduced an option to add the featured image to the gallery element.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-added"><?php esc_html_e('Added the option to hide attribute titles within the attributes element.', 'listdom'); ?></span>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added the option to hide attribute titles within the attributes element.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Introduced a layout option for the features element.', 'listdom'); ?></span>

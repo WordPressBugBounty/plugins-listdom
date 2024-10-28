@@ -39,10 +39,7 @@ $rate_summary = $this->entity->get_rate_stars('summary');
     <div class="lsd-col-12">
         <div class="lsd-full-width-banner-gallery">
             <div class="lsd-single-image-wrapper">
-                <?php
-                    if($gallery) echo LSD_Kses::element($gallery);
-                    elseif($image) echo LSD_Kses::element($image);
-                ?>
+                <?php if($gallery) echo LSD_Kses::element($gallery); ?>
 
                 <?php if($labels || $favorite): ?>
                     <?php
@@ -88,6 +85,10 @@ $rate_summary = $this->entity->get_rate_stars('summary');
             <?php endif; ?>
 
         </div>
+
+        <?php if($image): ?>
+            <div class="lsd-single-image-wrapper"><?php echo LSD_Kses::element($image); ?></div>
+        <?php endif; ?>
 
         <?php if($features) echo LSD_Kses::element($features); ?>
         <?php if($content) echo LSD_Kses::element($content); ?>

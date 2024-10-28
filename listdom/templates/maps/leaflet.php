@@ -44,7 +44,7 @@ if(count($objects) === 1 && $objects[0]["latitude"] === $latitude && $objects[0]
 $assets->footer('<script>
 jQuery(document).ready(function()
 {
-    var lsdMap = jQuery("#lsd_map'.$id.'").listdomLeaflet(
+    const lsdMap = jQuery("#lsd_map'.$id.'").listdomLeaflet(
     {
         latitude: "'.$latitude.'",
         longitude: "'.$longitude.'",
@@ -55,8 +55,8 @@ jQuery(document).ready(function()
         args: "'.http_build_query(['args'=>$args], '', '&').'",
         richmarker: "",
         infobox: "",
-        clustering: '.((isset($args['clustering']) && $args['clustering']) ? 'true' : 'false').',
-        clustering_images: "'.$assets->lsd_asset_url(((isset($args['clustering_images']) && trim($args['clustering_images'])) ? $args['clustering_images'] : 'img/cluster1/m')).'",
+        clustering: '.(isset($args['clustering']) && $args['clustering'] ? 'true' : 'false').',
+        clustering_images: "'.$assets->lsd_asset_url(isset($args['clustering_images']) && trim($args['clustering_images']) ? $args['clustering_images'] : 'img/cluster1/m').'",
         styles: "",
         mapcontrols: "",
         fill_color: "'.$settings['map_shape_fill_color'].'",

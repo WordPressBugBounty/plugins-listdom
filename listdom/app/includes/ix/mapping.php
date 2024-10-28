@@ -217,7 +217,7 @@ class LSD_IX_Mapping extends LSD_IX
                 'label' => esc_html($obj->label()),
                 'type' => $type,
                 'mandatory' => false,
-                'description' => sprintf(esc_html__("A %s field should get mapped.", 'listdom'), strtoupper($type)),
+                'description' => sprintf(esc_html__("A %s field should get mapped.", 'listdom'), $type),
                 'default' => [$default, $type],
             ];
         }
@@ -230,11 +230,14 @@ class LSD_IX_Mapping extends LSD_IX
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
             if ($type == 'separator') continue;
 
+            $mapping_type = in_array($type, ['number', 'email', 'url']) ? $type : 'text';
+
             $fields['lsd_attribute_' . $attribute->term_id] = [
                 'label' => $attribute->name,
-                'type' => in_array($type, ['number', 'email', 'url']) ? $type : 'text',
+                'type' => $mapping_type,
                 'mandatory' => false,
-                'default' => [$default, (in_array($type, ['number', 'email', 'url']) ? $type : 'text')],
+                'description' => sprintf(esc_html__("A %s field should get mapped.", 'listdom'), $mapping_type),
+                'default' => [$default, $mapping_type],
             ];
         }
 

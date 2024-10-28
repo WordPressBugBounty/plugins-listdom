@@ -10,6 +10,9 @@ $entity = new LSD_Entity_Listing($this->post->ID);
 // Category
 $category = $entity->get_data_category();
 
+// Form Type
+$form_type = $this->form_type;
+
 // Objects
 $postType = new LSD_PTypes_Listing();
 $gallery_max_size = $this->settings['submission_max_image_upload_size'] ?? '';
@@ -30,11 +33,14 @@ jQuery(document).ready(function()
 <div class="lsd-dashboard lsd-dashboard-form" id="lsd_dashboard" data-job-addon-installed="<?php echo class_exists('LSDADDJOB_Addon') ? 1 : 0; ?>">
 
     <div class="lsd-row">
-        <div class="lsd-col-2 lsd-dashboard-menus-wrapper">
-            <?php echo LSD_Kses::element($this->menus()); ?>
-        </div>
-        <div class="lsd-col-10">
-
+        <?php if (!$form_type): ?>
+            <div class="lsd-col-2 lsd-dashboard-menus-wrapper">
+                <?php echo LSD_Kses::element($this->menus()); ?>
+            </div>
+            <div class="lsd-col-10">
+        <?php else: ?>
+            <div class="lsd-col-12">
+        <?php endif; ?>
             <div id="lsd_dashboard_form_message"></div>
             <form class="lsd-dashboard-form" id="lsd_dashboard_form" enctype="multipart/form-data">
                 <div class="lsd-row">
@@ -48,7 +54,7 @@ jQuery(document).ready(function()
 								<?php wp_editor($this->post->post_content ?? '', 'lsd_dashboard_content', ['textarea_name'=>'lsd[content]']); ?>
 							</div>
 
-							<?php if($this->is_enabled('address')): ?>
+							<?php if ($this->is_enabled('address')): ?>
 							<div class="lsd-dashboard-right-box lsd-dashboard-address">
 								<h4><?php esc_html_e('Address / Map', 'listdom'); ?></h4>
 								<div>
@@ -64,7 +70,7 @@ jQuery(document).ready(function()
 								</div>
 							</div>
 
-							<?php if($this->is_enabled('attributes')): ?>
+							<?php if ($this->is_enabled('attributes')): ?>
 							<div class="lsd-dashboard-right-box lsd-dashboard-attributes">
 								<h4><?php esc_html_e('Attributes', 'listdom'); ?></h4>
 								<div>
@@ -75,7 +81,7 @@ jQuery(document).ready(function()
 
 							<?php do_action('lsd_dashboard_after_attributes', $this->post, $this); ?>
 
-							<?php if(!get_current_user_id()): ?>
+							<?php if (!get_current_user_id()): ?>
 							<div class="lsd-dashboard-right-box lsd-dashboard-message">
 								<h4><?php esc_html_e('To Reviewer', 'listdom'); ?></h4>
 
@@ -84,7 +90,7 @@ jQuery(document).ready(function()
 									<input type="email" id="lsd_guest_email" name="lsd[guest_email]" required value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_email', true)); ?>" placeholder="<?php esc_attr_e('Your Email', 'listdom'); ?>">
 								</div>
 
-                                <?php if($this->guest_registration): ?>
+                                <?php if ($this->guest_registration): ?>
                                     <div class="lsd-dashboard-guest-name">
                                         <label for="lsd_guest_fullname"><?php esc_html_e('Full Name', 'listdom'); ?></label>
                                         <input type="text" id="lsd_guest_fullname" name="lsd[guest_fullname]" value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_fullname', true)); ?>" placeholder="<?php esc_attr_e('Please insert your full name', 'listdom'); ?>">
@@ -147,7 +153,7 @@ jQuery(document).ready(function()
                             </div>
                         </div>
 
-                        <?php if($this->is_enabled('locations')): ?>
+                        <?php if ($this->is_enabled('locations')): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-locations">
                             <h4><?php esc_html_e('Locations', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_LOCATION); ?></h4>
                             <?php
@@ -165,7 +171,7 @@ jQuery(document).ready(function()
                         </div>
                         <?php endif; ?>
 
-                        <?php if($this->is_enabled('tags')): ?>
+                        <?php if ($this->is_enabled('tags')): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-tags">
                             <h4><?php esc_html_e('Tags', 'listdom'); ?><?php $this->required_html('tags'); ?></h4>
                             <?php
@@ -178,7 +184,7 @@ jQuery(document).ready(function()
                         </div>
                         <?php endif; ?>
 
-                        <?php if($this->is_enabled('features')): ?>
+                        <?php if ($this->is_enabled('features')): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-features">
                             <h4><?php esc_html_e('Features', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_FEATURE); ?></h4>
                             <?php
@@ -196,25 +202,25 @@ jQuery(document).ready(function()
                         </div>
                         <?php endif; ?>
 
-                        <?php if($this->is_enabled('labels')): ?>
+                        <?php if ($this->is_enabled('labels')): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-labels" id="lsd-dashboard-labels">
                             <h4><?php esc_html_e('Labels', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_LABEL); ?></h4>
                             <?php
-                            echo LSD_Dashboard_Terms::labels([
-                                'taxonomy' => LSD_Base::TAX_LABEL,
-                                'parent' => 0,
-                                'level' => 0,
-                                'hide_empty' => 0,
-                                'orderby' => 'name',
-                                'order' => 'ASC',
-                                'post_id' => $this->post->ID,
-                                'name' => 'tax_input['.LSD_Base::TAX_LABEL.']'
-                            ]);
+                                echo LSD_Dashboard_Terms::labels([
+                                    'taxonomy' => LSD_Base::TAX_LABEL,
+                                    'parent' => 0,
+                                    'level' => 0,
+                                    'hide_empty' => 0,
+                                    'orderby' => 'name',
+                                    'order' => 'ASC',
+                                    'post_id' => $this->post->ID,
+                                    'name' => 'tax_input['.LSD_Base::TAX_LABEL.']'
+                                ]);
                             ?>
                         </div>
                         <?php endif; ?>
 
-                        <?php if($this->is_enabled('image') && ($this->guest_status || LSD_Capability::can('upload_files'))): ?>
+                        <?php if ($this->is_enabled('image') && ($this->guest_status || LSD_Capability::can('upload_files'))): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-featured-image">
                             <h4><?php esc_html_e('Featured Image', 'listdom'); ?><?php $this->required_html('featured_image'); ?></h4>
                             <div>
@@ -222,7 +228,7 @@ jQuery(document).ready(function()
                                 $attachment_id = get_post_thumbnail_id($this->post->ID);
 
                                 $featured_image = wp_get_attachment_image_src($attachment_id, 'medium');
-                                if(isset($featured_image[0])) $featured_image = $featured_image[0];
+                                if (isset($featured_image[0])) $featured_image = $featured_image[0];
                                 ?>
                                 <div class="lsd-col-12" id="lsd_listing_featured_image_message"></div>
                                 <span id="lsd_dashboard_featured_image_preview"><?php echo trim($featured_image) ? '<img src="'.esc_url($featured_image).'" />' : ''; ?></span>

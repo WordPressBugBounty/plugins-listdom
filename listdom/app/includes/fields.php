@@ -300,48 +300,56 @@ class LSD_Fields extends LSD_Base
         $type = $field['type'] ?? null;
         $label = $field['label'] ?? null;
 
-        if ($type == 'image' and is_array($field['value']))
+        if ($type === 'image')
         {
-            $title = (isset($field['value']['title']) and trim($field['value']['title'])) ? $field['value']['title'] : $label;
-            return '<a href="' . esc_url($field['value']['url']) . '"><img src="' . esc_url($field['value']['sizes']['thumbnail']) . '" alt="' . esc_attr($title) . '"></a>';
+            if (is_array($field['value']))
+            {
+                $title = isset($field['value']['title']) && trim($field['value']['title']) ? $field['value']['title'] : $label;
+                return '<a href="' . esc_url($field['value']['url']) . '"><img src="' . esc_url($field['value']['sizes']['thumbnail']) . '" alt="' . esc_attr($title) . '"></a>';
+            }
+            else if (is_numeric($field['value']))
+            {
+                $image = wp_get_attachment_image_url($field['value']);
+                return $image ? '<img src="' . esc_url($image) . '" alt="">' : '';
+            }
+
+            return '<img src="' . esc_url($field['value']) . '" alt="">';
         }
-        else if ($type == 'checkbox' and is_array($field['value']))
+        else if ($type === 'checkbox' && is_array($field['value']))
         {
             return implode(', ', $field['value']);
         }
-        else if ($type == 'file' and is_array($field['value']))
+        else if ($type === 'file' && is_array($field['value']))
         {
-            $title = (isset($field['value']['title']) and trim($field['value']['title'])) ? $field['value']['title'] : esc_url($field['value']['url']);
+            $title = isset($field['value']['title']) && trim($field['value']['title']) ? $field['value']['title'] : esc_url($field['value']['url']);
             return '<a href="' . esc_url($field['value']['url']) . '">' . esc_html($title) . '</a>';
         }
-        else if ($type == 'post_object')
+        else if ($type === 'post_object')
         {
-            $ID = (is_object($field['value']) ? $field['value']->ID : $field['value']);
+            $ID = is_object($field['value']) ? $field['value']->ID : $field['value'];
             return '<a href="' . get_permalink($ID) . '">' . get_the_title($ID) . '</a>';
         }
-        else if ($type == 'user' and is_array($field['value']))
+        else if ($type === 'user' && is_array($field['value']))
         {
             return $field['value']['display_name'];
         }
-        else if ($type == 'google_map' and is_array($field['value']))
+        else if ($type === 'google_map' && is_array($field['value']))
         {
             return $field['value']['lat'] . ', ' . $field['value']['lng'];
         }
-        else if ($type == 'select' and is_array($field['value']))
+        else if ($type === 'select' && is_array($field['value']))
         {
             return implode(', ', $field['value']);
         }
-        else
+        else if (!is_array($field['value']))
         {
-            if (!is_array($field['value']))
-            {
-                $value = (trim($field['value']) ? $field['value'] : '');
-                if (trim($value) == '') $value = get_post_meta($listing_id, $field['name'], true);
+            $value = trim($field['value']) ? $field['value'] : '';
+            if (trim($value) == '') $value = get_post_meta($listing_id, $field['name'], true);
 
-                return $value;
-            }
-            else return '';
+            return $value;
         }
+
+        return '';
     }
 
 }

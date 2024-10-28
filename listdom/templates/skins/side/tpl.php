@@ -40,7 +40,10 @@ jQuery(document).ready(function()
             </div>
             <?php echo LSD_Kses::element($this->get_pagination()); ?>
         </div>
-        <div class="lsd-side-details"></div>
+        <div class="lsd-side-details">
+            <div class="lsd-side-details-close"><i class="lsd-icon fa fa-window-close"></i></div>
+            <div class="lsd-side-details-iframe"></div>
+        </div>
     </div>
     <?php if($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
 </div>

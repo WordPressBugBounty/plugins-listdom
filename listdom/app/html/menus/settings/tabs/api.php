@@ -51,10 +51,11 @@ $api = LSD_Options::api();
 // Add Token
 jQuery('#lsd_settings_api_add_token').on('click', function()
 {
-    const $button = jQuery("#lsd_settings_api_add_token");
+    // Loading Wrapper
+    const loading = (new ListdomLoadingWrapper());
 
-    // Loading Styles
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
+    // Loading
+    loading.start();
 
     jQuery.ajax(
     {
@@ -64,15 +65,15 @@ jQuery('#lsd_settings_api_add_token').on('click', function()
         dataType: "json",
         success: function(response)
         {
-            // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Add Token', 'listdom')); ?>");
+            // Unloading
+            loading.stop();
 
             if(response.success === 1) location.reload();
         },
         error: function()
         {
-            // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Add Token', 'listdom')); ?>");
+            // Unloading
+            loading.stop();
         }
     });
 });
@@ -81,9 +82,10 @@ jQuery('#lsd_settings_api_add_token').on('click', function()
 jQuery('.lsd-api-remove-token').on('click', function()
 {
     const $button = jQuery(this);
-    const i = $button.data('i');
 
+    const i = $button.data('i');
     const confirm = $button.data('confirm');
+
     if(!confirm)
     {
         $button.data('confirm', 1);
@@ -98,8 +100,11 @@ jQuery('.lsd-api-remove-token').on('click', function()
         return false;
     }
 
-    // Add loading Class to the button
-    $button.removeClass('lsd-need-confirm').addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
+    // Loading Wrapper
+    const loading = (new ListdomLoadingWrapper());
+
+    // Loading
+    loading.start();
 
     jQuery.ajax(
     {
@@ -113,12 +118,15 @@ jQuery('.lsd-api-remove-token').on('click', function()
             {
                 // Remove Token
                 jQuery('#lsd_settings_api_tokens_'+i).remove();
+
+                // Unloading
+                loading.stop();
             }
         },
         error: function()
         {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Remove', 'listdom')); ?>");
+            // Unloading
+            loading.stop();
         }
     });
 });
@@ -128,11 +136,13 @@ jQuery('#lsd_api_form').on('submit', function(event)
 {
     event.preventDefault();
 
-    // Add loading Class to the button
-    const $button = jQuery("#lsd_api_save_button");
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
+    // Loading Wrapper
+    const loading = (new ListdomLoadingWrapper());
 
-    const settings = jQuery("#lsd_api_form").serialize();
+    // Loading
+    loading.start();
+
+    const settings = jQuery(this).serialize();
     jQuery.ajax(
     {
         type: "POST",
@@ -140,13 +150,13 @@ jQuery('#lsd_api_form').on('submit', function(event)
         data: "action=lsd_save_api&" + settings,
         success: function()
         {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
+            // Unloading
+            loading.stop();
         },
         error: function()
         {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
+            // Unloading
+            loading.stop();
         }
     });
 });

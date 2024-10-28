@@ -5,15 +5,9 @@ defined('ABSPATH') || die();
 /** @var LSD_Skins_Masonry $this */
 
 $ids = $this->listings;
-$open = false;
 ?>
-<?php $i = 3; foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
-
-    <?php if($this->columns && $this->list_view && ($i % $this->columns) == 1): $open = true; ?>
-        <div class="lsd-row">
-    <?php endif; ?>
-
-    <div class="lsd-col-<?php echo ($this->list_view ? 12 : (12 / $this->columns)); ?> <?php echo esc_attr($this->filters_classes($id)); ?>">
+<?php foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
+<div class="<?php echo esc_attr($this->filters_classes($id)); ?>">
     <div class="lsd-listing<?php if(!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
 
         <?php if($this->display_image): ?>
@@ -28,19 +22,6 @@ $open = false;
                 <?php echo LSD_Kses::element($listing->get_labels()); ?>
             </div>
             <?php endif; ?>
-
-            <div class="lsd-listing-image-icons-wrapper">
-                <?php if($this->display_favorite_icon): ?>
-                    <div class="lsd-listing-favorite">
-                        <?php echo LSD_Kses::element($listing->get_favorite_button()); ?>
-                    </div>
-                <?php endif; ?>
-                <?php if($this->display_compare_icon): ?>
-                    <div class="lsd-listing-compare">
-                        <?php echo LSD_Kses::element($listing->get_compare_button()); ?>
-                    </div>
-                <?php endif; ?>
-            </div>
 
             <?php if($this->display_availability): ?>
                 <div class="lsd-listing-availability">
@@ -65,6 +46,7 @@ $open = false;
                 </div>
             </div>
 
+        <div class="lsd-listing-title-wrapper">
             <?php if($this->display_title): ?>
                 <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
                     <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
@@ -73,10 +55,23 @@ $open = false;
                     <?php endif; ?>
                 </h3>
             <?php endif; ?>
+            <div class="lsd-listing-image-icons-wrapper">
+                <?php if($this->display_favorite_icon): ?>
+                    <div class="lsd-listing-favorite">
+                        <?php echo LSD_Kses::element($listing->get_favorite_button()); ?>
+                    </div>
+                <?php endif; ?>
+                <?php if($this->display_compare_icon): ?>
+                    <div class="lsd-listing-compare">
+                        <?php echo LSD_Kses::element($listing->get_compare_button()); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
 
             <?php if($this->display_description): ?>
                 <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
-                    <?php echo LSD_Kses::element($listing->get_excerpt(10, false)); ?>
+                    <?php echo LSD_Kses::element($listing->get_excerpt(10)); ?>
                 </p>
             <?php endif; ?>
 
@@ -88,7 +83,7 @@ $open = false;
                 <?php endif; ?>
 
                 <?php if($this->display_address): ?>
-                    <?php if($address = $listing->get_address(true)): ?>
+                    <?php if($address = $listing->get_address()): ?>
                     <div class="lsd-listing-address" <?php echo lsd_schema()->address(); ?>>
                         <?php echo LSD_Kses::element($address); ?>
                     </div>
@@ -99,11 +94,4 @@ $open = false;
         </div>
     </div>
 </div>
-
-    <?php if($this->columns && $this->list_view && ($i % $this->columns) == 0): $open = false; ?>
-        </div>
-    <?php endif; ?>
-
-    <?php $i++; endforeach; ?>
-    <?php /** Close the unclosed Row **/ if($this->columns && $open) echo '</div>';
-
+<?php endforeach;

@@ -63,14 +63,14 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
                 <label for="' . $this->get_field_id('taxonomy') . '">' . esc_html__('Taxonomy', 'listdom') . '</label>
                 <select class="widefat" name="' . $this->get_field_name('taxonomy') . '" id="' . $this->get_field_id('taxonomy') . '">';
 
-        foreach ($taxonomies as $taxonomy => $label) echo '<option value="' . $taxonomy . '"' . ((isset($instance['taxonomy']) and $instance['taxonomy'] == $taxonomy) ? ' selected="selected"' : '') . '>' . $label . '</option>';
+        foreach ($taxonomies as $taxonomy => $label) echo '<option value="' . $taxonomy . '"' . (isset($instance['taxonomy']) && $instance['taxonomy'] == $taxonomy ? ' selected="selected"' : '') . '>' . $label . '</option>';
         echo '</select></p>';
 
         echo '<p class="lsd-widget-row">
             <label for="' . $this->get_field_id('show_count') . '">' . esc_html__('Display Count', 'listdom') . '</label>
             <select class="widefat" name="' . $this->get_field_name('show_count') . '" id="' . $this->get_field_id('show_count') . '">
                 <option value="0">' . esc_html__('No', 'listdom') . '</option>
-                <option value="1"' . ((isset($instance['show_count']) and $instance['show_count'] == 1) ? ' selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
+                <option value="1"' . (isset($instance['show_count']) && $instance['show_count'] == 1 ? ' selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
             </select>
         </p>';
 
@@ -78,7 +78,7 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
             <label for="' . $this->get_field_id('hide_empty') . '">' . esc_html__('Hide Empty', 'listdom') . '</label>
             <select class="widefat" name="' . $this->get_field_name('hide_empty') . '" id="' . $this->get_field_id('hide_empty') . '">
                 <option value="1">' . esc_html__('Yes', 'listdom') . '</option>
-                <option value="0"' . ((isset($instance['hide_empty']) and $instance['hide_empty'] == 0) ? ' selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
+                <option value="0"' . (isset($instance['hide_empty']) && $instance['hide_empty'] == 0 ? ' selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
             </select>
         </p>';
 
@@ -86,7 +86,7 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
             <label for="' . $this->get_field_id('orderby') . '">' . esc_html__('Sort By', 'listdom') . '</label>
             <select class="widefat" name="' . $this->get_field_name('orderby') . '" id="' . $this->get_field_id('orderby') . '">
                 <option value="name">' . esc_html__('Name', 'listdom') . '</option>
-                <option value="count"' . ((isset($instance['orderby']) and $instance['orderby'] == 'count') ? ' selected="selected"' : '') . '>' . esc_html__('Count', 'listdom') . '</option>
+                <option value="count"' . (isset($instance['orderby']) && $instance['orderby'] == 'count' ? ' selected="selected"' : '') . '>' . esc_html__('Count', 'listdom') . '</option>
             </select>
         </p>';
 

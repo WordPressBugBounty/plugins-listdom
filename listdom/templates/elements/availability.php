@@ -11,7 +11,7 @@ if(!is_array($availability) || !count($availability)) return '';
 $valid = false;
 foreach($availability as $a)
 {
-    $valid = ((isset($a['hours']) && $a['hours']) || (isset($a['off']) && $a['off']));
+    $valid = (isset($a['hours']) && $a['hours']) || (isset($a['off']) && $a['off']);
     if($valid) break;
 }
 

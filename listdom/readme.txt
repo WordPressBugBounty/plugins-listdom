@@ -4,8 +4,8 @@ Donate link: https://webilia.com/
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.0.0
 Requires PHP: 7.0
-Tested up to: 6.6.1
-Stable tag: 3.5.0
+Tested up to: 6.7
+Stable tag: 3.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -340,6 +340,20 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 
 == Changelog ==
 
+= 3.6.0 =
+* [PRO] Added a shortcode for an independent "Add Listing" form.
+* [PRO] Added responsive view support for the "Side by Side" skin.
+* Introduced support for listing excerpts.
+* Enabled featured image display in style 3 of listing details.
+* Improved the listing contact element.
+* Refined the settings loader style in the Listdom backend.
+* Enhanced the structure of "Masonry" and "Halfmap" skins for better performance and usability.
+* [PRO] Resolved an issue in the Frontend Dashboard.
+* [PRO] Fixed several issues related to listing schema.
+* Corrected various issues within the search module.
+* Addressed UI and responsiveness issues across different views.
+* Fixed certain issues with required attributes in listings editors.
+
 = 3.5.0 =
 * [PRO] Introduced authentication features including login, registration, and password recovery.
 * [PRO] Added the option to customize the listing details layout per category.
@@ -349,7 +363,7 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 * Introduced a welcome setup wizard.
 * Added a new "Listdom Publisher" user role with the capability to publish listings.
 * Introduced an option to add the featured image to the gallery element.
-* Added the option to hide attribute titles within the attributes element.
+* [PRO] Added the option to hide attribute titles within the attributes element.
 * Introduced a layout option for the features element.
 * Added a new option to customize the sort bar layout.
 * [PRO] Enhanced per-listing display options.

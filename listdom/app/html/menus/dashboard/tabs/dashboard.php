@@ -50,23 +50,7 @@ defined('ABSPATH') || die();
             </div>
         </div>
 
-        <?php if($this->can_display_review()): ?>
-        <div class="lsd-ask-review-wrapper lsd-flex lsd-flex-row lsd-gap-5 lsd-flex-content-start lsd-flex-items-start">
-            <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/rating.svg')); ?>" alt="">
-            <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-flex-items-start">
-                <h3 class="lsd-m-0 lsd-bold">Looks Like you are using Listdom for a while.</h3>
-                <p class="lsd-m-0">Can you give a 5-star rating on the WordPress repository? It’s going to let the Listdom team know their efforts are useful for you.</p>
-                <div class="lsd-ask-review-buttons lsd-flex lsd-flex-row lsd-gap-4 lsd-mt-3">
-                    <a class="button button-primary" href="https://api.webilia.com/go/wp-review" target="_blank">
-                        <span>Sure, you deserve it</span>
-                        <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/arrow-right.svg')); ?>" alt="">
-                    </a>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom&review=later')); ?>">Maybe later.</a>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom&review=done')); ?>">Already done :)</a>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
+        <?php (new LSD_Plugin_Review())->display(true); ?>
 
         <h2><?php esc_html_e('Changelog', 'listdom'); ?></h2>
         <div class="lsd-changelog-wrapper"><?php $this->include_html_file('menus/dashboard/tabs/changelog.php'); ?></div>
