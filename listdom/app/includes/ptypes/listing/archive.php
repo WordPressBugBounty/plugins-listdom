@@ -46,6 +46,9 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
             // Include Listing?
             if (!apply_filters('lsd_map_include_object', true, $entity)) continue;
 
+            // Set Current Post
+            LSD_LifeCycle::post($post_id);
+
             $object_type = get_post_meta($post_id, 'lsd_object_type', true);
             if ($object_type == 'marker')
             {
@@ -87,6 +90,9 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
 
             $objects[] = $object;
         }
+
+        // Back to Original Post
+        LSD_LifeCycle::reset();
 
         return $objects;
     }

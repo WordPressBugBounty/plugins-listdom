@@ -551,6 +551,11 @@ class LSD_Form extends LSD_Base
                 $user = get_user_by('id', $value);
                 $current .= '<span class="lsd-autosuggest-items-' . $user->ID . '">' . $user->user_email . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($user->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $user->ID . '"></span>';
             }
+            elseif (in_array($source, LSD_Base::taxonomies()))
+            {
+                $term = get_term($value);
+                $current .= '<span class="lsd-autosuggest-items-' . esc_attr($term->term_id) . '">' . esc_html($term->name) . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($term->term_id) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . esc_attr($term->term_id) . '"></span>';
+            }
             else
             {
                 $post = get_post($value);

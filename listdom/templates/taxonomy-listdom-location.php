@@ -21,7 +21,7 @@ get_header('lsd');
     <<?php echo esc_attr($html_tag); ?> id="<?php echo esc_attr(apply_filters(LSD_Base::TAX_LOCATION.'_html_id', 'content')); ?>" class="<?php echo esc_attr(apply_filters(LSD_Base::TAX_LOCATION.'_html_class', 'container')); ?>">
 
         <?php if($title_status): ?>
-        <h1><?php echo single_term_title(''); ?></h1>
+        <h1><?php echo single_term_title(); ?></h1>
         <?php endif; ?>
 
         <div class="lsd-taxonomy-content"><?php do_action(LSD_Base::TAX_LOCATION.'_archive_content'); ?></div>

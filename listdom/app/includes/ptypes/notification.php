@@ -84,13 +84,13 @@ class LSD_PTypes_Notification extends LSD_PTypes
         // Remove date column
         unset($columns['date']);
 
-        $columns['hook'] = esc_html__('Hook', 'listdom');
+        $columns['hook'] = esc_html__('Event', 'listdom');
         return $columns;
     }
 
     public function filter_columns_content($column_name, $post_id)
     {
-        if ($column_name == 'hook')
+        if ($column_name === 'hook')
         {
             $hook = get_post_meta($post_id, 'lsd_hook', true);
             $hooks = LSD_Notifications::get_notification_hooks();

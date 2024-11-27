@@ -16,6 +16,7 @@ $image = isset($elements['image']['enabled']) && $elements['image']['enabled'] ?
 $gallery = isset($elements['gallery']['enabled']) && $elements['gallery']['enabled'] ? $this->gallery() : '';
 $features = isset($elements['features']['enabled']) && $elements['features']['enabled'] ? $this->features() : '';
 $content = isset($elements['content']['enabled']) && $elements['content']['enabled'] ? $this->content($this->filtered_content) : '';
+$excerpt = isset($elements['excerpt']['enabled']) && $elements['excerpt']['enabled'] ? $this->excerpt() : '';
 $embeds = isset($elements['embed']['enabled']) && $elements['embed']['enabled'] ? $this->embeds() : '';
 $video = isset($elements['video']['enabled']) && $elements['video']['enabled'] ? $this->featured_video() : '';
 $price = isset($elements['price']['enabled']) && $elements['price']['enabled'] ? $this->price() : '';
@@ -85,6 +86,8 @@ $rate_summary = $this->entity->get_rate_stars('summary');
             <?php endif; ?>
 
         </div>
+
+        <?php if($excerpt) echo LSD_Kses::element($excerpt); ?>
 
         <?php if($image): ?>
             <div class="lsd-single-image-wrapper"><?php echo LSD_Kses::element($image); ?></div>

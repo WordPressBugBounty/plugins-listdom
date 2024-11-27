@@ -51,15 +51,15 @@ class LSD_Entity_Listing extends LSD_Entity
             LSD_Flash::add(esc_html__("A valid Listing Category is required.", 'listdom'), 'error');
         }
 
-        update_post_meta($this->post->ID, 'lsd_object_type', (isset($data['object_type']) ? sanitize_text_field($data['object_type']) : 'marker'));
-        update_post_meta($this->post->ID, 'lsd_zoomlevel', (isset($data['zoomlevel']) ? sanitize_text_field($data['zoomlevel']) : $this->settings['map_backend_zl']));
+        update_post_meta($this->post->ID, 'lsd_object_type', isset($data['object_type']) ? sanitize_text_field($data['object_type']) : 'marker');
+        update_post_meta($this->post->ID, 'lsd_zoomlevel', isset($data['zoomlevel']) ? sanitize_text_field($data['zoomlevel']) : $this->settings['map_backend_zl']);
 
         // Lat / Long
         $lat = isset($data['latitude']) ? sanitize_text_field($data['latitude']) : $this->settings['map_backend_lt'];
         $lng = isset($data['longitude']) ? sanitize_text_field($data['longitude']) : $this->settings['map_backend_ln'];
 
         // Geo Point on WP Meta Table
-        update_post_meta($this->post->ID, 'lsd_address', (isset($data['address']) ? sanitize_text_field($data['address']) : ''));
+        update_post_meta($this->post->ID, 'lsd_address', isset($data['address']) ? sanitize_text_field($data['address']) : '');
         update_post_meta($this->post->ID, 'lsd_latitude', $lat);
         update_post_meta($this->post->ID, 'lsd_longitude', $lng);
 
@@ -96,10 +96,10 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_price_max', isset($data['price_max']) ? sanitize_text_field($data['price_max']) : 0);
         update_post_meta($this->post->ID, 'lsd_price_after', isset($data['price_after']) ? sanitize_text_field($data['price_after']) : '');
         update_post_meta($this->post->ID, 'lsd_price_class', isset($data['price_class']) ? sanitize_text_field($data['price_class']) : 2);
-        update_post_meta($this->post->ID, 'lsd_currency', isset($data['currency']) ? sanitize_text_field($data['currency']) : 'USD');
+        update_post_meta($this->post->ID, 'lsd_currency', isset($data['currency']) ? sanitize_text_field($data['currency']) : LSD_Options::currency());
 
         // Availability
-        update_post_meta($this->post->ID, 'lsd_ava', ($data['ava'] ?? []));
+        update_post_meta($this->post->ID, 'lsd_ava', $data['ava'] ?? []);
 
         // Contact Details
         update_post_meta($this->post->ID, 'lsd_email', isset($data['email']) ? sanitize_email($data['email']) : '');
@@ -177,8 +177,8 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function get_excerpt($limit = 15, $read_more = false)
     {
-        $element = new LSD_Element_Content();
-        return $element->excerpt($this->post->ID, $limit, $read_more);
+        $element = new LSD_Element_Excerpt();
+        return $element->get($this->post->ID, $limit, $read_more);
     }
 
     public function get_features($method = 'list', $show_icons = true, $list_style = 'per-row')

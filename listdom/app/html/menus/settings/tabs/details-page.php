@@ -208,6 +208,37 @@ $sections = [
                     </div>
                 </div>
                 <?php endif; ?>
+
+                <?php if (!class_exists('LSDADDSUB')): ?>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-12">
+                            <?php echo LSD_Base::alert($this->missAddonMessage(esc_html__('Subscription', 'listdom'), '<strong>'.esc_html__('Display Options Per Package', 'listdom').'</strong>'), 'warning'); ?>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-6"><?php echo LSD_Form::label([
+                            'title' => esc_html__('Display Options Per Package', 'listdom'),
+                            'for' => 'lsd_dispp',
+                        ]); ?></div>
+                        <div class="lsd-col-6"><?php echo LSD_Form::select([
+                            'id' => 'lsd_dispp',
+                            'name' => 'lsd[general][dispp]',
+                            'options' => [
+                                0 => esc_html__('Disabled', 'listdom'),
+                                1 => esc_html__('Enabled', 'listdom'),
+                            ],
+                            'value' => $details_page['general']['dispp'] ?? 0,
+                        ]); ?></div>
+                    </div>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-12">
+                            <p class="description">
+                                <?php echo esc_html__("When enabled, you can assign a unique single listing style to each package.", 'listdom'); ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php endif; ?>
                 <?php if($this->isLite()): ?>
                 <div class="lsd-form-row">
                     <div class="lsd-col-12">

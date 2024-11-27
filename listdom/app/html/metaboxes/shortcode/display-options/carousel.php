@@ -8,7 +8,6 @@ defined('ABSPATH') || die();
 $carousel = $options['carousel'] ?? [];
 $missAddonMessages = [];
 ?>
-<div class="lsd-form-row lsd-form-row-separator"></div>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
@@ -178,7 +177,8 @@ $missAddonMessages = [];
                     <?php echo LSD_Form::switcher([
                         'id' => 'lsd_display_options_skin_carousel_display_description',
                         'name' => 'lsd[display][carousel][display_description]',
-                        'value' => $carousel['display_description'] ?? '1'
+                        'value' => $carousel['display_description'] ?? '1',
+                        'toggle' => '#lsd_display_options_skin_carousel_description_length_wrapper'
                     ]); ?>
                 </div>
             </div>
@@ -257,15 +257,15 @@ $missAddonMessages = [];
                     'id' => 'lsd_display_options_skin_carousel_title',
                     'name' => 'lsd[display][carousel][display_title]',
                     'value' => $carousel['display_title'] ?? '1',
-                    'toggle' => '#lsd_display_options_skin_carousel_is_claimed'
+                    'toggle' => '#lsd_display_options_skin_carousel_is_claimed_wrapper'
                 ]); ?>
             </div>
         </div>
         <?php if(class_exists('LSDADDCLM_Base')): ?>
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5">
-            <div class="lsd-form-row <?php echo (!isset($carousel['display_title']) || $carousel['display_title']) ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_carousel_is_claimed">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5 <?php echo !isset($carousel['display_title']) || $carousel['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_carousel_is_claimed_wrapper">
+            <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Is Claimed', 'listdom'),
+                    'title' => esc_html__('Claim Status', 'listdom'),
                     'for' => 'lsd_display_options_skin_carousel_is_claimed',
                 ]); ?></div>
                 <div class="lsd-col-6">
@@ -296,7 +296,7 @@ $missAddonMessages = [];
                     ]); ?>
                 </div>
             </div>
-            <div class="lsd-form-row <?php echo (!isset($carousel['display_image']) || $carousel['display_image']) ? '1' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_carousel_image_method">
+            <div class="lsd-form-row <?php echo (!isset($carousel['display_image']) || $carousel['display_image']) ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_carousel_image_method">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Image Method', 'listdom'),
                     'for' => 'lsd_display_options_skin_carousel_image_method',
@@ -317,6 +317,22 @@ $missAddonMessages = [];
         <?php else: ?>
             <?php $missAddonMessages[] = LSD_Base::missFeatureMessage(esc_html__('Display Image', 'listdom'), true); ?>
         <?php endif; ?>
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style5">
+            <div class="lsd-form-row <?php echo !isset($carousel['display_description']) || $carousel['display_description'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_carousel_description_length_wrapper">
+                <div class="lsd-col-5"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Description Length', 'listdom'),
+                    'for' => 'lsd_display_options_skin_carousel_description_length',
+                ]); ?></div>
+                <div class="lsd-col-6">
+                    <?php echo LSD_Form::number([
+                        'id' => 'lsd_display_options_skin_carousel_description_length',
+                        'name' => 'lsd[display][carousel][description_length]',
+                        'value' => $carousel['description_length'] ?? 12
+                    ]); ?>
+                    <p class="description"><?php esc_html_e("Description length is measured in words, so 10 means a 10-word limit.", 'listdom'); ?></p>
+                </div>
+            </div>
+        </div>
     </div>
     <?php if(count($missAddonMessages)): ?>
     <div class="lsd-addon-alert lsd-mt-4">

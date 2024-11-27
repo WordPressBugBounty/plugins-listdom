@@ -32,7 +32,7 @@ class LSD_Element_Tags extends LSD_Element
             $post_id = $post->ID;
         }
 
-        $terms = wp_get_post_terms($post_id, LSD_Base::TAX_TAG, []);
+        $terms = wp_get_post_terms($post_id, LSD_Base::TAX_TAG);
         if (!count($terms)) return '';
 
         $output = '<ul>';

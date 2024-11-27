@@ -340,7 +340,7 @@ $settings = LSD_Options::settings();
                             'name' => 'lsd[google_geocoding_api_key]',
                             'value' => $settings['google_geocoding_api_key'] ?? ''
                         ]); ?>
-                        <p class="description lsd-mt-2"><?php esc_html_e("If you don't provide the latitude and longitude when editing a listing, Listdom will automatically attempt to convert the address into a geo-point using OSM and Google Geocoding APIs. To ensure this functionality works smoothly, avoid restricting your API key by domain, as it is used in the backend of your website. Instead, consider using IP restrictions for better security.", 'listdom'); ?></p>
+                        <p class="description lsd-mt-2 lsd-mb-0"><?php esc_html_e("If you don't provide the latitude and longitude when editing a listing, Listdom will automatically attempt to convert the address into a geo-point using OSM and Google Geocoding APIs. To ensure this functionality works smoothly, avoid restricting your API key by domain, as it is used in the backend of your website. Instead, consider using IP restrictions for better security.", 'listdom'); ?></p>
                     </div>
                 </div>
             </div>
@@ -348,7 +348,7 @@ $settings = LSD_Options::settings();
 
         <div class="lsd-accordion-title">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
-                <h3><?php esc_html_e('Frontend Submission', 'listdom'); ?></h3>
+                <h3><?php esc_html_e('Price Components', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
                     <i class="lsd-icon fa fa-plus"></i>
                     <i class="lsd-icon fa fa-minus"></i>
@@ -356,246 +356,35 @@ $settings = LSD_Options::settings();
             </div>
         </div>
         <div class="lsd-settings-form-group lsd-accordion-panel">
-
-            <?php if($this->isLite()): ?>
-            <div class="lsd-mb-5 lsd-alert-no-mt"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Frontend Submission', 'listdom')), 'warning'); ?></div>
-            <?php endif; ?>
-
-            <h3 class="lsd-mb-4 lsd-mt-0"><?php esc_html_e('Configuration', 'listdom'); ?></h3>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Dashboard Page', 'listdom'),
-                    'for' => 'lsd_settings_submission_page',
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::pages([
-                        'id' => 'lsd_settings_submission_page',
-                        'value' => $settings['submission_page'] ?? null,
-                        'name' => 'lsd[submission_page]',
-                        'show_empty' => true,
-                    ]); ?>
-                    <p class="description"><?php echo sprintf(esc_html__("Put %s shortcode into the page.", 'listdom'), '<code>[listdom-dashboard]</code>'); ?></p>
-                </div>
-            </div>
-
-            <?php if($this->isPro()): ?>
-                <div class="lsd-form-row">
-                    <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Independent Add Listing Form', 'listdom'),
-                        'for' => 'lsd_settings_add_listing_page_status',
-                    ]); ?></div>
-                    <div class="lsd-col-4">
-                        <?php echo LSD_Form::switcher([
-                            'id' => 'lsd_settings_add_listing_page_status',
-                            'value' => $settings['add_listing_page_status'] ?? 0,
-                            'name' => 'lsd[add_listing_page_status]',
-                            'toggle' => '#lsd_settings_add_listing_page_status_options'
-                        ]); ?>
-                        <p class="description"><?php esc_html_e("Enable to have a independent add listing page ", 'listdom'); ?></p>
-                    </div>
-                </div>
-                <div id="lsd_settings_add_listing_page_status_options" class="lsd-form-row  <?php echo ((isset($settings['add_listing_page_status']) and $settings['add_listing_page_status']) ? '' : 'lsd-util-hide'); ?>">
-                    <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Add Listing Page', 'listdom'),
-                        'for' => 'lsd_settings_add_listing_page',
-                    ]); ?></div>
-                    <div class="lsd-col-4">
-                        <?php echo LSD_Form::pages([
-                            'id' => 'lsd_settings_add_listing_page',
-                            'value' => $settings['add_listing_page'] ?? null,
-                            'name' => 'lsd[add_listing_page]',
-                            'show_empty' => true,
-                        ]); ?>
-                        <p class="description"><?php echo sprintf(esc_html__("Put %s shortcode into the page.", 'listdom'), '<code>[listdom-add-listing]</code>'); ?></p>
-                    </div>
+            <?php if ($this->isLite()): ?>
+                <div class="lsd-alert lsd-warning lsd-mt-0">
+                    <?php echo LSD_Base::missFeatureMessage(
+                        sprintf(esc_html__('The ability to modify the %s', 'listdom'), '<strong>'.esc_html__('Price Components', 'listdom').'</strong>'),
+                        false,
+                        false
+                    ); ?>
                 </div>
             <?php endif; ?>
 
-            <?php foreach([
-                LSD_Base::TAX_LOCATION => esc_html__('Locations'),
-                LSD_Base::TAX_FEATURE => esc_html__('Features'),
-            ] as $tax => $label): ?>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__($label, 'listdom'),
-                    'for' => 'lsd_settings_tax_'.$tax.'_method',
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::select([
-                        'id' => 'lsd_settings_tax_'.$tax.'_method',
-                        'options' => [
-                            'checkboxes' => esc_html__('Checkboxes', 'listdom'),
-                            'dropdown' => esc_html__('Dropdown', 'listdom'),
-                        ],
-                        'value' => $settings['submission_tax_' . $tax . '_method'] ?? 'checkboxes',
-                        'name' => 'lsd[submission_tax_'.$tax.'_method]',
-                    ]); ?>
-                </div>
-            </div>
-            <?php endforeach; ?>
+            <h3 class="lsd-mb-0"><?php esc_html_e('Price Components', 'listdom'); ?></h3>
+            <p class="description"><?php esc_html_e('You can disable certain price components if they are not needed.', 'listdom'); ?></p>
 
+            <?php foreach ([
+                'currency' => esc_html__('Currency', 'listdom'),
+                'max' => esc_html__('Price Max', 'listdom'),
+                'after' => esc_html__('Price Description', 'listdom'),
+                'class' => esc_html__('Price Class', 'listdom')
+            ] as $component => $label): ?>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Gallery Method', 'listdom'),
-                    'for' => 'lsd_settings_submission_gallery_method',
+                    'for' => 'lsd_price_component_'.$component,
+                    'title' => $label
                 ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::select([
-                        'id' => 'lsd_settings_submission_gallery_method',
-                        'options' => [
-                            'wp' => esc_html__('WordPress Media', 'listdom'),
-                            'uploader' => esc_html__('Simple Uploader', 'listdom'),
-                        ],
-                        'value' => $settings['submission_gallery_method'] ?? 'wp',
-                        'name' => 'lsd[submission_gallery_method]',
-                    ]); ?>
-                </div>
-            </div>
-
-            <h3 class="lsd-mb-4"><?php esc_html_e('Guest Submission', 'listdom'); ?></h3>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Status', 'listdom'),
-                    'for' => 'lsd_settings_submission_guest',
+                <div class="lsd-col-10"><?php echo LSD_Form::switcher([
+                    'id' => 'lsd_price_component_'.$component,
+                    'name' => 'lsd[price_component_'.$component.']',
+                    'value' => $settings['price_component_'.$component] ?? 1
                 ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::switcher([
-                        'id' => 'lsd_settings_submission_guest',
-                        'value' => $settings['submission_guest'] ?? 0,
-                        'name' => 'lsd[submission_guest]',
-                        'toggle' => '#lsd_settings_submission_guest_options'
-                    ]); ?>
-                    <p class="description lsd-mb-2"><?php esc_html_e("Enable listing submission for guest users!", 'listdom'); ?></p>
-                </div>
-            </div>
-            <div id="lsd_settings_submission_guest_options" class="lsd-mt-3 <?php echo isset($settings['submission_guest']) && $settings['submission_guest'] ? '' : 'lsd-util-hide'; ?>">
-                <div class="lsd-form-row">
-                    <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('User Registration', 'listdom'),
-                        'for' => 'lsd_settings_submission_guest_registration',
-                    ]); ?></div>
-                    <div class="lsd-col-4">
-                        <?php echo LSD_Form::select([
-                            'id' => 'lsd_settings_submission_guest_registration',
-                            'value' => $settings['submission_guest_registration'] ?? 'approval',
-                            'name' => 'lsd[submission_guest_registration]',
-                            'options' => [
-                                'approval' => esc_html__('Once Approved', 'listdom'),
-                                'submission' => esc_html__('Once Submitted', 'listdom'),
-                                '0' => esc_html__('Disabled', 'listdom'),
-                            ],
-                        ]); ?>
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="lsd-mb-4"><?php esc_html_e('Required Fields', 'listdom'); ?></h3>
-            <div class="lsd-form-row">
-                <div class="lsd-col-12">
-                    <ul class="lsd-boxed-list">
-                        <?php foreach($dashboard->fields() as $f => $field): ?>
-                        <li class="lsd-d-inline-block">
-                            <label class="<?php echo isset($field['always_enabled']) && $field['always_enabled'] ? 'lsd-always-enabled' : ''; ?>">
-                                <input type="hidden" name="lsd[submission_fields][<?php echo esc_attr($f); ?>][required]" value="0">
-                                <input type="checkbox" name="lsd[submission_fields][<?php echo esc_attr($f); ?>][required]" value="1" <?php echo (isset($settings['submission_fields'][$f]) && $settings['submission_fields'][$f]['required'] == 1) || (isset($field['always_enabled']) && $field['always_enabled']) ? 'checked' : ''; ?> <?php echo isset($field['always_enabled']) && $field['always_enabled'] ? 'disabled' : ''; ?>>
-                                <?php echo esc_html($field['label']); ?>
-                            </label>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
-
-            <h3 class="lsd-mb-4"><?php esc_html_e('Restrictions', 'listdom'); ?></h3>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Maximum Gallery Images', 'listdom'),
-                    'for' => 'lsd_settings_submission_max_gallery_images',
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::number([
-                        'id' => 'lsd_settings_submission_max_gallery_images',
-                        'value' => $settings['submission_max_gallery_images'] ?? '',
-                        'name' => 'lsd[submission_max_gallery_images]',
-                        'attributes' => [
-                            'min' => 0,
-                            'step' => 1
-                        ]
-                    ]); ?>
-                    <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited number of images", 'listdom'); ?></p>
-                </div>
-            </div>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Maximum Image Size Allowed', 'listdom'),
-                    'for' => 'lsd_settings_submission_max_image_upload_size',
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::number([
-                        'id' => 'lsd_settings_submission_max_image_upload_size',
-                        'value' => $settings['submission_max_image_upload_size'] ?? '',
-                        'name' => 'lsd[submission_max_image_upload_size]',
-                        'attributes' => [
-                            'min' => 0,
-                            'step' => 10
-                        ]
-                    ]); ?>
-                    <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited size of images. The size is in KB", 'listdom'); ?></p>
-                </div>
-            </div>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Maximum Description Length', 'listdom'),
-                    'for' => 'lsd_settings_submission_max_description_length',
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::number([
-                        'id' => 'lsd_settings_submission_max_description_length',
-                        'value' => $settings['submission_max_description_length'] ?? '',
-                        'name' => 'lsd[submission_max_description_length]',
-                        'attributes' => [
-                            'min' => 0,
-                            'step' => 10
-                        ]
-                    ]); ?>
-                    <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited length", 'listdom'); ?></p>
-                </div>
-            </div>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Maximum Number of Tags', 'listdom'),
-                    'for' => 'lsd_settings_submission_max_tags_count',
-                    ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::number([
-                        'id' => 'lsd_settings_submission_max_tags_count',
-                        'value' => $settings['submission_max_tags_count'] ?? '',
-                        'name' => 'lsd[submission_max_tags_count]',
-                        'attributes' => [
-                            'min' => 0,
-                            'step' => 1
-                        ]
-                    ]); ?>
-                    <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited number of tags", 'listdom'); ?></p>
-                </div>
-            </div>
-
-            <h3 class="lsd-mb-4"><?php esc_html_e('Modules', 'listdom'); ?></h3>
-            <?php foreach($dashboard->modules() as $module): ?>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => $module['label'],
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <div class="lsd-radio-toggle lsd-mb-1">
-                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="1" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_1" <?php echo isset($settings['submission_module'][$module['key']]) && $settings['submission_module'][$module['key']] == 1 ? 'checked="checked"' : ''; ?>>
-                        <label for="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_1"><?php esc_html_e('Enabled', 'listdom'); ?></label>
-                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="2" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_2" <?php echo isset($settings['submission_module'][$module['key']]) && $settings['submission_module'][$module['key']] == 2 ? 'checked="checked"' : ''; ?>>
-                        <label for="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_2"><?php esc_html_e('Editor + Admin', 'listdom'); ?></label>
-                        <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="0" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_0" <?php echo isset($settings['submission_module']) && (!isset($settings['submission_module'][$module['key']]) || !$settings['submission_module'][$module['key']]) ? 'checked="checked"' : ''; ?>>
-                        <label for="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_0"><?php esc_html_e('Disabled', 'listdom'); ?></label>
-                    </div>
-                </div>
             </div>
             <?php endforeach; ?>
         </div>

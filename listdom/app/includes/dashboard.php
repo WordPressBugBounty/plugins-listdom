@@ -83,6 +83,14 @@ class LSD_Dashboard extends LSD_Base
             $fields[$obj->key()] = ['label' => $obj->label(), 'module' => 'contact'];
         }
 
+        // Price Components
+        $price_components = LSD_Options::price_components();
+
+        // Remove Price Fields
+        if(!$price_components['max']) unset($fields['price_max']);
+        if(!$price_components['after']) unset($fields['price_after']);
+        if(!$price_components['class']) unset($fields['price_class']);
+
         return apply_filters('lsd_dashboard_fields', $fields);
     }
 }

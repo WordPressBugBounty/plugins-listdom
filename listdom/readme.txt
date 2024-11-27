@@ -4,8 +4,8 @@ Donate link: https://webilia.com/
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.0.0
 Requires PHP: 7.0
-Tested up to: 6.7
-Stable tag: 3.6.0
+Tested up to: 6.7.1
+Stable tag: 3.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -166,7 +166,7 @@ For users seeking additional features and capabilities for a [WordPress director
 *   Hierarchy Categories
 *   Embed elements in listings
 *   Featured video for each listing
-*   [Advanced intractive map search feature](https://demo.webilia.com/listdom/skins/grid-view/style-1-map-first-grid-view)
+*   [Advanced interactive map search feature](https://demo.webilia.com/listdom/skins/grid-view/style-1-map-first-grid-view)
 *   Radius search field
 *   Hierarchical dropdowns search field
 *   [Drawing tools on the map for search](https://demo.webilia.com/listdom/skins/list-view/style-1-of-list-view-map-first/)
@@ -340,6 +340,24 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 
 == Changelog ==
 
+= 3.7.0 =
+* [PRO] Added a new feature to dynamically add custom menus to the "Frontend Dashboard".
+* [PRO] Introduced the "Exclusion Filter" to exclude listings with specific categories, locations, features, and labels from search results.
+* [PRO] Implemented the "Price Components" feature to enable or disable specific price elements.
+* [PRO] Added the "Attributes Filter" to allow filtering of listings based on attributes (custom fields) at the shortcode level.
+* [PRO] Enabled bulk layout changes for specific listings using WordPress quick edit.
+* [PRO] Introduced the ability to reorder "Frontend Dashboard" menus.
+* Added an option to control the description length in applicable skins.
+* Introduced a new element to display listing excerpts.
+* Added an option to customize the dropdown style of search fields.
+* Introduced a revamped interface for selecting different skins in shortcodes.
+* Improved the overall design and usability of the frontend dashboard.
+* Enhanced the structure and visual appeal of the settings menu in the backend.
+* Improved the responsiveness of the "Side by Side" skin.
+* Enhanced the Listdom welcome wizard by adding a theme installation step.
+* Resolved an issue with customizing display options in WordPress Multisite environments.
+* Fixed a display issue where the map appeared incorrectly when set to the bottom position in list and grid skins.
+
 = 3.6.0 =
 * [PRO] Added a shortcode for an independent "Add Listing" form.
 * [PRO] Added responsive view support for the "Side by Side" skin.
@@ -364,7 +382,7 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 * Added a new "Listdom Publisher" user role with the capability to publish listings.
 * Introduced an option to add the featured image to the gallery element.
 * [PRO] Added the option to hide attribute titles within the attributes element.
-* Introduced a layout option for the features element.
+* Introduced a layout option for the features' element.
 * Added a new option to customize the sort bar layout.
 * [PRO] Enhanced per-listing display options.
 * Streamlined the licensing and activation process.
@@ -406,7 +424,7 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 * Improved loading of Google Maps API.
 * Improved listdom settings menu.
 * Fixed some issues in trial and license activation.
-* Fixed an scroll issue in sortbar.
+* Fixed a scroll issue in sortbar.
 * Fixed issue of not displaying the success and error messages in listdom dashboard.
 * Fixed an issue when latitude and / or longitude are wrong.
 

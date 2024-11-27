@@ -8,7 +8,6 @@ defined('ABSPATH') || die();
 $halfmap = $options['halfmap'] ?? [];
 $missAddonMessages = [];
 ?>
-<div class="lsd-form-row lsd-form-row-separator"></div>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
@@ -85,18 +84,19 @@ $missAddonMessages = [];
 
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
             <div class="lsd-form-row lsd-display-options-builder-option">
-            <div class="lsd-col-5"><?php echo LSD_Form::label([
-                'title' => esc_html__('Description', 'listdom'),
-                'for' => 'lsd_display_options_skin_halfmap_display_description',
-            ]); ?></div>
-            <div class="lsd-col-6">
-                <?php echo LSD_Form::switcher([
-                    'id' => 'lsd_display_options_skin_halfmap_display_description',
-                    'name' => 'lsd[display][halfmap][display_description]',
-                    'value' => $halfmap['display_description'] ?? '1'
-                ]); ?>
+                <div class="lsd-col-5"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Description', 'listdom'),
+                    'for' => 'lsd_display_options_skin_halfmap_display_description',
+                ]); ?></div>
+                <div class="lsd-col-6">
+                    <?php echo LSD_Form::switcher([
+                        'id' => 'lsd_display_options_skin_halfmap_display_description',
+                        'name' => 'lsd[display][halfmap][display_description]',
+                        'value' => $halfmap['display_description'] ?? '1',
+                        'toggle' => '#lsd_display_options_skin_halfmap_description_length_wrapper'
+                    ]); ?>
+                </div>
             </div>
-        </div>
         </div>
 
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style3">
@@ -253,15 +253,15 @@ $missAddonMessages = [];
                     'id' => 'lsd_display_options_skin_halfmap_title',
                     'name' => 'lsd[display][halfmap][display_title]',
                     'value' => $halfmap['display_title'] ?? '1',
-                    'toggle' => '#lsd_display_options_skin_halfmap_is_claimed'
+                    'toggle' => '#lsd_display_options_skin_halfmap_is_claimed_wrapper'
                 ]); ?>
             </div>
         </div>
         <?php if(class_exists('LSDADDCLM_Base')): ?>
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
-            <div class="lsd-form-row <?php echo (!isset($halfmap['display_title']) || $halfmap['display_title']) ? '1' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_halfmap_is_claimed">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 <?php echo !isset($halfmap['display_title']) || $halfmap['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_halfmap_is_claimed_wrapper">
+            <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Is Claimed', 'listdom'),
+                    'title' => esc_html__('Claim Status', 'listdom'),
                     'for' => 'lsd_display_options_skin_halfmap_is_claimed',
                 ]); ?></div>
                 <div class="lsd-col-6">
@@ -278,21 +278,20 @@ $missAddonMessages = [];
         <?php endif; ?>
 
         <?php if($this->isPro()): ?>
-                <div class="lsd-form-row lsd-display-options-builder-option">
-                    <div class="lsd-col-5"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Image', 'listdom'),
-                        'for' => 'lsd_display_options_skin_halfmap_display_image',
-                    ]); ?></div>
-                    <div class="lsd-col-6">
-                        <?php echo LSD_Form::switcher([
-                            'id' => 'lsd_display_options_skin_halfmap_display_image',
-                            'name' => 'lsd[display][halfmap][display_image]',
-                            'value' => $halfmap['display_image'] ?? '1',
-                            'toggle' => '#lsd_display_options_skin_halfmap_image_method'
-                        ]); ?>
-                    </div>
+            <div class="lsd-form-row lsd-display-options-builder-option">
+                <div class="lsd-col-5"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Image', 'listdom'),
+                    'for' => 'lsd_display_options_skin_halfmap_display_image',
+                ]); ?></div>
+                <div class="lsd-col-6">
+                    <?php echo LSD_Form::switcher([
+                        'id' => 'lsd_display_options_skin_halfmap_display_image',
+                        'name' => 'lsd[display][halfmap][display_image]',
+                        'value' => $halfmap['display_image'] ?? '1',
+                        'toggle' => '#lsd_display_options_skin_halfmap_image_method'
+                    ]); ?>
                 </div>
-
+            </div>
             <div class="lsd-form-row <?php echo !isset($halfmap['display_image']) || $halfmap['display_image'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_halfmap_image_method">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Image Method', 'listdom'),
@@ -315,6 +314,22 @@ $missAddonMessages = [];
         <?php else: ?>
             <?php $missAddonMessages[] = LSD_Base::missFeatureMessage(esc_html__('Display Image', 'listdom'), true); ?>
         <?php endif; ?>
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
+            <div class="lsd-form-row <?php echo !isset($halfmap['display_description']) || $halfmap['display_description'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_halfmap_description_length_wrapper">
+                <div class="lsd-col-5"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Description Length', 'listdom'),
+                    'for' => 'lsd_display_options_skin_halfmap_description_length',
+                ]); ?></div>
+                <div class="lsd-col-6">
+                    <?php echo LSD_Form::number([
+                        'id' => 'lsd_display_options_skin_halfmap_description_length',
+                        'name' => 'lsd[display][halfmap][description_length]',
+                        'value' => $halfmap['description_length'] ?? 10
+                    ]); ?>
+                    <p class="description"><?php esc_html_e("Description length is measured in words, so 10 means a 10-word limit.", 'listdom'); ?></p>
+                </div>
+            </div>
+        </div>
     </div>
     <?php if(count($missAddonMessages)): ?>
     <div class="lsd-addon-alert lsd-mt-4">

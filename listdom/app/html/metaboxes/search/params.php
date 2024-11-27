@@ -21,8 +21,9 @@ $radius_values = $data['radius_values'] ?? '';
 $radius_display_unit = $data['radius_display_unit'] ?? 'm';
 $radius_display = $data['radius_display'] ?? 0;
 $hide_empty = $data['hide_empty'] ?? 1;
+$dropdown_style = $data['dropdown_style'] ?? 'enhanced';
 $display_all_terms = $data['all_terms'] ?? 1;
-$terms = (isset($data['terms']) and is_array($data['terms'])) ? $data['terms'] : [];
+$terms = isset($data['terms']) && is_array($data['terms']) ? $data['terms'] : [];
 
 $min = $data['min'] ?? 0;
 $max = $data['max'] ?? 100;
@@ -49,22 +50,30 @@ $th_separator = $data['th_separator'] ?? 1;
             </div>
             <div class="lsd-search-field-param">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_method"><?php esc_html_e('Method', 'listdom'); ?></label>
-                <select class="widefat lsd-search-method" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][method]" title="<?php esc_attr_e('Display Method', 'listdom'); ?>">
+                <select id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_method" class="widefat lsd-search-method" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][method]" title="<?php esc_attr_e('Display Method', 'listdom'); ?>">
                     <?php foreach($methods as $method => $method_title): ?>
                     <option value="<?php echo esc_attr($method); ?>" <?php echo isset($data['method']) && $data['method'] === $method ? 'selected="selected"' : ''; ?>><?php echo esc_html($method_title); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
 
-            <?php if($type === 'taxonomy' or strpos($key, 'att') !== false): ?>
+            <?php if($type === 'taxonomy' || strpos($key, 'att') !== false): ?>
             <div class="lsd-search-field-param">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_hide_empty"><?php esc_html_e('Hide Empty Terms', 'listdom'); ?></label>
-                <select class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][hide_empty]" title="<?php esc_attr_e('Only display those terms that have listings', 'listdom'); ?>">
-                    <option value="1" <?php echo ($hide_empty == 1 ? 'selected="selected"' : ''); ?>><?php echo esc_html__('Yes', 'listdom'); ?></option>
-                    <option value="0" <?php echo ($hide_empty == 0 ? 'selected="selected"' : ''); ?>><?php echo esc_html__('No', 'listdom'); ?></option>
+                <select id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_hide_empty" class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][hide_empty]" title="<?php esc_attr_e('Only display those terms that have listings', 'listdom'); ?>">
+                    <option value="1" <?php echo $hide_empty == 1 ? 'selected' : ''; ?>><?php echo esc_html__('Yes', 'listdom'); ?></option>
+                    <option value="0" <?php echo $hide_empty == 0 ? 'selected' : ''; ?>><?php echo esc_html__('No', 'listdom'); ?></option>
                 </select>
             </div>
             <?php endif; ?>
+
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-dropdown-plus">
+                <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_dropdown_style"><?php esc_html_e('Dropdown Style', 'listdom'); ?></label>
+                <select id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_dropdown_style" class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][dropdown_style]">
+                    <option value="enhanced" <?php echo $dropdown_style === 'enhanced' ? 'selected' : ''; ?>><?php echo esc_html__('Enhanced', 'listdom'); ?></option>
+                    <option value="standard" <?php echo $dropdown_style === 'standard' ? 'selected' : ''; ?>><?php echo esc_html__('Standard', 'listdom'); ?></option>
+                </select>
+            </div>
 
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-text-input lsd-search-method-number-input lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-dropdown-plus lsd-search-method-mm-input lsd-search-method-hierarchical lsd-search-method-radius lsd-search-method-date-range-picker">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_placeholder"><?php esc_html_e('Placeholder', 'listdom'); ?></label>
@@ -95,16 +104,16 @@ $th_separator = $data['th_separator'] ?? 1;
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-radius-dropdown">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_display_unit"><?php esc_html_e('Radius Display Unit', 'listdom'); ?></label>
                 <select class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_display_unit" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][radius_display_unit]">
-                    <option value="m" <?php echo ($radius_display_unit === 'm' ? 'selected' : ''); ?>><?php esc_html_e('Meters', 'listdom'); ?></option>
-                    <option value="km" <?php echo ($radius_display_unit === 'km' ? 'selected' : ''); ?>><?php esc_html_e('Kilo Meters (KM)', 'listdom'); ?></option>
-                    <option value="mile" <?php echo ($radius_display_unit === 'mile' ? 'selected' : ''); ?>><?php esc_html_e('Miles', 'listdom'); ?></option>
+                    <option value="m" <?php echo $radius_display_unit === 'm' ? 'selected' : ''; ?>><?php esc_html_e('Meters', 'listdom'); ?></option>
+                    <option value="km" <?php echo $radius_display_unit === 'km' ? 'selected' : ''; ?>><?php esc_html_e('Kilo Meters (KM)', 'listdom'); ?></option>
+                    <option value="mile" <?php echo $radius_display_unit === 'mile' ? 'selected' : ''; ?>><?php esc_html_e('Miles', 'listdom'); ?></option>
                 </select>
             </div>
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-radius">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_display"><?php esc_html_e('Display Radius Field', 'listdom'); ?></label>
-                <select class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][radius_display]" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_display">
-                    <option value="1" <?php echo ($radius_display == 1 ? 'selected="selected"' : ''); ?>><?php echo esc_html__('Yes', 'listdom'); ?></option>
-                    <option value="0" <?php echo ($radius_display == 0 ? 'selected="selected"' : ''); ?>><?php echo esc_html__('No', 'listdom'); ?></option>
+                <select id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_display" class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][radius_display]">
+                    <option value="1" <?php echo $radius_display == 1 ? 'selected' : ''; ?>><?php echo esc_html__('Yes', 'listdom'); ?></option>
+                    <option value="0" <?php echo $radius_display == 0 ? 'selected' : ''; ?>><?php echo esc_html__('No', 'listdom'); ?></option>
                 </select>
             </div>
 
@@ -119,8 +128,8 @@ $th_separator = $data['th_separator'] ?? 1;
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown-plus">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_th_separator"><?php esc_html_e('Thousands Separator', 'listdom'); ?></label>
                 <select class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][th_separator]" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_th_separator">
-                    <option value="1" <?php echo ($th_separator == 1 ? 'selected="selected"' : ''); ?>><?php echo esc_html__('Yes', 'listdom'); ?></option>
-                    <option value="0" <?php echo ($th_separator == 0 ? 'selected="selected"' : ''); ?>><?php echo esc_html__('No', 'listdom'); ?></option>
+                    <option value="1" <?php echo $th_separator == 1 ? 'selected' : ''; ?>><?php echo esc_html__('Yes', 'listdom'); ?></option>
+                    <option value="0" <?php echo $th_separator == 0 ? 'selected' : ''; ?>><?php echo esc_html__('No', 'listdom'); ?></option>
                 </select>
             </div>
 
@@ -129,8 +138,8 @@ $th_separator = $data['th_separator'] ?? 1;
                 <div class="lsd-search-field-param lsd-search-field-all-terms">
                     <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_all_terms"><?php esc_html_e('Terms Method', 'listdom'); ?></label>
                     <select class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][all_terms]" title="<?php esc_attr_e('You can display certain rms if you like.', 'listdom'); ?>">
-                        <option value="1" <?php echo ($display_all_terms == 1 ? 'selected="selected"' : ''); ?>><?php echo esc_html__('Display All Terms', 'listdom'); ?></option>
-                        <option value="0" <?php echo ($display_all_terms == 0 ? 'selected="selected"' : ''); ?>><?php echo esc_html__('Display Selected Terms', 'listdom'); ?></option>
+                        <option value="1" <?php echo $display_all_terms == 1 ? 'selected' : ''; ?>><?php echo esc_html__('Display All Terms', 'listdom'); ?></option>
+                        <option value="0" <?php echo $display_all_terms == 0 ? 'selected' : ''; ?>><?php echo esc_html__('Display Selected Terms', 'listdom'); ?></option>
                     </select>
                 </div>
                 <div class="lsd-search-field-param lsd-search-field-terms <?php echo ($display_all_terms == 1 ? 'lsd-util-hide' : ''); ?>">

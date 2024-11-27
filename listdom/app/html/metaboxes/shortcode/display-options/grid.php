@@ -8,7 +8,6 @@ defined('ABSPATH') || die();
 $grid = $options['grid'] ?? [];
 $missAddonMessages = [];
 ?>
-<div class="lsd-form-row lsd-form-row-separator"></div>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
@@ -94,7 +93,8 @@ $missAddonMessages = [];
                     <?php echo LSD_Form::switcher([
                         'id' => 'lsd_display_options_skin_grid_display_description',
                         'name' => 'lsd[display][grid][display_description]',
-                        'value' => $grid['display_description'] ?? '1'
+                        'value' => $grid['display_description'] ?? '1',
+                        'toggle' => '#lsd_display_options_skin_grid_description_length_wrapper'
                     ]); ?>
                 </div>
             </div>
@@ -187,15 +187,15 @@ $missAddonMessages = [];
                     'id' => 'lsd_display_options_skin_grid_title',
                     'name' => 'lsd[display][grid][display_title]',
                     'value' => $grid['display_title'] ?? '1',
-                    'toggle' => '#lsd_display_options_skin_grid_is_claimed'
+                    'toggle' => '#lsd_display_options_skin_grid_is_claimed_wrapper'
                 ]); ?>
             </div>
         </div>
         <?php if(class_exists('LSDADDCLM_Base')): ?>
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
-            <div class="lsd-form-row <?php echo (!isset($grid['display_title']) || $grid['display_title']) ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_grid_is_claimed">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 <?php echo !isset($grid['display_title']) || $grid['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_grid_is_claimed_wrapper">
+            <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Is Claimed', 'listdom'),
+                    'title' => esc_html__('Claim Status', 'listdom'),
                     'for' => 'lsd_display_options_skin_grid_is_claimed',
                 ]); ?></div>
                 <div class="lsd-col-6">
@@ -315,6 +315,22 @@ $missAddonMessages = [];
         <?php else: ?>
             <?php $missAddonMessages[] = LSD_Base::missFeatureMessage(esc_html__('Display Image', 'listdom'), true); ?>
         <?php endif; ?>
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
+            <div class="lsd-form-row <?php echo !isset($grid['display_description']) || $grid['display_description'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_grid_description_length_wrapper">
+                <div class="lsd-col-5"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Description Length', 'listdom'),
+                    'for' => 'lsd_display_options_skin_grid_description_length',
+                ]); ?></div>
+                <div class="lsd-col-6">
+                    <?php echo LSD_Form::number([
+                        'id' => 'lsd_display_options_skin_grid_description_length',
+                        'name' => 'lsd[display][grid][description_length]',
+                        'value' => $grid['description_length'] ?? 10
+                    ]); ?>
+                    <p class="description"><?php esc_html_e("Description length is measured in words, so 10 means a 10-word limit.", 'listdom'); ?></p>
+                </div>
+            </div>
+        </div>
     </div>
     <?php if(count($missAddonMessages)): ?>
     <div class="lsd-addon-alert lsd-mt-4">

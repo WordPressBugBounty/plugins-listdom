@@ -8,7 +8,6 @@ defined('ABSPATH') || die();
 $side = $options['side'] ?? [];
 $missAddonMessages = [];
 ?>
-<div class="lsd-form-row lsd-form-row-separator"></div>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">

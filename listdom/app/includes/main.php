@@ -246,13 +246,50 @@ class LSD_Main extends LSD_Base
 
     public static function get_attributes()
     {
-        return get_terms([
+        $attributes = get_terms([
             'taxonomy' => LSD_Base::TAX_ATTRIBUTE,
             'hide_empty' => false,
             'meta_key' => 'lsd_index',
             'orderby' => 'meta_value_num',
             'order' => 'ASC',
         ]);
+
+        // Always Array
+        return is_wp_error($attributes) ? [] : $attributes;
+    }
+
+    public static function get_attributes_details(): array
+    {
+        $terms = self::get_attributes();
+
+        $attributes = [];
+        foreach ($terms as $term)
+        {
+            $field_type = get_term_meta($term->term_id, 'lsd_field_type', true);
+            $values_raw = get_term_meta($term->term_id, 'lsd_values', true);
+            $icon = get_term_meta($term->term_id, 'lsd_icon', true);
+            $required = get_term_meta($term->term_id, 'lsd_required', true);
+            $editor = get_term_meta($term->term_id, 'lsd_editor', true);
+
+            $values_array = is_string($values_raw)
+                ? explode(',', $values_raw)
+                : (is_array($values_raw) ? $values_raw : []);
+
+            $values = array_combine($values_array, $values_array);
+
+            $attributes[] = [
+                'id' => $term->term_id,
+                'name' => $term->name,
+                'slug' => $term->slug,
+                'field_type' => $field_type,
+                'values' => $values,
+                'icon' => $icon,
+                'required' => $required,
+                'editor' => $editor,
+            ];
+        }
+
+        return $attributes;
     }
 
     /**

@@ -26,6 +26,8 @@ abstract class LSD_IX_Array extends LSD_IX
      */
     protected $attributes;
 
+    private $statuses;
+
     /**
      * Constructor method
      */
@@ -39,6 +41,18 @@ abstract class LSD_IX_Array extends LSD_IX
 
         // Attributes
         $this->attributes = LSD_Main::get_attributes();
+
+        // Statuses
+        $this->statuses = [
+            'publish',
+            'trash',
+            'pending',
+            'draft',
+            'future',
+            LSD_Base::STATUS_EXPIRED,
+            LSD_Base::STATUS_HOLD,
+            LSD_Base::STATUS_OFFLINE
+        ];
     }
 
     /**
@@ -51,7 +65,7 @@ abstract class LSD_IX_Array extends LSD_IX
         // Filter Options
         $args = apply_filters('lsd_export_listings_args', [
             'post_type' => LSD_Base::PTYPE_LISTING,
-            'post_status' => ['publish'],
+            'post_status' => $this->statuses,
             'posts_per_page' => '-1',
         ]);
 
@@ -69,31 +83,32 @@ abstract class LSD_IX_Array extends LSD_IX
     {
         // Columns
         $columns = [
-            esc_html__('ID', 'listdom-csv'),
-            esc_html__('Title', 'listdom-csv'),
-            esc_html__('Description', 'listdom-csv'),
-            esc_html__('Date', 'listdom-csv'),
-            esc_html__('Owner', 'listdom-csv'),
-            esc_html__('Price', 'listdom-csv'),
-            esc_html__('Price Max', 'listdom-csv'),
-            esc_html__('Price Description', 'listdom-csv'),
-            esc_html__('Currency', 'listdom-csv'),
-            esc_html__('Address', 'listdom-csv'),
-            esc_html__('Latitude', 'listdom-csv'),
-            esc_html__('Longitude', 'listdom-csv'),
-            esc_html__('Link', 'listdom-csv'),
-            esc_html__('Email', 'listdom-csv'),
-            esc_html__('Phone', 'listdom-csv'),
-            esc_html__('Website', 'listdom-csv'),
-            esc_html__('Contact Address', 'listdom-csv'),
-            esc_html__('Remark', 'listdom-csv'),
-            esc_html__('Image', 'listdom-csv'),
-            esc_html__('Gallery', 'listdom-csv'),
-            esc_html__('Category', 'listdom-csv'),
-            esc_html__('Locations', 'listdom-csv'),
-            esc_html__('Tags', 'listdom-csv'),
-            esc_html__('Features', 'listdom-csv'),
-            esc_html__('Labels', 'listdom-csv'),
+            esc_html__('ID', 'listdom'),
+            esc_html__('Title', 'listdom'),
+            esc_html__('Description', 'listdom'),
+            esc_html__('Date', 'listdom'),
+            esc_html__('Owner', 'listdom'),
+            esc_html__('Status', 'listdom'),
+            esc_html__('Price', 'listdom'),
+            esc_html__('Price Max', 'listdom'),
+            esc_html__('Price Description', 'listdom'),
+            esc_html__('Currency', 'listdom'),
+            esc_html__('Address', 'listdom'),
+            esc_html__('Latitude', 'listdom'),
+            esc_html__('Longitude', 'listdom'),
+            esc_html__('Link', 'listdom'),
+            esc_html__('Email', 'listdom'),
+            esc_html__('Phone', 'listdom'),
+            esc_html__('Website', 'listdom'),
+            esc_html__('Contact Address', 'listdom'),
+            esc_html__('Remark', 'listdom'),
+            esc_html__('Image', 'listdom'),
+            esc_html__('Gallery', 'listdom'),
+            esc_html__('Category', 'listdom'),
+            esc_html__('Locations', 'listdom'),
+            esc_html__('Tags', 'listdom'),
+            esc_html__('Features', 'listdom'),
+            esc_html__('Labels', 'listdom'),
         ];
 
         foreach ($this->networks as $network => $values)
@@ -110,7 +125,7 @@ abstract class LSD_IX_Array extends LSD_IX
         foreach ($this->attributes as $attribute)
         {
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-            if ($type == 'separator') continue;
+            if ($type === 'separator') continue;
 
             $columns[] = $attribute->name;
         }
@@ -132,7 +147,9 @@ abstract class LSD_IX_Array extends LSD_IX
 
         // Taxonomies
         $taxonomies = $this->get_taxonomies($listing['ID']);
-        $category_id = (isset($taxonomies[LSD_Base::TAX_CATEGORY]) and is_array($taxonomies[LSD_Base::TAX_CATEGORY]) and isset($taxonomies[LSD_Base::TAX_CATEGORY][0]) and isset($taxonomies[LSD_Base::TAX_CATEGORY][0]['term_id'])) ? $taxonomies[LSD_Base::TAX_CATEGORY][0]['term_id'] : null;
+        $category_id = is_array($taxonomies[LSD_Base::TAX_CATEGORY]) && isset($taxonomies[LSD_Base::TAX_CATEGORY][0]['term_id'])
+            ? $taxonomies[LSD_Base::TAX_CATEGORY][0]['term_id']
+            : null;
 
         // Listing Data
         $row = [
@@ -141,6 +158,7 @@ abstract class LSD_IX_Array extends LSD_IX
             $listing['post_content'],
             $listing['post_date'],
             get_the_author_meta('user_email', $listing['post_author']),
+            in_array($listing['post_status'], $this->statuses) ? $listing['post_status'] : 'draft',
             $metas['lsd_price'] ?? '',
             $metas['lsd_price_max'] ?? '',
             $metas['lsd_price_after'] ?? '',
@@ -178,17 +196,17 @@ abstract class LSD_IX_Array extends LSD_IX
         foreach ($this->attributes as $attribute)
         {
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-            if ($type == 'separator') continue;
+            if ($type === 'separator') continue;
 
             // Available for All Categories?
             $all_categories = get_term_meta($attribute->term_id, 'lsd_all_categories', true);
-            if (trim($all_categories) == '') $all_categories = 1;
+            if (trim($all_categories) === '') $all_categories = 1;
 
             // Specific Categories
             $categories = get_term_meta($attribute->term_id, 'lsd_categories', true);
             if ($all_categories) $categories = [];
 
-            if ($all_categories or ($category_id and is_array($categories) and count($categories) and isset($categories[$category_id]) and $categories[$category_id])) $row[] = $metas['lsd_attribute_' . $attribute->term_id] ?? '';
+            if ($all_categories || ($category_id && is_array($categories) && count($categories) && isset($categories[$category_id]) && $categories[$category_id])) $row[] = $metas['lsd_attribute_' . $attribute->term_id] ?? '';
             else $row[] = '';
         }
 
@@ -206,7 +224,7 @@ abstract class LSD_IX_Array extends LSD_IX
     public function get_taxonomies_text($taxonomies, $taxonomy): string
     {
         $terms = [];
-        if (isset($taxonomies[$taxonomy]) and is_array($taxonomies[$taxonomy]) and count($taxonomies[$taxonomy]))
+        if (isset($taxonomies[$taxonomy]) && is_array($taxonomies[$taxonomy]) && count($taxonomies[$taxonomy]))
         {
             foreach ($taxonomies[$taxonomy] as $term) $terms[] = $term['name'];
         }
@@ -227,7 +245,7 @@ abstract class LSD_IX_Array extends LSD_IX
 
         // Required Title
         $title = $mapped['post_title'] ?? '';
-        if (trim($title) == '') return [];
+        if (trim($title) === '') return [];
 
         // Building Listing Data
         $listing = [
@@ -236,6 +254,7 @@ abstract class LSD_IX_Array extends LSD_IX
             'post_content' => $mapped['post_content'] ?? '',
             'post_author' => $mapped['post_author'] ?? '',
             'post_date' => $mapped['post_date'] ?? '',
+            'post_status' => $mapped['post_status'] ?? 'publish',
             'image' => $mapped['lsd_image'] ?? '',
             'gallery' => isset($mapped['lsd_gallery']) ? explode(',', $mapped['lsd_gallery']) : '',
             'taxonomies' => [],
@@ -249,12 +268,12 @@ abstract class LSD_IX_Array extends LSD_IX
             if (in_array($key, $main->taxonomies()))
             {
                 $listing['taxonomies'][$key] = [];
-                if (is_null($value) || trim($value) == '') continue;
+                if (is_null($value) || trim($value) === '') continue;
 
                 $values = explode(',', $value);
                 foreach ($values as $v)
                 {
-                    if (trim($v) == '') continue;
+                    if (trim($v) === '') continue;
                     $listing['taxonomies'][$key][] = ['name' => trim($v)];
                 }
             }

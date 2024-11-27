@@ -35,6 +35,11 @@ $assets = new LSD_Assets();
                 <div class="stepper-line"></div>
                 <div class="lsd-flex">
                     <div class="step">4</div>
+                    <span class="step-label"><?php esc_html_e('Step Four', 'listdom'); ?></span>
+                </div>
+                <div class="stepper-line"></div>
+                <div class="lsd-flex lsd-step-ready">
+                    <div class="step">5</div>
                     <span class="step-label"><?php esc_html_e('Ready', 'listdom'); ?></span>
                 </div>
             </div>

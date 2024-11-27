@@ -12,7 +12,7 @@ $content = get_post_meta($post->ID, 'lsd_content', true);
         <div class="lsd-col-1">
             <?php echo LSD_Form::label([
                 'for' => 'lsd_notification_content_hook',
-                'title' => esc_html__('Hook', 'listdom'),
+                'title' => esc_html__('Event', 'listdom'),
                 'class' => 'lsd-label',
             ]); ?>
         </div>

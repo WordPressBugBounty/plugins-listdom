@@ -19,6 +19,7 @@ $embeds = isset($elements['embed']['enabled']) && $elements['embed']['enabled'] 
 $video = isset($elements['$video']['enabled']) && $elements['$video']['enabled'] ? $this->featured_video() : '';
 $labels = isset($elements['labels']['enabled']) && $elements['labels']['enabled'] ? $this->labels() : '';
 $content = isset($elements['content']['enabled']) && $elements['content']['enabled'] ? $this->content($this->filtered_content) : '';
+$excerpt = isset($elements['excerpt']['enabled']) && $elements['excerpt']['enabled'] ? $this->excerpt() : '';
 $remark = isset($elements['remark']['enabled']) && $elements['remark']['enabled'] ? $this->remark() : '';
 $tags = isset($elements['tags']['enabled']) && $elements['tags']['enabled'] ? $this->tags() : '';
 $contact_info = isset($elements['contact']['enabled']) && $elements['contact']['enabled'] ? $this->contact_info() : '';
@@ -42,6 +43,7 @@ $availability = isset($elements['availability']['enabled']) && $elements['availa
         <?php endif; ?>
 
 		<?php if($title) echo LSD_Kses::element($title); ?>
+        <?php if($excerpt) echo LSD_Kses::element($excerpt); ?>
 
 		<?php if($categories) echo LSD_Kses::element($categories); ?>
 		<?php if($price) echo LSD_Kses::element($price); ?>

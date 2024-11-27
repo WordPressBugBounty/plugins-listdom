@@ -222,6 +222,7 @@ class LSD_Options extends LSD_Base
                         'owner' => ['enabled' => 1, 'show_title' => 0],
                         'share' => ['enabled' => 1, 'show_title' => 0],
                         'abuse' => ['enabled' => 0, 'show_title' => 0],
+                        'excerpt' => ['enabled' => 0, 'show_title' => 0],
                     ],
                 ];
 
@@ -417,6 +418,10 @@ class LSD_Options extends LSD_Base
                     'tag_archive' => '',
                     'feature_archive' => '',
                     'label_archive' => '',
+                    'price_component_currency' => 1,
+                    'price_component_max' => 1,
+                    'price_component_after' => 1,
+                    'price_component_class' => 1,
                     'submission_tax_listdom-location_method' => 'checkboxes',
                     'submission_tax_listdom-feature_method' => 'checkboxes',
                     'submission_module' => [
@@ -503,6 +508,19 @@ class LSD_Options extends LSD_Base
         $currency = $settings['default_currency'] ?? 'USD';
 
         return apply_filters('lsd_default_currency', trim($currency));
+    }
+
+    public static function price_components(): array
+    {
+        $settings = LSD_Options::settings();
+        $pro = LSD_Base::isPro();
+
+        return [
+            'currency' => isset($settings['price_component_currency']) && $pro ? (int) $settings['price_component_currency'] : 1,
+            'max' => isset($settings['price_component_max']) && $pro ? (int) $settings['price_component_max'] : 1,
+            'after' => isset($settings['price_component_after']) && $pro ? (int) $settings['price_component_after'] : 1,
+            'class' => isset($settings['price_component_class']) && $pro ? (int) $settings['price_component_class'] : 1,
+        ];
     }
 
     /**

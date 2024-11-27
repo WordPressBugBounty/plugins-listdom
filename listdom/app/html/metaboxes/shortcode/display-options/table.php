@@ -19,7 +19,6 @@ $missAddonMessages = [];
 foreach ($fields_data as $key => $field) if (!isset($columns[$key])) $columns[$key] = $field;
 foreach ($columns as $key => $row) if (!isset($fields_data[$key])) unset($columns[$key]);
 ?>
-<div class="lsd-form-row lsd-form-row-separator"></div>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
@@ -104,7 +103,7 @@ foreach ($columns as $key => $row) if (!isset($fields_data[$key])) unset($column
 </div>
 <?php endif; ?>
 
-<div class="lsd-form-group lsd-py-5 <?php echo isset($table['style']) && $table['style'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_style">
+<div class="lsd-form-group lsd-py-5" id="lsd_display_options_style">
     <div class="lsd-row">
         <div class="lsd-col-2"></div>
         <div class="lsd-col-6">

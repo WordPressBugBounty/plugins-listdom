@@ -98,13 +98,29 @@ class LSD_Assets extends LSD_Base
         // Include Listdom backend script file
         wp_enqueue_script('lsd-backend', $this->lsd_asset_url('js/backend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable'], $this->version(), true);
 
+        $icon_options = [];
+        $fonts = LSD_Base::get_font_icons();
+        foreach ($fonts as $font => $code) $icon_options[] = ['value' => $font, 'label' => $font];
+
         // Localize Vars
         wp_localize_script('lsd-backend', 'lsd', [
             'ajaxurl' => admin_url('admin-ajax.php'),
             'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
             'i18n_field_search' => __('Add the “More Options” fields in the row below', 'listdom'),
             'i18n_field_delete' => __('Click twice to delete', 'listdom'),
+            'i18n_field_label' => __('Label', 'listdom'),
+            'i18n_placeholder_label' => __('Enter the menu name', 'listdom'),
+            'i18n_placeholder_slug' => __('Enter the menu Slug', 'listdom'),
+            'i18n_placeholder_icon' => __('Enter the icon class', 'listdom'),
+            'i18n_description_label' => __('This is the label for your menu item.', 'listdom'),
+            'i18n_description_slug' => __('Provide a unique slug for this menu.', 'listdom'),
+            'i18n_description_icon' => __('Select the icon.', 'listdom'),
+            'i18n_description_content' => __('Type dashboard content, You can also use shorcodes.', 'listdom'),
+            'icon_options' => $icon_options,
         ]);
+
+        // WP Editor
+        wp_enqueue_editor();
 
         // Include Listdom backend CSS file
         wp_enqueue_style('lsd-backend', $this->lsd_asset_url('css/backend.css'), [], $this->version());
@@ -419,6 +435,7 @@ class LSD_Assets extends LSD_Base
                      'listdom-addons',
                      'toplevel_page_listdom',
                      'widgets',
+                     'plugins'
                  ] as $menu_id)
                 {
                     if (strpos($base, $menu_id) !== false) return true;

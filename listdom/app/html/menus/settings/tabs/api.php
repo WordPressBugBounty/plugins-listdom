@@ -10,8 +10,8 @@ $api = LSD_Options::api();
     <?php if($this->isLite()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('API', 'listdom')), 'warning'); ?>
     <?php else: ?>
     <form id="lsd_api_form">
-        <div class="lsd-settings-form-group">
-            <h3><?php esc_html_e('API Tokens', 'listdom'); ?></h3>
+        <div class="lsd-settings-form-group lsd-box-white lsd-rounded lsd-mt-4 lsd-p-5">
+            <h3 class="lsd-mt-0"><?php esc_html_e('API Tokens', 'listdom'); ?></h3>
             <div class="lsd-mt-4 lsd-mb-5">
                 <p class="description"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
                 <button type="button" class="button" id="lsd_settings_api_add_token"><?php esc_html_e('Add Token', 'listdom'); ?></button>
@@ -66,14 +66,14 @@ jQuery('#lsd_settings_api_add_token').on('click', function()
         success: function(response)
         {
             // Unloading
-            loading.stop();
+            loading.stop(null, 200);
 
             if(response.success === 1) location.reload();
         },
         error: function()
         {
             // Unloading
-            loading.stop();
+            loading.stop(null, 200);
         }
     });
 });
@@ -120,13 +120,13 @@ jQuery('.lsd-api-remove-token').on('click', function()
                 jQuery('#lsd_settings_api_tokens_'+i).remove();
 
                 // Unloading
-                loading.stop();
+                loading.stop(null, 200);
             }
         },
         error: function()
         {
             // Unloading
-            loading.stop();
+            loading.stop(null, 200);
         }
     });
 });
@@ -151,12 +151,12 @@ jQuery('#lsd_api_form').on('submit', function(event)
         success: function()
         {
             // Unloading
-            loading.stop();
+            loading.stop(null, 1000);
         },
         error: function()
         {
             // Unloading
-            loading.stop();
+            loading.stop(null, 1000);
         }
     });
 });

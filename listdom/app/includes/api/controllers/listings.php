@@ -101,7 +101,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
 
         // Save the Data
         $entity = new LSD_Entity_Listing($id);
-        $entity->save($vars, true);
+        $entity->save($vars);
 
         if ($status === 'publish') $message = esc_html__('The listing published.', 'listdom');
         else $message = esc_html__('The listing submitted. It will publish as soon as possible.', 'listdom');
@@ -178,7 +178,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
 
         // Save the Data
         $entity = new LSD_Entity_Listing($id);
-        $entity->save($vars, true);
+        $entity->save($vars);
 
         // Trigger Action
         do_action('lsd_api_listing_updated', $id, $request);

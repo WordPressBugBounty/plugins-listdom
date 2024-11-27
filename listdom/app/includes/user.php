@@ -18,6 +18,21 @@ class LSD_User extends LSD_Base
         parent::__construct();
     }
 
+    public static function create(string $email)
+    {
+        $email = sanitize_email($email);
+
+        $exists = email_exists($email);
+        if ($exists) return $exists;
+        else
+        {
+            $results = register_new_user($email, $email);
+            if (!is_wp_error($results)) return $results;
+        }
+
+        return 0;
+    }
+
     public static function register($user_login, $user_email, $password = null)
     {
         // Password

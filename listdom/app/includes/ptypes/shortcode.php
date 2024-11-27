@@ -221,9 +221,19 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         // Skin
         update_post_meta($post_id, 'lsd_skin', $display['skin'] ?? '');
 
-        // Filter Options
+        // Filter and Exclude Options
         $filter = $lsd['filter'] ?? [];
+        $exclude = $lsd['exclude'] ?? [];
+
+        // Process each filter category
+        foreach ($filter as $key => $filter_values)
+        {
+            if (isset($exclude[$key]) && is_array($filter_values))
+                $filter[$key] = array_diff($filter_values, $exclude[$key]);
+        }
+
         update_post_meta($post_id, 'lsd_filter', $filter);
+        update_post_meta($post_id, 'lsd_exclude', $exclude);
 
         // Map Control Options
         $mapcontrols = $lsd['mapcontrols'] ?? [];

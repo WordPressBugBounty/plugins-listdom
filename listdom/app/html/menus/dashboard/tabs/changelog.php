@@ -3,6 +3,57 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v3.7.0 <span>November 26th, 2024</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added a new feature to dynamically add custom menus to the "Frontend Dashboard."', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Introduced the "Exclusion Filter" to exclude listings with specific categories, locations, features, and labels from search results.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Implemented the "Price Components" feature to enable or disable specific price elements.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added the "Attributes Filter" to allow filtering of listings based on attributes (custom fields) at the shortcode level.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Enabled bulk layout changes for specific listings using WordPress quick edit.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Introduced the ability to reorder "Frontend Dashboard" menus.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added an option to control the description length in applicable skins.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Introduced a new element to display listing excerpts.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added an option to customize the dropdown style of search fields.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Introduced a revamped interface for selecting different skins in shortcodes.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved the overall design and usability of the frontend dashboard.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Enhanced the structure and visual appeal of the settings menu in the backend.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved the responsiveness of the "Side by Side" skin.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Enhanced the Listdom welcome wizard by adding a theme installation step.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Resolved an issue with customizing display options in WordPress Multisite environments.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed a display issue where the map appeared incorrectly when set to the bottom position in list and grid skins.', 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v3.6.0 <span>October 27th, 2024</span></h2>
     <ul class="lsd-changelog">
         <li>

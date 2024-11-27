@@ -8,8 +8,8 @@ $addon = apply_filters('lsd_is_addon_installed', false);
 ?>
 <h2 class="nav-tab-wrapper">
     <a class="nav-tab <?php echo $this->tab === '' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings')); ?>"><?php esc_html_e('General', 'listdom'); ?></a>
-    <a class="nav-tab <?php echo $this->tab === 'archive-pages' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=archive-pages')); ?>"><?php esc_html_e('Archive Pages', 'listdom'); ?></a>
-    <a class="nav-tab <?php echo $this->tab === 'slugs' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=slugs')); ?>"><?php esc_html_e('Slugs', 'listdom'); ?></a>
+    <a class="nav-tab <?php echo $this->tab === 'frontend-dashboard' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard')); ?>"><?php esc_html_e('Frontend Dashboard', 'listdom'); ?></a>
+    <a class="nav-tab <?php echo $this->tab === 'archive-slugs' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=archive-slugs')); ?>"><?php esc_html_e('Archive & Slugs', 'listdom'); ?></a>
     <a class="nav-tab <?php echo $this->tab === 'social-networks' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=social-networks')); ?>"><?php esc_html_e('Social', 'listdom'); ?></a>
     <a class="nav-tab <?php echo $this->tab === 'custom-styles' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=custom-styles')); ?>"><?php esc_html_e('Custom Styles', 'listdom'); ?></a>
     <a class="nav-tab <?php echo $this->tab === 'details-page' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=details-page')); ?>"><?php esc_html_e('Details Page', 'listdom'); ?></a>

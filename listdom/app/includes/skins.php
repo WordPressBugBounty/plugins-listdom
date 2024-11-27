@@ -15,6 +15,8 @@ class LSD_Skins extends LSD_Base
     public $atts = [];
     public $skin_options = [];
     public $filter_options = [];
+    public $exclude_options = [];
+
     public $search_options = [];
     public $sm_shortcode;
     public $sm_position;
@@ -53,6 +55,7 @@ class LSD_Skins extends LSD_Base
     public $display_review_stars = true;
     public $display_slider_arrows = true;
     public $display_read_more_button = true;
+    public $description_length = 12;
 
     public $image_method = 'cover';
     public $display_share_buttons = false;
@@ -110,7 +113,13 @@ class LSD_Skins extends LSD_Base
         $this->sm_ajax = isset($this->search_options['ajax']) && trim($this->search_options['ajax']) !== '' ? (int) $this->search_options['ajax'] : 0;
 
         // Filter Options
-        $this->filter_options = $this->atts['lsd_filter'] ?? [];
+        $this->filter_options = $this->apply_current_query(
+            isset($this->atts['lsd_filter']) && is_array($this->atts['lsd_filter'])
+                ? $this->atts['lsd_filter']
+                : []
+        );
+
+        $this->exclude_options = $this->atts['lsd_exclude'] ?? [];
 
         // Map Controls Options
         $this->mapcontrols = $this->atts['lsd_mapcontrols'] ?? [];
@@ -141,11 +150,12 @@ class LSD_Skins extends LSD_Base
         $this->display_slider_arrows = !isset($this->skin_options['display_slider_arrows']) || $this->skin_options['display_slider_arrows'];
         $this->columns = isset($this->skin_options['columns']) && $this->skin_options['columns'] ? sanitize_text_field($this->skin_options['columns']) : 1;
         $this->default_view = isset($this->skin_options['default_view']) ? sanitize_text_field($this->skin_options['default_view']) : 'grid';
+        $this->description_length = isset($this->skin_options['description_length']) && is_numeric($this->skin_options['description_length']) ? $this->skin_options['description_length'] : 12;
 
         // Map Search Options
         $this->mapsearch = isset($this->skin_options['mapsearch']) && $this->skin_options['mapsearch'];
         $this->autoGPS = isset($this->skin_options['auto_gps']) && $this->skin_options['auto_gps'];
-        $this->maxBounds = apply_filters('lsd_map_max_bounds', (isset($this->skin_options['max_bounds']) && is_array($this->skin_options['max_bounds']) ? $this->skin_options['max_bounds'] : []));
+        $this->maxBounds = apply_filters('lsd_map_max_bounds', isset($this->skin_options['max_bounds']) && is_array($this->skin_options['max_bounds']) ? $this->skin_options['max_bounds'] : []);
 
         // HTML Class
         $this->html_class = isset($this->atts['html_class']) && trim($this->atts['html_class']) ? sanitize_text_field($this->atts['html_class']) : '';
@@ -203,7 +213,9 @@ class LSD_Skins extends LSD_Base
 
         // Pagination Options
         $paged = $this->page;
-        $this->limit = (isset($this->skin_options['limit']) and trim($this->skin_options['limit'])) ? sanitize_text_field($this->skin_options['limit']) : 300;
+        $this->limit = isset($this->skin_options['limit']) && trim($this->skin_options['limit'])
+            ? sanitize_text_field($this->skin_options['limit'])
+            : 300;
 
         $this->args['posts_per_page'] = $this->limit;
         $this->args['paged'] = $paged;
@@ -215,9 +227,11 @@ class LSD_Skins extends LSD_Base
         $this->args['lsd-init'] = true;
     }
 
-    public function query_keyword()
+    public function query_keyword(): string
     {
-        return (isset($this->filter_options['s']) and trim($this->filter_options['s']) != '') ? sanitize_text_field($this->filter_options['s']) : null;
+        return isset($this->filter_options['s']) && trim($this->filter_options['s']) !== ''
+            ? sanitize_text_field($this->filter_options['s'])
+            : '';
     }
 
     public function query_status()
@@ -242,7 +256,17 @@ class LSD_Skins extends LSD_Base
                     'taxonomy' => $tax,
                     'field' => 'term_id',
                     'terms' => $this->filter_options[$tax],
-                    'operator' => apply_filters('lsd_search_' . $tax . '_operator', 'IN'),
+                    'operator' => apply_filters('lsd_search_' . $tax . '_operator', 'IN', $tax),
+                ];
+            }
+
+            if (isset($this->exclude_options[$tax]) && is_array($this->exclude_options[$tax]) && count($this->exclude_options[$tax]))
+            {
+                $tax_query[] = [
+                    'taxonomy' => $tax,
+                    'field' => 'term_id',
+                    'terms' => $this->exclude_options[$tax],
+                    'operator' => apply_filters('lsd_search_' . $tax . '_exclude_operator', 'NOT IN', $tax),
                 ];
             }
         }
@@ -256,7 +280,7 @@ class LSD_Skins extends LSD_Base
                     'taxonomy' => LSD_Base::TAX_TAG,
                     'field' => 'term_id',
                     'terms' => $this->filter_options[LSD_Base::TAX_TAG],
-                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_operator', 'IN'),
+                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_operator', 'IN', LSD_Base::TAX_TAG),
                 ];
             }
             else if (trim($this->filter_options[LSD_Base::TAX_TAG]))
@@ -265,7 +289,7 @@ class LSD_Skins extends LSD_Base
                     'taxonomy' => LSD_Base::TAX_TAG,
                     'field' => 'name',
                     'terms' => explode(',', sanitize_text_field(trim($this->filter_options[LSD_Base::TAX_TAG], ', '))),
-                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_operator', 'IN'),
+                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_operator', 'IN', LSD_Base::TAX_TAG),
                 ];
             }
         }
@@ -277,11 +301,11 @@ class LSD_Skins extends LSD_Base
     {
         $meta_query = [];
 
-        if (isset($this->filter_options['attributes']) and is_array($this->filter_options['attributes']) and count($this->filter_options['attributes']))
+        if (isset($this->filter_options['attributes']) && is_array($this->filter_options['attributes']) && count($this->filter_options['attributes']))
         {
             foreach ($this->filter_options['attributes'] as $key => $value)
             {
-                if ((is_array($value) and !count($value)) or (!is_array($value) and trim($value) == '')) continue;
+                if ((is_array($value) && !count($value)) || (!is_array($value) && trim($value) == '')) continue;
 
                 $q = LSD_Query::attribute($key, $value);
                 if (!$q) continue;
@@ -299,7 +323,7 @@ class LSD_Skins extends LSD_Base
         $authors = '';
 
         // Authors
-        if (isset($this->filter_options['authors']) and is_array($this->filter_options['authors']) and count($this->filter_options['authors']))
+        if (isset($this->filter_options['authors']) && is_array($this->filter_options['authors']) && count($this->filter_options['authors']))
         {
             $authors = sanitize_text_field(implode(',', $this->filter_options['authors']));
         }
@@ -310,13 +334,13 @@ class LSD_Skins extends LSD_Base
     public function query_ixclude()
     {
         // Include
-        if (isset($this->filter_options['include']) and is_array($this->filter_options['include']) and count($this->filter_options['include']))
+        if (isset($this->filter_options['include']) && is_array($this->filter_options['include']) && count($this->filter_options['include']))
         {
             $this->args['post__in'] = $this->filter_options['include'];
         }
 
         // Exclude
-        if (isset($this->filter_options['exclude']) and is_array($this->filter_options['exclude']) and count($this->filter_options['exclude']))
+        if (isset($this->filter_options['exclude']) && is_array($this->filter_options['exclude']) && count($this->filter_options['exclude']))
         {
             $this->args['post__not_in'] = $this->filter_options['exclude'];
         }
@@ -375,7 +399,7 @@ class LSD_Skins extends LSD_Base
 
     public function query_join($join, $wp_query)
     {
-        if (is_string($wp_query->query_vars['post_type']) and $wp_query->query_vars['post_type'] == LSD_Base::PTYPE_LISTING and $wp_query->get('lsd-init', false))
+        if (is_string($wp_query->query_vars['post_type']) && $wp_query->query_vars['post_type'] === LSD_Base::PTYPE_LISTING && $wp_query->get('lsd-init', false))
         {
             global $wpdb;
             $join .= " LEFT JOIN `" . $wpdb->prefix . "lsd_data` AS lsddata ON `" . $wpdb->prefix . "posts`.`ID` = lsddata.`id` ";
@@ -470,7 +494,7 @@ class LSD_Skins extends LSD_Base
             $this->next_page = isset($args['paged']) ? $args['paged'] + 1 : 1;
 
             // Restore original Post Data
-            wp_reset_postdata();
+            LSD_LifeCycle::reset();
         }
 
         return $ids;
@@ -550,6 +574,23 @@ class LSD_Skins extends LSD_Base
         return $this->args = wp_parse_args($args, $this->args);
     }
 
+    public function apply_current_query(array $filter_options = []): array
+    {
+        // Current Query
+        $q = get_queried_object();
+
+        // It's not a taxonomy query
+        if (!isset($q->taxonomy) || !isset($q->term_id)) return $filter_options;
+
+        // It's not a Listdom taxonomy
+        if (!in_array($q->taxonomy, $this->taxonomies())) return $filter_options;
+
+        if (isset($filter_options[$q->taxonomy]) && is_array($filter_options[$q->taxonomy])) $filter_options[$q->taxonomy][] = $q->term_id;
+        else $filter_options[$q->taxonomy] = [$q->term_id];
+
+        return $filter_options;
+    }
+
     public function fetch()
     {
         // Get Listings
@@ -588,7 +629,7 @@ class LSD_Skins extends LSD_Base
     {
         if (!$limit)
         {
-            if ($type === 'map' and isset($this->skin_options['maplimit'])) $skin_limit = $this->skin_options['maplimit'];
+            if ($type === 'map' && isset($this->skin_options['maplimit'])) $skin_limit = $this->skin_options['maplimit'];
             else $skin_limit = $this->skin_options['limit'] ?? 300;
 
             $this->args['posts_per_page'] = $skin_limit;
@@ -665,7 +706,8 @@ class LSD_Skins extends LSD_Base
 
         if ($this->pagination === 'loadmore') return $this->get_loadmore_button();
         else if ($this->pagination === 'scroll') return $this->get_scroll_pagination();
-        else return '';
+
+        return '';
     }
 
     public function get_loadmore_button()

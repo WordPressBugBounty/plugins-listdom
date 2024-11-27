@@ -162,25 +162,25 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
     public function filter_content($content)
     {
         // It's not singular page of listing
-        if (!is_singular($this->PT)) return $content;
-
-        // Body Started?
-        if (!LSD_LifeCycle::isBodyStarted()) return $content;
-
-        // Content Already Printed
-        if (LSD_LifeCycle::isContentPrinted()) return $content;
+        if (!is_singular($this->PT) || !in_the_loop() || !is_main_query()) return $content;
 
         global $post;
-        if ($post->post_type != $this->PT) return $content;
+        if ($post->post_type !== $this->PT) return $content;
 
         // Is it an endpoint?
         if ($ep = LSD_Endpoints::is()) return LSD_Endpoints::output($ep);
 
-        // Mark Content as Printed
-        LSD_LifeCycle::setContentPrinted(true);
+        // Remove Loop
+        remove_filter('the_content', [$this, 'filter_content']);
 
         // Get Listing Details Content
-        return $this->get($content);
+        $output = $this->get($content);
+
+        // Add Filter
+        add_filter('the_content', [$this, 'filter_content']);
+
+        // Content
+        return $output;
     }
 
     public function get($content)
@@ -378,6 +378,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         {
             $contact_info = $this->contact_info();
             $rendered = str_replace('{contact}', LSD_Kses::element($contact_info), $rendered);
+        }
+
+        // Listing Excerpt
+        if (strpos($this->pattern, '{excerpt}') !== false)
+        {
+            $contact_info = $this->excerpt();
+            $rendered = str_replace('{excerpt}', LSD_Kses::element($contact_info), $rendered);
         }
 
         // Wrap the content
@@ -590,6 +597,25 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $output = '<div class="lsd-single-page-section lsd-single-page-section-content">';
         if ($this->details_page_options['elements']['content']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . esc_html__('Description', 'listdom') . '</h2>';
         $output .= '<div class="lsd-single-content-wrapper lsd-single-element lsd-single-content" ' . $schema . '>' . $content . '</div>';
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    public function excerpt($limit = -1, $read_more = false): string
+    {
+        $excerpt = $this->entity->get_excerpt($limit, $read_more);
+        $title_alignment = !empty($this->details_page_options['elements']['excerpt']['title_align']) ? ' ' . $this->details_page_options['elements']['excerpt']['title_align'] : '';
+
+        // Don't show anything when there is no content!
+        if (!trim($excerpt)) return '';
+
+        // Schema
+        $schema = lsd_schema()->description();
+
+        $output = '<div class="lsd-single-page-section lsd-single-page-section-excerpt">';
+        if ($this->details_page_options['elements']['excerpt']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . esc_html__('Excerpt', 'listdom') . '</h2>';
+        $output .= '<div class="lsd-single-excerpt-wrapper lsd-single-element lsd-single-excerpt" ' . $schema . '>' . $excerpt . '</div>';
         $output .= '</div>';
 
         return $output;
@@ -877,6 +903,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             else if ($key === 'owner') $content .= LSD_Kses::form($this->owner());
             else if ($key === 'abuse') $content .= LSD_Kses::form($this->abuse());
             else if ($key === 'availability') $content .= LSD_Kses::element($this->availability());
+            else if ($key === 'excerpt') $content .= LSD_Kses::element($this->excerpt());
             else $content .= '{' . $key . '}';
         }
 

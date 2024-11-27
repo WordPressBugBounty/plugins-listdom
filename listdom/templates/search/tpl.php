@@ -23,7 +23,10 @@ jQuery(document).ready(function()
         ajax: '.$this->ajax.',
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         nonce: "'.wp_create_nonce('lsd_search_form').'",
-        sf: '.json_encode($this->sf).'
+        sf: '.json_encode($this->sf).',
+        select2: {
+            noResults: "'.esc_js(esc_html__('No results found.', 'listdom')).'"
+        }
     });
 });
 </script>');

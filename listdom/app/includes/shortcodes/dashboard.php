@@ -147,7 +147,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 $this->listings[] = get_post();
             }
 
-            wp_reset_postdata();
+            LSD_LifeCycle::reset();
         }
         else $this->listings = [];
 
@@ -230,6 +230,31 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function menus(): string
     {
+        // Apply Filters
+        $menus = $this->menu_ids();
+
+        // Current Page
+        $current = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : 'manage';
+
+        $output = '<ul class="lsd-dashboard-menus">';
+        foreach ($menus as $key => $menu)
+        {
+            $target = $menu['target'] ?? '_self';
+            $icon = $menu['icon'] ?? 'fas fa-tachometer-alt';
+            $id = $menu['id'] ?? 'lsd_dashboard_menus_' . $key;
+
+            $output .= '<li id="' . esc_attr($id) . '" ' . ($current == $key ? 'class="lsd-active"' : '') . '><a href="' . esc_url($menu['url']) . '" target="' . esc_attr($target) . '"><i class="lsd-icon ' . esc_attr($icon) . '"></i>' . esc_html($menu['label']) . '</a></li>';
+        }
+
+        $output .= '</ul>';
+        return $output;
+    }
+
+    public function menu_ids(): array
+    {
+        // Order Menus
+        $order_menus = $this->settings['dashboard_menus'] ?? [];
+
         // Default Menus
         $menus = [
             'manage' => ['label' => esc_html__('Dashboard', 'listdom'), 'id' => 'lsd_dashboard_menus_manage', 'url' => $this->url, 'icon' => 'fas fa-tachometer-alt'],
@@ -244,21 +269,32 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Apply Filters
         $menus = apply_filters('lsd_dashboard_menus', $menus, $this);
 
-        // Current Page
-        $current = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : 'manage';
-
-        $output = '<ul class="lsd-dashboard-menus">';
-        foreach ($menus as $key => $menu)
+        if (isset($order_menus))
         {
-            $target = $menu['target'] ?? '_self';
-            $icon = $menu['icon'] ?? 'fas fa-tachometer-alt';
-            $id = $menu['id'] ?? 'lsd_dashboard_menus_' . $key;
+            $ordered_menus = [];
+            if (isset($menus['manage'])) $ordered_menus['manage'] = $menus['manage'];
+            unset($menus['manage']);
 
-            $output .= '<li id="' . esc_attr($id) . '" ' . ($current == $key ? 'class="lsd-active"' : '') . '><i class="lsd-icon ' . esc_attr($icon) . '"></i><a href="' . esc_url($menu['url']) . '" target="' . esc_attr($target) . '">' . esc_html($menu['label']) . '</a></li>';
+            foreach ($order_menus as $menu_id)
+            {
+                foreach ($menus as $key => $menu)
+                {
+                    if ($menu['id'] === $menu_id)
+                    {
+                        $ordered_menus[$key] = $menu;
+                        unset($menus[$key]);
+                        break;
+                    }
+                }
+            }
+
+            $ordered_menus = array_merge($ordered_menus, $menus);
+            if (isset($menus['logout'])) $ordered_menus['logout'] = $menus['logout'];
+
+            $menus = $ordered_menus;
         }
 
-        $output .= '</ul>';
-        return $output;
+        return $menus;
     }
 
     protected function get_form_link($listing_id = null): string
@@ -425,7 +461,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 'post_title' => $post_title,
                 'post_content' => $post_content,
                 'post_type' => LSD_Base::PTYPE_LISTING,
-                'post_status' => $status
+                'post_status' => $status,
             ]);
         }
 
@@ -434,7 +470,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             'ID' => $id,
             'post_title' => $post_title,
             'post_name' => sanitize_title($post_title),
-            'post_content' => $post_content
+            'post_content' => $post_content,
         ]);
 
         // Tags

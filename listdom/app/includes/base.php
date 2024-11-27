@@ -336,7 +336,7 @@ class LSD_Base
         return count($sf) ? $sf : $default;
     }
 
-    public function taxonomies(): array
+    public static function taxonomies(): array
     {
         return [
             LSD_Base::TAX_CATEGORY,
@@ -347,7 +347,7 @@ class LSD_Base
         ];
     }
 
-    public function postTypes(): array
+    public static function postTypes(): array
     {
         return [
             LSD_Base::PTYPE_LISTING,
@@ -392,25 +392,29 @@ class LSD_Base
         }
     }
 
-    public static function missFeatureMessage($feature = null, $multiple = false): string
+    public static function missFeatureMessage($feature = null, $multiple = false, $html = true): string
     {
+        $feature_html = $feature
+            ? ($html ? '<strong>' . esc_html($feature) . '</strong>' : $feature)
+            : ($multiple ? esc_html__('These features', 'listdom') : esc_html__('This feature', 'listdom'));
+
         // Whether Listdom Pro installed or Not
         $installed = is_plugin_active('listdom-pro/listdom.php');
         if ($installed)
         {
-            if ($multiple) return sprintf(esc_html__('%s are included in the pro add-on. You should activate the %s now to enjoy all the features!', 'listdom'), ($feature ? '<strong>' . esc_html($feature) . '</strong>' : esc_html__('This feature', 'listdom')), '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>');
-            else return sprintf(esc_html__('%s is included in the pro add-on. You should activate the %s now to enjoy all the features!', 'listdom'), ($feature ? '<strong>' . esc_html($feature) . '</strong>' : esc_html__('This feature', 'listdom')), '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>');
+            if ($multiple) return sprintf(esc_html__('%s are included in the pro add-on. You should activate the %s now to enjoy all its features!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>');
+            else return sprintf(esc_html__('%s is included in the pro add-on. You should activate the %s now to enjoy all its features!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>');
         }
         else
         {
-            if ($multiple) return sprintf(esc_html__('%s are included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), ($feature ? '<strong>' . esc_html($feature) . '</strong>' : esc_html__('This feature', 'listdom')), '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
-            else return sprintf(esc_html__('%s is included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), ($feature ? '<strong>' . esc_html($feature) . '</strong>' : esc_html__('This feature', 'listdom')), '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
+            if ($multiple) return sprintf(esc_html__('%s are included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
+            else return sprintf(esc_html__('%s is included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
         }
     }
 
     public static function missAddonMessage($addon = '', $feature = ''): string
     {
-        return sprintf(esc_html__('Activate the %s Addon to display the %s option ', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '"><strong>' . esc_html__($addon, 'listdom')) . '</strong></a>', esc_html__($feature, 'listdom'));
+        return sprintf(esc_html__('Activate the %s add-on to use the %s feature.', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '"><strong>' . esc_html__($addon, 'listdom')) . '</strong></a>', $feature);
     }
 
     public static function getActivationURL(): string
@@ -534,21 +538,21 @@ class LSD_Base
 
     public function remove_qs_var($key, $url = '')
     {
-        if (trim($url) == '') $url = $this->current_url();
+        if (is_null($url) || trim($url) === '') $url = $this->current_url();
 
         return remove_query_arg($key, $url);
     }
 
     public function add_qs_var($key, $value, $url = ''): string
     {
-        if (trim($url) == '') $url = $this->current_url();
+        if (is_null($url) || trim($url) === '') $url = $this->current_url();
 
         return add_query_arg($key, $value, $url);
     }
 
     public function add_qs_vars($vars, $url = ''): string
     {
-        if (trim($url) == '') $url = $this->current_url();
+        if (is_null($url) || trim($url) === '') $url = $this->current_url();
 
         return add_query_arg($vars, $url);
     }
@@ -1945,6 +1949,7 @@ class LSD_Base
      */
     public static function get_post_by_title(string $title, string $post_type = 'post')
     {
+        // Query
         $query = new WP_Query([
             'title' => $title,
             'post_type' => $post_type,
@@ -1962,8 +1967,10 @@ class LSD_Base
             }
         }
 
-        wp_reset_postdata();
+        // Reset Data
+        LSD_LifeCycle::reset();
 
+        // Return Post
         return $post;
     }
 

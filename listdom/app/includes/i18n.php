@@ -21,7 +21,7 @@ class LSD_i18n extends LSD_Base
     public function init()
     {
         // Register Language Files
-        add_action('plugins_loaded', [$this, 'load_languages']);
+        add_action('init', [$this, 'load_languages']);
     }
 
     public function load_languages()

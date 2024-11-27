@@ -54,6 +54,13 @@ class LSD_Builders extends LSD_Base
             $template->post_type === LSDADDELM_Base::PTYPE_DETAILS
         ) return $this->elementor($template_id);
 
+        // Divi
+        if (
+            class_exists('LSDADDDIV_Base') &&
+            function_exists('et_theme_builder_frontend_render_layout') &&
+            $template->post_type === LSDADDDIV_Base::PTYPE_DETAILS
+        ) return $this->divi($template_id);
+
         // Anything
         return $this->content($template_id);
     }
@@ -68,6 +75,17 @@ class LSD_Builders extends LSD_Base
         return Elementor\Plugin::instance()
             ->frontend
             ->get_builder_content_for_display($template_id, true);
+    }
+
+    public function divi($template_id): string
+    {
+        // Payload
+        LSD_Payload::set('single', $this->single);
+        LSD_Payload::set('listing', $this->listing);
+
+        // Build Content
+        $template_content = get_post_field('post_content', $template_id);
+        return et_core_intentionally_unescaped(et_builder_render_layout($template_content), 'html');
     }
 
     public function content($template_id)

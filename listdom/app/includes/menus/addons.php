@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Menus_Addons extends LSD_Menus
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function output()
     {
         // Generate output

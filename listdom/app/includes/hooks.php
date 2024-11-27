@@ -10,7 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Hooks extends LSD_Base
 {
-
     /**
      * Constructor method
      */
@@ -56,7 +55,7 @@ class LSD_Hooks extends LSD_Base
     public function redirect_after_activation()
     {
         // No need to redirect
-        if (!get_option('lsd_activation_redirect', false)) return;
+        if (!get_option('lsd_activation_redirect', false) || wp_doing_ajax()) return;
 
         // Delete the option to don't do it again
         delete_option('lsd_activation_redirect');

@@ -57,6 +57,13 @@ class LSD_IX_Mapping extends LSD_IX
                 'description' => esc_html__("An email field should get mapped. If mapped then listdom will create a user if not exists and assign the listing to the user.", 'listdom'),
                 'default' => [$default, 'email'],
             ],
+            'post_status' => [
+                'label' => esc_html__('Listing Status', 'listdom'),
+                'type' => 'text',
+                'mandatory' => false,
+                'description' => esc_html__("An text field should get mapped. valid values are publish, trash, draft, and pending. Default value is publish.", 'listdom'),
+                'default' => [$default, 'email'],
+            ],
             'lsd_price' => [
                 'label' => esc_html__('Price', 'listdom'),
                 'type' => 'number',
@@ -228,7 +235,7 @@ class LSD_IX_Mapping extends LSD_IX
         foreach ($attributes as $attribute)
         {
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-            if ($type == 'separator') continue;
+            if ($type === 'separator') continue;
 
             $mapping_type = in_array($type, ['number', 'email', 'url']) ? $type : 'text';
 
@@ -292,29 +299,29 @@ class LSD_IX_Mapping extends LSD_IX
         $mapped = [];
         foreach ($mappings as $key => $mapping)
         {
-            $field = (isset($mapping['map']) and trim($mapping['map']) != '') ? $mapping['map'] : null;
-            $default = (isset($mapping['default']) and trim($mapping['default']) != '') ? $mapping['default'] : null;
+            $field = isset($mapping['map']) && trim($mapping['map']) !== '' ? $mapping['map'] : null;
+            $default = isset($mapping['default']) && trim($mapping['default']) !== '' ? $mapping['default'] : null;
 
             // Not Mapped
             if (is_null($field) && is_null($default)) continue;
 
             // Value
-            $value = (!is_null($field) && isset($raw[$field]) && trim($raw[$field]) != '') ? $raw[$field] : $default;
+            $value = !is_null($field) && isset($raw[$field]) && trim($raw[$field]) !== '' ? $raw[$field] : $default;
 
             // Normalize the Value
-            $value = ($value && !preg_match('!!u', $value)) ? utf8_encode($value) : $value;
+            $value = $value && !preg_match('!!u', $value) ? utf8_encode($value) : $value;
 
             // Add to Mapped Data
             $mapped[$key] = $value;
         }
 
         // Latitude & Longitude by Address
-        if ((!isset($mapped['lsd_latitude']) or !isset($mapped['lsd_longitude'])) and isset($mapped['lsd_address']) and trim($mapped['lsd_address']))
+        if ((!isset($mapped['lsd_latitude']) || !isset($mapped['lsd_longitude'])) && isset($mapped['lsd_address']) && trim($mapped['lsd_address']))
         {
             $main = new LSD_Main();
             $geopoint = $main->geopoint($mapped['lsd_address']);
 
-            if (isset($geopoint[0]) and $geopoint[0] and isset($geopoint[1]) and $geopoint[1])
+            if (isset($geopoint[0]) && $geopoint[0] && isset($geopoint[1]) && $geopoint[1])
             {
                 $mapped['lsd_latitude'] = $geopoint[0];
                 $mapped['lsd_longitude'] = $geopoint[1];
@@ -337,12 +344,12 @@ class LSD_IX_Mapping extends LSD_IX
         $delimiters = [";" => 0, "," => 0, "\t" => 0, "|" => 0];
 
         $handle = fopen($csv, 'r');
-        $firstLine = fgets($handle);
+        $first_line = fgets($handle);
         fclose($handle);
 
         foreach ($delimiters as $delimiter => &$count)
         {
-            $count = count(str_getcsv($firstLine, $delimiter));
+            $count = count(str_getcsv($first_line, $delimiter));
         }
 
         return array_search(max($delimiters), $delimiters);

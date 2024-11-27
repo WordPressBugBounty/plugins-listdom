@@ -32,18 +32,25 @@ class LSD_Element_Content extends LSD_Element
     public function excerpt($post_id, $limit = 15, $read_more = false)
     {
         // Post Excerpt
-        $content = get_the_excerpt($post_id);
+        $excerpt = get_the_excerpt($post_id);
 
         // Post Content
-        if (trim($content) == 0) $content = strip_shortcodes(get_post_field('post_content', $post_id));
+        if (trim($excerpt) === '' && $limit > 0) $excerpt = strip_shortcodes(get_post_field('post_content', $post_id));
 
-        $words = explode(' ', strip_tags($content));
-        $excerpt = array_slice($words, 0, $limit);
+        $has_more = false;
+        if ($limit > 0)
+        {
+            $words = explode(' ', strip_tags($excerpt));
+            $excerpt = array_slice($words, 0, $limit);
+            $excerpt = implode(' ', $excerpt);
 
-        $HTML = implode(' ', $excerpt) . (count($words) > $limit ? ' ...' : '') . ((count($words) > $limit and $read_more) ? ' <a href="' . get_the_permalink($post_id) . '" class="lsd-excerpt-read-more lsd-color-m-txt">[' . esc_html__('More', 'listdom') . ']</a>' : '');
+            $has_more = count($words) > $limit;
+        }
+
+        $HTML = $excerpt . ($has_more ? ' ...' : '') . ($has_more && $read_more ? ' <a href="' . get_the_permalink($post_id) . '" class="lsd-excerpt-read-more lsd-color-m-txt">[' . esc_html__('More', 'listdom') . ']</a>' : '');
 
         return $this->content(
-            $HTML,
+            wpautop($HTML),
             $this,
             [
                 'post_id' => $post_id,

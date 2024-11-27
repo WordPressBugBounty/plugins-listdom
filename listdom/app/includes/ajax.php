@@ -119,6 +119,21 @@ class LSD_Ajax extends LSD_Base
                 $items .= '<li data-value="' . esc_attr($user->ID) . '">' . $user->user_email . '</li>';
             }
         }
+        else if (in_array($source, $this->taxonomies()))
+        {
+            $terms = get_terms([
+                'taxonomy' => $source,
+                'name__like' => $term,
+                'hide_empty' => false,
+                'number' => 10,
+            ]);
+
+            foreach ($terms as $term)
+            {
+                $found = true;
+                $items .= '<li data-value="' . esc_attr($term->term_id) . '">' . esc_html($term->name) . '</li>';
+            }
+        }
         else
         {
             $posts = get_posts([

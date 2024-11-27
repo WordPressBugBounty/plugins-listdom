@@ -59,4 +59,15 @@ class LSD_LifeCycle extends LSD_Base
     {
         return apply_filters('lsd_lifecycle_is_content_printed', self::$content_printed);
     }
+
+    public static function post($post_id)
+    {
+        $post = get_post($post_id);
+        setup_postdata($GLOBALS['post'] =& $post);
+    }
+
+    public static function reset()
+    {
+        wp_reset_postdata();
+    }
 }

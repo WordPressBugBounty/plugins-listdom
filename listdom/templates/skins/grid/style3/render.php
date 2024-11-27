@@ -71,7 +71,7 @@ $ids = $this->listings;
 
             <?php if ($this->display_description): ?>
                 <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
-                    <?php echo LSD_Kses::element($listing->get_excerpt(10, false)); ?>
+                    <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length)); ?>
                 </p>
             <?php endif; ?>
 
@@ -82,7 +82,7 @@ $ids = $this->listings;
                     <?php echo LSD_Kses::element($listing->get_rate_stars('summary')); ?>
                 <?php endif; ?>
                 <?php if ($this->display_address): ?>
-                    <?php if ($address = $listing->get_address(true)): ?>
+                    <?php if ($address = $listing->get_address()): ?>
                         <div class="lsd-listing-address" <?php echo lsd_schema()->address(); ?>>
                             <?php echo LSD_Kses::element($address); ?>
                         </div>

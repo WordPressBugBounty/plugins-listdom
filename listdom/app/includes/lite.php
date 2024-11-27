@@ -46,7 +46,7 @@ class LSD_Lite extends LSD_Base
         if (strpos($file, LSD_BASENAME) !== false)
         {
             $links = array_merge($links, [
-                'documentation' => '<a href="https://webilia.com/docs/doc-category/listdom/" target="_blank"><strong>' . esc_html__('Documentation', 'listdom') . '</strong></a>',
+                'documentation' => '<a href="https://webilia.com/docs/listdom/" target="_blank"><strong>' . esc_html__('Documentation', 'listdom') . '</strong></a>',
                 'support' => '<a href="https://webilia.com/support/" target="_blank">' . esc_html__('Support', 'listdom') . '</a>',
             ]);
         }

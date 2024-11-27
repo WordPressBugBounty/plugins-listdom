@@ -148,13 +148,14 @@ class LSD_Search_Helper extends LSD_Base
     {
         $key = $filter['key'] ?? '';
         $title = $filter['title'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
         $id = $args['id'] ?? null;
         $name = $args['name'] ?? 'sf-' . $key;
         $current = $args['current'] ?? null;
 
-        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '">';
+        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
         $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
         $output .= $this->dropdown_options($filter, 0, $current);
         $output .= '</select>';
@@ -248,7 +249,7 @@ class LSD_Search_Helper extends LSD_Base
             $level_terms = (isset($hierarchy[$l]) and is_array($hierarchy[$l])) ? $hierarchy[$l] : [];
             $placeholder = $placeholders[($l - 1)] ?? $placeholders[0];
 
-            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-level="' . esc_attr($l) . '">';
+            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-level="' . esc_attr($l) . '" data-enhanced="0">';
             $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
 
             foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id or in_array($level_term->term_id, $current_parents)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';

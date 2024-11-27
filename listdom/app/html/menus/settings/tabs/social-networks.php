@@ -8,8 +8,8 @@ $networks = LSD_Options::socials();
 ?>
 <div class="lsd-settings-wrap">
     <form id="lsd_socials_form">
-        <div class="lsd-settings-form-group">
-            <h3><?php esc_html_e('Social Networks', 'listdom'); ?></h3>
+        <div class="lsd-settings-form-group lsd-box-white lsd-rounded lsd-mt-4 lsd-p-5">
+            <h3 class="lsd-mt-0"><?php esc_html_e('Social Networks', 'listdom'); ?></h3>
             <div class="lsd-form-row lsd-mb-3">
                 <div class="lsd-col-2"></div>
                 <div class="lsd-col-1"></div>

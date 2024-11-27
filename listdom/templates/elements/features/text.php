@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var int $post_id */
 
-$terms = wp_get_post_terms($post_id, LSD_Base::TAX_FEATURE, []);
+$terms = wp_get_post_terms($post_id, LSD_Base::TAX_FEATURE);
 if(!count($terms)) return '';
 
 $text = '';

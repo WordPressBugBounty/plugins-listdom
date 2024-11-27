@@ -297,6 +297,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? '';
         $method = $filter['method'] ?? 'dropdown';
         $title = $filter['title'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
         $all_terms = $filter['all_terms'] ?? 1;
@@ -325,7 +326,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         {
             $current = $this->current($name, explode(',', $default));
 
-            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple>';
+            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
 
             $terms = $this->helper->get_terms($filter);
             foreach ($terms as $key => $term)
@@ -401,6 +402,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? '';
         $method = $filter['method'] ?? 'number-input';
         $title = $filter['title'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
         $id = 'lsd_search_' . $this->id . '_' . $key;
@@ -418,7 +420,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         }
         else if ($method === 'dropdown')
         {
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
 
             $terms = $this->helper->get_terms($filter, true);
             foreach ($terms as $term) $output .= '<option value="' . esc_attr($term) . '" ' . ($current == $term ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
@@ -435,7 +437,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $name = 'sf-' . $key . '-grq';
             $current = $this->current($name, $default);
 
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
 
             $output .= '<option value="0">' . $placeholder . '</option>';
             $i = $min;
@@ -459,6 +461,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? '';
         $method = $filter['method'] ?? 'dropdown';
         $title = $filter['title'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
         $id = 'lsd_search_' . $this->id . '_' . $key;
@@ -472,7 +475,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         if ($method === 'dropdown')
         {
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
             $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
 
             $terms = $this->helper->get_terms($filter, true);
@@ -485,7 +488,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $name = 'sf-' . $key . '-in';
             $current = $this->current($name, explode(',', $default));
 
-            $output .= '<select name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple>';
+            $output .= '<select name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
 
             $terms = $this->helper->get_terms($filter, true);
             foreach ($terms as $term) $output .= '<option value="' . esc_attr($term) . '" ' . (in_array($term, $current) ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
@@ -521,6 +524,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? '';
         $method = $filter['method'] ?? 'dropdown-plus';
         $title = $filter['title'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
 
         $min_placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
         $max_placeholder = isset($filter['max_placeholder']) && trim($filter['max_placeholder']) ? $filter['max_placeholder'] : $title;
@@ -543,7 +547,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $name = 'sf-att-' . $key . '-grq';
             $current = $this->current($name, $min_default);
 
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($min_placeholder, 'listdom') . '">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($min_placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
 
             $output .= '<option value="0">' . $min_placeholder . '</option>';
             $i = $min;
@@ -580,6 +584,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? '';
         $method = $filter['method'] ?? 'dropdown';
         $title = $filter['title'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
         $id = 'lsd_search_' . $this->id . '_' . $key;
@@ -595,7 +600,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $name = 'sf-att-' . $key . '-eq';
             $current = $this->current($name, $default);
 
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
 
             $output .= '<option value="">' . esc_html__('Any', 'listdom') . '</option>';
             $output .= '<option value="1" ' . (($current == 1) ? 'selected="selected"' : '') . '>' . esc_html__('$', 'listdom') . '</option>';

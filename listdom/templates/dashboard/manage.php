@@ -45,7 +45,7 @@ jQuery(document).ready(function()
                         ]); ?>
                     </div>
 
-                    <?php else: echo LSD_Base::alert(sprintf(esc_html__("No listing found! %s your first listing now.", 'listdom'), '<a href="'.esc_url($this->get_form_link()).'">'.esc_html__('Add', 'listdom').'</a>'), 'info'); ?>
+                    <?php else: echo LSD_Base::alert(sprintf(esc_html__("No listing found! %s your first listing now.", 'listdom'), '<a href="'.esc_url($this->get_form_link()).'">'.esc_html__('Add', 'listdom').'</a>')); ?>
                     <?php endif; ?>
 
                 </div>

@@ -8,7 +8,6 @@ defined('ABSPATH') || die();
 $slider = $options['slider'] ?? [];
 $missAddonMessages = [];
 ?>
-<div class="lsd-form-row lsd-form-row-separator"></div>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
@@ -175,15 +174,15 @@ $missAddonMessages = [];
                     'id' => 'lsd_display_options_skin_slider_title',
                     'name' => 'lsd[display][slider][display_title]',
                     'value' => $slider['display_title'] ?? '1',
-                    'toggle' => '#lsd_display_options_skin_slider_is_claimed'
+                    'toggle' => '#lsd_display_options_skin_slider_is_claimed_wrapper'
                 ]); ?>
             </div>
         </div>
         <?php if(class_exists('LSDADDCLM_Base')): ?>
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5">
-            <div class="lsd-form-row <?php echo (!isset($slider['display_title']) || $slider['display_title']) ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_slider_is_claimed">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5 <?php echo !isset($slider['display_title']) || $slider['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_slider_is_claimed_wrapper">
+            <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Is Claimed', 'listdom'),
+                    'title' => esc_html__('Claim Status', 'listdom'),
                     'for' => 'lsd_display_options_skin_slider_is_claimed',
                 ]); ?></div>
                 <div class="lsd-col-6">

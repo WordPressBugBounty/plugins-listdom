@@ -46,7 +46,7 @@ class LSD_API_Resources_Attribute extends LSD_API_Resource
             $values = get_term_meta($term->term_id, 'lsd_values', true);
 
             // This attribute is not specified for listing category
-            if (!$all_categories and (count($categories) and !isset($categories[$category->term_id]))) continue;
+            if (!$all_categories && (count($categories) && !isset($categories[$category->term_id]))) continue;
 
             $attributes[] = [
                 'id' => $attribute_id,

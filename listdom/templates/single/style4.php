@@ -8,13 +8,14 @@ defined('ABSPATH') || die();
 $elements = $this->details_page_options['elements'] ?? [];
 
 $categories = isset($elements['categories']['enabled']) && $elements['categories']['enabled'] ? $this->categories(true, 'text') : '';
-$title = isset($elements['title']['enabled']) && $elements['title']['enabled'] ? $this->title(false, true) : '';
+$title = isset($elements['title']['enabled']) && $elements['title']['enabled'] ? $this->title(false) : '';
 $discussion_status = isset($elements['discussion']['enabled']) && $elements['discussion']['enabled'];
 $labels = isset($elements['labels']['enabled']) && $elements['labels']['enabled'] ? $this->labels() : '';
 $image = isset($elements['image']['enabled']) && $elements['image']['enabled'] ? $this->image() : '';
 $gallery = isset($elements['gallery']['enabled']) && $elements['gallery']['enabled'] ? $this->gallery() : '';
 $features = isset($elements['features']['enabled']) && $elements['features']['enabled'] ? $this->features() : '';
 $content = isset($elements['content']['enabled']) && $elements['content']['enabled'] ? $this->content($this->filtered_content) : '';
+$excerpt = isset($elements['excerpt']['enabled']) && $elements['excerpt']['enabled'] ? $this->excerpt() : '';
 $embeds = isset($elements['embed']['enabled']) && $elements['embed']['enabled'] ? $this->embeds() : '';
 $video = isset($elements['video']['enabled']) && $elements['video']['enabled'] ? $this->featured_video() : '';
 $price = isset($elements['price']['enabled']) && $elements['price']['enabled'] ? $this->price() : '';
@@ -77,6 +78,7 @@ $rate_summary = $this->entity->get_rate_stars('summary');
     <div class="lsd-col-12">
 
         <?php if ($price) echo '<div class="lsd-single-page-price lsd-single-page-section">' . LSD_Kses::element($price) . '</div>'; ?>
+        <?php if ($excerpt) echo LSD_Kses::element($excerpt); ?>
         <?php if ($features) echo LSD_Kses::element($features); ?>
         <?php if ($content) echo LSD_Kses::element($content); ?>
         <?php if ($gallery) echo LSD_Kses::element($gallery); ?>

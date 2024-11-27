@@ -1,4 +1,4 @@
-<div class="lsd-welcome-step-content lsd-util-hide" id="step-4">
+<div class="lsd-welcome-step-content lsd-util-hide" id="step-5">
     <div class="lsd-finish-setup">
         <div class="lsd-check">
             <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/check.svg')); ?>" alt="">

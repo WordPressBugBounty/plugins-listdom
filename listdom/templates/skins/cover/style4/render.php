@@ -40,7 +40,7 @@ $ids = $this->listings;
                     <div class="lsd-col-9">
                         <?php if ($this->display_location): ?>
                             <div class="lsd-listing-locations">
-                                <?php echo LSD_Kses::element($listing->get_address(true)); ?>
+                                <?php echo LSD_Kses::element($listing->get_address()); ?>
                             </div>
                         <?php endif; ?>
                     </div>

@@ -61,6 +61,6 @@ class LSD_Personalize extends LSD_Base
         if ($blog_id > 1 && LSD_File::exists($this->get_listdom_path() . '/assets/css/personalized-' . $blog_id . '.css')) $css = $this->lsd_asset_url('css/personalized-' . $blog_id . '.css');
 
         // Include Listdom personalized CSS file
-        wp_enqueue_style('lsd-personalized', $css, ['lsd-frontend'], LSD_VERSION);
+        wp_enqueue_style('lsd-personalized', $css, ['lsd-frontend'], LSD_Assets::version());
     }
 }

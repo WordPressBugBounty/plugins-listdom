@@ -15,6 +15,7 @@ switch($this->tab)
         $this->include_html_file('menus/welcome/tabs/location.php');
         $this->include_html_file('menus/welcome/tabs/quick.php');
         $this->include_html_file('menus/welcome/tabs/dummy-data.php');
+        $this->include_html_file('menus/welcome/tabs/listdomer.php');
         $this->include_html_file('menus/welcome/tabs/finish.php');
 
         break;

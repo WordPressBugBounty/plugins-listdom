@@ -84,7 +84,7 @@ class LSD_Taxonomies extends LSD_Base
         $settings = LSD_Options::settings();
 
         // Listdom Location
-        if (is_tax(LSD_Base::TAX_LOCATION) and isset($settings['location_archive']) and trim($settings['location_archive']))
+        if (is_tax(LSD_Base::TAX_LOCATION) && isset($settings['location_archive']) && trim($settings['location_archive']))
         {
             $file = 'taxonomy-' . LSD_Base::TAX_LOCATION . '.php';
             $template = locate_template($file);
@@ -93,7 +93,7 @@ class LSD_Taxonomies extends LSD_Base
             if ($template == '') $template = lsd_template($file);
         }
         // Listdom Category
-        else if (is_tax(LSD_Base::TAX_CATEGORY) and isset($settings['category_archive']) and trim($settings['category_archive']))
+        else if (is_tax(LSD_Base::TAX_CATEGORY) && isset($settings['category_archive']) && trim($settings['category_archive']))
         {
             $file = 'taxonomy-' . LSD_Base::TAX_CATEGORY . '.php';
             $template = locate_template($file);
@@ -102,7 +102,7 @@ class LSD_Taxonomies extends LSD_Base
             if ($template == '') $template = lsd_template($file);
         }
         // Listdom Feature
-        else if (is_tax(LSD_Base::TAX_FEATURE) and isset($settings['feature_archive']) and trim($settings['feature_archive']))
+        else if (is_tax(LSD_Base::TAX_FEATURE) && isset($settings['feature_archive']) && trim($settings['feature_archive']))
         {
             $file = 'taxonomy-' . LSD_Base::TAX_FEATURE . '.php';
             $template = locate_template($file);
@@ -111,7 +111,7 @@ class LSD_Taxonomies extends LSD_Base
             if ($template == '') $template = lsd_template($file);
         }
         // Listdom Tag
-        else if (is_tax(LSD_Base::TAX_TAG) and isset($settings['tag_archive']) and trim($settings['tag_archive']))
+        else if (is_tax(LSD_Base::TAX_TAG) && isset($settings['tag_archive']) && trim($settings['tag_archive']))
         {
             $file = 'taxonomy-' . LSD_Base::TAX_TAG . '.php';
             $template = locate_template($file);
@@ -120,7 +120,7 @@ class LSD_Taxonomies extends LSD_Base
             if ($template == '') $template = lsd_template($file);
         }
         // Listdom Label
-        else if (is_tax(LSD_Base::TAX_LABEL) and isset($settings['label_archive']) and trim($settings['label_archive']))
+        else if (is_tax(LSD_Base::TAX_LABEL) && isset($settings['label_archive']) && trim($settings['label_archive']))
         {
             $file = 'taxonomy-' . LSD_Base::TAX_LABEL . '.php';
             $template = locate_template($file);
@@ -141,48 +141,25 @@ class LSD_Taxonomies extends LSD_Base
         $q = get_queried_object();
 
         // It's not a taxonomy query
-        if (!isset($q->taxonomy) or !isset($q->term_id)) return;
+        if (!isset($q->taxonomy) || !isset($q->term_id)) return;
 
-        $taxonomy = $q->taxonomy;
-        $term_id = $q->term_id;
-
-        // It's not an Listdom taxonomy
-        if (!in_array($taxonomy, $this->taxonomies())) return;
+        // It's not a Listdom taxonomy
+        if (!in_array($q->taxonomy, $this->taxonomies())) return;
 
         // Listdom Settings
         $settings = LSD_Options::settings();
 
-        if ($taxonomy == LSD_Base::TAX_LOCATION)
-        {
-            $shortcode_id = (int) $settings['location_archive'];
-            $filter = [LSD_Base::TAX_LOCATION => [$term_id]];
-        }
-        else if ($taxonomy == LSD_Base::TAX_FEATURE)
-        {
-            $shortcode_id = (int) $settings['feature_archive'];
-            $filter = [LSD_Base::TAX_FEATURE => [$term_id]];
-        }
-        else if ($taxonomy == LSD_Base::TAX_CATEGORY)
-        {
-            $shortcode_id = (int) $settings['category_archive'];
-            $filter = [LSD_Base::TAX_CATEGORY => [$term_id]];
-        }
-        else if ($taxonomy == LSD_Base::TAX_TAG)
-        {
-            $shortcode_id = (int) $settings['tag_archive'];
-            $filter = [LSD_Base::TAX_TAG => $q->name];
-        }
-        else
-        {
-            $shortcode_id = (int) $settings['label_archive'];
-            $filter = [LSD_Base::TAX_LABEL => [$term_id]];
-        }
+        $shortcode_id = (int) $settings['label_archive'];
+        if ($q->taxonomy === LSD_Base::TAX_LOCATION) $shortcode_id = (int) $settings['location_archive'];
+        else if ($q->taxonomy === LSD_Base::TAX_FEATURE) $shortcode_id = (int) $settings['feature_archive'];
+        else if ($q->taxonomy === LSD_Base::TAX_CATEGORY) $shortcode_id = (int) $settings['category_archive'];
+        else if ($q->taxonomy === LSD_Base::TAX_TAG) $shortcode_id = (int) $settings['tag_archive'];
 
         $LSD = new LSD_Shortcodes_Listdom();
         echo LSD_Kses::full($LSD->output([
             'id' => $shortcode_id,
         ], [
-            'lsd_filter' => $filter,
+            'lsd_filter' => [],
         ]));
     }
 
@@ -194,7 +171,7 @@ class LSD_Taxonomies extends LSD_Base
             foreach ($term as $t)
             {
                 $term = get_term_by('name', $t, $taxonomy);
-                if ($term and isset($term->term_id)) $ids[] = $term->term_id;
+                if ($term && isset($term->term_id)) $ids[] = $term->term_id;
             }
 
             return $ids;
@@ -214,7 +191,7 @@ class LSD_Taxonomies extends LSD_Base
             foreach ($term as $t)
             {
                 $term = get_term_by('term_id', $t, $taxonomy);
-                if ($term and isset($term->name)) $names[] = $term->name;
+                if ($term && isset($term->name)) $names[] = $term->name;
             }
 
             return $names;

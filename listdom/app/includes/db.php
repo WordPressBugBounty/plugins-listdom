@@ -83,7 +83,7 @@ class LSD_db extends LSD_Base
         $database = $this->get_DBO();
 
         if ($result == 'loadObjectList') return $database->get_results($query, OBJECT_K);
-        else if ($result == 'loadObject') return $database->get_row($query, OBJECT);
+        else if ($result == 'loadObject') return $database->get_row($query);
         else if ($result == 'loadAssocList') return $database->get_results($query, ARRAY_A);
         else if ($result == 'loadAssoc') return $database->get_row($query, ARRAY_A);
         else if ($result == 'loadResult') return $database->get_var($query);

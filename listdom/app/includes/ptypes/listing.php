@@ -221,7 +221,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function status($new_status, $old_status, $post)
     {
-        if ($post->post_type === $this->PT and $new_status !== $old_status)
+        if ($post->post_type === $this->PT && $new_status !== $old_status)
         {
             do_action('lsd_listing_status_changed', $post->ID, $old_status, $new_status);
         }
@@ -229,10 +229,10 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function filter_link($url, $post)
     {
-        if (LSD_Base::PTYPE_LISTING == get_post_type($post))
+        if (LSD_Base::PTYPE_LISTING === get_post_type($post))
         {
             $link = get_post_meta($post->ID, 'lsd_link', true);
-            return (trim($link) and filter_var($link, FILTER_VALIDATE_URL)) ? $link : $url;
+            return trim($link) && filter_var($link, FILTER_VALIDATE_URL) ? $link : $url;
         }
 
         return $url;
@@ -240,7 +240,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function add_filters($post_type)
     {
-        if ($post_type != $this->PT) return;
+        if ($post_type !== $this->PT) return;
 
         $taxonomy = LSD_Base::TAX_CATEGORY;
         if (wp_count_terms($taxonomy)) wp_dropdown_categories([
@@ -299,7 +299,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
     public function filters_join($join)
     {
         global $pagenow, $wpdb;
-        if (is_admin() && $pagenow == 'edit.php' && !empty($_GET['post_type']) && $_GET['post_type'] == $this->PT && !empty($_GET['s']) && filter_var($_GET['s'], FILTER_VALIDATE_EMAIL))
+        if (is_admin() && $pagenow == 'edit.php' && !empty($_GET['post_type']) && $_GET['post_type'] === $this->PT && !empty($_GET['s']) && filter_var($_GET['s'], FILTER_VALIDATE_EMAIL))
         {
             $join .= 'LEFT JOIN ' . $wpdb->postmeta . ' ON ' . $wpdb->posts . '.ID = ' . $wpdb->postmeta . '.post_id ';
         }
@@ -310,7 +310,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
     public function filters_where($where)
     {
         global $pagenow, $wpdb;
-        if (is_admin() && $pagenow == 'edit.php' && !empty($_GET['post_type']) && $_GET['post_type'] == $this->PT && !empty($_GET['s']) && filter_var($_GET['s'], FILTER_VALIDATE_EMAIL))
+        if (is_admin() && $pagenow == 'edit.php' && !empty($_GET['post_type']) && $_GET['post_type'] === $this->PT && !empty($_GET['s']) && filter_var($_GET['s'], FILTER_VALIDATE_EMAIL))
         {
             $where = preg_replace("/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*('[^']+')\s*\)/", "(" . $wpdb->posts . ".`post_title` LIKE $1) OR (" . $wpdb->postmeta . ".`meta_key`='lsd_guest_email' AND " . $wpdb->postmeta . ".`meta_value` LIKE $1)", $where);
         }

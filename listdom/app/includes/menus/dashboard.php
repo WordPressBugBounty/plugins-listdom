@@ -15,21 +15,6 @@ class LSD_Menus_Dashboard extends LSD_Menus
      */
     public $tab;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        // Initialize the menu
-        $this->init();
-    }
-
-    public function init()
-    {
-    }
-
     public function output()
     {
         // Get the current tab

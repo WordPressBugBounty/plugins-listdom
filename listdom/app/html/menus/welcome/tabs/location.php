@@ -49,15 +49,15 @@ $settings = LSD_Options::settings();
                 <div class="lsd-col-6 lsd-map-item">
                     <h3 class="lsd-my-3"><?php echo esc_html__('Open Street', 'listdom'); ?></h3>
                     <div class="lsd-image-wrapper">
-                        <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/check-green.svg')); ?>" alt="Selected Icon" class="lsd-icon <?php echo $settings['map_provider'] == 'leaflet' ? '' : 'lsd-util-hide'; ?>"">
-                        <img class="<?php echo $settings['map_provider'] == 'leaflet' ? 'lsd-selected' : ''; ?>" data-map="leaflet" width="100%" src="<?php echo esc_url_raw($this->lsd_asset_url('img/open-street.png')); ?>" alt="">
+                        <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/check-green.svg')); ?>" alt="Selected Icon" class="lsd-icon <?php echo $settings['map_provider'] === 'leaflet' ? '' : 'lsd-util-hide'; ?>">
+                        <img class="<?php echo $settings['map_provider'] === 'leaflet' ? 'lsd-selected' : ''; ?>" data-map="leaflet" width="100%" src="<?php echo esc_url_raw($this->lsd_asset_url('img/open-street.png')); ?>" alt="">
                     </div>
                 </div>
                 <div class="lsd-col-6 lsd-map-item">
                     <h3 class="lsd-my-3"><?php echo esc_html__('Google map', 'listdom'); ?></h3>
                     <div class="lsd-image-wrapper">
-                        <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/check-green.svg')); ?>" alt="Selected Icon" class="lsd-icon <?php echo $settings['map_provider'] == 'googlemap' ? '' : 'lsd-util-hide'; ?>">
-                        <img class="<?php echo $settings['map_provider'] == 'googlemap' ? 'lsd-selected' : ''; ?>" data-map="googlemap" width="100%" src="<?php echo esc_url_raw($this->lsd_asset_url('img/google-map.png')); ?>" alt="">
+                        <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/check-green.svg')); ?>" alt="Selected Icon" class="lsd-icon <?php echo $settings['map_provider'] === 'googlemap' ? '' : 'lsd-util-hide'; ?>">
+                        <img class="<?php echo $settings['map_provider'] === 'googlemap' ? 'lsd-selected' : ''; ?>" data-map="googlemap" width="100%" src="<?php echo esc_url_raw($this->lsd_asset_url('img/google-map.png')); ?>" alt="">
                     </div>
                 </div>
             </div>
@@ -184,7 +184,7 @@ jQuery(document).ready(function ($)
     $('.lsd-skip-wizard .lsd-skip-step').on('click', function (e)
     {
         e.preventDefault();
-        if (activeStep < 4) handleStepNavigation(activeStep + 1);
+        if (activeStep < 5) handleStepNavigation(activeStep + 1);
     });
 
     $('.lsd-skip-wizard .lsd-prev-step-link').on('click', function (e)

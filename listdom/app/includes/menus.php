@@ -70,13 +70,16 @@ class LSD_Menus extends LSD_Base
         add_submenu_page('listdom', esc_html__('Support', 'listdom'), esc_html__('Support', 'listdom'), 'manage_options', LSD_Base::getSupportURL(), null, 31);
     }
 
+    /**
+     * @param $parent_file
+     * @return null|string
+     */
     public function mainmenu_selection($parent_file)
     {
         global $current_screen;
-        $post_type = $current_screen->post_type;
 
         // Don't do anything if the post type is not Listdom Post Type
-        if (!in_array($post_type, [
+        if (!in_array($current_screen->post_type, [
             LSD_Base::PTYPE_SHORTCODE,
             LSD_Base::PTYPE_SEARCH,
             LSD_Base::PTYPE_NOTIFICATION,
@@ -85,22 +88,25 @@ class LSD_Menus extends LSD_Base
         return 'listdom';
     }
 
+    /**
+     * @param $submenu_file
+     * @return null|string
+     */
     public function submenu_selection($submenu_file)
     {
         global $current_screen;
-        $post_type = $current_screen->post_type;
 
         // Don't do anything if the post type is not Listdom Post Type
-        if (!in_array($post_type, [
+        if (!in_array($current_screen->post_type, [
             LSD_Base::PTYPE_SHORTCODE,
             LSD_Base::PTYPE_SEARCH,
             LSD_Base::PTYPE_NOTIFICATION,
         ])) return $submenu_file;
 
-        return 'edit.php?post_type=' . $post_type;
+        return 'edit.php?post_type=' . $current_screen->post_type;
     }
 
-    public function add_separators()
+    public function add_separators(): bool
     {
         if (!is_admin()) return false;
 
@@ -118,21 +124,21 @@ class LSD_Menus extends LSD_Base
         foreach ($menu as $m)
         {
             // Next menu of end is separator, so we don't need to add separator again
-            if ($end and is_null($do_end) and isset($m['4']) and strpos($m['4'], 'menu-separator') !== false) $do_end = false;
-            else if ($end and is_null($do_end)) $do_end = true;
+            if ($end && is_null($do_end) && isset($m['4']) && strpos($m['4'], 'menu-separator') !== false) $do_end = false;
+            else if ($end && is_null($do_end)) $do_end = true;
 
-            if (!$sep and isset($m['4']) and strpos($m['4'], 'menu-separator') !== false) $sep = $m;
-            if (!$start and isset($m['5']) and strpos($m['5'], 'page_listdom') !== false) $start = $i;
-            if (!$end and isset($m['5']) and strpos($m['5'], 'listdom-listing') !== false) $end = $i + 2;
+            if (!$sep && isset($m['4']) && strpos($m['4'], 'menu-separator') !== false) $sep = $m;
+            if (!$start && isset($m['5']) && strpos($m['5'], 'page_listdom') !== false) $start = $i;
+            if (!$end && isset($m['5']) && strpos($m['5'], 'listdom-listing') !== false) $end = $i + 2;
 
             // Previous menu of start is separator, so we don't need to add separator again
-            if ($start and is_null($do_start) and isset($previous['4']) and strpos($previous['4'], 'menu-separator') !== false) $do_start = false;
-            else if ($start and is_null($do_start)) $do_start = true;
+            if ($start && is_null($do_start) && isset($previous['4']) && strpos($previous['4'], 'menu-separator') !== false) $do_start = false;
+            else if ($start && is_null($do_start)) $do_start = true;
 
             $i++;
             $previous = $m;
 
-            if ($sep and $start and $end and !is_null($do_end)) break;
+            if ($sep && $start && $end && !is_null($do_end)) break;
         }
 
         if (is_null($do_start)) $do_start = true;

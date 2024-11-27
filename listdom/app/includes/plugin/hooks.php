@@ -20,6 +20,7 @@ class LSD_Plugin_Hooks
 
     public $main;
     public $db;
+    protected $feedback;
 
     /**
      * Listdom Plugin Hooks Instance.
