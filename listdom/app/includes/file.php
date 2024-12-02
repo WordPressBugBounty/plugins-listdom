@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_File extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function read($path)
     {
         return file_get_contents($path);

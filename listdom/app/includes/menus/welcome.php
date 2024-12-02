@@ -33,8 +33,16 @@ class LSD_Menus_Welcome extends LSD_Menus
         // Listdomer Installation & Activation
         add_action('wp_ajax_install_listdomer_theme', [$this, 'install_theme']);
         add_action('wp_ajax_activate_listdomer_theme', [$this, 'activate_theme']);
+
+        add_filter('admin_body_class', [$this, 'listdom_welcome_class']);
     }
-    
+
+    public function listdom_welcome_class($classes)
+    {
+        if (isset($_GET['page']) && $_GET['page'] === LSD_Base::WELCOME_SLUG) $classes .= ' lsd-welcome-wizard-page';
+        return $classes;
+    }
+
     public function output()
     {
         // Get the current tab

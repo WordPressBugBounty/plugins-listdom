@@ -16,14 +16,6 @@ class LSD_Shortcodes_Label extends LSD_Shortcodes_Taxonomy
     // Valid Styles
     protected $valid_styles = ['simple', 'clean'];
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_shortcode('listdom_label', [$this, 'output']);

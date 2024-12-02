@@ -16,14 +16,6 @@ class LSD_Compatibility extends LSD_Base
     public $tx_html_class = [];
     public $body_classes = [];
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // Add Taxonomy Template Filters

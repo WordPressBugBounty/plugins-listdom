@@ -10,15 +10,7 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Controllers_Logout extends LSD_API_Controller
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function perform(WP_REST_Request $request)
+    public function perform(WP_REST_Request $request): WP_REST_Response
     {
         $user_id = get_current_user_id();
 

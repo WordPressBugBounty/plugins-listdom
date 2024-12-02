@@ -16,14 +16,6 @@ class LSD_Shortcodes_Category extends LSD_Shortcodes_Taxonomy
     // Valid Styles
     protected $valid_styles = ['image', 'simple', 'clean', 'carousel'];
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_shortcode('listdom_category', [$this, 'output']);

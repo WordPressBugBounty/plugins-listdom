@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Taxonomies_Category extends LSD_Taxonomies
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_action('init', [$this, 'register']);
@@ -222,7 +214,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         <?php
     }
 
-    public function save_metadata($term_id)
+    public function save_metadata($term_id): bool
     {
         // It's quick edit
         if (!isset($_POST['lsd_icon'])) return false;

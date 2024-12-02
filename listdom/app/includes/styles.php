@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Styles extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function render($skin)
     {
         do_action('lsd_styles_render', $skin);

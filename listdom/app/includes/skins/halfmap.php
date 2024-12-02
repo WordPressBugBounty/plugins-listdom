@@ -16,14 +16,6 @@ class LSD_Skins_Halfmap extends LSD_Skins
     public $map_height;
     public $map_limit;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_action('wp_ajax_lsd_halfmap_load_more', [$this, 'filter']);

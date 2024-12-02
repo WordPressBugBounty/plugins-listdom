@@ -10,15 +10,7 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Controllers_Password extends LSD_API_Controller
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function update(WP_REST_Request $request)
+    public function update(WP_REST_Request $request): WP_REST_Response
     {
         $password = $request->get_param('password');
         $password_confirmation = $request->get_param('password_confirmation');

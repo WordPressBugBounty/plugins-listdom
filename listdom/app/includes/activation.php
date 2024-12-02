@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Activation extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_action('lsd_admin_dashboard_tabs', [$this, 'tab']);

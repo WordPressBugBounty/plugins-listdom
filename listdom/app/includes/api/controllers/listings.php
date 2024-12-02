@@ -10,15 +10,7 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Controllers_Listings extends LSD_API_Controller
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function get(WP_REST_Request $request)
+    public function get(WP_REST_Request $request): WP_REST_Response
     {
         $id = $request->get_param('id');
 
@@ -47,7 +39,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         ]);
     }
 
-    public function create(WP_REST_Request $request)
+    public function create(WP_REST_Request $request): WP_REST_Response
     {
         $vars = $request->get_params();
 
@@ -120,7 +112,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         ]);
     }
 
-    public function edit(WP_REST_Request $request)
+    public function edit(WP_REST_Request $request): WP_REST_Response
     {
         $id = $request->get_param('id');
 
@@ -193,7 +185,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         ]);
     }
 
-    public function trash(WP_REST_Request $request)
+    public function trash(WP_REST_Request $request): WP_REST_Response
     {
         $id = $request->get_param('id');
 
@@ -227,7 +219,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         ]);
     }
 
-    public function delete(WP_REST_Request $request)
+    public function delete(WP_REST_Request $request): WP_REST_Response
     {
         $id = $request->get_param('id');
 
@@ -261,7 +253,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         ]);
     }
 
-    public function contact(WP_REST_Request $request)
+    public function contact(WP_REST_Request $request): WP_REST_Response
     {
         $id = $request->get_param('id');
 
@@ -315,7 +307,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         ]);
     }
 
-    public function abuse(WP_REST_Request $request)
+    public function abuse(WP_REST_Request $request): WP_REST_Response
     {
         $id = $request->get_param('id');
 
@@ -366,7 +358,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         ]);
     }
 
-    public function fields()
+    public function fields(): WP_REST_Response
     {
         // Response
         return $this->response([

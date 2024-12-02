@@ -8,14 +8,6 @@ defined('ABSPATH') || die();
 class LSD_db extends LSD_Base
 {
     /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Runs any query
      * @param string $query
      * @param string $type

@@ -141,7 +141,7 @@ $settings = LSD_Options::settings();
         <?php LSD_Form::nonce('lsd_settings_form'); ?>
     </form>
     <div class="lsd-skip-wizard">
-        <button class="lsd-skip-step"><?php echo esc_html__('Skip This step', 'listdom'); ?></button>
+        <button class="lsd-skip-step"><?php echo esc_html__('Skip', 'listdom'); ?></button>
         <div class="lsd-flex lsd-gap-2">
             <button class="lsd-prev-step-link button button-hero button-primary">
                 <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/arrow-right.svg')); ?>" alt="">

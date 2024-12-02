@@ -18,14 +18,6 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
     public $id = 0;
     public $listing_id = null;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function boot($id): LSD_Notifications_Email_Sender
     {
         $this->id = $id;

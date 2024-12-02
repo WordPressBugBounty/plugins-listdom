@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Controllers_Search extends LSD_API_Controller
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function my(WP_REST_Request $request)
     {
         // All Params
@@ -62,7 +54,7 @@ class LSD_API_Controllers_Search extends LSD_API_Controller
         ]);
     }
 
-    public function search(WP_REST_Request $request)
+    public function search(WP_REST_Request $request): WP_REST_Response
     {
         // All Params
         $vars = $request->get_params();

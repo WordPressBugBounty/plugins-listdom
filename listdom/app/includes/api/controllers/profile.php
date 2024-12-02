@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Controllers_Profile extends LSD_API_Controller
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function get(WP_REST_Request $request)
     {
         // Get Current User
@@ -36,7 +28,7 @@ class LSD_API_Controllers_Profile extends LSD_API_Controller
         ]);
     }
 
-    public function update(WP_REST_Request $request)
+    public function update(WP_REST_Request $request): WP_REST_Response
     {
         $vars = $request->get_params();
 

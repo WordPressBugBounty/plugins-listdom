@@ -10,21 +10,12 @@ defined('ABSPATH') || die();
  */
 class LSD_Integrations_KC extends LSD_Integrations
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // King Composer is not installed
-        if (!function_exists('kc_add_map')) return false;
+        if (!function_exists('kc_add_map')) return;
 
         add_action('init', [$this, 'listdom']);
-        return true;
     }
 
     public function listdom()

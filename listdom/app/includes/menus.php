@@ -17,14 +17,6 @@ class LSD_Menus extends LSD_Base
     protected $welcome;
     public $tab;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // Initialize menus

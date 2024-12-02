@@ -15,14 +15,6 @@ class LSD_Skins_Masonry extends LSD_Skins
     public $filter_by = LSD_Base::TAX_CATEGORY;
     public $list_view = false;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
     }

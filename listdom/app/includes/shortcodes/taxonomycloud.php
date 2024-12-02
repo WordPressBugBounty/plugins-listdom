@@ -13,14 +13,6 @@ class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
     protected $atts = [];
     protected $terms = [];
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_shortcode('listdom_cloud', [$this, 'output']);

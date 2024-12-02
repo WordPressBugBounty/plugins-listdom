@@ -12,14 +12,6 @@ class LSD_Shortcodes_Terms extends LSD_Shortcodes
 {
     protected $atts = [];
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_shortcode('listdom_terms', [$this, 'output']);

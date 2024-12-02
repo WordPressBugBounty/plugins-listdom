@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Resources_Availability extends LSD_API_Resource
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function get($id): array
     {
         $availability = get_post_meta($id, 'lsd_ava', true);

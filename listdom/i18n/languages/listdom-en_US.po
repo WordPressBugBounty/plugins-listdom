@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Listdom\n"
-"POT-Creation-Date: 2024-11-26 16:16-0800\n"
-"PO-Revision-Date: 2024-11-26 16:16-0800\n"
+"POT-Creation-Date: 2024-11-28 12:17-0800\n"
+"PO-Revision-Date: 2024-11-28 12:17-0800\n"
 "Last-Translator: Totalery <info@totalery.com>\n"
 "Language-Team: Webilia <info@webilia.com>\n"
 "Language: en_US\n"
@@ -49,7 +49,7 @@ msgid "Recommended"
 msgstr ""
 
 #: app/html/menus/addons/tpl.php:42 app/html/menus/welcome/tabs/finish.php:15
-#: app/includes/lite.php:49 app/includes/menus.php:69
+#: app/includes/hooks.php:51 app/includes/menus.php:61
 msgid "Documentation"
 msgstr ""
 
@@ -1033,7 +1033,7 @@ msgstr ""
 msgid "Fixed an issue in search builder regarding default values."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:694 app/includes/fields.php:64
+#: app/html/menus/dashboard/tabs/changelog.php:694 app/includes/fields.php:56
 msgid "Claim"
 msgstr ""
 
@@ -1500,10 +1500,10 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/masonry.php:353
 #: app/html/metaboxes/shortcode/display-options/slider.php:107
 #: app/html/metaboxes/shortcode/filter-options.php:30
-#: app/includes/api/controllers/taxonomies.php:27
+#: app/includes/api/controllers/taxonomies.php:19
 #: app/includes/element/categories.php:30 app/includes/search/builder.php:55
-#: app/includes/taxonomies/category.php:39
-#: app/includes/taxonomies/category.php:41
+#: app/includes/taxonomies/category.php:31
+#: app/includes/taxonomies/category.php:33
 #: app/includes/widgets/taxonomycloud.php:51 app/includes/widgets/terms.php:51
 msgid "Categories"
 msgstr ""
@@ -1513,14 +1513,14 @@ msgstr ""
 #: app/html/menus/welcome/tabs/dummy-data.php:42
 #: app/html/metaboxes/shortcode/display-options/masonry.php:354
 #: app/html/metaboxes/shortcode/filter-options.php:79
-#: app/includes/api/controllers/taxonomies.php:32
-#: app/includes/api/resources/fields.php:70
-#: app/includes/api/resources/fields.php:76 app/includes/dashboard.php:38
-#: app/includes/dashboard.php:71 app/includes/element/locations.php:24
-#: app/includes/fields.php:55 app/includes/ix/array.php:108
+#: app/includes/api/controllers/taxonomies.php:24
+#: app/includes/api/resources/fields.php:62
+#: app/includes/api/resources/fields.php:68 app/includes/dashboard.php:30
+#: app/includes/dashboard.php:63 app/includes/element/locations.php:24
+#: app/includes/fields.php:47 app/includes/ix/array.php:108
 #: app/includes/ptypes/listing/single.php:493
-#: app/includes/search/builder.php:63 app/includes/taxonomies/location.php:38
-#: app/includes/taxonomies/location.php:40
+#: app/includes/search/builder.php:63 app/includes/taxonomies/location.php:30
+#: app/includes/taxonomies/location.php:32
 #: app/includes/widgets/taxonomycloud.php:52 app/includes/widgets/terms.php:52
 #: templates/dashboard/form.php:158
 msgid "Locations"
@@ -1530,14 +1530,14 @@ msgstr ""
 #: app/html/menus/welcome/tabs/dummy-data.php:53
 #: app/html/metaboxes/shortcode/filter-options.php:128
 #: app/html/metaboxes/shortcode/filter-options.php:138
-#: app/includes/api/controllers/taxonomies.php:37
-#: app/includes/api/resources/fields.php:89
-#: app/includes/api/resources/fields.php:95 app/includes/dashboard.php:39
-#: app/includes/dashboard.php:70 app/includes/element/tags.php:24
-#: app/includes/fields.php:54 app/includes/ix/array.php:109
+#: app/includes/api/controllers/taxonomies.php:29
+#: app/includes/api/resources/fields.php:81
+#: app/includes/api/resources/fields.php:87 app/includes/dashboard.php:31
+#: app/includes/dashboard.php:62 app/includes/element/tags.php:24
+#: app/includes/fields.php:46 app/includes/ix/array.php:109
 #: app/includes/ptypes/listing/single.php:817
-#: app/includes/search/builder.php:71 app/includes/taxonomies/tag.php:29
-#: app/includes/taxonomies/tag.php:31 app/includes/widgets/taxonomycloud.php:50
+#: app/includes/search/builder.php:71 app/includes/taxonomies/tag.php:21
+#: app/includes/taxonomies/tag.php:23 app/includes/widgets/taxonomycloud.php:50
 #: app/includes/widgets/terms.php:50 templates/dashboard/form.php:176
 msgid "Tags"
 msgstr ""
@@ -1547,14 +1547,14 @@ msgstr ""
 #: app/html/menus/welcome/tabs/dummy-data.php:64
 #: app/html/metaboxes/shortcode/display-options/masonry.php:355
 #: app/html/metaboxes/shortcode/filter-options.php:145
-#: app/includes/api/controllers/taxonomies.php:42
-#: app/includes/api/resources/fields.php:111
-#: app/includes/api/resources/fields.php:117 app/includes/dashboard.php:40
-#: app/includes/dashboard.php:72 app/includes/element/features.php:27
-#: app/includes/fields.php:56 app/includes/ix/array.php:110
+#: app/includes/api/controllers/taxonomies.php:34
+#: app/includes/api/resources/fields.php:103
+#: app/includes/api/resources/fields.php:109 app/includes/dashboard.php:32
+#: app/includes/dashboard.php:64 app/includes/element/features.php:27
+#: app/includes/fields.php:48 app/includes/ix/array.php:110
 #: app/includes/ptypes/listing/single.php:654
-#: app/includes/search/builder.php:79 app/includes/taxonomies/feature.php:38
-#: app/includes/taxonomies/feature.php:40
+#: app/includes/search/builder.php:79 app/includes/taxonomies/feature.php:30
+#: app/includes/taxonomies/feature.php:32
 #: app/includes/widgets/taxonomycloud.php:53 app/includes/widgets/terms.php:53
 #: templates/dashboard/form.php:189
 msgid "Features"
@@ -1576,14 +1576,14 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/masonry.php:356
 #: app/html/metaboxes/shortcode/display-options/slider.php:43
 #: app/html/metaboxes/shortcode/filter-options.php:193
-#: app/includes/api/controllers/taxonomies.php:47
-#: app/includes/api/resources/fields.php:130
-#: app/includes/api/resources/fields.php:136 app/includes/dashboard.php:41
-#: app/includes/dashboard.php:73 app/includes/element/labels.php:25
-#: app/includes/fields.php:46 app/includes/ix/array.php:111
+#: app/includes/api/controllers/taxonomies.php:39
+#: app/includes/api/resources/fields.php:122
+#: app/includes/api/resources/fields.php:128 app/includes/dashboard.php:33
+#: app/includes/dashboard.php:65 app/includes/element/labels.php:25
+#: app/includes/fields.php:38 app/includes/ix/array.php:111
 #: app/includes/ptypes/listing/single.php:771
-#: app/includes/search/builder.php:87 app/includes/taxonomies/label.php:34
-#: app/includes/taxonomies/label.php:36
+#: app/includes/search/builder.php:87 app/includes/taxonomies/label.php:26
+#: app/includes/taxonomies/label.php:28
 #: app/includes/widgets/taxonomycloud.php:54 app/includes/widgets/terms.php:54
 #: templates/dashboard/form.php:207
 msgid "Labels"
@@ -1594,8 +1594,8 @@ msgstr ""
 #: app/html/menus/welcome/tabs/dummy-data.php:87
 #: app/html/metaboxes/shortcode/display-options/table.php:141
 #: app/html/metaboxes/shortcode/filter-options.php:242
-#: app/includes/api/controllers/taxonomies.php:52
-#: app/includes/api/resources/fields.php:398 app/includes/dashboard.php:37
+#: app/includes/api/controllers/taxonomies.php:44
+#: app/includes/api/resources/fields.php:390 app/includes/dashboard.php:29
 #: app/includes/element/attributes.php:24 templates/dashboard/form.php:75
 msgid "Attributes"
 msgstr ""
@@ -1689,7 +1689,7 @@ msgid ""
 "increasing the maximum execution time of your server."
 msgstr ""
 
-#: app/html/menus/ix/tpl.php:8 app/includes/menus.php:65
+#: app/html/menus/ix/tpl.php:8 app/includes/menus.php:57
 msgid "Import / Export"
 msgstr ""
 
@@ -1769,7 +1769,7 @@ msgstr ""
 #: app/html/menus/settings/tabs.php:10
 #: app/html/menus/settings/tabs/details-page.php:92
 #: app/html/menus/settings/tabs/general.php:17
-#: app/includes/api/resources/fields.php:32
+#: app/includes/api/resources/fields.php:24
 msgid "General"
 msgstr ""
 
@@ -1794,7 +1794,7 @@ msgstr ""
 msgid "API"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:26 app/includes/menus.php:67
+#: app/html/menus/settings/tabs.php:26 app/includes/menus.php:59
 msgid "Addons"
 msgstr ""
 
@@ -1883,8 +1883,8 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/listgrid.php:57
 #: app/html/metaboxes/shortcode/display-options/masonry.php:57
 #: app/html/metaboxes/shortcode/display-options/slider.php:59
-#: app/includes/api/controllers/taxonomies.php:31
-#: app/includes/ptypes/listing.php:152 app/includes/taxonomies/location.php:41
+#: app/includes/api/controllers/taxonomies.php:23
+#: app/includes/ptypes/listing.php:152 app/includes/taxonomies/location.php:33
 msgid "Location"
 msgstr ""
 
@@ -1906,14 +1906,14 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/archive-slugs.php:30
 #: app/html/menus/settings/tabs/archive-slugs.php:127
-#: app/includes/api/controllers/taxonomies.php:26
-#: app/includes/api/resources/fields.php:51
-#: app/includes/api/resources/fields.php:57 app/includes/dashboard.php:69
-#: app/includes/fields.php:53 app/includes/ix/array.php:107
+#: app/includes/api/controllers/taxonomies.php:18
+#: app/includes/api/resources/fields.php:43
+#: app/includes/api/resources/fields.php:49 app/includes/dashboard.php:61
+#: app/includes/fields.php:45 app/includes/ix/array.php:107
 #: app/includes/ptypes/listing.php:128
 #: app/includes/ptypes/listing/single.php:580
-#: app/includes/taxonomies/category.php:42
-#: app/includes/taxonomies/category.php:80 templates/dashboard/form.php:135
+#: app/includes/taxonomies/category.php:34
+#: app/includes/taxonomies/category.php:72 templates/dashboard/form.php:135
 msgid "Category"
 msgstr ""
 
@@ -1927,8 +1927,8 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/archive-slugs.php:47
 #: app/html/menus/settings/tabs/archive-slugs.php:141
-#: app/includes/api/controllers/taxonomies.php:36
-#: app/includes/taxonomies/tag.php:32
+#: app/includes/api/controllers/taxonomies.php:28
+#: app/includes/taxonomies/tag.php:24
 msgid "Tag"
 msgstr ""
 
@@ -1942,8 +1942,8 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/archive-slugs.php:64
 #: app/html/menus/settings/tabs/archive-slugs.php:155
-#: app/includes/api/controllers/taxonomies.php:41
-#: app/includes/taxonomies/feature.php:41
+#: app/includes/api/controllers/taxonomies.php:33
+#: app/includes/taxonomies/feature.php:33
 msgid "Feature"
 msgstr ""
 
@@ -1958,8 +1958,8 @@ msgstr ""
 #: app/html/menus/settings/tabs/archive-slugs.php:81
 #: app/html/menus/settings/tabs/archive-slugs.php:169
 #: app/html/menus/settings/tabs/frontend-dashboard.php:133
-#: app/includes/api/controllers/taxonomies.php:46 app/includes/assets.php:111
-#: app/includes/taxonomies/label.php:37
+#: app/includes/api/controllers/taxonomies.php:38 app/includes/assets.php:111
+#: app/includes/taxonomies/label.php:29
 msgid "Label"
 msgstr ""
 
@@ -2071,15 +2071,15 @@ msgstr ""
 msgid "Hide Forgot Password"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:176 app/includes/options.php:322
+#: app/html/menus/settings/tabs/auth.php:176 app/includes/options.php:314
 msgid "Login"
 msgstr ""
 
 #: app/html/menus/settings/tabs/auth.php:189
 #: app/html/menus/settings/tabs/auth.php:246
 #: app/html/menus/settings/tabs/auth.php:305
-#: app/html/menus/settings/tabs/auth.php:362 app/includes/options.php:329
-#: app/includes/options.php:346
+#: app/html/menus/settings/tabs/auth.php:362 app/includes/options.php:321
+#: app/includes/options.php:338
 msgid "Username"
 msgstr ""
 
@@ -2087,8 +2087,8 @@ msgstr ""
 #: app/html/menus/settings/tabs/auth.php:260
 #: app/html/menus/settings/tabs/auth.php:319
 #: app/html/menus/settings/tabs/auth.php:376
-#: app/includes/api/resources/fields.php:446 app/includes/options.php:331
-#: app/includes/options.php:347 templates/dashboard/form.php:100
+#: app/includes/api/resources/fields.php:438 app/includes/options.php:323
+#: app/includes/options.php:339 templates/dashboard/form.php:100
 msgid "Password"
 msgstr ""
 
@@ -2121,8 +2121,8 @@ msgstr ""
 msgid "After the user logs in, they will be redirected to the designated page."
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:291 app/includes/options.php:320
-#: app/includes/options.php:335
+#: app/html/menus/settings/tabs/auth.php:291 app/includes/options.php:312
+#: app/includes/options.php:327
 msgid "Register"
 msgstr ""
 
@@ -2133,12 +2133,12 @@ msgstr ""
 #: app/html/metaboxes/listing/details.php:68
 #: app/html/metaboxes/listing/details.php:179
 #: app/html/metaboxes/listing/details.php:182
-#: app/includes/api/resources/fields.php:274
-#: app/includes/api/resources/fields.php:275
-#: app/includes/api/resources/fields.php:417 app/includes/dashboard.php:62
-#: app/includes/element/owner.php:114 app/includes/fields.php:45
-#: app/includes/ix/array.php:100 app/includes/options.php:333
-#: app/includes/options.php:355 templates/dashboard/form.php:89
+#: app/includes/api/resources/fields.php:266
+#: app/includes/api/resources/fields.php:267
+#: app/includes/api/resources/fields.php:409 app/includes/dashboard.php:54
+#: app/includes/element/owner.php:114 app/includes/fields.php:37
+#: app/includes/ix/array.php:100 app/includes/options.php:325
+#: app/includes/options.php:347 templates/dashboard/form.php:89
 #: templates/elements/owner.php:82
 msgid "Email"
 msgstr ""
@@ -2185,7 +2185,7 @@ msgstr ""
 msgid "Contain Special Characters"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:530 app/includes/options.php:324
+#: app/html/menus/settings/tabs/auth.php:530 app/includes/options.php:316
 msgid "Forgot Password"
 msgstr ""
 
@@ -2375,7 +2375,7 @@ msgstr ""
 #: app/html/metaboxes/shortcode/map-controls.php:89 app/includes/base.php:1822
 #: app/includes/element/gallery.php:114 app/includes/element/map.php:63
 #: app/includes/element/map.php:127 app/includes/element/map.php:165
-#: app/includes/element/map.php:174 app/includes/form.php:351
+#: app/includes/element/map.php:174 app/includes/form.php:343
 #: app/includes/widgets/alllistings.php:108
 msgid "Disabled"
 msgstr ""
@@ -2430,7 +2430,7 @@ msgid ""
 msgstr ""
 
 #: app/html/menus/settings/tabs/details-page.php:275 app/includes/base.php:190
-#: app/includes/options.php:277
+#: app/includes/options.php:269
 msgid "Comments"
 msgstr ""
 
@@ -2440,7 +2440,7 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/details-page.php:288
 #: app/html/menus/settings/tabs/details-page.php:305
-#: app/includes/styles.php:128 app/includes/styles.php:139
+#: app/includes/styles.php:120 app/includes/styles.php:131
 msgid "Design Builder"
 msgstr ""
 
@@ -2557,12 +2557,12 @@ msgid "Provide a unique slug for this menu."
 msgstr ""
 
 #: app/html/menus/settings/tabs/frontend-dashboard.php:153
-#: app/includes/taxonomies/category.php:116
-#: app/includes/taxonomies/category.php:168
-#: app/includes/taxonomies/category.php:263
-#: app/includes/taxonomies/feature.php:80
-#: app/includes/taxonomies/feature.php:110
-#: app/includes/taxonomies/feature.php:163
+#: app/includes/taxonomies/category.php:108
+#: app/includes/taxonomies/category.php:160
+#: app/includes/taxonomies/category.php:255
+#: app/includes/taxonomies/feature.php:72
+#: app/includes/taxonomies/feature.php:102
+#: app/includes/taxonomies/feature.php:155
 msgid "Icon"
 msgstr ""
 
@@ -2739,7 +2739,7 @@ msgid "12 Hours (AM / PM)"
 msgstr ""
 
 #: app/html/menus/settings/tabs/general.php:65
-#: app/html/metaboxes/listing/details.php:216 app/includes/dashboard.php:66
+#: app/html/metaboxes/listing/details.php:216 app/includes/dashboard.php:58
 msgid "Listing Custom Link"
 msgstr ""
 
@@ -2804,7 +2804,7 @@ msgid "OpenStreetMap & Mapbox"
 msgstr ""
 
 #: app/html/menus/settings/tabs/general.php:143 app/includes/element/map.php:24
-#: app/includes/fields.php:57
+#: app/includes/fields.php:49
 msgid "Map"
 msgstr ""
 
@@ -2933,19 +2933,19 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/general.php:373
 #: app/html/metaboxes/listing/details.php:88
-#: app/includes/api/resources/fields.php:205 app/includes/ix/array.php:95
-#: app/includes/ix/mapping.php:89
+#: app/includes/api/resources/fields.php:197 app/includes/ix/array.php:95
+#: app/includes/ix/mapping.php:81
 msgid "Currency"
 msgstr ""
 
 #: app/html/menus/settings/tabs/general.php:374 app/includes/ix/array.php:93
-#: app/includes/ix/mapping.php:75
+#: app/includes/ix/mapping.php:67
 msgid "Price Max"
 msgstr ""
 
 #: app/html/menus/settings/tabs/general.php:375
 #: app/html/metaboxes/listing/details.php:120
-#: app/includes/api/resources/fields.php:224 app/includes/dashboard.php:60
+#: app/includes/api/resources/fields.php:216 app/includes/dashboard.php:52
 #: app/includes/ix/array.php:94
 msgid "Price Description"
 msgstr ""
@@ -2958,7 +2958,7 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/list.php:72
 #: app/html/metaboxes/shortcode/display-options/listgrid.php:72
 #: app/html/metaboxes/shortcode/display-options/masonry.php:72
-#: app/includes/dashboard.php:61 app/includes/fields.php:51
+#: app/includes/dashboard.php:53 app/includes/fields.php:43
 #: app/includes/search/builder.php:127
 msgid "Price Class"
 msgstr ""
@@ -3065,7 +3065,7 @@ msgstr ""
 msgid "Error: Unable to save options"
 msgstr ""
 
-#: app/html/menus/settings/tpl.php:8 app/includes/menus.php:64
+#: app/html/menus/settings/tpl.php:8 app/includes/menus.php:56
 msgid "Settings"
 msgstr ""
 
@@ -3099,7 +3099,7 @@ msgstr ""
 msgid "Now you can start your Listdom journey."
 msgstr ""
 
-#: app/html/menus/welcome/tabs/finish.php:8 app/includes/ptypes.php:60
+#: app/html/menus/welcome/tabs/finish.php:8 app/includes/ptypes.php:52
 msgid "Create your first listing"
 msgstr ""
 
@@ -3255,9 +3255,9 @@ msgstr ""
 #: app/html/metaboxes/author/form.php:22
 #: app/html/metaboxes/listing/details.php:187
 #: app/html/metaboxes/listing/details.php:190
-#: app/includes/api/resources/fields.php:281
-#: app/includes/api/resources/fields.php:282 app/includes/dashboard.php:63
-#: app/includes/dummy.php:513 app/includes/fields.php:44
+#: app/includes/api/resources/fields.php:273
+#: app/includes/api/resources/fields.php:274 app/includes/dashboard.php:55
+#: app/includes/dummy.php:513 app/includes/fields.php:36
 #: app/includes/ix/array.php:101 templates/elements/owner.php:75
 msgid "Phone"
 msgstr ""
@@ -3272,8 +3272,8 @@ msgid "Please insert your mobile number."
 msgstr ""
 
 #: app/html/metaboxes/author/form.php:35
-#: app/html/metaboxes/listing/details.php:195 app/includes/dashboard.php:64
-#: app/includes/element/owner.php:132 app/includes/fields.php:47
+#: app/html/metaboxes/listing/details.php:195 app/includes/dashboard.php:56
+#: app/includes/element/owner.php:132 app/includes/fields.php:39
 #: app/includes/ix/array.php:102 templates/elements/owner.php:96
 msgid "Website"
 msgstr ""
@@ -3298,8 +3298,8 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/masonry.php:105
 #: app/html/metaboxes/shortcode/display-options/side.php:49
 #: app/html/metaboxes/shortcode/display-options/slider.php:75
-#: app/includes/dashboard.php:56 app/includes/dummy.php:510
-#: app/includes/element/address.php:24 app/includes/fields.php:41
+#: app/includes/dashboard.php:48 app/includes/dummy.php:510
+#: app/includes/element/address.php:24 app/includes/fields.php:33
 #: app/includes/ix/array.php:96 app/includes/ptypes/listing.php:127
 #: app/includes/ptypes/listing/single.php:477
 #: app/includes/search/builder.php:135 app/includes/widgets/simplemap.php:62
@@ -3307,7 +3307,7 @@ msgstr ""
 msgid "Address"
 msgstr ""
 
-#: app/html/metaboxes/listing/address.php:41 app/includes/ix/mapping.php:96
+#: app/html/metaboxes/listing/address.php:41 app/includes/ix/mapping.php:88
 #: templates/maps/upsert.php:38
 msgid "Listing Address"
 msgstr ""
@@ -3352,12 +3352,12 @@ msgid "Name"
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:72
-#: app/includes/api/resources/fields.php:424 templates/dashboard/form.php:107
+#: app/includes/api/resources/fields.php:416 templates/dashboard/form.php:107
 msgid "Message"
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:83
-#: app/includes/api/resources/fields.php:199 app/includes/dashboard.php:32
+#: app/includes/api/resources/fields.php:191 app/includes/dashboard.php:24
 msgid "Price Options"
 msgstr ""
 
@@ -3370,10 +3370,10 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/listgrid.php:153
 #: app/html/metaboxes/shortcode/display-options/masonry.php:153
 #: app/html/metaboxes/shortcode/display-options/side.php:63
-#: app/includes/api/resources/fields.php:212 app/includes/base.php:210
-#: app/includes/dashboard.php:58 app/includes/dummy.php:511
-#: app/includes/element/price.php:24 app/includes/fields.php:42
-#: app/includes/ix/array.php:92 app/includes/ix/mapping.php:68
+#: app/includes/api/resources/fields.php:204 app/includes/base.php:210
+#: app/includes/dashboard.php:50 app/includes/dummy.php:511
+#: app/includes/element/price.php:24 app/includes/fields.php:34
+#: app/includes/ix/array.php:92 app/includes/ix/mapping.php:60
 #: app/includes/ptypes/listing/single.php:790
 #: app/includes/search/builder.php:119
 msgid "Price"
@@ -3381,7 +3381,7 @@ msgstr ""
 
 #: app/html/metaboxes/listing/details.php:110
 #: app/html/metaboxes/listing/details.php:113
-#: app/includes/api/resources/fields.php:218 app/includes/dashboard.php:59
+#: app/includes/api/resources/fields.php:210 app/includes/dashboard.php:51
 msgid "Price (Max)"
 msgstr ""
 
@@ -3412,31 +3412,31 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/list.php:135
 #: app/html/metaboxes/shortcode/display-options/listgrid.php:104
 #: app/html/metaboxes/shortcode/display-options/masonry.php:121
-#: app/includes/api/resources/fields.php:257 app/includes/dashboard.php:33
-#: app/includes/dummy.php:512 app/includes/fields.php:43
+#: app/includes/api/resources/fields.php:249 app/includes/dashboard.php:25
+#: app/includes/dummy.php:512 app/includes/fields.php:35
 msgid "Work Hours"
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:157
-#: app/includes/api/resources/fields.php:242
+#: app/includes/api/resources/fields.php:234
 msgid "9 - 18, 9 AM to 9 PM"
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:163
-#: app/includes/api/resources/availability.php:35
-#: app/includes/api/resources/fields.php:249
+#: app/includes/api/resources/availability.php:27
+#: app/includes/api/resources/fields.php:241
 #: templates/elements/availability.php:34
 #: templates/elements/availability.php:49
 msgid "Off"
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:175
-#: app/includes/api/resources/fields.php:268 app/includes/dashboard.php:34
+#: app/includes/api/resources/fields.php:260 app/includes/dashboard.php:26
 msgid "Contact Details"
 msgstr ""
 
-#: app/html/metaboxes/listing/details.php:203 app/includes/dashboard.php:65
-#: app/includes/fields.php:52 app/includes/ix/array.php:103
+#: app/html/metaboxes/listing/details.php:203 app/includes/dashboard.php:57
+#: app/includes/fields.php:44 app/includes/ix/array.php:103
 msgid "Contact Address"
 msgstr ""
 
@@ -3456,14 +3456,14 @@ msgid ""
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:236
-#: app/includes/api/resources/fields.php:302 app/includes/dashboard.php:35
-#: app/includes/dashboard.php:57 app/includes/fields.php:50
+#: app/includes/api/resources/fields.php:294 app/includes/dashboard.php:27
+#: app/includes/dashboard.php:49 app/includes/fields.php:42
 #: app/includes/ix/array.php:104
 msgid "Remark"
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:240
-#: app/includes/api/resources/fields.php:308
+#: app/includes/api/resources/fields.php:300
 #: app/includes/ptypes/listing/single.php:635
 msgid "Owner Message"
 msgstr ""
@@ -3475,9 +3475,9 @@ msgid ""
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:259
-#: app/includes/api/resources/fields.php:321
-#: app/includes/api/resources/fields.php:327 app/includes/dashboard.php:36
-#: app/includes/dashboard.php:67 app/includes/ix/array.php:106
+#: app/includes/api/resources/fields.php:313
+#: app/includes/api/resources/fields.php:319 app/includes/dashboard.php:28
+#: app/includes/dashboard.php:59 app/includes/ix/array.php:106
 msgid "Gallery"
 msgstr ""
 
@@ -3494,7 +3494,7 @@ msgstr ""
 msgid "Maximum Allowed Image Size: %s KB"
 msgstr ""
 
-#: app/html/metaboxes/listing/details.php:295 app/includes/dashboard.php:68
+#: app/html/metaboxes/listing/details.php:295 app/includes/dashboard.php:60
 #: app/includes/element/embed.php:24
 msgid "Embed"
 msgstr ""
@@ -3519,9 +3519,9 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/masonry.php:251
 #: app/html/metaboxes/shortcode/display-options/side.php:131
 #: app/html/metaboxes/shortcode/display-options/slider.php:169
-#: app/includes/api/resources/fields.php:38
-#: app/includes/api/resources/fields.php:346
-#: app/includes/api/resources/fields.php:347 app/includes/ix/array.php:87
+#: app/includes/api/resources/fields.php:30
+#: app/includes/api/resources/fields.php:338
+#: app/includes/api/resources/fields.php:339 app/includes/ix/array.php:87
 #: app/includes/ptypes/listing/single.php:834
 #: app/includes/widgets/alllistings.php:77 app/includes/widgets/search.php:55
 #: app/includes/widgets/shortcode.php:66 app/includes/widgets/simplemap.php:57
@@ -3532,8 +3532,8 @@ msgstr ""
 
 #: app/html/metaboxes/listing/details.php:310
 #: app/html/metaboxes/listing/details.php:334
-#: app/includes/api/resources/fields.php:353
-#: app/includes/api/resources/fields.php:354
+#: app/includes/api/resources/fields.php:345
+#: app/includes/api/resources/fields.php:346
 msgid "Code"
 msgstr ""
 
@@ -3953,7 +3953,7 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/listgrid.php:198
 #: app/html/metaboxes/shortcode/display-options/masonry.php:198
 #: app/html/metaboxes/shortcode/display-options/side.php:78
-#: app/includes/fields.php:63
+#: app/includes/fields.php:55
 msgid "Favorite Icon"
 msgstr ""
 
@@ -3975,7 +3975,7 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/listgrid.php:216
 #: app/html/metaboxes/shortcode/display-options/masonry.php:216
 #: app/html/metaboxes/shortcode/display-options/side.php:96
-#: app/includes/fields.php:62
+#: app/includes/fields.php:54
 msgid "Compare Icon"
 msgstr ""
 
@@ -3996,7 +3996,7 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/list.php:167
 #: app/html/metaboxes/shortcode/display-options/listgrid.php:120
 #: app/html/metaboxes/shortcode/display-options/masonry.php:88
-#: app/includes/api/resources/fields.php:44 app/includes/ix/array.php:88
+#: app/includes/api/resources/fields.php:36 app/includes/ix/array.php:88
 #: app/includes/ptypes/listing/single.php:598
 msgid "Description"
 msgstr ""
@@ -4019,7 +4019,7 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/masonry.php:234
 #: app/html/metaboxes/shortcode/display-options/side.php:114
 #: app/html/metaboxes/shortcode/display-options/slider.php:139
-#: app/includes/fields.php:61
+#: app/includes/fields.php:53
 msgid "Review Rates"
 msgstr ""
 
@@ -4172,7 +4172,7 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/slider.php:243
 #: app/html/metaboxes/shortcode/display-options/table.php:84
 #: app/html/metaboxes/shortcode/display-options/table.php:101
-#: app/includes/api/resources/fields.php:288 app/includes/ix/mapping.php:117
+#: app/includes/api/resources/fields.php:280 app/includes/ix/mapping.php:109
 msgid "Listing Link"
 msgstr ""
 
@@ -4231,12 +4231,12 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/listgrid.php:286
 #: app/html/metaboxes/shortcode/display-options/masonry.php:286
 #: app/html/metaboxes/shortcode/display-options/side.php:145
-#: app/includes/ix/array.php:105 app/includes/taxonomies/category.php:135
-#: app/includes/taxonomies/category.php:195
-#: app/includes/taxonomies/category.php:262
-#: app/includes/taxonomies/location.php:80
-#: app/includes/taxonomies/location.php:96
-#: app/includes/taxonomies/location.php:139
+#: app/includes/ix/array.php:105 app/includes/taxonomies/category.php:127
+#: app/includes/taxonomies/category.php:187
+#: app/includes/taxonomies/category.php:254
+#: app/includes/taxonomies/location.php:72
+#: app/includes/taxonomies/location.php:88
+#: app/includes/taxonomies/location.php:131
 msgid "Image"
 msgstr ""
 
@@ -4570,7 +4570,7 @@ msgid "Side by Side"
 msgstr ""
 
 #: app/html/metaboxes/shortcode/display-options/side.php:20
-#: app/includes/skins/side.php:47
+#: app/includes/skins/side.php:39
 msgid "Side by Side Skin"
 msgstr ""
 
@@ -4909,220 +4909,220 @@ msgstr ""
 msgid "Default Order"
 msgstr ""
 
-#: app/includes/activation.php:51
+#: app/includes/activation.php:43
 msgid "License Activation"
 msgstr ""
 
-#: app/includes/ajax.php:97 app/includes/ajax.php:164
-#: app/includes/notifications/dispatcher.php:63
+#: app/includes/ajax.php:89 app/includes/ajax.php:156
+#: app/includes/notifications/dispatcher.php:55
 msgid "Security nonce is required."
 msgstr ""
 
-#: app/includes/ajax.php:100 app/includes/ajax.php:167
-#: app/includes/notifications/dispatcher.php:66
+#: app/includes/ajax.php:92 app/includes/ajax.php:159
+#: app/includes/notifications/dispatcher.php:58
 msgid "Security nonce is invalid."
 msgstr ""
 
 #: app/includes/api/controller.php:66 app/includes/api/controller.php:77
-#: app/includes/api/controllers/map.php:148
-#: app/includes/api/controllers/map.php:159
+#: app/includes/api/controllers/map.php:140
+#: app/includes/api/controllers/map.php:151
 msgid "Invalid API Token!"
 msgstr ""
 
-#: app/includes/api/controller.php:69 app/includes/api/controllers/map.php:151
+#: app/includes/api/controller.php:69 app/includes/api/controllers/map.php:143
 msgid "Invalid User Token!"
 msgstr ""
 
-#: app/includes/api/controllers/images.php:38
+#: app/includes/api/controllers/images.php:30
 msgid "You're not authorized to upload images!"
 msgstr ""
 
-#: app/includes/api/controllers/images.php:54
+#: app/includes/api/controllers/images.php:46
 msgid "Image is required!"
 msgstr ""
 
-#: app/includes/api/controllers/images.php:63
+#: app/includes/api/controllers/images.php:55
 msgid "Invalid image extension! PNG, JPG and GIF images are allowed."
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:30
-#: app/includes/api/controllers/listings.php:138
-#: app/includes/api/controllers/listings.php:211
-#: app/includes/api/controllers/listings.php:245
-#: app/includes/api/controllers/listings.php:273
-#: app/includes/api/controllers/listings.php:327
-#: app/includes/api/controllers/map.php:33
-#: app/includes/api/controllers/map.php:74
+#: app/includes/api/controllers/listings.php:22
+#: app/includes/api/controllers/listings.php:130
+#: app/includes/api/controllers/listings.php:203
+#: app/includes/api/controllers/listings.php:237
+#: app/includes/api/controllers/listings.php:265
+#: app/includes/api/controllers/listings.php:319
+#: app/includes/api/controllers/map.php:25
+#: app/includes/api/controllers/map.php:66
 msgid "Listing not found!"
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:60
-#: app/includes/api/controllers/listings.php:150
-#: app/includes/api/controllers/push.php:33
+#: app/includes/api/controllers/listings.php:52
+#: app/includes/api/controllers/listings.php:142
+#: app/includes/api/controllers/push.php:25
 msgid "Listing title field is required!"
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:106
-#: app/includes/api/controllers/push.php:227
+#: app/includes/api/controllers/listings.php:98
+#: app/includes/api/controllers/push.php:219
 msgid "The listing published."
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:107
-#: app/includes/api/controllers/push.php:228
+#: app/includes/api/controllers/listings.php:99
+#: app/includes/api/controllers/push.php:220
 msgid "The listing submitted. It will publish as soon as possible."
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:129
+#: app/includes/api/controllers/listings.php:121
 msgid "You're not authorized to edit this listing!"
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:202
+#: app/includes/api/controllers/listings.php:194
 msgid "You're not authorized to trash this listing!"
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:236
+#: app/includes/api/controllers/listings.php:228
 msgid "You're not authorized to delete this listing!"
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:284
-#: app/includes/api/controllers/listings.php:338
+#: app/includes/api/controllers/listings.php:276
+#: app/includes/api/controllers/listings.php:330
 msgid "Name, Email, Phone and Message fields are required!"
 msgstr ""
 
-#: app/includes/api/controllers/listings.php:290
-#: app/includes/api/controllers/listings.php:344
-#: app/includes/api/controllers/register.php:33
+#: app/includes/api/controllers/listings.php:282
+#: app/includes/api/controllers/listings.php:336
+#: app/includes/api/controllers/register.php:25
 msgid "Email is not valid!"
 msgstr ""
 
-#: app/includes/api/controllers/login.php:82
+#: app/includes/api/controllers/login.php:74
 msgid "User not found!"
 msgstr ""
 
-#: app/includes/api/controllers/password.php:28
+#: app/includes/api/controllers/password.php:20
 msgid "Password is too short! It should be at-least 6 characters."
 msgstr ""
 
-#: app/includes/api/controllers/password.php:34
+#: app/includes/api/controllers/password.php:26
 msgid "Password do not match with its confirmation."
 msgstr ""
 
-#: app/includes/api/controllers/password.php:77
+#: app/includes/api/controllers/password.php:69
 msgid "Enter a username or email address."
 msgstr ""
 
-#: app/includes/api/controllers/password.php:82
-#: app/includes/api/controllers/password.php:94
+#: app/includes/api/controllers/password.php:74
+#: app/includes/api/controllers/password.php:86
 msgid "There is no account with that username or email address."
 msgstr ""
 
-#: app/includes/api/controllers/password.php:107 app/includes/user.php:227
+#: app/includes/api/controllers/password.php:99 app/includes/user.php:219
 msgid "Someone has requested a password reset for the following account:"
 msgstr ""
 
-#: app/includes/api/controllers/password.php:108
+#: app/includes/api/controllers/password.php:100
 #, php-format
 msgid "Site Name: %s"
 msgstr ""
 
-#: app/includes/api/controllers/password.php:109 app/includes/user.php:229
+#: app/includes/api/controllers/password.php:101 app/includes/user.php:221
 #, php-format
 msgid "Username: %s"
 msgstr ""
 
-#: app/includes/api/controllers/password.php:110 app/includes/user.php:230
+#: app/includes/api/controllers/password.php:102 app/includes/user.php:222
 msgid "If this was a mistake, just ignore this email and nothing will happen."
 msgstr ""
 
-#: app/includes/api/controllers/password.php:111 app/includes/user.php:231
+#: app/includes/api/controllers/password.php:103 app/includes/user.php:223
 msgid "To reset your password, visit the following address:"
 msgstr ""
 
-#: app/includes/api/controllers/password.php:114
+#: app/includes/api/controllers/password.php:106
 #, php-format
 msgid "[%s] Password Reset"
 msgstr ""
 
-#: app/includes/api/controllers/register.php:30
+#: app/includes/api/controllers/register.php:22
 msgid "Email and Password are required!"
 msgstr ""
 
-#: app/includes/api/controllers/register.php:36
+#: app/includes/api/controllers/register.php:28
 msgid "Password should be at-least 6 characters!"
 msgstr ""
 
-#: app/includes/api/controllers/searchmodules.php:50
+#: app/includes/api/controllers/searchmodules.php:42
 msgid "Search module not found!"
 msgstr ""
 
-#: app/includes/api/controllers/taxonomies.php:51
+#: app/includes/api/controllers/taxonomies.php:43
 msgid "Attribute"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:96 templates/dashboard/form.php:183
+#: app/includes/api/resources/fields.php:88 templates/dashboard/form.php:183
 msgid "Tag1,Tag2,Tag3"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:149
-#: app/includes/api/resources/fields.php:155 app/includes/dashboard.php:42
-#: app/includes/dashboard.php:74 app/includes/element/image.php:24
-#: app/includes/fields.php:48 app/includes/ix/mapping.php:159
+#: app/includes/api/resources/fields.php:141
+#: app/includes/api/resources/fields.php:147 app/includes/dashboard.php:34
+#: app/includes/dashboard.php:66 app/includes/element/image.php:24
+#: app/includes/fields.php:40 app/includes/ix/mapping.php:151
 #: templates/dashboard/form.php:225
 msgid "Featured Image"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:157
+#: app/includes/api/resources/fields.php:149
 msgid "You should upload image and send the attachment ID of image!"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:168
-#: app/includes/api/resources/fields.php:183 app/includes/dashboard.php:31
+#: app/includes/api/resources/fields.php:160
+#: app/includes/api/resources/fields.php:175 app/includes/dashboard.php:23
 #: templates/dashboard/form.php:59
 msgid "Address / Map"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:290
+#: app/includes/api/resources/fields.php:282
 msgid ""
 "If you fill it, then it will be used to override default details page link. "
 "You can use it for linking the listing to an external or custom page!"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:309
+#: app/includes/api/resources/fields.php:301
 msgid "Owner message to the visitors ..."
 msgstr ""
 
-#: app/includes/api/resources/fields.php:329
+#: app/includes/api/resources/fields.php:321
 msgid "You should upload images and send an array of attachment IDs!"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:340 app/includes/dashboard.php:43
+#: app/includes/api/resources/fields.php:332 app/includes/dashboard.php:35
 #: app/includes/ptypes/listing/single.php:739
 msgid "Embed Codes"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:418 templates/dashboard/form.php:90
+#: app/includes/api/resources/fields.php:410 templates/dashboard/form.php:90
 #: templates/elements/abuse.php:35 templates/elements/abuse.php:36
 #: templates/elements/owner.php:134 templates/elements/owner.php:135
 msgid "Your Email"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:425 templates/dashboard/form.php:108
+#: app/includes/api/resources/fields.php:417 templates/dashboard/form.php:108
 msgid "Message to Reviewer"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:435 templates/dashboard/form.php:95
+#: app/includes/api/resources/fields.php:427 templates/dashboard/form.php:95
 msgid "Full Name"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:436 templates/dashboard/form.php:96
+#: app/includes/api/resources/fields.php:428 templates/dashboard/form.php:96
 msgid "Please insert your full name"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:447 templates/dashboard/form.php:101
+#: app/includes/api/resources/fields.php:439 templates/dashboard/form.php:101
 msgid "Should be at-least 8 characters"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:454 templates/dashboard/form.php:86
+#: app/includes/api/resources/fields.php:446 templates/dashboard/form.php:86
 msgid "To Reviewer"
 msgstr ""
 
@@ -5198,22 +5198,22 @@ msgstr ""
 msgid "Bottom Right"
 msgstr ""
 
-#: app/includes/base.php:175 app/includes/options.php:262
+#: app/includes/base.php:175 app/includes/options.php:254
 msgid "List Date"
 msgstr ""
 
-#: app/includes/base.php:180 app/includes/dashboard.php:52
+#: app/includes/base.php:180 app/includes/dashboard.php:44
 #: app/includes/dummy.php:509 app/includes/element/title.php:24
-#: app/includes/fields.php:40 app/includes/ix/mapping.php:35
-#: app/includes/options.php:267
+#: app/includes/fields.php:32 app/includes/ix/mapping.php:27
+#: app/includes/options.php:259
 msgid "Listing Title"
 msgstr ""
 
-#: app/includes/base.php:185 app/includes/options.php:272
+#: app/includes/base.php:185 app/includes/options.php:264
 msgid "Last Update"
 msgstr ""
 
-#: app/includes/base.php:195 app/includes/options.php:282
+#: app/includes/base.php:195 app/includes/options.php:274
 msgid "Listing ID"
 msgstr ""
 
@@ -5225,7 +5225,7 @@ msgstr ""
 msgid "Random"
 msgstr ""
 
-#: app/includes/base.php:215 app/includes/options.php:287
+#: app/includes/base.php:215 app/includes/options.php:279
 msgid "Most Viewed"
 msgstr ""
 
@@ -5269,7 +5269,7 @@ msgstr ""
 msgid "Pro Add-on"
 msgstr ""
 
-#: app/includes/base.php:390 app/includes/lite.php:40
+#: app/includes/base.php:390 app/includes/lite.php:24
 msgid "Upgrade"
 msgstr ""
 
@@ -5418,15 +5418,15 @@ msgstr ""
 msgid "Poppins"
 msgstr ""
 
-#: app/includes/dashboard.php:53 app/includes/fields.php:49
+#: app/includes/dashboard.php:45 app/includes/fields.php:41
 msgid "Listing Description"
 msgstr ""
 
-#: app/includes/dashboard.php:54
+#: app/includes/dashboard.php:46
 msgid "Guest Email"
 msgstr ""
 
-#: app/includes/dashboard.php:55
+#: app/includes/dashboard.php:47
 msgid "Guest Password"
 msgstr ""
 
@@ -5590,7 +5590,7 @@ msgstr ""
 msgid "Contact Information"
 msgstr ""
 
-#: app/includes/element/content.php:24 app/includes/ix/mapping.php:41
+#: app/includes/element/content.php:24 app/includes/ix/mapping.php:33
 msgid "Listing Content"
 msgstr ""
 
@@ -5698,90 +5698,94 @@ msgstr ""
 msgid "Normal"
 msgstr ""
 
-#: app/includes/form.php:232
+#: app/includes/form.php:224
 msgid "Upload/Select image"
 msgstr ""
 
-#: app/includes/form.php:233
+#: app/includes/form.php:225
 msgid "Remove image"
 msgstr ""
 
-#: app/includes/form.php:245
+#: app/includes/form.php:237
 msgid "Upload/Select file"
 msgstr ""
 
-#: app/includes/form.php:246
+#: app/includes/form.php:238
 msgid "Remove file"
 msgstr ""
 
-#: app/includes/form.php:606
+#: app/includes/form.php:598
 msgid "Hour"
 msgstr ""
 
-#: app/includes/form.php:613 app/includes/form.php:614
+#: app/includes/form.php:605 app/includes/form.php:606
 #, php-format
 msgid "%d AM"
 msgstr ""
 
-#: app/includes/form.php:615 app/includes/form.php:616
+#: app/includes/form.php:607 app/includes/form.php:608
 #, php-format
 msgid "%d PM"
 msgstr ""
 
-#: app/includes/form.php:625
+#: app/includes/form.php:617
 msgid "Minute"
 msgstr ""
 
-#: app/includes/hooks.php:187 app/includes/shortcodes/dashboard.php:548
+#: app/includes/hooks.php:52 app/includes/menus.php:62
+msgid "Support"
+msgstr ""
+
+#: app/includes/hooks.php:195 app/includes/shortcodes/dashboard.php:548
 #: app/includes/shortcodes/dashboard.php:647
 msgid "You are not allowed to upload files!"
 msgstr ""
 
-#: app/includes/hooks.php:190 app/includes/shortcodes/dashboard.php:313
+#: app/includes/hooks.php:198 app/includes/shortcodes/dashboard.php:313
 #: app/includes/shortcodes/dashboard.php:551
 #: app/includes/shortcodes/dashboard.php:623
 #: app/includes/shortcodes/dashboard.php:650
 msgid "Security nonce is missing!"
 msgstr ""
 
-#: app/includes/hooks.php:196 app/includes/shortcodes/dashboard.php:316
+#: app/includes/hooks.php:204 app/includes/shortcodes/dashboard.php:316
 #: app/includes/shortcodes/dashboard.php:554
 #: app/includes/shortcodes/dashboard.php:626
 #: app/includes/shortcodes/dashboard.php:653
 msgid "Security nonce is not valid!"
 msgstr ""
 
-#: app/includes/hooks.php:204
+#: app/includes/hooks.php:212
 msgid "Please upload a file!"
 msgstr ""
 
-#: app/includes/hooks.php:255
+#: app/includes/hooks.php:263
 msgid "The files are uploaded!"
 msgstr ""
 
-#: app/includes/hooks.php:255
+#: app/includes/hooks.php:263
 msgid "An error occurred!"
 msgstr ""
 
-#: app/includes/integrations/be.php:58 app/includes/integrations/kc.php:49
-#: app/includes/integrations/vc.php:48 app/includes/menus.php:50
-#: app/includes/menus.php:59
+#: app/includes/integrations/be.php:58 app/includes/integrations/kc.php:40
+#: app/includes/integrations/vc.php:39 app/includes/menus.php:42
+#: app/includes/menus.php:51
 msgid "Listdom"
 msgstr ""
 
-#: app/includes/integrations/kc.php:50 app/includes/integrations/vc.php:52
+#: app/includes/integrations/kc.php:41 app/includes/integrations/vc.php:43
 #: app/includes/ptypes/notification.php:106
 msgid "Content"
 msgstr ""
 
-#: app/includes/integrations/kc.php:55 app/includes/integrations/vc.php:58
+#: app/includes/integrations/kc.php:46 app/includes/integrations/vc.php:49
 #: app/includes/ptypes/search.php:91 app/includes/ptypes/search.php:108
 #: app/includes/ptypes/shortcode.php:47 app/includes/ptypes/shortcode.php:120
 #: app/includes/ptypes/shortcode.php:142 app/includes/widgets/shortcode.php:71
 msgid "Shortcode"
 msgstr ""
 
-#: app/includes/integrations/kc.php:58 app/includes/integrations/vc.php:61
+#: app/includes/integrations/kc.php:49 app/includes/integrations/vc.php:52
 msgid "Select one of predefined shortcodes."
 msgstr ""
 
@@ -5805,242 +5809,238 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
-#: app/includes/ix/mapping.php:28
+#: app/includes/ix/mapping.php:20
 msgid "Unique ID"
 msgstr ""
 
-#: app/includes/ix/mapping.php:31
+#: app/includes/ix/mapping.php:23
 msgid ""
 "It's required if you want to update the listings later. If you don't map it "
 "then listdom tries to update the existing listing with same title and "
 "content!"
 msgstr ""
 
-#: app/includes/ix/mapping.php:47
+#: app/includes/ix/mapping.php:39
 msgid "Listing Date"
 msgstr ""
 
-#: app/includes/ix/mapping.php:50
+#: app/includes/ix/mapping.php:42
 msgid "A date field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:54
+#: app/includes/ix/mapping.php:46
 msgid "Listing Owner"
 msgstr ""
 
-#: app/includes/ix/mapping.php:57
+#: app/includes/ix/mapping.php:49
 msgid ""
 "An email field should get mapped. If mapped then listdom will create a user "
 "if not exists and assign the listing to the user."
 msgstr ""
 
-#: app/includes/ix/mapping.php:61
+#: app/includes/ix/mapping.php:53
 msgid "Listing Status"
 msgstr ""
 
-#: app/includes/ix/mapping.php:64
+#: app/includes/ix/mapping.php:56
 msgid ""
 "An text field should get mapped. valid values are publish, trash, draft, and "
 "pending. Default value is publish."
 msgstr ""
 
-#: app/includes/ix/mapping.php:71 app/includes/ix/mapping.php:78
+#: app/includes/ix/mapping.php:63 app/includes/ix/mapping.php:70
 msgid "A numeric field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:82
+#: app/includes/ix/mapping.php:74
 msgid "Price After"
 msgstr ""
 
-#: app/includes/ix/mapping.php:85 app/includes/ix/mapping.php:92
-#: app/includes/ix/mapping.php:99 app/includes/ix/mapping.php:148
+#: app/includes/ix/mapping.php:77 app/includes/ix/mapping.php:84
+#: app/includes/ix/mapping.php:91 app/includes/ix/mapping.php:140
 msgid "A text field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:103
+#: app/includes/ix/mapping.php:95
 msgid "Listing Latitude"
 msgstr ""
 
-#: app/includes/ix/mapping.php:106
+#: app/includes/ix/mapping.php:98
 msgid "A latitude field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:110
+#: app/includes/ix/mapping.php:102
 msgid "Listing Longitude"
 msgstr ""
 
-#: app/includes/ix/mapping.php:113
+#: app/includes/ix/mapping.php:105
 msgid "A longitude field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:120 app/includes/ix/mapping.php:141
+#: app/includes/ix/mapping.php:112 app/includes/ix/mapping.php:133
 msgid "A URL field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:124
+#: app/includes/ix/mapping.php:116
 msgid "Listing Email"
 msgstr ""
 
-#: app/includes/ix/mapping.php:127
+#: app/includes/ix/mapping.php:119
 msgid "An email field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:131
+#: app/includes/ix/mapping.php:123
 msgid "Listing Phone"
 msgstr ""
 
-#: app/includes/ix/mapping.php:134
+#: app/includes/ix/mapping.php:126
 msgid "An phone field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:138
+#: app/includes/ix/mapping.php:130
 msgid "Listing Website"
 msgstr ""
 
-#: app/includes/ix/mapping.php:145
+#: app/includes/ix/mapping.php:137
 msgid "Listing Contact Address"
 msgstr ""
 
-#: app/includes/ix/mapping.php:152
+#: app/includes/ix/mapping.php:144
 msgid "Listing Remark"
 msgstr ""
 
-#: app/includes/ix/mapping.php:155
+#: app/includes/ix/mapping.php:147
 msgid "An text field should get mapped."
 msgstr ""
 
-#: app/includes/ix/mapping.php:162
+#: app/includes/ix/mapping.php:154
 msgid "A URL field should get mapped. It should contain image URL."
 msgstr ""
 
-#: app/includes/ix/mapping.php:166 app/includes/ptypes/listing/single.php:723
+#: app/includes/ix/mapping.php:158 app/includes/ptypes/listing/single.php:723
 msgid "Listing Gallery"
 msgstr ""
 
-#: app/includes/ix/mapping.php:169
+#: app/includes/ix/mapping.php:161
 msgid "A URL field should get mapped. It should contain URLs to images."
 msgstr ""
 
-#: app/includes/ix/mapping.php:173
+#: app/includes/ix/mapping.php:165
 msgid "Listing Category"
 msgstr ""
 
-#: app/includes/ix/mapping.php:176
+#: app/includes/ix/mapping.php:168
 msgid ""
 "A text field should get mapped. Listdom will create a category using the "
 "text if not exists and assign listing to that category."
 msgstr ""
 
-#: app/includes/ix/mapping.php:180
+#: app/includes/ix/mapping.php:172
 msgid "Listing Locations"
 msgstr ""
 
-#: app/includes/ix/mapping.php:183
+#: app/includes/ix/mapping.php:175
 msgid ""
 "A text field should get mapped. Listdom will create locations using the text "
 "if not exists and assign listing to locations."
 msgstr ""
 
-#: app/includes/ix/mapping.php:187
+#: app/includes/ix/mapping.php:179
 msgid "Listing Tags"
 msgstr ""
 
-#: app/includes/ix/mapping.php:190
+#: app/includes/ix/mapping.php:182
 msgid ""
 "A text field should get mapped. Listdom will create tags using the text if "
 "not exists and assign listing to tags."
 msgstr ""
 
-#: app/includes/ix/mapping.php:194
+#: app/includes/ix/mapping.php:186
 msgid "Listing Features"
 msgstr ""
 
-#: app/includes/ix/mapping.php:197
+#: app/includes/ix/mapping.php:189
 msgid ""
 "A text field should get mapped. Listdom will create features using the text "
 "if not exists and assign listing to features."
 msgstr ""
 
-#: app/includes/ix/mapping.php:201
+#: app/includes/ix/mapping.php:193
 msgid "Listing Labels"
 msgstr ""
 
-#: app/includes/ix/mapping.php:204
+#: app/includes/ix/mapping.php:196
 msgid ""
 "A text field should get mapped. Listdom will create labels using the text if "
 "not exists and assign listing to labels."
 msgstr ""
 
-#: app/includes/ix/mapping.php:227 app/includes/ix/mapping.php:246
+#: app/includes/ix/mapping.php:219 app/includes/ix/mapping.php:238
 #, php-format
 msgid "A %s field should get mapped."
 msgstr ""
 
-#: app/includes/lite.php:50 app/includes/menus.php:70
-msgid "Support"
-msgstr ""
-
-#: app/includes/main.php:96
+#: app/includes/main.php:88
 msgid "Sunday"
 msgstr ""
 
-#: app/includes/main.php:97
+#: app/includes/main.php:89
 msgid "Monday"
 msgstr ""
 
-#: app/includes/main.php:98
+#: app/includes/main.php:90
 msgid "Tuesday"
 msgstr ""
 
-#: app/includes/main.php:99
+#: app/includes/main.php:91
 msgid "Wednesday"
 msgstr ""
 
-#: app/includes/main.php:100
+#: app/includes/main.php:92
 msgid "Thursday"
 msgstr ""
 
-#: app/includes/main.php:101
+#: app/includes/main.php:93
 msgid "Friday"
 msgstr ""
 
-#: app/includes/main.php:102
+#: app/includes/main.php:94
 msgid "Saturday"
 msgstr ""
 
-#: app/includes/map/provider.php:37 app/includes/map/provider.php:45
+#: app/includes/map/provider.php:29 app/includes/map/provider.php:37
 msgid "Google Maps"
 msgstr ""
 
-#: app/includes/map/provider.php:44
+#: app/includes/map/provider.php:36
 msgid "Leaflet (OpenStreetMap)"
 msgstr ""
 
-#: app/includes/menus.php:51 app/includes/menus.php:60
+#: app/includes/menus.php:43 app/includes/menus.php:52
 msgid "Home"
 msgstr ""
 
-#: app/includes/menus.php:61 app/includes/ptypes/shortcode.php:46
+#: app/includes/menus.php:53 app/includes/ptypes/shortcode.php:46
 msgid "Shortcodes"
 msgstr ""
 
-#: app/includes/menus.php:62
+#: app/includes/menus.php:54
 msgid "Search Builder"
 msgstr ""
 
-#: app/includes/menus.php:62
+#: app/includes/menus.php:54
 msgid "Search and Filter Builder"
 msgstr ""
 
-#: app/includes/menus.php:63 app/includes/ptypes/notification.php:47
+#: app/includes/menus.php:55 app/includes/ptypes/notification.php:47
 msgid "Notifications"
 msgstr ""
 
-#: app/includes/menus.php:66
+#: app/includes/menus.php:58
 msgid "Welcome to Listdom Setup Wizard"
 msgstr ""
 
-#: app/includes/menus.php:66
+#: app/includes/menus.php:58
 msgid "Wizard"
 msgstr ""
 
@@ -6104,182 +6104,182 @@ msgstr ""
 msgid "Failed to activate Listdomer theme."
 msgstr ""
 
-#: app/includes/notifications.php:39
+#: app/includes/notifications.php:31
 msgid "Contact Owner"
 msgstr ""
 
-#: app/includes/notifications.php:40 app/includes/ptypes/listing.php:93
+#: app/includes/notifications.php:32 app/includes/ptypes/listing.php:93
 msgid "New Listing"
 msgstr ""
 
-#: app/includes/notifications.php:41
+#: app/includes/notifications.php:33
 msgid "Listing Status Changed"
 msgstr ""
 
-#: app/includes/notifications.php:42
+#: app/includes/notifications.php:34
 msgid "Abuse Report"
 msgstr ""
 
-#: app/includes/notifications.php:52
+#: app/includes/notifications.php:44
 msgid "Name field of the contact form"
 msgstr ""
 
-#: app/includes/notifications.php:53
+#: app/includes/notifications.php:45
 msgid "Email field of the contact form"
 msgstr ""
 
-#: app/includes/notifications.php:54
+#: app/includes/notifications.php:46
 msgid "Phone field of the contact form"
 msgstr ""
 
-#: app/includes/notifications.php:55 app/includes/notifications.php:80
+#: app/includes/notifications.php:47 app/includes/notifications.php:72
 msgid "Sent message"
 msgstr ""
 
-#: app/includes/notifications.php:56 app/includes/notifications.php:64
-#: app/includes/notifications.php:74 app/includes/notifications.php:81
+#: app/includes/notifications.php:48 app/includes/notifications.php:56
+#: app/includes/notifications.php:66 app/includes/notifications.php:73
 msgid "Link to the listing"
 msgstr ""
 
-#: app/includes/notifications.php:59
+#: app/includes/notifications.php:51
 msgid "Status of new listing"
 msgstr ""
 
-#: app/includes/notifications.php:60 app/includes/notifications.php:70
+#: app/includes/notifications.php:52 app/includes/notifications.php:62
 msgid "Listing creation date"
 msgstr ""
 
-#: app/includes/notifications.php:61 app/includes/notifications.php:71
+#: app/includes/notifications.php:53 app/includes/notifications.php:63
 msgid "Title to the listing"
 msgstr ""
 
-#: app/includes/notifications.php:62 app/includes/notifications.php:72
+#: app/includes/notifications.php:54 app/includes/notifications.php:64
 msgid "Name of listing owner"
 msgstr ""
 
-#: app/includes/notifications.php:63 app/includes/notifications.php:73
+#: app/includes/notifications.php:55 app/includes/notifications.php:65
 msgid "Email or listing owner"
 msgstr ""
 
-#: app/includes/notifications.php:65
+#: app/includes/notifications.php:57
 msgid "Link to the listing manage page in WordPress backend"
 msgstr ""
 
-#: app/includes/notifications.php:68
+#: app/includes/notifications.php:60
 msgid "Previous Status"
 msgstr ""
 
-#: app/includes/notifications.php:69
+#: app/includes/notifications.php:61
 msgid "New Status"
 msgstr ""
 
-#: app/includes/notifications.php:77
+#: app/includes/notifications.php:69
 msgid "Name field of abuse form"
 msgstr ""
 
-#: app/includes/notifications.php:78
+#: app/includes/notifications.php:70
 msgid "Email field of abuse form"
 msgstr ""
 
-#: app/includes/notifications.php:79
+#: app/includes/notifications.php:71
 msgid "Phone field of abuse form"
 msgstr ""
 
-#: app/includes/notifications.php:84
+#: app/includes/notifications.php:76
 msgid "Current date while sending"
 msgstr ""
 
-#: app/includes/notifications.php:85
+#: app/includes/notifications.php:77
 msgid "Current time while sending"
 msgstr ""
 
-#: app/includes/notifications.php:86
+#: app/includes/notifications.php:78
 msgid "Current date & time while sending"
 msgstr ""
 
-#: app/includes/notifications.php:87
+#: app/includes/notifications.php:79
 msgid "Email of the website admin"
 msgstr ""
 
-#: app/includes/notifications.php:88
+#: app/includes/notifications.php:80
 msgid "Subject of the website"
 msgstr ""
 
-#: app/includes/notifications.php:89
+#: app/includes/notifications.php:81
 msgid "Home URL of the website"
 msgstr ""
 
-#: app/includes/notifications.php:90
+#: app/includes/notifications.php:82
 msgid "Description of the website"
 msgstr ""
 
-#: app/includes/notifications.php:91
+#: app/includes/notifications.php:83
 msgid ""
 "Link to the website. Subject of the website will be used as the link title"
 msgstr ""
 
-#: app/includes/notifications/dispatcher.php:40
+#: app/includes/notifications/dispatcher.php:32
 msgid "Your message sent successfully."
 msgstr ""
 
-#: app/includes/notifications/dispatcher.php:48
+#: app/includes/notifications/dispatcher.php:40
 msgid "Your report sent successfully."
 msgstr ""
 
-#: app/includes/notifications/dispatcher.php:60
+#: app/includes/notifications/dispatcher.php:52
 msgid "Invalid request!"
 msgstr ""
 
-#: app/includes/notifications/dispatcher.php:69
+#: app/includes/notifications/dispatcher.php:61
 msgid "Invalid email!"
 msgstr ""
 
-#: app/includes/notifications/dispatcher.php:72
+#: app/includes/notifications/dispatcher.php:64
 #: app/includes/shortcodes/dashboard.php:319
 msgid "Google recaptcha is invalid."
 msgstr ""
 
-#: app/includes/options.php:305
+#: app/includes/options.php:297
 msgid "Default API"
 msgstr ""
 
-#: app/includes/options.php:321
+#: app/includes/options.php:313
 msgid "Not a member? Register."
 msgstr ""
 
-#: app/includes/options.php:323
+#: app/includes/options.php:315
 msgid "Already a member? Login."
 msgstr ""
 
-#: app/includes/options.php:325
+#: app/includes/options.php:317
 msgid "Forgot your password?"
 msgstr ""
 
-#: app/includes/options.php:330 app/includes/options.php:348
+#: app/includes/options.php:322 app/includes/options.php:340
 msgid "Enter your username"
 msgstr ""
 
-#: app/includes/options.php:332 app/includes/options.php:349
+#: app/includes/options.php:324 app/includes/options.php:341
 msgid "Enter your password"
 msgstr ""
 
-#: app/includes/options.php:334
+#: app/includes/options.php:326
 msgid "Enter your email address"
 msgstr ""
 
-#: app/includes/options.php:350
+#: app/includes/options.php:342
 msgid "Remember Me"
 msgstr ""
 
-#: app/includes/options.php:351
+#: app/includes/options.php:343
 msgid "Log In"
 msgstr ""
 
-#: app/includes/options.php:356
+#: app/includes/options.php:348
 msgid "Enter your Email Address"
 msgstr ""
 
-#: app/includes/options.php:357
+#: app/includes/options.php:349
 msgid "Reset Password"
 msgstr ""
 
@@ -6333,35 +6333,35 @@ msgid ""
 "any inconvenience."
 msgstr ""
 
-#: app/includes/ptypes.php:59
+#: app/includes/ptypes.php:51
 msgid "Ready to start? Create your first listing here."
 msgstr ""
 
-#: app/includes/ptypes.php:66
+#: app/includes/ptypes.php:58
 msgid ""
 "Use the shortcodes to show a list of your directories and listings on any "
 "page and with your desired skin and style."
 msgstr ""
 
-#: app/includes/ptypes.php:67
+#: app/includes/ptypes.php:59
 msgid "Create your first shortcode"
 msgstr ""
 
-#: app/includes/ptypes.php:73
+#: app/includes/ptypes.php:65
 msgid ""
 "You can create various search and filter forms by inserting different "
 "fields, rows etc.!"
 msgstr ""
 
-#: app/includes/ptypes.php:74
+#: app/includes/ptypes.php:66
 msgid "Create your first search and filter form"
 msgstr ""
 
-#: app/includes/ptypes.php:80
+#: app/includes/ptypes.php:72
 msgid "You can create various notifications to be sent in different hooks!"
 msgstr ""
 
-#: app/includes/ptypes.php:81
+#: app/includes/ptypes.php:73
 msgid "Create your first notification"
 msgstr ""
 
@@ -6813,7 +6813,7 @@ msgstr ""
 msgid "KM"
 msgstr ""
 
-#: app/includes/shortcodes/simplemap.php:49
+#: app/includes/shortcodes/simplemap.php:41
 msgid ""
 "The marker location couldn't find. Please specify address or lat/lng "
 "parameters."
@@ -6828,7 +6828,7 @@ msgstr ""
 msgid "Style is invalid! Valid styles are: %s"
 msgstr ""
 
-#: app/includes/shortcodes/terms.php:54
+#: app/includes/shortcodes/terms.php:46
 msgid "Select Item"
 msgstr ""
 
@@ -6856,7 +6856,7 @@ msgstr ""
 msgid "Cover View"
 msgstr ""
 
-#: app/includes/skins/masonry.php:41
+#: app/includes/skins/masonry.php:33
 msgid "All"
 msgstr ""
 
@@ -6908,488 +6908,488 @@ msgstr ""
 msgid "Youtube"
 msgstr ""
 
-#: app/includes/styles.php:34 app/includes/styles.php:45
-#: app/includes/styles.php:55 app/includes/styles.php:64
-#: app/includes/styles.php:73 app/includes/styles.php:82
-#: app/includes/styles.php:89 app/includes/styles.php:98
-#: app/includes/styles.php:107 app/includes/styles.php:118
-#: app/includes/styles.php:146
+#: app/includes/styles.php:26 app/includes/styles.php:37
+#: app/includes/styles.php:47 app/includes/styles.php:56
+#: app/includes/styles.php:65 app/includes/styles.php:74
+#: app/includes/styles.php:81 app/includes/styles.php:90
+#: app/includes/styles.php:99 app/includes/styles.php:110
+#: app/includes/styles.php:138
 msgid "Style 1"
 msgstr ""
 
-#: app/includes/styles.php:35 app/includes/styles.php:46
-#: app/includes/styles.php:56 app/includes/styles.php:65
-#: app/includes/styles.php:74 app/includes/styles.php:90
-#: app/includes/styles.php:99 app/includes/styles.php:108
-#: app/includes/styles.php:119 app/includes/styles.php:147
+#: app/includes/styles.php:27 app/includes/styles.php:38
+#: app/includes/styles.php:48 app/includes/styles.php:57
+#: app/includes/styles.php:66 app/includes/styles.php:82
+#: app/includes/styles.php:91 app/includes/styles.php:100
+#: app/includes/styles.php:111 app/includes/styles.php:139
 msgid "Style 2"
 msgstr ""
 
-#: app/includes/styles.php:36 app/includes/styles.php:47
-#: app/includes/styles.php:57 app/includes/styles.php:66
-#: app/includes/styles.php:75 app/includes/styles.php:91
-#: app/includes/styles.php:100 app/includes/styles.php:109
-#: app/includes/styles.php:120
+#: app/includes/styles.php:28 app/includes/styles.php:39
+#: app/includes/styles.php:49 app/includes/styles.php:58
+#: app/includes/styles.php:67 app/includes/styles.php:83
+#: app/includes/styles.php:92 app/includes/styles.php:101
+#: app/includes/styles.php:112
 msgid "Style 3"
 msgstr ""
 
-#: app/includes/styles.php:37 app/includes/styles.php:48
-#: app/includes/styles.php:110
+#: app/includes/styles.php:29 app/includes/styles.php:40
+#: app/includes/styles.php:102
 msgid "Style 4"
 msgstr ""
 
-#: app/includes/styles.php:38 app/includes/styles.php:111
+#: app/includes/styles.php:30 app/includes/styles.php:103
 msgid "Style 5"
 msgstr ""
 
-#: app/includes/styles.php:127
+#: app/includes/styles.php:119
 msgid "Pre-Made Styles"
 msgstr ""
 
-#: app/includes/styles.php:135
+#: app/includes/styles.php:127
 msgid "Style 1 - Basic"
 msgstr ""
 
-#: app/includes/styles.php:136
+#: app/includes/styles.php:128
 msgid "Style 2 - Sidebar"
 msgstr ""
 
-#: app/includes/styles.php:137
+#: app/includes/styles.php:129
 msgid "Style 3 - Slider Header"
 msgstr ""
 
-#: app/includes/styles.php:138
+#: app/includes/styles.php:130
 msgid "Style 4 - User Directory"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:43
+#: app/includes/taxonomies/category.php:35
 msgid "All Categories"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:44
+#: app/includes/taxonomies/category.php:36
 msgid "Edit Category"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:45
+#: app/includes/taxonomies/category.php:37
 msgid "View Category"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:46
+#: app/includes/taxonomies/category.php:38
 msgid "Update Category"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:47
+#: app/includes/taxonomies/category.php:39
 msgid "Add New Category"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:48
+#: app/includes/taxonomies/category.php:40
 msgid "New Category Name"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:49
+#: app/includes/taxonomies/category.php:41
 msgid "Popular Categories"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:50
+#: app/includes/taxonomies/category.php:42
 msgid "Search Categories"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:51
+#: app/includes/taxonomies/category.php:43
 msgid "Separate categories with commas"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:52
+#: app/includes/taxonomies/category.php:44
 msgid "Add or remove categories"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:53
+#: app/includes/taxonomies/category.php:45
 msgid "Choose from the most used categories"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:54
+#: app/includes/taxonomies/category.php:46
 msgid "No categories found."
 msgstr ""
 
-#: app/includes/taxonomies/category.php:55
+#: app/includes/taxonomies/category.php:47
 msgid "← Back to Categories"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:56
+#: app/includes/taxonomies/category.php:48
 msgid "Parent Category"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:57
+#: app/includes/taxonomies/category.php:49
 msgid "Parent Category:"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:58
+#: app/includes/taxonomies/category.php:50
 msgid "No Categories"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:91
+#: app/includes/taxonomies/category.php:83
 msgid "Please select primary category."
 msgstr ""
 
-#: app/includes/taxonomies/category.php:122
-#: app/includes/taxonomies/category.php:176
+#: app/includes/taxonomies/category.php:114
+#: app/includes/taxonomies/category.php:168
 msgid "The icon is needed for listings' markers and some other sections."
 msgstr ""
 
-#: app/includes/taxonomies/category.php:125
-#: app/includes/taxonomies/label.php:76 app/includes/taxonomies/label.php:93
+#: app/includes/taxonomies/category.php:117
+#: app/includes/taxonomies/label.php:68 app/includes/taxonomies/label.php:85
 msgid "Color"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:132
-#: app/includes/taxonomies/category.php:190
+#: app/includes/taxonomies/category.php:124
+#: app/includes/taxonomies/category.php:182
 msgid "It's listings' markers color."
 msgstr ""
 
-#: app/includes/taxonomies/category.php:141
-#: app/includes/taxonomies/category.php:203
+#: app/includes/taxonomies/category.php:133
+#: app/includes/taxonomies/category.php:195
 msgid "The image used for category views/shortcodes."
 msgstr ""
 
-#: app/includes/taxonomies/category.php:144
-#: app/includes/taxonomies/feature.php:88
+#: app/includes/taxonomies/category.php:136
+#: app/includes/taxonomies/feature.php:80
 msgid "SEO Schema"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:146
-#: app/includes/taxonomies/category.php:209
+#: app/includes/taxonomies/category.php:138
+#: app/includes/taxonomies/category.php:201
 msgid "Schema Type"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:153
-#: app/includes/taxonomies/category.php:218
+#: app/includes/taxonomies/category.php:145
+#: app/includes/taxonomies/category.php:210
 msgid "Schema Item Type (https://schema.org/)"
 msgstr ""
 
-#: app/includes/taxonomies/category.php:181
+#: app/includes/taxonomies/category.php:173
 msgid "Marker Color"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:42
+#: app/includes/taxonomies/feature.php:34
 msgid "All Features"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:43
+#: app/includes/taxonomies/feature.php:35
 msgid "Edit Feature"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:44
+#: app/includes/taxonomies/feature.php:36
 msgid "View Feature"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:45
+#: app/includes/taxonomies/feature.php:37
 msgid "Update Feature"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:46
+#: app/includes/taxonomies/feature.php:38
 msgid "Add New Feature"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:47
+#: app/includes/taxonomies/feature.php:39
 msgid "New Feature Name"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:48
+#: app/includes/taxonomies/feature.php:40
 msgid "Popular Features"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:49
+#: app/includes/taxonomies/feature.php:41
 msgid "Search Features"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:50
+#: app/includes/taxonomies/feature.php:42
 msgid "Separate features with commas"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:51
+#: app/includes/taxonomies/feature.php:43
 msgid "Add or remove features"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:52
+#: app/includes/taxonomies/feature.php:44
 msgid "Choose from the most used features"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:53
+#: app/includes/taxonomies/feature.php:45
 msgid "No features found."
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:54
+#: app/includes/taxonomies/feature.php:46
 msgid "← Back to Features"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:55
+#: app/includes/taxonomies/feature.php:47
 msgid "Parent Feature"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:56
+#: app/includes/taxonomies/feature.php:48
 msgid "Parent Feature:"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:57
+#: app/includes/taxonomies/feature.php:49
 msgid "No Features"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:86
-#: app/includes/taxonomies/feature.php:118
+#: app/includes/taxonomies/feature.php:78
+#: app/includes/taxonomies/feature.php:110
 msgid "The icon will show on the website frontend next to the feature."
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:91
-#: app/includes/taxonomies/feature.php:124
+#: app/includes/taxonomies/feature.php:83
+#: app/includes/taxonomies/feature.php:116
 msgid "Schema Property"
 msgstr ""
 
-#: app/includes/taxonomies/feature.php:97
-#: app/includes/taxonomies/feature.php:133
+#: app/includes/taxonomies/feature.php:89
+#: app/includes/taxonomies/feature.php:125
 msgid "Schema Item Property (https://schema.org/)"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:38
+#: app/includes/taxonomies/label.php:30
 msgid "All Labels"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:39
+#: app/includes/taxonomies/label.php:31
 msgid "Edit Label"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:40
+#: app/includes/taxonomies/label.php:32
 msgid "View Label"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:41
+#: app/includes/taxonomies/label.php:33
 msgid "Update Label"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:42
+#: app/includes/taxonomies/label.php:34
 msgid "Add New Label"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:43
+#: app/includes/taxonomies/label.php:35
 msgid "New Label Name"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:44
+#: app/includes/taxonomies/label.php:36
 msgid "Popular Labels"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:45
+#: app/includes/taxonomies/label.php:37
 msgid "Search Labels"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:46
+#: app/includes/taxonomies/label.php:38
 msgid "Separate labels with commas"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:47
+#: app/includes/taxonomies/label.php:39
 msgid "Add or remove labels"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:48
+#: app/includes/taxonomies/label.php:40
 msgid "Choose from the most used labels"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:49
+#: app/includes/taxonomies/label.php:41
 msgid "No labels found."
 msgstr ""
 
-#: app/includes/taxonomies/label.php:50
+#: app/includes/taxonomies/label.php:42
 msgid "← Back to Labels"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:51
+#: app/includes/taxonomies/label.php:43
 msgid "Parent Label"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:52
+#: app/includes/taxonomies/label.php:44
 msgid "Parent Label:"
 msgstr ""
 
-#: app/includes/taxonomies/label.php:53
+#: app/includes/taxonomies/label.php:45
 msgid "No Labels"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:42
+#: app/includes/taxonomies/location.php:34
 msgid "All Locations"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:43
+#: app/includes/taxonomies/location.php:35
 msgid "Edit Location"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:44
+#: app/includes/taxonomies/location.php:36
 msgid "View Location"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:45
+#: app/includes/taxonomies/location.php:37
 msgid "Update Location"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:46
+#: app/includes/taxonomies/location.php:38
 msgid "Add New Location"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:47
+#: app/includes/taxonomies/location.php:39
 msgid "New Location Name"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:48
+#: app/includes/taxonomies/location.php:40
 msgid "Popular Locations"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:49
+#: app/includes/taxonomies/location.php:41
 msgid "Search Locations"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:50
+#: app/includes/taxonomies/location.php:42
 msgid "Separate locations with commas"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:51
+#: app/includes/taxonomies/location.php:43
 msgid "Add or remove locations"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:52
+#: app/includes/taxonomies/location.php:44
 msgid "Choose from the most used locations"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:53
+#: app/includes/taxonomies/location.php:45
 msgid "No locations found."
 msgstr ""
 
-#: app/includes/taxonomies/location.php:54
+#: app/includes/taxonomies/location.php:46
 msgid "← Back to Locations"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:55
+#: app/includes/taxonomies/location.php:47
 msgid "Parent Location"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:56
+#: app/includes/taxonomies/location.php:48
 msgid "Parent Location:"
 msgstr ""
 
-#: app/includes/taxonomies/location.php:57
+#: app/includes/taxonomies/location.php:49
 msgid "No Locations"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:33
+#: app/includes/taxonomies/tag.php:25
 msgid "All Tags"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:34
+#: app/includes/taxonomies/tag.php:26
 msgid "Edit Tag"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:35
+#: app/includes/taxonomies/tag.php:27
 msgid "View Tag"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:36
+#: app/includes/taxonomies/tag.php:28
 msgid "Update Tag"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:37
+#: app/includes/taxonomies/tag.php:29
 msgid "Add New Tag"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:38
+#: app/includes/taxonomies/tag.php:30
 msgid "New Tag Name"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:39
+#: app/includes/taxonomies/tag.php:31
 msgid "Popular Tags"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:40
+#: app/includes/taxonomies/tag.php:32
 msgid "Search Tags"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:41
+#: app/includes/taxonomies/tag.php:33
 msgid "Separate tags with commas"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:42
+#: app/includes/taxonomies/tag.php:34
 msgid "Add or remove tags"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:43
+#: app/includes/taxonomies/tag.php:35
 msgid "Choose from the most used tags"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:44
+#: app/includes/taxonomies/tag.php:36
 msgid "No tags found."
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:45
+#: app/includes/taxonomies/tag.php:37
 msgid "← Back to Tags"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:46
+#: app/includes/taxonomies/tag.php:38
 msgid "Parent Tag"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:47
+#: app/includes/taxonomies/tag.php:39
 msgid "Parent Tag:"
 msgstr ""
 
-#: app/includes/taxonomies/tag.php:48
+#: app/includes/taxonomies/tag.php:40
 msgid "No Tags"
 msgstr ""
 
-#: app/includes/upgrade.php:77
+#: app/includes/upgrade.php:69
 msgid "Listdom Author"
 msgstr ""
 
-#: app/includes/upgrade.php:90
+#: app/includes/upgrade.php:82
 msgid "Listdom Publisher"
 msgstr ""
 
-#: app/includes/user.php:55
+#: app/includes/user.php:47
 msgid "<strong>Error</strong>: Please enter a username."
 msgstr ""
 
-#: app/includes/user.php:58
+#: app/includes/user.php:50
 msgid ""
 "<strong>Error</strong>: This username is invalid because it uses illegal "
 "characters. Please enter a valid username."
 msgstr ""
 
-#: app/includes/user.php:61
+#: app/includes/user.php:53
 msgid ""
 "<strong>Error</strong>: This username is already registered. Please choose "
 "another one."
 msgstr ""
 
-#: app/includes/user.php:66
+#: app/includes/user.php:58
 msgid "<strong>Error</strong>: Sorry, that username is not allowed."
 msgstr ""
 
-#: app/includes/user.php:70
+#: app/includes/user.php:62
 msgid "<strong>Error</strong>: Please type your email address."
 msgstr ""
 
-#: app/includes/user.php:73
+#: app/includes/user.php:65
 msgid "<strong>Error</strong>: The email address isn&#8217;t correct."
 msgstr ""
 
-#: app/includes/user.php:76
+#: app/includes/user.php:68
 msgid ""
 "<strong>Error</strong>: This email is already registered. Please choose "
 "another one."
 msgstr ""
 
-#: app/includes/user.php:116
+#: app/includes/user.php:108
 #, php-format
 msgid ""
 "<strong>Error</strong>: Couldn&#8217;t register you&hellip; please contact "
 "the <a href=\"mailto:%s\">site admin</a>!"
 msgstr ""
 
-#: app/includes/user.php:234
+#: app/includes/user.php:226
 msgid "Password Reset Request"
 msgstr ""
 

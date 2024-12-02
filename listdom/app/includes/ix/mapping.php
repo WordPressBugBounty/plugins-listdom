@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_IX_Mapping extends LSD_IX
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function listdom_fields()
     {
         // Default Value

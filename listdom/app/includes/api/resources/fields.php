@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Resources_Fields extends LSD_API_Resource
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function grab()
     {
         // Resource

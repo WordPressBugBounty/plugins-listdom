@@ -357,7 +357,7 @@ $settings = LSD_Options::settings();
         </div>
         <div class="lsd-settings-form-group lsd-accordion-panel">
             <?php if ($this->isLite()): ?>
-                <div class="lsd-alert lsd-warning lsd-mt-0">
+                <div class="lsd-alert lsd-warning lsd-mt-0 lsd-mb-4">
                     <?php echo LSD_Base::missFeatureMessage(
                         sprintf(esc_html__('The ability to modify the %s', 'listdom'), '<strong>'.esc_html__('Price Components', 'listdom').'</strong>'),
                         false,
@@ -366,7 +366,7 @@ $settings = LSD_Options::settings();
                 </div>
             <?php endif; ?>
 
-            <h3 class="lsd-mb-0"><?php esc_html_e('Price Components', 'listdom'); ?></h3>
+            <h3 class="lsd-my-0"><?php esc_html_e('Price Components', 'listdom'); ?></h3>
             <p class="description"><?php esc_html_e('You can disable certain price components if they are not needed.', 'listdom'); ?></p>
 
             <?php foreach ([

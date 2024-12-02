@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Controllers_Push extends LSD_API_Controller
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function listing(WP_REST_Request $request): WP_REST_Response
     {
         $vars = $request->get_params();

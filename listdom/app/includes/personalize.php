@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Personalize extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function generate()
     {
         // Global Settings

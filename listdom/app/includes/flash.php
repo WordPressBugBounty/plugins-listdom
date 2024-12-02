@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Flash extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function add($message, $class = 'info')
     {
         $classes = ['error', 'info', 'success', 'warning'];

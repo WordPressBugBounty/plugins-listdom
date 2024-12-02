@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Folder extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function files($path, $filter = '.')
     {
         // Path doesn't exists

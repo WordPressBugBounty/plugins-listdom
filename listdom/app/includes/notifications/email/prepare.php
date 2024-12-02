@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Notifications_Email_Prepare extends LSD_Notifications
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // Contact Email

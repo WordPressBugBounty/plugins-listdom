@@ -3,6 +3,15 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v3.7.1 <span>December 1st, 2024</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Refined the user interface of the settings panel for a more intuitive experience.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Enhanced the security measures for the search widget.', 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v3.7.0 <span>November 26th, 2024</span></h2>
     <ul class="lsd-changelog">
         <li>

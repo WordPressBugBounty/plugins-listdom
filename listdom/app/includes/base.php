@@ -779,7 +779,7 @@ class LSD_Base
         if ($currency_sign_position == 'after') $rendered = $rendered . $sign;
         else if ($currency_sign_position == 'after_ws') $rendered = $rendered . ' ' . $sign;
         else if ($currency_sign_position == 'before_ws') $rendered = $sign . ' ' . $rendered;
-        else $rendered = $sign . $rendered;
+        else $rendered = '<span>'.$sign .'</span>' . $rendered;
 
         return $rendered;
     }

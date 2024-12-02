@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_i18n extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // Register Language Files

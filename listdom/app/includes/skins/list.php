@@ -13,14 +13,6 @@ class LSD_Skins_List extends LSD_Skins
     public $skin = 'list';
     public $default_style = 'style1';
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_action('wp_ajax_lsd_list_load_more', [$this, 'filter']);

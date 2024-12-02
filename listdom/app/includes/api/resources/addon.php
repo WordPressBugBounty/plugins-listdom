@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Resources_Addon extends LSD_API_Resource
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function all()
     {
         return apply_filters('lsd_api_resource_addon', LSD_Base::addons());

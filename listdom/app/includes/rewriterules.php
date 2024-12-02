@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_RewriteRules extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function todo()
     {
         update_option('lsd_todo_flush', 1);

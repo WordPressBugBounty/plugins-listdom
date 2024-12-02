@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_IX_Listdom extends LSD_IX
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function json()
     {
         $data = $this->data();

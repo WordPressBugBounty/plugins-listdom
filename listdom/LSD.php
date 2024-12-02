@@ -15,7 +15,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '3.7.0';
+    public $version = '3.7.1';
 
     /**
      * The single instance of the class.

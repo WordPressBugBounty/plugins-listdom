@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Hooks extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // Register Actions
@@ -46,6 +38,22 @@ class LSD_Hooks extends LSD_Base
     {
         add_filter('lsd_skins_atts', [$this, 'apply_search']);
         add_filter('ajax_query_attachments_args', [$this, 'protect_wp_media']);
+
+        // Add Meta Links
+        add_filter('plugin_row_meta', [$this, 'meta_links'], 10, 2);
+    }
+
+    public function meta_links($links, $file)
+    {
+        if (strpos($file, LSD_BASENAME) !== false)
+        {
+            $links = array_merge($links, [
+                'documentation' => '<a href="https://webilia.com/docs/listdom/" target="_blank"><strong>' . esc_html__('Documentation', 'listdom') . '</strong></a>',
+                'support' => '<a href="https://webilia.com/support/" target="_blank">' . esc_html__('Support', 'listdom') . '</a>',
+            ]);
+        }
+
+        return $links;
     }
 
     /**

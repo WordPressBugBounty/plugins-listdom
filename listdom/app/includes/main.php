@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Main extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function get_installed_db_version()
     {
         $installed_db_ver = get_option('lsd_db_version');

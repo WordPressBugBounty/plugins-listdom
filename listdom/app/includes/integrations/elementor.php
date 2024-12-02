@@ -2,6 +2,8 @@
 // no direct access
 defined('ABSPATH') || die();
 
+use Elementor\Widgets_Manager;
+
 /**
  * Listdom Integrations Elementor Class.
  *
@@ -10,14 +12,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Integrations_Elementor extends LSD_Integrations
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // Register Widgets
@@ -26,9 +20,9 @@ class LSD_Integrations_Elementor extends LSD_Integrations
 
     /**
      * Register Other Widgets
-     * @param Elementor\Widgets_Manager $widget_manager
+     * @param Widgets_Manager $widget_manager
      */
-    public function register_widgets($widget_manager)
+    public function register_widgets(Widgets_Manager $widget_manager)
     {
     }
 }

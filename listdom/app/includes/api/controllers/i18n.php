@@ -10,15 +10,7 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Controllers_I18n extends LSD_API_Controller
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function languages(WP_REST_Request $request)
+    public function languages(WP_REST_Request $request): WP_REST_Response
     {
         // Response
         return $this->response([

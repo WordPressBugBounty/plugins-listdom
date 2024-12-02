@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Query extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function attribute($key, $value)
     {
         list($id, $type) = explode('-', $key);

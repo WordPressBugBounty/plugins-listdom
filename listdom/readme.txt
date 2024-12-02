@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.0.0
 Requires PHP: 7.0
 Tested up to: 6.7.1
-Stable tag: 3.7.0
+Stable tag: 3.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,7 +31,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 
 **👉 Display Features with Fully Customizable Tools**
 
-*   Wonderful 80 different skins
+*   Wonderful 80 different skins for listing cards and archives
 *   Display listings in List + Grid view (Contains a switch button)
 *   Display listings in List view
 *   Display listings in Grid view
@@ -41,7 +41,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Display listings in Cover view
 *   Display listings in Slider view
 *   Different styles for views and skins
-*   Elements display options for each skin and style
+*   Elements display options for each skin and style (Excerpt length, elements deactivation, etc.)
 *   Display views anywhere with a powerful shortcode generator
 *   Use shortcodes in all page builders
 *   Assign multiple shortcodes to one page
@@ -58,11 +58,11 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   4 Different pre-made styles for listing details page
 *   A built-in Design Builder to design the listing details page
 *   Custom color for settings
-*   Category filter option
-*   Location filter option
-*   Tags filter option
-*   Features filter option
-*   Author filter options
+*   Category filter option for the listings displayed in each skin
+*   Location filter option for the listings displayed in each skin
+*   Tags filter option for the listings displayed in each skin
+*   Features filter option for the listings displayed in each skin
+*   Author filter options for the listings displayed in each skin
 *   Social network buttons manager
 *   Show listing owner data
 *   Contact listing owner
@@ -158,14 +158,19 @@ For users seeking additional features and capabilities for a [WordPress director
 *   Powerful login and register shortcodes
 *   Schema option
 *   Map GPS search
-*   [Listing frontend submission](https://demo.webilia.com/listdom/dashboard/)
+*   [Listing submission](https://demo.webilia.com/listdom/dashboard/) via frontend dashboard
+*   Frontend dashboard menus customization
 *   Image size limits on frontend listing submission
 *   Guest posting without user registration
+*   Separate shortcode for Add listing form
 *   [Custom fields/attributes](https://webilia.com/docs/listdom/setting-up-listing/attributes?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+fields%2Fattributes)
+*   Filter the listings displayed in each skin by custom fields/attributes
+*   Exclusion filter  for the listings displayed in each skin
 *   Search and filter by custom fields/attributes
 *   Hierarchy Categories
 *   Embed elements in listings
 *   Featured video for each listing
+*   Price options management
 *   [Advanced interactive map search feature](https://demo.webilia.com/listdom/skins/grid-view/style-1-map-first-grid-view)
 *   Radius search field
 *   Hierarchical dropdowns search field
@@ -175,8 +180,9 @@ For users seeking additional features and capabilities for a [WordPress director
 *   Mapbox tiles support
 *   Change style and modules per category
 *   Change style and modules per listing
+*   Bulk edit the listings styles
 *   JSON importer and exporter
-*   Display listings in Side-by-Side view
+*   Display listings in Side-by-Side view with great responsive view
 *   API support
 
 Listdom as a classified listing plugin has been developed according to the latest best practices, design patterns, trending design methods, and technologies. We offer all the advanced features that a WordPress directory plugin needs in Listdom.
@@ -262,12 +268,14 @@ Listdom also offers about 30 add-ons to enhance the functionality of your WordPr
 *   Jobs Addon
 *   SMS Addon
 *   ADS Addon (FREE)
-*   Divi Addon
-*   Elementor Addon
+*   Divi Addon (Design listing details page, listing cards, archives, and map info windows with Divi)
+*   Elementor Addon (Design listing details page, listing cards, archives, and map info windows with Elementor)
 *   Advanced Map
 *   Visibility Addon
 *   BuddyPress profile page integration
-*   Advanced Custom (ACF) support
+*   Advanced Custom Fields (ACF) Addon
+*   PMS (Paid Member Subscriptions plugin) Addon
+*   Memberpress plugin Addon 
 
 You can see the details of the addons on [Webilia](https://webilia.com/pricing/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Webilia) website.
 
@@ -339,6 +347,10 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 3.7.1 =
+* Refined the user interface of the settings panel for a more intuitive experience.
+* Enhanced the security measures for the search widget.
 
 = 3.7.0 =
 * [PRO] Added a new feature to dynamically add custom menus to the "Frontend Dashboard".

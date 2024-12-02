@@ -78,11 +78,6 @@ class LSD_Kses extends LSD_Base
         'content' => 1,
     ];
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_filter('lsd_kses_tags', [$this, 'tags'], 10, 2);

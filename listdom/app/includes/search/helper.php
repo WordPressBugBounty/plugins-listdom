@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Search_Helper extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function get_type_by_key($key)
     {
         if (in_array($key, $this->taxonomies())) return 'taxonomy';

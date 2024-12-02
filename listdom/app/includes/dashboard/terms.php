@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Dashboard_Terms extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function category($args)
     {
         $output = LSD_Dashboard_Terms::dropdown($args);

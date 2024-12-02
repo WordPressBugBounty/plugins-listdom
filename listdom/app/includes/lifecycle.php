@@ -13,14 +13,6 @@ class LSD_LifeCycle extends LSD_Base
     public static $body_started = false;
     public static $content_printed = false;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_filter('body_class', function ($class)

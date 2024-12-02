@@ -10,15 +10,7 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Controllers_Taxonomies extends LSD_API_Controller
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function get(WP_REST_Request $request)
+    public function get(WP_REST_Request $request): WP_REST_Response
     {
         $taxonomies = [
             [
@@ -63,7 +55,7 @@ class LSD_API_Controllers_Taxonomies extends LSD_API_Controller
         ]);
     }
 
-    public function terms(WP_REST_Request $request)
+    public function terms(WP_REST_Request $request): WP_REST_Response
     {
         $vars = $request->get_params();
 
@@ -85,7 +77,7 @@ class LSD_API_Controllers_Taxonomies extends LSD_API_Controller
         ]);
     }
 
-    public function hierarchy($taxonomy, $parent = 0, $hide_empty = false, $orderby = 'name', $order = 'ASC')
+    public function hierarchy($taxonomy, $parent = 0, $hide_empty = false, $orderby = 'name', $order = 'ASC'): array
     {
         $terms = get_terms([
             'taxonomy' => $taxonomy,

@@ -118,7 +118,7 @@ $dummy = LSD_Options::dummy();
             <?php LSD_Form::nonce('lsd_dummy_data_form'); ?>
 
             <div class="lsd-skip-wizard lsd-mt-2">
-                <button class="lsd-skip-step"><?php echo esc_html__('Skip This step', 'listdom'); ?></button>
+                <button class="lsd-skip-step"><?php echo esc_html__('Skip', 'listdom'); ?></button>
                 <div class="lsd-flex lsd-gap-2">
                     <button type="button" class="lsd-prev-step-link button button-hero button-primary">
                         <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/arrow-right.svg')); ?>" alt="">

@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Validation extends LSD_API
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function APIToken(WP_REST_Request $request, $token = null): bool
     {
         // Check Token

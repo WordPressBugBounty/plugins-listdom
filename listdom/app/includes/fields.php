@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Fields extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function titles(array $fields = []): array
     {
         if (empty($fields)) $fields = $this->get();

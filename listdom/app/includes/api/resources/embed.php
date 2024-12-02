@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Resources_Embed extends LSD_API_Resource
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function get($embed): array
     {
         return apply_filters('lsd_api_resource_embed', $embed);

@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Integrations_Divi extends LSD_Integrations
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
     }

@@ -12,14 +12,6 @@ class LSD_Payload extends LSD_Base
 {
     protected static $vars;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function set($key, $value)
     {
         self::$vars[$key] = $value;

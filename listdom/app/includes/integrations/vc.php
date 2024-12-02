@@ -10,21 +10,12 @@ defined('ABSPATH') || die();
  */
 class LSD_Integrations_VC extends LSD_Integrations
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // Visual Composer is not installed
-        if (!function_exists('vc_map')) return false;
+        if (!function_exists('vc_map')) return;
 
         add_action('vc_before_init', [$this, 'listdom']);
-        return true;
     }
 
     public function listdom()

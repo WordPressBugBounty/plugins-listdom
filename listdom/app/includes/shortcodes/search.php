@@ -69,8 +69,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $this->form = $this->atts['lsd_form'] ?? [];
 
         // Overwrite Form Options
-        if (isset($this->atts['page']) && trim($this->atts['page'])) $this->form['page'] = $this->atts['page'];
-        if (isset($this->atts['shortcode']) && trim($this->atts['shortcode'])) $this->form['shortcode'] = $this->atts['shortcode'];
+        if (isset($this->atts['page']) && trim($this->atts['page'])) $this->form['page'] = (int) $this->atts['page'];
+        if (isset($this->atts['shortcode']) && trim($this->atts['shortcode'])) $this->form['shortcode'] = (int) $this->atts['shortcode'];
 
         // Current Values
         $this->sf = $this->get_sf();

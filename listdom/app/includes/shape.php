@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Shape extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function get(array $args = [])
     {
         if (!count($args)) return false;

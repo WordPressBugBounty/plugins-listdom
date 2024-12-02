@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Notifications extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         // Notification Post Type

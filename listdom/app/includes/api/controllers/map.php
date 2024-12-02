@@ -13,14 +13,6 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
     protected $id;
     protected $settings;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function single(WP_REST_Request $request)
     {
         $id = $request->get_param('id');

@@ -13,14 +13,6 @@ class LSD_Skins_Cover extends LSD_Skins
     public $skin = 'cover';
     public $default_style = 'style1';
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
     }

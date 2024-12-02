@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Options extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function settings(): array
     {
         return self::parse_args(

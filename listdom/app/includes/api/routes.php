@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_API_Routes extends LSD_API
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_action('rest_api_init', [$this, 'register']);

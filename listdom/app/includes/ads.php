@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Ads extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function display($position)
     {
         $html = LSD_Ads::get($position);

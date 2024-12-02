@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_shortcode('listdom', [$this, 'output']);

@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Map_Provider extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function get($provider = null)
     {
         // Provider is Valid

@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Color extends LSD_Base
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public static function text_color($bg_color = null): string
     {
         // Get Main BG color

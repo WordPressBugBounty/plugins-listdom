@@ -14,14 +14,6 @@ class LSD_Skins_Side extends LSD_Skins
     public $default_style = 'style1';
     public $layout_width = '4060';
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function after_start()
     {
         // Layout Width

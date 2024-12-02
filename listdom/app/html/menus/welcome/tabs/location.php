@@ -93,7 +93,7 @@ $settings = LSD_Options::settings();
     </form>
 
     <div class="lsd-skip-wizard">
-        <button class="lsd-skip-step"><?php echo esc_html__('Skip This step', 'listdom'); ?></button>
+        <button class="lsd-skip-step"><?php echo esc_html__('Skip', 'listdom'); ?></button>
         <button class="lsd-step-link button button-hero button-primary" id="lsd_settings_location_save_button">
             <?php echo esc_html__('Continue', 'listdom'); ?>
             <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/arrow-right.svg')); ?>" alt="">

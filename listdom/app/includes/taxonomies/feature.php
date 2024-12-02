@@ -10,14 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Taxonomies_Feature extends LSD_Taxonomies
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_action('init', [$this, 'register']);

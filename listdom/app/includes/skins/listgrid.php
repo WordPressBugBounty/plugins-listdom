@@ -13,14 +13,6 @@ class LSD_Skins_Listgrid extends LSD_Skins
     public $skin = 'listgrid';
     public $default_style = 'style1';
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
         add_action('wp_ajax_lsd_listgrid_load_more', [$this, 'filter']);
