@@ -106,15 +106,12 @@ class LSD_Menus_Settings extends LSD_Menus
             $value = sanitize_text_field($value);
         });
 
-        // Clear existing custom menus values if present and sanitize shortcode
-        if (isset($current['dashboard_menu_custom']))
-        {
-            $current['dashboard_menu_custom'] = [];
-        }
-
         // Get current Listdom options
         $current = get_option('lsd_settings', []);
         if (is_string($current) && trim($current) === '') $current = [];
+
+        // Clear existing custom menus values if present and sanitize shortcode
+        if (isset($current['dashboard_menu_custom'])) $current['dashboard_menu_custom'] = [];
 
         // Merge new options with previous options
         $final = array_merge($current, $lsd);

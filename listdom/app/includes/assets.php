@@ -134,6 +134,9 @@ class LSD_Assets extends LSD_Base
         // Include Color Picker
         $this->colorpicker();
 
+        // Include Select2
+        $this->select2();
+
         // Include Assets
         do_action('lsd_admin_assets');
     }

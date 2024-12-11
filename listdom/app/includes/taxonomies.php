@@ -82,7 +82,7 @@ class LSD_Taxonomies extends LSD_Base
             $template = locate_template($file);
 
             // Listdom Template
-            if ($template == '') $template = lsd_template($file);
+            if ($template === '') $template = lsd_template($file);
         }
         // Listdom Category
         else if (is_tax(LSD_Base::TAX_CATEGORY) && isset($settings['category_archive']) && trim($settings['category_archive']))
@@ -91,7 +91,7 @@ class LSD_Taxonomies extends LSD_Base
             $template = locate_template($file);
 
             // Listdom Template
-            if ($template == '') $template = lsd_template($file);
+            if ($template === '') $template = lsd_template($file);
         }
         // Listdom Feature
         else if (is_tax(LSD_Base::TAX_FEATURE) && isset($settings['feature_archive']) && trim($settings['feature_archive']))
@@ -100,7 +100,7 @@ class LSD_Taxonomies extends LSD_Base
             $template = locate_template($file);
 
             // Listdom Template
-            if ($template == '') $template = lsd_template($file);
+            if ($template === '') $template = lsd_template($file);
         }
         // Listdom Tag
         else if (is_tax(LSD_Base::TAX_TAG) && isset($settings['tag_archive']) && trim($settings['tag_archive']))
@@ -109,7 +109,7 @@ class LSD_Taxonomies extends LSD_Base
             $template = locate_template($file);
 
             // Listdom Template
-            if ($template == '') $template = lsd_template($file);
+            if ($template === '') $template = lsd_template($file);
         }
         // Listdom Label
         else if (is_tax(LSD_Base::TAX_LABEL) && isset($settings['label_archive']) && trim($settings['label_archive']))
@@ -118,7 +118,7 @@ class LSD_Taxonomies extends LSD_Base
             $template = locate_template($file);
 
             // Listdom Template
-            if ($template == '') $template = lsd_template($file);
+            if ($template === '') $template = lsd_template($file);
         }
 
         return $template;

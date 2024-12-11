@@ -3,7 +3,7 @@
  * Plugin Name: Listdom
  * Plugin URI: https://webilia.com/products/listdom-directory-classified-listings-plugin/
  * Description: Listdom is an advanced but simple tool to list everything on your website and show them in modern responsive skins like list, grid, map and masonry.
- * Version: 3.7.1
+ * Version: 3.7.2
  * Author: Webilia
  * Author URI: https://webilia.com/
  * Requires at least: 4.0.0

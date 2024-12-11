@@ -11,6 +11,9 @@ $skins = new LSD_Skins();
 // Display Options
 $options = get_post_meta($post->ID, 'lsd_display', true);
 $selected_skin = $options['skin'] ?? '';
+
+// Price Components
+$price_components = LSD_Options::price_components();
 ?>
 <div class="lsd-metabox lsd-metabox-display-options">
     <div class="lsd-form-group lsd-skins-form-group">
@@ -39,7 +42,8 @@ $selected_skin = $options['skin'] ?? '';
         <div class="lsd-skin-display-options" id="lsd_skin_display_options_<?php echo esc_attr($skin); ?>">
             <?php $this->include_html_file('metaboxes/shortcode/display-options/'.$skin.'.php', [
                 'parameters' => [
-                    'options' => $options
+                    'options' => $options,
+                    'price_components' => $price_components,
                 ]
             ]); ?>
             <?php

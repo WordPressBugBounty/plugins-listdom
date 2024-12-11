@@ -4,8 +4,19 @@ defined('ABSPATH') || die();
 
 /** @var LSD_PTypes_Shortcode $this */
 /** @var array $options */
+/** @var array $price_components */
+
+$counts = (array) wp_count_posts(LSD_Base::PTYPE_LISTING);
+
+unset($counts['auto-draft']);
+$number_of_listings = array_sum($counts);
 
 $cover = $options['cover'] ?? [];
+
+$listing = isset($cover['listing']) && is_array($cover['listing'])
+    ? $cover['listing'][0]
+    : ($cover['listing'] ?? 0);
+
 $missAddonMessages = [];
 ?>
 <div class="lsd-form-row">
@@ -197,13 +208,27 @@ $missAddonMessages = [];
         'for' => 'lsd_display_options_skin_cover_listing',
     ]); ?></div>
     <div class="lsd-col-6">
-        <?php echo LSD_Form::listings([
-            'id' => 'lsd_display_options_skin_cover_listing',
-            'name' => 'lsd[display][cover][listing]',
-            'value' => $cover['listing'] ?? null,
-            'has_post_thumbnail' => true
-        ]); ?>
-        <p class="description"><?php echo esc_html__("You can select only the listings that have featured image.", 'listdom'); ?></p>
+        <?php if ($number_of_listings > 100): ?>
+            <?php echo LSD_Form::autosuggest([
+                'source' => LSD_Base::PTYPE_LISTING,
+                'name' => 'lsd[display][cover][listing]',
+                'id' => 'lsd_display_options_skin_cover_listing',
+                'input_id' => 'lsd_display_options_skin_cover_listing_input',
+                'suggestions' => 'lsd_display_options_skin_cover_listing_suggestions',
+                'values' => $listing ? [$listing] : [],
+                'max_items' => 1,
+                'placeholder' => esc_html__("Enter at least 3 characters of the listing's title ...", 'listdom'),
+                'description' => esc_html__('You can select only one listing.', 'listdom'),
+            ]); ?>
+        <?php else: ?>
+            <?php echo LSD_Form::listings([
+                'id' => 'lsd_display_options_skin_cover_listing',
+                'name' => 'lsd[display][cover][listing]',
+                'value' => $listing,
+                'has_post_thumbnail' => true
+            ]); ?>
+            <p class="description"><?php echo esc_html__("You can select only the listings that have featured image.", 'listdom'); ?></p>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -230,4 +255,4 @@ $missAddonMessages = [];
         <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Listing Link', 'listdom')); ?></p>
     </div>
 </div>
-<?php endif; ?>
+<?php endif;

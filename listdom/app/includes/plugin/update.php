@@ -26,12 +26,12 @@ class LSD_Plugin_Update
         $activation_id_option = $args['activation_id_option'] ?? $args['prefix'].'_activation_id';
 
         // Webilia Licensing Server
-        $licensing = new Licensing(
+        $licensing = apply_filters('lsd_update_licensing', new Licensing(
             $license_key_option,
             $activation_id_option,
             $basename,
             LSD_LICENSING_SERVER
-        );
+        ), $args);
 
         // Webilia Update Server
         new Update(

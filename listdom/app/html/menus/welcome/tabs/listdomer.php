@@ -15,8 +15,8 @@ defined('ABSPATH') || die();
             <div class="lsd-skip-wizard lsd-mt-4">
                 <button class="lsd-skip-step"><?php echo esc_html__('Skip', 'listdom'); ?></button>
                 <div class="lsd-flex lsd-gap-2">
-                    <button type="button" class="lsd-prev-step-link button button-hero button-primary">
-                        <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/arrow-right.svg')); ?>" alt="">
+                    <button type="button" class="lsd-prev-step-link button button-hero button-secondary">
+                        <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/arrow-right-purple.svg')); ?>" alt="">
                         <?php echo esc_html__('Prev Step', 'listdom'); ?>
                     </button>
                     <button type="submit" class="lsd-step-link button button-hero button-primary" id="lsd_listdomer_installation_save_button">

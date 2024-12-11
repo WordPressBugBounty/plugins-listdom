@@ -4,6 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var LSD_PTypes_Shortcode $this */
 /** @var array $options */
+/** @var array $price_components */
 
 $table = $options['table'] ?? [];
 

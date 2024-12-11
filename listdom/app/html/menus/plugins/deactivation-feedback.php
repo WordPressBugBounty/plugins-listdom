@@ -57,13 +57,13 @@ $reasons = [
             <?php endforeach; ?>
         </div>
         <div class="listdom-feedback-buttons lsd-mt-4">
+            <button type="submit" name="action_type" value="skip_deactivate" id="skip-deactivate-plugin"
+                    class="lsd-button-skip">
+                <?php echo esc_html__('Skip & Deactivate', 'listdom'); ?>
+            </button>
             <button type="submit" name="action_type" value="submit_feedback" id="submit-feedback"
                     class="button button-primary">
                 <?php echo esc_html__('Submit & Deactivate', 'listdom'); ?>
-            </button>
-            <button type="submit" name="action_type" value="skip_deactivate" id="skip-deactivate-plugin"
-                    class="button button-secondary">
-                <?php echo esc_html__('Skip & Deactivate', 'listdom'); ?>
             </button>
         </div>
     </form>

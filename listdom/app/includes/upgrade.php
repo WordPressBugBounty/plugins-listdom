@@ -513,7 +513,7 @@ class LSD_Upgrade extends LSD_Base
         // Add Primary Category Meta
         $listings = get_posts([
             'post_type' => LSD_Base::PTYPE_LISTING,
-            'posts_per_page' => '-1',
+            'posts_per_page' => 1000,
         ]);
 
         foreach ($listings as $listing)
@@ -528,7 +528,7 @@ class LSD_Upgrade extends LSD_Base
         // Add Price Class
         $listings = get_posts([
             'post_type' => LSD_Base::PTYPE_LISTING,
-            'posts_per_page' => '-1',
+            'posts_per_page' => 1000,
         ]);
 
         foreach ($listings as $listing) add_post_meta($listing->ID, 'lsd_price_class', 2, true);

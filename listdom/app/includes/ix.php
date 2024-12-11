@@ -150,7 +150,12 @@ class LSD_IX extends LSD_Base
             $exists = post_exists($listing['post_title'], $listing['post_content'] ?? '', '', LSD_Base::PTYPE_LISTING);
         }
 
-        if ($exists) $post['ID'] = $exists;
+        $mode = 'add';
+        if ($exists)
+        {
+            $post['ID'] = $exists;
+            $mode = 'edit';
+        }
 
         // Insert User
         if (isset($listing['post_author']) && is_email($listing['post_author']))
@@ -328,7 +333,7 @@ class LSD_IX extends LSD_Base
         if (isset($listing['unique_id']) && $listing['unique_id']) update_post_meta($post_id, 'lsd_sys_unique_id', $listing['unique_id']);
 
         // New Listing Imported
-        do_action('lsd_listing_imported', $post_id, $listing);
+        do_action('lsd_listing_imported', $post_id, $listing, $mode);
 
         return $post_id;
     }

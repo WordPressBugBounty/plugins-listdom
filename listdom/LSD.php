@@ -15,7 +15,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '3.7.1';
+    public $version = '3.7.2';
 
     /**
      * The single instance of the class.
@@ -213,7 +213,7 @@ final class Listdom
         $statuses->init();
 
         // Review Notice
-        $review = new LSD_Plugin_Review();
+        $review = new LSD_Plugin_Notice();
         $review->init();
 
         // Deactivation Feedback

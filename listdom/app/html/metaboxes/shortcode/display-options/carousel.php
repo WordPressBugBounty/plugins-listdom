@@ -4,6 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var LSD_PTypes_Shortcode $this */
 /** @var array $options */
+/** @var array $price_components */
 
 $carousel = $options['carousel'] ?? [];
 $missAddonMessages = [];
@@ -66,6 +67,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
+        <?php if (!isset($price_components['class']) || $price_components['class']): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -81,7 +83,9 @@ $missAddonMessages = [];
                 </div>
             </div>
         </div>
-        <?php if(class_exists('LSDADDFAV_Base')): ?>
+        <?php endif; ?>
+
+        <?php if (class_exists('LSDADDFAV_Base')): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -100,7 +104,7 @@ $missAddonMessages = [];
         <?php else: ?>
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom')); ?>
         <?php endif; ?>
-        <?php if(class_exists('LSDADDCMP_Base')): ?>
+        <?php if (class_exists('LSDADDCMP_Base')): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -230,7 +234,7 @@ $missAddonMessages = [];
                 </div>
             </div>
         </div>
-        <?php if(class_exists('LSDADDREV_Base')): ?>
+        <?php if (class_exists('LSDADDREV_Base')): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Review Rates', 'listdom'),
@@ -261,7 +265,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php if(class_exists('LSDADDCLM_Base')): ?>
+        <?php if (class_exists('LSDADDCLM_Base')): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5 <?php echo !isset($carousel['display_title']) || $carousel['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_carousel_is_claimed_wrapper">
             <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -281,7 +285,7 @@ $missAddonMessages = [];
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Claim', esc_html__('Is claimed', 'listdom')); ?>
         <?php endif; ?>
 
-        <?php if($this->isPro()): ?>
+        <?php if ($this->isPro()): ?>
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Display Image', 'listdom'),
@@ -334,7 +338,7 @@ $missAddonMessages = [];
             </div>
         </div>
     </div>
-    <?php if(count($missAddonMessages)): ?>
+    <?php if (count($missAddonMessages)): ?>
     <div class="lsd-addon-alert lsd-mt-4">
         <?php foreach ($missAddonMessages as $alert) echo LSD_Base::alert($alert,'warning'); ?>
     </div>
@@ -368,7 +372,7 @@ $missAddonMessages = [];
     </div>
 </div>
 
-<?php if($this->isPro()): ?>
+<?php if ($this->isPro()): ?>
 <div class="lsd-form-row lsd-display-options-builder-option">
     <div class="lsd-col-2"><?php echo LSD_Form::label([
         'title' => esc_html__('Listing Link', 'listdom'),
@@ -391,4 +395,4 @@ $missAddonMessages = [];
         <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Listing Link', 'listdom')); ?></p>
     </div>
 </div>
-<?php endif; ?>
+<?php endif;

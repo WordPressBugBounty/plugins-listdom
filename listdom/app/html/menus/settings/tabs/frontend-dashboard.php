@@ -142,7 +142,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                     <label>
                                         <?php esc_html_e('Slug', 'listdom'); ?>
                                         <input type="text"
-                                           name="lsd[dashboard_menu_custom][<?php echo esc_attr($slug); ?>][id]"
+                                           name="lsd[dashboard_menu_custom][<?php echo esc_attr($slug); ?>][slug]"
                                            placeholder="<?php esc_attr_e('Enter the menu slug', 'listdom') ?>"
                                            required="required"
                                            value="<?php echo esc_attr($slug); ?>"
@@ -176,6 +176,13 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                     </ul>
                     <button type="button" class="lsd-custom-menu-btn button"><?php esc_html_e('Add Custom Menu', 'listdom'); ?></button>
                     <p class="description lsd-mb-0 lsd-mt-3"><?php esc_html_e("Drag and drop the menus to change the order of dashboard menus.", 'listdom'); ?></p>
+                    <?php echo LSD_Form::iconpicker([
+                        'name' => '',
+                        'id' => 'lsd_icon',
+                        'value' => 'fas fa-tachometer-alt',
+                        'data-field' => 'icon',
+                        'class' => 'lsd-util-hide',
+                    ]); ?>
                 </div>
             </div>
         </div>
@@ -436,8 +443,8 @@ jQuery('#lsd_settings_form').on('submit', function (e)
 
     jQuery('.lsd-custom-menu-content textarea').each(function ()
     {
-        const uniqueId = jQuery(this).attr('slug');
-        const content = tinymce.activeEditor.getContent(uniqueId);
+        const uniqueId = jQuery(this).attr('id');
+        const content = tinymce.editors[uniqueId].getContent();
 
         jQuery(this).val(content);
     });

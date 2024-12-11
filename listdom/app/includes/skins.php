@@ -68,6 +68,7 @@ class LSD_Skins extends LSD_Base
     public $autoGPS = false;
     public $maxBounds = [];
     public $map_provider = 'leaflet';
+    public $price_components = [];
 
     /**
      * Constructor method
@@ -76,7 +77,11 @@ class LSD_Skins extends LSD_Base
     {
         parent::__construct();
 
+        // Settings
         $this->settings = LSD_Options::settings();
+
+        // Price Components
+        $this->price_components = LSD_Options::price_components();
     }
 
     public function init()
@@ -134,7 +139,13 @@ class LSD_Skins extends LSD_Base
         $this->display_contact_info = !isset($this->skin_options['display_contact_info']) || $this->skin_options['display_contact_info'];
         $this->display_read_more_button = !isset($this->skin_options['display_read_more_button']) || $this->skin_options['display_read_more_button'];
         $this->display_location = !isset($this->skin_options['display_location']) || $this->skin_options['display_location'];
+
+        // Price Class
         $this->display_price_class = !isset($this->skin_options['display_price_class']) || $this->skin_options['display_price_class'];
+
+        // Price class is disabled globally
+        if (isset($this->price_components['class']) && !$this->price_components['class']) $this->display_price_class = false;
+
         $this->display_description = !isset($this->skin_options['display_description']) || $this->skin_options['display_description'];
         $this->display_address = !isset($this->skin_options['display_address']) || $this->skin_options['display_address'];
         $this->display_availability = !isset($this->skin_options['display_availability']) || $this->skin_options['display_availability'];

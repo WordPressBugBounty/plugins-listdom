@@ -4,6 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var LSD_PTypes_Shortcode $this */
 /** @var array $options */
+/** @var array $price_components */
 
 $singlemap = $options['singlemap'] ?? [];
 ?>
@@ -101,7 +102,7 @@ $singlemap = $options['singlemap'] ?? [];
         'for' => 'lsd_display_options_skin_singlemap_mapsearch',
     ]); ?></div>
     <div class="lsd-col-6">
-        <?php if($this->isPro()): ?>
+        <?php if ($this->isPro()): ?>
             <?php echo LSD_Form::switcher([
                 'id' => 'lsd_display_options_skin_singlemap_mapsearch',
                 'name' => 'lsd[display][singlemap][mapsearch]',

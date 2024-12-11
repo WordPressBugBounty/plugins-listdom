@@ -29,7 +29,7 @@ class LSD_PTypes extends LSD_Base
         global $post_type;
 
         // It's not one of Listdom Post Types
-        if (!in_array($post_type, $this->postTypes()) or 'bottom' !== $which) return;
+        if (!in_array($post_type, $this->postTypes()) || 'bottom' !== $which) return;
 
         $counts = (array) wp_count_posts($post_type);
 

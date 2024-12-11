@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.0.0
 Requires PHP: 7.0
 Tested up to: 6.7.1
-Stable tag: 3.7.1
+Stable tag: 3.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -347,6 +347,15 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 3.7.2 =
+
+* Enhanced the performance of the Cover skin for better speed.
+* Refined the Welcome Wizard and updated button styles for improved usability.
+* Resolved one click handler issue to ensure smoother interactions.
+* Fixed an issue with the include/exclude filter options for better usability.
+* [PRO] Corrected a problem with price components when the price class was globally disabled.
+* [PRO] Fixed some issues in dashboard menus for improved customization.
 
 = 3.7.1 =
 * Refined the user interface of the settings panel for a more intuitive experience.

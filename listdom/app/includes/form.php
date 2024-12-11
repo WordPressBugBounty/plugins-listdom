@@ -308,7 +308,7 @@ class LSD_Form extends LSD_Base
         $q = ['post_type' => LSD_Base::PTYPE_LISTING, 'posts_per_page' => '-1'];
 
         // Only Posts with Featured Image
-        if (isset($args['has_post_thumbnail']) and $args['has_post_thumbnail'])
+        if (isset($args['has_post_thumbnail']) && $args['has_post_thumbnail'])
         {
             $q['meta_query'] = [[
                 'key' => '_thumbnail_id',
@@ -522,18 +522,18 @@ class LSD_Form extends LSD_Base
     {
         if (!count($args)) return false;
 
-        $placeholder = (isset($args['placeholder']) and trim($args['placeholder'])) ? $args['placeholder'] : '';
-        $description = (isset($args['description']) and trim($args['description'])) ? $args['description'] : '';
-        $name = (isset($args['name']) and trim($args['name'])) ? $args['name'] : 'lsd[team]';
-        $id = (isset($args['id']) and trim($args['id'])) ? $args['id'] : 'lsd_autosuggest_append';
-        $input_id = (isset($args['input_id']) and trim($args['input_id'])) ? $args['input_id'] : '';
-        $suggestions = (isset($args['suggestions']) and trim($args['suggestions'])) ? $args['suggestions'] : 'lsd_autosuggest_suggestions';
-        $min = (isset($args['min-characters']) and is_numeric($args['min-characters'])) ? (int) $args['min-characters'] : 3;
-        $max_items = (isset($args['max_items']) and is_numeric($args['max_items']) and $args['max_items'] > 0) ? (int) $args['max_items'] : null;
+        $placeholder = isset($args['placeholder']) && trim($args['placeholder']) ? $args['placeholder'] : '';
+        $description = isset($args['description']) && trim($args['description']) ? $args['description'] : '';
+        $name = isset($args['name']) && trim($args['name']) ? $args['name'] : 'lsd[team]';
+        $id = isset($args['id']) && trim($args['id']) ? $args['id'] : 'lsd_autosuggest_append';
+        $input_id = isset($args['input_id']) && trim($args['input_id']) ? $args['input_id'] : '';
+        $suggestions = isset($args['suggestions']) && trim($args['suggestions']) ? $args['suggestions'] : 'lsd_autosuggest_suggestions';
+        $min = isset($args['min-characters']) && is_numeric($args['min-characters']) ? (int) $args['min-characters'] : 3;
+        $max_items = isset($args['max_items']) && is_numeric($args['max_items']) && $args['max_items'] > 0 ? (int) $args['max_items'] : null;
         $nonce = wp_create_nonce('lsd_autosuggest');
 
-        $source = (isset($args['source']) and trim($args['source'])) ? $args['source'] : '';
-        $values = (isset($args['values']) and is_array($args['values'])) ? $args['values'] : [];
+        $source = isset($args['source']) && trim($args['source']) ? $args['source'] : '';
+        $values = isset($args['values']) && is_array($args['values']) ? $args['values'] : [];
 
         $current = '';
         foreach ($values as $value)

@@ -3,6 +3,27 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v3.7.2 <span>December 10th, 2024</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Enhanced the performance of the Cover skin for better speed.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Refined the Welcome Wizard and updated button styles for improved usability.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Resolved one click handler issue to ensure smoother interactions.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed an issue with the include/exclude filter options for better usability.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('[PRO] Corrected a problem with price components when the price class was globally disabled.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('[PRO] Fixed some issues in dashboard menus for improved customization.', 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v3.7.1 <span>December 1st, 2024</span></h2>
     <ul class="lsd-changelog">
         <li>

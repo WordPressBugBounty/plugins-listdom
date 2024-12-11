@@ -50,7 +50,7 @@ defined('ABSPATH') || die();
             </div>
         </div>
 
-        <?php (new LSD_Plugin_Review())->display(true); ?>
+        <?php (new LSD_Plugin_Notice())->display('review', true); ?>
 
         <h2><?php esc_html_e('Changelog', 'listdom'); ?></h2>
         <div class="lsd-changelog-wrapper"><?php $this->include_html_file('menus/dashboard/tabs/changelog.php'); ?></div>

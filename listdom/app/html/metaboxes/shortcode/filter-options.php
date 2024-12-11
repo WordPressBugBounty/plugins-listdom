@@ -356,7 +356,7 @@ $walker = new LSD_Walker_Taxonomy();
                         'input_id' => 'in_lsd_author',
                         'suggestions' => 'lsd_filter_author_suggestions',
                         'values' => $options['authors'] ?? [],
-                        'placeholder' => esc_html__('Type at-least 3 characters of author name ...', 'listdom'),
+                        'placeholder' => esc_html__("Enter at least 3 characters of the author's name ...", 'listdom'),
                         'description' => esc_html__('You can select multiple authors.', 'listdom'),
                     ]); ?>
                 <?php else: ?>

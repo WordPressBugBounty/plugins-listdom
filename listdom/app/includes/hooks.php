@@ -184,7 +184,14 @@ class LSD_Hooks extends LSD_Base
             // Template Redirect Hook
             do_action('template_redirect');
 
-            echo (new LSD_Endpoints_Raw())->output();
+            // Additional Classes
+            $classes = '';
+
+            // Side by Side Skin
+            if (isset($_REQUEST['lsd-side']) && trim($_REQUEST['lsd-side'])) $classes .= 'lsd-side-skin';
+
+            // Output
+            echo (new LSD_Endpoints_Raw())->output($classes);
             exit;
         }
     }

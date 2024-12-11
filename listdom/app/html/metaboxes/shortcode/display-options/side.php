@@ -4,6 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var LSD_PTypes_Shortcode $this */
 /** @var array $options */
+/** @var array $price_components */
 
 $side = $options['side'] ?? [];
 $missAddonMessages = [];
@@ -14,7 +15,7 @@ $missAddonMessages = [];
         <p class="description"><?php echo sprintf(esc_html__('Using the %s skin allows you to display a list of the directories and listings on one side and the details page on the other side.', 'listdom'), '<strong>'.esc_html__('Side by Side', 'listdom').'</strong>'); ?></p>
     </div>
 </div>
-<?php if($this->isLite()): ?>
+<?php if ($this->isLite()): ?>
 <div class="lsd-form-row lsd-mb-3">
     <div class="lsd-col-12">
         <p class="lsd-alert lsd-warning"><?php echo LSD_Base::missFeatureMessage(esc_html__('Side by Side Skin', 'listdom')); ?></p>
@@ -72,7 +73,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <?php if(class_exists('LSDADDFAV_Base')): ?>
+        <?php if (class_exists('LSDADDFAV_Base')): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Favorite Icon', 'listdom'),
@@ -90,7 +91,7 @@ $missAddonMessages = [];
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom')); ?>
         <?php endif; ?>
 
-        <?php if(class_exists('LSDADDCMP_Base')): ?>
+        <?php if (class_exists('LSDADDCMP_Base')): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Compare Icon', 'listdom'),
@@ -108,7 +109,7 @@ $missAddonMessages = [];
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Compare', esc_html__('Compare icon', 'listdom')); ?>
         <?php endif; ?>
 
-        <?php if(class_exists('LSDADDREV_Base')): ?>
+        <?php if (class_exists('LSDADDREV_Base')): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Review Rates', 'listdom'),
@@ -139,7 +140,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php if($this->isPro()): ?>
+        <?php if ($this->isPro()): ?>
         <div class="lsd-form-row">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Image', 'listdom'),
@@ -158,7 +159,7 @@ $missAddonMessages = [];
             <?php $missAddonMessages[] = LSD_Base::missFeatureMessage(esc_html__('Display Image', 'listdom'), true); ?>
     <?php endif; ?>
     </div>
-    <?php if(count($missAddonMessages)): ?>
+    <?php if (count($missAddonMessages)): ?>
     <div class="lsd-addon-alert lsd-mt-4">
         <?php foreach ($missAddonMessages as $alert) echo LSD_Base::alert($alert,'warning'); ?>
     </div>
@@ -217,4 +218,3 @@ $missAddonMessages = [];
         <p class="description"><?php esc_html_e('Choose how to load additional listings more than the default limit.', 'listdom'); ?></p>
     </div>
 </div>
-

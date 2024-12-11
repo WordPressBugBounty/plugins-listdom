@@ -87,7 +87,7 @@ class LSD_Notifications extends LSD_Base
         return apply_filters('lsd_notification_placeholders', $placeholders);
     }
 
-    public function get($hook)
+    public function get($hook): array
     {
         return get_posts([
             'post_type' => LSD_Base::PTYPE_NOTIFICATION,
