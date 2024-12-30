@@ -89,7 +89,6 @@ $dummy = LSD_Options::dummy();
                         ]); ?></div>
                     </div>
                 <?php endif; ?>
-                <?php if ($this->isPro()): ?>
                 <div class="lsd-form-row">
                     <div class="lsd-col-1"><?php echo LSD_Form::switcher([
                         'id' => 'lsd_dummy_frontend_dashboard',
@@ -101,7 +100,6 @@ $dummy = LSD_Options::dummy();
                         'for' => 'lsd_dummy_frontend_dashboard',
                     ]); ?></div>
                 </div>
-                <?php endif; ?>
                 <div class="lsd-form-row">
                     <div class="lsd-col-1"><?php echo LSD_Form::switcher([
                         'id' => 'lsd_dummy_shortcodes',

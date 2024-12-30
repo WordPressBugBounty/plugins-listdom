@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.0.0
 Requires PHP: 7.0
 Tested up to: 6.7.1
-Stable tag: 3.8.0
+Stable tag: 3.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -358,6 +358,10 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 3.8.1 =
+* Fixed an issue with settings import functionality.
+* Resolved a problem with the Frontend Dashboard.
 
 = 3.8.0 =
 * [PRO] Added an option to use Listdom authentication pages instead of WordPress default pages.

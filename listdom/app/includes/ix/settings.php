@@ -107,7 +107,7 @@ class LSD_IX_Settings extends LSD_Base
         $this->response(['success' => 0, 'code' => 'UPLOAD_ERROR']);
     }
 
-    public static function import(string $file): bool
+    public static function import(string $file, bool $delete = true): bool
     {
         // Read the Content
         $JSON = LSD_File::read($file);
@@ -155,7 +155,7 @@ class LSD_IX_Settings extends LSD_Base
         LSD_RewriteRules::todo();
 
         // Delete Temp File
-        LSD_File::delete($file);
+        if ($delete) LSD_File::delete($file);
 
         return true;
     }

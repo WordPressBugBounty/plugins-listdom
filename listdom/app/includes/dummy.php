@@ -631,7 +631,7 @@ class LSD_Dummy extends LSD_Base
         }
 
         // Frontend Dashboard
-        if ($this->isPro() && $import_frontend_dashboard && !post_exists('Manage Listings', '[listdom-dashboard]'))
+        if ($import_frontend_dashboard && !post_exists('Manage Listings', '[listdom-dashboard]'))
         {
             wp_insert_post([
                 'post_title' => 'Manage Listings',

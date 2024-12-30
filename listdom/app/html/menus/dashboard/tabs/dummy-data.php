@@ -92,21 +92,17 @@ $missFeatureMessages = [];
             <?php else: ?>
                 <?php $missFeatureMessages[] = $this->missFeatureMessage(esc_html__('Attributes', 'listdom')); ?>
             <?php endif; ?>
-            <?php if($this->isPro()): ?>
-                <div class="lsd-form-row">
-                    <div class="lsd-col-6"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Frontend Dashboard', 'listdom'),
-                        'for' => 'lsd_dummy_frontend_dashboard',
-                    ]); ?></div>
-                    <div class="lsd-col-6"><?php echo LSD_Form::switcher([
-                        'id' => 'lsd_dummy_frontend_dashboard',
-                        'name' => 'lsd[dummy][frontend_dashboard]',
-                        'value' => $dummy['dummy']['frontend_dashboard'] ?? 0,
-                    ]); ?></div>
-                </div>
-            <?php else: ?>
-                <?php $missFeatureMessages[] = $this->missFeatureMessage(esc_html__('Frontend Dashboard', 'listdom')); ?>
-            <?php endif; ?>
+            <div class="lsd-form-row">
+                <div class="lsd-col-6"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Frontend Dashboard', 'listdom'),
+                    'for' => 'lsd_dummy_frontend_dashboard',
+                ]); ?></div>
+                <div class="lsd-col-6"><?php echo LSD_Form::switcher([
+                    'id' => 'lsd_dummy_frontend_dashboard',
+                    'name' => 'lsd[dummy][frontend_dashboard]',
+                    'value' => $dummy['dummy']['frontend_dashboard'] ?? 0,
+                ]); ?></div>
+            </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-6"><?php echo LSD_Form::label([
                     'title' => esc_html__('Shortcodes & Pages', 'listdom'),
