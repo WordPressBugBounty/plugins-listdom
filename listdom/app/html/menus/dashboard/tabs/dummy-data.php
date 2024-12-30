@@ -8,7 +8,7 @@ $missFeatureMessages = [];
 <div class="lsd-dummy-data-wrap">
     <h2 class="lsd-mt-5"><?php esc_html_e('Dummy Data', 'listdom'); ?></h2>
     <form id="lsd_dummy_data_form">
-        <p class="description"><?php esc_html_e("Dummy data are pre-made sample search modules, categories, tags, labels, locations, shortcodes, pages etc. that you'll be able to remove them at anytime. Do you want to import them?", 'listdom'); ?></p>
+        <p class="description"><?php esc_html_e("Dummy data are pre-made sample listings, search forms, categories, tags, labels, locations, shortcodes, pages, etc. that help you set up the site faster. You'll be able to remove them at any time. Select the items you want to import:", 'listdom'); ?></p>
 
         <div class="lsd-form-group">
             <div class="lsd-form-row">

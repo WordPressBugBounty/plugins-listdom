@@ -18,6 +18,7 @@ class LSD_Element_Categories extends LSD_Element
 
     /**
      * Constructor method
+     *
      * @param boolean $show_color
      * @param boolean $multiple_categories
      * @param string $color_method
@@ -28,6 +29,8 @@ class LSD_Element_Categories extends LSD_Element
         parent::__construct();
 
         $this->label = esc_html__('Categories', 'listdom');
+        $this->has_title_settings = false;
+
         $this->show_color = $show_color;
         $this->multiple_categories = $multiple_categories;
         $this->color_method = $color_method;

@@ -3,6 +3,7 @@
 defined('ABSPATH') || die();
 
 /** @var WP_Post $post */
+/** @var LSD_PTypes_Listing $this */
 
 // Include Map Assets to the page
 LSD_Assets::map(true);
@@ -38,7 +39,7 @@ $shape = LSD_Shape::get([
         <div class="lsd-form-row">
             <div class="lsd-col-12">
                 <label for="lsd_object_type_address" class="lsd-address-label"><?php esc_html_e('Address', 'listdom'); ?></label>
-                <input type="text" name="lsd[address]" id="lsd_object_type_address" placeholder="<?php esc_attr_e('Listing Address', 'listdom'); ?>" value="<?php echo esc_attr($address); ?>">
+                <input type="text" name="lsd[address]" id="lsd_object_type_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($address); ?>">
             </div>
         </div>
         <div class="lsd-form-row">

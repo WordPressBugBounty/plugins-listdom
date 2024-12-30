@@ -28,6 +28,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
      */
     public $q;
 
+    private $is_pro;
+
     /**
      * Constructor method
      */
@@ -38,11 +40,16 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Settings
         $this->settings = LSD_Options::settings();
 
+        // Listdom Pro?
+        $this->is_pro = $this->isPro();
+
         // Guest Status
-        $this->guest_status = isset($this->settings['submission_guest']) && $this->settings['submission_guest'];
+        $this->guest_status = $this->is_pro && isset($this->settings['submission_guest']) && $this->settings['submission_guest'];
 
         // Registration Method
-        $this->guest_registration = $this->settings['submission_guest_registration'] ?? 'approval';
+        $this->guest_registration = $this->is_pro && isset($this->settings['submission_guest_registration'])
+            ? $this->settings['submission_guest_registration']
+            : 'approval';
     }
 
     public function init()
@@ -72,11 +79,6 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function output($atts = [])
     {
-        if ($this->isLite())
-        {
-            return $this->alert($this->missFeatureMessage(esc_html__('Dashboard', 'listdom')), 'error');
-        }
-
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-dashboard');
         if (trim($pre)) return $pre;
@@ -269,7 +271,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Apply Filters
         $menus = apply_filters('lsd_dashboard_menus', $menus, $this);
 
-        if (isset($order_menus))
+        // Order Menus
+        if (isset($order_menus) && $this->is_pro)
         {
             $ordered_menus = [];
             if (isset($menus['manage'])) $ordered_menus['manage'] = $menus['manage'];

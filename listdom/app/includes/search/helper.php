@@ -24,6 +24,13 @@ class LSD_Search_Helper extends LSD_Base
         else if ($key == 'period') return 'period';
         else if (in_array($key, ['adults', 'children'])) return 'numeric';
 
+        // ACF
+        else if (strpos($key, 'acf_number_') === 0) return 'number';
+        else if (strpos($key, 'acf_text_') === 0 || strpos($key, 'acf_email_') === 0) return 'text';
+        else if (strpos($key, 'acf_select_') === 0 || strpos($key, 'acf_radio_') === 0 || strpos($key, 'acf_checkbox_') === 0) return 'acf_dropdown';
+        else if (strpos($key, 'acf_range_') === 0) return 'acf_range';
+        else if (strpos($key, 'acf_true_false_') === 0) return 'acf_true_false';
+
         return 'textsearch';
     }
 
@@ -43,6 +50,39 @@ class LSD_Search_Helper extends LSD_Base
         }
 
         return $branch;
+    }
+
+    public function acf_get_values($name): array
+    {
+        $acf_name = substr(substr($name, 0, -4), 7);
+        $args = [
+            'post_type' => LSD_Base::PTYPE_LISTING,
+            'posts_per_page' => -1,
+            'meta_query' => [
+                [
+                    'key' => $acf_name,
+                    'compare' => 'EXISTS',
+                ],
+            ],
+        ];
+
+        $query = new WP_Query($args);
+        if ($query->have_posts())
+        {
+            $values = [];
+            while ($query->have_posts())
+            {
+                $query->the_post();
+                $value = get_field($acf_name);
+
+                if (!empty($value)) $values[] = $value;
+            }
+
+            wp_reset_postdata();
+            return array_values(array_unique($values));
+        }
+
+        return [];
     }
 
     public function get_terms($filter, $numeric = false, $hierarchy = false): array
@@ -136,6 +176,134 @@ class LSD_Search_Helper extends LSD_Base
         return [$field_column, $button_column];
     }
 
+    public function text($filter, $args = []): string
+    {
+        $key = $filter['key'] ?? '';
+        $title = $args['title'] ?? '';
+        $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
+        $id = $args['id'] ?? 'lsd_search_text_' . $key;
+        $name = $args['name'] ?? 'sf-' . $key . '-lk';
+        $col_filter = $args['col_filter'] ?? '';
+        $current = $args['current'] ?? '';
+
+        $output = '<div class="lsd-search-filter ' . esc_attr($col_filter) . '">';
+        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    public function number($filter, $args = []): string
+    {
+        $key = $filter['key'] ?? '';
+        $method = $filter['method'] ?? 'number-input';
+        $title = $args['title'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
+        $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
+
+        $id = $args['id'] ?? 'lsd_search_number_' . $key;
+        $name = $args['name'] ?? 'sf-' . $key . '-eq';
+        $class = ($method === 'range') ? 'lsd-search-range ' : '';
+
+        $current = $args['current'] ?? '';
+
+        $output = '<div class="lsd-search-filter ' . esc_attr($class . ($args['col_filter'] ?? '')) . '">';
+        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+
+        if ($method === 'number-input')
+        {
+            $output .= '<input type="number" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
+        }
+        else if ($method === 'dropdown')
+        {
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+
+            if (strpos($name, 'sf-acf-') !== false)
+            {
+                $values = $this->acf_get_values($name);
+                foreach ($values as $v) $output .= '<option value="' . esc_attr($v) . '" ' . ($current == $v ? 'selected="selected"' : '') . '>' . esc_html($v) . '</option>';
+            }
+            else
+            {
+                $terms = $this->get_terms($filter, true);
+                foreach ($terms as $term) $output .= '<option value="' . esc_attr($term) . '" ' . ($current == $term ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
+            }
+
+            $output .= '</select>';
+        }
+        else if ($method === 'dropdown-plus')
+        {
+            $min = $filter['min'] ?? 0;
+            $max = $filter['max'] ?? 100;
+            $increment = $filter['increment'] ?? 10;
+            $th_separator = isset($filter['th_separator']) && $filter['th_separator'];
+
+            $name = $args['dropdown_name'] ?? '';
+            $current = $args['dropdown_current'] ?? '';
+
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+
+            $output .= '<option value="0">' . $placeholder . '</option>';
+            $i = $min;
+            while ($i <= $max)
+            {
+                $decimals = (floor($i) == $i) ? 0 : 2;
+
+                $output .= '<option value="' . esc_attr($i) . '" ' . (($current == (string) $i) ? 'selected="selected"' : '') . '>' . ($th_separator ? number_format_i18n($i, $decimals) : $i) . '+</option>';
+                $i += $increment;
+            }
+
+            $output .= '</select>';
+        }
+        else if ($method === 'range')
+        {
+            if (strpos($name, 'sf-acf-') !== false)
+            {
+                $acf_name = substr(substr($name, 0, -4), 7);
+                $min_name = $args['min_name'] ?? 'sf-acf-' . $acf_name . '-ara-min';
+                $min_current = $args['min_current'] ?? '';
+                $max_name = $args['max_name'] ?? 'sf-acf-' . $acf_name . '-ara-max';
+                $max_current = $args['max_current'] ?? '';
+                $min = !empty($filter['min']) ? $filter['min'] : ($this->acf_field_data($acf_name, 'min')[0] ?? 0);
+                $max = !empty($filter['max']) ? $filter['max'] : ($this->acf_field_data($acf_name, 'max')[0] ?? 100);
+                $increment = !empty($filter['increment']) ? $filter['increment'] : ($this->acf_field_data($acf_name, 'step')[0] ?? 1);
+                $prepend = !empty($filter['prepend']) ? $filter['prepend'] : ($this->acf_field_data($acf_name, 'prepend')[0] ?? '');
+            }
+            else
+            {
+                $min_name = $args['min_name'] ?? 'sf-' . $key . '-grb-min';
+                $min_current = $args['min_current'] ?? '';
+                $max_name = $args['max_name'] ?? 'sf-' . $key . '-grb-max';
+                $max_current = $args['max_current'] ?? '';
+                $min = $filter['min'] ?? 0;
+                $max = $filter['max'] ?? 100;
+                $increment = $filter['increment'] ?? 10;
+                $prepend = $filter['prepend'] ?? '';
+            }
+
+            $default = $filter['default_value'] ?? '';
+            $max_default = $filter['max_default_value'] ?? '';
+
+            $output .= $this->range($filter, [
+                'id' => $id,
+                'min_name' => $min_name,
+                'min_current' => $min_current,
+                'max_name' => $max_name,
+                'max_current' => $max_current,
+                'default' => $default,
+                'max_default' => $max_default,
+                'min' => $min,
+                'max' => $max,
+                'step' => $increment,
+                'prepend' => $prepend,
+            ]);
+        }
+
+        $output .= '</div>';
+        return $output;
+    }
+
     public function dropdown($filter, $args = []): string
     {
         $key = $filter['key'] ?? '';
@@ -147,7 +315,7 @@ class LSD_Search_Helper extends LSD_Base
         $name = $args['name'] ?? 'sf-' . $key;
         $current = $args['current'] ?? null;
 
-        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
+        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
         $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
         $output .= $this->dropdown_options($filter, 0, $current);
         $output .= '</select>';
@@ -176,12 +344,12 @@ class LSD_Search_Helper extends LSD_Base
         foreach ($terms as $term)
         {
             // Term is not in the predefined terms
-            if (!$all_terms and count($predefined_terms) and !isset($predefined_terms[$term->term_id])) continue;
+            if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$term->term_id])) continue;
 
             $output .= '<option class="level-' . esc_attr($level) . '" value="' . esc_attr($term->term_id) . '" ' . ($current == $term->term_id ? 'selected="selected"' : '') . '>' . esc_html(($prefix . (trim($prefix) ? ' ' : '') . $term->name)) . '</option>';
 
             $children = get_term_children($term->term_id, $key);
-            if (is_array($children) and count($children))
+            if (is_array($children) && count($children))
             {
                 $output .= $this->dropdown_options($filter, $term->term_id, $current, $level + 1);
             }
@@ -220,13 +388,13 @@ class LSD_Search_Helper extends LSD_Base
         foreach ($terms as $term)
         {
             // Term is not in the predefined terms
-            if (!$all_terms and count($predefined_terms) and !isset($predefined_terms[$term->term_id])) continue;
+            if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$term->term_id])) continue;
 
             $level = count(LSD_Taxonomies::parents($term)) + 1;
             $max_levels = max($max_levels, $level);
 
             // Term is not child of current parents
-            if ($current and count($available_parents_for_childs) and $term->parent != 0 and $term->term_id != $current and !in_array($term->parent, $available_parents_for_childs))
+            if ($current && count($available_parents_for_childs) && $term->parent != 0 && $term->term_id != $current && !in_array($term->parent, $available_parents_for_childs))
             {
                 continue;
             }
@@ -238,17 +406,87 @@ class LSD_Search_Helper extends LSD_Base
         $output = '<div class="lsd-hierarchical-dropdowns" id="' . esc_attr($id) . '_wrapper" data-for="' . esc_attr($key) . '" data-id="' . esc_attr($id) . '" data-max-levels="' . esc_attr($max_levels) . '" data-name="' . esc_attr($name) . '" data-hide-empty="' . esc_attr($hide_empty) . '">';
         for ($l = 1; $l <= $max_levels; $l++)
         {
-            $level_terms = (isset($hierarchy[$l]) and is_array($hierarchy[$l])) ? $hierarchy[$l] : [];
+            $level_terms = isset($hierarchy[$l]) && is_array($hierarchy[$l]) ? $hierarchy[$l] : [];
             $placeholder = $placeholders[($l - 1)] ?? $placeholders[0];
 
             $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-level="' . esc_attr($l) . '" data-enhanced="0">';
             $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
 
-            foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id or in_array($level_term->term_id, $current_parents)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';
+            foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id || in_array($level_term->term_id, $current_parents)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';
             $output .= '</select>';
         }
 
         $output .= '</div>';
         return $output;
+    }
+
+    public function range($filter, $args = []): string
+    {
+        $key = $filter['key'] ?? '';
+        $id = $args['id'] ?? null;
+        $min_name = $args['min_name'] ?? 'sf-' . $key . '-min';
+        $max_name = $args['max_name'] ?? 'sf-' . $key . '-max';
+        $min = $args['min'] ?? '';
+        $min_current = $args['min_current'] ?? '';
+        $max = $args['max'] ?? '';
+        $max_current = $args['max_current'] ?? '';
+        $step = $args['step'] ?? '1';
+        $min_default = !empty($min_current) ? $min_current : ($args['default'] !== '' && $args['default'] >= $min ? $args['default'] : $min);
+        $max_default = !empty($max_current) ? $max_current : ($args['max_default'] !== '' && $args['max_default'] <= $max ? $args['max_default'] : $max);
+        $prepend = $args['prepend'] ?? '';
+
+        $output = '<div class="lsd-range-slider-label"><label>' . esc_html($prepend) . '<span class="lsd-range-min">' . esc_html($min_default) . '</span> - ' . esc_html($prepend) . '<span class="lsd-range-max">' . esc_html($max_default) . '</span></label></div>';
+        $output .= '<div class="lsd-range-slider-search ' . esc_attr($key) . '" data-default="' . esc_html($min_default) . '" data-max-default="' . esc_html($max_default) . '" data-min="' . esc_html($min) . '" data-max="' . esc_html($max) . '" data-step="' . esc_html($step) . '"></div>';
+        $output .= '<input class="lsd-range-min-value" type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($min_name) . '" value="' . esc_attr($min_default) . '">';
+        $output .= '<input class="lsd-range-max-value" type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($max_name) . '" value="' . esc_attr($max_default) . '">';
+
+        return $output;
+    }
+
+    public function acf_dropdown($filter, $args = []): string
+    {
+        $key = $filter['key'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
+
+        $title = $args['title'] ?? '';
+        $placeholder = isset($args['placeholder']) && trim($args['placeholder']) ? $args['placeholder'] : $title;
+        $id = $args['id'] ?? null;
+        $name = $args['name'] ?? 'sf-' . $key;
+        $current = $args['current'] ?? null;
+        $options = $args['options'] ?? [];
+
+        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom-acf') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+        $output .= '<option value="">' . esc_html__($placeholder, 'listdom-acf') . '</option>';
+        $output .= $this->acf_dropdown_options($options, $current);
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    public function acf_dropdown_options($options, $current = null): string
+    {
+        $acf_options = $options ?? [];
+        $output = '';
+
+        foreach ($acf_options as $value => $label)
+        {
+            $output .= '<option class="acf-option" value="' . esc_attr($value) . '" ' . ($current == $value ? 'selected="selected"' : '') . '>' . esc_html($label) . '</option>';
+        }
+
+        return $output;
+    }
+
+    public function acf_field_data($acf_name, $data): array
+    {
+        $acf_field_name = is_string($acf_name) ? [$acf_name] : ($acf_name ?? []);
+
+        $options = [];
+        foreach ($acf_field_name as $acf_field_data)
+        {
+            $acf_field = acf_get_field($acf_field_data);
+            if (!empty($acf_field[$data])) $options[] = $acf_field[$data];
+        }
+
+        return $options;
     }
 }

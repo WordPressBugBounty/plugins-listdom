@@ -283,11 +283,11 @@ $sections = [
                 </div>
             </div>
             <div class="lsd-col-8">
-                <ul class="lsd-tab-switcher <?php echo $current_style === 'dynamic' ? '' : 'lsd-util-hide'; ?> lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mt-4" id="lsd_dynamic_switcher">
+                <ul class="lsd-tab-switcher <?php echo $current_style === 'dynamic' ? '' : 'lsd-util-hide'; ?> lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mt-4" id="lsd_dynamic_switcher" data-for=".lsd-tab-switcher-content-details">
                     <li data-tab="config" class="<?php echo $current_style !== 'dynamic' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="#"><?php esc_html_e('Configuration', 'listdom'); ?></a></li>
                     <li data-tab="builder" class="<?php echo $current_style === 'dynamic' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="#"><?php esc_html_e('Design Builder', 'listdom'); ?></a></li>
                 </ul>
-                <div class="lsd-tab-switcher-content <?php echo $current_style !== 'dynamic' ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-config-content">
+                <div class="lsd-tab-switcher-content lsd-tab-switcher-content-details <?php echo $current_style !== 'dynamic' ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-config-content">
                     <h3><?php esc_html_e('Elements', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-12">
@@ -301,7 +301,7 @@ $sections = [
                         </div>
                     </div>
                 </div>
-                <div class="lsd-tab-switcher-content <?php echo $current_style === 'dynamic' ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-builder-content">
+                <div class="lsd-tab-switcher-content lsd-tab-switcher-content-details <?php echo $current_style === 'dynamic' ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-builder-content">
                     <h3><?php esc_html_e('Design Builder', 'listdom'); ?></h3>
                     <div class="lsd-form-row lsd-mt-4">
                         <div class="lsd-col-2 lsd-flex lsd-flex-content-end lsd-flex-align-items-center">

@@ -15,7 +15,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '3.7.2';
+    public $version = '3.8.0';
 
     /**
      * The single instance of the class.
@@ -219,6 +219,10 @@ final class Listdom
         // Deactivation Feedback
         $df = new LSD_Plugin_Feedback();
         $df->init();
+
+        // Settings Import / Export
+        $ixs = new LSD_IX_Settings();
+        $ixs->init();
 
         // Initialize Lite Features
         if ($main->isLite())

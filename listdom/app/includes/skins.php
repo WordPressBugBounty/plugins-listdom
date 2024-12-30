@@ -69,6 +69,8 @@ class LSD_Skins extends LSD_Base
     public $maxBounds = [];
     public $map_provider = 'leaflet';
     public $price_components = [];
+    public $connected_shortcodes = [];
+    public $map_position;
 
     /**
      * Constructor method
@@ -110,6 +112,9 @@ class LSD_Skins extends LSD_Base
 
         // Skin Options
         $this->skin_options = $this->atts['lsd_display'][$this->skin] ?? [];
+
+        // Map Position
+        $this->map_position = isset($this->skin_options['map_position']) && trim($this->skin_options['map_position']) ? $this->skin_options['map_position'] : 'top';
 
         // Search Options
         $this->search_options = $this->atts['lsd_search'] ?? [];
@@ -159,7 +164,7 @@ class LSD_Skins extends LSD_Base
         $this->display_is_claimed = !isset($this->skin_options['display_is_claimed']) || $this->skin_options['display_is_claimed'];
         $this->display_share_buttons = !isset($this->skin_options['display_share_buttons']) || $this->skin_options['display_share_buttons'];
         $this->display_slider_arrows = !isset($this->skin_options['display_slider_arrows']) || $this->skin_options['display_slider_arrows'];
-        $this->columns = isset($this->skin_options['columns']) && $this->skin_options['columns'] ? sanitize_text_field($this->skin_options['columns']) : 1;
+        $this->columns = isset($this->skin_options['columns']) && $this->skin_options['columns'] ? sanitize_text_field($this->skin_options['columns']) : 3;
         $this->default_view = isset($this->skin_options['default_view']) ? sanitize_text_field($this->skin_options['default_view']) : 'grid';
         $this->description_length = isset($this->skin_options['description_length']) && is_numeric($this->skin_options['description_length']) ? $this->skin_options['description_length'] : 12;
 
@@ -173,6 +178,11 @@ class LSD_Skins extends LSD_Base
 
         // Is it Widget?
         $this->widget = isset($this->atts['widget']) && $this->atts['widget'];
+
+        // Connected Shortcodes
+        $this->connected_shortcodes = isset($this->skin_options['connected_shortcodes']) && is_array($this->skin_options['connected_shortcodes'])
+            ? $this->skin_options['connected_shortcodes']
+            : [];
 
         // Disable Pro features
         if ($this->isLite())
@@ -255,11 +265,11 @@ class LSD_Skins extends LSD_Base
         $tax_query = ['relation' => 'AND'];
 
         foreach ([
-             LSD_Base::TAX_CATEGORY,
-             LSD_Base::TAX_LOCATION,
-             LSD_Base::TAX_FEATURE,
-             LSD_Base::TAX_LABEL,
-         ] as $tax)
+                     LSD_Base::TAX_CATEGORY,
+                     LSD_Base::TAX_LOCATION,
+                     LSD_Base::TAX_FEATURE,
+                     LSD_Base::TAX_LABEL,
+                 ] as $tax)
         {
             if (isset($this->filter_options[$tax]) && is_array($this->filter_options[$tax]) && count($this->filter_options[$tax]))
             {
@@ -312,17 +322,33 @@ class LSD_Skins extends LSD_Base
     {
         $meta_query = [];
 
+        // Attributes
         if (isset($this->filter_options['attributes']) && is_array($this->filter_options['attributes']) && count($this->filter_options['attributes']))
         {
             foreach ($this->filter_options['attributes'] as $key => $value)
             {
                 if ((is_array($value) && !count($value)) || (!is_array($value) && trim($value) == '')) continue;
 
-                $q = LSD_Query::attribute($key, $value);
-                if (!$q) continue;
+                $qa = LSD_Query::attribute($key, $value);
+                if (!$qa) continue;
 
                 // Add to Meta Query
-                $meta_query[] = $q;
+                $meta_query[] = $qa;
+            }
+        }
+
+        // ACF Fields
+        if (isset($this->filter_options['acf_fields']['acf_values']) && is_array($this->filter_options['acf_fields']['acf_values']) && count($this->filter_options['acf_fields']['acf_values']))
+        {
+            foreach ($this->filter_options['acf_fields']['acf_values'] as $key => $value)
+            {
+                if ((is_array($value) && !count($value)) || (!is_array($value) && trim($value) == '')) continue;
+
+                $qf = LSD_Query::acf_fields($key, $value);
+                if (!$qf) continue;
+
+                // Add to Meta Query
+                $meta_query[] = $qf;
             }
         }
 
@@ -684,7 +710,7 @@ class LSD_Skins extends LSD_Base
             'list' => esc_html__('List View', 'listdom'),
             'grid' => esc_html__('Grid View', 'listdom'),
             'side' => esc_html__('Side by Side View', 'listdom'),
-            'listgrid' => esc_html__('List+Grid View', 'listdom'),
+            'listgrid' => esc_html__('List + Grid View', 'listdom'),
             'halfmap' => esc_html__('Half Map / Split View', 'listdom'),
             'table' => esc_html__('Table View', 'listdom'),
             'masonry' => esc_html__('Masonry View', 'listdom'),
@@ -766,7 +792,7 @@ class LSD_Skins extends LSD_Base
             : 'normal';
     }
 
-    public function get_map()
+    public function get_map(bool $force_to_show = false)
     {
         return lsd_map($this->search([
             'posts_per_page' => $this->skin_options['maplimit'],
@@ -782,7 +808,74 @@ class LSD_Skins extends LSD_Base
             'mapsearch' => $this->mapsearch,
             'autoGPS' => $this->autoGPS,
             'max_bounds' => $this->maxBounds,
+            'force_to_show' => $force_to_show,
         ]);
+    }
+
+    public function get_left_bar(): string
+    {
+        $content = '';
+
+        // Map
+        if ($this->map_provider && $this->map_position === 'left')
+        {
+            $content .= '<div class="lsd-map-left-wrapper">';
+            $content .= $this->get_map(true);
+            $content .= '</div>';
+        }
+
+        // Search
+        if ($this->sm_shortcode && $this->sm_position === 'left') $content .= LSD_Kses::form($this->get_search_module());
+
+        return trim($content) ? '<div class="lsd-skin-left-bar-wrapper">' . $content . '</div>' : '';
+    }
+
+    public function get_right_bar(): string
+    {
+        $content = '';
+
+        // Map
+        if ($this->map_provider && $this->map_position === 'right')
+        {
+            $content .= '<div class="lsd-map-right-wrapper">';
+            $content .= $this->get_map(true);
+            $content .= '</div>';
+        }
+
+        // Search
+        if ($this->sm_shortcode && $this->sm_position === 'right') $content .= LSD_Kses::form($this->get_search_module());
+
+        return trim($content) ? '<div class="lsd-skin-right-bar-wrapper">' . $content . '</div>' : '';
+    }
+
+    public function get_bar_class(): string
+    {
+        $left = false;
+        $right = false;
+
+        // Left Bar
+        if (
+            ($this->map_provider && $this->map_position === 'left')
+            || ($this->sm_shortcode && $this->sm_position === 'left')
+        ) $left = true;
+
+        // right Bar
+        if (
+            ($this->map_provider && $this->map_position === 'right')
+            || ($this->sm_shortcode && $this->sm_position === 'right')
+        ) $right = true;
+
+        // Both Bars Enabled
+        if ($left && $right) return 'lsd-skin-right-left-bars';
+
+        // Left Bar Enabled
+        if ($left) return 'lsd-skin-left-bar';
+
+        // Right Bar Enabled
+        if ($right) return 'lsd-skin-right-bar';
+
+        // No Bar
+        return '';
     }
 
     public function getField($field)

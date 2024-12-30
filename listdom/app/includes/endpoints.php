@@ -50,7 +50,7 @@ class LSD_Endpoints extends LSD_Base
         return $response;
     }
 
-    private static function get()
+    public static function get()
     {
         return apply_filters('lsd_listing_endpoints', ['raw']);
     }

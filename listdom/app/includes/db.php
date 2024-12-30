@@ -13,7 +13,7 @@ class LSD_db extends LSD_Base
      * @param string $type
      * @return mixed
      */
-    public function q($query, $type = '')
+    public function q(string $query, string $type = '')
     {
         // Apply DB prefix
         $query = $this->_prefix($query);
@@ -22,13 +22,13 @@ class LSD_db extends LSD_Base
         $type = strtolower($type);
 
         // Calls select function if query type is select
-        if ($type == 'select') return $this->select($query);
+        if ($type === 'select') return $this->select($query);
 
         // Get WordPress DB object
         $database = $this->get_DBO();
 
         // If query type is insert, return the insert id
-        if ($type == 'insert')
+        if ($type === 'insert')
         {
             $database->query($query);
             return $database->insert_id;
@@ -44,10 +44,10 @@ class LSD_db extends LSD_Base
      * @param string $table
      * @return int
      */
-    public function num($query, $table = '')
+    public function num(string $query, string $table = ''): int
     {
         // If table is filled, generate the query
-        if (trim($table) != '')
+        if (trim($table) !== '')
         {
             $query = "SELECT COUNT(*) FROM `#__$table`";
         }
@@ -57,7 +57,7 @@ class LSD_db extends LSD_Base
 
         // Get WordPress Db object
         $database = $this->get_DBO();
-        return $database->get_var($query);
+        return (int) $database->get_var($query);
     }
 
     /**
@@ -66,7 +66,7 @@ class LSD_db extends LSD_Base
      * @param string $result
      * @return mixed
      */
-    public function select($query, $result = 'loadObjectList')
+    public function select(string $query, string $result = 'loadObjectList')
     {
         // Apply DB prefix
         $query = $this->_prefix($query);
@@ -74,12 +74,12 @@ class LSD_db extends LSD_Base
         // Get WordPress DB object
         $database = $this->get_DBO();
 
-        if ($result == 'loadObjectList') return $database->get_results($query, OBJECT_K);
-        else if ($result == 'loadObject') return $database->get_row($query);
-        else if ($result == 'loadAssocList') return $database->get_results($query, ARRAY_A);
-        else if ($result == 'loadAssoc') return $database->get_row($query, ARRAY_A);
-        else if ($result == 'loadResult') return $database->get_var($query);
-        else if ($result == 'loadColumn') return $database->get_col($query);
+        if ($result === 'loadObjectList') return $database->get_results($query, OBJECT_K);
+        else if ($result === 'loadObject') return $database->get_row($query);
+        else if ($result === 'loadAssocList') return $database->get_results($query, ARRAY_A);
+        else if ($result === 'loadAssoc') return $database->get_row($query, ARRAY_A);
+        else if ($result === 'loadResult') return $database->get_var($query);
+        else if ($result === 'loadColumn') return $database->get_col($query);
         else return $database->get_results($query, OBJECT_K);
     }
 
@@ -89,11 +89,11 @@ class LSD_db extends LSD_Base
      * @param string $table
      * @param string $field
      * @param string $value
-     * @param boolean $return_object
+     * @param boolean $object
      * @param string $condition
      * @return mixed
      */
-    public function get($selects, $table, $field, $value, $return_object = true, $condition = '')
+    public function get($selects, string $table, string $field, string $value, bool $object = true, string $condition = '')
     {
         $fields = '';
 
@@ -108,7 +108,7 @@ class LSD_db extends LSD_Base
         }
 
         // Generate the condition
-        if (trim($condition) == '') $condition = "`$field`='$value'";
+        if (trim($condition) === '') $condition = "`$field`='$value'";
 
         // Generate the query
         $query = "SELECT $fields FROM `#__$table` WHERE $condition";
@@ -119,9 +119,20 @@ class LSD_db extends LSD_Base
         // Get WordPress DB object
         $database = $this->get_DBO();
 
-        if ($selects != '*' && !is_array($selects)) return $database->get_var($query);
-        else if ($return_object) return $database->get_row($query);
+        if ($selects !== '*' && !is_array($selects)) return $database->get_var($query);
+        else if ($object) return $database->get_row($query);
         else return $database->get_row($query, ARRAY_A);
+    }
+
+    /**
+     * Check if a table exist or not
+     * @param string $table
+     * @return bool
+     */
+    public function exists(string $table): bool
+    {
+        $query = "SHOW TABLES LIKE '#__".$table."'";
+        return (bool) $this->select($query, 'loadObject');
     }
 
     /**
@@ -129,7 +140,7 @@ class LSD_db extends LSD_Base
      * @param string $query
      * @return string
      */
-    public function _prefix($query)
+    public function _prefix(string $query): string
     {
         // Get WordPress DB object
         $wpdb = $this->get_DBO();
@@ -143,12 +154,15 @@ class LSD_db extends LSD_Base
      * @return wpdb
      * @global wpdb $wpdb
      */
-    public function get_DBO()
+    public function get_DBO(): wpdb
     {
         global $wpdb;
         return $wpdb;
     }
 
+    /**
+     * @return mixed
+     */
     public function version()
     {
         $query = "SELECT VERSION();";

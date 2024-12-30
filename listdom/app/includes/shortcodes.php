@@ -61,6 +61,6 @@ class LSD_Shortcodes extends LSD_Base
 
     public function get_default_skin(): string
     {
-        return 'singlemap';
+        return 'grid';
     }
 }

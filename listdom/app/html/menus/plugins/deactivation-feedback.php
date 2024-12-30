@@ -26,28 +26,28 @@ $reasons = [
     ],
 ];
 ?>
-<div id="listdom-deactivate-feedback-dialog-wrapper" class="lsd-util-hide">
-    <form id="listdom-deactivate-feedback-dialog-form" method="post">
+<div id="lsd-deactivate-feedback-dialog-wrapper" class="lsd-util-hide">
+    <form id="lsd-deactivate-feedback-dialog-form" method="post">
         <div id="lsd_deactivation_feedback_message"></div>
-        <?php wp_nonce_field('_listdom_deactivate_feedback_nonce'); ?>
-        <input type="hidden" name="action" value="listdom_deactivate_feedback">
+        <?php wp_nonce_field('_lsd_deactivation_feedback_nonce'); ?>
+        <input type="hidden" name="action" value="lsd_deactivation_feedback">
 
-        <div id="listdom-deactivate-feedback-dialog-form-caption">
+        <div id="lsd-deactivate-feedback-dialog-form-caption">
             <?php echo esc_html__('If you have a moment, please share why you are deactivating this plugin:', 'listdom'); ?>
         </div>
-        <div id="listdom-deactivate-feedback-dialog-form-body" class="lsd-my-4">
-            <?php foreach ($reasons as $reason_key => $reason) : ?>
-                <div class="listdom-deactivate-feedback-dialog-input-wrapper">
-                    <div class="listdom-deactivate-feedback-dialog-radio-input-wrapper">
-                        <input id="listdom-deactivate-feedback-<?php echo esc_attr($reason_key); ?>"
-                               class="listdom-deactivate-feedback-dialog-input" type="radio" name="reason_key"
+        <div id="lsd-deactivate-feedback-dialog-form-body" class="lsd-my-4">
+            <?php foreach ($reasons as $reason_key => $reason): ?>
+                <div class="lsd-deactivate-feedback-dialog-input-wrapper">
+                    <div class="lsd--deactivate-feedback-dialog-radio-input-wrapper">
+                        <input id="lsd-deactivate-feedback-<?php echo esc_attr($reason_key); ?>"
+                               class="lsd-deactivate-feedback-dialog-input" type="radio" name="reason_key"
                                value="<?php echo esc_attr($reason_key); ?>">
-                        <label for="listdom-deactivate-feedback-<?php echo esc_attr($reason_key); ?>"
-                               class="listdom-deactivate-feedback-dialog-label"><?php echo esc_html($reason['title']); ?></label>
+                        <label for="lsd-deactivate-feedback-<?php echo esc_attr($reason_key); ?>"
+                               class="lsd-deactivate-feedback-dialog-label"><?php echo esc_html($reason['title']); ?></label>
                     </div>
-                    <?php if (trim($reason['placeholder'])) : ?>
-                        <div class="listdom-feedback-text-wrapper lsd-util-hide">
-                            <input class="listdom-feedback-text" type="text"
+                    <?php if (trim($reason['placeholder'])): ?>
+                        <div class="lsd-feedback-text-wrapper lsd-util-hide">
+                            <input class="lsd-feedback-text" type="text"
                                    name="reason_<?php echo esc_attr($reason_key); ?>"
                                    placeholder="<?php echo esc_attr($reason['placeholder']); ?>"
                                    title="<?php echo esc_attr__('Details', 'listdom'); ?>">
@@ -56,7 +56,7 @@ $reasons = [
                 </div>
             <?php endforeach; ?>
         </div>
-        <div class="listdom-feedback-buttons lsd-mt-4">
+        <div class="lsd-feedback-buttons lsd-mt-4">
             <button type="submit" name="action_type" value="skip_deactivate" id="skip-deactivate-plugin"
                     class="lsd-button-skip">
                 <?php echo esc_html__('Skip & Deactivate', 'listdom'); ?>

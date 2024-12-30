@@ -140,6 +140,7 @@ $auth = LSD_Options::auth();
                         'id' => 'lsd_auth_hide_login_form',
                         'name' => 'lsd[auth][hide_login_form]',
                         'value' => $auth['auth']['hide_login_form'],
+                        'toggle' => '#lsd-login-default-form'
                     ]); ?>
                 </div>
             </div>
@@ -152,7 +153,8 @@ $auth = LSD_Options::auth();
                     <?php echo LSD_Form::switcher([
                         'id' => 'lsd_auth_hide_register_form',
                         'name' => 'lsd[auth][hide_register_form]',
-                        'value' => $auth['auth']['hide_register_form']
+                        'value' => $auth['auth']['hide_register_form'],
+                        'toggle' => '#lsd-register-default-form'
                     ]); ?>
                 </div>
             </div>
@@ -165,8 +167,105 @@ $auth = LSD_Options::auth();
                     <?php echo LSD_Form::switcher([
                         'id' => 'lsd_auth_hide_forgot_password_form',
                         'name' => 'lsd[auth][hide_forgot_password_form]',
-                        'value' => $auth['auth']['hide_forgot_password_form']
+                        'value' => $auth['auth']['hide_forgot_password_form'],
+                        'toggle' => '#lsd-forgot-password-default-form'
                     ]); ?>
+                </div>
+            </div>
+
+            <h3><?php esc_html_e('Change Default Pages', 'listdom'); ?></h3>
+            <p class="description lsd-mb-4"><?php echo esc_html__('Select the desired login, registration, and forgot password pages. These changes will apply site-wide.', 'listdom'); ?></p>
+
+            <div class="lsd-default-forms <?php echo $auth['auth']['hide_login_form'] ? 'lsd-util-hide' : ''; ?>" id="lsd-login-default-form">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Login', 'listdom'),
+                        'for' => 'lsd_auth_login_form',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+			            <?php echo LSD_Form::switcher([
+				            'id' => 'lsd_auth_login_form',
+				            'name' => 'lsd[auth][login_form]',
+				            'value' => $auth['auth']['login_form'] ?? 0,
+				            'toggle' => '#lsd_login_page_select'
+			            ]); ?>
+                    </div>
+                </div>
+                <div id="lsd_login_page_select" class="lsd-form-row lsd-mb-4 <?php echo $auth['auth']['login_form'] ? '' : 'lsd-util-hide'; ?>">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Login Page', 'listdom'),
+                        'for' => 'lsd_auth_login_page',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+			            <?php echo LSD_Form::pages([
+				            'id' => 'lsd_auth_login_page',
+				            'name' => 'lsd[auth][login_page]',
+				            'value' => $auth['auth']['login_page'] ?? null,
+				            'show_empty' => true,
+			            ]); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lsd-default-forms <?php echo $auth['auth']['hide_register_form'] ? 'lsd-util-hide' : ''; ?>" id="lsd-register-default-form">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Register', 'listdom'),
+                        'for' => 'lsd_auth_register_form',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::switcher([
+                            'id' => 'lsd_auth_register_form',
+                            'name' => 'lsd[auth][register_form]',
+                            'value' => $auth['auth']['register_form'] ?? 0,
+                            'toggle' => '#lsd_register_page_select'
+                        ]); ?>
+                    </div>
+                </div>
+                <div id="lsd_register_page_select" class="lsd-form-row lsd-mb-4 <?php echo $auth['auth']['register_form'] ? '' : 'lsd-util-hide'; ?>">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Register Page', 'listdom'),
+                        'for' => 'lsd_auth_register_page',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::pages([
+                            'id' => 'lsd_auth_register_page',
+                            'name' => 'lsd[auth][register_page]',
+                            'value' => $auth['auth']['register_page'] ?? null,
+                            'show_empty' => true,
+                        ]); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lsd-default-forms <?php echo $auth['auth']['hide_forgot_password_form'] ? 'lsd-util-hide' : ''; ?>" id="lsd-forgot-password-default-form">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Forgot Password', 'listdom'),
+                        'for' => 'lsd_auth_forgot_password_form',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::switcher([
+                            'id' => 'lsd_auth_forgot_password_form',
+                            'name' => 'lsd[auth][forgot_password_form]',
+                            'value' => $auth['auth']['forgot_password_form'] ?? 0,
+                            'toggle' => '#lsd_forgot_password_page_select'
+                        ]); ?>
+                    </div>
+                </div>
+                <div id="lsd_forgot_password_page_select" class="lsd-form-row <?php echo $auth['auth']['forgot_password_form'] ? '' : 'lsd-util-hide'; ?>">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Forgot Password Page', 'listdom'),
+                        'for' => 'lsd_auth_forgot_password_page',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::pages([
+                            'id' => 'lsd_auth_forgot_password_page',
+                            'name' => 'lsd[auth][forgot_password_page]',
+                            'value' => $auth['auth']['forgot_password_page'] ?? null,
+                            'show_empty' => true,
+                        ]); ?>
+                    </div>
                 </div>
             </div>
         </div>

@@ -22,8 +22,10 @@ $canvas_height = $args['canvas_height'] ?? null;
 $atts = isset($args['atts']) && is_array($args['atts']) ? $args['atts'] : [];
 $mapsearch = isset($args['mapsearch']) && $args['mapsearch'];
 $gplaces = isset($args['gplaces']) && $args['gplaces'];
+$infowindow = !isset($args['infowindow']) || $args['infowindow'];
 $max_bounds = isset($args['max_bounds']) && is_array($args['max_bounds']) ? $args['max_bounds'] : [];
 $access_token = LSD_Options::mapbox_token();
+$force_to_show = isset($args['force_to_show']) && $args['force_to_show'];
 
 // The Unique ID
 $id = $args['id'] ?? mt_rand(100, 999);
@@ -38,7 +40,8 @@ else
     $objects = $archive->render_map_objects($listings, $args);
 }
 
-if(count($objects) === 1 && $objects[0]["latitude"] === $latitude && $objects[0]["longitude"] === $longitude) return;
+// No Objects to show or only one object with default location
+if(!$force_to_show && (!count($objects) || (count($objects) === 1 && $objects[0]['latitude'] === $latitude && $objects[0]['longitude'] === $longitude))) return;
     
 // Add Leaflet JS codes to footer
 $assets->footer('<script>
@@ -67,6 +70,7 @@ jQuery(document).ready(function()
         atts: "'.http_build_query(['atts'=>$atts], '', '&').'",
         mapsearch: '.($mapsearch ? 'true' : 'false').',
         gplaces: false,
+        display_infowindow: '.($infowindow ? 'true' : 'false').',
         max_bounds: '.json_encode($max_bounds, JSON_NUMERIC_CHECK).',
         gps_zoom: {
             zl: '.$gps_zl.',

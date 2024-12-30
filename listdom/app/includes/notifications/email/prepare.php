@@ -25,12 +25,12 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         add_action('lsd_listing_report_abuse', [$this, 'abuse'], 10, 2);
     }
 
-    public function contact($args)
+    public function contact($args): array
     {
         return $this->form($args, 'lsd_contact_owner');
     }
 
-    public function new_listing($listing_id)
+    public function new_listing($listing_id): array
     {
         $owner_id = get_post_field('post_author', $listing_id);
         $owner_name = get_the_author_meta('display_name', $owner_id);
@@ -64,7 +64,14 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             }
 
             $sender = new LSD_Notifications_Email_Sender();
-            $mails[] = $sender->boot($notification->ID)->to($to)->cc($cc)->bcc($bcc)->subject($subject)->content($content)->render($listing_id)->send();
+            $mails[] = $sender->boot($notification->ID)
+                ->to($to)
+                ->cc($cc)
+                ->bcc($bcc)
+                ->subject($subject)
+                ->content($content)
+                ->render($listing_id)
+                ->send();
 
             // Trigger Action
             do_action('lsd_send_notification', $this->admin_id(), [
@@ -117,7 +124,14 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             }
 
             $sender = new LSD_Notifications_Email_Sender();
-            $mails[] = $sender->boot($notification->ID)->to($to)->cc($cc)->bcc($bcc)->subject($subject)->content($content)->render($listing_id)->send();
+            $mails[] = $sender->boot($notification->ID)
+                ->to($to)
+                ->cc($cc)
+                ->bcc($bcc)
+                ->subject($subject)
+                ->content($content)
+                ->render($listing_id)
+                ->send();
 
             // Trigger Action
             do_action('lsd_send_notification', $owner_id, [
@@ -130,19 +144,19 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         return $mails;
     }
 
-    public function abuse($args)
+    public function abuse($args): array
     {
         return $this->form($args, 'lsd_listing_report_abuse');
     }
 
-    public function form($args, $hook)
+    public function form($args, $hook): array
     {
         $listing_id = $args['post_id'] ?? null;
         $owner_id = get_post_field('post_author', $listing_id);
 
-        $name = $args['name'] ?? '';
+        $name = isset($args['name']) && trim($args['name']) ? $args['name'] : 'N/A';
         $email = $args['email'] ?? '';
-        $phone = $args['phone'] ?? '';
+        $phone = isset($args['phone']) && trim($args['phone']) ? $args['phone'] : 'N/A';
         $message = $args['message'] ?? '';
 
         // Results

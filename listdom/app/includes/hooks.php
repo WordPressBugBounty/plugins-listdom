@@ -32,6 +32,16 @@ class LSD_Hooks extends LSD_Base
 
         // Uploader
         add_action('wp_ajax_lsd_uploader', [$this, 'upload']);
+
+        // Database Tables
+        add_action('admin_init', function ()
+        {
+            // Create Table
+            if ((new LSD_Main())->is_db_update_required())
+            {
+                LSD_Plugin_Hooks::db_update();
+            }
+        });
     }
 
     public function filters()
@@ -96,16 +106,18 @@ class LSD_Hooks extends LSD_Base
             $atts['lsd_filter']['s'] = $sf['s'];
         }
 
-        // Category
-        if (isset($sf[LSD_Base::TAX_CATEGORY]) && (is_array($sf[LSD_Base::TAX_CATEGORY]) || trim($sf[LSD_Base::TAX_CATEGORY]) !== ''))
+        // Category, Location, Feature, Label
+        foreach ([
+             LSD_Base::TAX_CATEGORY,
+             LSD_Base::TAX_LOCATION,
+             LSD_Base::TAX_FEATURE,
+             LSD_Base::TAX_LABEL,
+         ] as $tax)
         {
-            $atts['lsd_filter'][LSD_Base::TAX_CATEGORY] = is_array($sf[LSD_Base::TAX_CATEGORY]) ? $sf[LSD_Base::TAX_CATEGORY] : [$sf[LSD_Base::TAX_CATEGORY]];
-        }
-
-        // Location
-        if (isset($sf[LSD_Base::TAX_LOCATION]) && (is_array($sf[LSD_Base::TAX_LOCATION]) || trim($sf[LSD_Base::TAX_LOCATION]) !== ''))
-        {
-            $atts['lsd_filter'][LSD_Base::TAX_LOCATION] = is_array($sf[LSD_Base::TAX_LOCATION]) ? $sf[LSD_Base::TAX_LOCATION] : [$sf[LSD_Base::TAX_LOCATION]];
+            if (isset($sf[$tax]) && (is_array($sf[$tax]) || trim($sf[$tax]) !== ''))
+            {
+                $atts['lsd_filter'][$tax] = is_array($sf[$tax]) ? $sf[$tax] : [$sf[$tax]];
+            }
         }
 
         // Tag
@@ -120,18 +132,6 @@ class LSD_Hooks extends LSD_Base
                 $term = get_term($sf[LSD_Base::TAX_TAG]);
                 $atts['lsd_filter'][LSD_Base::TAX_TAG] = ($term && isset($term->name)) ? $term->name : '';
             }
-        }
-
-        // Feature
-        if (isset($sf[LSD_Base::TAX_FEATURE]) && (is_array($sf[LSD_Base::TAX_FEATURE]) || trim($sf[LSD_Base::TAX_FEATURE]) !== ''))
-        {
-            $atts['lsd_filter'][LSD_Base::TAX_FEATURE] = is_array($sf[LSD_Base::TAX_FEATURE]) ? $sf[LSD_Base::TAX_FEATURE] : [$sf[LSD_Base::TAX_FEATURE]];
-        }
-
-        // Label
-        if (isset($sf[LSD_Base::TAX_LABEL]) && (is_array($sf[LSD_Base::TAX_LABEL]) || trim($sf[LSD_Base::TAX_LABEL]) !== ''))
-        {
-            $atts['lsd_filter'][LSD_Base::TAX_LABEL] = is_array($sf[LSD_Base::TAX_LABEL]) ? $sf[LSD_Base::TAX_LABEL] : [$sf[LSD_Base::TAX_LABEL]];
         }
 
         // Attributes
@@ -163,6 +163,17 @@ class LSD_Hooks extends LSD_Base
 
             if (isset($sf['adults']) && trim($sf['adults'])) $atts['lsd_filter']['inquiry']['adults'] = $sf['adults'];
             if (isset($sf['children']) && trim($sf['children'])) $atts['lsd_filter']['inquiry']['children'] = $sf['children'];
+        }
+
+        // ACF Fields
+        foreach ($sf as $key => $value)
+        {
+            if (strpos($key, 'acf') !== false && (is_array($value) || trim($value) !== ''))
+            {
+                if (!isset($atts['lsd_filter']['acf_fields'])) $atts['lsd_filter']['acf_fields'] = [];
+
+                $atts['lsd_filter']['acf_fields'][$key] = $value;
+            }
         }
 
         return $atts;

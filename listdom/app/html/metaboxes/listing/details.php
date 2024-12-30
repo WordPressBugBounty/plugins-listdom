@@ -4,6 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Shortcodes_Dashboard $dashboard */
 /** @var WP_Post $post */
+/** @var LSD_PTypes_Listing $this */
 
 $price_currency = get_post_meta($post->ID, 'lsd_currency', true);
 if (trim($price_currency) === '') $price_currency = LSD_Options::currency();
@@ -203,7 +204,7 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
                 <label for="lsd_contact_address"><?php esc_html_e('Contact Address', 'listdom'); ?><?php $dashboard && $dashboard->required_html('contact_address'); ?></label>
             </div>
             <div class="lsd-col-9">
-                <input type="text" name="lsd[contact_address]" id="lsd_contact_address" placeholder="<?php esc_attr_e('Unit X, City, Zipcode State', 'listdom'); ?>" value="<?php echo esc_attr($contact_address); ?>" />
+                <input type="text" name="lsd[contact_address]" id="lsd_contact_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($contact_address); ?>" />
             </div>
         </div>
 

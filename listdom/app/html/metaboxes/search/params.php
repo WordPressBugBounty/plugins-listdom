@@ -18,6 +18,7 @@ $max_default_value = $data['max_default_value'] ?? '';
 
 $radius = $data['radius'] ?? 5000;
 $radius_values = $data['radius_values'] ?? '';
+$prepend = $data['prepend'] ?? '';
 $radius_display_unit = $data['radius_display_unit'] ?? 'm';
 $radius_display = $data['radius_display'] ?? 0;
 $hide_empty = $data['hide_empty'] ?? 1;
@@ -40,14 +41,16 @@ $th_separator = $data['th_separator'] ?? 1;
             <h4><?php echo esc_html($title); ?></h4>
         </div>
     </div>
-    <div class="lsd-row">
+    <div class="lsd-row lsd-mt-2">
         <div class="lsd-col-12">
 
             <input type="hidden" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][key]" value="<?php echo esc_attr($key); ?>">
+
             <div class="lsd-search-field-param">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_title"><?php esc_html_e('Title', 'listdom'); ?></label>
                 <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_title" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][title]" value="<?php echo esc_attr($title); ?>" placeholder="<?php esc_attr_e('Field Title', 'listdom'); ?>">
             </div>
+
             <div class="lsd-search-field-param">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_method"><?php esc_html_e('Method', 'listdom'); ?></label>
                 <select id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_method" class="widefat lsd-search-method" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][method]" title="<?php esc_attr_e('Display Method', 'listdom'); ?>">
@@ -57,7 +60,7 @@ $th_separator = $data['th_separator'] ?? 1;
                 </select>
             </div>
 
-            <?php if($type === 'taxonomy' || strpos($key, 'att') !== false): ?>
+            <?php if(($type === 'taxonomy' || strpos($key, 'att') !== false) && $type !== 'number'): ?>
             <div class="lsd-search-field-param">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_hide_empty"><?php esc_html_e('Hide Empty Terms', 'listdom'); ?></label>
                 <select id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_hide_empty" class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][hide_empty]" title="<?php esc_attr_e('Only display those terms that have listings', 'listdom'); ?>">
@@ -84,11 +87,13 @@ $th_separator = $data['th_separator'] ?? 1;
                 <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_max_placeholder" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][max_placeholder]" value="<?php echo esc_attr($max_placeholder); ?>" placeholder="<?php esc_attr_e('Optional Max Placeholder', 'listdom'); ?>">
             </div>
 
-            <div class="lsd-search-field-param">
-                <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_value"><?php esc_html_e('Default Value', 'listdom'); ?></label>
-                <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_value" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][default_value]" value="<?php echo esc_attr($default_value); ?>" placeholder="<?php esc_attr_e('Optional', 'listdom'); ?>">
-            </div>
-            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-mm-input">
+            <?php if($type !== 'acf_true_false'): ?>
+                <div class="lsd-search-field-param">
+                    <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_value"><?php esc_html_e('Default Value', 'listdom'); ?></label>
+                    <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_value" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][default_value]" value="<?php echo esc_attr($default_value); ?>" placeholder="<?php esc_attr_e('Optional', 'listdom'); ?>">
+                </div>
+            <?php endif; ?>
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-mm-input lsd-search-method-range lsd-search-method-acf_range">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_max_default_value"><?php esc_html_e('Max Default Value', 'listdom'); ?></label>
                 <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_max_default_value" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][max_default_value]" value="<?php echo esc_attr($max_default_value); ?>" placeholder="<?php esc_attr_e('Optional', 'listdom'); ?>">
             </div>
@@ -100,6 +105,10 @@ $th_separator = $data['th_separator'] ?? 1;
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-radius-dropdown">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_values"><?php esc_html_e('Radius Values (Meters)', 'listdom'); ?></label>
                 <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_values" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][radius_values]" value="<?php echo esc_attr($radius_values); ?>" placeholder="<?php esc_attr_e('100,200,500,1000,2000', 'listdom'); ?>">
+            </div>
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-range lsd-search-method-acf_range">
+                <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_prepend"><?php esc_html_e('Prepend', 'listdom'); ?></label>
+                <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_values" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][prepend]" value="<?php echo esc_attr($prepend); ?>" placeholder="<?php esc_attr_e('Optional', 'listdom'); ?>">
             </div>
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-radius-dropdown">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_radius_display_unit"><?php esc_html_e('Radius Display Unit', 'listdom'); ?></label>
@@ -117,7 +126,7 @@ $th_separator = $data['th_separator'] ?? 1;
                 </select>
             </div>
 
-            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown-plus">
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown-plus lsd-search-method-range lsd-search-method-acf_range">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_min"><?php esc_html_e('Min / Max / Increment', 'listdom'); ?></label>
                 <div class="lsd-input-group">
                     <input id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_min" type="number" min="0" step="0.01" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][min]" value="<?php echo esc_attr($min); ?>" title="<?php esc_attr_e('Min', 'listdom'); ?>">

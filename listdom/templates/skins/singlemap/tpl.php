@@ -4,12 +4,12 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Skins_Singlemap $this */
 ?>
-<div class="lsd-skin-wrapper lsd-singlemap-view-wrapper <?php if($this->sm_shortcode) echo 'lsd-search-position-' . esc_attr($this->sm_position); ?> <?php echo esc_attr($this->html_class); ?>">
+<div class="lsd-skin-wrapper lsd-singlemap-view-wrapper <?php if ($this->sm_shortcode) echo 'lsd-search-position-' . esc_attr($this->sm_position); ?> <?php echo esc_attr($this->html_class); ?>">
 
-    <?php if($this->sm_shortcode && in_array($this->sm_position, ['top', 'left', 'right', 'before_listings'])) echo LSD_Kses::form($this->get_search_module()); ?>
+    <?php if ($this->sm_shortcode && in_array($this->sm_position, ['top', 'left', 'right', 'before_listings'])) echo LSD_Kses::form($this->get_search_module()); ?>
 
     <div class="lsd-singlemap-wrapper">
-        <?php if(!count($this->listings)) echo LSD_Kses::page($this->get_not_found_message()); ?>
+        <?php if (!count($this->listings)) echo LSD_Kses::page($this->get_not_found_message()); ?>
 
         <?php echo lsd_map($this->listings, [
             'provider' => $this->map_provider,
@@ -23,8 +23,9 @@ defined('ABSPATH') || die();
             'mapsearch' => $this->mapsearch,
             'autoGPS' => $this->autoGPS,
             'max_bounds' => $this->maxBounds,
+            'connected_shortcodes' => $this->connected_shortcodes,
         ]); ?>
     </div>
 
-    <?php if($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
+    <?php if ($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
 </div>

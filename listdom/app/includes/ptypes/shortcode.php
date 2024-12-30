@@ -82,12 +82,12 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
     {
         if ($post_type !== $this->PT) return;
 
-        $selected = isset($_GET['skin']) && $_GET['skin'] ? $_GET['skin'] : '';
+        $selected = isset($_GET['lsd_skin']) && $_GET['lsd_skin'] ? sanitize_text_field($_GET['lsd_skin']) : '';
         echo LSD_Form::skins([
             'id' => 'lsd_shortcode_filter_skin',
-            'name' => 'skin',
+            'name' => 'lsd_skin',
             'value' => $selected,
-            'empty_label' => 'All Skins',
+            'empty_label' => esc_html__('All Skins', 'listdom'),
             'show_empty' => true,
         ]);
     }
@@ -98,12 +98,12 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
 
         if ($typenow === $this->PT && $pagenow == 'edit.php')
         {
-            if (isset($_GET['skin']) && $_GET['skin'] !== '')
+            if (isset($_GET['lsd_skin']) && $_GET['lsd_skin'] !== '')
             {
                 $query->query_vars['meta_query'] = [
                     [
                         'key' => 'lsd_skin',
-                        'value' => sanitize_text_field($_GET['skin']),
+                        'value' => sanitize_text_field($_GET['lsd_skin']),
                         'compare' => '=',
                     ],
                 ];

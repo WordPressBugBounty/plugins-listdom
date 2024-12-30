@@ -22,6 +22,7 @@ class LSD_Element_Locations extends LSD_Element
         parent::__construct();
 
         $this->label = esc_html__('Locations', 'listdom');
+        $this->has_title_settings = false;
     }
 
     public function get($post_id = null)

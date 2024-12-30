@@ -372,7 +372,9 @@ $missAddonMessages = [];
                 'name' => 'lsd[display][list][map_position]',
                 'options' => [
                     'top' => esc_html__('Show before the List view', 'listdom'),
-                    'bottom' => esc_html__('Show after the List view', 'listdom')
+                    'bottom' => esc_html__('Show after the List view', 'listdom'),
+                    'left' => esc_html__('Show on left', 'listdom'),
+                    'right' => esc_html__('Show on right', 'listdom')
                 ],
                 'value' => $list['map_position'] ?? 'top'
             ]); ?>

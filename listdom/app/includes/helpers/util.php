@@ -27,7 +27,7 @@ function lsd_leaflet($listings = [], $args = [])
     return ob_get_clean();
 }
 
-function lsd_schema()
+function lsd_schema(): LSD_Schema
 {
     return new LSD_Schema();
 }

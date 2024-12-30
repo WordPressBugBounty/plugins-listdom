@@ -15,6 +15,9 @@ class LSD_Personalize extends LSD_Base
         // Global Settings
         $settings = LSD_Options::settings();
 
+        // Default Options
+        if (LSD_Base::is_current_theme('listdomer')) $settings = LSD_Options::defaults();
+
         $main = new LSD_Main();
         $raw = LSD_File::read($main->get_listdom_path() . '/assets/css/personalized.raw');
 
@@ -36,6 +39,9 @@ class LSD_Personalize extends LSD_Base
     {
         // Global Settings
         $settings = LSD_Options::settings();
+
+        // Default Options
+        if (LSD_Base::is_current_theme('listdomer')) $settings = LSD_Options::defaults();
 
         $fonts = $this->get_fonts();
         $font = $fonts[$settings['dply_main_font']] ?? ['code' => 'Lato'];

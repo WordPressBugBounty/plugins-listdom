@@ -16,7 +16,7 @@ $availability = $this->listing->get_availability(true);
         
         <div class="lsd-infowindow-body">
 			<h4 class="lsd-listing-title">
-				<a data-listing-id="<?php echo esc_attr($post_id); ?>" href="<?php echo esc_url(get_permalink($post_id)); ?>"><?php echo LSD_Kses::element($this->listing->get_title()); ?></a>
+				<a data-listing-id="<?php echo esc_attr($post_id); ?>" href="<?php echo esc_url(get_permalink($post_id)); ?>" aria-label="<?php echo esc_attr($this->listing->get_title()); ?>"><?php echo LSD_Kses::element($this->listing->get_title()); ?></a>
 			</h4>
 			<div class="lsd-listing-address">
 				<?php echo LSD_Kses::element($this->listing->get_address(false)); ?>

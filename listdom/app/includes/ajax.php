@@ -111,7 +111,7 @@ class LSD_Ajax extends LSD_Base
                 $items .= '<li data-value="' . esc_attr($user->ID) . '">' . $user->user_email . '</li>';
             }
         }
-        else if (in_array($source, $this->taxonomies()))
+        else if (in_array($source, get_taxonomies()))
         {
             $terms = get_terms([
                 'taxonomy' => $source,

@@ -60,13 +60,24 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                         case 'text':
 
-                            $keys = ['sf-' . $f['key'] . '-lk'];
+                            (strpos($f['key'], 'acf_email_') === 0) ? $acf_key = substr($f['key'], strlen('acf_email_')) : ((strpos($f['key'], 'acf_text_') === 0) ? $acf_key = substr($f['key'], strlen('acf_text_')) : $acf_key = '');
+                            $keys = (strpos($f['key'], 'acf-') !== false)
+                                ? ['sf-acf-' . $acf_key . '-atx']
+                                : ['sf-' . $f['key'] . '-lk'];
+
                             break;
 
                         case 'number':
 
                             $keys = ['sf-' . $f['key'] . '-eq'];
                             if ($method == 'dropdown-plus') $keys = ['sf-' . $f['key'] . '-grq'];
+                            else if ($method == 'range')
+                            {
+                                $keys = [
+                                    'sf-att-' . $f['key'] . '-grb-min',
+                                    'sf-att-' . $f['key'] . '-grb-max',
+                                ];
+                            }
 
                             $values = $helper->get_terms($f, true);
 
@@ -81,10 +92,36 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                             break;
 
+                        case 'acf_dropdown':
+
+                            $acf_key = '';
+                            if (strpos($f['key'], 'acf_select_') === 0) $acf_key = substr($f['key'], strlen('acf_select_'));
+                            else if (strpos($f['key'], 'acf_radio_') === 0) $acf_key = substr($f['key'], strlen('acf_radio_'));
+                            else if (strpos($f['key'], 'acf_checkbox_') === 0) $acf_key = substr($f['key'], strlen('acf_checkbox_'));
+                            else if (strpos($f['key'], 'acf_true_false_') === 0) $acf_key = substr($f['key'], strlen('acf_true_false_'));
+
+                            $keys = ['sf-acf-' . $acf_key . '-dra'];
+                            if ($method == 'dropdown-multiple' or $method == 'checkboxes') $keys = ['sf-acf-' . $acf_key . '-drm[]'];
+
+                            $values = $helper->acf_field_data($acf_key, 'choices')[0] ?? [];
+
+                            break;
+
+                        case 'acf_range':
+
+                            (strpos($f['key'], 'acf_range_') === 0) ? $acf_key = substr($f['key'], strlen('acf_range_')) : $acf_key = '';
+
+                            $keys[] = [
+                                'sf-acf-' . $acf_key . '_min',
+                                'sf-acf-' . $acf_key . '_max',
+                            ];
+
+                            break;
+
                         case 'price':
 
                             if ($method == 'dropdown-plus') $keys = ['sf-att-' . $f['key'] . '-grq'];
-                            else if ($method == 'mm-input')
+                            else if ($method == 'mm-input' || $method == 'range')
                             {
                                 $keys = [
                                     'sf-att-' . $f['key'] . '-bt-min',

@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.0.0
 Requires PHP: 7.0
 Tested up to: 6.7.1
-Stable tag: 3.7.2
+Stable tag: 3.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,8 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 **👉 Map Module with Plenty of Features**
 
 *   Display listings on the map with various styles
+*   Add a map to each directory list
+*   Position the map on top, bottom, right, or left of the directories
 *   Display listings in Half Map / Split views (See the demo)
 *   Show listings on [Google Maps](https://demo.webilia.com/listdom/half-map-split-view/style-2-half-map-right-map/) based on their location with full map module options
 *   Advanced marker clustering
@@ -81,6 +83,15 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Address module and Google map support
 *   Address to location conversion feature
 
+**👉 Frontend Dashboard**
+
+*   [Listing submission](https://demo.webilia.com/listdom/dashboard/) via frontend dashboard
+*   Add listing form's modules management (Visibility & Requirement)
+*   Maximum gallery images restriction
+*   Image size limits on frontend listing submission
+*   Maximum description length restriction
+*   Maximum number of tags restriction
+
 **👉 Directory Management**
 
 *   Unlimited number of directories
@@ -88,7 +99,9 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Advanced availability time module (Work hours and off days)
 *   Advanced price module
 *   Global and per listing currency manager
-*   Define [contact information](https://webilia.com/docs/listdom/setting-up-listing/add-listing#contact?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Listing+contact+information) for a listing
+*   Define contact information for each listing
+*   Contact form
+*   Report Abuse form
 *   Nice remark module
 *   Categories in unlimited levels
 *   Locations
@@ -155,12 +168,10 @@ For users seeking additional features and capabilities for a [WordPress director
 
 **👉 Pro Add-on of The Listdom Classified Listing Plugin**
 
-*   Powerful login and register shortcodes
+*   Powerful login, register, and forgot password shortcodes
 *   Schema option
 *   Map GPS search
-*   [Listing submission](https://demo.webilia.com/listdom/dashboard/) via frontend dashboard
 *   Frontend dashboard menus customization
-*   Image size limits on frontend listing submission
 *   Guest posting without user registration
 *   Separate shortcode for Add listing form
 *   [Custom fields/attributes](https://webilia.com/docs/listdom/setting-up-listing/attributes?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+fields%2Fattributes)
@@ -348,8 +359,29 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 
 == Changelog ==
 
-= 3.7.2 =
+= 3.8.0 =
+* [PRO] Added an option to use Listdom authentication pages instead of WordPress default pages.
+* [PRO] Introduced an advanced permalink system to include categories and locations in listing URLs.
+* [PRO] Added the ability to connect different shortcodes to the Singlemap skin, allowing search results to update dynamically based on the map's position.
+* Introduced the 'Optimize Assets Loading' feature to suppress Listdom CSS/JS file loading on specific WordPress pages.
+* Moved the Frontend Dashboard feature from the Pro add-on to the Listdom core.
+* Added an option to set custom titles for elements on the details page.
+* Added left and right map display positions for applicable skins.
+* Introduced the settings export to create JSON backups of Listdom options.
+* Added settings import to restore Listdom settings.
+* Added the ability to customize the placeholder for the address field in both the backend and frontend.
+* Introduced a control option for the phone and name fields in the listing contact and report abuse forms.
+* Added an option to disable the map info-window on the listing details page.
+* Enhanced accessibility across Listdom.
+* Improved backend management for listings and notifications.
+* Refined the structure and organization of the settings menu and setting tabs.
+* Improved the user interface of the search builder.
+* Resolved several responsive UI issues.
+* Fixed an issue with clearing selections in the search widget.
+* Addressed a problem with WordPress Multisite integration.
+* Fixed some icon display issues.
 
+= 3.7.2 =
 * Enhanced the performance of the Cover skin for better speed.
 * Refined the Welcome Wizard and updated button styles for improved usability.
 * Resolved one click handler issue to ensure smoother interactions.

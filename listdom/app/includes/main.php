@@ -18,10 +18,10 @@ class LSD_Main extends LSD_Base
         return $installed_db_ver;
     }
 
-    public function is_db_update_required()
+    public function is_db_update_required(): bool
     {
         $installed_db_ver = $this->get_installed_db_version();
-        return version_compare($installed_db_ver, LSD_Base::DB_VERSION, '<');
+        return version_compare($installed_db_ver, LSD_Base::DB_VERSION, '<') || !(new LSD_db())->exists('lsd_data');
     }
 
     public function geopoint($address): array

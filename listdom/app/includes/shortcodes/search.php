@@ -246,6 +246,22 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
                 $output = $this->field_period($filter);
                 break;
+
+            case 'acf_dropdown':
+
+                $output = $this->field_acf_dropdown($filter);
+                break;
+
+            case 'acf_range':
+
+                $output = $this->field_acf_range($filter);
+                break;
+
+            case 'acf_true_false':
+
+                $output = $this->field_acf_true_false($filter);
+                break;
+
         }
 
         // Apply Filters
@@ -326,7 +342,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         {
             $current = $this->current($name, explode(',', $default));
 
-            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
+            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
 
             $terms = $this->helper->get_terms($filter);
             foreach ($terms as $key => $term)
@@ -380,80 +396,78 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
     public function field_text($filter): string
     {
         $key = $filter['key'] ?? '';
-        $title = $filter['title'] ?? '';
-        $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
+        $col_filter = $this->col_filter;
+        $default = $filter['default_value'] ?? '';
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
         $name = 'sf-' . $key . '-lk';
 
-        $default = $filter['default_value'] ?? '';
+        if (strpos($key, 'acf_email_') === 0 || strpos($key, 'acf_text_') === 0)
+        {
+            $key = str_replace('acf_email_', '', $key);
+            $key = str_replace('acf_text_', '', $key);
+
+            $name = 'sf-acf-' . $key . '-atx';
+        }
+
+        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $title = $filter['title'] ?? '';
         $current = $this->current($name, $default);
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
-        $output .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
-        $output .= '</div>';
-
-        return $output;
+        return $this->helper->text($filter, [
+            'id' => $id,
+            'name' => $name,
+            'title' => $title,
+            'current' => $current,
+            'col_filter' => $col_filter,
+        ]);
     }
 
     public function field_number($filter): string
     {
-        $key = $filter['key'] ?? '';
-        $method = $filter['method'] ?? 'number-input';
-        $title = $filter['title'] ?? '';
-        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
-        $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
-
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $name = 'sf-' . $key . '-eq';
-
+        $key = $filter['key'];
+        $col_filter = $this->col_filter;
         $default = $filter['default_value'] ?? '';
+
+        if (strpos($key, 'acf_number_') === 0)
+        {
+            $key = str_replace('acf_number_', '', $key);
+
+            $name = 'sf-acf-' . $key . '-nma';
+            $dropdown_name = 'sf-acf-' . $key . '-nmd';
+            $min_name = 'sf-acf-' . $key . '-ara-min';
+            $max_name = 'sf-acf-' . $key . '-ara-max';
+        }
+        else
+        {
+            $name = 'sf-' . $key . '-eq';
+            $dropdown_name = 'sf-' . $key . '-grq';
+            $min_name = 'sf-' . $key . '-grb-min';
+            $max_name = 'sf-' . $key . '-grb-max';
+        }
+
+        $min_current = $this->current($min_name, $default);
+        $dropdown_current = $this->current($dropdown_name, $default);
         $current = $this->current($name, $default);
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $max_default = $filter['max_default_value'] ?? '';
+        $max_current = $this->current($max_name, $max_default);
 
-        if ($method === 'number-input')
-        {
-            $output .= '<input type="number" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
-        }
-        else if ($method === 'dropdown')
-        {
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
+        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $title = $filter['title'] ?? '';
 
-            $terms = $this->helper->get_terms($filter, true);
-            foreach ($terms as $term) $output .= '<option value="' . esc_attr($term) . '" ' . ($current == $term ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
-
-            $output .= '</select>';
-        }
-        else if ($method === 'dropdown-plus')
-        {
-            $min = $filter['min'] ?? 0;
-            $max = $filter['max'] ?? 100;
-            $increment = $filter['increment'] ?? 10;
-            $th_separator = isset($filter['th_separator']) && $filter['th_separator'];
-
-            $name = 'sf-' . $key . '-grq';
-            $current = $this->current($name, $default);
-
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
-
-            $output .= '<option value="0">' . $placeholder . '</option>';
-            $i = $min;
-            while ($i <= $max)
-            {
-                $decimals = (floor($i) == $i) ? 0 : 2;
-
-                $output .= '<option value="' . esc_attr($i) . '" ' . (($current == (string) $i) ? 'selected="selected"' : '') . '>' . ($th_separator ? number_format_i18n($i, $decimals) : $i) . '+</option>';
-                $i += $increment;
-            }
-
-            $output .= '</select>';
-        }
-
-        $output .= '</div>';
-        return $output;
+        return $this->helper->number($filter, [
+            'id' => $id,
+            'name' => $name,
+            'min_name' => $min_name,
+            'min_current' => $min_current,
+            'max_name' => $max_name,
+            'max_current' => $max_current,
+            'title' => $title,
+            'current' => $current,
+            'col_filter' => $col_filter,
+            'dropdown_name' => $dropdown_name,
+            'dropdown_current' => $dropdown_current,
+        ]);
     }
 
     public function field_dropdown($filter): string
@@ -475,7 +489,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         if ($method === 'dropdown')
         {
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
             $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
 
             $terms = $this->helper->get_terms($filter, true);
@@ -488,7 +502,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $name = 'sf-' . $key . '-in';
             $current = $this->current($name, explode(',', $default));
 
-            $output .= '<select name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
+            $output .= '<select name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
 
             $terms = $this->helper->get_terms($filter, true);
             foreach ($terms as $term) $output .= '<option value="' . esc_attr($term) . '" ' . (in_array($term, $current) ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
@@ -533,8 +547,9 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         $min_default = $filter['default_value'] ?? '';
         $max_default = $filter['max_default_value'] ?? '';
+        $class = ($method === 'range') ? 'lsd-search-range ' : '';
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
+        $output = '<div class="lsd-search-filter ' . esc_attr($class . $this->col_filter) . '">';
         $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
 
         if ($method === 'dropdown-plus')
@@ -548,8 +563,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $current = $this->current($name, $min_default);
 
             $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($min_placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
+            $output .= '<option value="">' . $min_placeholder . '</option>';
 
-            $output .= '<option value="0">' . $min_placeholder . '</option>';
             $i = $min;
             while ($i <= $max)
             {
@@ -573,6 +588,31 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '<input type="text" name="' . esc_attr($min_name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($min_placeholder, 'listdom') . '" value="' . esc_attr($min_current) . '">';
             $output .= '<input type="text" name="' . esc_attr($max_name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($max_placeholder, 'listdom') . '" value="' . esc_attr($max_current) . '">';
             $output .= '</div>';
+        }
+        else if ($method === 'range')
+        {
+            $min_name = 'sf-att-' . $key . '-bt-min';
+            $min_current = $this->current($min_name, $min_default);
+            $max_name = 'sf-att-' . $key . '-bt-max';
+            $max_current = $this->current($max_name, $max_default);
+            $prepend = $filter['prepend'] ?? '';
+            $min = $filter['min'] ?? 0;
+            $max = $filter['max'] ?? 100;
+            $increment = $filter['increment'] ?? 10;
+
+            $output .= $this->helper->range($filter, [
+                'id' => $id,
+                'min_name' => $min_name,
+                'min_current' => $min_current,
+                'max_name' => $max_name,
+                'max_current' => $max_current,
+                'default' => $min_default,
+                'max_default' => $max_default,
+                'min' => $min,
+                'max' => $max,
+                'step' => $increment,
+                'prepend' => $prepend,
+            ]);
         }
 
         $output .= '</div>';
@@ -600,7 +640,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $name = 'sf-att-' . $key . '-eq';
             $current = $this->current($name, $default);
 
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
 
             $output .= '<option value="">' . esc_html__('Any', 'listdom') . '</option>';
             $output .= '<option value="1" ' . (($current == 1) ? 'selected="selected"' : '') . '>' . esc_html__('$', 'listdom') . '</option>';
@@ -732,6 +772,156 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
         $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
         $output .= '<input type="text" class="lsd-date-range-picker" data-format="' . strtoupper(esc_attr($format)) . '" data-periods="' . htmlspecialchars(json_encode($months), ENT_QUOTES, 'UTF-8') . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '" autocomplete="off">';
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    public function field_acf_dropdown($filter): string
+    {
+        $key = $filter['key'] ?? '';
+        $method = $filter['method'] ?? 'dropdown';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
+        $output = '';
+
+        $key = str_replace('acf_true_false_', '', $key);
+        $key = str_replace('acf_select_', '', $key);
+        $key = str_replace('acf_radio_', '', $key);
+        $key = str_replace('acf_checkbox_', '', $key);
+
+        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $name = 'sf-acf-' . $key . '-dra';
+        $default = $filter['default_value'] ?? '';
+        $current = $this->current($name, $default);
+
+        $title = $filter['title'] ?? '';
+        $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
+        $acf_options = $this->helper->acf_field_data($key, 'choices')[0] ?? [];
+
+        $output .= '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
+        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+
+        if ($method === 'dropdown')
+        {
+            $output .= $this->helper->acf_dropdown($filter, [
+                'id' => $id,
+                'name' => $name,
+                'current' => $current,
+                'title' => $title,
+                'placeholder' => $placeholder,
+                'options' => $acf_options,
+            ]);
+        }
+        else if ($method === 'dropdown-multiple')
+        {
+            $name = 'sf-acf-' . $key . '-drm';
+            $current = $this->current($name, explode(',', $default));
+            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+
+            foreach ($acf_options as $value => $label)
+            {
+                $output .= '<option class="acf-option" value="' . esc_attr($value) . '" ' . (in_array($value, $current) ? 'selected="selected"' : '') . '>' . esc_html($label) . '</option>';
+            }
+
+            $output .= '</select>';
+        }
+        else if ($method === 'text-input')
+        {
+            $output .= '<input class="' . esc_attr($key) . '" type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
+        }
+        else if ($method === 'checkboxes')
+        {
+            $current = $this->current($name, explode(',', $default));
+            $name = 'sf-acf-' . $key . '-drm';
+
+            $output .= $this->field_acf_hierarchy($name, $current, $acf_options);
+        }
+        else if ($method === 'radio')
+        {
+            foreach ($acf_options as $key => $label)
+            {
+                $output .= '<label class="lsd-search-radio-label"><input type="radio" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" value="' . esc_attr($key) . '" ' . ($current == $key ? 'checked="checked"' : '') . '>' . esc_html($label) . '</label>';
+            }
+        }
+
+        $output .= '</div>';
+        return $output;
+    }
+
+    public function field_acf_hierarchy($name, $current, $choices): string
+    {
+        $render = '<ul class="lsd-hierarchy-list">';
+        foreach ($choices as $key => $label)
+        {
+            $render .= '<li>';
+            $render .= '<label class="lsd-search-checkbox-label"><input type="checkbox" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" value="' . esc_attr($key) . '" ' . (in_array($key, $current) ? 'checked="checked"' : '') . '>' . esc_html($label) . '</label>';
+            $render .= '</li>';
+        }
+
+        $render .= '</ul>';
+        return $render;
+    }
+
+    public function field_acf_range($filter): string
+    {
+        $key = $filter['key'] ?? '';
+        $key = str_replace('acf_range_', '', $key);
+
+        $default = $filter['default_value'] ?? '';
+        $max_default = $filter['max_default_value'] ?? '';
+
+        $output = '';
+        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $min_name = 'sf-acf-' . $key . '-ara-min';
+        $min_current = $this->current($min_name, $default);
+        $max_name = 'sf-acf-' . $key . '-ara-max';
+        $max_current = $this->current($max_name, $max_default);
+
+        $title = $filter['title'] ?? '';
+        $min = $filter['min'] ?? ($this->helper->acf_field_data($key, 'min')[0] ?? 0);
+        $max = $filter['max'] ?? ($this->helper->acf_field_data($key, 'max')[0] ?? 100);
+        $step = $filter['increment'] ?? ($this->helper->acf_field_data($key, 'step')[0] ?? 1);
+        $prepend = $filter['prepend'] ?? ($this->helper->acf_field_data($key, 'prepend')[0] ?? '');
+
+        $output .= '<div class="lsd-search-filter lsd-search-range ' . esc_attr($this->col_filter) . '">';
+        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output .= $this->helper->range($filter, [
+            'id' => $id,
+            'min_name' => $min_name,
+            'min_current' => $min_current,
+            'max_name' => $max_name,
+            'max_current' => $max_current,
+            'default' => $default,
+            'max_default' => $max_default,
+            'min' => $min,
+            'max' => $max,
+            'step' => $step,
+            'prepend' => $prepend,
+        ]);
+
+        $output .= '</div>';
+        return $output;
+    }
+
+    public function field_acf_true_false($filter): string
+    {
+        $key = $filter['key'] ?? '';
+        $key = str_replace('acf_true_false_', '', $key);
+
+        $output = '';
+        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $name = 'sf-acf-' . $key . '-trf';
+        $current = $this->current($name, '');
+        $title = $filter['title'] ?? '';
+        $default_value = $this->helper->acf_field_data($key, 'default_value')[0] ?? 0;
+
+        $output .= '<div class="lsd-search-filter lsd-true-false-search ' . esc_attr($this->col_filter) . '">';
+        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output .= '<label class="lsd-search-checkbox-label">';
+        $output .= '<input type="hidden" class="lsd-search-checkbox-hidden" id="hidden-' . esc_attr($id) . '" name="' . esc_attr($name) . '" value="0">';
+        $output .= '<input type="checkbox" class="lsd-search-checkbox-input" id="' . esc_attr($id) . '" name="' . esc_attr($name) . '" ' . (($default_value === 1 && $current === '') || (isset($current) && $current == 1) ? 'value="1" checked="checked"' : 'value="0"') . '>';
+        $output .= esc_html($title);
+        $output .= '</label>';
         $output .= '</div>';
 
         return $output;

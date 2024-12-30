@@ -25,47 +25,53 @@ jQuery(document).ready(function()
 });
 </script>');
 ?>
-<div class="lsd-skin-wrapper lsd-list-view-wrapper <?php if($this->sm_shortcode) echo 'lsd-search-position-' . esc_attr($this->sm_position); ?> <?php echo esc_attr($this->html_class); ?> lsd-style-<?php echo esc_attr($this->style); ?> lsd-font-m" id="lsd_skin<?php echo esc_attr($this->id); ?>" data-next-page="<?php echo esc_attr($this->next_page); ?>">
+<div class="lsd-skin-wrapper lsd-list-view-wrapper <?php echo sanitize_html_class($this->get_bar_class()); ?> <?php echo esc_attr($this->html_class); ?> lsd-style-<?php echo esc_attr($this->style); ?> lsd-font-m" id="lsd_skin<?php echo esc_attr($this->id); ?>" data-next-page="<?php echo esc_attr($this->next_page); ?>">
 
-    <?php if($this->sm_shortcode && in_array($this->sm_position, ['top', 'left', 'right'])) echo LSD_Kses::form($this->get_search_module()); ?>
-    
-    <div class="lsd-list-wrapper">
-        <?php
-            /**
-             * Top Position of List View
-             */
-            if($this->map_provider && isset($this->skin_options['map_position']) && $this->skin_options['map_position'] === 'top')
-            {
-                echo '<div class="lsd-list-view-top-wrapper">';
-                echo $this->get_map();
-                echo '</div>';
-            }
-        ?>
+    <?php echo LSD_Kses::form($this->get_left_bar()); ?>
 
-        <?php if($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module()); ?>
+    <div class="lsd-skin-main-bar-wrapper">
+        <?php if ($this->sm_shortcode && $this->sm_position === 'top') echo LSD_Kses::form($this->get_search_module()); ?>
 
-        <?php echo LSD_Kses::form($this->get_sortbar()); ?>
+        <div class="lsd-list-wrapper">
+            <?php
+                /**
+                 * Top Position of List View
+                 */
+                if ($this->map_provider && $this->map_position === 'top')
+                {
+                    echo '<div class="lsd-list-view-top-wrapper">';
+                    echo $this->get_map();
+                    echo '</div>';
+                }
+            ?>
 
-        <div class="lsd-list-view-listings-wrapper lsd-viewstyle-list">
-            <div class="lsd-listing-wrapper">
-                <?php echo LSD_Kses::full($listings_html); ?>
+            <?php if ($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module()); ?>
+
+            <?php echo LSD_Kses::form($this->get_sortbar()); ?>
+
+            <div class="lsd-list-view-listings-wrapper lsd-viewstyle-list">
+                <div class="lsd-listing-wrapper">
+                    <?php echo LSD_Kses::full($listings_html); ?>
+                </div>
             </div>
+
+            <?php echo LSD_Kses::element($this->get_pagination()); ?>
+
+            <?php
+                /**
+                 * Bottom Position of List View
+                 */
+                if ($this->map_provider && $this->map_position === 'bottom')
+                {
+                    echo '<div class="lsd-list-view-bottom-wrapper">';
+                    echo $this->get_map();
+                    echo '</div>';
+                }
+            ?>
         </div>
 
-        <?php echo LSD_Kses::element($this->get_pagination()); ?>
-
-        <?php
-            /**
-             * Bottom Position of List View
-             */
-            if($this->map_provider && isset($this->skin_options['map_position']) && $this->skin_options['map_position'] === 'bottom')
-            {
-                echo '<div class="lsd-list-view-bottom-wrapper">';
-                echo $this->get_map();
-                echo '</div>';
-            }
-        ?>
+        <?php if ($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
     </div>
-    
-    <?php if($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
+
+    <?php echo LSD_Kses::form($this->get_right_bar()); ?>
 </div>

@@ -17,6 +17,7 @@ class LSD_Query extends LSD_Base
         if ($id == 'address') $field = 'lsd_address';
         else if ($id == 'price') $field = 'lsd_price';
         else if ($id == 'class') $field = 'lsd_price_class';
+        else if ($id == 'acf_fields') $field = 'acf_fields';
         else $field = 'lsd_attribute_' . $id;
 
         $query = [];
@@ -60,6 +61,17 @@ class LSD_Query extends LSD_Base
                     'value' => $value,
                     'compare' => '>=',
                     'type' => 'NUMERIC',
+                ];
+
+                break;
+
+            case 'grb':
+
+                $query = [
+                    'key' => $field,
+                    'value' => explode(':', rtrim($value, ':')),
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
                 ];
 
                 break;
@@ -170,6 +182,80 @@ class LSD_Query extends LSD_Base
                 ];
 
                 break;
+        }
+
+        return count($query) ? $query : false;
+    }
+
+    public static function acf_fields($key, $value)
+    {
+        $type = substr($key, -3);
+        $key_field = substr($key, 0, -4);
+
+        $query = [];
+        switch ($type)
+        {
+            case 'atx':
+            case 'dra':
+            case 'trf':
+
+                $query = [
+                    'key' => $key_field,
+                    'value' => $value,
+                    'compare' => 'LIKE',
+                ];
+
+                break;
+
+            case 'nma':
+
+                $query = [
+                    'key' => $key_field,
+                    'value' => $value,
+                    'compare' => '=',
+                ];
+
+                break;
+
+            case 'nmd':
+
+                $query = [
+                    'key' => $key_field,
+                    'value' => $value,
+                    'compare' => '>=',
+                    'type' => 'NUMERIC',
+                ];
+
+                break;
+
+            case 'drm':
+
+                // Force to Array
+                if (!is_array($value)) $value = [$value];
+
+                foreach ($value as $v)
+                {
+                    $query[] = [
+                        'key'     => $key_field,
+                        'value'   => $v,
+                        'compare' => 'LIKE',
+                    ];
+                }
+
+                break;
+
+            case 'ara':
+                $value = explode(':', rtrim($value, ':'));
+
+                $query = [
+                    'key' => $key_field,
+                    'value' => $value,
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                ];
+
+                break;
+
         }
 
         return count($query) ? $query : false;

@@ -9,6 +9,9 @@ $dashboard = new LSD_Dashboard();
 
 // Settings
 $settings = LSD_Options::settings();
+
+$SN = new LSD_Socials();
+$networks = LSD_Options::socials();
 ?>
 <div class="lsd-settings-wrap">
     <form id="lsd_settings_form">
@@ -45,9 +48,9 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Time Picker Format', 'listdom'),
-                    'for' => 'lsd_settings_timepicker_format',
-                ]); ?></div>
+                        'title' => esc_html__('Time Picker Format', 'listdom'),
+                        'for' => 'lsd_settings_timepicker_format',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::select([
                         'id' => 'lsd_settings_timepicker_format',
@@ -62,9 +65,9 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Listing Custom Link', 'listdom'),
-                    'for' => 'lsd_settings_listing_link_status',
-                ]); ?></div>
+                        'title' => esc_html__('Listing Custom Link', 'listdom'),
+                        'for' => 'lsd_settings_listing_link_status',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::switcher([
                         'id' => 'lsd_settings_listing_link_status',
@@ -76,9 +79,9 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Currency Position', 'listdom'),
-                    'for' => 'lsd_settings_currency_position',
-                ]); ?></div>
+                        'title' => esc_html__('Currency Position', 'listdom'),
+                        'for' => 'lsd_settings_currency_position',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::select([
                         'id' => 'lsd_settings_currency_position',
@@ -95,9 +98,9 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Default Currency', 'listdom'),
-                    'for' => 'lsd_settings_default_currency',
-                ]); ?></div>
+                        'title' => esc_html__('Default Currency', 'listdom'),
+                        'for' => 'lsd_settings_default_currency',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::currency([
                         'id' => 'lsd_settings_default_currency',
@@ -109,9 +112,23 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('No Listing Message', 'listdom'),
-                    'for' => 'lsd_settings_no_listings_message',
-                ]); ?></div>
+                        'title' => esc_html__('Address Placeholder', 'listdom'),
+                        'for' => 'lsd_settings_address_placeholder',
+                    ]); ?></div>
+                <div class="lsd-col-4">
+                    <?php echo LSD_Form::text([
+                        'id' => 'lsd_settings_address_placeholder',
+                        'name' => 'lsd[address_placeholder]',
+                        'value' => $settings['address_placeholder'] ?? __('123 Main St, Unit X, City, State, Zipcode', 'listdom')
+                    ]); ?>
+                    <p class="description"><?php esc_html_e("This will appear as the placeholder for address fields in the listing editor.", 'listdom'); ?></p>
+                </div>
+            </div>
+            <div class="lsd-form-row">
+                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('No Listing Message', 'listdom'),
+                        'for' => 'lsd_settings_no_listings_message',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::textarea([
                         'id' => 'lsd_settings_no_listings_message',
@@ -137,15 +154,15 @@ $settings = LSD_Options::settings();
         <div class="lsd-settings-form-group lsd-accordion-panel">
 
             <?php if($this->isLite()): ?>
-            <div class="lsd-mb-5 lsd-alert-no-mt"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('OpenStreetMap & Mapbox', 'listdom'), true), 'warning'); ?></div>
+                <div class="lsd-mb-5 lsd-alert-no-mt"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('OpenStreetMap & Mapbox', 'listdom'), true), 'warning'); ?></div>
             <?php endif; ?>
 
             <h3 class="lsd-mb-4 lsd-mt-0"><?php esc_html_e('Map', 'listdom'); ?></h3>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Default Map Provider', 'listdom'),
-                    'for' => 'lsd_settings_map_provider',
-                ]); ?></div>
+                        'title' => esc_html__('Default Map Provider', 'listdom'),
+                        'for' => 'lsd_settings_map_provider',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::providers([
                         'id' => 'lsd_settings_map_provider',
@@ -158,9 +175,9 @@ $settings = LSD_Options::settings();
             <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Google Maps API key', 'listdom'),
-                        'for' => 'lsd_settings_googlemaps_api_key',
-                    ]); ?></div>
+                            'title' => esc_html__('Google Maps API key', 'listdom'),
+                            'for' => 'lsd_settings_googlemaps_api_key',
+                        ]); ?></div>
                     <div class="lsd-col-10">
                         <?php echo LSD_Form::text([
                             'id' => 'lsd_settings_googlemaps_api_key',
@@ -173,29 +190,29 @@ $settings = LSD_Options::settings();
             </div>
 
             <?php if($this->isPro()): ?>
-            <div class="lsd-map-provider-dependency lsd-map-provider-dependency-leaflet">
-                <div class="lsd-form-row">
-                    <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Mapbox Access Token', 'listdom'),
-                        'for' => 'lsd_settings_mapbox_access_token',
-                    ]); ?></div>
-                    <div class="lsd-col-10">
-                        <?php echo LSD_Form::text([
-                            'id' => 'lsd_settings_mapbox_access_token',
-                            'name' => 'lsd[mapbox_access_token]',
-                            'value' => $settings['mapbox_access_token'] ?? ''
-                        ]); ?>
-                        <p class="description"><?php echo sprintf(esc_html__("If you want to use mapbox tiles you can get one from %s website otherwise the OSM tiles will be loaded in the maps.", 'listdom'), '<a href="https://mapbox.com" target="_blank">mapbox.com</a>'); ?></p>
+                <div class="lsd-map-provider-dependency lsd-map-provider-dependency-leaflet">
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                'title' => esc_html__('Mapbox Access Token', 'listdom'),
+                                'for' => 'lsd_settings_mapbox_access_token',
+                            ]); ?></div>
+                        <div class="lsd-col-10">
+                            <?php echo LSD_Form::text([
+                                'id' => 'lsd_settings_mapbox_access_token',
+                                'name' => 'lsd[mapbox_access_token]',
+                                'value' => $settings['mapbox_access_token'] ?? ''
+                            ]); ?>
+                            <p class="description"><?php echo sprintf(esc_html__("If you want to use mapbox tiles you can get one from %s website otherwise the OSM tiles will be loaded in the maps.", 'listdom'), '<a href="https://mapbox.com" target="_blank">mapbox.com</a>'); ?></p>
+                        </div>
                     </div>
                 </div>
-            </div>
             <?php endif; ?>
 
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Default Zoom Level', 'listdom'),
-                    'for' => 'lsd_settings_map_backend_zl',
-                ]); ?></div>
+                        'title' => esc_html__('Default Zoom Level', 'listdom'),
+                        'for' => 'lsd_settings_map_backend_zl',
+                    ]); ?></div>
                 <div class="lsd-col-1">
                     <?php echo LSD_Form::select([
                         'id' => 'lsd_settings_map_backend_zl',
@@ -210,29 +227,29 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('GPS Zoom Level', 'listdom'),
-                    'for' => 'lsd_settings_map_gps_zl',
-                ]); ?></div>
+                        'title' => esc_html__('GPS Zoom Level', 'listdom'),
+                        'for' => 'lsd_settings_map_gps_zl',
+                    ]); ?></div>
                 <div class="lsd-col-10 lsd-col-inline">
                     <p class="description"><?php echo sprintf(__("Change map zoom level to %s after detecting the geo point by GPS if current zoom level was less or equal to %s", 'listdom'), LSD_Form::select([
-                        'id' => 'lsd_settings_map_gps_zl',
-                        'name' => 'lsd[map_gps_zl]',
-                        'class' => 'lsd-d-inline',
-                        'value' => $settings['map_gps_zl'] ?? '',
-                        'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14]
-                    ]), LSD_Form::select([
-                        'id' => 'lsd_settings_map_gps_zl_current',
-                        'name' => 'lsd[map_gps_zl_current]',
-                        'value' => $settings['map_gps_zl_current'] ?? '',
-                        'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14]
-                    ])); ?></p>
+                            'id' => 'lsd_settings_map_gps_zl',
+                            'name' => 'lsd[map_gps_zl]',
+                            'class' => 'lsd-d-inline',
+                            'value' => $settings['map_gps_zl'] ?? '',
+                            'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14]
+                        ]), LSD_Form::select([
+                            'id' => 'lsd_settings_map_gps_zl_current',
+                            'name' => 'lsd[map_gps_zl_current]',
+                            'value' => $settings['map_gps_zl_current'] ?? '',
+                            'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14]
+                        ])); ?></p>
                 </div>
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Default Latitude', 'listdom'),
-                    'for' => 'lsd_settings_map_backend_lt',
-                ]); ?></div>
+                        'title' => esc_html__('Default Latitude', 'listdom'),
+                        'for' => 'lsd_settings_map_backend_lt',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::text([
                         'id' => 'lsd_settings_map_backend_lt',
@@ -244,9 +261,9 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Default Longitude', 'listdom'),
-                    'for' => 'lsd_settings_map_backend_ln',
-                ]); ?></div>
+                        'title' => esc_html__('Default Longitude', 'listdom'),
+                        'for' => 'lsd_settings_map_backend_ln',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::text([
                         'id' => 'lsd_settings_map_backend_ln',
@@ -258,9 +275,9 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row lsd-form-row-shape-display-options lsd-mt-5">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Shape Display Options', 'listdom'),
-                    'for' => 'lsd_settings_map_shape_options_fill_color',
-                ]); ?></div>
+                        'title' => esc_html__('Shape Display Options', 'listdom'),
+                        'for' => 'lsd_settings_map_shape_options_fill_color',
+                    ]); ?></div>
                 <div class="lsd-col-10">
                     <div class="lsd-form-row">
                         <div class="lsd-col-3">
@@ -331,9 +348,9 @@ $settings = LSD_Options::settings();
             <div>
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Google Geo-coding API key', 'listdom'),
-                        'for' => 'lsd_settings_google_geocoding_api_key',
-                    ]); ?></div>
+                            'title' => esc_html__('Google Geo-coding API key', 'listdom'),
+                            'for' => 'lsd_settings_google_geocoding_api_key',
+                        ]); ?></div>
                     <div class="lsd-col-10">
                         <?php echo LSD_Form::text([
                             'id' => 'lsd_settings_google_geocoding_api_key',
@@ -370,22 +387,22 @@ $settings = LSD_Options::settings();
             <p class="description"><?php esc_html_e('You can disable certain price components if they are not needed.', 'listdom'); ?></p>
 
             <?php foreach ([
-                'currency' => esc_html__('Currency', 'listdom'),
-                'max' => esc_html__('Price Max', 'listdom'),
-                'after' => esc_html__('Price Description', 'listdom'),
-                'class' => esc_html__('Price Class', 'listdom')
-            ] as $component => $label): ?>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'for' => 'lsd_price_component_'.$component,
-                    'title' => $label
-                ]); ?></div>
-                <div class="lsd-col-10"><?php echo LSD_Form::switcher([
-                    'id' => 'lsd_price_component_'.$component,
-                    'name' => 'lsd[price_component_'.$component.']',
-                    'value' => $settings['price_component_'.$component] ?? 1
-                ]); ?></div>
-            </div>
+                   'currency' => esc_html__('Currency', 'listdom'),
+                   'max' => esc_html__('Price Max', 'listdom'),
+                   'after' => esc_html__('Price Description', 'listdom'),
+                   'class' => esc_html__('Price Class', 'listdom')
+               ] as $component => $label): ?>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'for' => 'lsd_price_component_'.$component,
+                        'title' => $label
+                    ]); ?></div>
+                    <div class="lsd-col-10"><?php echo LSD_Form::switcher([
+                        'id' => 'lsd_price_component_'.$component,
+                        'name' => 'lsd[price_component_'.$component.']',
+                        'value' => $settings['price_component_'.$component] ?? 1
+                    ]); ?></div>
+                </div>
             <?php endforeach; ?>
         </div>
 
@@ -399,6 +416,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
         <div class="lsd-settings-form-group lsd-accordion-panel">
+            <?php if(!LSD_Base::is_current_theme('listdomer')): ?>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
                     'title' => esc_html__('Main Color', 'listdom'),
@@ -451,9 +469,9 @@ $settings = LSD_Options::settings();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Main Font', 'listdom'),
-                    'for' => 'lsd_settings_display_options_main_font',
-                ]); ?></div>
+                        'title' => esc_html__('Main Font', 'listdom'),
+                        'for' => 'lsd_settings_display_options_main_font',
+                    ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::fontpicker([
                         'id' => 'lsd_settings_display_options_main_font',
@@ -463,6 +481,16 @@ $settings = LSD_Options::settings();
                     <p class="description"><?php esc_html_e("Use your theme / desired font if you don't like the default font.", 'listdom'); ?></p>
                 </div>
             </div>
+            <?php else: ?>
+                <p class="description lsd-alert lsd-info">
+                    <?php
+                    printf(
+                        esc_html__('You have listdomer theme installed. Use %s to manage the Listdom display options.', 'listdom'),
+                        '<a href="?page=listdomer-settings">' . esc_html__('Theme Settings', 'listdom') . '</a>'
+                    );
+                    ?>
+                </p>
+            <?php endif; ?>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
                     'title' => esc_html__('Font Awesome Status', 'listdom'),
@@ -481,7 +509,70 @@ $settings = LSD_Options::settings();
 
         <div class="lsd-accordion-title">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
-                <h3><?php esc_html_e('Google recaptcha', 'listdom'); ?></h3>
+                <h3><?php esc_html_e('Socials', 'listdom'); ?></h3>
+                <div class="lsd-accordion-icons">
+                    <i class="lsd-icon fa fa-plus"></i>
+                    <i class="lsd-icon fa fa-minus"></i>
+                </div>
+            </div>
+        </div>
+        <div class="lsd-settings-form-group lsd-accordion-panel">
+            <h3 class="lsd-mt-0"><?php esc_html_e('Social Networks', 'listdom'); ?></h3>
+            <div class="lsd-form-row lsd-mb-3">
+                <div class="lsd-col-2"></div>
+                <div class="lsd-col-1"></div>
+                <div class="lsd-col-1"><?php esc_html_e('Profile', 'listdom'); ?></div>
+                <div class="lsd-col-1"><?php esc_html_e('Archive', 'listdom'); ?></div>
+                <div class="lsd-col-1"><?php esc_html_e('Details', 'listdom'); ?></div>
+                <div class="lsd-col-1"><?php esc_html_e('Contact', 'listdom'); ?></div>
+            </div>
+            <div class="lsd-social-networks lsd-sortable">
+                <?php foreach($networks as $network=>$values): $obj = $SN->get($network, $values); if(!$obj) continue; ?>
+                    <div class="lsd-form-row lsd-social-network">
+                        <div class="lsd-col-2 lsd-cursor-move">
+                            <i class="lsd-icon fas fa-arrows-alt"></i>
+                            <span class="lsd-ml-4">
+                                    <strong><?php echo esc_html($obj->label()); ?></strong>
+                                    <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][key]" value="<?php echo esc_attr($obj->key()); ?>">
+                                </span>
+                        </div>
+                        <div class="lsd-col-1"></div>
+                        <div class="lsd-col-1">
+                            <label class="lsd-switch">
+                                <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][profile]" value="0">
+                                <input type="checkbox" name="lsd[<?php echo esc_attr($obj->key()); ?>][profile]" value="1" <?php echo $obj->option('profile') == 1 ? 'checked="checked"' : ''; ?>>
+                                <span class="lsd-slider"></span>
+                            </label>
+                        </div>
+                        <div class="lsd-col-1">
+                            <label class="lsd-switch">
+                                <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][archive_share]" value="0">
+                                <input type="checkbox" name="lsd[<?php echo esc_attr($obj->key()); ?>][archive_share]" value="1" <?php echo $obj->option('archive_share') == 1 ? 'checked="checked"' : ''; ?>>
+                                <span class="lsd-slider"></span>
+                            </label>
+                        </div>
+                        <div class="lsd-col-1">
+                            <label class="lsd-switch">
+                                <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][single_share]" value="0">
+                                <input type="checkbox" name="lsd[<?php echo esc_attr($obj->key()); ?>][single_share]" value="1" <?php echo $obj->option('single_share') == 1 ? 'checked="checked"' : ''; ?>>
+                                <span class="lsd-slider"></span>
+                            </label>
+                        </div>
+                        <div class="lsd-col-1">
+                            <label class="lsd-switch">
+                                <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][listing]" value="0">
+                                <input type="checkbox" name="lsd[<?php echo esc_attr($obj->key()); ?>][listing]" value="1" <?php echo $obj->option('listing') == 1 ? 'checked="checked"' : ''; ?>>
+                                <span class="lsd-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <div class="lsd-accordion-title">
+            <div class="lsd-flex lsd-flex-row lsd-py-2">
+                <h3><?php esc_html_e('Google reCAPTCHA', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
                     <i class="lsd-icon fa fa-plus"></i>
                     <i class="lsd-icon fa fa-minus"></i>
@@ -567,29 +658,30 @@ $settings = LSD_Options::settings();
 
         <div class="lsd-spacer-10"></div>
         <div class="lsd-form-row">
-			<div class="lsd-col-12 lsd-flex lsd-gap-3">
-				<?php LSD_Form::nonce('lsd_settings_form'); ?>
-				<?php echo LSD_Form::submit([
-					'label' => esc_html__('Save', 'listdom'),
-					'id' => 'lsd_settings_save_button',
+            <div class="lsd-col-12 lsd-flex lsd-gap-3">
+                <?php LSD_Form::nonce('lsd_settings_form'); ?>
+                <?php echo LSD_Form::submit([
+                    'label' => esc_html__('Save', 'listdom'),
+                    'id' => 'lsd_settings_save_button',
                     'class' => 'button button-hero button-primary',
-				]); ?>
+                ]); ?>
                 <div>
                     <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
                     <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
                 </div>
-			</div>
+            </div>
         </div>
     </form>
 </div>
 <script>
-jQuery('#lsd_settings_form').on('submit', function(e) {
+jQuery('#lsd_settings_form').on('submit', function(e)
+{
     e.preventDefault();
 
     // Elements
-    const $button = jQuery("#lsd_settings_save_button");
-    const $success = jQuery(".lsd-settings-success-message");
-    const $error = jQuery(".lsd-settings-error-message");
+    const $button = jQuery('#lsd_settings_save_button');
+    const $success = jQuery('.lsd-settings-success-message');
+    const $error = jQuery('.lsd-settings-error-message');
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
@@ -603,9 +695,9 @@ jQuery('#lsd_settings_form').on('submit', function(e) {
     const settings = jQuery(this).serialize();
     jQuery.ajax(
     {
-        type: "POST",
+        type: 'POST',
         url: ajaxurl,
-        data: "action=lsd_save_settings&" + settings,
+        data: 'action=lsd_save_settings&' + settings,
         success: function()
         {
             // Loading Styles

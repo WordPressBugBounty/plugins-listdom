@@ -19,6 +19,10 @@ class LSD_Element extends LSD_Base
      */
     public $listing;
 
+    protected $pro_needed = false;
+    protected $has_title_settings = true;
+    protected $inline_title = false;
+
     /**
      * Constructor method
      */
@@ -32,11 +36,31 @@ class LSD_Element extends LSD_Base
 
     public function form($data = [])
     {
+        // Disabled in Lite
+        if ($this->isLite() && $this->pro_needed) return '<div class="lsd-form-row">
+            <div class="lsd-col-12 lsd-handler">
+                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . ']" />
+                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . '][enabled]" value="0" />
+                ' . $this->missFeatureMessage(esc_html__($this->label, 'listdom')) . '
+            </div>
+        </div>';
+
         // Third Party Fields
         ob_start();
         do_action('lsd_element_form_options', $this->key, $data);
         $additional = LSD_Kses::form(ob_get_clean());
-        $additional_settings = $this->specific_elements_setting($this->key, $data);
+
+        // Title Settings
+        $title = $this->title_settings($data);
+
+        // General Settings
+        $general = $this->general_settings($data);
+
+        // Has General Options
+        $has_general_options = trim($general) || trim($additional);
+
+        // Has Options
+        $has_options = $has_general_options || trim($title);
 
         return '<div class="lsd-form-row">
             <div class="lsd-col-10 lsd-handler">
@@ -45,45 +69,46 @@ class LSD_Element extends LSD_Base
                 ' . $this->label . '
             </div>
             <div class="lsd-col-2 lsd-actions lsd-details-page-element-toggle-status" id="lsd_actions_' . esc_attr($this->key) . '" data-key="' . esc_attr($this->key) . '">
-                <span class="lsd-toggle lsd-mr-2" data-for="#lsd_options_' . esc_attr($this->key) . '" data-all=".lsd-element-options">
+                '.($has_options ? '<span class="lsd-toggle lsd-mr-2" data-for="#lsd_options_' . esc_attr($this->key) . '" data-all=".lsd-element-options">
                     <i class="lsd-icon fa fa-cog fa-lg"></i>
-                </span>
+                </span>' : '').'
                 <strong class="lsd-enabled ' . ($data['enabled'] ? '' : 'lsd-util-hide') . '"><i class="lsd-icon fa fa-check"></i></strong>
                 <strong class="lsd-disabled ' . ($data['enabled'] ? 'lsd-util-hide' : '') . '"><i class="lsd-icon fa fa-minus-circle"></i></strong>
             </div>
         </div>
         <div class="lsd-element-options lsd-util-hide" id="lsd_options_' . esc_attr($this->key) . '">
-            <div class="lsd-form-row lsd-trigger-select-parent">
-                <div class="lsd-col-2">
-                    <label for="lsd_elements_' . esc_attr($this->key) . '_show_title">' . esc_html__('Show Title', 'listdom') . '</label>
-                    <select class="lsd-trigger-select-options" name="lsd[elements][' . esc_attr($this->key) . '][show_title]" id="lsd_elements_' . esc_attr($this->key) . '_show_title">
-                        <option value="1" ' . (isset($data['show_title']) && $data['show_title'] == 1 ? 'selected="selected"' : '') . ' data-lsd-show="#lsd_title_alignment_' . esc_attr($this->key) . '_option">' . esc_html__('Yes', 'listdom') . '</option>
-                        <option value="0" ' . (isset($data['show_title']) && $data['show_title'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
-                    </select>
-                </div>
-                ' . $additional_settings . '
+            ' . ($has_general_options ? '<ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" id="lsd_element_option_switcher_' . esc_attr($this->key) . '" data-for=".lsd-tab-switcher-element-' . esc_attr($this->key) . '-content">
+                <li data-tab="title-' . esc_attr($this->key) . '" class="lsd-sub-tabs-active"><a href="#">' . esc_html__('Title', 'listdom') . '</a></li>
+                <li data-tab="options-' . esc_attr($this->key) . '"><a href="#">' . esc_html__('Options', 'listdom') . '</a></li>
+            </ul>' : '') . '
+            <div class="lsd-element-option-wrapper '.($has_general_options ? 'lsd-tab-switcher-content lsd-tab-switcher-element-' . esc_attr($this->key) . '-content lsd-tab-switcher-content-active' : '').'" id="lsd-tab-switcher-title-' . esc_attr($this->key) . '-content">
+                <div>' . $title . '</div>
             </div>
-            ' . $additional . '
+            ' . ($has_general_options ? '<div class="lsd-element-option-wrapper lsd-tab-switcher-content lsd-tab-switcher-element-' . esc_attr($this->key) . '-content" id="lsd-tab-switcher-options-' . esc_attr($this->key) . '-content">
+                <div>
+                    ' . $general . '
+                    ' . $additional . '
+                </div>
+            </div>' : '') . '
         </div>';
     }
 
-    /**
-     * Add additional setting for specific elements.
-     * @param $element
-     * @param $data
-     * @return mixed
-     */
-    protected function specific_elements_setting($element, $data)
+    private function title_settings(array $data): string
     {
-        $settings = '';
+        // No Title Settings
+        if (!$this->has_title_settings) return '';
+
+        // Show Title
+        $show_title = isset($data['show_title']) && $data['show_title'] == 1;
 
         // Title Alignment
-        $bypass_elements = ['share', 'title', 'tags'];
-        if (!in_array($element, $bypass_elements))
+        $title_alignment = '';
+
+        if (!$this->inline_title)
         {
-            $settings .= '<div class="lsd-col-2 lsd-trigger-select-content' . (isset($data['show_title']) && $data['show_title'] != 1 ? ' lsd-util-hide' : '') . '" id="lsd_title_alignment_' . esc_attr($element) . '_option">
-                <label for="lsd_elements_' . esc_attr($element) . '_title_align">' . esc_html__('Title Alignment', 'listdom') . '</label>
-                <select name="lsd[elements][' . esc_attr($element) . '][title_align]" id="lsd_elements_' . esc_attr($element) . '_title_align">
+            $title_alignment .= '<div class="lsd-title-dependent-' . esc_attr($this->key) . '-option '.($show_title ? '' : 'lsd-util-hide').'">
+                <label for="lsd_elements_' . esc_attr($this->key) . '_title_align">' . esc_html__('Title Alignment', 'listdom') . '</label>
+                <select name="lsd[elements][' . esc_attr($this->key) . '][title_align]" id="lsd_elements_' . esc_attr($this->key) . '_title_align">
                     <option value="">' . esc_html__('Default', 'listdom') . '</option>
                     <option value="lsd-text-left" ' . (isset($data['title_align']) && $data['title_align'] === 'lsd-text-left' ? 'selected="selected"' : '') . '>' . esc_html__('Left', 'listdom') . '</option>
                     <option value="lsd-text-center" ' . (isset($data['title_align']) && $data['title_align'] === 'lsd-text-center' ? 'selected="selected"' : '') . '>' . esc_html__('Center', 'listdom') . '</option>
@@ -92,7 +117,24 @@ class LSD_Element extends LSD_Base
             </div>';
         }
 
-        return $settings;
+        return '<div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_show_title">' . esc_html__('Show Title', 'listdom') . '</label>
+            <select class="lsd-trigger-select-options" name="lsd[elements][' . esc_attr($this->key) . '][show_title]" id="lsd_elements_' . esc_attr($this->key) . '_show_title">
+                <option value="1" ' . ($show_title ? 'selected="selected"' : '') . ' data-lsd-show=".lsd-title-dependent-' . esc_attr($this->key) . '-option">' . esc_html__('Yes', 'listdom') . '</option>
+                <option value="0" ' . (!$show_title ? 'selected="selected"' : '') . ' data-lsd-hide=".lsd-title-dependent-' . esc_attr($this->key) . '-option">' . esc_html__('No', 'listdom') . '</option>
+            </select>
+        </div>
+        ' . $title_alignment . '
+        <div class="lsd-title-dependent-' . esc_attr($this->key) . '-option '.($show_title ? '' : 'lsd-util-hide').'">
+            <label for="lsd_elements_' . esc_attr($this->key) . '_custom_title">' . esc_html__('Custom Title', 'listdom') . '</label>
+            <input type="text" name="lsd[elements][' . esc_attr($this->key) . '][custom_title]" id="lsd_elements_' . esc_attr($this->key) . '_custom_title" value="'.(isset($data['custom_title']) && trim($data['custom_title']) ? esc_attr($data['custom_title']) : '').'" placeholder="' . esc_attr__('Custom Title', 'listdom') . '">
+            <p class="description lsd-mb-0">'.esc_html__('If a custom title is provided, it will replace the default title.', 'listdom').'</p>
+        </div>';
+    }
+
+    protected function general_settings(array $data): string
+    {
+        return '';
     }
 
     /**

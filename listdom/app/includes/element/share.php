@@ -26,6 +26,7 @@ class LSD_Element_Share extends LSD_Element
         parent::__construct();
 
         $this->label = esc_html__('Share', 'listdom');
+        $this->inline_title = true;
         $this->layout = $layout;
         $this->args = $args;
     }

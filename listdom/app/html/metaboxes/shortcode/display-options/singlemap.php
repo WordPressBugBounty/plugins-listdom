@@ -7,6 +7,7 @@ defined('ABSPATH') || die();
 /** @var array $price_components */
 
 $singlemap = $options['singlemap'] ?? [];
+$mapsearch = $singlemap['mapsearch'] ?? '1';
 ?>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
@@ -106,7 +107,8 @@ $singlemap = $options['singlemap'] ?? [];
             <?php echo LSD_Form::switcher([
                 'id' => 'lsd_display_options_skin_singlemap_mapsearch',
                 'name' => 'lsd[display][singlemap][mapsearch]',
-                'value' => $singlemap['mapsearch'] ?? '1',
+                'toggle' => '#lsd_skin_singlemap_connected_shortcodes',
+                'value' => $mapsearch,
             ]); ?>
             <p class="description"><?php esc_html_e("Provide ability to filter listings based on current map position.", 'listdom'); ?></p>
         <?php else: ?>
@@ -114,6 +116,31 @@ $singlemap = $options['singlemap'] ?? [];
         <?php endif; ?>
     </div>
 </div>
+<?php if ($this->isPro()): ?>
+<div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
+    <div class="<?php echo $mapsearch ? '' : 'lsd-util-hide'; ?>" id="lsd_skin_singlemap_connected_shortcodes">
+        <div class="lsd-form-row">
+            <div class="lsd-col-2"><?php echo LSD_Form::label([
+                'title' => esc_html__('Connected Shortcodes', 'listdom'),
+                'for' => 'lsd_display_options_skin_singlemap_connected_shortcodes_input',
+            ]); ?></div>
+            <div class="lsd-col-6">
+                <?php echo LSD_Form::autosuggest([
+                    'source' => LSD_Base::PTYPE_SHORTCODE,
+                    'name' => 'lsd[display][singlemap][connected_shortcodes]',
+                    'id' => 'lsd_display_options_skin_singlemap_connected_shortcodes',
+                    'input_id' => 'lsd_display_options_skin_singlemap_connected_shortcodes_input',
+                    'suggestions' => 'lsd_display_options_skin_singlemap_connected_shortcodes_suggestions',
+                    'values' => $singlemap['connected_shortcodes'] ?? [],
+                    'max_items' => 3,
+                    'placeholder' => esc_html__("Enter at least 3 characters of the shortcode's title ...", 'listdom'),
+                    'description' => esc_html__('You should select up tp 3 search-able skin shortcodes e.g. List, Grid, Masonry, List + Grid, Half Map, Side By Side, etc.', 'listdom'),
+                ]); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 <?php
     // Action for Third Party Plugins
     do_action('lsd_shortcode_map_options', 'singlemap', $options);

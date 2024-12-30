@@ -107,6 +107,9 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_website', isset($data['website']) ? esc_url($data['website']) : '');
         update_post_meta($this->post->ID, 'lsd_contact_address', isset($data['contact_address']) ? sanitize_text_field($data['contact_address']) : '');
 
+        // add zero Visits
+        add_post_meta($this->id(), 'lsd_visits', 0, true);
+
         // Remark
         update_post_meta($this->post->ID, 'lsd_remark', $data['remark'] ?? '');
 
@@ -336,9 +339,9 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID);
     }
 
-    public function get_abuse()
+    public function get_abuse(array $args = [])
     {
-        $element = new LSD_Element_Abuse();
+        $element = new LSD_Element_Abuse($args);
         return $element->get($this->post->ID);
     }
 

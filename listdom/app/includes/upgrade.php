@@ -43,6 +43,7 @@ class LSD_Upgrade extends LSD_Base
         if (version_compare($version, '3.3.1', '<')) $this->v331();
         if (version_compare($version, '3.4.0', '<')) $this->v340();
         if (version_compare($version, '3.5.0', '<')) $this->v350();
+        if (version_compare($version, '3.8.0', '<')) $this->v380();
     }
 
     private function socials()
@@ -514,6 +515,12 @@ class LSD_Upgrade extends LSD_Base
         $listings = get_posts([
             'post_type' => LSD_Base::PTYPE_LISTING,
             'posts_per_page' => 1000,
+            'meta_query' => [
+                [
+                    'key' => 'lsd_primary_category',
+                    'compare' => 'NOT EXISTS',
+                ],
+            ]
         ]);
 
         foreach ($listings as $listing)
@@ -529,6 +536,12 @@ class LSD_Upgrade extends LSD_Base
         $listings = get_posts([
             'post_type' => LSD_Base::PTYPE_LISTING,
             'posts_per_page' => 1000,
+            'meta_query' => [
+                [
+                    'key' => 'lsd_price_class',
+                    'compare' => 'NOT EXISTS',
+                ],
+            ]
         ]);
 
         foreach ($listings as $listing) add_post_meta($listing->ID, 'lsd_price_class', 2, true);
@@ -634,5 +647,22 @@ class LSD_Upgrade extends LSD_Base
     private function v350()
     {
         $this->roles();
+    }
+
+    private function v380()
+    {
+        // Add Visits
+        $listings = get_posts([
+            'post_type' => LSD_Base::PTYPE_LISTING,
+            'posts_per_page' => 1000,
+            'meta_query' => [
+                [
+                    'key' => 'lsd_visits',
+                    'compare' => 'NOT EXISTS',
+                ],
+            ]
+        ]);
+
+        foreach ($listings as $listing) add_post_meta($listing->ID, 'lsd_visits', 0, true);
     }
 }

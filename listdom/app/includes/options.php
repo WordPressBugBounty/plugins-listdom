@@ -108,9 +108,7 @@ class LSD_Options extends LSD_Base
         {
             case 'styles';
 
-                $defaults = [
-                    'CSS' => '',
-                ];
+                $defaults = ['CSS' => ''];
                 break;
 
             case 'socials';
@@ -180,7 +178,6 @@ class LSD_Options extends LSD_Base
                         'listing' => 1,
                     ],
                 ];
-
                 break;
 
             case 'details_page';
@@ -209,7 +206,7 @@ class LSD_Options extends LSD_Base
                         'remark' => ['enabled' => 1, 'show_title' => 0],
                         'locations' => ['enabled' => 1, 'show_title' => 0],
                         'address' => ['enabled' => 1, 'show_title' => 0],
-                        'map' => ['enabled' => 1, 'show_title' => 0],
+                        'map' => ['enabled' => 1, 'show_title' => 0, 'infowindow' => 0],
                         'availability' => ['enabled' => 1, 'show_title' => 1],
                         'owner' => ['enabled' => 1, 'show_title' => 0],
                         'share' => ['enabled' => 1, 'show_title' => 0],
@@ -217,7 +214,6 @@ class LSD_Options extends LSD_Base
                         'excerpt' => ['enabled' => 0, 'show_title' => 0],
                     ],
                 ];
-
                 break;
 
             case 'details_page_pattern':
@@ -236,7 +232,6 @@ class LSD_Options extends LSD_Base
                     'scale' => '0',
                     'fullscreen' => '1',
                 ];
-
                 break;
 
             case 'sorts':
@@ -281,7 +276,6 @@ class LSD_Options extends LSD_Base
                         ],
                     ],
                 ];
-
                 break;
 
             case 'addons':
@@ -315,6 +309,12 @@ class LSD_Options extends LSD_Base
                         'login_link_label' => __('Already a member? Login.', 'listdom'),
                         'forgot_password_tab_label' => __('Forgot Password', 'listdom'),
                         'forgot_password_link_label' => __('Forgot your password?', 'listdom'),
+                        'login_form' => 0,
+                        'login_page' => '',
+                        'register_form' => 0,
+                        'register_page' => '',
+                        'forgot_password_form' => 0,
+                        'forgot_password_page' => '',
                     ],
                     'register' => [
                         'redirect' => get_option('page_on_front') ?? 0,
@@ -368,8 +368,8 @@ class LSD_Options extends LSD_Base
                         'labels' => 1,
                         'shortcodes' => 1,
                         'frontend_dashboard' => 1,
-                        'attributes' => 1
-                    ]
+                        'attributes' => 1,
+                    ],
                 ];
                 break;
 
@@ -380,6 +380,7 @@ class LSD_Options extends LSD_Base
                     'currency_position' => 'before',
                     'timepicker_format' => 24,
                     'listing_link_status' => 1,
+                    'address_placeholder' => __('123 Main St, Unit X, City, State, Zipcode', 'listdom'),
                     'map_provider' => 'googlemap',
                     'map_gps_zl' => 13,
                     'map_gps_zl_current' => 7,
@@ -402,6 +403,8 @@ class LSD_Options extends LSD_Base
                     'tag_slug' => 'listing-tag',
                     'feature_slug' => 'listing-feature',
                     'label_slug' => 'listing-label',
+                    'advanced_slug_status' => 0,
+                    'advanced_slug' => '%location%/%category%',
                     'grecaptcha_status' => 0,
                     'grecaptcha_sitekey' => '',
                     'grecaptcha_secretkey' => '',
@@ -431,6 +434,9 @@ class LSD_Options extends LSD_Base
                         'image' => 1,
                         'embed' => 1,
                     ],
+                    'assets' => [
+                        'load' => 1,
+                    ],
                 ];
         }
 
@@ -441,7 +447,9 @@ class LSD_Options extends LSD_Base
     public static function slug(): string
     {
         $settings = self::settings();
-        $slug = $settings['listings_slug'] ?? 'listings';
+        $slug = isset($settings['listings_slug']) && trim($settings['listings_slug'])
+            ? $settings['listings_slug']
+            : 'listings';
 
         return sanitize_title($slug);
     }

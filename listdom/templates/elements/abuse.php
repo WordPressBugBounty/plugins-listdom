@@ -7,6 +7,9 @@ defined('ABSPATH') || die();
 
 $owner_id = get_post_field('post_author', $post_id);
 
+$field_name = !isset($this->args['name_field']) || $this->args['name_field'];
+$field_phone = !isset($this->args['phone_field']) || $this->args['phone_field'];
+
 // Current User
 $current = wp_get_current_user();
 $current_id = get_current_user_id();
@@ -15,6 +18,7 @@ $current_id = get_current_user_id();
 	<form class="lsd-report-abuse-form" id="lsd_report_abuse_form_<?php echo esc_attr($post_id); ?>" data-id="<?php echo esc_attr($post_id); ?>">
 		
 		<div class="lsd-report-abuse-form-name-email-phone-wrapper">
+			<?php if ($field_name): ?>
 			<div class="lsd-report-abuse-form-row lsd-report-abuse-form-row-name">
 				<input
 					class="lsd-form-control-input"
@@ -27,6 +31,8 @@ $current_id = get_current_user_id();
 				>
 				<i class="lsd-icon fa fa-user"></i>
 			</div>
+			<?php endif; ?>
+
 			<div class="lsd-report-abuse-form-row lsd-report-abuse-form-row-email">
 				<input
 					class="lsd-form-control-input"
@@ -39,6 +45,8 @@ $current_id = get_current_user_id();
 				>
 				<i class="lsd-icon fa fa-envelope"></i>
 			</div>
+
+			<?php if ($field_name): ?>
 			<div class="lsd-report-abuse-form-row lsd-report-abuse-form-row-phone">
 				<input
 					class="lsd-form-control-input"
@@ -51,6 +59,7 @@ $current_id = get_current_user_id();
 				>
 				<i class="lsd-icon fas fa-phone-alt"></i>
 			</div>
+			<?php endif; ?>
 		</div>
 		
 		<div class="lsd-report-abuse-form-row">

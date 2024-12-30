@@ -20,7 +20,7 @@ class LSD_Plugin_Feedback extends LSD_Base
         });
 
         // Ajax
-        add_action('wp_ajax_listdom_deactivate_feedback', [$this, 'save']);
+        add_action('wp_ajax_lsd_deactivation_feedback', [$this, 'save']);
     }
 
     /**
@@ -37,7 +37,7 @@ class LSD_Plugin_Feedback extends LSD_Base
     public function save()
     {
         // Check nonce for security
-        check_ajax_referer('_listdom_deactivate_feedback_nonce');
+        check_ajax_referer('_lsd_deactivation_feedback_nonce');
 
         // Retrieve the action type to determine which button was clicked
         $action_type = isset($_POST['action_type']) ? sanitize_text_field($_POST['action_type']) : '';

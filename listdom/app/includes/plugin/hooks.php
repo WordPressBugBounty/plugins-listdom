@@ -121,7 +121,7 @@ class LSD_Plugin_Hooks
         // DB Update
         if ($this->main->is_db_update_required())
         {
-            $this->db_update();
+            LSD_Plugin_Hooks::db_update();
         }
 
         // Generate personalized CSS File
@@ -131,7 +131,7 @@ class LSD_Plugin_Hooks
         add_option('lsd_installed_at', current_time('timestamp'));
     }
 
-    public function db_update()
+    public static function db_update()
     {
         global $wpdb;
 

@@ -33,6 +33,9 @@ class LSD_PTypes_Notification extends LSD_PTypes
         add_filter('manage_' . $this->PT . '_posts_columns', [$this, 'filter_columns']);
         add_action('manage_' . $this->PT . '_posts_custom_column', [$this, 'filter_columns_content'], 10, 2);
 
+        add_action('restrict_manage_posts', [$this, 'add_filters']);
+        add_filter('parse_query', [$this, 'apply_filters']);
+
         add_action('add_meta_boxes', [$this, 'register_metaboxes'], 10, 2);
         add_action('save_post', [$this, 'save'], 10, 2);
 
@@ -167,5 +170,55 @@ class LSD_PTypes_Notification extends LSD_PTypes
         // BCC
         $bcc = isset($lsd['bcc']) ? preg_replace('/\s/', '', $lsd['bcc']) : '';
         update_post_meta($post_id, 'lsd_bcc', $bcc);
+    }
+
+    public function add_filters($post_type)
+    {
+        if ($post_type !== $this->PT) return;
+
+        $options = [];
+
+        $hooks = LSD_Notifications::get_notification_hooks();
+        foreach ($hooks as $hook => $title)
+        {
+            $posts = get_posts([
+                'post_type' => LSD_Base::PTYPE_NOTIFICATION,
+                'post_status' => 'any',
+                'posts_per_page' => -1,
+                'meta_key' => 'lsd_hook',
+                'meta_value' => $hook
+            ]);
+
+            $options[$hook] = $title.' ('.count($posts).')';
+        }
+
+        $selected = isset($_GET['lsd_hook']) && $_GET['lsd_hook'] ? sanitize_text_field($_GET['lsd_hook']) : '';
+        echo LSD_Form::select([
+            'id' => 'lsd_notification_filter_hook',
+            'name' => 'lsd_hook',
+            'options' => $options,
+            'value' => $selected,
+            'empty_label' => esc_html__('All Events', 'listdom'),
+            'show_empty' => true,
+        ]);
+    }
+
+    public function apply_filters($query)
+    {
+        global $pagenow, $typenow;
+
+        if ($typenow === $this->PT && $pagenow == 'edit.php')
+        {
+            if (isset($_GET['lsd_hook']) && $_GET['lsd_hook'] !== '')
+            {
+                $query->query_vars['meta_query'] = [
+                    [
+                        'key' => 'lsd_hook',
+                        'value' => sanitize_text_field($_GET['lsd_hook']),
+                        'compare' => '=',
+                    ],
+                ];
+            }
+        }
     }
 }

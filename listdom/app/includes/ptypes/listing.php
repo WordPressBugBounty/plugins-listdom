@@ -76,6 +76,10 @@ class LSD_PTypes_Listing extends LSD_PTypes
         // WPML Duplicate
         add_action('icl_make_duplicate', [$this, 'icl_duplicate'], 10, 4);
         add_action('icl_pro_translation_saved', [$this, 'wpml_pro_translation_saved'], 10, 3);
+
+        // Advanced Slug
+        add_filter('post_type_link', [LSD_Slug::class, 'populate'], 10, 2);
+        add_action('init', [LSD_Slug::class, 'add_rules']);
     }
 
     public function register_post_type()
@@ -105,7 +109,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
             'show_in_rest' => false,
             'supports' => $supports,
             'rewrite' => [
-                'slug' => LSD_Options::slug(),
+                'slug' => LSD_Slug::get(),
                 'ep_mask' => LSD_Base::EP_LISTING,
             ],
             'menu_icon' => $icon,
@@ -126,6 +130,8 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
         $columns['address'] = esc_html__('Address', 'listdom');
         $columns['category'] = esc_html__('Category', 'listdom');
+        $columns['location'] = esc_html__('Locations', 'listdom');
+        $columns['label'] = esc_html__('Labels', 'listdom');
         $columns['author'] = $author;
         $columns['date'] = $date;
 
@@ -134,16 +140,27 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function filter_columns_content($column_name, $post_id)
     {
-        if ($column_name == 'category')
+        if ($column_name === 'category')
         {
             // Primary Category
             $category = LSD_Entity_Listing::get_primary_category($post_id);
 
             echo $category && isset($category->name) ? '<strong>' . esc_html($category->name) . '</strong>' : '';
         }
-        else if ($column_name == 'address')
+        else if ($column_name === 'address')
         {
             echo esc_html(get_post_meta($post_id, 'lsd_address', true));
+        }
+        else if (in_array($column_name, ['location', 'label']))
+        {
+            $terms = wp_get_post_terms($post_id, $column_name === 'location' ? LSD_Base::TAX_LOCATION : LSD_Base::TAX_LABEL);
+            if (is_array($terms) && count($terms))
+            {
+                foreach ($terms as $term)
+                {
+                    echo $term && isset($term->name) ? '<span>' . esc_html($term->name) . '</span><br>' : '';
+                }
+            }
         }
     }
 

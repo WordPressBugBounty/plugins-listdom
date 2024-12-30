@@ -44,10 +44,10 @@ $settings = LSD_Options::settings();
             <?php LSD_Form::nonce('lsd_settings_form'); ?>
         </div>
         <div class="lsd-map-settings">
-            <h3 class="lsd-my-4"><?php esc_html_e('Choose the Map provider:', 'listdom'); ?></h3>
+            <h3 class="lsd-my-4"><?php esc_html_e('Choose the map provider:', 'listdom'); ?></h3>
             <div class="lsd-maps">
                 <div class="lsd-col-6 lsd-map-item">
-                    <h3 class="lsd-my-3"><?php echo esc_html__('Open Street', 'listdom'); ?></h3>
+                    <h3 class="lsd-my-3"><?php echo esc_html__('OpenStreetMap', 'listdom'); ?></h3>
                     <div class="lsd-image-wrapper">
                         <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/check-green.svg')); ?>" alt="Selected Icon" class="lsd-icon <?php echo $settings['map_provider'] === 'leaflet' ? '' : 'lsd-util-hide'; ?>">
                         <img class="<?php echo $settings['map_provider'] === 'leaflet' ? 'lsd-selected' : ''; ?>" data-map="leaflet" width="100%" src="<?php echo esc_url_raw($this->lsd_asset_url('img/open-street.png')); ?>" alt="">

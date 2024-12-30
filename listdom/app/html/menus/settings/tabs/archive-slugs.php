@@ -2,7 +2,16 @@
 // no direct access
 defined('ABSPATH') || die();
 
+/** @var LSD_Menus_Settings $this */
+
+// Pro version
+$is_pro = LSD_Base::isPro();
+
+// General Settings
 $settings = LSD_Options::settings();
+
+// Advanced Slug
+$advanced_slug_status = $is_pro && isset($settings['advanced_slug_status']) && $settings['advanced_slug_status'] ? 1 : 0;
 ?>
 <div class="lsd-settings-wrap">
     <form id="lsd_settings_form">
@@ -94,18 +103,66 @@ $settings = LSD_Options::settings();
                 </div>
             </div>
             <h3 class="lsd-mb-5"><?php esc_html_e('Slugs', 'listdom'); ?></h3>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Listings', 'listdom'),
-                    'for' => 'lsd_settings_listings_slug',
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::text([
-                        'id' => 'lsd_settings_listings_slug',
-                        'name' => 'lsd[listings_slug]',
-                        'value' => $settings['listings_slug'] ?? ''
-                    ]); ?>
-                    <p class="description"><?php echo sprintf(esc_html__("This option changes the listing page URL. For example if you set it to Markers, then the address of the listings will be %s.", 'listdom'), 'https://YOURSITE.com/markers/listing-name/'); ?></p>
+            <div class="lsd-border lsd-p-4 lsd-rounded lsd-mb-5">
+                <h4 class="lsd-mt-0 lsd-mb-4"><?php esc_html_e('Listings', 'listdom'); ?></h4>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Prefix', 'listdom'),
+                        'for' => 'lsd_settings_listings_slug',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::text([
+                            'id' => 'lsd_settings_listings_slug',
+                            'name' => 'lsd[listings_slug]',
+                            'value' => $settings['listings_slug'] ?? ''
+                        ]); ?>
+                        <p class="description"><?php echo sprintf(esc_html__("This option modifies the listing page URL. For example, if you set it to markers, the listings' addresses will be %s", 'listdom'), sprintf('https://yourwebsite.com/%s/listing-name/', '<strong>markers</strong>')); ?></p>
+                    </div>
+                </div>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Advanced Slug', 'listdom'),
+                        'for' => 'lsd_settings_advanced_slug',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::switcher([
+                            'id' => 'lsd_settings_advanced_slug',
+                            'name' => 'lsd[advanced_slug_status]',
+                            'toggle' => '.lsd-advanced-slug',
+                            'value' => $advanced_slug_status
+                        ]); ?>
+                    </div>
+                </div>
+                <?php if (!$is_pro): ?>
+                <div class="lsd-form-row lsd-advanced-slug <?php echo $advanced_slug_status ? '' : 'lsd-util-hide'; ?>">
+                    <div class="lsd-col-12">
+                        <?php echo LSD_Base::alert(LSD_Main::missFeatureMessage(esc_html__('Advanced Slug', 'listdom')), 'warning'); ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <div class="lsd-form-row lsd-mt-4 lsd-mb-0 lsd-advanced-slug <?php echo $advanced_slug_status ? '' : 'lsd-util-hide'; ?>">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Pattern', 'listdom'),
+                        'for' => 'lsd_settings_advanced_slug',
+                    ]); ?></div>
+                    <div class="lsd-col-6">
+                        <?php echo LSD_Form::text([
+                            'id' => 'lsd_settings_advanced_slug',
+                            'name' => 'lsd[advanced_slug]',
+                            'value' => isset($settings['advanced_slug']) && trim($settings['advanced_slug']) ? preg_replace('/\s+/', '', strtolower($settings['advanced_slug'])) : ''
+                        ]); ?>
+                        <div class="lsd-advanced-slug-help">
+                            <p><?php esc_html_e("You can use the following placeholders:", 'listdom'); ?></p>
+                            <ul class="lsd-mb-0">
+                                <li><code>%category%</code>: <?php esc_html_e('Includes the slug of the primary category in the URL, such as restaurant or cafe.', 'listdom'); ?></li>
+                                <li><code>%categories%</code>: <?php esc_html_e('Includes the slug of the primary category and its parent categories in the URL, such as cars/suv or restaurants/persian.', 'listdom'); ?></li>
+                                <li><code>%location%</code>: <?php esc_html_e('Includes the slug of the first location in the URL.', 'listdom'); ?></li>
+                                <li><code>%locations%</code>: <?php esc_html_e('Includes the slug of the first location and its parent locations in the URL, such as united-states/california or canada/bc.', 'listdom'); ?></li>
+                                <li><?php echo sprintf(esc_html__('Make sure to use %s or %s to separate parts of the slug.', 'listdom'), '<code>/</code>', '<code>-</code>'); ?></li>
+                                <li><?php esc_html_e('Please use lowercase characters and avoid spaces or tab characters in the URL.', 'listdom'); ?></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="lsd-form-row">

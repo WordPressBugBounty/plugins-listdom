@@ -22,6 +22,7 @@ class LSD_Element_Tags extends LSD_Element
         parent::__construct();
 
         $this->label = esc_html__('Tags', 'listdom');
+        $this->inline_title = true;
     }
 
     public function get($post_id = null)

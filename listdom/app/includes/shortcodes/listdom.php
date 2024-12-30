@@ -89,7 +89,7 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
         else if ($skin === 'carousel') $SKO = new LSD_Skins_Carousel();
         else if ($skin === 'slider') $SKO = new LSD_Skins_Slider();
         else if ($skin === 'masonry') $SKO = new LSD_Skins_Masonry();
-        else $SKO = new LSD_Skins_Singlemap();
+        else $SKO = new LSD_Skins_Grid();
 
         return $SKO;
     }

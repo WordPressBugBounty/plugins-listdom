@@ -7,7 +7,7 @@ defined('ABSPATH') || die();
     <h2 class="text-xl mb-4"><?php esc_html_e('Enjoy the Listdom more with Listdomer theme', 'listdom'); ?></h2>
     <div class="lsd-listdomer-installation-wrap">
         <form id="lsd_listdomer_installation_form">
-            <p class="description"><?php esc_html_e("Enhance your website's styling with the Listdomer theme! In addition to Listdom's impressive features, the Listdomer theme provides you with greater control over your site's design and customization. Thinking about upgrading your website's look? Try the Listdomer theme today!", 'listdom'); ?></p>
+            <p class="description"><?php esc_html_e("Enhance your website's styling with the Listdomer theme! In addition to Listdom's impressive features, the Listdomer theme gives you greater control over your site's design and customization. Install and activate it to customize your directory site more.", 'listdom'); ?></p>
 
             <?php LSD_Form::nonce('lsd_listdomer_installation_form'); ?>
 

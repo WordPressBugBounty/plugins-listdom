@@ -88,30 +88,6 @@ class LSD_Search_Builder extends LSD_Base
             'methods' => $this->getFieldMethods('taxonomy', LSD_Base::TAX_LABEL),
         ];
 
-        // Attributes
-        if ($this->isPro())
-        {
-            // Attributes
-            $attributes = LSD_Main::get_attributes();
-
-            foreach ($attributes as $attribute)
-            {
-                $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-                $key = 'att-' . $attribute->term_id;
-
-                // Skip URL, Email and Separator Fields
-                if (in_array($type, ['url', 'email', 'separator'])) continue;
-                if (in_array($key, $existings)) continue;
-
-                $fields[] = [
-                    'type' => 'attribute',
-                    'key' => $key,
-                    'title' => $attribute->name,
-                    'methods' => $this->getFieldMethods($type),
-                ];
-            }
-        }
-
         // Price
         if (!in_array('price', $existings)) $fields[] = [
             'type' => 'price',
@@ -135,6 +111,31 @@ class LSD_Search_Builder extends LSD_Base
             'title' => esc_html__('Address', 'listdom'),
             'methods' => $this->getFieldMethods('address'),
         ];
+
+        // Attributes
+        if ($this->isPro())
+        {
+            // Attributes
+            $attributes = LSD_Main::get_attributes();
+
+            foreach ($attributes as $attribute)
+            {
+                $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
+                $key = 'att-' . $attribute->term_id;
+
+                // Skip URL, Email and Separator Fields
+                if (in_array($type, ['url', 'email', 'separator'])) continue;
+                if (in_array($key, $existings)) continue;
+
+                $fields[] = [
+                    'type' => 'attribute',
+                    'key' => $key,
+                    'title' => $attribute->name,
+                    'description' => esc_html__('Attributes', 'listdom'),
+                    'methods' => $this->getFieldMethods($type),
+                ];
+            }
+        }
 
         // Apply Filters
         return apply_filters('lsd_search_fields', $fields, $existings, $this);
@@ -188,6 +189,19 @@ class LSD_Search_Builder extends LSD_Base
             'period' => [
                 'date-range-picker' => esc_html__('Date Range Picker', 'listdom'),
             ],
+            'acf_dropdown' => [
+                'dropdown' => esc_html__('Dropdown', 'listdom'),
+                'dropdown-multiple' => esc_html__('Dropdown (Multiple Selection)', 'listdom'),
+                'text-input' => esc_html__('Text Input', 'listdom'),
+                'checkboxes' => esc_html__('Checkboxes', 'listdom'),
+                'radio' => esc_html__('Radio Buttons', 'listdom'),
+            ],
+            'acf_range' => [
+                'acf_range' => esc_html__('Range Slider', 'listdom'),
+            ],
+            'acf_true_false' => [
+                'checkbox' => esc_html__('Checkbox', 'listdom'),
+            ],
         ];
 
         // Pro Methods
@@ -195,8 +209,11 @@ class LSD_Search_Builder extends LSD_Base
         {
             if (in_array($key, [LSD_Base::TAX_CATEGORY, LSD_Base::TAX_LOCATION]))
                 $methods['taxonomy']['hierarchical'] = esc_html__('Hierarchical Dropdowns', 'listdom');
+
             $methods['address']['radius'] = esc_html__('Radius Search', 'listdom');
             $methods['address']['radius-dropdown'] = esc_html__('Radius Search (Dropdown)', 'listdom');
+            $methods['price']['range'] = esc_html__('Range Slider', 'listdom');
+            $methods['number']['range'] = esc_html__('Range Slider', 'listdom');
         }
 
         // Apply Filters

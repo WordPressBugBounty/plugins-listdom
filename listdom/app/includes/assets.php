@@ -53,7 +53,7 @@ class LSD_Assets extends LSD_Base
         if (!$this->should_include()) return;
 
         // Include Listdom frontend script file
-        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable'], $this->version(), true);
+        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider'], $this->version(), true);
 
         // Localize Vars
         wp_localize_script('lsd-frontend', 'lsd', [
@@ -412,7 +412,49 @@ class LSD_Assets extends LSD_Base
     public function should_include($client = 'frontend')
     {
         // Always return true for frontend
-        if ($client === 'frontend') return true;
+        if ($client === 'frontend')
+        {
+            // If global settings is on return true
+            if (!isset($this->settings['assets']['load']) || $this->settings['assets']['load']) return true;
+
+            // If it's a listdom page return true
+            if (LSD_Base::is_listdom_page()) return true;
+
+            // Queried Object
+            $query = get_queried_object();
+
+            // Is Post
+            if ($query instanceof WP_Post)
+            {
+                $config = $this->settings['assets'][$query->post_type] ?? [];
+
+                if (is_array($config) && isset($config['load']) && !$config['load'])
+                {
+                    // Empty Items
+                    if (!isset($config['items']) || (is_array($config['items']) && !count($config['items']))) return false;
+
+                    // Not Matched
+                    if (is_array($config['items']) && !in_array($query->ID, $config['items'])) return false;
+                }
+            }
+
+            // Is Term
+            if ($query instanceof WP_Term)
+            {
+                $config = $this->settings['assets'][$query->taxonomy] ?? [];
+
+                if (is_array($config) && isset($config['load']) && !$config['load'])
+                {
+                    // Empty Items
+                    if (!isset($config['items']) || (is_array($config['items']) && !count($config['items']))) return false;
+
+                    // Not Matched
+                    if (is_array($config['items']) && !in_array($query->term_id, $config['items'])) return false;
+                }
+            }
+
+            return true;
+        }
         else
         {
             // Current Screen
@@ -438,7 +480,7 @@ class LSD_Assets extends LSD_Base
                      'listdom-addons',
                      'toplevel_page_listdom',
                      'widgets',
-                     'plugins'
+                     'plugins',
                  ] as $menu_id)
                 {
                     if (strpos($base, $menu_id) !== false) return true;

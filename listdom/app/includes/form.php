@@ -541,17 +541,17 @@ class LSD_Form extends LSD_Base
             if ($source === 'users')
             {
                 $user = get_user_by('id', $value);
-                $current .= '<span class="lsd-autosuggest-items-' . $user->ID . '">' . $user->user_email . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($user->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $user->ID . '"></span>';
+                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $user->ID . '" data-lsd-tooltip="'. esc_attr('Click twice to delete', 'listdom') .'">' . $user->user_email . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($user->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $user->ID . '"></span>';
             }
-            elseif (in_array($source, LSD_Base::taxonomies()))
+            elseif (in_array($source, get_taxonomies()))
             {
                 $term = get_term($value);
-                $current .= '<span class="lsd-autosuggest-items-' . esc_attr($term->term_id) . '">' . esc_html($term->name) . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($term->term_id) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . esc_attr($term->term_id) . '"></span>';
+                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . esc_attr($term->term_id) . '" data-lsd-tooltip="'. esc_attr('Click twice to delete', 'listdom') .'">' . esc_html($term->name) . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($term->term_id) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . esc_attr($term->term_id) . '"></span>';
             }
             else
             {
-                $post = get_post($value);
-                $current .= '<span class="lsd-autosuggest-items-' . $post->ID . '">' . $post->post_title . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($post->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $post->ID . '"></span>';
+	            $post = get_post($value);
+                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $post->ID . '" data-lsd-tooltip="'. esc_attr('Click twice to delete', 'listdom') .'">' . $post->post_title . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($post->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $post->ID . '"></span>';
             }
         }
 

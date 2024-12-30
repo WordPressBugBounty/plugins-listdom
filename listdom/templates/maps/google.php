@@ -27,7 +27,12 @@ $gps_zl = $settings['map_gps_zl'] ?? 13;
 $gps_zl_current = $settings['map_gps_zl_current'] ?? 7;
 $max_bounds = isset($args['max_bounds']) && is_array($args['max_bounds']) ? $args['max_bounds'] : [];
 $gplaces = isset($args['gplaces']) && $args['gplaces'];
+$infowindow = !isset($args['infowindow']) || $args['infowindow'];
 $direction = isset($args['direction']) && $args['direction'];
+$force_to_show = isset($args['force_to_show']) && $args['force_to_show'];
+$connected_shortcodes = isset($args['connected_shortcodes']) && is_array($args['connected_shortcodes'])
+	? $args['connected_shortcodes']
+	: [];
 
 // Map Controls
 $mapcontrols = $args['mapcontrols'] ?? [];
@@ -47,7 +52,7 @@ else
 }
 
 // No Objects to show or only one object with default location
-if(!count($objects) || (count($objects) === 1 && $objects[0]['latitude'] === $latitude && $objects[0]['longitude'] === $longitude)) return;
+if(!$force_to_show && (!count($objects) || (count($objects) === 1 && $objects[0]['latitude'] === $latitude && $objects[0]['longitude'] === $longitude))) return;
 
 // Add Google Maps JS codes to footer
 $assets->footer('<script>
@@ -78,6 +83,8 @@ jQuery(document).ready(function()
             atts: "'.http_build_query(['atts'=>$atts], '', '&').'",
             mapsearch: '.($mapsearch ? 'true' : 'false').',
             autoGPS: '.($autoGPS ? 'true' : 'false').',
+            display_infowindow: '.($infowindow ? 'true' : 'false').',
+            connected_shortcodes: '.json_encode($connected_shortcodes, JSON_NUMERIC_CHECK).',
             geo_request: '.($main->is_geo_request() ? 'true' : 'false').',
             gps_zoom: {
                 zl: '.$gps_zl.',
@@ -86,8 +93,7 @@ jQuery(document).ready(function()
             max_bounds: '.json_encode($max_bounds, JSON_NUMERIC_CHECK).',
             gplaces: '.($gplaces ? 'true' : 'false').',
             layers: '.json_encode(apply_filters('lsd_map_layers', [], LSD_MP_GOOGLE), JSON_NUMERIC_CHECK).',
-            direction:
-            {
+            direction: {
                 status: '.($direction ? 'true' : 'false').',
                 destination:
                 {

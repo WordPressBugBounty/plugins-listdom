@@ -372,7 +372,9 @@ $missAddonMessages = [];
                 'name' => 'lsd[display][grid][map_position]',
                 'options' => [
                     'top' => esc_html__('Show before the Grid view', 'listdom'),
-                    'bottom' => esc_html__('Show after the Grid view', 'listdom')
+                    'bottom' => esc_html__('Show after the Grid view', 'listdom'),
+                    'left' => esc_html__('Show on left', 'listdom'),
+                    'right' => esc_html__('Show on right', 'listdom')
                 ],
                 'value' => $grid['map_position'] ?? 'top'
             ]); ?>

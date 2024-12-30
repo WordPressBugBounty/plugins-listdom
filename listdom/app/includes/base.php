@@ -276,7 +276,25 @@ class LSD_Base
                     if (!isset($sf['attributes']['price-bt'])) $sf['attributes']['price-bt'] = '';
                     $sf['attributes']['price-bt'] .= sanitize_text_field($value) . ':';
                 }
+                else if (strpos($parameter, 'grb-') !== false)
+                {
+                    if (!isset($sf['attributes'][substr($parameter, 0, -4)])) $sf['attributes'][substr($parameter, 0, -4)] = '';
+                    $sf['attributes'][substr($parameter, 0, -4)] .= sanitize_text_field($value) . ':';
+                }
                 else $sf['attributes'][$parameter] = is_array($value) ? $value : sanitize_text_field($value);
+            }
+            // ACF Fields
+            else if (strpos($parameter, 'acf-') !== false)
+            {
+                $parameter = substr($parameter, 4);
+                if (!isset($sf['acf_values'])) $sf['acf_values'] = [];
+
+                if (strpos($parameter, '-ara-') !== false)
+                {
+                    if (!isset($sf['acf_values'][substr($parameter, 0, -4)])) $sf['acf_values'][substr($parameter, 0, -4)] = '';
+                    $sf['acf_values'][substr($parameter, 0, -4)] .= sanitize_text_field($value) . ':';
+                }
+                else $sf['acf_values'][$parameter] = is_array($value) ? $value : sanitize_text_field($value);
             }
             // Radius
             else if (strpos($parameter, 'circle-') !== false)
@@ -294,7 +312,7 @@ class LSD_Base
             {
                 $sf[substr($parameter, 0, -3)] = sanitize_text_field($value);
             }
-            else if ($parameter == 'period')
+            else if ($parameter === 'period' && trim($value) !== '')
             {
                 // Dates
                 $ex = explode(' - ', sanitize_text_field($value));
@@ -306,7 +324,10 @@ class LSD_Base
                 $settings = LSD_Options::settings();
                 $format = isset($settings['datepicker_format']) && trim($settings['datepicker_format']) ? $settings['datepicker_format'] : 'yyyy-mm-dd';
 
-                $sf[$parameter] = [$main->standardize_format($ex[0], $format), $main->standardize_format($ex[1], $format)];
+                $sf[$parameter] = [
+                    isset($ex[0]) ? $main->standardize_format($ex[0], $format) : '',
+                    isset($ex[1]) ? $main->standardize_format($ex[1], $format) : '',
+                ];
             }
             else
             {
@@ -779,7 +800,7 @@ class LSD_Base
         if ($currency_sign_position == 'after') $rendered = $rendered . $sign;
         else if ($currency_sign_position == 'after_ws') $rendered = $rendered . ' ' . $sign;
         else if ($currency_sign_position == 'before_ws') $rendered = $sign . ' ' . $rendered;
-        else $rendered = '<span>'.$sign .'</span>' . $rendered;
+        else $rendered = '<span>' . $sign . '</span>' . $rendered;
 
         return $rendered;
     }
@@ -1987,6 +2008,18 @@ class LSD_Base
         });
     }
 
+    public static function is_theme_installed($theme): bool
+    {
+        $theme = wp_get_theme($theme);
+        return $theme->exists();
+    }
+
+    public static function is_current_theme($theme): bool
+    {
+        $current_theme = wp_get_theme();
+        return $current_theme->get_template() === $theme;
+    }
+
     public static function remove_protocols(string $url = ''): string
     {
         // Remove Protocols
@@ -1998,4 +2031,73 @@ class LSD_Base
         // Return
         return trim($url, '/ ');
     }
+
+    public static function get_ptypes_and_tax($exclude = false): array
+    {
+        $post_types = get_post_types(['public' => true], 'objects');
+        $taxonomies = get_taxonomies([], 'objects');
+
+        $result = [];
+        foreach ($post_types as $post_type_key => $post_type)
+            $result[$post_type_key] = ['post_type' => $post_type, 'taxonomies' => []];
+
+        // Assign taxonomies to post types
+        foreach ($taxonomies as $taxonomy_key => $taxonomy)
+        {
+            foreach ($taxonomy->object_type as $object_type)
+            {
+                if (isset($result[$object_type])) $result[$object_type]['taxonomies'][$taxonomy_key] = $taxonomy;
+            }
+        }
+
+        if ($exclude) $result = self::exclude_ptypes_and_tax($result);
+
+        return $result;
+    }
+
+    private static function exclude_ptypes_and_tax(array $result): array
+    {
+        // Define exclusions
+        $exclusions = [
+            'post_types' => array_merge(['attachment'], self::postTypes()),
+            'taxonomies' => array_merge(['post_format', 'product_visibility', 'product_shipping_class', 'elementor_library_type', 'elementor_library_category', 'product_type'], self::taxonomies()),
+        ];
+
+        // Exclude post types
+        foreach ($exclusions['post_types'] as $excluded_post_type) unset($result[$excluded_post_type]);
+
+        // Exclude taxonomies
+        foreach ($result as $key => $data)
+        {
+            foreach ($data['taxonomies'] as $tax_key => $taxonomy)
+            {
+                if (in_array($tax_key, $exclusions['taxonomies'])) unset($result[$key]['taxonomies'][$tax_key]);
+            }
+        }
+
+        return $result;
+    }
+
+    public static function is_listdom_page(): bool
+    {
+        $status = false;
+
+        // Current post type
+        $post_type = get_post_type();
+
+        // Check if the post type matches any Listdom-related post types
+        if ($post_type && in_array($post_type, LSD_Base::postTypes())) $status = true;
+
+        $query = get_queried_object();
+
+        // Determine the taxonomy if it's a taxonomy archive
+        $taxonomy = null;
+        if ($query && isset($query->taxonomy)) $taxonomy = $query->taxonomy;
+
+        // Check if the current taxonomy matches any Listdom-related taxonomies
+        if ($taxonomy && in_array($taxonomy, LSD_Base::taxonomies())) $status = true;
+
+        return apply_filters('lsd_is_listdom_page', $status);
+    }
+
 }

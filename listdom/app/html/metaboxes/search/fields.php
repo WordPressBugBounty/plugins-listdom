@@ -50,36 +50,38 @@ jQuery(document).ready(function()
     </div>
     <div class="lsd-search-container">
         <div class="lsd-row">
-           <div class="lsd-col-9 lsd-search-sandbox">
+            <div class="lsd-col-9 lsd-search-sandbox">
                 <?php foreach($meta_fields as $i=>$row): $i = $i + 1; ?>
-                <div class="<?php echo ($row['type'] === 'more_options' ? 'lsd-search-more-options' : 'lsd-search-row'); ?>" id="lsd_search_row_<?php echo esc_attr($i); ?>" data-i="<?php echo esc_attr($i); ?>">
+                <div class="<?php echo $row['type'] === 'more_options' ? 'lsd-search-more-options' : 'lsd-search-row'; ?>" id="lsd_search_row_<?php echo esc_attr($i); ?>" data-i="<?php echo esc_attr($i); ?>">
                     <?php echo ($row['type'] === 'more_options' ? '<span class="lsd-search-more-options-label">'. esc_html__('Add the “More Options” fields in the row below', 'listdom') .'</span>' : ''); ?>
 
-                    <input type="hidden" name="lsd[fields][<?php echo esc_attr($i); ?>][type]" value="<?php echo (isset($row['type']) and trim($row['type'])) ? $row['type'] : 'row'; ?>">
+                    <input type="hidden" name="lsd[fields][<?php echo esc_attr($i); ?>][type]" value="<?php echo isset($row['type']) && trim($row['type']) ? $row['type'] : 'row'; ?>">
 
                     <div class="lsd-search-filters">
-                        <?php if(isset($row['filters']) and is_array($row['filters'])) foreach($row['filters'] as $key=>$data) echo LSD_Kses::form($builder->params($key, $data, $i)); ?>
+                        <?php if (isset($row['filters']) and is_array($row['filters'])) foreach ($row['filters'] as $key=>$data) echo LSD_Kses::form($builder->params($key, $data, $i)); ?>
                     </div>
 
                     <ul class="lsd-search-row-actions">
                         <li class="lsd-search-row-actions-sort lsd-row-handler"><i class="lsd-icon fas fa-arrows-alt"></i></li>
                         <li class="lsd-search-row-actions-delete lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Click twice to delete', 'listdom'); ?>" data-confirm="0" data-i="<?php echo esc_attr($i); ?>"><i class="lsd-icon fas fa-trash-alt"></i></li>
                     </ul>
-                    <?php if($row['type'] == 'row') echo LSD_Kses::form($builder->row($row, $i)); ?>
+                    <?php if ($row['type'] === 'row') echo LSD_Kses::form($builder->row($row, $i)); ?>
                 </div>
                 <?php endforeach; ?>
             </div>
-            <div class="lsd-col-3 lsd-search-available-fields">
-                <h3><?php esc_html_e('Available Fields', 'listdom'); ?></h3>
-                <div id="lsd_search_available_fields">
-                    <?php foreach($fields as $field): ?>
-                    <div class="lsd-search-field" id="lsd_search_available_fields_<?php echo esc_attr($field['key']); ?>" data-key="<?php echo esc_attr($field['key']); ?>">
-                        <strong><?php echo esc_html($field['title']); ?></strong>
-                        <?php if(isset($field['description'])): ?>
-                        <p class="description lsd-mb-0"><?php echo esc_html($field['description']); ?></p>
-                        <?php endif; ?>
+            <div class="lsd-col-3">
+                <div class="lsd-search-available-fields">
+                    <h3><?php esc_html_e('Available Fields', 'listdom'); ?></h3>
+                    <div id="lsd_search_available_fields">
+                        <?php foreach ($fields as $field): ?>
+                            <div class="lsd-search-field" id="lsd_search_available_fields_<?php echo esc_attr($field['key']); ?>" data-key="<?php echo esc_attr($field['key']); ?>">
+                                <strong><?php echo esc_html($field['title']); ?></strong>
+                                <?php if (isset($field['description'])): ?>
+                                    <p class="description lsd-mb-0"><?php echo esc_html($field['description']); ?></p>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php endforeach; ?>
                 </div>
             </div>
         </div>

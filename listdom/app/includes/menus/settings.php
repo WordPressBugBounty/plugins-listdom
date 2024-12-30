@@ -25,10 +25,9 @@ class LSD_Menus_Settings extends LSD_Menus
     {
         add_action('wp_ajax_lsd_save_settings', [$this, 'save_settings']);
         add_action('wp_ajax_lsd_save_dashboard', [$this, 'save_dashboard']);
-        add_action('wp_ajax_lsd_save_socials', [$this, 'save_socials']);
-        add_action('wp_ajax_lsd_save_styles', [$this, 'save_styles']);
         add_action('wp_ajax_lsd_save_details_page', [$this, 'save_details_page']);
         add_action('wp_ajax_lsd_save_addons', [$this, 'save_addons']);
+        add_action('wp_ajax_lsd_save_advanced', [$this, 'save_advanced']);
 
         // API
         add_action('wp_ajax_lsd_api_add_token', [$this, 'token_add']);
@@ -70,6 +69,69 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
+
+        // Separate social settings
+        $social_settings = array_filter($lsd, function ($key)
+        {
+            return in_array($key, [
+                'twitter',
+                'pinterest',
+                'linkedin',
+                'facebook',
+                'instagram',
+                'whatsapp',
+                'youtube',
+                'tiktok',
+                'telegram',
+            ]);
+        }, ARRAY_FILTER_USE_KEY);
+
+        // Remove social settings from main settings
+        $lsd = array_diff_key($lsd, $social_settings);
+
+        // Get current Listdom options
+        $current = get_option('lsd_settings', []);
+        if (is_string($current) && trim($current) === '') $current = [];
+
+        // Merge new options with previous options
+        $final = array_merge($current, $lsd);
+
+        // Save final options
+        update_option('lsd_settings', $final);
+
+        // Save social settings
+        update_option('lsd_socials', $social_settings);
+
+        // Generate personalized CSS File
+        LSD_Personalize::generate();
+
+        // Add WordPress flush rewrite rules in to-do list
+        LSD_RewriteRules::todo();
+
+        // Print the response
+        $this->response(['success' => 1]);
+    }
+
+    public function save_advanced()
+    {
+        // Check Access
+        $this->check_access();
+
+        // Get Listdom options
+        $lsd = $_POST['lsd'] ?? [];
+
+        // Sanitization
+        array_walk_recursive($lsd, 'sanitize_text_field');
+
+        // Get current Listdom options
+        $current = get_option('lsd_styles', []);
+        if (is_string($current) && trim($current) === '') $current = [];
+
+        // Merge new options with previous options
+        $final = array_merge($current, $lsd);
+
+        // Save final options`
+        update_option('lsd_styles', $final);
 
         // Get current Listdom options
         $current = get_option('lsd_settings', []);
@@ -121,49 +183,6 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Generate personalized CSS File
         LSD_Personalize::generate();
-
-        // Print the response
-        $this->response(['success' => 1]);
-    }
-
-    public function save_socials()
-    {
-        // Check Access
-        $this->check_access('lsd_socials_form');
-
-        // Get Listdom options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
-
-        // Save options
-        update_option('lsd_socials', $lsd);
-
-        // Print the response
-        $this->response(['success' => 1]);
-    }
-
-    public function save_styles()
-    {
-        // Check Access
-        $this->check_access();
-
-        // Get Listdom options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
-
-        // Get current Listdom options
-        $current = get_option('lsd_styles', []);
-        if (is_string($current) && trim($current) === '') $current = [];
-
-        // Merge new options with previous options
-        $final = array_merge($current, $lsd);
-
-        // Save final options
-        update_option('lsd_styles', $final);
 
         // Print the response
         $this->response(['success' => 1]);

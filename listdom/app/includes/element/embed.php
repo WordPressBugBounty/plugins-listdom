@@ -22,6 +22,8 @@ class LSD_Element_Embed extends LSD_Element
         parent::__construct();
 
         $this->label = esc_html__('Embed', 'listdom');
+        $this->has_title_settings = false;
+        $this->pro_needed = true;
     }
 
     public function get($post_id = null)
@@ -46,20 +48,6 @@ class LSD_Element_Embed extends LSD_Element
                 'post_id' => $post_id,
             ]
         );
-    }
-
-    public function form($data = [])
-    {
-        // Disabled in Lite
-        if ($this->isLite()) return '<div class="lsd-form-row">
-            <div class="lsd-col-12 lsd-handler">
-                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . ']" />
-                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . '][enabled]" value="0" />
-                ' . $this->missFeatureMessage(esc_html__('Embed Element', 'listdom')) . '
-            </div>
-        </div>';
-
-        return parent::form($data);
     }
 }
 

@@ -25,11 +25,6 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
 });
 ?>
 <div class="lsd-settings-wrap" id="lsd_settings_frontend_dashboard">
-    <?php if ($this->isLite()): ?>
-    <div class="lsd-alert lsd-warning lsd-my-4">
-        <?php echo LSD_Base::missFeatureMessage(esc_html__('Frontend Dashboard', 'listdom')); ?>
-    </div>
-    <?php endif; ?>
     <form id="lsd_settings_form">
         <div class="lsd-accordion-title lsd-accordion-active">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
@@ -68,23 +63,31 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                         'name' => 'lsd[add_listing_page_status]',
                         'toggle' => '#lsd_settings_add_listing_page_status_options',
                     ]); ?>
-                    <p class="description"><?php esc_html_e("Enable to have a independent add listing page ", 'listdom'); ?></p>
+                    <p class="description lsd-mb-0"><?php esc_html_e("Enable to have a independent add listing page ", 'listdom'); ?></p>
                 </div>
             </div>
-            <div id="lsd_settings_add_listing_page_status_options"
-                 class="lsd-form-row  <?php echo isset($settings['add_listing_page_status']) && $settings['add_listing_page_status'] ? '' : 'lsd-util-hide'; ?>">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Add Listing Page', 'listdom'),
-                    'for' => 'lsd_settings_add_listing_page',
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::pages([
-                        'id' => 'lsd_settings_add_listing_page',
-                        'value' => $settings['add_listing_page'] ?? null,
-                        'name' => 'lsd[add_listing_page]',
-                        'show_empty' => true,
-                    ]); ?>
-                    <p class="description lsd-mb-0"><?php echo sprintf(esc_html__("Put %s shortcode into the page.", 'listdom'), '<code>[listdom-add-listing]</code>'); ?></p>
+            <div id="lsd_settings_add_listing_page_status_options" class="<?php echo isset($settings['add_listing_page_status']) && $settings['add_listing_page_status'] ? '' : 'lsd-util-hide'; ?>">
+
+                <?php if ($this->isLite()): ?>
+                    <div class="lsd-alert lsd-warning lsd-mt-4">
+                        <?php echo LSD_Base::missFeatureMessage(esc_html__('Independent Add Listing', 'listdom')); ?>
+                    </div>
+                <?php endif; ?>
+
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Add Listing Page', 'listdom'),
+                        'for' => 'lsd_settings_add_listing_page',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::pages([
+                            'id' => 'lsd_settings_add_listing_page',
+                            'value' => $settings['add_listing_page'] ?? null,
+                            'name' => 'lsd[add_listing_page]',
+                            'show_empty' => true,
+                        ]); ?>
+                        <p class="description lsd-mb-0"><?php echo sprintf(esc_html__("Put %s shortcode into the page.", 'listdom'), '<code>[listdom-add-listing]</code>'); ?></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,14 +102,18 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
             </div>
         </div>
         <div class="lsd-settings-form-group lsd-accordion-panel">
+            <?php if ($this->isLite()): ?>
+                <div class="lsd-alert lsd-warning lsd-mt-0 lsd-mb-4">
+                    <?php echo LSD_Base::missFeatureMessage(esc_html__('Dashboard Menus', 'listdom')); ?>
+                </div>
+            <?php endif; ?>
+
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Sort dashboard menus', 'listdom'),
-                        'for' => 'lsd_settings_add_listing_page_status',
-                    ]); ?>
-                </div>
+                    'title' => esc_html__('Dashboard Menus', 'listdom')
+                ]); ?></div>
                 <div class="lsd-col-4">
-                    <ul class="lsd-settings-dashboard-menus">
+                    <ul class="lsd-settings-dashboard-menus lsd-mt-0">
                         <?php foreach ($filtered_menus as $key => $menu)
                         {
                             $target = $menu['target'] ?? '_self';
@@ -197,6 +204,12 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
             </div>
         </div>
         <div class="lsd-settings-form-group lsd-accordion-panel">
+            <?php if ($this->isLite()): ?>
+                <div class="lsd-alert lsd-warning lsd-mt-0 lsd-mb-4">
+                    <?php echo LSD_Base::missFeatureMessage(esc_html__('Guest Submission', 'listdom')); ?>
+                </div>
+            <?php endif; ?>
+
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
                     'title' => esc_html__('Status', 'listdom'),
