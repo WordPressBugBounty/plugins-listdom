@@ -21,6 +21,9 @@ $contact_address = !isset($args['show_address']) || $args['show_address']
     ? get_post_meta($post_id, 'lsd_contact_address', true)
     : '';
 
+$display_icon = !isset($args['display_icon']) || $args['display_icon'];
+$display_label = isset($args['display_label']) && $args['display_label'];
+
 // Social Networks
 $socials = '';
 if (!isset($args['show_socials']) || $args['show_socials']) $socials = (new LSD_Socials())->list($post_id, 'listing');
@@ -32,44 +35,65 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
     <ul>
 
         <?php if ($phone): ?>
-        <li>
-			<strong><i class="lsd-icon fas fa-phone-alt"></i></strong>
-			<span <?php echo lsd_schema()->telephone(); ?>>
-				<a href="tel:<?php echo esc_attr($phone); ?>"><?php echo esc_html($phone); ?></a>
-			</span>
-		</li>
+            <li>
+                <?php if ($display_icon): ?>
+                    <strong><i class="lsd-icon fas fa-phone-alt"></i></strong>
+                <?php endif; ?>
+                <?php if ($display_label): ?>
+                    <span class="lsd-contact-info-label"><?php esc_html_e('Phone', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
+                <?php endif; ?>
+                <span <?php echo lsd_schema()->telephone(); ?>>
+                    <a href="tel:<?php echo esc_attr($phone); ?>"><?php echo esc_html($phone); ?></a>
+                </span>
+            </li>
         <?php endif; ?>
 
         <?php if ($email): ?>
-        <li>
-			<strong><i class="lsd-icon fa fa-envelope"></i></strong>
-			<span <?php echo lsd_schema()->email(); ?>>
-				<a href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a>
-			</span>
-		</li>
+            <li>
+                <?php if ($display_icon): ?>
+                    <strong><i class="lsd-icon fa fa-envelope"></i></strong>
+                <?php endif; ?>
+                <?php if ($display_label): ?>
+                    <span class="lsd-contact-info-label"><?php esc_html_e('Email', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
+                <?php endif; ?>
+                <span <?php echo lsd_schema()->email(); ?>>
+                    <a href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a>
+                </span>
+            </li>
         <?php endif; ?>
 
         <?php if ($website): ?>
-        <li>
-            <strong><i class="lsd-icon fas fa-link"></i></strong>
-            <span>
-                <a href="<?php echo esc_url($website); ?>" target="_blank"><?php echo esc_html(LSD_Base::remove_protocols($website)); ?></a>
-            </span>
-        </li>
+            <li>
+                <?php if ($display_icon): ?>
+                    <strong><i class="lsd-icon fas fa-link"></i></strong>
+                <?php endif; ?>
+                <?php if ($display_label): ?>
+                    <span class="lsd-contact-info-label"><?php esc_html_e('Website', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
+                <?php endif; ?>
+                <span <?php echo lsd_schema()->url(); ?>>
+                    <a href="<?php echo esc_url($website); ?>"
+                       target="_blank"><?php echo esc_html(LSD_Base::remove_protocols($website)); ?></a>
+                </span>
+            </li>
         <?php endif; ?>
 
         <?php if ($contact_address): ?>
-        <li>
-            <strong><i class="lsd-icon fas fa-search-location"></i></strong>
-            <span><?php echo esc_html($contact_address); ?></span>
-        </li>
+            <li>
+                <?php if ($display_icon): ?>
+                    <strong><i class="lsd-icon fas fa-search-location"></i></strong>
+                <?php endif; ?>
+                <?php if ($display_label): ?>
+                    <span class="lsd-contact-info-label"><?php esc_html_e('Address', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
+                <?php endif; ?>
+                <span <?php echo lsd_schema()->address(); ?>><?php echo esc_html($contact_address); ?></span>
+            </li>
         <?php endif; ?>
 
     </ul>
 
     <?php if (trim($socials)): ?>
-    <div class="lsd-listing-social-networks">
-        <ul><?php echo LSD_Kses::element($socials); ?></ul>
-    </div>
+        <div class="lsd-listing-social-networks">
+            <ul><?php echo LSD_Kses::element($socials); ?></ul>
+        </div>
     <?php endif; ?>
 </div>

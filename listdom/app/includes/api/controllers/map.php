@@ -26,7 +26,7 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
             'status' => 404,
         ]);
 
-        // Details Page options
+        // Single Listing options
         $details_page_options = LSD_Options::details_page();
 
         $entity = new LSD_Entity_Listing($listing);

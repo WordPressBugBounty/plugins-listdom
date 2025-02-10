@@ -221,7 +221,7 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
         </div>
 		<div class="lsd-col-3"></div>
 		<div class="lsd-col-9">
-			<p class="description"><?php esc_html_e("If you fill it, then it will be used to override the default listing details page link. You can use it for linking the listing to a custom internal or external address.", 'listdom'); ?></p>
+			<p class="description"><?php esc_html_e("If you fill it, then it will be used to override the default single listing page link. You can use it for linking the listing to a custom internal or external address.", 'listdom'); ?></p>
 		</div>
     </div>
     <?php else: ?>
@@ -308,7 +308,7 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
                         <div class="lsd-row">
                             <div class="lsd-embeds-fields lsd-col-11">
                                 <input type="text" name="lsd[_embeds][<?php echo esc_attr($i); ?>][name]" value="<?php echo $embed['name'] ?? ''; ?>" title="<?php esc_attr_e('Title', 'listdom'); ?>" placeholder="<?php esc_attr_e('Title', 'listdom'); ?>">
-                                <textarea name="lsd[_embeds][<?php echo esc_attr($i); ?>][code]" title="<?php esc_attr_e('Code', 'listdom'); ?>" class="lsd-embed-code" placeholder="<?php esc_attr_e('Code', 'listdom'); ?>"><?php echo isset($embed['code']) ? esc_textarea(stripslashes($embed['code'])) : ''; ?></textarea>
+                                <textarea name="lsd[_embeds][<?php echo esc_attr($i); ?>][code]" title="<?php esc_attr_e('Embed Code or URL', 'listdom'); ?>" class="lsd-embed-code" placeholder="<?php esc_attr_e('Embed Code or URL', 'listdom'); ?>"><?php echo isset($embed['code']) ? esc_textarea(stripslashes($embed['code'])) : ''; ?></textarea>
                                 <input type="hidden" name="lsd[_embeds][<?php echo esc_attr($i); ?>][featured]" class="lsd-embed-featured-status" value="<?php echo $embed['featured'] ?? ''; ?>">
                             </div>
                             <div class="lsd-embeds-actions lsd-col-1 lsd-text-center">
@@ -332,7 +332,7 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
                 <div class="lsd-row">
                     <div class="lsd-embeds-fields lsd-col-11">
                         <input type="text" name="lsd[_embeds][:i:][name]" value="" title="<?php esc_attr_e('Title', 'listdom'); ?>" placeholder="<?php esc_attr_e('Title', 'listdom'); ?>">
-                        <textarea name="lsd[_embeds][:i:][code]"  class="lsd-embed-code" title="<?php esc_attr_e('Code', 'listdom'); ?>" placeholder="<?php esc_attr_e('Code', 'listdom'); ?>"></textarea>
+                        <textarea name="lsd[_embeds][:i:][code]"  class="lsd-embed-code" title="<?php esc_attr_e('Embed Code or URL', 'listdom'); ?>" placeholder="<?php esc_attr_e('Embed Code or URL', 'listdom'); ?>"></textarea>
                         <input type="hidden" name="lsd[_embeds][:i:][featured]" class="lsd-embed-featured-status" value="0">
                     </div>
                     <div class="lsd-embeds-actions lsd-col-1 lsd-text-center">

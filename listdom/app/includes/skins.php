@@ -58,6 +58,7 @@ class LSD_Skins extends LSD_Base
     public $description_length = 12;
 
     public $image_method = 'cover';
+    public $image_fit = 'cover';
     public $display_share_buttons = false;
     public $columns = 1;
     public $default_view = 'grid';
@@ -68,17 +69,14 @@ class LSD_Skins extends LSD_Base
     public $autoGPS = false;
     public $maxBounds = [];
     public $map_provider = 'leaflet';
+    public $map_height;
+    public $ignore_map_exclusion = false;
     public $price_components = [];
     public $connected_shortcodes = [];
     public $map_position;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Settings
         $this->settings = LSD_Options::settings();
 
@@ -139,6 +137,7 @@ class LSD_Skins extends LSD_Base
         $this->style = isset($this->skin_options['style']) && $this->skin_options['style'] ? sanitize_text_field($this->skin_options['style']) : $this->default_style;
         $this->display_image = $this->isLite() || !isset($this->skin_options['display_image']) || $this->skin_options['display_image'];
         $this->image_method = isset($this->skin_options['image_method']) && $this->skin_options['image_method'] ? $this->skin_options['image_method'] : 'cover';
+        $this->image_fit = isset($this->skin_options['image_fit']) && $this->skin_options['image_fit'] ? $this->skin_options['image_fit'] : 'cover';
         $this->load_more = isset($this->skin_options['load_more']) && $this->skin_options['load_more'];
         $this->pagination = $this->skin_options['pagination'] ?? (!$this->load_more ? 'disabled' : 'loadmore');
         $this->display_contact_info = !isset($this->skin_options['display_contact_info']) || $this->skin_options['display_contact_info'];
@@ -172,6 +171,11 @@ class LSD_Skins extends LSD_Base
         $this->mapsearch = isset($this->skin_options['mapsearch']) && $this->skin_options['mapsearch'];
         $this->autoGPS = isset($this->skin_options['auto_gps']) && $this->skin_options['auto_gps'];
         $this->maxBounds = apply_filters('lsd_map_max_bounds', isset($this->skin_options['max_bounds']) && is_array($this->skin_options['max_bounds']) ? $this->skin_options['max_bounds'] : []);
+        $this->ignore_map_exclusion = isset($this->skin_options['show_excluded_listings']) && $this->skin_options['show_excluded_listings'];
+
+        // Map height
+        $this->map_height = isset($this->skin_options['map_height']) && trim($this->skin_options['map_height']) ? $this->skin_options['map_height'] : '500px';
+        if (is_numeric($this->map_height)) $this->map_height .= 'px';
 
         // HTML Class
         $this->html_class = isset($this->atts['html_class']) && trim($this->atts['html_class']) ? sanitize_text_field($this->atts['html_class']) : '';
@@ -505,7 +509,7 @@ class LSD_Skins extends LSD_Base
         // Random Order
         if (isset($args['orderby']) && $args['orderby'] === 'rand')
         {
-            $seed = (isset($this->atts['seed']) && isset($args['paged']) && $args['paged'] != 1) ? $this->atts['seed'] : rand(10000, 99999);
+            $seed = isset($this->atts['seed']) && isset($args['paged']) && $args['paged'] != 1 ? $this->atts['seed'] : rand(10000, 99999);
 
             $args['orderby'] = 'RAND(' . $seed . ')';
             $this->atts['seed'] = $seed;
@@ -529,10 +533,10 @@ class LSD_Skins extends LSD_Base
 
             // Next Page
             $this->next_page = isset($args['paged']) ? $args['paged'] + 1 : 1;
-
-            // Restore original Post Data
-            LSD_LifeCycle::reset();
         }
+
+        // Restore original Post Data
+        LSD_LifeCycle::reset();
 
         return $ids;
     }
@@ -622,8 +626,16 @@ class LSD_Skins extends LSD_Base
         // It's not a Listdom taxonomy
         if (!in_array($q->taxonomy, $this->taxonomies())) return $filter_options;
 
-        if (isset($filter_options[$q->taxonomy]) && is_array($filter_options[$q->taxonomy])) $filter_options[$q->taxonomy][] = $q->term_id;
-        else $filter_options[$q->taxonomy] = [$q->term_id];
+        if (isset($filter_options[$q->taxonomy]) && is_array($filter_options[$q->taxonomy]))
+        {
+            $filter_options[$q->taxonomy][] = $q->term_id;
+            $this->atts['lsd_filter'][$q->taxonomy][] = $q->term_id;
+        }
+        else
+        {
+            $filter_options[$q->taxonomy] = [$q->term_id];
+            $this->atts['lsd_filter'][$q->taxonomy] = [$q->term_id];
+        }
 
         return $filter_options;
     }
@@ -703,7 +715,7 @@ class LSD_Skins extends LSD_Base
         return ob_get_clean();
     }
 
-    public function get_skins()
+    public static function get_skins()
     {
         return apply_filters('lsd_skins', [
             'singlemap' => esc_html__('Single Map', 'listdom'),
@@ -720,12 +732,26 @@ class LSD_Skins extends LSD_Base
         ]);
     }
 
-    public function get_search_module(): string
+    public static function get_searchable_skins()
+    {
+        return apply_filters('lsd_searchable_skins', [
+            'singlemap' => esc_html__('Single Map', 'listdom'),
+            'list' => esc_html__('List View', 'listdom'),
+            'grid' => esc_html__('Grid View', 'listdom'),
+            'side' => esc_html__('Side by Side View', 'listdom'),
+            'listgrid' => esc_html__('List + Grid View', 'listdom'),
+            'halfmap' => esc_html__('Half Map / Split View', 'listdom'),
+            'table' => esc_html__('Table View', 'listdom'),
+            'masonry' => esc_html__('Masonry View', 'listdom'),
+        ]);
+    }
+
+    public function get_search_module(string $style = ''): string
     {
         global $post;
 
         $shortcode_id = isset($this->atts['id']) ? (int) $this->atts['id'] : $this->id;
-        return do_shortcode('[listdom-search id="' . $this->sm_shortcode . '" style="' . (in_array($this->sm_position, ['left', 'right']) ? 'sidebar' : '') . '" page="' . (is_singular() && $post && isset($post->ID) ? $post->ID : '') . '" shortcode="' . $shortcode_id . '" ajax="' . $this->sm_ajax . '"]');
+        return do_shortcode('[listdom-search id="' . $this->sm_shortcode . '" style="' . ($style ?: (in_array($this->sm_position, ['left', 'right']) ? 'sidebar' : '')) . '" page="' . (is_singular() && $post && isset($post->ID) ? $post->ID : '') . '" shortcode="' . $shortcode_id . '" ajax="' . $this->sm_ajax . '"]');
     }
 
     public function get_sortbar()
@@ -792,10 +818,10 @@ class LSD_Skins extends LSD_Base
             : 'normal';
     }
 
-    public function get_map(bool $force_to_show = false)
+    public function get_map(bool $force_to_show = false, $limit = null)
     {
         return lsd_map($this->search([
-            'posts_per_page' => $this->skin_options['maplimit'],
+            'posts_per_page' => $limit ?: $this->skin_options['maplimit'],
         ]), [
             'provider' => $this->map_provider,
             'clustering' => $this->skin_options['clustering'] ?? true,
@@ -804,11 +830,13 @@ class LSD_Skins extends LSD_Base
             'id' => $this->id,
             'onclick' => $this->skin_options['mapobject_onclick'] ?? 'infowindow',
             'mapcontrols' => $this->mapcontrols,
+            'map_height' => $this->map_height,
             'atts' => $this->atts,
             'mapsearch' => $this->mapsearch,
             'autoGPS' => $this->autoGPS,
             'max_bounds' => $this->maxBounds,
             'force_to_show' => $force_to_show,
+            'ignore_map_exclusion' => $this->ignore_map_exclusion,
         ]);
     }
 

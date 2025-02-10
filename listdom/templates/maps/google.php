@@ -19,7 +19,7 @@ $latitude = $args['default_lt'] ?? $settings['map_backend_lt'];
 $longitude = $args['default_ln'] ?? $settings['map_backend_ln'];
 $style = $args['mapstyle'] ?? '';
 $zoomlevel = $args['zoomlevel'] ?? 14;
-$canvas_height = $args['canvas_height'] ?? null;
+$map_height = $args['map_height'] ?? null;
 $atts = isset($args['atts']) && is_array($args['atts']) ? $args['atts'] : [];
 $mapsearch = isset($args['mapsearch']) && $args['mapsearch'];
 $autoGPS = isset($args['autoGPS']) && $args['autoGPS'];
@@ -112,7 +112,7 @@ jQuery(document).ready(function()
 </script>');
 ?>
 <div class="lsd-listing-googlemap">
-    <div id="lsd_map<?php echo esc_attr($id); ?>" class="<?php echo (isset($args['canvas_class']) ? esc_attr($args['canvas_class']) : 'lsd-map-canvas'); ?>" <?php if($canvas_height) echo 'style="height: '.esc_attr($canvas_height).'px;"'; ?>></div>
+    <div id="lsd_map<?php echo esc_attr($id); ?>" class="<?php echo isset($args['canvas_class']) ? sanitize_html_class($args['canvas_class']) : 'lsd-map-canvas'; ?>" <?php if ($map_height) echo 'style="height: '.esc_attr($map_height).';"'; ?>></div>
 
     <?php if($direction): ?>
     <div class="lsd-direction">

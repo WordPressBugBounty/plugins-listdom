@@ -33,6 +33,7 @@ jQuery('#lsd_addons_form').on('submit', function(e)
     const $button = jQuery("#lsd_addons_save_button");
     const $success = jQuery(".lsd-settings-success-message");
     const $error = jQuery(".lsd-settings-error-message");
+    const $tab = jQuery('.nav-tab-active');
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
@@ -53,6 +54,8 @@ jQuery('#lsd_addons_form').on('submit', function(e)
         data: "action=lsd_save_addons&" + addons,
         success: function()
         {
+            $tab.attr('data-saved', 'true');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
             $success.removeClass('lsd-util-hide');
@@ -62,6 +65,8 @@ jQuery('#lsd_addons_form').on('submit', function(e)
         },
         error: function()
         {
+            $tab.attr('data-saved', 'false');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
             $error.removeClass('lsd-util-hide');

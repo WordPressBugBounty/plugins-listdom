@@ -19,13 +19,8 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
     protected $columns = 1;
     protected $hierarchical = false;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Unique ID
         $this->id = LSD_id::get(mt_rand(100, 999));
     }

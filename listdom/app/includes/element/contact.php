@@ -2,23 +2,13 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Contact Information Element Class.
- *
- * @class LSD_Element_Contact
- * @version    1.0.0
- */
 class LSD_Element_Contact extends LSD_Element
 {
     public $key = 'contact';
     public $label;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Contact Information', 'listdom');
@@ -43,5 +33,25 @@ class LSD_Element_Contact extends LSD_Element
                 'post_id' => $post_id,
             ]
         );
+    }
+
+    protected function general_settings(array $data): string
+    {
+        return '<div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_display_icon">' . esc_html__('Display Icon', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_icon',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_icon]',
+                'value' => $data['display_icon'] ?? 1,
+            ]) . '
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_display_label">' . esc_html__('Display Label', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_label',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_label]',
+                'value' => $data['display_label'] ?? 0,
+            ]) . '
+        </div>';
     }
 }

@@ -13,13 +13,8 @@ class LSD_Statuses extends LSD_Base
     protected $statuses;
     protected $PT;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         $this->PT = LSD_Base::PTYPE_LISTING;
     }
 

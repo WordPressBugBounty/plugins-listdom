@@ -22,7 +22,7 @@ if (!$this->display_slider_arrows) LSD_Assets::footer('<style>.owl-nav{display:n
 
                 <?php if ($this->display_categories): ?>
                     <div class="lsd-listing-category">
-                        <?php echo LSD_Kses::element($listing->get_categories(true, false, 'text')); ?>
+                        <?php echo LSD_Kses::element($listing->get_categories(['show_color' => true, 'multiple_categories' => false, 'color_method' => 'text'])); ?>
                     </div>
                 <?php endif; ?>
 

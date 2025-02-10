@@ -25,13 +25,8 @@ class LSD_Schema extends LSD_Base
      */
     private $schema;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Pro
         $this->pro = $this->isPro();
 

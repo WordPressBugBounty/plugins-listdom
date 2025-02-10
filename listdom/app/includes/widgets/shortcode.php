@@ -12,9 +12,6 @@ class LSD_Widgets_Shortcode extends WP_Widget
 {
     public $LSD;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct('LSD_Widgets_Shortcode', esc_html__('(Listdom) Shortcode', 'listdom'), [

@@ -21,7 +21,7 @@ $walker = new LSD_Walker_Taxonomy();
 <div class="lsd-metabox lsd-metabox-filter-options">
     <p class="description lsd-m-4"><?php esc_html_e('Use the options below to filter the listings you want to display with this shortcode.', 'listdom'); ?></p>
 
-    <?php if (!class_exists('LSDADDAPS')): ?>
+    <?php if (!class_exists(LSDADDAPS::class) && !class_exists(\LSDPACAPS\Base::class)): ?>
     <div class="lsd-m-4"><?php echo LSD_Base::alert(sprintf(esc_html__('Did you know that with the %s add-on, you can customize the matching logic for taxonomies?', 'listdom'), '<strong>'.esc_html__('Advanced Portal Search', 'listdom').'</strong>')); ?></div>
     <?php endif; ?>
 

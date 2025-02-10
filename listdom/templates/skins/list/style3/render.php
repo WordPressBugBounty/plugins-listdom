@@ -9,9 +9,12 @@ $ids = $this->listings;
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
 <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
 
-    <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
+    <?php if($this->display_image || $this->display_compare_icon || $this->display_favorite_icon || $this->display_labels) : ?>
+        <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
         <?php if ($this->display_image): ?>
-            <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
+            <div class="lsd-image">
+                <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
+            </div>
         <?php endif; ?>
 
         <div class="lsd-listing-image-icons-wrapper">
@@ -26,15 +29,16 @@ $ids = $this->listings;
                 </div>
             <?php endif; ?>
         </div>
+
+	    <?php if ($this->display_labels): ?>
+            <div class="lsd-listing-labels">
+			    <?php echo LSD_Kses::element($listing->get_labels()); ?>
+            </div>
+	    <?php endif; ?>
     </div>
 
+    <?php endif; ?>
     <div class="lsd-listing-body">
-
-        <?php if ($this->display_labels): ?>
-            <div class="lsd-listing-labels">
-                <?php echo LSD_Kses::element($listing->get_labels()); ?>
-            </div>
-        <?php endif; ?>
 
         <?php if ($this->display_availability): ?>
             <div class="lsd-listing-availability">
@@ -46,7 +50,7 @@ $ids = $this->listings;
             <div class="lsd-col-8">
                 <?php if ($this->display_categories): ?>
                     <div class="lsd-listing-category">
-                        <?php echo LSD_Kses::element($listing->get_categories(true, false, 'text')); ?>
+                        <?php echo LSD_Kses::element($listing->get_categories(['show_color' => true, 'multiple_categories' => false, 'color_method' => 'text'])); ?>
                     </div>
                 <?php endif; ?>
             </div>

@@ -20,22 +20,16 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
     public $more_options;
     public $settings;
     public $ajax;
+    public $connected_shortcodes = [];
 
     /**
      * @var LSD_Search_Helper
      */
     public $helper;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
-        $this->more_options = false;
         $this->helper = new LSD_Search_Helper();
-
         $this->settings = LSD_Options::settings();
     }
 
@@ -50,14 +44,10 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-search');
         if (trim($pre)) return $pre;
 
+        $this->more_options = false;
+
         // Shortcode ID
         $this->id = $atts['id'] ?? 0;
-
-        // AJAX Search
-        $this->ajax = $atts['ajax'] ?? 0;
-
-        // APS Addon is Required
-        if (!apply_filters('lsd_is_addaps_installed', false)) $this->ajax = 0;
 
         // Attributes
         $this->atts = apply_filters('lsd_search_atts', $this->parse($this->id, $atts));
@@ -68,12 +58,31 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         // Form
         $this->form = $this->atts['lsd_form'] ?? [];
 
-        // Overwrite Form Options
-        if (isset($this->atts['page']) && trim($this->atts['page'])) $this->form['page'] = (int) $this->atts['page'];
-        if (isset($this->atts['shortcode']) && trim($this->atts['shortcode'])) $this->form['shortcode'] = (int) $this->atts['shortcode'];
+        // AJAX Search
+        $this->ajax = $atts['ajax'] ?? ($this->form['ajax'] ?? 0);
 
         // Current Values
         $this->sf = $this->get_sf();
+
+        // Connected Shortcodes
+        $this->connected_shortcodes = isset($this->form['connected_shortcodes']) && is_array($this->form['connected_shortcodes'])
+            ? $this->form['connected_shortcodes']
+            : [];
+
+        // Overwrite Form Options
+        if (isset($this->atts['page']) && trim($this->atts['page'])) $this->form['page'] = (int) $this->atts['page'];
+        if (isset($this->atts['shortcode']) && trim($this->atts['shortcode']))
+        {
+            $this->form['shortcode'] = (int) $this->atts['shortcode'];
+            $this->connected_shortcodes = [];
+        }
+
+        // APS Addon is Required
+        if (!class_exists(LSDADDAPS::class) && !class_exists(\LSDPACAPS\Base::class))
+        {
+            $this->ajax = 0;
+            $this->connected_shortcodes = [];
+        }
 
         // Search Form
         ob_start();
@@ -96,22 +105,44 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         return $value;
     }
 
-    public function row($row): string
+    public function row(array $args = []): string
     {
-        $type = isset($row['type']) && trim($row['type']) ? $row['type'] : 'row';
-        $filters = isset($row['filters']) && is_array($row['filters']) && count($row['filters']) ? $row['filters'] : [];
-        $buttons = isset($row['buttons']) && $row['buttons'];
+        $type = isset($args['type']) && trim($args['type']) ? $args['type'] : 'row';
+        $filters = isset($args['filters']) && is_array($args['filters']) ? $args['filters'] : [];
+
+        $buttons = isset($args['buttons']) && (
+            (is_string($args['buttons']) && $args['buttons']) || (is_array($args['buttons']) && $args['buttons']['status'])
+        );
 
         $row = '';
-        if ($type == 'row')
+        if ($type === 'row')
         {
-            // Columns
-            list($this->col_filter, $this->col_button) = $this->helper->column(count($filters), $buttons);
+            // Visible Filters
+            $visible_filters = array_filter($filters, function($filter) {
+                return !isset($filter['visibility']) || $filter['visibility'];
+            });
 
-            $row .= '<div class="lsd-search-row ' . ($this->more_options ? 'lsd-search-included-in-more' : '') . '"><div class="lsd-row">';
+            // Auto Width
+            [$this->col_filter, $this->col_button] = $this->helper->column(count($visible_filters), $buttons);
 
-            foreach ($filters as $filter) $row .= $this->filter($filter);
-            if ($buttons) $row .= $this->buttons();
+            // Row container
+            $row .= '<div class="lsd-search-row ' . ($this->more_options ? 'lsd-search-included-in-more' : '') . '"><div class="lsd-row lsd-grid-container">';
+
+            // Filters
+            foreach ($filters as $filter)
+            {
+                $visibility = !isset($filter['visibility']) || $filter['visibility'];
+
+                // Manual Width
+                $col_class = isset($filter['width']) && $filter['width'] ? 'lsd-col-span-' . ((int) $filter['width']) : $this->col_filter;
+
+                $row .= '<div class="lsd-search-filter ' . sanitize_html_class($col_class) . ' ' . sanitize_html_class(!$visibility ? 'lsd-search-field-hidden' : '') . '">';
+                $row .= $this->filter($filter);
+                $row .= '</div>';
+            }
+
+            // Buttons
+            if ($buttons) $row .= $this->buttons($args);
 
             $row .= '</div></div>';
         }
@@ -127,23 +158,39 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         return $row;
     }
 
-    public function buttons(): string
+    private function buttons(array $args = []): string
     {
-        $main = new LSD_Main();
+        // Manual & Auto Width
+        $width = $args['buttons']['width'] ?? (int) preg_replace('/\D/', '', $this->col_button);
+        $alignment = $args['buttons']['alignment'] ?? 'left';
 
-        $buttons = '<div class="lsd-search-buttons ' . esc_attr($this->col_button) . '">';
+        $total = 12;
+        $remaining = $total - $width;
+        $side = $alignment === 'center' ? (int) floor($remaining / 2) : $remaining;
+
+        $buttons = '';
+
+        // Add left spacer if needed
+        if (in_array($alignment, ['center', 'right']) && $side > 0) $buttons .= '<div class="lsd-col-span-' . $side . '"></div>';
+
+        $buttons .= '<div class="lsd-search-buttons lsd-col-span-' . esc_attr($width) . '">';
 
         // Shortcode Input
-        if (isset($this->form['shortcode']) && trim($this->form['shortcode'])) $buttons .= '<input type="hidden" name="sf-shortcode" value="' . esc_attr($this->form['shortcode']) . '">';
+        if (!empty($this->form['page']) && !empty($this->form['shortcode'])) $buttons .= '<input type="hidden" name="sf-shortcode" value="' . esc_attr($this->form['shortcode']) . '">';
 
         // Language Input
-        $lang = $this->current('lang');
-        if ($lang) $buttons .= '<input type="hidden" name="lang" value="' . esc_attr($lang) . '">';
+        if ($lang = $this->current('lang')) $buttons .= '<input type="hidden" name="lang" value="' . esc_attr($lang) . '">';
 
         // Submit Button
-        $buttons .= '<div class="lsd-search-buttons-submit"><button type="submit" class="lsd-search-button lsd-color-m-bg ' . sanitize_html_class($main->get_text_class()) . '">' . esc_html__('Search', 'listdom') . '</button></div>';
+        $buttons .= '<div class="lsd-search-buttons-submit">';
+        $buttons .= '<button type="submit" class="lsd-search-button lsd-color-m-bg ' . sanitize_html_class(LSD_Main::get_text_class()) . '">';
+        $buttons .= esc_html__('Search', 'listdom') . '</button></div>';
 
         $buttons .= '</div>';
+
+        // Add right spacer if center-aligned
+        if ($alignment === 'center' && $side > 0) $buttons .= '<div class="lsd-col-span-' . $side . '"></div>';
+
         return $buttons;
     }
 
@@ -280,16 +327,17 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $default = $filter['default_value'] ?? '';
         $current = $this->current($name, $default);
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
         $output .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
-        $output .= '</div>';
 
         return $output;
     }
 
     public function field_taxonomy_hierarchy($name, $current, $all_terms, $predefined_terms, $terms, $render_type): string
     {
+        if (!is_array($current) && $current) $current = [$current];
+        else if (!is_array($current)) $current = [];
+
         $render = '<ul class="lsd-hierarchy-list">';
         foreach ($terms as $key => $term)
         {
@@ -327,8 +375,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         $current = $this->current($name, $default);
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
 
         if ($method === 'dropdown')
         {
@@ -389,14 +436,12 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             ]);
         }
 
-        $output .= '</div>';
         return $output;
     }
 
     public function field_text($filter): string
     {
         $key = $filter['key'] ?? '';
-        $col_filter = $this->col_filter;
         $default = $filter['default_value'] ?? '';
 
         $name = 'sf-' . $key . '-lk';
@@ -418,14 +463,12 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             'name' => $name,
             'title' => $title,
             'current' => $current,
-            'col_filter' => $col_filter,
         ]);
     }
 
     public function field_number($filter): string
     {
         $key = $filter['key'];
-        $col_filter = $this->col_filter;
         $default = $filter['default_value'] ?? '';
 
         if (strpos($key, 'acf_number_') === 0)
@@ -464,7 +507,6 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             'max_current' => $max_current,
             'title' => $title,
             'current' => $current,
-            'col_filter' => $col_filter,
             'dropdown_name' => $dropdown_name,
             'dropdown_current' => $dropdown_current,
         ]);
@@ -484,8 +526,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $default = $filter['default_value'] ?? '';
         $current = $this->current($name, $default);
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
 
         if ($method === 'dropdown')
         {
@@ -529,7 +570,6 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             foreach ($terms as $term) $output .= '<label><input type="radio" name="' . esc_attr($name) . '" value="' . esc_attr($term) . '" ' . ($term == $current ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
         }
 
-        $output .= '</div>';
         return $output;
     }
 
@@ -547,10 +587,11 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         $min_default = $filter['default_value'] ?? '';
         $max_default = $filter['max_default_value'] ?? '';
-        $class = ($method === 'range') ? 'lsd-search-range ' : '';
+        $class = $method === 'range' ? 'lsd-search-range ' : '';
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($class . $this->col_filter) . '">';
+        $output = '<div class="' . esc_attr($class) . '">';
         $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output .= $method === 'range' ? '<div class="lsd-search-range-inner">' : '';
 
         if ($method === 'dropdown-plus')
         {
@@ -562,7 +603,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $name = 'sf-att-' . $key . '-grq';
             $current = $this->current($name, $min_default);
 
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($min_placeholder, 'listdom') . '" data-enhanced="'.($dropdown_style === 'enhanced' ? 1 : 0).'">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($min_placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
             $output .= '<option value="">' . $min_placeholder . '</option>';
 
             $i = $min;
@@ -615,6 +656,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             ]);
         }
 
+        $output .= $method === 'range' ? '</div>' : '';
         $output .= '</div>';
         return $output;
     }
@@ -632,8 +674,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $default = $filter['default_value'] ?? '';
         if (!is_numeric($default)) $default = substr_count($default, '$');
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
 
         if ($method === 'dropdown')
         {
@@ -651,7 +692,6 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '</select>';
         }
 
-        $output .= '</div>';
         return $output;
     }
 
@@ -666,9 +706,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $name = 'sf-att-' . $key . '-lk';
 
         $default = $filter['default_value'] ?? '';
-
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
 
         if ($method === 'text-input')
         {
@@ -742,7 +780,6 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '</div>';
         }
 
-        $output .= '</div>';
         return $output;
     }
 
@@ -769,10 +806,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $months = [];
         for ($i = 0; $i <= 13; $i++) $months[] = LSD_Base::date(strtotime('+' . $i . ' Months'), 'M Y');
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
         $output .= '<input type="text" class="lsd-date-range-picker" data-format="' . strtoupper(esc_attr($format)) . '" data-periods="' . htmlspecialchars(json_encode($months), ENT_QUOTES, 'UTF-8') . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '" autocomplete="off">';
-        $output .= '</div>';
 
         return $output;
     }
@@ -782,7 +817,6 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? '';
         $method = $filter['method'] ?? 'dropdown';
         $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
-        $output = '';
 
         $key = str_replace('acf_true_false_', '', $key);
         $key = str_replace('acf_select_', '', $key);
@@ -798,8 +832,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
         $acf_options = $this->helper->acf_field_data($key, 'choices')[0] ?? [];
 
-        $output .= '<div class="lsd-search-filter ' . esc_attr($this->col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
 
         if ($method === 'dropdown')
         {
@@ -844,12 +877,14 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             }
         }
 
-        $output .= '</div>';
         return $output;
     }
 
     public function field_acf_hierarchy($name, $current, $choices): string
     {
+        if (!is_array($current) && $current) $current = [$current];
+        else if (!is_array($current)) $current = [];
+
         $render = '<ul class="lsd-hierarchy-list">';
         foreach ($choices as $key => $label)
         {
@@ -883,7 +918,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $step = $filter['increment'] ?? ($this->helper->acf_field_data($key, 'step')[0] ?? 1);
         $prepend = $filter['prepend'] ?? ($this->helper->acf_field_data($key, 'prepend')[0] ?? '');
 
-        $output .= '<div class="lsd-search-filter lsd-search-range ' . esc_attr($this->col_filter) . '">';
+        $output .= '<div class="lsd-search-range">';
         $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
         $output .= $this->helper->range($filter, [
             'id' => $id,
@@ -915,7 +950,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $title = $filter['title'] ?? '';
         $default_value = $this->helper->acf_field_data($key, 'default_value')[0] ?? 0;
 
-        $output .= '<div class="lsd-search-filter lsd-true-false-search ' . esc_attr($this->col_filter) . '">';
+        $output .= '<div class="lsd-true-false-search">';
         $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
         $output .= '<label class="lsd-search-checkbox-label">';
         $output .= '<input type="hidden" class="lsd-search-checkbox-hidden" id="hidden-' . esc_attr($id) . '" name="' . esc_attr($name) . '" value="0">';

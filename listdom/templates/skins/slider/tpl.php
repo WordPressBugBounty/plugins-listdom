@@ -12,11 +12,11 @@ $assets = new LSD_Assets();
 $assets->footer('<script>
 jQuery(document).ready(function()
 {
-    jQuery("#lsd_skin'.$this->id.'").listdomSliderSkin(
+    jQuery("#lsd_skin' . $this->id . '").listdomSliderSkin(
     {
-        id: "'.$this->id.'",
-        ajax_url: "'.admin_url('admin-ajax.php', null).'",
-        atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
+        id: "' . $this->id . '",
+        ajax_url: "' . admin_url('admin-ajax.php', null) . '",
+        atts: "' . http_build_query(['atts' => $this->atts], '', '&') . '",
         items: 1,
         loop: 1,
         autoplay: true,

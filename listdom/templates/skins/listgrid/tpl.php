@@ -22,7 +22,7 @@ jQuery(document).ready(function()
         next_page: "'.$this->next_page.'",
         limit: "'.$this->limit.'",
         view: "'.$this->default_view.'",
-        columns: "'.$this->columns.'",
+        columns: "'.($this->style === 'style4' ? '2' : $this->columns).'",
     });
 });
 </script>');
@@ -52,7 +52,7 @@ jQuery(document).ready(function()
             <?php echo LSD_Kses::form($this->get_switcher_buttons()); ?>
 
             <div class="lsd-listgrid-view-listings-wrapper lsd-viewstyle-<?php echo esc_attr($this->default_view); ?>">
-                <div class="lsd-listing-wrapper">
+                <div class="lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?>">
                     <?php echo LSD_Kses::full($listings_html); ?>
                 </div>
             </div>

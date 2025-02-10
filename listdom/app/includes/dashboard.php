@@ -33,6 +33,7 @@ class LSD_Dashboard extends LSD_Base
             ['label' => esc_html__('Labels', 'listdom'), 'key' => 'labels'],
             ['label' => esc_html__('Featured Image', 'listdom'), 'key' => 'image'],
             ['label' => esc_html__('Embed Codes', 'listdom'), 'key' => 'embed'],
+            ['label' => esc_html__('Excerpt', 'listdom'), 'key' => 'excerpt'],
         ];
 
         return apply_filters('lsd_dashboard_modules', $modules);
@@ -43,6 +44,7 @@ class LSD_Dashboard extends LSD_Base
         $fields = [
             'title' => ['label' => esc_html__('Listing Title', 'listdom'), 'always_enabled' => true],
             'content' => ['label' => esc_html__('Listing Description', 'listdom')],
+            'excerpt' => ['label' => esc_html__('Listing Excerpt', 'listdom')],
             'guest_email' => ['label' => esc_html__('Guest Email', 'listdom'), 'always_enabled' => true, 'guest' => true],
             'guest_password' => ['label' => esc_html__('Guest Password', 'listdom'), 'always_enabled' => true, 'guest' => true],
             'address' => ['label' => esc_html__('Address', 'listdom'), 'module' => 'address'],

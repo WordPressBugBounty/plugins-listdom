@@ -15,13 +15,8 @@ class LSD_Socials extends LSD_Base
     public $label;
     public $option;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         $this->path = $this->get_listdom_path() . '/app/includes/socials/';
     }
 

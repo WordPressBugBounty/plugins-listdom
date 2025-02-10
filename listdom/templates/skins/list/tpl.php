@@ -50,7 +50,7 @@ jQuery(document).ready(function()
             <?php echo LSD_Kses::form($this->get_sortbar()); ?>
 
             <div class="lsd-list-view-listings-wrapper lsd-viewstyle-list">
-                <div class="lsd-listing-wrapper">
+                <div class="lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?>">
                     <?php echo LSD_Kses::full($listings_html); ?>
                 </div>
             </div>

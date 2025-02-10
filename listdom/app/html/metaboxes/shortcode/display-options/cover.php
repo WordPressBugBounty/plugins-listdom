@@ -144,7 +144,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <?php if(class_exists('LSDADDREV_Base')): ?>
+        <?php if(class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Review Rates', 'listdom'),
@@ -175,7 +175,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php if(class_exists('LSDADDCLM_Base')): ?>
+        <?php if(class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style4 <?php echo !isset($cover['display_title']) || $cover['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_cover_is_claimed_wrapper">
             <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -245,7 +245,7 @@ $missAddonMessages = [];
             'value' => $cover['listing_link'] ?? 'normal',
             'options' => LSD_Base::get_listing_link_methods(),
         ]); ?>
-        <p class="description"><?php esc_html_e("Link to listing detail page.", 'listdom'); ?></p>
+        <p class="description"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
     </div>
 </div>
 <?php else: ?>

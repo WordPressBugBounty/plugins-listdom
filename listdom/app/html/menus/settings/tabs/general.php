@@ -154,7 +154,7 @@ $networks = LSD_Options::socials();
         <div class="lsd-settings-form-group lsd-accordion-panel">
 
             <?php if($this->isLite()): ?>
-                <div class="lsd-mb-5 lsd-alert-no-mt"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('OpenStreetMap & Mapbox', 'listdom'), true), 'warning'); ?></div>
+                <div class="lsd-mb-4 lsd-alert-no-mt"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('OpenStreetMap & Mapbox', 'listdom'), true), 'warning'); ?></div>
             <?php endif; ?>
 
             <h3 class="lsd-mb-4 lsd-mt-0"><?php esc_html_e('Map', 'listdom'); ?></h3>
@@ -428,11 +428,11 @@ $networks = LSD_Options::socials();
                             'for' => '#lsd_settings_display_options_main_color',
                             'value' => $settings['dply_main_color'] ?? '#2b93ff'
                         ]); ?>
-                        <p class="description"><?php esc_html_e("Choose from one of predefined colors in order to match it with your theme and acheive your desired look.", 'listdom'); ?></p>
+                        <p class="description"><?php esc_html_e("Choose from one of the predefined colors to match your theme and achieve your desired look.", 'listdom'); ?></p>
                     </div>
                     <h3><?php esc_html_e('Or', 'listdom'); ?></h3>
                     <div>
-                        <p class="description lsd-mb-2"><?php esc_html_e("Manually select your desired color.", 'listdom'); ?></p>
+                        <p class="description lsd-mb-2"><?php esc_html_e("Manually select your preferred color.", 'listdom'); ?></p>
                         <?php echo LSD_Form::colorpicker([
                             'id' => 'lsd_settings_display_options_main_color',
                             'name' => 'lsd[dply_main_color]',
@@ -442,43 +442,18 @@ $networks = LSD_Options::socials();
                     </div>
                 </div>
             </div>
-            <div class="lsd-form-row lsd-mt-4 lsd-mb-4">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Secondary Color', 'listdom'),
-                    'for' => 'lsd_settings_display_options_secondary_color',
-                ]); ?></div>
-                <div class="lsd-col-10">
-                    <div class="lsd-color-palette">
-                        <?php echo LSD_Form::colorpalette([
-                            'for' => '#lsd_settings_display_options_secondary_color',
-                            'value' => $settings['dply_secondary_color'] ?? '#f43d3d'
-                        ]); ?>
-                        <p class="description"><?php esc_html_e("Choose secondary color from one of predefined colors.", 'listdom'); ?></p>
-                    </div>
-                    <h3><?php esc_html_e('Or', 'listdom'); ?></h3>
-                    <div>
-                        <p class="description lsd-mb-2"><?php esc_html_e("Manually select your desired color.", 'listdom'); ?></p>
-                        <?php echo LSD_Form::colorpicker([
-                            'id' => 'lsd_settings_display_options_secondary_color',
-                            'name' => 'lsd[dply_secondary_color]',
-                            'default' => '#f43d3d',
-                            'value' => $settings['dply_secondary_color'] ?? '#f43d3d'
-                        ]); ?>
-                    </div>
-                </div>
-            </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Main Font', 'listdom'),
-                        'for' => 'lsd_settings_display_options_main_font',
-                    ]); ?></div>
+                    'title' => esc_html__('Main Font', 'listdom'),
+                    'for' => 'lsd_settings_display_options_main_font',
+                ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::fontpicker([
                         'id' => 'lsd_settings_display_options_main_font',
                         'name' => 'lsd[dply_main_font]',
                         'value' => $settings['dply_main_font'] ?? 'lato'
                     ]); ?>
-                    <p class="description"><?php esc_html_e("Use your theme / desired font if you don't like the default font.", 'listdom'); ?></p>
+                    <p class="description"><?php esc_html_e("Use your theme's font or a custom font if you prefer not to use the default font.", 'listdom'); ?></p>
                 </div>
             </div>
             <?php else: ?>
@@ -502,7 +477,7 @@ $networks = LSD_Options::socials();
                         'value' => $settings['fontawesome_status'] ?? 1,
                         'name' => 'lsd[fontawesome_status]',
                     ]); ?>
-                    <p class="description lsd-mb-0"><?php esc_html_e("Disable Listdom icon file (Font-awesome) if it's loaded by another third party!", 'listdom'); ?></p>
+                    <p class="description lsd-mb-0"><?php esc_html_e("Disable the Listdom icon file (Font Awesome) if it is already being loaded by a third party.", 'listdom'); ?></p>
                 </div>
             </div>
         </div>
@@ -522,8 +497,8 @@ $networks = LSD_Options::socials();
                 <div class="lsd-col-2"></div>
                 <div class="lsd-col-1"></div>
                 <div class="lsd-col-1"><?php esc_html_e('Profile', 'listdom'); ?></div>
-                <div class="lsd-col-1"><?php esc_html_e('Archive', 'listdom'); ?></div>
-                <div class="lsd-col-1"><?php esc_html_e('Details', 'listdom'); ?></div>
+                <div class="lsd-col-1"><?php esc_html_e('Listing Card', 'listdom'); ?></div>
+                <div class="lsd-col-1"><?php esc_html_e('Single Listing', 'listdom'); ?></div>
                 <div class="lsd-col-1"><?php esc_html_e('Contact', 'listdom'); ?></div>
             </div>
             <div class="lsd-social-networks lsd-sortable">
@@ -532,9 +507,9 @@ $networks = LSD_Options::socials();
                         <div class="lsd-col-2 lsd-cursor-move">
                             <i class="lsd-icon fas fa-arrows-alt"></i>
                             <span class="lsd-ml-4">
-                                    <strong><?php echo esc_html($obj->label()); ?></strong>
-                                    <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][key]" value="<?php echo esc_attr($obj->key()); ?>">
-                                </span>
+                                <strong><?php echo esc_html($obj->label()); ?></strong>
+                                <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][key]" value="<?php echo esc_attr($obj->key()); ?>">
+                            </span>
                         </div>
                         <div class="lsd-col-1"></div>
                         <div class="lsd-col-1">
@@ -592,10 +567,10 @@ $networks = LSD_Options::socials();
                         'name' => 'lsd[grecaptcha_status]',
                         'toggle' => '#lsd_settings_grecaptcha_options'
                     ]); ?>
-                    <p class="description"><?php esc_html_e("Protect Listdom forms against spammer robots using Google reCAPTCHA V2.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-0"><?php esc_html_e("Protect Listdom forms against spammer robots using Google reCAPTCHA V2.", 'listdom'); ?></p>
                 </div>
             </div>
-            <div id="lsd_settings_grecaptcha_options" <?php echo isset($settings['grecaptcha_status']) && $settings['grecaptcha_status'] ? '' : 'style="display: none;"'; ?>>
+            <div class="lsd-mt-4" id="lsd_settings_grecaptcha_options" <?php echo isset($settings['grecaptcha_status']) && $settings['grecaptcha_status'] ? '' : 'style="display: none;"'; ?>>
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
                         'title' => esc_html__('Site Key', 'listdom'),
@@ -682,6 +657,7 @@ jQuery('#lsd_settings_form').on('submit', function(e)
     const $button = jQuery('#lsd_settings_save_button');
     const $success = jQuery('.lsd-settings-success-message');
     const $error = jQuery('.lsd-settings-error-message');
+    const $tab = jQuery('.nav-tab-active');
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
@@ -700,6 +676,8 @@ jQuery('#lsd_settings_form').on('submit', function(e)
         data: 'action=lsd_save_settings&' + settings,
         success: function()
         {
+            $tab.attr('data-saved', 'true');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 
@@ -708,6 +686,8 @@ jQuery('#lsd_settings_form').on('submit', function(e)
         },
         error: function()
         {
+            $tab.attr('data-saved', 'false');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 

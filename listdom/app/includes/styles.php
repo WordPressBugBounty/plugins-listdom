@@ -47,6 +47,7 @@ class LSD_Styles extends LSD_Base
             'style1' => esc_html__('Style 1', 'listdom'),
             'style2' => esc_html__('Style 2', 'listdom'),
             'style3' => esc_html__('Style 3', 'listdom'),
+            'style4' => esc_html__('Style 4', 'listdom'),
         ], 'grid');
     }
 
@@ -65,6 +66,7 @@ class LSD_Styles extends LSD_Base
             'style1' => esc_html__('Style 1', 'listdom'),
             'style2' => esc_html__('Style 2', 'listdom'),
             'style3' => esc_html__('Style 3', 'listdom'),
+            'style4' => esc_html__('Style 4', 'listdom'),
         ], 'list');
     }
 
@@ -81,6 +83,7 @@ class LSD_Styles extends LSD_Base
             'style1' => esc_html__('Style 1', 'listdom'),
             'style2' => esc_html__('Style 2', 'listdom'),
             'style3' => esc_html__('Style 3', 'listdom'),
+            'style4' => esc_html__('Style 4', 'listdom'),
         ], 'listgrid');
     }
 
@@ -90,6 +93,7 @@ class LSD_Styles extends LSD_Base
             'style1' => esc_html__('Style 1', 'listdom'),
             'style2' => esc_html__('Style 2', 'listdom'),
             'style3' => esc_html__('Style 3', 'listdom'),
+            'style4' => esc_html__('Style 4', 'listdom'),
         ], 'masonry');
     }
 

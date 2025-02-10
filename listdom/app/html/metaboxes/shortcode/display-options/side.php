@@ -12,7 +12,7 @@ $missAddonMessages = [];
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
-        <p class="description"><?php echo sprintf(esc_html__('Using the %s skin allows you to display a list of the directories and listings on one side and the details page on the other side.', 'listdom'), '<strong>'.esc_html__('Side by Side', 'listdom').'</strong>'); ?></p>
+        <p class="description"><?php echo sprintf(esc_html__('Using the %s skin allows you to display a list of the directories and listings on one side and the single listing page on the other side.', 'listdom'), '<strong>'.esc_html__('Side by Side', 'listdom').'</strong>'); ?></p>
     </div>
 </div>
 <?php if ($this->isLite()): ?>
@@ -73,7 +73,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <?php if (class_exists('LSDADDFAV_Base')): ?>
+        <?php if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Favorite Icon', 'listdom'),
@@ -91,7 +91,7 @@ $missAddonMessages = [];
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom')); ?>
         <?php endif; ?>
 
-        <?php if (class_exists('LSDADDCMP_Base')): ?>
+        <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Compare Icon', 'listdom'),
@@ -109,7 +109,7 @@ $missAddonMessages = [];
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Compare', esc_html__('Compare icon', 'listdom')); ?>
         <?php endif; ?>
 
-        <?php if (class_exists('LSDADDREV_Base')): ?>
+        <?php if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Review Rates', 'listdom'),

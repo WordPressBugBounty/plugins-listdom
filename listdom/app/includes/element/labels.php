@@ -2,28 +2,20 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Labels Element Class.
- *
- * @class LSD_Element_Labels
- * @version    1.0.0
- */
 class LSD_Element_Labels extends LSD_Element
 {
     public $key = 'labels';
     public $style = 'tags';
+    public $enable_link;
     public $label;
 
-    /**
-     * Constructor method
-     */
-    public function __construct($style = 'tags')
+    public function __construct($style = 'tags', $enable_link = true)
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Labels', 'listdom');
         $this->style = $style;
+        $this->enable_link = $enable_link;
     }
 
     public function get($post_id = null)

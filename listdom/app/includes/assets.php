@@ -17,13 +17,8 @@ class LSD_Assets extends LSD_Base
     public static $params = [];
     public $settings = [];
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // General Settings
         $this->settings = LSD_Options::settings();
     }

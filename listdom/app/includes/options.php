@@ -83,7 +83,7 @@ class LSD_Options extends LSD_Base
         return trim($pattern) ? $pattern : $default;
     }
 
-    public static function addons($addon = null, $values = null)
+    public static function addons($addon = null, $values = null): mixed
     {
         $addons = self::parse_args(
             get_option('lsd_addons', []),
@@ -395,7 +395,6 @@ class LSD_Options extends LSD_Base
                     'googlemaps_api_key' => '',
                     'mapbox_access_token' => '',
                     'dply_main_color' => '#2b93ff',
-                    'dply_secondary_color' => '#f43d3d',
                     'dply_main_font' => 'lato',
                     'listings_slug' => 'listings',
                     'category_slug' => 'listing-category',
@@ -437,6 +436,10 @@ class LSD_Options extends LSD_Base
                     'assets' => [
                         'load' => 1,
                     ],
+                    'block_admin_subscriber' => 1,
+                    'block_admin_contributor' => 1,
+                    'block_admin_listdom_author' => 1,
+                    'block_admin_listdom_publisher' => 1,
                 ];
         }
 
@@ -535,6 +538,19 @@ class LSD_Options extends LSD_Base
         $post_id = $settings[$key] ?? 0;
 
         return (int) apply_filters('wpml_object_id', $post_id, $type, $return_original);
+    }
+
+    public static function merge(string $key, array $options)
+    {
+        // Get current Listdom options
+        $current = get_option($key, []);
+        if (is_string($current) && trim($current) === '') $current = [];
+
+        // Merge new options with previous options
+        $final = array_merge($current, $options);
+
+        // Save final options
+        update_option($key, $final);
     }
 }
 

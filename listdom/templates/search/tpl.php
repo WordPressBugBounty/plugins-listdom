@@ -5,11 +5,13 @@ defined('ABSPATH') || die();
 /** @var LSD_Shortcodes_Search $this */
 
 $action = isset($this->form['page']) ? get_page_link($this->form['page']) : home_url();
+if (is_tax() && isset($this->form['page']) && !trim($this->form['page'])) $action = get_term_link(get_queried_object()->term_id);
+
 $shortcode = isset($this->form['shortcode']) && trim($this->form['shortcode']) ? $this->form['shortcode'] : '';
 $criteria = $this->form['criteria'] ?? 0;
 
 $style = isset($this->form['style']) && trim($this->form['style']) ? trim(strtolower($this->form['style'])) : 'default';
-if(isset($this->atts['style']) && trim($this->atts['style'])) $style = $this->atts['style'];
+if (isset($this->atts['style']) && trim($this->atts['style'])) $style = $this->atts['style'];
 
 // Add JS codes to footer
 $assets = new LSD_Assets();
@@ -24,6 +26,7 @@ jQuery(document).ready(function()
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         nonce: "'.wp_create_nonce('lsd_search_form').'",
         sf: '.json_encode($this->sf).',
+        connected_shortcodes: '.json_encode($this->connected_shortcodes, JSON_NUMERIC_CHECK).',
         select2: {
             noResults: "'.esc_js(esc_html__('No results found.', 'listdom')).'"
         }
@@ -33,14 +36,14 @@ jQuery(document).ready(function()
 ?>
 <div class="lsd-search lsd-search-style-<?php echo esc_attr($style); ?> lsd-search-default-style" id="lsd_search_<?php echo esc_attr($this->id); ?>">
 
-    <?php if(is_array($this->filters) && count($this->filters)): ?>
+    <?php if (is_array($this->filters) && count($this->filters)): ?>
     <form action="<?php echo esc_url($action); ?>" class="lsd-search-form">
         <?php
             $HTML = '';
-            foreach($this->filters as $row) $HTML .= $this->row($row);
+            foreach ($this->filters as $row) $HTML .= $this->row($row);
 
             // Display Criteria
-            if($criteria) $HTML .= $this->criteria();
+            if ($criteria) $HTML .= $this->criteria();
 
             // Print the Search Form
             echo apply_filters('lsd_search_form_html', $HTML);

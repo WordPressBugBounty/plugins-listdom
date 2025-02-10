@@ -11,7 +11,7 @@ defined('ABSPATH') || die();
 class LSD_Skins_Grid extends LSD_Skins
 {
     public $skin = 'grid';
-    public $default_style = 'style1';
+    public $default_style = 'style3';
 
     public function init()
     {

@@ -86,16 +86,16 @@ class LSD_Ajax extends LSD_Base
     public function autosuggest()
     {
         // Check if security nonce is set
-        if (!isset($_REQUEST['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__("Security nonce is required.", 'listdom')]);
+        if (!isset($_REQUEST['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is required.', 'listdom')]);
 
         // Verify that the nonce is valid
-        if (!wp_verify_nonce(sanitize_text_field($_REQUEST['_wpnonce']), 'lsd_autosuggest')) $this->response(['success' => 0, 'message' => esc_html__("Security nonce is invalid.", 'listdom')]);
+        if (!wp_verify_nonce(sanitize_text_field($_REQUEST['_wpnonce']), 'lsd_autosuggest')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom')]);
 
         $term = isset($_REQUEST['term']) ? sanitize_text_field($_REQUEST['term']) : '';
         $source = isset($_REQUEST['source']) ? sanitize_text_field($_REQUEST['source']) : '';
 
-        $found = false;
-        $items = '<ul class="lsd-autosuggest-items">';
+        $total = 0;
+        $items = '';
 
         if ($source === 'users')
         {
@@ -107,7 +107,7 @@ class LSD_Ajax extends LSD_Base
 
             foreach ($users as $user)
             {
-                $found = true;
+                $total++;
                 $items .= '<li data-value="' . esc_attr($user->ID) . '">' . $user->user_email . '</li>';
             }
         }
@@ -122,8 +122,29 @@ class LSD_Ajax extends LSD_Base
 
             foreach ($terms as $term)
             {
-                $found = true;
+                $total++;
                 $items .= '<li data-value="' . esc_attr($term->term_id) . '">' . esc_html($term->name) . '</li>';
+            }
+        }
+        else if ($source === LSD_Base::PTYPE_SHORTCODE.'-searchable')
+        {
+            $posts = get_posts([
+                'post_type' => LSD_Base::PTYPE_SHORTCODE,
+                's' => $term,
+                'numberposts' => 10,
+                'post_status' => 'publish',
+            ]);
+
+            $skins = array_keys(LSD_Skins::get_searchable_skins());
+            foreach ($posts as $post)
+            {
+                $display = get_post_meta($post->ID, 'lsd_display', true);
+                $skin = is_array($display) && isset($display['skin']) ? $display['skin'] : '';
+
+                if (!in_array($skin, $skins)) continue;
+
+                $total++;
+                $items .= '<li data-value="' . esc_attr($post->ID) . '">' . $post->post_title . '</li>';
             }
         }
         else
@@ -137,16 +158,15 @@ class LSD_Ajax extends LSD_Base
 
             foreach ($posts as $post)
             {
-                $found = true;
+                $total++;
                 $items .= '<li data-value="' . esc_attr($post->ID) . '">' . $post->post_title . '</li>';
             }
         }
 
-        $items .= '</ul>';
-
         $this->response([
-            'success' => ((int) $found),
-            'items' => $items,
+            'success' => 1,
+            'total' => $total,
+            'items' => trim($items) ? '<ul class="lsd-autosuggest-items">'.$items.'</ul>' : '',
         ]);
     }
 

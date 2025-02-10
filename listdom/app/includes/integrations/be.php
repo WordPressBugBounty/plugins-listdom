@@ -12,13 +12,8 @@ class LSD_Integrations_BE extends LSD_Integrations
 {
     private $settings;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Listdom Settings
         $this->settings = LSD_Options::settings();
     }

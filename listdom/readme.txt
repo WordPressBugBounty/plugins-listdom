@@ -3,9 +3,9 @@ Contributors: webilia
 Donate link: https://webilia.com/
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.0.0
-Requires PHP: 7.0
+Requires PHP: 7.2
 Tested up to: 6.7.1
-Stable tag: 3.8.1
+Stable tag: 3.9.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,8 +55,8 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   [Use predefined colors](https://webilia.com/docs/listdom/settings/general-settings?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Use+predefined+colors)
 *   Font manager
 *   Several [skins and views](https://demo.webilia.com/listdom/skins/multiple-shortcodes/) on one page
-*   4 Different pre-made styles for listing details page
-*   A built-in Design Builder to design the listing details page
+*   4 Different pre-made styles for single listing page
+*   A built-in Design Builder to design the single listing page
 *   Custom color for settings
 *   Category filter option for the listings displayed in each skin
 *   Location filter option for the listings displayed in each skin
@@ -66,7 +66,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Social network buttons manager
 *   Show listing owner data
 *   Contact listing owner
-*   Listing details elements manager (Enable/disable listing elements)
+*   Single listing elements manager (Enable/disable listing elements)
 *   Available widgets for sidebars
 *   Show shortcodes with widgets
 
@@ -78,7 +78,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Display listings in Half Map / Split views (See the demo)
 *   Show listings on [Google Maps](https://demo.webilia.com/listdom/half-map-split-view/style-2-half-map-right-map/) based on their location with full map module options
 *   Advanced marker clustering
-*   Show listing details as a modal box on the map
+*   Show single listing as a modal box on the map
 *   [Stunning map styles](https://demo.webilia.com/listdom/single-map/) (Apple, Facebook, Ultralight, Dark and many more map styles)
 *   Address module and Google map support
 *   Address to location conversion feature
@@ -121,10 +121,13 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 
 *   Complete search form builder
 *   Fully customizable different filters to show listings
+*   Hidden values and fields
 *   Search form shortcode
 
 **👉 Advanced Management Tools**
 
+*   Powerful login, register, and forgot password shortcodes
+*   Block access of different user roles to WordPress dashboard
 *   Powerful notifications manager (Admin and user notification emails)
 *   [Custom CSS styles](https://webilia.com/docs/listdom/settings/custom-styles?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+CSS+styles)
 *   [Google reCAPTCHA](https://webilia.com/docs/listdom/settings/general-settings/#recaptcha?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Google+Recaptcha)
@@ -134,6 +137,8 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Visual Composer support
 *   King Composer support
 *   Compatible with Membership plugins
+*   JS and CSS load management (Speed optimization)
+*   Settings backup
 
 **👉 Seo Ready**
 *   [Friendly slug manager](https://webilia.com/docs/listdom/settings/slugs?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Friendly+slug+manager) (Change the slug of listings, categories, features, tags, attributes, labels, locations)
@@ -160,6 +165,11 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Use Listdom APIs
 *   Customize features
 
+== Our Community Videos About Listdom ==
+Discover more about Listdom through tutorials provided by web technicians.
+
+[youtube https://www.youtube.com/watch?v=pgPt1zDs85M]
+
 == The Premium Version of Listdom Classified Listing Plugin ==
 
 [youtube https://www.youtube.com/watch?v=VHDCQ6Jj_DM]
@@ -168,7 +178,6 @@ For users seeking additional features and capabilities for a [WordPress director
 
 **👉 Pro Add-on of The Listdom Classified Listing Plugin**
 
-*   Powerful login, register, and forgot password shortcodes
 *   Schema option
 *   Map GPS search
 *   Frontend dashboard menus customization
@@ -183,14 +192,17 @@ For users seeking additional features and capabilities for a [WordPress director
 *   Featured video for each listing
 *   Price options management
 *   [Advanced interactive map search feature](https://demo.webilia.com/listdom/skins/grid-view/style-1-map-first-grid-view)
+*   Singlemap skin sync with other shortcodes
 *   Radius search field
 *   Hierarchical dropdowns search field
+*   Range slider search method
 *   [Drawing tools on the map for search](https://demo.webilia.com/listdom/skins/list-view/style-1-of-list-view-map-first/)
 *   Listing cards link options and image status
 *   [OpenStreetMap](https://demo.webilia.com/listdom/single-map/openstreetmap/) (Display maps using OpenStreetMap with Leaflet.js - 100% free)
 *   Mapbox tiles support
 *   Change style and modules per category
 *   Change style and modules per listing
+*   Listing slugs with hierarchical categories and locations
 *   Bulk edit the listings styles
 *   JSON importer and exporter
 *   Display listings in Side-by-Side view with great responsive view
@@ -279,8 +291,8 @@ Listdom also offers about 30 add-ons to enhance the functionality of your WordPr
 *   Jobs Addon
 *   SMS Addon
 *   ADS Addon (FREE)
-*   Divi Addon (Design listing details page, listing cards, archives, and map info windows with Divi)
-*   Elementor Addon (Design listing details page, listing cards, archives, and map info windows with Elementor)
+*   Divi Addon (Design single listing page, listing cards, archives, and map info windows with Divi)
+*   Elementor Addon (Design single listing page, listing cards, archives, and map info windows with Elementor)
 *   Advanced Map
 *   Visibility Addon
 *   BuddyPress profile page integration
@@ -326,13 +338,13 @@ Absolutely! Listdom supports Google Maps! Also, Listdom PRO includes OpenStreetM
 
 Yes, of course! You're able to create your desired custom fields using Attributes in Listdom Pro. You're even able to create category-specific fields!
 
-= Is it possible to manage listing details page modules? =
+= Is it possible to manage single listing page modules? =
 
-Yes, using our advanced configuration options you're able to disable/enable the modules on the listing details page, and also you're able to change their positions if you're using Style 1.
+Yes, using our advanced configuration options you're able to disable/enable the modules on the single listing page, and also you're able to change their positions if you're using Style 1.
 
 = Do I have to use Google Maps? it's a little expensive! =
 
-Listdom PRO supports free OpenStreetMap! Also, it's possible to use both of them at once! For example in the details page you can use Google Maps but in List, Grid and other skins you can use OpenStreetMap.
+Listdom PRO supports free OpenStreetMap! Also, it's possible to use both of them at once! For example in the single listing page you can use Google Maps but in List, Grid and other skins you can use OpenStreetMap.
 
 = I like to use OpenStreetMap but with more beautiful tiles! What can I do? =
 
@@ -343,8 +355,8 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 1. Listdom Carousel View
 2. Listdom Grid View
 3. Listdom List View
-4. Listing Details (Style 2)
-5. Listing Details (Style 1)
+4. Single Listing (Style 2)
+5. Single Listing (Style 1)
 6. Listdom Slider View
 7. Listdom Half map View
 8. Listdom Table View
@@ -359,6 +371,24 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 
 == Changelog ==
 
+= 3.9.0 =
+* Added a Connected Shortcodes feature in the search builder, allowing multiple shortcodes to update dynamically with a single search widget.
+* Introduced a new style for List, Grid, Masonry, and List + Grid skins.
+* Enabled embedding via URL for the Embed and Featured Video elements.
+* Introduced a new option to control the visibility of search fields.
+* Added the ability to restrict certain user roles from accessing the WordPress backend.
+* Added an Image Fit option to applicable skins.
+* Added an option to adjust the map height across different shortcodes.
+* Added listing excerpts to Listdom fields and frontend dashboard modules.
+* Added a Thumbnail Status feature to the gallery element.
+* Moved the entire Listdom Pro authentication feature to Listdom core.
+* Improved the appearance and usability of search widgets.
+* Enhanced the Listdom settings menu for better navigation.
+* Improved the user interface and responsiveness of various elements.
+* Fixed search-related issues on archive pages.
+* Fixed an issue where multiple search widgets with More Options caused conflicts on the same page.
+* Resolved various AJAX search issues in Table and Masonry skins.
+
 = 3.8.1 =
 * Fixed an issue with settings import functionality.
 * Resolved a problem with the Frontend Dashboard.
@@ -369,13 +399,13 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 * [PRO] Added the ability to connect different shortcodes to the Singlemap skin, allowing search results to update dynamically based on the map's position.
 * Introduced the 'Optimize Assets Loading' feature to suppress Listdom CSS/JS file loading on specific WordPress pages.
 * Moved the Frontend Dashboard feature from the Pro add-on to the Listdom core.
-* Added an option to set custom titles for elements on the details page.
+* Added an option to set custom titles for elements on the single listing page.
 * Added left and right map display positions for applicable skins.
 * Introduced the settings export to create JSON backups of Listdom options.
 * Added settings import to restore Listdom settings.
 * Added the ability to customize the placeholder for the address field in both the backend and frontend.
 * Introduced a control option for the phone and name fields in the listing contact and report abuse forms.
-* Added an option to disable the map info-window on the listing details page.
+* Added an option to disable the map info-window on the single listing page.
 * Enhanced accessibility across Listdom.
 * Improved backend management for listings and notifications.
 * Refined the structure and organization of the settings menu and setting tabs.
@@ -419,7 +449,7 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 * [PRO] Added a shortcode for an independent "Add Listing" form.
 * [PRO] Added responsive view support for the "Side by Side" skin.
 * Introduced support for listing excerpts.
-* Enabled featured image display in style 3 of listing details.
+* Enabled featured image display in style 3 of single listing.
 * Improved the listing contact element.
 * Refined the settings loader style in the Listdom backend.
 * Enhanced the structure of "Masonry" and "Halfmap" skins for better performance and usability.
@@ -431,7 +461,7 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 
 = 3.5.0 =
 * [PRO] Introduced authentication features including login, registration, and password recovery.
-* [PRO] Added the option to customize the listing details layout per category.
+* [PRO] Added the option to customize the single listing layout per category.
 * [PRO] Implemented the ability to restrict image size in the frontend dashboard.
 * Introduced a table builder feature for the table skin.
 * Added numerous configurable display options across different skins.
@@ -446,13 +476,13 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 * Improved the search and filter form builder.
 * Optimized the dummy data importer.
 * Resolved display option issues in WP Multisite.
-* Addressed issues with pre-made layouts in listing details.
+* Addressed issues with pre-made layouts in single listing.
 * Fixed various UI and responsiveness issues.
 
 = 3.4.0 =
 * [ADDON] Released Connect addon!
-* Added a design builder for creating flexible and visually appealing listing details pages.
-* Added Style 3 and Style 4 for listing details pages.
+* Added a design builder for creating flexible and visually appealing single listing pages.
+* Added Style 3 and Style 4 for single listing pages.
 * Added a slider type for the gallery element.
 * Added a new sort option based on listing visits.
 * Added duplicate listing, duplicate shortcode, duplicate notification, and duplicate search features.
@@ -497,7 +527,7 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 * Added new icons for listdom and listings menus.
 * Improved listdom dashboard.
 * Improved the block editor integration.
-* Fixed some issues in listing details page.
+* Fixed some issues in single listing page.
 * Fixed an issue in assigning guest user to listing.
 * Fixed some issues in image slider mode of listing image.
 
@@ -558,7 +588,7 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 * Added webp image support.
 * [PRO] Added pagination to frontend dashboard.
 * [PRO] Fixed some issues in hierarchical dropdown.
-* Fixed an issue regarding style 1 of details page.
+* Fixed an issue regarding style 1 of single listing page.
 
 = 2.1.1 =
 * Added Instagram to social network options.
@@ -623,7 +653,7 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 
 = 1.7.0 =
 * [ADDON] Released Team addon!
-* Added an option to load listing details page into light-box on click of marker.
+* Added an option to load single listing page into light-box on click of marker.
 * Improved the listdom icons.
 * Fixed some issues.
 

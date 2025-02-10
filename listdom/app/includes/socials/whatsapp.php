@@ -10,9 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Socials_Whatsapp extends LSD_Socials
 {
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct();

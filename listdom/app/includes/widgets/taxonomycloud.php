@@ -12,9 +12,6 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
 {
     public $LSD;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct('LSD_Widgets_TaxonomyCloud', esc_html__('(Listdom) Cloud', 'listdom'), [

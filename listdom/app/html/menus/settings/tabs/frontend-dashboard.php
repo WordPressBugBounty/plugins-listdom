@@ -466,6 +466,7 @@ jQuery('#lsd_settings_form').on('submit', function (e)
     const $button = jQuery("#lsd_settings_save_button");
     const $success = jQuery(".lsd-settings-success-message");
     const $error = jQuery(".lsd-settings-error-message");
+    const $tab = jQuery('.nav-tab-active');
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
@@ -484,6 +485,8 @@ jQuery('#lsd_settings_form').on('submit', function (e)
         data: "action=lsd_save_dashboard&" + settings,
         success: function ()
         {
+            $tab.attr('data-saved', 'true');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 
@@ -492,6 +495,8 @@ jQuery('#lsd_settings_form').on('submit', function (e)
         },
         error: function ()
         {
+            $tab.attr('data-saved', 'false');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 

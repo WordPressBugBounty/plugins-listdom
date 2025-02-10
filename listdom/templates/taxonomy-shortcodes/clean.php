@@ -5,6 +5,7 @@ defined('ABSPATH') || die();
 /** @var LSD_Shortcodes_Taxonomy $this */
 
 $grid = $this->atts['grid'] ?? 2;
+if (!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
 ?>
 <div class="lsd-taxonomy-shortcode-wrapper lsd-taxonomy-shortcode-clean lsd-font-m">
     <?php if(!count($this->terms)): ?>
@@ -22,7 +23,7 @@ $grid = $this->atts['grid'] ?? 2;
                 <?php endif; ?>
 
                 <div class="lsd-title<?php if(!$have_icon) echo ' lsd-title-full'; ?>">
-                    <?php echo esc_html($term->name); ?>
+                    <span class="lsd-tax-title"><?php echo esc_html($term->name); ?></span>
                     <?php if(isset($this->atts['show_count']) && $this->atts['show_count']): ?>
                         <span class="lsd-count">(<?php echo esc_html($term->count); ?>)</span>
                     <?php endif; ?>
@@ -35,7 +36,7 @@ $grid = $this->atts['grid'] ?? 2;
                 <li>
                     <a href="<?php echo esc_url(get_term_link($child->term_id)); ?>">
                         <div class="lsd-title">
-                            <?php echo esc_html($child->name); ?>
+                            <span class="lsd-tax-title"><?php echo esc_html($child->name); ?></span>
                             <?php if(isset($this->atts['show_count']) && $this->atts['show_count']): ?>
                                 <span class="lsd-count">(<?php echo esc_html($child->count); ?>)</span>
                             <?php endif; ?>

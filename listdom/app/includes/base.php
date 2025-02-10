@@ -29,7 +29,7 @@ class LSD_Base
     const WELCOME_SLUG = 'listdom-welcome';
 
     /**
-     * Constructor method
+     * @todo Remove
      */
     public function __construct()
     {
@@ -380,11 +380,7 @@ class LSD_Base
 
     public static function isPro(): bool
     {
-        // Include Function
-        if (!function_exists('is_plugin_active')) require_once ABSPATH . 'wp-admin/includes/plugin.php';
-
-        return is_plugin_active('listdom-pro/listdom.php')
-            && LSD_Licensing::isValid('listdom-pro/listdom.php', 'lsd');
+        return class_exists(LSDADDPRO::class) || class_exists(\LSDPACPRO\Base::class);
     }
 
     public static function isLite(): bool
@@ -493,7 +489,7 @@ class LSD_Base
     /**
      * @return array
      */
-    public static function addons()
+    public static function addons(): mixed
     {
         return apply_filters('lsd_addons', []);
     }
@@ -768,6 +764,26 @@ class LSD_Base
 
         $link = admin_url(sprintf($post_type_object->_edit_link . '&action=edit', $post->ID));
         return apply_filters('get_edit_post_link', $link, $post->ID, 'display');
+    }
+
+    public static function add_uncategorized(): int
+    {
+        // Uncategorized
+        $category = wp_create_term(
+            esc_html__('Uncategorized', 'listdom'),
+            LSD_Base::TAX_CATEGORY
+        );
+
+        $id = 0;
+        if (is_array($category) && isset($category['term_id']))
+        {
+            $id = (int) $category['term_id'];
+
+            update_term_meta($id, 'lsd_icon', 'fa fa-ban');
+            update_term_meta($id, 'lsd_color', '#000000');
+        }
+
+        return $id;
     }
 
     public function render_price($price, $currency, $minimized = false): string
@@ -1968,7 +1984,7 @@ class LSD_Base
      * @param string $post_type
      * @return WP_Post|null
      */
-    public static function get_post_by_title(string $title, string $post_type = 'post')
+    public static function get_post_by_title(string $title, string $post_type = 'post'): ?WP_Post
     {
         // Query
         $query = new WP_Query([

@@ -2,23 +2,13 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Gallery Element Class.
- *
- * @class LSD_Element_Gallery
- * @version    1.0.0
- */
 class LSD_Element_Gallery extends LSD_Element
 {
     public $key = 'gallery';
     public $label;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Image Gallery', 'listdom');
@@ -87,6 +77,19 @@ class LSD_Element_Gallery extends LSD_Element
                 'options' => [
                     'lightbox' => esc_html__('List', 'listdom'),
                     'slider' => esc_html__('Slider', 'listdom'),
+                ],
+            ]) . '
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_thumbnail_status">' . esc_html__('Thumbnail Status', 'listdom') . '</label>
+            ' . LSD_Form::select([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_thumbnail_status',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][thumbnail_status]',
+                'value' => $data['thumbnail_status'] ?? 'image',
+                'options' => [
+                    'list' => esc_html__('List', 'listdom'),
+                    'image' => esc_html__('On the Image', 'listdom'),
+                    'disabled' => esc_html__('Disabled', 'listdom'),
                 ],
             ]) . '
         </div>

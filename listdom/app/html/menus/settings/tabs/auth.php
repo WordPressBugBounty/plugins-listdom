@@ -2,12 +2,13 @@
 // no direct access
 defined('ABSPATH') || die();
 
-// Authentication Settings
+// Auth Settings
 $auth = LSD_Options::auth();
+
+// Settings
+$settings = LSD_Options::settings();
 ?>
 <div class="lsd-auth-wrap">
-    <?php if($this->isLite()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Authentication', 'listdom')), 'warning'); ?>
-    <?php else: ?>
     <form id="lsd_auth_form">
         <div class="lsd-accordion-title lsd-accordion-active">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
@@ -722,7 +723,7 @@ $auth = LSD_Options::auth();
                         'show_empty' => true,
                         'value' => $auth['logout']['redirect']
                     ]); ?>
-                    <p class="description lsd-mb-0"><?php esc_html_e("After the user logs out, they will be redirected to the designated page.", 'listdom'); ?></p>
+                    <p class="description"><?php esc_html_e("After the user logs out, they will be redirected to the designated page.", 'listdom'); ?></p>
                 </div>
             </div>
 
@@ -742,6 +743,42 @@ $auth = LSD_Options::auth();
             </div>
 
         </div>
+        <div class="lsd-accordion-title">
+            <div class="lsd-flex lsd-flex-row lsd-py-2">
+                <h3><?php esc_html_e('Block Admin Access', 'listdom'); ?></h3>
+                <div class="lsd-accordion-icons">
+                    <i class="lsd-icon fa fa-plus"></i>
+                    <i class="lsd-icon fa fa-minus"></i>
+                </div>
+            </div>
+        </div>
+        <div class="lsd-settings-form-group lsd-accordion-panel">
+            <div class="lsd-form-row lsd-mt-0">
+                <div class="lsd-col-12">
+                    <p class="description lsd-mt-0 lsd-mb-5"><?php esc_html_e('You can block WordPress admin access for the following user roles, if needed. Check to block access, or uncheck to allow it.', 'listdom'); ?></p>
+
+                    <?php foreach ([
+                        'subscriber' => esc_html__('Subscriber', 'listdom'),
+                        'contributor' => esc_html__('Contributor', 'listdom'),
+                        'listdom_author' => esc_html__('Listdom Author', 'listdom'),
+                        'listdom_publisher' => esc_html__('Listdom Publisher', 'listdom'),
+                    ] as $role => $label): ?>
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                'for' => 'lsd_block_admin_role_'.$role,
+                                'title' => $label
+                            ]); ?></div>
+                            <div class="lsd-col-10"><?php echo LSD_Form::switcher([
+                                'id' => 'lsd_block_admin_role_'.$role,
+                                'name' => 'settings[block_admin_'.$role.']',
+                                'value' => $settings['block_admin_'.$role] ?? 1
+                            ]); ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+
         <?php do_action('lsd_auth_form_general', $auth); ?>
 
         <div class="lsd-spacer-10"></div>
@@ -760,7 +797,6 @@ $auth = LSD_Options::auth();
             </div>
         </div>
     </form>
-    <?php endif; ?>
 </div>
 <script>
 jQuery('#lsd_auth_form').on('submit', function (e)
@@ -771,6 +807,7 @@ jQuery('#lsd_auth_form').on('submit', function (e)
     const $button = jQuery("#lsd_auth_save_button");
     const $success = jQuery(".lsd-auth-success-message");
     const $error = jQuery(".lsd-auth-error-message");
+    const $tab = jQuery('.nav-tab-active');
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
@@ -789,6 +826,8 @@ jQuery('#lsd_auth_form').on('submit', function (e)
         data: "action=lsd_save_auth&" + auth,
         success: function()
         {
+            $tab.attr('data-saved', 'true');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 
@@ -797,6 +836,8 @@ jQuery('#lsd_auth_form').on('submit', function (e)
         },
         error: function()
         {
+            $tab.attr('data-saved', 'false');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 

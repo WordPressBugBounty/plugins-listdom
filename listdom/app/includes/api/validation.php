@@ -2,15 +2,9 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Validation Class.
- *
- * @class LSD_API_Validation
- * @version    1.0.0
- */
 class LSD_API_Validation extends LSD_API
 {
-    public function APIToken(WP_REST_Request $request, $token = null): bool
+    public function APIToken(WP_REST_Request $request, $token = ''): bool
     {
         // Check Token
         if (trim($token))
@@ -30,7 +24,7 @@ class LSD_API_Validation extends LSD_API
         return false;
     }
 
-    public function UserToken(WP_REST_Request $request, $token = null): bool
+    public function UserToken(WP_REST_Request $request, $token = ''): bool
     {
         // Check User
         if (trim($token))

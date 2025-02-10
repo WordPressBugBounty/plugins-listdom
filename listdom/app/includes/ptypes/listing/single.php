@@ -20,15 +20,11 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
     public $style;
     protected $filtered_content;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        // Call the parent constructor
         parent::__construct();
 
-        // Details Page options
+        // Single Listing options
         $this->details_page_options = LSD_Options::details_page();
     }
 
@@ -80,35 +76,58 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         return $single;
     }
 
+    public static function get_listing_style(int $listing_id): string
+    {
+        $listing_style = '';
+
+        $single_listing_options = LSD_Options::details_page();
+        $general_style = $single_listing_options['general']['style'] ?? 'style1';
+
+        // Apply Listing Display Options
+        if (LSD_Base::isPro() && isset($single_listing_options['general']['displ']) && $single_listing_options['general']['displ'])
+        {
+            $displ = get_post_meta($listing_id, 'lsd_displ', true);
+            if (!is_array($displ)) $displ = [];
+
+            // Listing Style
+            if (isset($displ['style']) && trim($displ['style'])) $listing_style = $displ['style'];
+        }
+
+        // Get Listing Style by Category and Others
+        $listing_style = (string) apply_filters('lsd_listing_details_style', $listing_style, $listing_id);
+
+        return $listing_style ?: $general_style;
+    }
+
+    public static function get_listing_elements(int $listing_id): array
+    {
+        $single_listing_options = LSD_Options::details_page();
+
+        $listing_elements = [];
+
+        // Apply Listing Display Options
+        if (LSD_Base::isPro() && isset($single_listing_options['general']['displ']) && $single_listing_options['general']['displ'])
+        {
+            $displ = get_post_meta($listing_id, 'lsd_displ', true);
+            if (!is_array($displ)) $displ = [];
+
+            if (isset($displ['elements']) && is_array($displ['elements']) && count($displ['elements']) && isset($displ['elements_global']) && !$displ['elements_global']) $listing_elements = $displ['elements'];
+        }
+
+        // Get Listing Elements by Category and Others
+        return (array) apply_filters('lsd_listing_details_elements', $listing_elements, $listing_id);
+    }
+
     public function bootstrap($post, $content = null)
     {
         // Single Page Pattern
         $this->pattern = LSD_Options::details_page_pattern();
 
-        $style = $this->details_page_options['general']['style'] ?? 'style1';
-        $listing_style = '';
-        $listing_elements = [];
-
-        // Apply Listing Display Options
-        if ($this->isPro() && isset($this->details_page_options['general']['displ']) && $this->details_page_options['general']['displ'])
-        {
-            $displ = get_post_meta($post->ID, 'lsd_displ', true);
-            if (!is_array($displ)) $displ = [];
-
-            // Listing Style
-            if (isset($displ['style']) && trim($displ['style'])) $listing_style = $displ['style'];
-
-            if (isset($displ['elements']) && is_array($displ['elements']) && count($displ['elements']) && isset($displ['elements_global']) && !$displ['elements_global']) $listing_elements = $displ['elements'];
-        }
-
-        // Get Listing Style by Category and Others
-        $listing_style = apply_filters('lsd_listing_details_style', $listing_style, $post->ID);
-
-        // Get Listing Elements by Category and Others
-        $listing_elements = apply_filters('lsd_listing_details_elements', $listing_elements, $post->ID);
+        $listing_style = $this->get_listing_style($post->ID);
+        $listing_elements = $this->get_listing_elements($post->ID);
 
         // Listing Elements
-        if (is_array($listing_elements) && count($listing_elements))
+        if (count($listing_elements))
         {
             $this->pattern = '';
             foreach ($listing_elements as $key => $elm)
@@ -121,13 +140,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             }
         }
 
-        $this->details_page_options['general']['style'] = $listing_style ?: $style;
-        $this->style = $listing_style ?: $style;
+        $this->details_page_options['general']['style'] = $listing_style;
+        $this->style = $listing_style;
         $this->filtered_content = $content;
 
         $this->entity = new LSD_Entity_Listing($post);
 
-        // Filter The Details Page Options
+        // Filter The Single Listing Options
         $this->details_page_options = apply_filters('lsd_details_page_options', $this->details_page_options, $post);
     }
 
@@ -173,7 +192,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Remove Loop
         remove_filter('the_content', [$this, 'filter_content']);
 
-        // Get Listing Details Content
+        // Get Single Listing Content
         $output = $this->get($content);
 
         // Add Filter
@@ -480,7 +499,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Address', 'listdom');
 
         $output = '<div class="lsd-single-page-section">';
-        if ($this->details_page_options['elements']['address']['show_title']) $output .= '<div class="lsd-single-label ' . $title_alignment . '">' . $heading . '</div>';
+        if ($this->details_page_options['elements']['address']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-single-page-section-address ' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-address" ' . $schema . '>' . $address . '</div>';
         $output .= '</div>';
 
@@ -555,7 +574,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Heading
         $heading = isset($this->details_page_options['elements']['attributes']['custom_title']) && trim($this->details_page_options['elements']['attributes']['custom_title'])
             ? $this->details_page_options['elements']['attributes']['custom_title']
-            : esc_html__('Listing Details', 'listdom');
+            : esc_html__('Attributes', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-attributes">';
         if ($this->details_page_options['elements']['attributes']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
@@ -578,7 +597,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Heading
         $heading = isset($this->details_page_options['elements']['availability']['custom_title']) && trim($this->details_page_options['elements']['availability']['custom_title'])
             ? $this->details_page_options['elements']['availability']['custom_title']
-            : esc_html__('Availability Time', 'listdom');
+            : esc_html__('Working Hours', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-availability">';
         if ($this->details_page_options['elements']['availability']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
@@ -594,7 +613,11 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $multiple = apply_filters('lsd_listing_display_multiple_categories', false);
 
         // Get Categories
-        $categories = $this->entity->get_categories($show_color, $multiple, $color_method);
+        $categories = $this->entity->get_categories([
+            'show_color' => $show_color,
+            'multiple_categories' => $multiple,
+            'color_method' => $color_method
+        ]);
 
         // Don't show anything when there is no category!
         if (!trim($categories)) return '';
@@ -681,7 +704,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $show_icons = $this->details_page_options['elements']['features']['show_icons'] ?? 0;
         $list_style = $this->details_page_options['elements']['features']['list_style'] ?? 'per-row';
 
-        $features = $this->entity->get_features('list', $show_icons, $list_style);
+        $features = $this->entity->get_features('list', $show_icons, true, $list_style);
 
         // Don't show anything when there is no features!
         if (!trim($features)) return '';
@@ -755,7 +778,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Listing Image', 'listdom');
 
         $output = '';
-        if ($this->details_page_options['elements']['image']['show_title']) $output .= '<div class="lsd-single-label' . $title_alignment . '">' . $heading . '</div>';
+        if ($this->details_page_options['elements']['image']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-featured-image" ' . lsd_schema()->scope()->type('https://schema.org/ImageObject') . '>' . $featured_image . '</div>';
 
         return $output;
@@ -766,6 +789,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $gallery = $this->entity->get_gallery([
             'lightbox' => $this->details_page_options['elements']['gallery']['lightbox'] ?? 1,
             'style' => $style ?: ($this->details_page_options['elements']['gallery']['style'] ?? 'lightbox'),
+            'thumbnail_status' => $this->details_page_options['elements']['gallery']['thumbnail_status'] ?? 'image',
             'include_thumbnail' => ($this->details_page_options['elements']['gallery']['thumbnail'] ?? 0),
         ]);
 
@@ -780,7 +804,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Listing Gallery', 'listdom');
 
         $output = '<div class="lsd-single-gallery-box">';
-        if ($this->details_page_options['elements']['gallery']['show_title']) $output .= '<div class="lsd-single-label' . $title_alignment . '">' . $heading . '</div>';
+        if ($this->details_page_options['elements']['gallery']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-gallery">' . $gallery . '</div>';
         $output .= '</div>';
 
@@ -830,7 +854,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Labels', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-labels">';
-        if ($this->details_page_options['elements']['labels']['show_title']) $output .= '<div class="lsd-single-label' . $title_alignment . '">' . $heading . '</div>';
+        if ($this->details_page_options['elements']['labels']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-labels">' . $labels . '</div>';
         $output .= '</div>';
 
@@ -855,7 +879,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $schema = lsd_schema()->priceRange();
 
         $output = '';
-        if ($this->details_page_options['elements']['price']['show_title']) $output .= '<div class="lsd-single-label' . $title_alignment . '">' . $heading . '</div>';
+        if ($this->details_page_options['elements']['price']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-price" ' . $schema . '><div class="lsd-color-m-bg ' . $this->get_text_class() . '">' . $price . '</div></div>';
 
         return $output;
@@ -935,7 +959,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
     public function contact_info(): string
     {
-        $contact = $this->entity->get_contact_info();
+        $contact = $this->entity->get_contact_info($this->details_page_options['elements']['contact'] ?? []);
 
         // Don't show anything when there is no contact information!
         if (!trim($contact)) return '';

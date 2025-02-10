@@ -10,13 +10,8 @@ defined('ABSPATH') || die();
  */
 class LSD_Menus_Settings extends LSD_Menus
 {
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Initialize the Menu
         $this->init();
     }
@@ -89,15 +84,8 @@ class LSD_Menus_Settings extends LSD_Menus
         // Remove social settings from main settings
         $lsd = array_diff_key($lsd, $social_settings);
 
-        // Get current Listdom options
-        $current = get_option('lsd_settings', []);
-        if (is_string($current) && trim($current) === '') $current = [];
-
-        // Merge new options with previous options
-        $final = array_merge($current, $lsd);
-
-        // Save final options
-        update_option('lsd_settings', $final);
+        // Save Settings
+        LSD_Options::merge('lsd_settings', $lsd);
 
         // Save social settings
         update_option('lsd_socials', $social_settings);
@@ -123,25 +111,11 @@ class LSD_Menus_Settings extends LSD_Menus
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
 
-        // Get current Listdom options
-        $current = get_option('lsd_styles', []);
-        if (is_string($current) && trim($current) === '') $current = [];
+        // Save Styles
+        LSD_Options::merge('lsd_styles', $lsd);
 
-        // Merge new options with previous options
-        $final = array_merge($current, $lsd);
-
-        // Save final options`
-        update_option('lsd_styles', $final);
-
-        // Get current Listdom options
-        $current = get_option('lsd_settings', []);
-        if (is_string($current) && trim($current) === '') $current = [];
-
-        // Merge new options with previous options
-        $final = array_merge($current, $lsd);
-
-        // Save final options
-        update_option('lsd_settings', $final);
+        // Save Settings
+        LSD_Options::merge('lsd_settings', $lsd);
 
         // Generate personalized CSS File
         LSD_Personalize::generate();
@@ -208,18 +182,11 @@ class LSD_Menus_Settings extends LSD_Menus
             $pattern .= '{' . $key . '}';
         }
 
-        // Save details page pattern
+        // Save single listing pattern
         update_option('lsd_details_page_pattern', trim($pattern));
 
-        // Get current Listdom options
-        $current = get_option('lsd_details_page', []);
-        if (is_string($current) && trim($current) === '') $current = [];
-
-        // Merge new options with previous options
-        $final = array_merge($current, $lsd);
-
-        // Save final options
-        update_option('lsd_details_page', $final);
+        // Save Settings
+        LSD_Options::merge('lsd_details_page', $lsd);
 
         // Print the response
         $this->response(['success' => 1]);
@@ -308,14 +275,23 @@ class LSD_Menus_Settings extends LSD_Menus
         // Check Access
         $this->check_access('lsd_auth_form');
 
-        // Get Auth options
+        // Get Auth
         $lsd = $_POST['lsd'] ?? [];
 
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
 
-        // Save options
+        // Save Auth
         update_option('lsd_auth', $lsd);
+
+        // Get Settings
+        $settings = $_POST['settings'] ?? [];
+
+        // Sanitization
+        array_walk_recursive($settings, 'sanitize_text_field');
+
+        // Save Settings
+        LSD_Options::merge('lsd_settings', $settings);
 
         // Print the response
         $this->response(['success' => 1]);

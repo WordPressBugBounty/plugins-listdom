@@ -36,14 +36,10 @@ class LSD_Color extends LSD_Base
     public static function text_class($color = 'main'): string
     {
         // Get Main or Secondary BG color
-        if (in_array($color, ['main', 'secondary']))
+        if ($color === 'main')
         {
             $settings = LSD_Options::settings();
-
-            // Get Main Color
-            if ($color == 'main') $bg_color = $settings['dply_main_color'];
-            // Get Secondary BG color
-            else $bg_color = $settings['dply_secondary_color'];
+            $bg_color = $settings['dply_main_color'];
         }
         // Custom Color
         else $bg_color = $color;

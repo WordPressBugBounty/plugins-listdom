@@ -2,30 +2,20 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Tags Element Class.
- *
- * @class LSD_Element_Tags
- * @version    1.0.0
- */
 class LSD_Element_Tags extends LSD_Element
 {
     public $key = 'tags';
     public $label;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Tags', 'listdom');
         $this->inline_title = true;
     }
 
-    public function get($post_id = null)
+    public function get($post_id = null, $enable_link = true)
     {
         if (is_null($post_id))
         {
@@ -37,7 +27,12 @@ class LSD_Element_Tags extends LSD_Element
         if (!count($terms)) return '';
 
         $output = '<ul>';
-        foreach ($terms as $term) $output .= '<li><a href="' . esc_url(get_term_link($term->term_id)) . '">' . esc_html($term->name) . '</a></li>';
+        foreach ($terms as $term)
+        {
+            $link = $enable_link ? esc_url(get_term_link($term->term_id)) : '#';
+            $output .= '<li><a href="' . $link . '">' . esc_html($term->name) . '</a></li>';
+        }
+
         $output .= '</ul>';
 
         return $this->content(

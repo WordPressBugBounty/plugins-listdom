@@ -6,12 +6,18 @@ defined('ABSPATH') || die();
 /** @var int $post_id */
 
 $owner_id = get_post_field('post_author', $post_id);
+$display_avatar = !isset($this->args['display_avatar']) || $this->args['display_avatar'];
+$display_name = !isset($this->args['display_name']) || $this->args['display_name'];
+$display_job_title = !isset($this->args['display_job_title']) || $this->args['display_job_title'];
+$display_bio = !isset($this->args['display_bio']) || $this->args['display_bio'];
+$display_socials = !isset($this->args['display_socials']) || $this->args['display_socials'];
 $display_tel = !isset($this->args['display_tel']) || $this->args['display_tel'];
 $display_email = !isset($this->args['display_email']) || $this->args['display_email'];
 $display_mobile = !isset($this->args['display_mobile']) || $this->args['display_mobile'];
 $display_website = isset($this->args['display_website']) && $this->args['display_website'];
 $display_fax = !isset($this->args['display_fax']) || $this->args['display_fax'];
 $display_form = !isset($this->args['display_form']) || $this->args['display_form'];
+$author_link = isset($this->args['author_link']) && $this->args['author_link'];
 $field_name = !isset($this->args['name_field']) || $this->args['name_field'];
 $field_phone = !isset($this->args['phone_field']) || $this->args['phone_field'];
 
@@ -32,47 +38,58 @@ $current_id = get_current_user_id();
 <div class="lsd-owner-details" <?php echo lsd_schema()->scope()->type('https://schema.org/Person'); ?>>
 	<div class="lsd-owner-details-wrapper">
 		<div class="lsd-owner-information">
-			<div class="lsd-owner-first-part">	
-				<div class="lsd-owner-image-wrapper">
-					<?php echo get_avatar($owner_id, 250); ?>
-				</div>
-				<div class="lsd-owner-information-part-1">
-					<h4 class="lsd-owner-name" <?php echo lsd_schema()->name(); ?>><?php echo esc_html(get_the_author_meta('display_name', $owner_id)); ?></h4>
+			<div class="lsd-owner-first-part">
+        		<?php if($display_avatar) :?>
+                    <div class="lsd-owner-image-wrapper">
+                        <?php echo get_avatar($owner_id, 250); ?>
+                    </div>
+                <?php endif; ?>
+        		<div class="lsd-owner-information-part-1">
+                    <?php if ($display_name): ?>
+					<h4 class="lsd-owner-name" <?php echo lsd_schema()->name(); ?>>
+						<?php if ($author_link): ?>
+							<a href="<?php echo esc_url(get_author_posts_url($owner_id)); ?>">
+								<?php echo esc_html(get_the_author_meta('display_name', $owner_id)); ?>
+							</a>
+						<?php else: echo esc_html(get_the_author_meta('display_name', $owner_id)); ?>
+						<?php endif; ?>
+					</h4>
+                    <?php endif; ?>
 
-					<?php if (isset($user['lsd_job_title'][0]) && trim($user['lsd_job_title'][0])): ?>
+					<?php if ($display_job_title && isset($user['lsd_job_title'][0]) && trim($user['lsd_job_title'][0])): ?>
 					<div class="lsd-owner-job-title" <?php echo lsd_schema()->jobTitle(); ?> ><?php echo esc_html($user['lsd_job_title'][0]); ?></div>
 					<?php endif; ?>
 
-					<?php if (trim($socials) != ''): ?>
+					<?php if ($display_socials && trim($socials) != ''): ?>
 					<div class="lsd-owner-social-networks">
 						<ul><?php echo LSD_Kses::element($socials); ?></ul>
 					</div>
 					<?php endif; ?>
 
-					<?php if (isset($user['description'][0]) && trim($user['description'][0])): ?>
+					<?php if ($display_bio && isset($user['description'][0]) && trim($user['description'][0])): ?>
 					<div class="lsd-owner-biography" <?php echo lsd_schema()->description(); ?> ><?php echo esc_html($user['description'][0]); ?></div>
 					<?php endif; ?>
 				</div>
 			</div>
-			
+
 			<div class="lsd-owner-information-part-2">
 				<?php if ($display_tel && isset($user['lsd_phone'][0]) && trim($user['lsd_phone'][0])): ?>
 				<div class="lsd-owner-phone" title="<?php esc_attr_e('Phone', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
-					<i class="lsd-icon fas fa-phone-alt"></i> 
+					<i class="lsd-icon fas fa-phone-alt"></i>
 					<a href="tel:<?php echo esc_html($user['lsd_phone'][0]); ?>"><?php echo esc_html($user['lsd_phone'][0]); ?></a>
 				</div>
 				<?php endif; ?>
 
                 <?php if ($display_email): ?>
 				<div class="lsd-owner-email" title="<?php esc_attr_e('Email', 'listdom'); ?>" <?php echo lsd_schema()->email(); ?>>
-					<i class="lsd-icon fa fa-envelope"></i> 
+					<i class="lsd-icon fa fa-envelope"></i>
 					<a href="mailto:<?php echo esc_html(get_the_author_meta('email', $owner_id)); ?>"><?php echo esc_html(get_the_author_meta('email', $owner_id)); ?></a>
 				</div>
                 <?php endif; ?>
 
 				<?php if ($display_mobile && isset($user['lsd_mobile'][0]) && trim($user['lsd_mobile'][0])): ?>
 				<div class="lsd-owner-mobile" title="<?php esc_attr_e('Mobile', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
-					<i class="lsd-icon fa fa-mobile"></i> 
+					<i class="lsd-icon fa fa-mobile"></i>
 					<a href="tel:<?php echo esc_html($user['lsd_mobile'][0]); ?>"><?php echo esc_html($user['lsd_mobile'][0]); ?></a>
 				</div>
 				<?php endif; ?>
@@ -97,9 +114,9 @@ $current_id = get_current_user_id();
 <?php if ($display_form): ?>
 <div class="lsd-owner-contact-form-wrapper">
 	<form class="lsd-owner-contact-form" id="lsd_owner_contact_form_<?php echo esc_attr($post_id); ?>" data-id="<?php echo esc_attr($post_id); ?>">
-		
+
 		<div class="lsd-owner-contact-form-name-email-phone-wrapper">
-			<?php if($field_phone): ?>
+			<?php if ($field_name): ?>
 			<div class="lsd-owner-contact-form-row lsd-owner-contact-form-row-name">
 				<input
 					class="lsd-form-control-input"
@@ -127,7 +144,7 @@ $current_id = get_current_user_id();
 				<i class="lsd-icon fa fa-envelope"></i>
 			</div>
 
-			<?php if($field_phone): ?>
+			<?php if ($field_phone): ?>
 			<div class="lsd-owner-contact-form-row lsd-owner-contact-form-row-phone">
 				<input
 					class="lsd-form-control-input"
@@ -142,7 +159,7 @@ $current_id = get_current_user_id();
 			</div>
 			<?php endif; ?>
 		</div>
-		
+
 		<div class="lsd-owner-contact-form-row">
 			<textarea
 				class="lsd-form-control-textarea"
@@ -152,7 +169,7 @@ $current_id = get_current_user_id();
 				required
 			></textarea>
 		</div>
-		
+
 		<div class="lsd-owner-contact-form-row lsd-owner-contact-form-third-row">
 			<?php echo LSD_Main::grecaptcha_field('transform-95'); ?>
 			<button class="lsd-form-submit lsd-widefat lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" type="submit"><?php esc_html_e('Send', 'listdom'); ?></button>

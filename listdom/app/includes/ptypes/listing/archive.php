@@ -12,15 +12,6 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
 {
     protected $entity;
 
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        // Call the parent constructor
-        parent::__construct();
-    }
-
     public function hooks()
     {
         add_action('lsd_listings', [$this, 'do_listings'], 10, 3);
@@ -38,19 +29,26 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
         // Marker onclick method
         $onclick = isset($args['onclick']) ? sanitize_text_field($args['onclick']) : 'infowindow';
 
+        // Sidebar
+        $sidebar = isset($args['sidebar']) && $args['sidebar'];
+
+        // Ignore Map Exclusion
+        $ignore_map_exclusion = isset($args['ignore_map_exclusion']) && $args['ignore_map_exclusion'];
+
         $objects = [];
         foreach ($post_ids as $post_id)
         {
+            // Listing
             $entity = new LSD_Entity_Listing($post_id);
-
-            // Include Listing?
-            if (!apply_filters('lsd_map_include_object', true, $entity)) continue;
 
             // Set Current Post
             LSD_LifeCycle::post($post_id);
 
+            // Include Listing?
+            if (!$ignore_map_exclusion && !apply_filters('lsd_map_include_object', true, $entity)) continue;
+
             $object_type = get_post_meta($post_id, 'lsd_object_type', true);
-            if ($object_type == 'marker')
+            if ($object_type === 'marker')
             {
                 $object = [];
                 $object['type'] = 'marker';
@@ -79,6 +77,7 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
 
             $object['id'] = $post_id;
             $object['infowindow'] = $onclick === 'infowindow' ? $entity->get_infowindow() : null;
+            $object['card'] = $sidebar ? $entity->get_map_card() : null;
             $object['latitude'] = (float) get_post_meta($post_id, 'lsd_latitude', true);
             $object['longitude'] = (float) get_post_meta($post_id, 'lsd_longitude', true);
             $object['onclick'] = $onclick;

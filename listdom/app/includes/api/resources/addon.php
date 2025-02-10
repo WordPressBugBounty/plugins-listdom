@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Addon Resource Class.
- *
- * @class LSD_API_Resources_Addon
- * @version    1.0.0
- */
 class LSD_API_Resources_Addon extends LSD_API_Resource
 {
     public static function all()

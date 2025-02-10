@@ -2,24 +2,14 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Abuse Element Class.
- *
- * @class LSD_Element_Abuse
- * @version    1.0.0
- */
 class LSD_Element_Abuse extends LSD_Element
 {
     public $key = 'abuse';
     public $label;
     protected $args;
 
-    /**
-     * Constructor method
-     */
     public function __construct(array $args = [])
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Report Abuse', 'listdom');

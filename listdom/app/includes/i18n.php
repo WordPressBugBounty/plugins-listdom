@@ -2,13 +2,7 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom i18n Class.
- *
- * @class LSD_i18n
- * @version    1.0.0
- */
-class LSD_i18n extends LSD_Base
+class LSD_i18n
 {
     public function init()
     {
@@ -18,19 +12,19 @@ class LSD_i18n extends LSD_Base
 
     public function load_languages()
     {
-        // Listdom File library
+        // Listdom File
         $file = new LSD_File();
 
         // Get current locale
         $locale = apply_filters('plugin_locale', get_locale(), 'listdom');
 
         // WordPress' language directory /wp-content/languages/listdom-en_US.mo
-        $language_filepath = WP_LANG_DIR . '/listdom-' . $locale . '.mo';
+        $path = WP_LANG_DIR . '/listdom-' . $locale . '.mo';
 
         // If language file exists on WordPress' language directory use it
-        if ($file->exists($language_filepath))
+        if ($file->exists($path))
         {
-            load_textdomain('listdom', $language_filepath);
+            load_textdomain('listdom', $path);
         }
         // Otherwise use Listdom plugin directory /path/to/plugin/i18n/languages/listdom-en_US.mo
         else

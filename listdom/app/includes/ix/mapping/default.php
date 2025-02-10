@@ -10,13 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_IX_Mapping_Default
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-    }
-
     public function date($args)
     {
         echo LSD_Form::input([

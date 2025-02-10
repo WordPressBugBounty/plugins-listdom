@@ -10,13 +10,8 @@ defined('ABSPATH') || die();
  */
 class LSD_Menus_IX extends LSD_Menus
 {
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Initialize the menu
         $this->init();
     }

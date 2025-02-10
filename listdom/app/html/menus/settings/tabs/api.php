@@ -7,13 +7,15 @@ defined('ABSPATH') || die();
 $api = LSD_Options::api();
 ?>
 <div class="lsd-settings-wrap">
-    <?php if($this->isLite()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('API', 'listdom')), 'warning'); ?>
+    <?php if($this->isLite()): ?>
+    <div class="lsd-mt-4"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('API', 'listdom')), 'warning'); ?></div>
     <?php else: ?>
     <form id="lsd_api_form">
         <div class="lsd-settings-form-group lsd-box-white lsd-rounded lsd-mt-4 lsd-p-5">
-            <h3 class="lsd-mt-0"><?php esc_html_e('API Tokens', 'listdom'); ?></h3>
-            <div class="lsd-mt-4 lsd-mb-5">
-                <p class="description"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
+            <h3 class="lsd-my-0"><?php esc_html_e('API Tokens', 'listdom'); ?></h3>
+            <div class="lsd-mt-0 lsd-mb-5">
+                <p class="description lsd-mt-0 lsd-mb-0"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
+                <div class="lsd-alert lsd-info"><?php echo sprintf(esc_html__('You can use the %s URL as the API base URL.', 'listdom-network'), '<code>'.get_rest_url().'</code>'); ?></div>
                 <button type="button" class="button" id="lsd_settings_api_add_token"><?php esc_html_e('Add Token', 'listdom'); ?></button>
             </div>
             <?php foreach($api['tokens'] as $i => $token): ?>
@@ -138,6 +140,7 @@ jQuery('#lsd_api_form').on('submit', function(event)
 
     // Loading Wrapper
     const loading = (new ListdomLoadingWrapper());
+    const $tab = jQuery('.nav-tab-active');
 
     // Loading
     loading.start();
@@ -150,11 +153,15 @@ jQuery('#lsd_api_form').on('submit', function(event)
         data: "action=lsd_save_api&" + settings,
         success: function()
         {
+            $tab.attr('data-saved', 'true');
+
             // Unloading
             loading.stop(null, 1000);
         },
         error: function()
         {
+            $tab.attr('data-saved', 'false');
+
             // Unloading
             loading.stop(null, 1000);
         }

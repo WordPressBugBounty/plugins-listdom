@@ -10,13 +10,6 @@ defined('ABSPATH') || die();
  */
 class LSD_Walker_Taxonomy extends Walker_Category_Checklist
 {
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-    }
-
     public function start_el(&$output, $category, $depth = 0, $args = [], $id = 0)
     {
         if (empty($args['taxonomy'])) $taxonomy = 'category';

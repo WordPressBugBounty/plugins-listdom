@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Categories Element Class.
- *
- * @class LSD_Element_Categories
- * @version    1.0.0
- */
 class LSD_Element_Categories extends LSD_Element
 {
     public $key = 'categories';
@@ -15,25 +9,23 @@ class LSD_Element_Categories extends LSD_Element
     public $show_color;
     public $color_method;
     public $multiple_categories;
+    public $enable_link;
+    public $display_name = true;
+    public $display_icon = false;
 
-    /**
-     * Constructor method
-     *
-     * @param boolean $show_color
-     * @param boolean $multiple_categories
-     * @param string $color_method
-     */
-    public function __construct(bool $show_color = true, bool $multiple_categories = false, string $color_method = 'bg')
+    public function __construct(array $args = [])
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Categories', 'listdom');
         $this->has_title_settings = false;
 
-        $this->show_color = $show_color;
-        $this->multiple_categories = $multiple_categories;
-        $this->color_method = $color_method;
+        $this->show_color = $args['show_color'] ?? true;
+        $this->multiple_categories = $args['multiple_categories'] ?? false;
+        $this->color_method = $args['color_method'] ?? 'bg';
+        $this->enable_link = $args['enable_link'] ?? true;
+        $this->display_name = $args['display_name'] ?? true;
+        $this->display_icon = $args['display_icon'] ?? false;
     }
 
     public function get($post_id = null)
@@ -82,5 +74,13 @@ class LSD_Element_Categories extends LSD_Element
             $text = LSD_Base::get_text_color($color);
             return 'style="background-color: ' . esc_attr($color) . '; color: ' . esc_attr($text) . ';"';
         }
+    }
+
+    public function display(WP_Term $category): string
+    {
+        $link = $this->enable_link ? esc_url(get_term_link($category->term_id)) : '#';
+        $icon = $this->display_icon ? LSD_Taxonomies::icon($category->term_id) : '';
+
+        return '<span><a href="' . $link . '" ' . ($this->show_color ? LSD_Element_Categories::styles($category->term_id, $this->color_method) : '') . ' ' . lsd_schema()->category() . '>' . $icon . ($this->display_name ? esc_html($category->name) : '') . '</a></span>';
     }
 }

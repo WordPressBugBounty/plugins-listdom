@@ -2,23 +2,13 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Attributes Element Class.
- *
- * @class LSD_Element_Attributes
- * @version    1.0.0
- */
 class LSD_Element_Attributes extends LSD_Element
 {
     public $key = 'attributes';
     public $label;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Attributes', 'listdom');

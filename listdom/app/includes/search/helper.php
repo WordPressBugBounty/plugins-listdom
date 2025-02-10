@@ -149,28 +149,28 @@ class LSD_Search_Helper extends LSD_Base
     {
         if ($count <= 1)
         {
-            $field_column = $buttons ? 'lsd-col-10' : 'lsd-col-12';
-            $button_column = 'lsd-col-2';
+            $field_column = $buttons ? 'lsd-col-span-10' : 'lsd-col-span-12';
+            $button_column = 'lsd-col-span-2';
         }
         else if ($count == 2)
         {
-            $field_column = $buttons ? 'lsd-col-5' : 'lsd-col-6';
-            $button_column = 'lsd-col-2';
+            $field_column = $buttons ? 'lsd-col-span-5' : 'lsd-col-span-6';
+            $button_column = 'lsd-col-span-2';
         }
         else if ($count == 3)
         {
-            $field_column = $buttons ? 'lsd-col-3' : 'lsd-col-4';
-            $button_column = 'lsd-col-3';
+            $field_column = $buttons ? 'lsd-col-span-3' : 'lsd-col-span-4';
+            $button_column = 'lsd-col-span-3';
         }
         else if ($count == 4)
         {
-            $field_column = $buttons ? 'lsd-col-2' : 'lsd-col-3';
-            $button_column = 'lsd-col-4';
+            $field_column = $buttons ? 'lsd-col-span-2' : 'lsd-col-span-3';
+            $button_column = 'lsd-col-span-4';
         }
         else
         {
-            $field_column = 'lsd-col-2';
-            $button_column = 'lsd-col-2';
+            $field_column = 'lsd-col-span-2';
+            $button_column = 'lsd-col-span-2';
         }
 
         return [$field_column, $button_column];
@@ -183,13 +183,10 @@ class LSD_Search_Helper extends LSD_Base
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
         $id = $args['id'] ?? 'lsd_search_text_' . $key;
         $name = $args['name'] ?? 'sf-' . $key . '-lk';
-        $col_filter = $args['col_filter'] ?? '';
         $current = $args['current'] ?? '';
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($col_filter) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
         $output .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
-        $output .= '</div>';
 
         return $output;
     }
@@ -204,12 +201,13 @@ class LSD_Search_Helper extends LSD_Base
 
         $id = $args['id'] ?? 'lsd_search_number_' . $key;
         $name = $args['name'] ?? 'sf-' . $key . '-eq';
-        $class = ($method === 'range') ? 'lsd-search-range ' : '';
+        $class = $method === 'range' ? 'lsd-search-range ' : '';
 
         $current = $args['current'] ?? '';
 
-        $output = '<div class="lsd-search-filter ' . esc_attr($class . ($args['col_filter'] ?? '')) . '">';
+        $output = '<div class="' . esc_attr($class) . '">';
         $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output .= $method === 'range' ? '<div class="lsd-search-range-inner">' : '';
 
         if ($method === 'number-input')
         {
@@ -218,6 +216,7 @@ class LSD_Search_Helper extends LSD_Base
         else if ($method === 'dropdown')
         {
             $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+            $output .= '<option value="">' . esc_html($placeholder) . '</option>';
 
             if (strpos($name, 'sf-acf-') !== false)
             {
@@ -243,8 +242,8 @@ class LSD_Search_Helper extends LSD_Base
             $current = $args['dropdown_current'] ?? '';
 
             $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+            $output .= '<option value="">' . esc_html($placeholder) . '</option>';
 
-            $output .= '<option value="0">' . $placeholder . '</option>';
             $i = $min;
             while ($i <= $max)
             {
@@ -300,6 +299,7 @@ class LSD_Search_Helper extends LSD_Base
             ]);
         }
 
+        $output .= $method === 'range' ? '</div>' : '';
         $output .= '</div>';
         return $output;
     }
@@ -435,7 +435,7 @@ class LSD_Search_Helper extends LSD_Base
         $max_default = !empty($max_current) ? $max_current : ($args['max_default'] !== '' && $args['max_default'] <= $max ? $args['max_default'] : $max);
         $prepend = $args['prepend'] ?? '';
 
-        $output = '<div class="lsd-range-slider-label"><label>' . esc_html($prepend) . '<span class="lsd-range-min">' . esc_html($min_default) . '</span> - ' . esc_html($prepend) . '<span class="lsd-range-max">' . esc_html($max_default) . '</span></label></div>';
+        $output = '<div class="lsd-range-slider-label"><div><span>' . esc_html($prepend) . '<span class="lsd-range-min">' . esc_html($min_default) . '</span></span> <span>' . esc_html($prepend) . '<span class="lsd-range-max">' . esc_html($max_default) . '</span></span></div></div>';
         $output .= '<div class="lsd-range-slider-search ' . esc_attr($key) . '" data-default="' . esc_html($min_default) . '" data-max-default="' . esc_html($max_default) . '" data-min="' . esc_html($min) . '" data-max="' . esc_html($max) . '" data-step="' . esc_html($step) . '"></div>';
         $output .= '<input class="lsd-range-min-value" type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($min_name) . '" value="' . esc_attr($min_default) . '">';
         $output .= '<input class="lsd-range-max-value" type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($max_name) . '" value="' . esc_attr($max_default) . '">';

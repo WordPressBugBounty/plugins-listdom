@@ -22,7 +22,6 @@ class LSD_Personalize extends LSD_Base
         $raw = LSD_File::read($main->get_listdom_path() . '/assets/css/personalized.raw');
 
         $CSS = str_replace('((dply_main_color))', $settings['dply_main_color'], $raw);
-        $CSS = str_replace('((dply_secondary_color))', $settings['dply_secondary_color'], $CSS);
 
         $fonts = $main->get_fonts();
         $font = $fonts[$settings['dply_main_font']] ?? ['family' => 'Lato'];

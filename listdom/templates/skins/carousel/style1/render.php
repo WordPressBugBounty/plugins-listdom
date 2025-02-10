@@ -11,9 +11,11 @@ $ids = $this->listings;
 	<div>
 		<div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
 
-			<?php if ($this->display_image): ?>
-				<?php echo LSD_Kses::element($listing->get_cover_image([390, 260], $this->get_listing_link_method())); ?>
-			<?php endif; ?>
+            <?php if ($this->display_image): ?>
+                <div class="lsd-image">
+                    <?php echo LSD_Kses::element($listing->get_cover_image([390, 260], $this->get_listing_link_method())); ?>
+                </div>
+            <?php endif; ?>
 
 			<?php if ($this->display_labels): ?>
 				<div class="lsd-listing-labels">

@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Taxonomy Resource Class.
- *
- * @class LSD_API_Resources_Taxonomy
- * @version    1.0.0
- */
 class LSD_API_Resources_Taxonomy extends LSD_API_Resource
 {
     public static function get($id): array

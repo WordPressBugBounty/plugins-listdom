@@ -88,13 +88,13 @@ $mapsearch = $singlemap['mapsearch'] ?? '1';
             'name' => 'lsd[display][singlemap][mapobject_onclick]',
             'options' => [
                 'infowindow' => esc_html__('Open Infowindow', 'listdom'),
-                'redirect' => esc_html__('Redirect to Listing Details Page', 'listdom'),
-                'lightbox' => esc_html__('Open Listing Details in a Lightbox', 'listdom'),
+                'redirect' => esc_html__('Redirect to Single Listing Page', 'listdom'),
+                'lightbox' => esc_html__('Open Single Listing in a Lightbox', 'listdom'),
                 'none' => esc_html__('None', 'listdom')
             ],
             'value' => $singlemap['mapobject_onclick'] ?? 'infowindow'
         ]); ?>
-        <p class="description"><?php esc_html_e("You can select to show an infowindow when someone clicks on a marker or shape on the map or open the listing details page directly. Also it's possible to show the details on a Lightbox without reloading the page.", 'listdom'); ?></p>
+        <p class="description"><?php esc_html_e("You can choose to display an info window when someone clicks on a marker or shape on the map, open the single listing page directly, or show the details in a lightbox without reloading the page.", 'listdom'); ?></p>
     </div>
 </div>
 <div class="lsd-form-row lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
@@ -112,7 +112,7 @@ $mapsearch = $singlemap['mapsearch'] ?? '1';
             ]); ?>
             <p class="description"><?php esc_html_e("Provide ability to filter listings based on current map position.", 'listdom'); ?></p>
         <?php else: ?>
-            <p class="lsd-alert lsd-warning"><?php echo LSD_Base::missFeatureMessage(esc_html__('Map Search', 'listdom')); ?></p>
+            <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Map Search', 'listdom')); ?></p>
         <?php endif; ?>
     </div>
 </div>
@@ -126,7 +126,7 @@ $mapsearch = $singlemap['mapsearch'] ?? '1';
             ]); ?></div>
             <div class="lsd-col-6">
                 <?php echo LSD_Form::autosuggest([
-                    'source' => LSD_Base::PTYPE_SHORTCODE,
+                    'source' => LSD_Base::PTYPE_SHORTCODE.'-searchable',
                     'name' => 'lsd[display][singlemap][connected_shortcodes]',
                     'id' => 'lsd_display_options_skin_singlemap_connected_shortcodes',
                     'input_id' => 'lsd_display_options_skin_singlemap_connected_shortcodes_input',
@@ -134,7 +134,7 @@ $mapsearch = $singlemap['mapsearch'] ?? '1';
                     'values' => $singlemap['connected_shortcodes'] ?? [],
                     'max_items' => 3,
                     'placeholder' => esc_html__("Enter at least 3 characters of the shortcode's title ...", 'listdom'),
-                    'description' => esc_html__('You should select up tp 3 search-able skin shortcodes e.g. List, Grid, Masonry, List + Grid, Half Map, Side By Side, etc.', 'listdom'),
+                    'description' => esc_html__('You should select up to 3 search-able skin shortcodes e.g. List, Grid, Masonry, List + Grid, Half Map, Side By Side, etc.', 'listdom'),
                 ]); ?>
             </div>
         </div>
@@ -156,6 +156,25 @@ $mapsearch = $singlemap['mapsearch'] ?? '1';
             'name' => 'lsd[display][singlemap][limit]',
             'value' => $singlemap['limit'] ?? '300'
         ]); ?>
-        <p class="description"><?php esc_html_e("This option contrlos the number of the items showed on the map. If you increase the limit to more than 300, then the page may load pretty slow. We suggest you to use filter options to filter only the listings that you want to include in this shortcode.", 'listdom'); ?></p>
+        <p class="description"><?php esc_html_e("This option controls the number of items displayed on the map. Increasing the limit beyond 300 may significantly slow down the page loading time. We recommend using filter options to include only the listings you want in this shortcode.", 'listdom'); ?></p>
     </div>
 </div>
+<div class="lsd-form-row">
+    <div class="lsd-col-2"><?php echo LSD_Form::label([
+        'title' => esc_html__('Map Height', 'listdom'),
+        'for' => 'lsd_display_options_skin_singlemap_map_height',
+    ]); ?></div>
+    <div class="lsd-col-6">
+        <?php echo LSD_Form::text([
+            'id' => 'lsd_display_options_skin_singlemap_map_height',
+            'name' => 'lsd[display][singlemap][map_height]',
+            'value' => $singlemap['map_height'] ?? ''
+        ]); ?>
+        <p class="description"><?php esc_html_e("Use this option to set the map height. Enter a value with units, such as 500px or 100vh. If you're unsure, leave it blank.", 'listdom'); ?></p>
+    </div>
+</div>
+
+<?php
+    // Action for Third Party Plugins
+    do_action('lsd_shortcode_singlemap_options', $singlemap);
+?>

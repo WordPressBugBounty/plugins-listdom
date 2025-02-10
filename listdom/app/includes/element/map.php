@@ -2,23 +2,13 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Map Element Class.
- *
- * @class LSD_Element_Map
- * @version    1.0.0
- */
 class LSD_Element_Map extends LSD_Element
 {
     public $key = 'map';
     public $label;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Map', 'listdom');

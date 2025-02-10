@@ -13,13 +13,8 @@ class LSD_PTypes_Notification extends LSD_PTypes
     public $PT;
     protected $settings;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         $this->PT = LSD_Base::PTYPE_NOTIFICATION;
 
         // Listdom Settings

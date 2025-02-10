@@ -2,21 +2,18 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Profile Controller Class.
- *
- * @class LSD_API_Controllers_Profile
- * @version    1.0.0
- */
 class LSD_API_Controllers_Profile extends LSD_API_Controller
 {
-    public function get(WP_REST_Request $request)
+    public function get(WP_REST_Request $request): WP_REST_Response
     {
         // Get Current User
         $user = wp_get_current_user();
 
-        // Invalid User
-        if (is_wp_error($user)) return $user;
+        /** @var WP_Error $user */
+        if (is_wp_error($user)) return $this->response([
+            'data' => new WP_Error('400', $user->get_error_message()),
+            'status' => 400,
+        ]);
 
         // Response
         return $this->response([

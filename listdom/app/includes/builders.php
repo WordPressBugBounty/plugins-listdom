@@ -13,23 +13,12 @@ class LSD_Builders extends LSD_Base
     /**
      * @var LSD_PTypes_Listing_Single
      */
-    private $single;
+    private $single = null;
 
     /**
      * @var LSD_Entity_Listing
      */
-    private $listing;
-
-    /**
-     * Constructor method
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->single = null;
-        $this->listing = null;
-    }
+    private $listing = null;
 
     public function single($single): LSD_Builders
     {
@@ -49,16 +38,16 @@ class LSD_Builders extends LSD_Base
 
         // Elementor
         if (
-            class_exists('LSDADDELM_Base') &&
+            class_exists(\LSDPACELM\Base::class) &&
             class_exists('Elementor\Plugin') &&
-            $template->post_type === LSDADDELM_Base::PTYPE_DETAILS
+            $template->post_type === \LSDPACELM\Base::PTYPE_DETAILS
         ) return $this->elementor($template_id);
 
         // Divi
         if (
-            class_exists('LSDADDDIV_Base') &&
+            class_exists(\LSDPACDIV\Base::class) &&
             function_exists('et_theme_builder_frontend_render_layout') &&
-            $template->post_type === LSDADDDIV_Base::PTYPE_DETAILS
+            $template->post_type === \LSDPACDIV\Base::PTYPE_DETAILS
         ) return $this->divi($template_id);
 
         // Anything
@@ -71,10 +60,18 @@ class LSD_Builders extends LSD_Base
         LSD_Payload::set('single', $this->single);
         LSD_Payload::set('listing', $this->listing);
 
+        // Set Current Post
+        if ($this->listing) LSD_LifeCycle::post($this->listing->id());
+
         // Build Content
-        return Elementor\Plugin::instance()
+        $output = Elementor\Plugin::instance()
             ->frontend
             ->get_builder_content_for_display($template_id, true);
+
+        // Back to Original Post
+        if ($this->listing) LSD_LifeCycle::reset();
+
+        return $output;
     }
 
     public function divi($template_id): string
@@ -83,9 +80,17 @@ class LSD_Builders extends LSD_Base
         LSD_Payload::set('single', $this->single);
         LSD_Payload::set('listing', $this->listing);
 
+        // Set Current Post
+        if ($this->listing) LSD_LifeCycle::post($this->listing->id());
+
         // Build Content
         $template_content = get_post_field('post_content', $template_id);
-        return et_core_intentionally_unescaped(et_builder_render_layout($template_content), 'html');
+        $output = et_core_intentionally_unescaped(et_builder_render_layout($template_content), 'html');
+
+        // Back to Original Post
+        if ($this->listing) LSD_LifeCycle::reset();
+
+        return $output;
     }
 
     public function content($template_id)

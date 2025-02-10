@@ -137,7 +137,7 @@ $sections = [
                 </div>
 
                 <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-my-3">
-                    <?php if(!class_exists('LSDADDELM_Base')): ?>
+                    <?php if (!class_exists(\LSDPACELM\Base::class)): ?>
                         <p class="lsd-alert lsd-warning lsd-my-0">
                             <?php echo sprintf(
                                 esc_html__('Activate the Listdom %s add-on to design new styles with Elementor Page Builder', 'listdom'),
@@ -145,7 +145,7 @@ $sections = [
                             ); ?>
                         </p>
                     <?php endif; ?>
-                    <?php if(!class_exists('LSDADDDIV_Base')): ?>
+                    <?php if (!class_exists(\LSDPACDIV\Base::class)): ?>
                         <p class="lsd-alert lsd-warning lsd-my-0">
                             <?php echo sprintf(
                                 esc_html__('Activate the Listdom %s add-on to design new styles with Divi Builder.', 'listdom'),
@@ -173,8 +173,8 @@ $sections = [
                 </div>
                 <div class="lsd-form-row">
                     <div class="lsd-col-12">
-                        <p class="description">
-                            <?php echo sprintf(esc_html__("If the website theme supports multiple layouts for %s, you can select your desired layout for listing details page. If you're not sure about this option, just select the Default Layout. Also, don't select an archive layout if your theme has added this option.", 'listdom'), '<strong>'.esc_html__('single pages', 'listdom').'</strong>'); ?>
+                        <p class="description lsd-mb-0">
+                            <?php echo sprintf(esc_html__("If the website theme supports multiple layouts for %s, you can select your desired layout for single listing page. If you're not sure about this option, just select the Default Layout. Also, don't select an archive layout if your theme has added this option.", 'listdom'), '<strong>'.esc_html__('single pages', 'listdom').'</strong>'); ?>
                         </p>
                     </div>
                 </div>
@@ -185,7 +185,7 @@ $sections = [
                     </div>
                 </div>
                 <?php else: ?>
-                <div class="lsd-form-row">
+                <div class="lsd-form-row lsd-mt-4">
                     <div class="lsd-col-6"><?php echo LSD_Form::label([
                         'title' => esc_html__('Display Options Per Category', 'listdom'),
                         'for' => 'lsd_dispc',
@@ -202,21 +202,21 @@ $sections = [
                 </div>
                 <div class="lsd-form-row">
                     <div class="lsd-col-12">
-                        <p class="description">
+                        <p class="description lsd-mb-0">
                             <?php echo esc_html__("When enabled, you can assign a unique single listing style to each category.", 'listdom'); ?>
                         </p>
                     </div>
                 </div>
                 <?php endif; ?>
 
-                <?php if (!class_exists('LSDADDSUB')): ?>
+                <?php if (!class_exists(LSDADDSUB::class) && !class_exists(\LSDPACSUB\Base::class)): ?>
                     <div class="lsd-form-row">
                         <div class="lsd-col-12">
                             <?php echo LSD_Base::alert($this->missAddonMessage(esc_html__('Subscription', 'listdom'), '<strong>'.esc_html__('Display Options Per Package', 'listdom').'</strong>'), 'warning'); ?>
                         </div>
                     </div>
                 <?php else: ?>
-                    <div class="lsd-form-row">
+                    <div class="lsd-form-row lsd-mt-4">
                         <div class="lsd-col-6"><?php echo LSD_Form::label([
                             'title' => esc_html__('Display Options Per Package', 'listdom'),
                             'for' => 'lsd_dispp',
@@ -233,7 +233,7 @@ $sections = [
                     </div>
                     <div class="lsd-form-row">
                         <div class="lsd-col-12">
-                            <p class="description">
+                            <p class="description lsd-mb-0">
                                 <?php echo esc_html__("When enabled, you can assign a unique single listing style to each package.", 'listdom'); ?>
                             </p>
                         </div>
@@ -246,7 +246,7 @@ $sections = [
                     </div>
                 </div>
                 <?php else: ?>
-                <div class="lsd-form-row">
+                <div class="lsd-form-row lsd-mt-4">
                     <div class="lsd-col-6"><?php echo LSD_Form::label([
                         'title' => esc_html__('Display Options Per Listing', 'listdom'),
                         'for' => 'lsd_displ',
@@ -264,13 +264,13 @@ $sections = [
                 </div>
                 <div class="lsd-form-row">
                     <div class="lsd-col-12">
-                        <p class="description">
+                        <p class="description lsd-mb-0">
                             <?php echo esc_html__("Select who has access to disable or enable the Elements for each listing and can select a certain Style for that.", 'listdom'); ?>
                         </p>
                     </div>
                 </div>
                 <?php endif; ?>
-                <div class="lsd-form-row">
+                <div class="lsd-form-row lsd-mt-4">
                     <div class="lsd-col-6"><?php echo LSD_Form::label([
                         'title' => esc_html__('Comments', 'listdom'),
                         'for' => 'lsd_comments',
@@ -379,6 +379,7 @@ jQuery('#lsd_settings_form').on('submit', function(e)
     const $button = jQuery("#lsd_settings_save_button");
     const $success = jQuery(".lsd-settings-success-message");
     const $error = jQuery(".lsd-settings-error-message");
+    const $tab = jQuery('.nav-tab-active');
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
@@ -397,6 +398,8 @@ jQuery('#lsd_settings_form').on('submit', function(e)
         data: "action=lsd_save_details_page&" + settings,
         success: function()
         {
+            $tab.attr('data-saved', 'true');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 
@@ -405,6 +408,8 @@ jQuery('#lsd_settings_form').on('submit', function(e)
         },
         error: function()
         {
+            $tab.attr('data-saved', 'false');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 

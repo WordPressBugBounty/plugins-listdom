@@ -2,30 +2,21 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Features Element Class.
- *
- * @class LSD_Element_Features
- * @version    1.0.0
- */
 class LSD_Element_Features extends LSD_Element
 {
     public $key = 'features';
     public $label;
     public $show_icons;
+    public $enable_link;
     public $separator = '/';
 
-    /**
-     * Constructor method
-     * @param bool $show_icons
-     */
-    public function __construct($show_icons = false)
+    public function __construct($show_icons = false, $enable_link = true)
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Features', 'listdom');
         $this->show_icons = $show_icons;
+        $this->enable_link = $enable_link;
     }
 
     public function get($post_id = null, $list_style = 'per-row')
@@ -76,6 +67,13 @@ class LSD_Element_Features extends LSD_Element
             <select name="lsd[elements][' . esc_attr($this->key) . '][show_icons]" id="lsd_elements_' . esc_attr($this->key) . '_show_icons">
                 <option value="0" ' . (isset($data['show_icons']) && $data['show_icons'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
                 <option value="1" ' . (isset($data['show_icons']) && $data['show_icons'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
+            </select>
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_enable_link">' . esc_html__('Enable Link To Archive', 'listdom') . '</label>
+            <select name="lsd[elements][' . esc_attr($this->key) . '][enable_link]" id="lsd_elements_' . esc_attr($this->key) . '_enable_link">
+                <option value="0" ' . (isset($data['enable_link']) && $data['enable_link'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
+                <option value="1" ' . (isset($data['enable_link']) && $data['enable_link'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
             </select>
         </div>
         <div>

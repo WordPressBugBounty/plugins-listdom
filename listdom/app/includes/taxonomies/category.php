@@ -77,6 +77,9 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         // Primary Category
         $category = LSD_Entity_Listing::get_primary_category($post->ID);
 
+        // All Categories
+        $all_categories = LSD_Taxonomies_Category::get_terms();
+
         // Security Nonce
         LSD_Form::nonce('lsd_listing_cpt', '_lsdnonce');
 
@@ -88,7 +91,9 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
             'id' => 'lsd_listing_category',
             'taxonomy' => LSD_Base::TAX_CATEGORY,
             'show_option_none' => '-----',
-            'selected' => $category ? $category->term_id : null,
+            'selected' => $category && isset($category->term_id)
+                ? $category->term_id
+                : (is_array($all_categories) && count($all_categories) === 1 ? $all_categories[0]->term_id : null),
             'class' => 'widefat',
             'hierarchical' => 1,
             'orderby' => 'name',

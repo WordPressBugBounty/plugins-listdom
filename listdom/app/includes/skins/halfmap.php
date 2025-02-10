@@ -12,7 +12,6 @@ class LSD_Skins_Halfmap extends LSD_Skins
 {
     public $skin = 'halfmap';
     public $default_style = 'style1';
-    public $map_height;
     public $map_limit;
 
     public function init()
@@ -26,9 +25,6 @@ class LSD_Skins_Halfmap extends LSD_Skins
 
     public function after_start()
     {
-        // Map height
-        $this->map_height = isset($this->skin_options['map_height']) && trim($this->skin_options['map_height']) ? (int) $this->skin_options['map_height'] : 500;
-
         // Map Limit
         $this->map_limit = isset($this->skin_options['maplimit']) && trim($this->skin_options['maplimit']) ? (int) $this->skin_options['maplimit'] : 300;
 

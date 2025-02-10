@@ -18,9 +18,8 @@ class LSD_Plugin_Hooks
      */
     protected static $instance = null;
 
-    public $main;
-    public $db;
-    protected $feedback;
+    protected $main;
+    protected $db;
 
     /**
      * Listdom Plugin Hooks Instance.
@@ -29,7 +28,7 @@ class LSD_Plugin_Hooks
      * @since 1.0.0
      * @static
      */
-    public static function instance()
+    public static function instance(): LSD_Plugin_Hooks
     {
         // Get an instance of Class
         if (is_null(self::$instance)) self::$instance = new self();
@@ -38,9 +37,6 @@ class LSD_Plugin_Hooks
         return self::$instance;
     }
 
-    /**
-     * Constructor method
-     */
     protected function __construct()
     {
         register_activation_hook(LSD_BASENAME, [$this, 'activate']);

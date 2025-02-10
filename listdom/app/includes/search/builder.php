@@ -15,13 +15,8 @@ class LSD_Search_Builder extends LSD_Base
      */
     public $helper;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         $this->helper = new LSD_Search_Helper();
     }
 
@@ -141,6 +136,27 @@ class LSD_Search_Builder extends LSD_Base
         return apply_filters('lsd_search_fields', $fields, $existings, $this);
     }
 
+    public function getAllFields(?string $key = null): array
+    {
+        // All Fields
+        $all = $this->getAvailableFields();
+
+        // Key / Value Pair
+        $pairs = [];
+        foreach ($all as $field)
+        {
+            if (!isset($field['key']) || !$field['key']) continue;
+
+            $pairs[$field['key']] = $field;
+        }
+
+        // Single Field
+        if ($key) return isset($pairs[$key]) && is_array($pairs[$key]) ? $pairs[$key] :  [];
+
+        // All Fields
+        return $pairs;
+    }
+
     public function getFieldMethods($type, $key = '')
     {
         // Methods
@@ -227,12 +243,16 @@ class LSD_Search_Builder extends LSD_Base
         $type = $this->helper->get_type_by_key($key);
         $methods = $this->getFieldMethods($type, $key);
 
+        // Original Field Data
+        $field = $this->getAllFields($key);
+
         // Generate output
         return $this->include_html_file('metaboxes/search/params.php', [
             'return_output' => true,
             'parameters' => [
                 'key' => $key,
                 'data' => $data,
+                'field' => $field,
                 'type' => $type,
                 'i' => $index,
                 'methods' => $methods,

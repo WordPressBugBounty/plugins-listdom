@@ -28,7 +28,7 @@ class LSD_id
      * @since 1.0.0
      * @static
      */
-    public static function instance()
+    public static function instance(): LSD_id
     {
         // Get an instance of Class
         if (is_null(self::$instance)) self::$instance = new self();

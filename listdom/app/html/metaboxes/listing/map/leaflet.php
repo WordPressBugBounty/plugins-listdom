@@ -6,27 +6,27 @@ defined('ABSPATH') || die();
 /** @var array $shape */
 ?>
 <script>
-var bounds;
-var fill_color = '<?php echo esc_js($settings['map_shape_fill_color']); ?>';
-var fill_opacity = '<?php echo esc_js($settings['map_shape_fill_opacity']); ?>';
-var stroke_color = '<?php echo esc_js($settings['map_shape_stroke_color']); ?>';
-var stroke_opacity = '<?php echo esc_js($settings['map_shape_stroke_opacity']); ?>';
-var stroke_weight = '<?php echo esc_js($settings['map_shape_stroke_weight']); ?>';
-var mapbox_token = '<?php echo esc_js($settings['mapbox_access_token']); ?>';
+let bounds;
+const fill_color = '<?php echo esc_js($settings['map_shape_fill_color']); ?>';
+const fill_opacity = '<?php echo esc_js($settings['map_shape_fill_opacity']); ?>';
+const stroke_color = '<?php echo esc_js($settings['map_shape_stroke_color']); ?>';
+const stroke_opacity = '<?php echo esc_js($settings['map_shape_stroke_opacity']); ?>';
+const stroke_weight = '<?php echo esc_js($settings['map_shape_stroke_weight']); ?>';
+const mapbox_token = '<?php echo esc_js($settings['mapbox_access_token']); ?>';
 
 jQuery(document).ready(function($)
 {
-    var object_type = $('#lsd_object_type').val();
-    var latitude = $('#lsd_object_type_latitude').val();
-    var longitude = $('#lsd_object_type_longitude').val();
-    var zoomlevel = parseInt($('#lsd_object_type_zoomlevel').val());
-    var overlaysArray = [];
-    var center = new L.LatLng(latitude, longitude);
-    var overlay;
-    var latlngs = [];
+    const object_type = $('#lsd_object_type').val();
+    const latitude = $('#lsd_object_type_latitude').val();
+    const longitude = $('#lsd_object_type_longitude').val();
+    const zoomlevel = parseInt($('#lsd_object_type_zoomlevel').val());
+    let overlaysArray = [];
+    const center = new L.LatLng(latitude, longitude);
+    let overlay;
+    let latlngs = [];
 
     // Init map
-    var map = L.map(document.getElementById('lsd_address_map')).setView(center, zoomlevel);
+    const map = L.map(document.getElementById('lsd_address_map')).setView(center, zoomlevel);
 
     if(mapbox_token)
     {
@@ -48,11 +48,11 @@ jQuery(document).ready(function($)
     }
 
     // Draw Toolbar
-    var drawnItems = new L.FeatureGroup();
+    const drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
     // Shape Display Options
-    var displayOptions = {
+    const displayOptions = {
         color: stroke_color,
         weight: stroke_weight,
         opacity: stroke_opacity,
@@ -61,7 +61,7 @@ jQuery(document).ready(function($)
     };
 
     // Draw Control
-    var drawControl = new L.Control.Draw(
+    const drawControl = new L.Control.Draw(
     {
         draw: {
             marker: false,
@@ -97,7 +97,7 @@ jQuery(document).ready(function($)
 
     <?php elseif(isset($shape['type']) and $shape['type'] == 'rectangle'): ?>
 
-    latlngs = [[<?php echo esc_js($shape['north']); ?>, <?php echo esc_js($shape['east']); ?>], [<?php echo esc_js($shape['south']); ?>, <?php echo esc_js($shape['west']); ?>]];
+    latlngs = [['<?php echo esc_js($shape['north']); ?>', '<?php echo esc_js($shape['east']); ?>'], ['<?php echo esc_js($shape['south']); ?>', '<?php echo esc_js($shape['west']); ?>']];
     overlay = L.rectangle(latlngs, displayOptions).addTo(map);
 
     <?php elseif(isset($shape['type']) and $shape['type'] == 'polygon'): ?>
@@ -107,7 +107,7 @@ jQuery(document).ready(function($)
 
     <?php elseif(isset($shape['type']) and $shape['type'] == 'circle'): ?>
 
-    overlay = L.circle([<?php echo esc_js($shape['center']->lat); ?>, <?php echo esc_js($shape['center']->lng); ?>], {radius: <?php echo esc_js($shape['radius']); ?>}).addTo(map);
+    overlay = L.circle(['<?php echo esc_js($shape['center']->lat); ?>', '<?php echo esc_js($shape['center']->lng); ?>'], {radius: <?php echo esc_js($shape['radius']); ?>}).addTo(map);
 
     <?php endif; ?>
 
@@ -119,14 +119,14 @@ jQuery(document).ready(function($)
 
     map.on(L.Draw.Event.CREATED, function(e)
     {
-        var type = e.layerType;
+        let type = e.layerType;
         overlay = e.layer;
 
         // Set the boundaries
         lsd_set_boundaries(overlay, type);
 
         // Delete Overlays
-        for(var i = 0; i < overlaysArray.length; i++) overlaysArray[i].remove();
+        for(let i = 0; i < overlaysArray.length; i++) overlaysArray[i].remove();
         overlaysArray = [];
 
         // Push to array
@@ -140,7 +140,7 @@ jQuery(document).ready(function($)
     {
         e.layers.eachLayer(function(overlay)
         {
-            var type;
+            let type;
 
             if(overlay instanceof L.Circle) type = 'circle';
             else if(overlay instanceof L.Marker) type = 'marker';
@@ -155,7 +155,7 @@ jQuery(document).ready(function($)
     });
 
     // Define Marker
-    var marker = L.marker(center, {
+    const marker = L.marker(center, {
         draggable: true
     }).addTo(map);
 
@@ -172,14 +172,14 @@ jQuery(document).ready(function($)
     // Address Changed Manually
     $('#lsd_object_type_address').on('change', function()
     {
-        var address = $('#lsd_object_type_address').val();
+        const address = $('#lsd_object_type_address').val();
 
         $.get(location.protocol + '//nominatim.openstreetmap.org/search?format=json&q='+address, function(data)
         {
             if(data.length > 0)
             {
-                var latitude = $('#lsd_object_type_latitude');
-                var longitude = $('#lsd_object_type_longitude');
+                const latitude = $('#lsd_object_type_latitude');
+                const longitude = $('#lsd_object_type_longitude');
 
                 latitude.val(data[0].lat);
                 longitude.val(data[0].lon);
@@ -192,9 +192,9 @@ jQuery(document).ready(function($)
     // Latitude and Longitude Changed Manually
     $('#lsd_object_type_latitude, #lsd_object_type_longitude').on('change', function()
     {
-        var lat = $('#lsd_object_type_latitude').val();
-        var lng = $('#lsd_object_type_longitude').val();
-        var position = new L.LatLng(lat, lng);
+        const lat = $('#lsd_object_type_latitude').val();
+        const lng = $('#lsd_object_type_longitude').val();
+        const position = new L.LatLng(lat, lng);
 
         marker.setLatLng(position);
         map.flyTo(position, map.getZoom());
@@ -249,8 +249,8 @@ jQuery(document).ready(function($)
 
 function lsd_set_boundaries(overlay, type)
 {
-    var paths = [];
-    var radius;
+    const paths = [];
+    let radius;
 
     if(type === 'polygon')
     {
@@ -271,15 +271,15 @@ function lsd_set_boundaries(overlay, type)
     }
     else if(type === 'rectangle')
     {
-        var ne = overlay.getBounds().getNorthEast();
-        var sw = overlay.getBounds().getSouthWest();
+        const ne = overlay.getBounds().getNorthEast();
+        const sw = overlay.getBounds().getSouthWest();
 
         paths.push(L.latLng(ne.lat, ne.lng));
         paths.push(L.latLng(sw.lat, sw.lng));
     }
     else if(type === 'circle')
     {
-        var center = overlay.getLatLng();
+        const center = overlay.getLatLng();
         paths.push(L.latLng(center.lat, center.lng));
 
         radius = overlay.getRadius();

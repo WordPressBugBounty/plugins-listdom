@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Routes Class.
- *
- * @class LSD_API_Routes
- * @version    1.0.0
- */
 class LSD_API_Routes extends LSD_API
 {
     public function init()

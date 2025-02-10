@@ -12,9 +12,6 @@ class LSD_Widgets_SimpleMap extends WP_Widget
 {
     public $LSD;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct('LSD_Widgets_SimpleMap', esc_html__('(Listdom) Simple Map', 'listdom'), ['description' => esc_html__('Show a certain address on map.', 'listdom')]);

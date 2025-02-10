@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Share Element Class.
- *
- * @class LSD_Element_Share
- * @version    1.0.0
- */
 class LSD_Element_Share extends LSD_Element
 {
     public $key = 'share';
@@ -15,14 +9,8 @@ class LSD_Element_Share extends LSD_Element
     public $layout;
     public $args;
 
-    /**
-     * Constructor method
-     * @param string $layout
-     * @param array $args
-     */
     public function __construct(string $layout = 'full', array $args = [])
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Share', 'listdom');

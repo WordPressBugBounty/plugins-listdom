@@ -47,7 +47,7 @@ $ids = $this->listings;
 				<div class="lsd-col-8">
 					<?php if ($this->display_categories): ?>
 						<div class="lsd-listing-category">
-							<?php echo LSD_Kses::element($listing->get_categories(true, false, 'text')); ?>
+							<?php echo LSD_Kses::element($listing->get_categories(['show_color' => true, 'multiple_categories' => false, 'color_method' => 'text'])); ?>
 						</div>
 					<?php endif; ?>
 				</div>

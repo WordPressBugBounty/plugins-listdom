@@ -18,7 +18,7 @@ $style = $args['mapstyle'] ?? '';
 $zoomlevel = $args['zoomlevel'] ?? 14;
 $gps_zl = $settings['map_gps_zl'] ?? 13;
 $gps_zl_current = $settings['map_gps_zl_current'] ?? 7;
-$canvas_height = $args['canvas_height'] ?? null;
+$map_height = $args['map_height'] ?? null;
 $atts = isset($args['atts']) && is_array($args['atts']) ? $args['atts'] : [];
 $mapsearch = isset($args['mapsearch']) && $args['mapsearch'];
 $gplaces = isset($args['gplaces']) && $args['gplaces'];
@@ -87,5 +87,5 @@ jQuery(document).ready(function()
 </script>');
 ?>
 <div class="lsd-listing-leaflet">
-    <div id="lsd_map<?php echo esc_attr($id); ?>" class="<?php echo $args['canvas_class'] ?? 'lsd-map-canvas'; ?>" <?php if($canvas_height) echo 'style="height: '.esc_attr($canvas_height).'px;"'; ?>></div>
+    <div id="lsd_map<?php echo esc_attr($id); ?>" class="<?php echo isset($args['canvas_class']) ? sanitize_html_class($args['canvas_class']) : 'lsd-map-canvas'; ?>" <?php if ($map_height) echo 'style="height: '.esc_attr($map_height).';"'; ?>></div>
 </div>

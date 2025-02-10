@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Fields Resource Class.
- *
- * @class LSD_API_Resources_Fields
- * @version    1.0.0
- */
 class LSD_API_Resources_Fields extends LSD_API_Resource
 {
     public static function grab()
@@ -279,7 +273,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'method' => 'url-input',
                         'label' => esc_html__('Listing Link', 'listdom'),
                         'placeholder' => 'https://anothersite.com/listing-page/',
-                        'guide' => esc_html__('If you fill it, then it will be used to override default details page link. You can use it for linking the listing to an external or custom page!', 'listdom'),
+                        'guide' => esc_html__('If you fill it, then it will be used to override default single listing page link. You can use it for linking the listing to an external or custom page!', 'listdom'),
                         'required' => false,
                     ],
                 ],

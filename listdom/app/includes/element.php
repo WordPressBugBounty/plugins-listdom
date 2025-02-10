@@ -23,13 +23,8 @@ class LSD_Element extends LSD_Base
     protected $has_title_settings = true;
     protected $inline_title = false;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Listdom Settings
         $this->settings = LSD_Options::settings();
     }

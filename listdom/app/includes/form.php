@@ -209,7 +209,7 @@ class LSD_Form extends LSD_Base
     {
         if (!count($args)) return false;
 
-        return '<input type="text" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : 'lsd-colorpicker') . '" value="' . (isset($args['value']) ? esc_attr($args['value']) : '') . '" data-default-color="' . (isset($args['default']) ? esc_attr($args['default']) : '') . '" />';
+        return '<input type="text" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : 'lsd-colorpicker') . '" value="' . (isset($args['value']) ? esc_attr($args['value']) : '') . '" data-default-color="' . (isset($args['default']) ? esc_attr($args['default']) : '') . '">';
     }
 
     public static function imagepicker($args)
@@ -219,10 +219,12 @@ class LSD_Form extends LSD_Base
         $image_id = $args['value'] ?? '';
         $image = $image_id ? wp_get_attachment_image($image_id, ['400', '266']) : '';
 
-        return '<div id="' . esc_attr($args['id']) . '_img" class="lsd-imagepicker-image-placeholder lsd-mb-2">' . (trim($image) ? $image : '') . '</div>
-        <input type="hidden" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" value="' . esc_attr($image_id) . '">
-        <button type="button" class="lsd-select-image-button button ' . ($image_id ? 'lsd-util-hide' : '') . '" id="' . esc_attr($args['id']) . '_button" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Upload/Select image', 'listdom') . '</button>
-        <button type="button" class="lsd-remove-image-button button ' . ($image_id ? '' : 'lsd-util-hide') . '" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Remove image', 'listdom') . '</button>';
+        return '<div>
+            <div id="' . esc_attr($args['id']) . '_img" class="lsd-imagepicker-image-placeholder lsd-mb-2">' . (trim($image) ? $image : '') . '</div>
+            <input type="hidden" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" value="' . esc_attr($image_id) . '">
+            <button type="button" class="lsd-select-image-button button ' . ($image_id ? 'lsd-util-hide' : '') . '" id="' . esc_attr($args['id']) . '_button" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Upload/Select image', 'listdom') . '</button>
+            <button type="button" class="lsd-remove-image-button button ' . ($image_id ? '' : 'lsd-util-hide') . '" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Remove image', 'listdom') . '</button>
+        </div>';
     }
 
     public static function filepicker($args)
@@ -471,19 +473,19 @@ class LSD_Form extends LSD_Base
     public static function packages($args)
     {
         if (!count($args)) return false;
-        if (!class_exists('LSDADDSUB_Base')) return false;
+        if (!class_exists(\LSDPACSUB\Base::class)) return false;
 
         $options = '';
-        $query = ['post_type' => LSDADDSUB_Base::PTYPE_PACKAGE, 'posts_per_page' => '-1'];
+        $query = ['post_type' => \LSDPACSUB\Base::PTYPE_PACKAGE, 'posts_per_page' => '-1'];
         $packages = get_posts($query);
 
         // Show Empty Option
-        if (isset($args['show_empty']) and $args['show_empty'])
+        if (isset($args['show_empty']) && $args['show_empty'])
         {
-            $options .= '<option value="" ' . ((isset($args['value']) and esc_attr($args['value']) == '') ? 'selected="selected"' : '') . '>' . ((isset($args['empty_label']) and trim($args['empty_label'])) ? $args['empty_label'] : '-----') . '</option>';
+            $options .= '<option value="" ' . ((isset($args['value']) && esc_attr($args['value']) == '') ? 'selected="selected"' : '') . '>' . ((isset($args['empty_label']) && trim($args['empty_label'])) ? $args['empty_label'] : '-----') . '</option>';
         }
 
-        foreach ($packages as $package) $options .= '<option value="' . esc_attr($package->ID) . '" ' . ((isset($args['value']) and $args['value'] == $package->ID) ? 'selected="selected"' : '') . '>' . esc_html($package->post_title) . '</option>';
+        foreach ($packages as $package) $options .= '<option value="' . esc_attr($package->ID) . '" ' . ((isset($args['value']) && $args['value'] == $package->ID) ? 'selected="selected"' : '') . '>' . esc_html($package->post_title) . '</option>';
 
         return '<select name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : 'lsd-package') . '">
             ' . $options . '                       
@@ -533,6 +535,7 @@ class LSD_Form extends LSD_Base
         $nonce = wp_create_nonce('lsd_autosuggest');
 
         $source = isset($args['source']) && trim($args['source']) ? $args['source'] : '';
+        $toggle = isset($args['toggle']) && trim($args['toggle']) ? $args['toggle'] : '';
         $values = isset($args['values']) && is_array($args['values']) ? $args['values'] : [];
 
         $current = '';
@@ -541,25 +544,25 @@ class LSD_Form extends LSD_Base
             if ($source === 'users')
             {
                 $user = get_user_by('id', $value);
-                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $user->ID . '" data-lsd-tooltip="'. esc_attr('Click twice to delete', 'listdom') .'">' . $user->user_email . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($user->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $user->ID . '"></span>';
+                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $user->ID . '" data-lsd-tooltip="' . esc_attr__('Click twice to delete', 'listdom') . '">' . $user->user_email . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($user->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $user->ID . '"></span>';
             }
-            elseif (in_array($source, get_taxonomies()))
+            else if (in_array($source, get_taxonomies()))
             {
                 $term = get_term($value);
-                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . esc_attr($term->term_id) . '" data-lsd-tooltip="'. esc_attr('Click twice to delete', 'listdom') .'">' . esc_html($term->name) . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($term->term_id) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . esc_attr($term->term_id) . '"></span>';
+                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . esc_attr($term->term_id) . '" data-lsd-tooltip="' . esc_attr__('Click twice to delete', 'listdom') . '">' . esc_html($term->name) . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($term->term_id) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . esc_attr($term->term_id) . '"></span>';
             }
             else
             {
-	            $post = get_post($value);
-                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $post->ID . '" data-lsd-tooltip="'. esc_attr('Click twice to delete', 'listdom') .'">' . $post->post_title . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($post->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $post->ID . '"></span>';
+                $post = get_post($value);
+                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $post->ID . '" data-lsd-tooltip="' . esc_attr__('Click twice to delete', 'listdom') . '">' . $post->post_title . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($post->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $post->ID . '"></span>';
             }
         }
 
         // Start Wrapper
-        $output = '<div class="lsd-autosuggest-wrapper">';
+        $output = '<div class="lsd-autosuggest-wrapper" data-toggle="' . esc_attr($toggle) . '">';
 
         // Input
-        $output .= '<input type="text" id="' . esc_attr($input_id) . '" class="lsd-autosuggest" data-source="' . esc_attr($source) . '" data-name="' . esc_attr($name) . '" data-append="#' . esc_attr($id) . '" data-suggestions="#' . esc_attr($suggestions) . '" data-min-characters="' . esc_attr($min) . '" data-max-items="' . esc_attr($max_items) . '" data-nonce="' . esc_attr($nonce) . '" placeholder="' . esc_attr($placeholder) . '">';
+        $output .= '<input type="text" id="' . esc_attr($input_id) . '" class="lsd-autosuggest" data-source="' . esc_attr($source) . '" data-name="' . esc_attr($name) . '" data-append="#' . esc_attr($id) . '" data-suggestions="#' . esc_attr($suggestions) . '" data-min-characters="' . esc_attr($min) . '" data-max-items="' . esc_attr($max_items) . '" data-nonce="' . esc_attr($nonce) . '" placeholder="' . esc_attr($placeholder) . '" autocomplete="off">';
 
         // Suggestions Placeholder
         $output .= '<div class="lsd-autosuggest-suggestions" id="' . esc_attr($suggestions) . '"></div>';

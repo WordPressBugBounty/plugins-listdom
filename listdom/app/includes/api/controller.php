@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Controller Class.
- *
- * @class LSD_API_Controller
- * @version    1.0.0
- */
 class LSD_API_Controller extends LSD_API
 {
     /**
@@ -15,9 +9,6 @@ class LSD_API_Controller extends LSD_API
      */
     protected $validate;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct();
@@ -52,7 +43,7 @@ class LSD_API_Controller extends LSD_API
         delete_user_meta($user_id, 'lsd_login');
     }
 
-    public function perform(WP_REST_Request $request)
+    public function perform(WP_REST_Request $request): WP_REST_Response
     {
         $response = new WP_REST_Response(['success' => 1]);
         $response->set_status(200);

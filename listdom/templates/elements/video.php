@@ -19,7 +19,10 @@ if(!count($embeds)) return '';
                         <h2 class="lsd-single-page-section-title" <?php echo lsd_schema()->name(); ?> ><?php echo esc_html($embed['name']); ?></h2>
                     <?php endif; ?>
                     <div class="lsd-embed-code-wrapper">
-                        <?php echo LSD_Kses::embed($embed['code']); ?>
+                        <?php
+                            if (filter_var($embed['code'], FILTER_VALIDATE_URL)) echo LSD_Kses::embed(wp_oembed_get($embed['code']));
+                            else echo LSD_Kses::embed($embed['code']);
+                        ?>
                     </div>
                 </li>
             <?php endif; ?>

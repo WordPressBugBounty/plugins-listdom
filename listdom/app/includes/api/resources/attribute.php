@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Attribute Resource Class.
- *
- * @class LSD_API_Resources_Attribute
- * @version    1.0.0
- */
 class LSD_API_Resources_Attribute extends LSD_API_Resource
 {
     public static function listing($id)

@@ -23,7 +23,7 @@ $addons = $this->get();
                 $basename = isset($addon->basename) && trim($addon->basename) ? $addon->basename : null;
                 if(!$basename) continue;
 
-                $installed = is_plugin_active($basename);
+                $installed = apply_filters('lsd_addons_is_installed', is_plugin_active($basename), $basename);
                 $recommended = isset($addon->recommended) && $addon->recommended;
 
                 $classes = ($recommended ? 'lsd-addons-recommended ' : '').($installed ? 'lsd-addons-installed ' : '');

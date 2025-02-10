@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Listdom
- * Plugin URI: https://webilia.com/products/listdom-directory-classified-listings-plugin/
- * Description: Listdom is an advanced but simple tool to list everything on your website and show them in modern responsive skins like list, grid, map and masonry.
- * Version: 3.8.1
+ * Plugin URI: https://webilia.com/listdom/
+ * Description: Listdom is a powerful yet easy-to-use tool for listing anything on your website. It offers modern, responsive skins such as List, Grid, Map, and Masonry to showcase your content beautifully.
+ * Version: 3.9.0
  * Author: Webilia
  * Author URI: https://webilia.com/
  * Requires at least: 4.0.0
@@ -13,18 +13,21 @@
  * Domain Path: /i18n/languages/
  */
 
+// No Direct Access
+defined('ABSPATH') || die();
+
 // Initialize the Listdom or not?!
 $init = true;
 
 // Check Minimum PHP version
-if (version_compare(phpversion(), '7.0', '<'))
+if (version_compare(phpversion(), '7.2', '<'))
 {
     $init = false;
     add_action('user_admin_notices', function ()
     {
         ?>
         <div class="notice notice-error is-dismissible">
-            <p><?php echo sprintf(esc_html__("%s needs at-least PHP 7.0 or higher while your server PHP version is %s. Please contact your host provider and ask them to upgrade PHP of your server or change your host provider completely.", 'listdom'), '<strong>Listdom</strong>', '<strong>' . phpversion() . '</strong>'); ?></p>
+            <p><?php echo sprintf(esc_html__("%s requires at least PHP 7.2 or higher, but your server is currently running PHP %s. Please contact your hosting provider to upgrade your PHP version or consider switching to a different host.", 'listdom'), '<strong>Listdom</strong>', '<strong>' . phpversion() . '</strong>'); ?></p>
         </div>
         <?php
     });
@@ -39,7 +42,7 @@ if (version_compare($wp_version, '4.0.0', '<'))
     {
         ?>
         <div class="notice notice-error is-dismissible">
-            <p><?php echo sprintf(esc_html__("%s needs at-least WordPress 4.0.0 or higher while your WordPress version is %s. Please update your WordPress to latest version first.", 'listdom'), '<strong>Listdom</strong>', '<strong>' . esc_html($wp_version) . '</strong>'); ?></p>
+            <p><?php echo sprintf(esc_html__("%s requires at least WordPress 4.0.0 or higher, but your current version is %s. Please update WordPress to the latest version first.", 'listdom'), '<strong>Listdom</strong>', '<strong>' . esc_html($wp_version) . '</strong>'); ?></p>
         </div>
         <?php
     });

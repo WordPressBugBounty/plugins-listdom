@@ -53,7 +53,7 @@ jQuery(document).on("ready", function()
 						<?php endif; ?>
 					</div>
 
-					<h5 class="lsd-term-name"><?php echo esc_html($term->name); ?></h5>
+					<span class="lsd-term-name"><?php echo esc_html($term->name); ?></span>
 				</a>
 			</div>
         </div>

@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 switch ($this->tab)
 {
-    case 'details-page':
+    case 'single-listing':
 
         $this->include_html_file('menus/settings/tabs/details-page.php');
         break;

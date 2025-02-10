@@ -12,40 +12,12 @@ class LSD_Hooks extends LSD_Base
 {
     public function init()
     {
-        // Register Actions
-        $this->actions();
-
-        // Register Filters
-        $this->filters();
-    }
-
-    public function actions()
-    {
-        // Activation Redirect
-        add_action('admin_init', [$this, 'redirect_after_activation']);
-
-        // Notices
-        add_action('admin_notices', ['LSD_Flash', 'show']);
-
         // Iframe
         add_action('wp', [$this, 'raw']);
 
         // Uploader
         add_action('wp_ajax_lsd_uploader', [$this, 'upload']);
 
-        // Database Tables
-        add_action('admin_init', function ()
-        {
-            // Create Table
-            if ((new LSD_Main())->is_db_update_required())
-            {
-                LSD_Plugin_Hooks::db_update();
-            }
-        });
-    }
-
-    public function filters()
-    {
         add_filter('lsd_skins_atts', [$this, 'apply_search']);
         add_filter('ajax_query_attachments_args', [$this, 'protect_wp_media']);
 
@@ -64,23 +36,6 @@ class LSD_Hooks extends LSD_Base
         }
 
         return $links;
-    }
-
-    /**
-     * Redirect the user to Listdom Dashboard after plugin activation
-     * @return void
-     */
-    public function redirect_after_activation()
-    {
-        // No need to redirect
-        if (!get_option('lsd_activation_redirect', false) || wp_doing_ajax()) return;
-
-        // Delete the option to don't do it again
-        delete_option('lsd_activation_redirect');
-
-        // Redirect to Listdom Dashboard
-        wp_redirect(admin_url('/admin.php?page=' . LSD_Base::WELCOME_SLUG));
-        exit;
     }
 
     public function apply_search($atts)

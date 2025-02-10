@@ -92,7 +92,7 @@ foreach ($columns as $key => $row) if (!isset($fields_data[$key])) unset($column
             'value' => $table['listing_link'] ?? 'normal',
             'options' => LSD_Base::get_listing_link_methods(),
         ]); ?>
-        <p class="description"><?php esc_html_e("Link to listing detail page.", 'listdom'); ?></p>
+        <p class="description"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
     </div>
 </div>
 <?php else: ?>
@@ -141,13 +141,13 @@ foreach ($columns as $key => $row) if (!isset($fields_data[$key])) unset($column
             <?php
                 if (LSD_Base::isLite()) $missAddonMessages[] = LSD_Base::missFeatureMessage(esc_html__('Attributes', 'listdom'), true);
 
-                if (!class_exists('LSDADDACF_Base')) $missAddonMessages[] = LSD_Base::missAddonMessage('ACF', esc_html__('ACF Fields', 'listdom'));
-                else if (!class_exists('ACF')) $missAddonMessages[] = LSDADDACF_Base::get_acf_message();
+                if (!class_exists(LSDADDACF::class) && !class_exists(\LSDPACACF\Base::class)) $missAddonMessages[] = LSD_Base::missAddonMessage('ACF', esc_html__('ACF Fields', 'listdom'));
+                else if (!class_exists(ACF::class)) $missAddonMessages[] = \LSDPACACF\Base::get_acf_message();
 
-                if (!class_exists('LSDADDCMP_Base')) $missAddonMessages[] = LSD_Base::missAddonMessage('Compare', esc_html__('Compare icon', 'listdom'));
-                if (!class_exists('LSDADDFAV_Base')) $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom'));
-                if (!class_exists('LSDADDCLM_Base')) $missAddonMessages[] = LSD_Base::missAddonMessage('Claim', esc_html__('Is claimed', 'listdom'));
-                if (!class_exists('LSDADDREV_Base')) $missAddonMessages[] = LSD_Base::missAddonMessage('Reviews', esc_html__('Reviews Rate', 'listdom'));
+                if (!class_exists(LSDADDCMP::class) && !class_exists(\LSDPACCMP\Base::class)) $missAddonMessages[] = LSD_Base::missAddonMessage('Compare', esc_html__('Compare icon', 'listdom'));
+                if (!class_exists(LSDADDFAV::class) && !class_exists(\LSDPACFAV\Base::class)) $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom'));
+                if (!class_exists(LSDADDCLM::class) && !class_exists(\LSDPACCLM\Base::class)) $missAddonMessages[] = LSD_Base::missAddonMessage('Claim', esc_html__('Is claimed', 'listdom'));
+                if (!class_exists(LSDADDREV::class) && !class_exists(\LSDPACREV\Base::class)) $missAddonMessages[] = LSD_Base::missAddonMessage('Reviews', esc_html__('Reviews Rate', 'listdom'));
             ?>
 
             <div class="lsd-addon-alert lsd-mt-4">

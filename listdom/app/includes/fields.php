@@ -30,6 +30,7 @@ class LSD_Fields extends LSD_Base
     {
         $fields = [
             'title' => ['label' => esc_html__('Listing Title', 'listdom'), 'enabled' => 1],
+            'excerpt' => ['label' => esc_html__('Listing Excerpt', 'listdom'), 'enabled' => 0],
             'address' => ['label' => esc_html__('Address', 'listdom'), 'enabled' => 1],
             'price' => ['label' => esc_html__('Price', 'listdom'), 'enabled' => 1],
             'availability' => ['label' => esc_html__('Work Hours', 'listdom'), 'enabled' => 1],
@@ -50,10 +51,10 @@ class LSD_Fields extends LSD_Base
         ];
 
         // Conditionally include or exclude fields based on specific class existence
-        if (class_exists('LSDADDREV_Base')) $fields['review_stars'] = ['label' => esc_html__('Review Rates', 'listdom'), 'enabled' => 0];
-        if (class_exists('LSDADDCMP_Compare')) $fields['compare'] = ['label' => esc_html__('Compare Icon', 'listdom'), 'enabled' => 0];
-        if (class_exists('LSDADDFAV_Base')) $fields['favorite'] = ['label' => esc_html__('Favorite Icon', 'listdom'), 'enabled' => 0];
-        if (class_exists('LSDADDCLM_Base')) $fields['claim'] = ['label' => esc_html__('Claim', 'listdom'), 'enabled' => 0];
+        if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)) $fields['review_stars'] = ['label' => esc_html__('Review Rates', 'listdom'), 'enabled' => 0];
+        if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)) $fields['compare'] = ['label' => esc_html__('Compare Icon', 'listdom'), 'enabled' => 0];
+        if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)) $fields['favorite'] = ['label' => esc_html__('Favorite Icon', 'listdom'), 'enabled' => 0];
+        if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)) $fields['claim'] = ['label' => esc_html__('Claim', 'listdom'), 'enabled' => 0];
 
         $SN = new LSD_Socials();
         $networks = LSD_Options::socials();
@@ -77,7 +78,7 @@ class LSD_Fields extends LSD_Base
         }
 
         // Fetch ACF Field Groups
-        if (function_exists('acf_get_field_groups') && class_exists('LSDADDACF_Base'))
+        if (function_exists('acf_get_field_groups') && (class_exists(LSDADDACF::class) || class_exists(\LSDPACACF\Base::class)))
         {
             $field_groups = acf_get_field_groups([
                 'post_type' => LSD_Base::PTYPE_LISTING,
@@ -118,6 +119,10 @@ class LSD_Fields extends LSD_Base
 
             case 'address':
                 $output = LSD_Kses::element($listing->get_address(false));
+                break;
+
+            case 'excerpt':
+                $output = LSD_Kses::element($listing->get_excerpt());
                 break;
 
             case 'remark':
@@ -161,7 +166,7 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'category':
-                $output = LSD_Kses::element($listing->get_categories(true, true));
+                $output = LSD_Kses::element($listing->get_categories(['show_color' => true, 'multiple_categories' => true]));
                 break;
 
             case 'tags':
@@ -173,7 +178,7 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'description':
-                $output = LSD_Kses::element($listing->get_excerpt());
+                $output = LSD_Kses::element($listing->get_excerpt(50));
                 break;
 
             case 'features':
@@ -213,7 +218,6 @@ class LSD_Fields extends LSD_Base
                 $value = $listing->get_meta('lsd_' . $key_without_prefix);
 
                 if (!empty($value)) $output = '<a href="' . esc_url($value) . '" target="_blank"><i class="lsd-icon fab fa-' . $key_without_prefix . '"></i></a>';
-
                 break;
 
             case substr($key, 0, 4) === 'acf_':
@@ -240,7 +244,6 @@ class LSD_Fields extends LSD_Base
                     }
                 }
                 else $output = self::acf(get_field_object($field['key'], $listing_id), $listing_id);
-
                 break;
         }
 
@@ -271,6 +274,7 @@ class LSD_Fields extends LSD_Base
                 $output = lsd_schema()->category();
                 break;
 
+            case 'excerpt':
             case 'description':
                 $output = lsd_schema()->description();
                 break;

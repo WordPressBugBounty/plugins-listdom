@@ -13,13 +13,8 @@ class LSD_PTypes_Search extends LSD_PTypes
     public $PT;
     protected $settings;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         $this->PT = LSD_Base::PTYPE_SEARCH;
 
         // Listdom Settings
@@ -105,20 +100,27 @@ class LSD_PTypes_Search extends LSD_PTypes
     public function register_metaboxes()
     {
         add_meta_box('lsd_metabox_form', esc_html__('Form', 'listdom'), [$this, 'metabox_form'], $this->PT, 'side');
+        add_meta_box('lsd_metabox_results', esc_html__('Search Results', 'listdom'), [$this, 'metabox_results'], $this->PT, 'side');
         add_meta_box('lsd_metabox_shortcode', esc_html__('Shortcode', 'listdom'), [$this, 'metabox_shortcode'], $this->PT, 'side');
         add_meta_box('lsd_metabox_fields', esc_html__('Fields', 'listdom'), [$this, 'metabox_fields'], $this->PT, 'normal', 'high');
-    }
-
-    public function metabox_shortcode($post)
-    {
-        // Generate output
-        include $this->include_html_file('metaboxes/search/shortcode.php', ['return_path' => true]);
     }
 
     public function metabox_form($post)
     {
         // Generate output
         include $this->include_html_file('metaboxes/search/form.php', ['return_path' => true]);
+    }
+
+    public function metabox_results($post)
+    {
+        // Generate output
+        include $this->include_html_file('metaboxes/search/results.php', ['return_path' => true]);
+    }
+
+    public function metabox_shortcode($post)
+    {
+        // Generate output
+        include $this->include_html_file('metaboxes/search/shortcode.php', ['return_path' => true]);
     }
 
     public function metabox_fields($post)
@@ -151,8 +153,29 @@ class LSD_PTypes_Search extends LSD_PTypes
         $fields = $lsd['fields'] ?? [];
         update_post_meta($post_id, 'lsd_fields', $fields);
 
-        // Form Options
+        /**
+         * Form Options
+         */
+
         $form = $lsd['form'] ?? [];
+
+        // Target Page Mode
+        if (isset($form['page']) && trim($form['page']))
+        {
+            $form['connected_shortcodes'] = [];
+            $form['ajax'] = 0;
+        }
+        // Connected Shortcodes Mode
+        else
+        {
+            $form['shortcode'] = '';
+        }
+
+        // Empty Values
+        if (!isset($form['connected_shortcodes'])) $form['connected_shortcodes'] = [];
+        if (!isset($form['ajax'])) $form['ajax'] = 0;
+
+        // Save Form Options
         update_post_meta($post_id, 'lsd_form', $form);
     }
 

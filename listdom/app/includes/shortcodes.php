@@ -13,32 +13,34 @@ class LSD_Shortcodes extends LSD_Base
     public function init()
     {
         // Listdom Shortcode
-        $Listdom = new LSD_Shortcodes_Listdom();
-        $Listdom->init();
+        (new LSD_Shortcodes_Listdom())->init();
 
         // SimpleMap Shortcode
-        $Simplemap = new LSD_Shortcodes_Simplemap();
-        $Simplemap->init();
+        (new LSD_Shortcodes_Simplemap())->init();
 
         // Location Shortcode
-        $Location = new LSD_Shortcodes_Location();
-        $Location->init();
+        (new LSD_Shortcodes_Location())->init();
 
         // Category Shortcode
-        $Category = new LSD_Shortcodes_Category();
-        $Category->init();
+        (new LSD_Shortcodes_Category())->init();
+
+        // Tag Shortcode
+        (new LSD_Shortcodes_Tag())->init();
+
+        // Feature Shortcode
+        (new LSD_Shortcodes_Feature())->init();
 
         // Label Shortcode
-        $Label = new LSD_Shortcodes_Label();
-        $Label->init();
+        (new LSD_Shortcodes_Label())->init();
 
         // Taxonomy Cloud Shortcode
-        $TaxonomyCloud = new LSD_Shortcodes_TaxonomyCloud();
-        $TaxonomyCloud->init();
+        (new LSD_Shortcodes_TaxonomyCloud())->init();
 
         // Terms Shortcode
-        $Terms = new LSD_Shortcodes_Terms();
-        $Terms->init();
+        (new LSD_Shortcodes_Terms())->init();
+
+        // Auth Shortcode
+        (new LSD_Shortcodes_Auth())->init();
     }
 
     public function parse($post_id, $atts = []): array

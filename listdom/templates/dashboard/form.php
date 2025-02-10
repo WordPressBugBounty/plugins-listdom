@@ -10,6 +10,9 @@ $entity = new LSD_Entity_Listing($this->post->ID);
 // Category
 $category = $entity->get_data_category();
 
+// All Categories
+$all_categories = LSD_Taxonomies_Category::get_terms();
+
 // Form Type
 $form_type = $this->form_type;
 
@@ -30,7 +33,7 @@ jQuery(document).ready(function()
 });
 </script>');
 ?>
-<div class="lsd-dashboard lsd-dashboard-form" id="lsd_dashboard" data-job-addon-installed="<?php echo class_exists('LSDADDJOB_Addon') ? 1 : 0; ?>">
+<div class="lsd-dashboard lsd-dashboard-form" id="lsd_dashboard" data-job-addon-installed="<?php echo class_exists(LSDADDJOB::class) || class_exists(\LSDPACJOB\Base::class) ? 1 : 0; ?>">
 
     <div class="lsd-row">
         <?php if (!$form_type): ?>
@@ -50,11 +53,28 @@ jQuery(document).ready(function()
 								<input type="text" name="lsd[title]" required value="<?php echo isset($this->post->post_title) ? esc_attr($this->post->post_title) : ''; ?>" placeholder="<?php esc_attr_e('Title', 'listdom'); ?>">
 							</div>
 
-							<div class="lsd-dashboard-editor">
+                            <div class="lsd-dashboard-editor">
+                                <div class="lsd-col-3 lsd-text-left">
+                                    <label for="lsd_remark"><?php esc_html_e('Description', 'listdom'); ?><?php $this->required_html('content'); ?></label>
+                                </div>
+
 								<?php wp_editor($this->post->post_content ?? '', 'lsd_dashboard_content', ['textarea_name'=>'lsd[content]']); ?>
 							</div>
 
-							<?php if ($this->is_enabled('address')): ?>
+                            <?php if ($this->is_enabled('excerpt')): ?>
+                                <div class="lsd-form-group lsd-no-border lsd-mt-0 lsd-listing-module-excerpt">
+                                    <div class="lsd-form-row lsd-excerpt-row">
+                                        <div class="lsd-col-3 lsd-text-left">
+                                            <label for="lsd_remark"><?php esc_html_e('Excerpt', 'listdom'); ?><?php $this->required_html('excerpt'); ?></label>
+                                        </div>
+                                        <div class="lsd-col-9">
+                                            <?php wp_editor($this->post->post_excerpt ?? '', 'lsd_dashboard_excerpt', ['textarea_name' => 'lsd[excerpt]']); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($this->is_enabled('address')): ?>
 							<div class="lsd-dashboard-right-box lsd-dashboard-address">
 								<h4><?php esc_html_e('Address / Map', 'listdom'); ?></h4>
 								<div>
@@ -140,7 +160,9 @@ jQuery(document).ready(function()
                                         'hide_empty' => 0,
                                         'orderby' => 'name',
                                         'order' => 'ASC',
-                                        'selected' => $category && isset($category->term_id) ? $category->term_id : null,
+                                        'selected' => $category && isset($category->term_id)
+                                            ? $category->term_id
+                                            : (is_array($all_categories) && count($all_categories) === 1 ? $all_categories[0]->term_id : null),
                                         'hierarchical' => 0,
                                         'id' => 'lsd_listing_category',
                                         'name' => 'lsd[listing_category]',

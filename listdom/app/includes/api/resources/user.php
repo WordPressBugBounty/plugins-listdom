@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API User Resource Class.
- *
- * @class LSD_API_Resources_User
- * @version    1.0.0
- */
 class LSD_API_Resources_User extends LSD_API_Resource
 {
     public static function get($user): array

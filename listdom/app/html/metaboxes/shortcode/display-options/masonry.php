@@ -34,7 +34,7 @@ $missAddonMessages = [];
     </div>
 </div>
 
-<div class="lsd-form-group lsd-form-row-style-needed lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3" id="lsd_display_options_style">
+<div class="lsd-form-group lsd-form-row-style-needed lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4" id="lsd_display_options_style">
     <h3 class="lsd-mb-0 lsd-mt-1"><?php echo esc_html__("Elements Display Options", 'listdom'); ?></h3>
     <p class="description lsd-mb-4"><?php echo esc_html__("You can simply change the visibility of each element that you want on listing card", 'listdom'); ?> </p>
     <div class="lsd-flex lsd-gap-2">
@@ -196,7 +196,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php if (class_exists('LSDADDFAV_Base')): ?>
+        <?php if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Favorite Icon', 'listdom'),
@@ -214,7 +214,7 @@ $missAddonMessages = [];
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom')); ?>
         <?php endif; ?>
 
-        <?php if (class_exists('LSDADDCMP_Base')): ?>
+        <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Compare Icon', 'listdom'),
@@ -232,7 +232,7 @@ $missAddonMessages = [];
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Compare', esc_html__('Compare icon', 'listdom')); ?>
         <?php endif; ?>
 
-        <?php if (class_exists('LSDADDREV_Base')): ?>
+        <?php if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Review Rates', 'listdom'),
@@ -264,7 +264,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php if (class_exists('LSDADDCLM_Base')): ?>
+        <?php if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 <?php echo !isset($masonry['display_title']) || $masonry['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_masonry_is_claimed_wrapper">
             <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -295,26 +295,48 @@ $missAddonMessages = [];
                         'id' => 'lsd_display_options_skin_masonry_display_image',
                         'name' => 'lsd[display][masonry][display_image]',
                         'value' => $masonry['display_image'] ?? '1',
-                        'toggle' => '#lsd_display_options_skin_masonry_image_method'
+                        'toggle' => '.lsd-display-options-skin-masonry-image-options'
                     ]); ?>
                 </div>
             </div>
-            <div class="lsd-form-row <?php echo !isset($masonry['display_image']) || $masonry['display_image'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_masonry_image_method">
-                <div class="lsd-col-5"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Image Method', 'listdom'),
-                    'for' => 'lsd_display_options_skin_masonry_image_method',
-                ]); ?></div>
-                <div class="lsd-col-6">
-                    <?php echo LSD_Form::select([
-                        'id' => 'lsd_display_options_skin_masonry_image_method',
-                        'name' => 'lsd[display][masonry][image_method]',
-                        'options' => [
-                            'cover' => esc_html__('Cover', 'listdom'),
-                            'slider' => esc_html__('Slider', 'listdom'),
-                        ],
-                        'value' => $masonry['image_method'] ?? 'cover'
-                    ]); ?>
-                    <p class="description"><?php esc_html_e("Cover shows only featured image but slider shows all gallery images.", 'listdom'); ?></p>
+            <div class="lsd-display-options-skin-masonry-image-options <?php echo !isset($masonry['display_image']) || $masonry['display_image'] ? '' : 'lsd-util-hide'; ?>">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-5"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Image Method', 'listdom'),
+                        'for' => 'lsd_display_options_skin_masonry_image_method',
+                    ]); ?></div>
+                    <div class="lsd-col-6">
+                        <?php echo LSD_Form::select([
+                            'id' => 'lsd_display_options_skin_masonry_image_method',
+                            'name' => 'lsd[display][masonry][image_method]',
+                            'options' => [
+                                'cover' => esc_html__('Cover', 'listdom'),
+                                'slider' => esc_html__('Slider', 'listdom'),
+                            ],
+                            'value' => $masonry['image_method'] ?? 'cover'
+                        ]); ?>
+                        <p class="description"><?php esc_html_e("Cover shows only featured image but slider shows all gallery images.", 'listdom'); ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="lsd-display-options-skin-masonry-image-options <?php echo !isset($masonry['display_image']) || $masonry['display_image'] ? '' : 'lsd-util-hide'; ?>">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-5"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Image fit', 'listdom'),
+                        'for' => 'lsd_display_options_skin_masonry_image_fit',
+                    ]); ?></div>
+                    <div class="lsd-col-6">
+                        <?php echo LSD_Form::select([
+                            'id' => 'lsd_display_options_skin_masonry_image_fit',
+                            'name' => 'lsd[display][masonry][image_fit]',
+                            'options' => [
+                                'cover' => esc_html__('Cover', 'listdom'),
+                                'contain' => esc_html__('Contain', 'listdom'),
+                            ],
+                            'value' => $masonry['image_fit'] ?? 'cover'
+                        ]); ?>
+                        <p class="description"><?php esc_html_e("Cover shows featured image as object fit cover.", 'listdom'); ?></p>
+                    </div>
                 </div>
             </div>
         <?php else: ?>
@@ -392,7 +414,7 @@ $missAddonMessages = [];
         <p class="description"><?php esc_html_e("Display listings in the List view.", 'listdom'); ?></p>
     </div>
 </div>
-<div class="lsd-form-row <?php echo isset($masonry['list_view']) && $masonry['list_view'] ? 'lsd-util-hide' : ''; ?>" id="lsd_display_options_skin_masonry_listing_per_row_option">
+<div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style1 <?php echo isset($masonry['list_view']) && $masonry['list_view'] ? 'lsd-util-hide' : ''; ?>" id="lsd_display_options_skin_masonry_listing_per_row_option">
     <div class="lsd-col-2"><?php echo LSD_Form::label([
         'title' => esc_html__('Listings Per Row', 'listdom'),
         'for' => 'lsd_display_options_skin_masonry_columns',
@@ -420,7 +442,7 @@ $missAddonMessages = [];
             'value' => $masonry['listing_link'] ?? 'normal',
             'options' => LSD_Base::get_listing_link_methods(),
         ]); ?>
-        <p class="description"><?php esc_html_e("Link to listing detail page.", 'listdom'); ?></p>
+        <p class="description"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
     </div>
 </div>
 <?php else: ?>

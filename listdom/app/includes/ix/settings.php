@@ -130,7 +130,7 @@ class LSD_IX_Settings extends LSD_Base
             LSD_Options::styles(), isset($options['styles']) && is_array($options['styles']) ? $options['styles'] : []
         ));
 
-        // Merge Details Page
+        // Merge Single Listing
         update_option('lsd_details_page', array_merge(
             LSD_Options::details_page(), isset($options['details_page']) && is_array($options['details_page']) ? $options['details_page'] : []
         ));
@@ -140,7 +140,7 @@ class LSD_IX_Settings extends LSD_Base
             LSD_Options::socials(), isset($options['socials']) && is_array($options['socials']) ? $options['socials'] : []
         ));
 
-        // Merge Details Page Pattern
+        // Merge Single Listing Pattern
         if (isset($options['details_page_pattern']) && trim($options['details_page_pattern'])) update_option('lsd_details_page_pattern', $options['details_page_pattern']);
 
         // Merge Addons

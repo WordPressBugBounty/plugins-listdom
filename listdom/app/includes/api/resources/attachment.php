@@ -2,19 +2,13 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Attachment Resource Class.
- *
- * @class LSD_API_Resources_Attachment
- * @version    1.0.0
- */
 class LSD_API_Resources_Attachment extends LSD_API_Resource
 {
     public static function get($id): array
     {
         return apply_filters('lsd_api_resource_attachment', [
-            'id' => $id,
-            'url' => wp_get_attachment_url($id),
+            'id' => $id ?: null,
+            'url' => $id ? wp_get_attachment_url($id) : null,
         ], $id);
     }
 

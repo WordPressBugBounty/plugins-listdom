@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Embed Resource Class.
- *
- * @class LSD_API_Resources_Embed
- * @version    1.0.0
- */
 class LSD_API_Resources_Embed extends LSD_API_Resource
 {
     public static function get($embed): array

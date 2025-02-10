@@ -23,6 +23,39 @@ abstract class LSD_Collections
         return $collections[$key] ?? [];
     }
 
+    public function key(string $name): int
+    {
+        $collections = $this->all();
+
+        foreach ($collections as $key => $collection)
+        {
+            if (isset($collection['name']) && $collection['name'] === $name) return (int) $key;
+        }
+
+        return 0;
+    }
+
+    public function exists(string $name): bool
+    {
+        return (bool) $this->key($name);
+    }
+
+    public function upsert($item = []): int
+    {
+        // Collection Name
+        $name = $item['name'] ?? '';
+
+        // Update
+        if ($key = $this->key($name))
+        {
+            $this->update($key, $item);
+            return $key;
+        }
+
+        // Insert
+        return $this->add($item);
+    }
+
     public function add($item = []): int
     {
         // New Key

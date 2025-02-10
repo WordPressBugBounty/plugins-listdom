@@ -16,7 +16,7 @@ $advanced_slug_status = $is_pro && isset($settings['advanced_slug_status']) && $
 <div class="lsd-settings-wrap">
     <form id="lsd_settings_form">
         <div class="lsd-settings-form-group lsd-box-white lsd-rounded lsd-mt-4 lsd-p-5">
-            <h3 class="lsd-mt-0 lsd-mb-5"><?php esc_html_e('Archive Pages', 'listdom'); ?></h3>
+            <h3 class="lsd-mt-0 lsd-mb-4"><?php esc_html_e('Archive Pages', 'listdom'); ?></h3>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
                     'title' => esc_html__('Location', 'listdom'),
@@ -102,7 +102,7 @@ $advanced_slug_status = $is_pro && isset($settings['advanced_slug_status']) && $
                     <p class="description"><?php esc_html_e("If your site theme doesn't support the Listdom label template, then Listdom uses its own template file which might not be 100% compatible with your theme.", 'listdom'); ?></p>
                 </div>
             </div>
-            <h3 class="lsd-mb-5"><?php esc_html_e('Slugs', 'listdom'); ?></h3>
+            <h3 class="lsd-mb-4"><?php esc_html_e('Slugs', 'listdom'); ?></h3>
             <div class="lsd-border lsd-p-4 lsd-rounded lsd-mb-5">
                 <h4 class="lsd-mt-0 lsd-mb-4"><?php esc_html_e('Listings', 'listdom'); ?></h4>
                 <div class="lsd-form-row">
@@ -262,6 +262,7 @@ jQuery('#lsd_settings_form').on('submit', function(e)
     const $button = jQuery("#lsd_settings_save_button");
     const $success = jQuery(".lsd-settings-success-message");
     const $error = jQuery(".lsd-settings-error-message");
+    const $tab = jQuery('.nav-tab-active');
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
@@ -280,6 +281,8 @@ jQuery('#lsd_settings_form').on('submit', function(e)
         data: "action=lsd_save_settings&" + settings,
         success: function()
         {
+            $tab.attr('data-saved', 'true');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 
@@ -288,6 +291,8 @@ jQuery('#lsd_settings_form').on('submit', function(e)
         },
         error: function()
         {
+            $tab.attr('data-saved', 'false');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 

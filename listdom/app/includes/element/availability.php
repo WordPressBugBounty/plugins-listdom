@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Availability Element Class.
- *
- * @class LSD_Element_Availability
- * @version    1.0.0
- */
 class LSD_Element_Availability extends LSD_Element
 {
     public $key = 'availability';
@@ -15,17 +9,11 @@ class LSD_Element_Availability extends LSD_Element
     public $oneday = false;
     public $day = null;
 
-    /**
-     * Constructor method
-     * @param boolean $oneday
-     * @param int $day
-     */
     public function __construct($oneday = false, $day = null)
     {
-        // Call the parent constructor
         parent::__construct();
 
-        $this->label = esc_html__('Availability', 'listdom');
+        $this->label = esc_html__('Working Hours', 'listdom');
         $this->oneday = $oneday;
         $this->day = $day;
     }

@@ -52,10 +52,11 @@ class LSD_LifeCycle extends LSD_Base
         return apply_filters('lsd_lifecycle_is_content_printed', self::$content_printed);
     }
 
-    public static function post($post_id)
+    public static function post($post_id): bool
     {
+        global $post;
         $post = get_post($post_id);
-        setup_postdata($GLOBALS['post'] =& $post);
+        return setup_postdata($post);
     }
 
     public static function reset()

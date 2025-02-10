@@ -12,9 +12,6 @@ class LSD_Widgets_Terms extends WP_Widget
 {
     public $LSD;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct('LSD_Widgets_Terms', esc_html__('(Listdom) Terms', 'listdom'), [

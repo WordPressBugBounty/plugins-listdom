@@ -9,13 +9,8 @@ class LSD_IX extends LSD_Base
 {
     protected $db;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // DB Library
         $this->db = new LSD_db();
     }

@@ -162,7 +162,7 @@ class LSD_Kses extends LSD_Base
             self::$allowed_html_full = apply_filters('lsd_kses_tags', $allowed, 'full');
         }
 
-        return wp_kses($html, self::$allowed_html_full);
+        return $html;
     }
 
     public function styles($styles)
@@ -202,7 +202,11 @@ class LSD_Kses extends LSD_Base
         }
 
         // Add Schema Attributes
-        if (LSD_Base::isPro()) foreach ($tags as $tag => $attr) $tags[$tag] = array_merge($attr, self::$schema_attr);
+        if (LSD_Base::isPro())
+        {
+            foreach ($tags as $tag => $attr)
+                $tags[$tag] = array_merge(is_array($attr) ? $attr : [], self::$schema_attr);
+        }
 
         return $tags;
     }

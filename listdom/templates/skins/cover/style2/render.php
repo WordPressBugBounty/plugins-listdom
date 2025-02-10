@@ -32,8 +32,7 @@ $ids = $this->listings;
 
             <?php if ($this->display_read_more_button): ?>
                 <div class="lsd-listing-link-button">
-                    <a href="<?php echo esc_url(get_the_permalink($id)); ?>"
-                       class="lsd-color-s-bg <?php echo esc_attr($listing->get_text_class('secondary')); ?>" <?php echo lsd_schema()->url(); ?>>
+                    <a href="<?php echo esc_url(get_the_permalink($id)); ?>" class="lsd-color-m-bg <?php echo esc_attr($listing->get_text_class()); ?>" <?php echo lsd_schema()->url(); ?>>
                         <?php esc_html_e('Read More', 'listdom'); ?>
                     </a>
                 </div>

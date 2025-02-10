@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Owner Element Class.
- *
- * @class LSD_Element_Owner
- * @version    1.0.0
- */
 class LSD_Element_Owner extends LSD_Element
 {
     public $key = 'owner';
@@ -15,14 +9,8 @@ class LSD_Element_Owner extends LSD_Element
     public $layout;
     public $args;
 
-    /**
-     * Constructor method
-     * @param array $args
-     * @param string $layout
-     */
     public function __construct(string $layout = 'details', array $args = [])
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Owner', 'listdom');
@@ -56,6 +44,46 @@ class LSD_Element_Owner extends LSD_Element
         $display_form = $data['display_form'] ?? 1;
 
         return '<div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_display_avatar">' . esc_html__('Avatar', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_avatar',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_avatar]',
+                'value' => $data['display_avatar'] ?? 1,
+            ]) . '
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_display_name">' . esc_html__('Name', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_name',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_name]',
+                'value' => $data['display_name'] ?? 1,
+            ]) . '
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_display_job_title">' . esc_html__('Job Title', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_job_title',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_job_title]',
+                'value' => $data['display_job_title'] ?? 1,
+            ]) . '
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_display_bio">' . esc_html__('Bio', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_bio',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_bio]',
+                'value' => $data['display_bio'] ?? 1,
+            ]) . '
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_display_socials">' . esc_html__('Socials', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_socials',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_socials]',
+                'value' => $data['display_socials'] ?? 1,
+            ]) . '
+        </div>
+        <div>
             <label for="lsd_elements_' . esc_attr($this->key) . '_display_tel">' . esc_html__('Tel', 'listdom') . '</label>
             ' . LSD_Form::switcher([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_tel',
@@ -104,7 +132,7 @@ class LSD_Element_Owner extends LSD_Element
                 'toggle' => '.lsd-elements-' . esc_attr($this->key) . '-field-options',
             ]) . '
         </div>
-        <div class="lsd-elements-' . esc_attr($this->key) . '-field-options '.($display_form ? '' : 'lsd-util-hide').'">
+        <div class="lsd-elements-' . esc_attr($this->key) . '-field-options ' . ($display_form ? '' : 'lsd-util-hide') . '">
             <label for="lsd_elements_' . esc_attr($this->key) . '_name_field">' . esc_html__('Name Field', 'listdom') . '</label>
             ' . LSD_Form::switcher([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_name_field',
@@ -112,12 +140,20 @@ class LSD_Element_Owner extends LSD_Element
                 'value' => $data['name_field'] ?? 1,
             ]) . '
         </div>
-        <div class="lsd-elements-' . esc_attr($this->key) . '-field-options '.($display_form ? '' : 'lsd-util-hide').'">
+        <div class="lsd-elements-' . esc_attr($this->key) . '-field-options ' . ($display_form ? '' : 'lsd-util-hide') . '">
             <label for="lsd_elements_' . esc_attr($this->key) . '_phone_field">' . esc_html__('Phone Field', 'listdom') . '</label>
             ' . LSD_Form::switcher([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_phone_field',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][phone_field]',
                 'value' => $data['phone_field'] ?? 1,
+            ]) . '
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_author_link">' . esc_html__('Author Link', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_author_link',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][author_link]',
+                'value' => $data['author_link'] ?? 0,
             ]) . '
         </div>';
     }

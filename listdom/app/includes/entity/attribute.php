@@ -13,14 +13,8 @@ class LSD_Entity_Attribute extends LSD_Base
     protected $term_id;
     public $type;
 
-    /**
-     * LSD_Entity_Attribute constructor.
-     * @param $term_id
-     */
     public function __construct($term_id)
     {
-        parent::__construct();
-
         $this->term_id = $term_id;
         $this->type = get_term_meta($this->term_id, 'lsd_field_type', true);
     }

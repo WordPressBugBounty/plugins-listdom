@@ -9,6 +9,7 @@ defined('ABSPATH') || die();
 $width = $params['width'] ?? 1920;
 $height = $params['height'] ?? 500;
 $lightbox = !isset($params['lightbox']) || $params['lightbox'];
+$thumbnail_status = $params['thumbnail_status'] ?? 'image';
 $include_thumbnail = $params['include_thumbnail'] ?? false;
 
 $gallery = $this->get_gallery($post_id , $include_thumbnail);
@@ -29,12 +30,12 @@ jQuery(document).ready(function()
     const totalItems = jQuery(".lsd-gallery-slider .lsd-gallery-item").length;
 
     jQuery(".lsd-gallery-slider-thumbs").listdomGallerySliderThumbnail({
-        items: Math.min(3, totalItems),
+        items: Math.min(4, totalItems),
     });
 });
 </script>');
 ?>
-<div class="lsd-gallery-slider-wrapper">
+<div class="<?php echo $thumbnail_status === 'list' ? 'lsd-gallery-slider-wrapper-list' : 'lsd-gallery-slider-wrapper'; ?>">
     <div class="lsd-gallery-slider lsd-owl-carousel <?php echo $lightbox ? 'lsd-image-lightbox' : ''; ?>" <?php echo lsd_schema()->scope()->type('https://schema.org/ImageGallery'); ?>>
         <?php
             foreach($gallery as $id)
@@ -53,18 +54,20 @@ jQuery(document).ready(function()
         ?>
     </div>
 
-    <!-- Thumbnails -->
-    <div class="lsd-gallery-slider-thumbs lsd-owl-carousel">
-        <?php
-        foreach($gallery as $id)
-        {
-            $thumb = wp_get_attachment_image_src($id, [100, 100]);
-            if(!$thumb) continue;
+    <?php if($thumbnail_status === 'image' || $thumbnail_status == 'list'): ?>
+        <!-- Thumbnails -->
+        <div class="lsd-gallery-slider-thumbs lsd-owl-carousel">
+            <?php
+            foreach($gallery as $id)
+            {
+                $thumb = wp_get_attachment_image_src($id, 'full');
+                if(!$thumb) continue;
 
-            echo '<div class="lsd-gallery-thumb-item">
-                <img alt="" src="' . esc_url($thumb[0]) . '" width="100" height="100">
-            </div>';
-        }
-        ?>
-    </div>
+                echo '<div class="lsd-gallery-thumb-item">
+                    <img alt="" src="' . esc_url($thumb[0]) . '" width="300" height="200">
+                </div>';
+            }
+            ?>
+        </div>
+    <?php endif; ?>
 </div>

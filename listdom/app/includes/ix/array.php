@@ -28,9 +28,6 @@ abstract class LSD_IX_Array extends LSD_IX
 
     private $statuses;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct();
@@ -147,9 +144,7 @@ abstract class LSD_IX_Array extends LSD_IX
 
         // Taxonomies
         $taxonomies = $this->get_taxonomies($listing['ID']);
-        $category_id = is_array($taxonomies[LSD_Base::TAX_CATEGORY]) && isset($taxonomies[LSD_Base::TAX_CATEGORY][0]['term_id'])
-            ? $taxonomies[LSD_Base::TAX_CATEGORY][0]['term_id']
-            : null;
+        $category_id = $taxonomies[LSD_Base::TAX_CATEGORY][0]['term_id'] ?? null;
 
         // Listing Data
         $row = [

@@ -13,9 +13,6 @@ class LSD_Shortcodes_AddListing extends LSD_Shortcodes_Dashboard
     public $form_type;
     public $add_listing;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct();

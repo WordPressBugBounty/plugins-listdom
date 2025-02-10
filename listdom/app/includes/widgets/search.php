@@ -13,9 +13,6 @@ class LSD_Widgets_Search extends WP_Widget
     public $LSD;
     public $instance;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct('LSD_Widgets_Search', esc_html__('(Listdom) Search', 'listdom'), ['description' => esc_html__('A search form to filter listings!', 'listdom')]);

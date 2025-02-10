@@ -3,7 +3,7 @@
 defined('ABSPATH') || die();
 
 // User is Already Logged-in
-if(is_user_logged_in()) return '';
+if (is_user_logged_in()) return '';
 
 $auth = LSD_Options::auth();
 

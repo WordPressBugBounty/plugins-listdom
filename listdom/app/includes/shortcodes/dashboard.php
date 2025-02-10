@@ -30,13 +30,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     private $is_pro;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Settings
         $this->settings = LSD_Options::settings();
 
@@ -148,10 +143,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 $this->q->the_post();
                 $this->listings[] = get_post();
             }
-
-            LSD_LifeCycle::reset();
         }
         else $this->listings = [];
+
+        // Restore original Post Data
+        LSD_LifeCycle::reset();
 
         // Dashboard
         ob_start();
@@ -335,6 +331,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         $post_title = isset($lsd['title']) ? sanitize_text_field($lsd['title']) : '';
         $post_content = $lsd['content'] ?? '';
+        $post_excerpt = $lsd['excerpt'] ?? '';
 
         if (!trim($post_title)) $this->response(['success' => 0, 'message' => esc_html__('Please fill listing title field!', 'listdom')]);
 
@@ -463,6 +460,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $id = wp_insert_post([
                 'post_title' => $post_title,
                 'post_content' => $post_content,
+                'post_excerpt' => $post_excerpt,
                 'post_type' => LSD_Base::PTYPE_LISTING,
                 'post_status' => $status,
             ]);
@@ -474,6 +472,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             'post_title' => $post_title,
             'post_name' => sanitize_title($post_title),
             'post_content' => $post_content,
+            'post_excerpt' => $post_excerpt,
         ]);
 
         // Tags

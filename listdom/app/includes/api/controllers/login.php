@@ -2,15 +2,9 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Login Controller Class.
- *
- * @class LSD_API_Controllers_Login
- * @version    1.0.0
- */
 class LSD_API_Controllers_Login extends LSD_API_Controller
 {
-    public function perform(WP_REST_Request $request)
+    public function perform(WP_REST_Request $request): WP_REST_Response
     {
         $vars = $request->get_params();
 
@@ -25,7 +19,10 @@ class LSD_API_Controllers_Login extends LSD_API_Controller
         ], is_ssl());
 
         // Invalid Credentials
-        if (is_wp_error($response)) return $response;
+        if (is_wp_error($response)) return $this->response([
+            'data' => new WP_Error('400', $response->get_error_message()),
+            'status' => 400,
+        ]);
 
         // Trigger Action
         do_action('lsd_api_user_loggedin', $response->ID, $request);

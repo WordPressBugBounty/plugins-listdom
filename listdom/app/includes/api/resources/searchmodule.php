@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Search Module Resource Class.
- *
- * @class LSD_API_Resources_SearchModule
- * @version    1.0.0
- */
 class LSD_API_Resources_SearchModule extends LSD_API_Resource
 {
     public static function get($id): array

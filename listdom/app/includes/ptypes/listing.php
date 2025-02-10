@@ -14,19 +14,14 @@ class LSD_PTypes_Listing extends LSD_PTypes
     protected $settings;
     protected $details_page_options;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         $this->PT = LSD_Base::PTYPE_LISTING;
 
         // Listdom Settings
         $this->settings = LSD_Options::settings();
 
-        // Details Page options
+        // Single Listing options
         $this->details_page_options = LSD_Options::details_page();
     }
 
@@ -424,7 +419,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
         // Listing Post Type
         if ($post && $post->post_type === $this->PT)
         {
-            // Details Page options
+            // Single Listing options
             $options = LSD_Options::details_page();
 
             // Comments are disabled globally for listings

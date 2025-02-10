@@ -12,13 +12,8 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
 {
     public $PT;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         $this->PT = LSD_Base::PTYPE_SHORTCODE;
     }
 
@@ -133,7 +128,7 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         else if ($column_name == 'skin')
         {
             $display = get_post_meta($post_id, 'lsd_display', true);
-            echo (is_array($display) and isset($display['skin'])) ? '<strong>' . esc_html($display['skin']) . '</strong>' : '-----';
+            echo is_array($display) && isset($display['skin']) ? '<strong>' . esc_html($display['skin']) . '</strong>' : '-----';
         }
     }
 

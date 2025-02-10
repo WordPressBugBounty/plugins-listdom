@@ -11,6 +11,7 @@ $dashboard = new LSD_Dashboard();
 $settings = LSD_Options::settings();
 $styles = LSD_Options::styles();
 
+// Post Types & Their Taxonomies
 $post_types = LSD_Base::get_ptypes_and_tax(true);
 ?>
 <div class="lsd-settings-wrap" id="lsd_settings_advanced_wrapper">
@@ -247,6 +248,7 @@ jQuery('#lsd_settings_form').on('submit', function (e)
     const $button = jQuery("#lsd_settings_save_button");
     const $success = jQuery(".lsd-settings-success-message");
     const $error = jQuery(".lsd-settings-error-message");
+    const $tab = jQuery('.nav-tab-active');
 
     // Loading Styles
     $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
@@ -263,14 +265,20 @@ jQuery('#lsd_settings_form').on('submit', function (e)
         type: "POST",
         url: ajaxurl,
         data: "action=lsd_save_advanced&" + settings,
-        success: function () {
+        success: function ()
+        {
+            $tab.attr('data-saved', 'true');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 
             // Unloading
             loading.stop($success, 2000);
         },
-        error: function () {
+        error: function ()
+        {
+            $tab.attr('data-saved', 'false');
+
             // Loading Styles
             $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
 

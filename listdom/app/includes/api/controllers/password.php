@@ -2,12 +2,6 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom API Forgot Controller Class.
- *
- * @class LSD_API_Controllers_Password
- * @version    1.0.0
- */
 class LSD_API_Controllers_Password extends LSD_API_Controller
 {
     public function update(WP_REST_Request $request): WP_REST_Response
@@ -21,8 +15,8 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
             'status' => 400,
         ]);
 
-        // Password do not Match
-        if ($password != $password_confirmation) return $this->response([
+        // Password does not Match
+        if ($password !== $password_confirmation) return $this->response([
             'data' => new WP_Error('400', esc_html__("Password do not match with its confirmation.", 'listdom')),
             'status' => 400,
         ]);
@@ -42,13 +36,16 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         ]);
     }
 
-    public function forgot(WP_REST_Request $request)
+    public function forgot(WP_REST_Request $request): WP_REST_Response
     {
         $username = $request->get_param('username');
         $response = $this->send($username);
 
         // Invalid Username
-        if (is_wp_error($response)) return $response;
+        if (is_wp_error($response)) return $this->response([
+            'data' => new WP_Error('400', $response->get_error_message()),
+            'status' => 400,
+        ]);
 
         // Response
         return $this->response([
@@ -59,12 +56,12 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         ]);
     }
 
-    public function send($username)
+    private function send($username)
     {
         $user = null;
         $errors = new WP_Error();
 
-        if (empty($username) or !is_string($username))
+        if (empty($username) || !is_string($username))
         {
             $errors->add('empty_username', esc_html__('Enter a username or email address.', 'listdom'));
         }
@@ -75,22 +72,21 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         }
         else
         {
-            $login = trim($username);
-            $user = get_user_by('login', $login);
+            $user = get_user_by('login', trim($username));
         }
 
         if ($errors->has_errors()) return $errors;
 
         if (!$user)
         {
-            $errors->add('invalidcombo', esc_html__('There is no account with that username or email address.', 'listdom'));
+            $errors->add('invalid-combo', esc_html__('There is no account with that username or email address.', 'listdom'));
             return $errors;
         }
 
         $user_login = $user->user_login;
         $user_email = $user->user_email;
-        $key = get_password_reset_key($user);
 
+        $key = get_password_reset_key($user);
         if (is_wp_error($key)) return $key;
 
         if (is_multisite()) $site_name = get_network()->site_name;

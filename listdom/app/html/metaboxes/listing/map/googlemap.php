@@ -134,7 +134,7 @@ jQuery(document).ready(function($)
          */
         <?php if(is_array($shape)): ?>
 
-        const overlay;
+        let overlay;
         <?php if(isset($shape['type']) and $shape['type'] == 'polyline'): ?>
         overlay = new google.maps.Polyline(
         {

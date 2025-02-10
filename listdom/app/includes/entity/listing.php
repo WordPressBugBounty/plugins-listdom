@@ -15,7 +15,6 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function __construct($post = null)
     {
-        // Call Parent Constructor
         parent::__construct();
 
         // Get the Post
@@ -184,23 +183,35 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID, $limit, $read_more);
     }
 
-    public function get_features($method = 'list', $show_icons = true, $list_style = 'per-row')
+    public function get_features($method = 'list', $show_icons = true, $enable_link = true, $list_style = 'per-row')
     {
-        $element = new LSD_Element_Features($show_icons);
+        $element = new LSD_Element_Features($show_icons, $enable_link);
 
         if ($method === 'text') return $element->text($this->post->ID);
         else return $element->get($this->post->ID, $list_style);
     }
 
-    public function get_tags()
+    public function get_tags($enable_link = true)
     {
         $element = new LSD_Element_Tags();
-        return $element->get($this->post->ID);
+        return $element->get($this->post->ID, $enable_link);
     }
 
-    public function get_categories($show_color = true, $multiple_categories = false, $color_method = 'bg')
+    public function get_categories(mixed $args = true, $multiple_categories = false, $color_method = 'bg', $enable_link = true)
     {
-        $element = new LSD_Element_Categories($show_color, $multiple_categories, $color_method);
+        if (!is_array($args))
+        {
+            $args = [
+                'show_color' => (bool) $args,
+                'multiple_categories' => $multiple_categories,
+                'color_method' => $color_method,
+                'enable_link' => $enable_link,
+                'display_name' => true,
+                'display_icon' => false,
+            ];
+        }
+
+        $element = new LSD_Element_Categories($args);
         return $element->get($this->post->ID);
     }
 
@@ -345,9 +356,9 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID);
     }
 
-    public function get_labels($style = 'tags')
+    public function get_labels($style = 'tags', $enable_link = true)
     {
-        $element = new LSD_Element_Labels($style);
+        $element = new LSD_Element_Labels($style, $enable_link);
         return $element->get($this->post->ID);
     }
 
@@ -380,6 +391,17 @@ class LSD_Entity_Listing extends LSD_Entity
 
         // Apply Filters
         return apply_filters('lsd_infowindow', $infowindow, $element);
+    }
+
+    public function get_map_card()
+    {
+        $element = new LSD_Element_Mapcard();
+        $element->set_listing($this);
+
+        $card = $element->get($this->post->ID);
+
+        // Apply Filters
+        return apply_filters('lsd_map_card', $card, $element);
     }
 
     /**

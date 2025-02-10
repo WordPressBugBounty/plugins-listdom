@@ -15,7 +15,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '3.8.1';
+    public $version = '3.9.0';
 
     /**
      * The single instance of the class.
@@ -35,7 +35,7 @@ final class Listdom
      * @since 1.0.0
      * @static
      */
-    public static function instance()
+    public static function instance(): Listdom
     {
         // Get an instance of Class
         if (is_null(self::$instance)) self::$instance = new self();
@@ -187,6 +187,10 @@ final class Listdom
         // Listdom AJAX
         $ajax = new LSD_Ajax();
         $ajax->init();
+
+        // Listdom Admin
+        $admin = new LSD_Admin();
+        $admin->init();
 
         // Listdom Dummy Data
         $dummy = new LSD_Dummy();

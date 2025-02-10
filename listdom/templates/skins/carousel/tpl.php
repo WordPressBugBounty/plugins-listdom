@@ -47,7 +47,7 @@ jQuery(document).ready(function()
 
     <div class="lsd-carousel-view-listings-wrapper">
         <div class="lsd-listing-wrapper">
-            <div class="lsd-skin-<?php echo esc_attr($this->id); ?>-carousel lsd-owl-carousel">
+            <div class="lsd-skin-<?php echo esc_attr($this->id); ?>-carousel lsd-owl-carousel <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?>">
                 <?php echo LSD_Kses::full($listings_html); ?>
             </div>
         </div>

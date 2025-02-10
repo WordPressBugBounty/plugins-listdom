@@ -85,7 +85,7 @@ $missAddonMessages = [];
         </div>
         <?php endif; ?>
 
-        <?php if (class_exists('LSDADDFAV_Base')): ?>
+        <?php if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -104,7 +104,7 @@ $missAddonMessages = [];
         <?php else: ?>
             <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom')); ?>
         <?php endif; ?>
-        <?php if (class_exists('LSDADDCMP_Base')): ?>
+        <?php if (class_exists(LSDADDCMP::class)|| class_exists(\LSDPACCMP\Base::class)): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -234,7 +234,7 @@ $missAddonMessages = [];
                 </div>
             </div>
         </div>
-        <?php if (class_exists('LSDADDREV_Base')): ?>
+        <?php if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Review Rates', 'listdom'),
@@ -265,7 +265,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php if (class_exists('LSDADDCLM_Base')): ?>
+        <?php if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5 <?php echo !isset($carousel['display_title']) || $carousel['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_carousel_is_claimed_wrapper">
             <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -296,26 +296,48 @@ $missAddonMessages = [];
                         'id' => 'lsd_display_options_skin_carousel_display_image',
                         'name' => 'lsd[display][carousel][display_image]',
                         'value' => $carousel['display_image'] ?? '1',
-                        'toggle' => '#lsd_display_options_skin_carousel_image_method'
+                        'toggle' => '.lsd-display-options-skin-carousel-image-options',
                     ]); ?>
                 </div>
             </div>
-            <div class="lsd-form-row <?php echo (!isset($carousel['display_image']) || $carousel['display_image']) ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_carousel_image_method">
-                <div class="lsd-col-5"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Image Method', 'listdom'),
-                    'for' => 'lsd_display_options_skin_carousel_image_method',
-                ]); ?></div>
-                <div class="lsd-col-6">
-                    <?php echo LSD_Form::select([
-                        'id' => 'lsd_display_options_skin_carousel_image_method',
-                        'name' => 'lsd[display][carousel][image_method]',
-                        'options' => [
-                            'cover' => esc_html__('Cover', 'listdom'),
-                            'slider' => esc_html__('Slider', 'listdom'),
-                        ],
-                        'value' => $carousel['image_method'] ?? 'cover'
-                    ]); ?>
-                    <p class="description"><?php esc_html_e("Cover shows only featured image but slider shows all gallery images.", 'listdom'); ?></p>
+            <div class="lsd-display-options-skin-carousel-image-options <?php echo !isset($carousel['display_image']) || $carousel['display_image'] ? '' : 'lsd-util-hide'; ?>">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-5"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Image Method', 'listdom'),
+                        'for' => 'lsd_display_options_skin_carousel_image_method',
+                    ]); ?></div>
+                    <div class="lsd-col-6">
+                        <?php echo LSD_Form::select([
+                            'id' => 'lsd_display_options_skin_carousel_image_method',
+                            'name' => 'lsd[display][carousel][image_method]',
+                            'options' => [
+                                'cover' => esc_html__('Cover', 'listdom'),
+                                'slider' => esc_html__('Slider', 'listdom'),
+                            ],
+                            'value' => $carousel['image_method'] ?? 'cover'
+                        ]); ?>
+                        <p class="description"><?php esc_html_e("Cover shows only featured image but slider shows all gallery images.", 'listdom'); ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="lsd-display-options-skin-carousel-image-options <?php echo !isset($carousel['display_image']) || $carousel['display_image'] ? '' : 'lsd-util-hide'; ?>">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-5"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Image fit', 'listdom'),
+                        'for' => 'lsd_display_options_skin_carousel_image_fit',
+                    ]); ?></div>
+                    <div class="lsd-col-6">
+                        <?php echo LSD_Form::select([
+                            'id' => 'lsd_display_options_skin_carousel_image_fit',
+                            'name' => 'lsd[display][carousel][image_fit]',
+                            'options' => [
+                                'cover' => esc_html__('Cover', 'listdom'),
+                                'contain' => esc_html__('Contain', 'listdom'),
+                            ],
+                            'value' => $carousel['image_fit'] ?? 'cover'
+                        ]); ?>
+                        <p class="description"><?php esc_html_e("Cover shows featured image as object fit cover.", 'listdom'); ?></p>
+                    </div>
                 </div>
             </div>
         <?php else: ?>
@@ -385,7 +407,7 @@ $missAddonMessages = [];
             'value' => $carousel['listing_link'] ?? 'normal',
             'options' => LSD_Base::get_listing_link_methods(),
         ]); ?>
-        <p class="description"><?php esc_html_e("Link to listing detail page.", 'listdom'); ?></p>
+        <p class="description"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
     </div>
 </div>
 <?php else: ?>

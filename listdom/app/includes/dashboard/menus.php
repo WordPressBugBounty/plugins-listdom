@@ -13,13 +13,8 @@ class LSD_Dashboard_Menus extends LSD_Shortcodes
     public $menus;
     public $content;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         $settings = LSD_Options::settings();
         $this->menus = isset($settings['dashboard_menu_custom']) && is_array($settings['dashboard_menu_custom'])
             ? $settings['dashboard_menu_custom']

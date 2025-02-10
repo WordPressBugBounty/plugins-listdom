@@ -17,13 +17,8 @@ class LSD_Menus_Welcome extends LSD_Menus
 
     private $listdomer = 'listdomer';
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        parent::__construct();
-
         // Initialize the Menu
         $this->init();
     }

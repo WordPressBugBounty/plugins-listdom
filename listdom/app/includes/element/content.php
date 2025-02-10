@@ -2,23 +2,13 @@
 // no direct access
 defined('ABSPATH') || die();
 
-/**
- * Listdom Content Element Class.
- *
- * @class LSD_Element_Content
- * @version    1.0.0
- */
 class LSD_Element_Content extends LSD_Element
 {
     public $key = 'content';
     public $label;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
-        // Call the parent constructor
         parent::__construct();
 
         $this->label = esc_html__('Listing Content', 'listdom');

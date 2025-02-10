@@ -12,9 +12,6 @@ class LSD_Widgets_Alllistings extends WP_Widget
 {
     public $LSD;
 
-    /**
-     * Constructor method
-     */
     public function __construct()
     {
         parent::__construct('LSD_Widgets_Alllistings', esc_html__('(Listdom) All Listings', 'listdom'), ['description' => esc_html__('Show all of your listings in a Map widget. If you like to filter listings, you should use Listdom Shortcode Widget.', 'listdom')]);
