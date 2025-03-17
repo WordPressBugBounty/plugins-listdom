@@ -221,6 +221,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                         'value' => $settings['submission_guest'] ?? 0,
                         'name' => 'lsd[submission_guest]',
                         'toggle' => '#lsd_settings_submission_guest_options',
+                        'toggle2' => '#lsd_settings_submission_non_guest_options',
                     ]); ?>
                     <p class="description lsd-mb-2"><?php esc_html_e("Enable listing submission for guest users!", 'listdom'); ?></p>
                 </div>
@@ -242,6 +243,22 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                 '0' => esc_html__('Disabled', 'listdom'),
                             ],
                         ]); ?>
+                    </div>
+                </div>
+            </div>
+            <div id="lsd_settings_submission_non_guest_options" class="lsd-mt-3 <?php echo !isset($settings['submission_guest']) || !$settings['submission_guest'] ? '' : 'lsd-util-hide'; ?>">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Redirect to Login', 'listdom'),
+                        'for' => 'lsd_settings_submission_guest_redirect',
+                    ]); ?></div>
+                    <div class="lsd-col-4">
+                        <?php echo LSD_Form::switcher([
+                            'id' => 'lsd_settings_submission_guest_redirect',
+                            'value' => $settings['submission_guest_redirect'] ?? 0,
+                            'name' => 'lsd[submission_guest_redirect]',
+                        ]); ?>
+                        <p class="description lsd-mb-0"><?php esc_html_e("Redirect users to the WordPress login page instead of displaying the default login forms.", 'listdom'); ?></p>
                     </div>
                 </div>
             </div>

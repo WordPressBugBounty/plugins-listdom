@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_Element_Categories extends LSD_Element
 {

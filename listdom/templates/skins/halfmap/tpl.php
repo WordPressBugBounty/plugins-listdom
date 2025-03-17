@@ -39,10 +39,10 @@ jQuery(document).ready(function()
 
             <?php if ($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module()); ?>
 
-            <?php echo LSD_Kses::form($this->get_switcher_buttons()); ?>
+            <?php echo LSD_Kses::form($this->get_switcher_buttons(!is_numeric($this->style))); ?>
 
             <div class="lsd-halfmap-view-listings-wrapper lsd-viewstyle-<?php echo esc_attr($this->default_view); ?>">
-                <div class="lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?>">
+                <div class="lsd-listing-wrapper <?php echo 'lsd-listgrid-columns-'.$this->columns; ?> <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?>">
                     <?php echo LSD_Kses::full($listings_html); ?>
                 </div>
             </div>

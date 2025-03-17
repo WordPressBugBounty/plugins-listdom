@@ -209,7 +209,13 @@ class LSD_Form extends LSD_Base
     {
         if (!count($args)) return false;
 
-        return '<input type="text" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : 'lsd-colorpicker') . '" value="' . (isset($args['value']) ? esc_attr($args['value']) : '') . '" data-default-color="' . (isset($args['default']) ? esc_attr($args['default']) : '') . '">';
+        $transparency = isset($args['transparency']) && $args['transparency'];
+        $value = $args['value'] ?? '';
+
+        return '<div class="lsd-colorpicker-wrapper">
+            <input type="text" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : 'lsd-colorpicker') . '" value="' . $value . '" data-default-color="' . (isset($args['default']) ? esc_attr($args['default']) : '') . '">
+            ' . ($transparency ? '<label><input type="checkbox" ' . (trim($value) === '' ? 'checked' : '') . ' class="lsd-colorpicker-transparent">' . esc_html__('Transparent', 'listdom') . '</label>' : '') . '
+        </div>';
     }
 
     public static function imagepicker($args)
@@ -260,6 +266,12 @@ class LSD_Form extends LSD_Base
 
         $options = '';
         $fonts = LSD_Base::get_fonts();
+
+        // Inherit
+        if (isset($args['show_inherit']) && $args['show_inherit'])
+        {
+            $options .= '<option value="inherit" ' . ((isset($args['value']) && $args['value'] === 'inherit') ? 'selected="selected"' : '') . '>' . esc_html__('Inherit', 'listdom') . '</option>';
+        }
 
         foreach ($fonts as $code => $font) $options .= '<option value="' . esc_attr($code) . '" ' . ((isset($args['value']) and $args['value'] == $code) ? 'selected="selected"' : '') . '>' . esc_html($font['label']) . '</option>';
 
@@ -742,6 +754,307 @@ class LSD_Form extends LSD_Base
 
         // Dropdown Field
         return self::select($args);
+    }
+
+    public static function border(array $args): string
+    {
+        $id = $args['id'] ?? 'lsd_border';
+        $name = $args['name'] ?? 'border';
+        $value = isset($args['value']) && is_array($args['value']) ? $args['value'] : [];
+
+        return '<div class="lsd-border-wrapper">
+            <div class="lsd-border-width-wrapper lsd-flex-3">
+                <div class="lsd-border-width-top">
+                    '.LSD_Form::label([
+                'title' => esc_html__('Border Top', 'listdom'),
+                'for' => $id.'_top'
+            ]).'
+                    '.LSD_Form::number([
+                'id' => $id.'_top',
+                'name' => $name.'[top]',
+                'placeholder' => esc_html__('Top', 'listdom'),
+                'attributes' => [
+                    'min' => 0,
+                    'max' => 10,
+                    'increment' => 1
+                ],
+                'value' => $value['top'] ?? 0
+            ]).'
+                </div>
+                <div class="lsd-border-width-right">
+                    '.LSD_Form::label([
+                'title' => esc_html__('Border Right', 'listdom'),
+                'for' => $id.'_right'
+            ]).'
+                    '.LSD_Form::number([
+                'id' => $id.'_right',
+                'name' => $name.'[right]',
+                'placeholder' => esc_html__('Right', 'listdom'),
+                'attributes' => [
+                    'min' => 0,
+                    'max' => 10,
+                    'increment' => 1
+                ],
+                'value' => $value['right'] ?? 0
+            ]).'
+                </div>
+                <div class="lsd-border-width-bottom">
+                    '.LSD_Form::label([
+                'title' => esc_html__('Border Bottom', 'listdom'),
+                'for' => $id.'_bottom'
+            ]).'
+                    '.LSD_Form::number([
+                'id' => $id.'_bottom',
+                'name' => $name.'[bottom]',
+                'placeholder' => esc_html__('Bottom', 'listdom'),
+                'attributes' => [
+                    'min' => 0,
+                    'max' => 10,
+                    'increment' => 1
+                ],
+                'value' => $value['bottom'] ?? 0
+            ]).'
+                </div>
+                <div class="lsd-border-width-left">
+                    '.LSD_Form::label([
+                'title' => esc_html__('Border Left', 'listdom'),
+                'for' => $id.'_left'
+            ]).'
+                    '.LSD_Form::number([
+                'id' => $id.'_left',
+                'name' => $name.'[left]',
+                'placeholder' => esc_html__('Left', 'listdom'),
+                'attributes' => [
+                    'min' => 0,
+                    'max' => 10,
+                    'increment' => 1
+                ],
+                'value' => $value['left'] ?? 0
+            ]).'
+                </div>
+            </div>
+            <div class="lsd-border-color-wrapper lsd-flex-1">
+                '.LSD_Form::label([
+                'title' => esc_html__('Border Color', 'listdom'),
+                'for' => $id.'_color'
+            ]).'
+                '.LSD_Form::colorpicker([
+                'id' => $id.'_color',
+                'name' => $name.'[color]',
+                'value' => $value['color'] ?? ''
+            ]).'
+            </div>
+            <div class="lsd-border-radius-wrapper lsd-flex-1">
+                '.LSD_Form::label([
+                'title' => esc_html__('Border Radius', 'listdom'),
+                'for' => $id.'_radius'
+            ]).'
+                '.LSD_Form::number([
+                'id' => $id.'_radius',
+                'name' => $name.'[radius]',
+                'placeholder' => esc_html__('Radius', 'listdom'),
+                'attributes' => [
+                    'min' => 0,
+                    'max' => 50,
+                    'increment' => 1
+                ],
+                'value' => $value['radius'] ?? 0
+            ]).'
+            </div>
+            <div class="lsd-border-style-wrapper lsd-flex-1">
+                '.LSD_Form::label([
+                'title' => esc_html__('Border Style', 'listdom'),
+                'for' => $id.'_style'
+            ]).'
+                '.LSD_Form::select([
+                'id' => $id.'_style',
+                'name' => $name.'[style]',
+                'options' => [
+                    'none' => esc_html__('None', 'listdom'),
+                    'solid' => esc_html__('Solid', 'listdom'),
+                    'dashed' => esc_html__('Dashed', 'listdom'),
+                    'dotted' => esc_html__('Dotted', 'listdom'),
+                    'double' => esc_html__('Double', 'listdom'),
+                ],
+                'value' => $value['style'] ?? 'none'
+            ]).'
+            </div>
+        </div>';
+    }
+
+    public static function padding(array $args): string
+    {
+        $id = $args['id'] ?? 'lsd_padding';
+        $name = $args['name'] ?? 'padding';
+        $value = isset($args['value']) && is_array($args['value']) ? $args['value'] : [];
+
+        return '<div class="lsd-padding-wrapper">
+            <div class="lsd-padding-width-wrapper lsd-flex-1">
+                <div class="lsd-padding-top">
+                    '.LSD_Form::label([
+                        'title' => esc_html__('Padding Top', 'listdom'),
+                        'for' => $id.'_top'
+                    ]).'
+                    '.LSD_Form::number([
+                        'id' => $id.'_top',
+                        'name' => $name.'[top]',
+                        'placeholder' => esc_html__('Top', 'listdom'),
+                        'attributes' => [
+                            'min' => 0,
+                            'increment' => 1
+                        ],
+                        'value' => $value['top'] ?? 0
+                    ]).'
+                </div>
+                <div class="lsd-padding-right">
+                    '.LSD_Form::label([
+                        'title' => esc_html__('Padding Right', 'listdom'),
+                        'for' => $id.'_right'
+                    ]).'
+                    '.LSD_Form::number([
+                        'id' => $id.'_right',
+                        'name' => $name.'[right]',
+                        'placeholder' => esc_html__('Right', 'listdom'),
+                        'attributes' => [
+                            'min' => 0,
+                            'increment' => 1
+                        ],
+                        'value' => $value['right'] ?? 0
+                    ]).'
+                </div>
+                <div class="lsd-padding-bottom">
+                    '.LSD_Form::label([
+                        'title' => esc_html__('Padding Bottom', 'listdom'),
+                        'for' => $id.'_bottom'
+                    ]).'
+                    '.LSD_Form::number([
+                        'id' => $id.'_bottom',
+                        'name' => $name.'[bottom]',
+                        'placeholder' => esc_html__('Bottom', 'listdom'),
+                        'attributes' => [
+                            'min' => 0,
+                            'increment' => 1
+                        ],
+                        'value' => $value['bottom'] ?? 0
+                    ]).'
+                </div>
+                <div class="lsd-padding-left">
+                    '.LSD_Form::label([
+                        'title' => esc_html__('Padding Left', 'listdom'),
+                        'for' => $id.'_left'
+                    ]).'
+                    '.LSD_Form::number([
+                        'id' => $id.'_left',
+                        'name' => $name.'[left]',
+                        'placeholder' => esc_html__('Left', 'listdom'),
+                        'attributes' => [
+                            'min' => 0,
+                            'increment' => 1
+                        ],
+                        'value' => $value['left'] ?? 0
+                    ]).'
+                </div>
+            </div>
+        </div>';
+    }
+
+    public static function typography(array $args): string
+    {
+        $id = $args['id'] ?? 'lsd_typography';
+        $name = $args['name'] ?? 'typography';
+        $include = isset($args['include']) && is_array($args['include']) ? $args['include'] : [];
+        $value = isset($args['value']) && is_array($args['value']) ? $args['value'] : [];
+
+        return '<div class="lsd-typography-wrapper">
+            '.(!$include || in_array('family', $include) ? '<div class="lsd-typography-family-wrapper lsd-flex-2">
+                '.LSD_Form::label([
+                    'title' => esc_html__('Font Family', 'listdom'),
+                    'for' => $id.'_family'
+                ]).'
+                '.LSD_Form::fontpicker([
+                    'id' => $id.'_family',
+                    'name' => $name.'[family]',
+                    'value' => $value['family'] ?? 'inherit',
+                    'show_inherit' => true,
+                ]).'
+            </div>' : '' ).'
+            '.(!$include || in_array('weight', $include) ? '<div class="lsd-typography-weight-wrapper lsd-flex-2">
+                '.LSD_Form::label([
+                    'title' => esc_html__('Font Weight', 'listdom'),
+                    'for' => $id.'_weight'
+                ]).'
+                '.LSD_Form::select([
+                    'id' => $id.'_weight',
+                    'name' => $name.'[weight]',
+                    'options' => [
+                        'inherit' => esc_html__('Inherit', 'listdom'),
+                        '100' => esc_html__('100 (Thin)', 'listdom'),
+                        '200' => esc_html__('200 (Extra Light)', 'listdom'),
+                        '300' => esc_html__('300 (Light)', 'listdom'),
+                        '400' => esc_html__('400 (Regular)', 'listdom'),
+                        '500' => esc_html__('500 (Medium)', 'listdom'),
+                        '600' => esc_html__('600 (Semi-Bold)', 'listdom'),
+                        '700' => esc_html__('700 (Bold)', 'listdom'),
+                        '800' => esc_html__('800 (Extra Bold)', 'listdom'),
+                        '900' => esc_html__('900 (Black)', 'listdom'),
+                    ],
+                    'value' => $value['weight'] ?? 'inherit'
+                ]).'
+            </div>' : '' ).'
+            '.(!$include || in_array('align', $include) ? '<div class="lsd-typography-align-wrapper lsd-flex-1">
+                '.LSD_Form::label([
+                    'title' => esc_html__('Text Align', 'listdom'),
+                    'for' => $id.'_align'
+                ]).'
+                '.LSD_Form::select([
+                    'id' => $id.'_align',
+                    'name' => $name.'[align]',
+                    'options' => [
+                        'inherit' => esc_html__('Inherit', 'listdom'),
+                        'left' => esc_html__('Left', 'listdom'),
+                        'right' => esc_html__('Right', 'listdom'),
+                        'center' => esc_html__('Center', 'listdom'),
+                        'justify' => esc_html__('Justify', 'listdom'),
+                        'initial' => esc_html__('Initial', 'listdom'),
+                    ],
+                    'value' => $value['align'] ?? 'inherit'
+                ]).'
+            </div>' : '' ).'
+            '.(!$include || in_array('size', $include) ? '<div class="lsd-typography-size-wrapper lsd-flex-1">
+                '.LSD_Form::label([
+                    'title' => esc_html__('Size', 'listdom'),
+                    'for' => $id.'_size'
+                ]).'
+                '.LSD_Form::number([
+                    'id' => $id.'_size',
+                    'name' => $name.'[size]',
+                    'placeholder' => esc_html__('Size', 'listdom'),
+                    'attributes' => [
+                        'min' => 0,
+                        'max' => 80,
+                        'increment' => 1
+                    ],
+                    'value' => $value['size'] ?? ''
+                ]).'
+            </div>' : '' ).'
+            '.(!$include || in_array('line_height', $include) ? '<div class="lsd-typography-line-height-wrapper lsd-flex-1">
+                '.LSD_Form::label([
+                    'title' => esc_html__('Line Height', 'listdom'),
+                    'for' => $id.'_line_height'
+                ]).'
+                '.LSD_Form::number([
+                    'id' => $id.'_line_height',
+                    'name' => $name.'[line_height]',
+                    'placeholder' => esc_html__('Line Height', 'listdom'),
+                    'attributes' => [
+                        'min' => 0,
+                        'max' => 120,
+                        'increment' => 1
+                    ],
+                    'value' => $value['line_height'] ?? ''
+                ]).'
+            </div>' : '' ).'
+        </div>';
     }
 
     public static function submit($args = []): string

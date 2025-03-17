@@ -64,6 +64,16 @@ class LSD_Options extends LSD_Base
         );
     }
 
+    public static function customizer(string $key = '')
+    {
+        if ($key) return LSD_Customizer::values($key);
+
+        return self::parse_args(
+            LSD_Customizer::values(),
+            self::defaults('customizer')
+        );
+    }
+
     public static function socials()
     {
         $socials = get_option('lsd_socials', []);
@@ -83,7 +93,7 @@ class LSD_Options extends LSD_Base
         return trim($pattern) ? $pattern : $default;
     }
 
-    public static function addons($addon = null, $values = null): mixed
+    public static function addons($addon = null, $values = null)
     {
         $addons = self::parse_args(
             get_option('lsd_addons', []),
@@ -106,12 +116,17 @@ class LSD_Options extends LSD_Base
     {
         switch ($option)
         {
-            case 'styles';
+            case 'customizer':
+
+                $defaults = LSD_Customizer::defaults();
+                break;
+
+            case 'styles':
 
                 $defaults = ['CSS' => ''];
                 break;
 
-            case 'socials';
+            case 'socials':
 
                 $defaults = [
                     'facebook' => [
@@ -180,7 +195,7 @@ class LSD_Options extends LSD_Base
                 ];
                 break;
 
-            case 'details_page';
+            case 'details_page':
 
                 $defaults = [
                     'general' => [

@@ -11,6 +11,7 @@ defined('ABSPATH') || die();
 /** @var array $field */
 
 $title = $data['title'] ?? '';
+$title_visibility = !isset($data['title_visibility']) || $data['title_visibility'] ? 1 : 0;
 $visibility = !isset($data['visibility']) || $data['visibility'] ? 1 : 0;
 
 $form = get_post_meta(get_the_ID(), 'lsd_form', true);
@@ -37,10 +38,11 @@ $min = $data['min'] ?? 0;
 $max = $data['max'] ?? 100;
 $increment = $data['increment'] ?? 10;
 $th_separator = $data['th_separator'] ?? 1;
+$level_status = $data['level_status'] ?? 'dependant';
 
 $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($data['title'] ?? 'N/A');
 ?>
-<div class="lsd-search-field <?php echo !$visibility ? 'lsd-search-field-hidden' : ''; ?>" id="lsd_search_field_<?php echo esc_attr($i); ?>_<?php echo esc_attr($key); ?>" data-row="<?php echo esc_attr($i); ?>" data-key="<?php echo esc_attr($key); ?>">
+<div class="lsd-search-field <?php echo !$visibility ? 'lsd-search-field-hidden' : ''; ?> <?php echo !$title_visibility ? 'lsd-search-field-title-hidden' : ''; ?>" id="lsd_search_field_<?php echo esc_attr($i); ?>_<?php echo esc_attr($key); ?>" data-row="<?php echo esc_attr($i); ?>" data-key="<?php echo esc_attr($key); ?>" data-label="<?php echo esc_attr($label); ?>">
     <div class="lsd-row">
         <div class="lsd-col-9">
             <h4><?php echo esc_html($label); ?> <code class="lsd-ml-3 lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Key', 'listdom'); ?>"><?php echo $field['key'] ?? ''; ?></code></h4>
@@ -85,12 +87,16 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
 
             <input type="hidden" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][key]" value="<?php echo esc_attr($key); ?>">
             <input type="hidden" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_visibility" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][visibility]" value="<?php echo esc_attr($visibility); ?>">
+            <input type="hidden" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_title_visibility" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][title_visibility]" value="<?php echo esc_attr($title_visibility); ?>">
 
             <div class="lsd-alert lsd-info lsd-search-field-visibility-alert"><?php esc_html_e("The field is now hidden, but it still affects the search request. If you don’t want a search field to influence the search results, you can remove it entirely.", 'listdom'); ?></div>
 
             <div class="lsd-search-field-param">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_title"><?php esc_html_e('Title', 'listdom'); ?></label>
-                <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_title" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][title]" value="<?php echo esc_attr($title); ?>" placeholder="<?php esc_attr_e('Field Title', 'listdom'); ?>">
+                <div class="lsd-flex lsd-flex-row lsd-flex-align-items-stretch lsd-gap-3">
+                    <span class="lsd-search-field-param-title-visibility lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Toggle Visibility of Title', 'listdom'); ?>" data-i="<?php echo esc_attr($i); ?>" data-key="<?php echo esc_attr($key); ?>"><i class="lsd-icon fa <?php echo $title_visibility ? 'fa-eye' : 'fa-eye-slash'; ?>"></i></span>
+                    <input class="lsd-search-field-param-title widefat lsd-flex-1" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_title" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][title]" value="<?php echo esc_attr($title); ?>" placeholder="<?php esc_attr_e('Field Title', 'listdom'); ?>">
+                </div>
             </div>
 
             <div class="lsd-search-field-param">
@@ -112,7 +118,7 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
             </div>
             <?php endif; ?>
 
-            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-dropdown-plus">
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-hierarchical lsd-search-method-dropdown-plus">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_dropdown_style"><?php esc_html_e('Dropdown Style', 'listdom'); ?></label>
                 <select id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_dropdown_style" class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][dropdown_style]">
                     <option value="enhanced" <?php echo $dropdown_style === 'enhanced' ? 'selected' : ''; ?>><?php echo esc_html__('Enhanced', 'listdom'); ?></option>
@@ -122,7 +128,7 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
 
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-text-input lsd-search-method-number-input lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-dropdown-plus lsd-search-method-mm-input lsd-search-method-hierarchical lsd-search-method-radius lsd-search-method-date-range-picker">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_placeholder"><?php esc_html_e('Placeholder', 'listdom'); ?></label>
-                <input class="widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_placeholder" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][placeholder]" value="<?php echo esc_attr($placeholder); ?>" placeholder="<?php esc_attr_e('Optional Placeholder', 'listdom'); ?>">
+                <input class="lsd-search-field-param-placeholder widefat" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_placeholder" type="text" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][placeholder]" value="<?php echo esc_attr($placeholder); ?>" placeholder="<?php esc_attr_e('Optional Placeholder', 'listdom'); ?>">
             </div>
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-mm-input">
                 <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_max_placeholder"><?php esc_html_e('Max Placeholder', 'listdom'); ?></label>
@@ -181,6 +187,15 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
                 <select class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][th_separator]" id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_th_separator">
                     <option value="1" <?php echo $th_separator == 1 ? 'selected' : ''; ?>><?php echo esc_html__('Yes', 'listdom'); ?></option>
                     <option value="0" <?php echo $th_separator == 0 ? 'selected' : ''; ?>><?php echo esc_html__('No', 'listdom'); ?></option>
+                </select>
+            </div>
+
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-hierarchical">
+                <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_level_status"><?php esc_html_e('Level Status', 'listdom'); ?></label>
+                <select class="widefat" name="lsd[fields][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][level_status]"
+                        id="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_level_status">
+                    <option value="all" <?php echo $level_status == 'all' ? 'selected' : ''; ?>><?php echo esc_html__('Show All Options', 'listdom'); ?></option>
+                    <option value="dependant" <?php echo $level_status == 'dependant' ? 'selected' : ''; ?>><?php echo esc_html__('Dependent on First Selection', 'listdom'); ?></option>
                 </select>
             </div>
 

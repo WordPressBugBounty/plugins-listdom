@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom API Search Controller Class.
- *
- * @class LSD_API_Controllers_Search
- * @version    1.0.0
- */
 class LSD_API_Controllers_Search extends LSD_API_Controller
 {
     public function my(WP_REST_Request $request)

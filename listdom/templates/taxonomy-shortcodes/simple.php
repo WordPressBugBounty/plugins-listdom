@@ -5,23 +5,21 @@ defined('ABSPATH') || die();
 /** @var LSD_Shortcodes_Taxonomy $this */
 
 $grid = $this->atts['grid'] ?? 1;
-if(!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
+if (!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
 ?>
 <div class="lsd-taxonomy-shortcode-wrapper lsd-taxonomy-shortcode-simple lsd-font-m lsd-columns-<?php echo esc_attr($this->columns); ?>">
-    <?php if(!count($this->terms)): ?>
+    <?php if (!count($this->terms)): ?>
         <?php echo LSD_Base::alert(esc_html__('No item found!', 'listdom'), 'warning'); ?>
     <?php else: ?>
-        <?php $i = 1; foreach($this->terms as $term): ?>
+        <?php $i = 1; foreach ($this->terms as $term): ?>
 
         <?php if($i == 1): ?><div class="lsd-row"><?php endif; ?>
 
-        <div class="lsd-col-<?php echo (12/$grid); ?>">
+        <div class="lsd-col-<?php echo 12/$grid; ?>">
             <a href="<?php echo esc_url(get_term_link($term->term_id)); ?>">
                 <span class="lsd-title"><?php echo esc_html($term->name); ?></span>
-				<?php if(!isset($this->atts['show_count']) || (isset($this->atts['show_count']) && $this->atts['show_count'])): ?>
-                    <span class="lsd-count">
-                        (<?php echo esc_html($term->count); ?>)
-                    </span>
+                <?php if (!isset($this->atts['show_count']) || $this->atts['show_count']): ?>
+                    <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdomer'), $term->count); ?></span>
                 <?php endif; ?>
             </a>
 
@@ -33,7 +31,7 @@ if(!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
                         <div class="lsd-title">
                             <?php echo esc_html($child->name); ?>
                             <?php if(isset($this->atts['show_count']) && $this->atts['show_count']): ?>
-                                <span class="lsd-count">(<?php echo esc_html($child->count); ?>)</span>
+                                <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdomer'), $child->count); ?></span>
                             <?php endif; ?>
                         </div>
                     </a>

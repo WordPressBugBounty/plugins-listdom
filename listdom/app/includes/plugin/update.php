@@ -3,12 +3,6 @@
 use Webilia\WP\Plugin\Licensing;
 use Webilia\WP\Plugin\Update;
 
-/**
- * Listdom Plugin Update Class.
- *
- * @class LSD_Plugin_Update
- * @version	1.0.0
- */
 class LSD_Plugin_Update
 {
     /**

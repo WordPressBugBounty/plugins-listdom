@@ -1,15 +1,7 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 use Elementor\Widgets_Manager;
 
-/**
- * Listdom Integrations Elementor Class.
- *
- * @class LSD_Integrations_Elementor
- * @version    1.0.0
- */
 class LSD_Integrations_Elementor extends LSD_Integrations
 {
     public function init()

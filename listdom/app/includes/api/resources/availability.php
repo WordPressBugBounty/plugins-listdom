@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_API_Resources_Availability extends LSD_API_Resource
 {

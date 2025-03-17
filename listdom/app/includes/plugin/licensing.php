@@ -2,12 +2,6 @@
 
 use Webilia\WP\Plugin\Licensing;
 
-/**
- * Listdom Plugin Licensing Class.
- *
- * @class LSD_Plugin_Licensing
- * @version	1.0.0
- */
 class LSD_Plugin_Licensing
 {
     /**

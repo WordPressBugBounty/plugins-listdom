@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_Element_Image extends LSD_Element
 {
@@ -37,7 +35,7 @@ class LSD_Element_Image extends LSD_Element
         );
     }
 
-    public function cover($size = [350, 220], $post_id = null, $link_method = 'normal')
+    public function cover($size = [350, 220], $post_id = null, $link_method = 'normal', string $style = '')
     {
         if (is_null($post_id))
         {

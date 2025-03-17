@@ -52,8 +52,8 @@ class LSD_Fields extends LSD_Base
 
         // Conditionally include or exclude fields based on specific class existence
         if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)) $fields['review_stars'] = ['label' => esc_html__('Review Rates', 'listdom'), 'enabled' => 0];
-        if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)) $fields['compare'] = ['label' => esc_html__('Compare Icon', 'listdom'), 'enabled' => 0];
-        if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)) $fields['favorite'] = ['label' => esc_html__('Favorite Icon', 'listdom'), 'enabled' => 0];
+        if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)) $fields['compare'] = ['label' => esc_html__('Compare', 'listdom'), 'enabled' => 0];
+        if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)) $fields['favorite'] = ['label' => esc_html__('Favorite', 'listdom'), 'enabled' => 0];
         if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)) $fields['claim'] = ['label' => esc_html__('Claim', 'listdom'), 'enabled' => 0];
 
         $SN = new LSD_Socials();
@@ -104,16 +104,15 @@ class LSD_Fields extends LSD_Base
         return apply_filters('lsd_dashboard_fields', $fields);
     }
 
-    public function content($key, LSD_Entity_Listing $listing)
+    public function content($key, LSD_Entity_Listing $listing, $skin)
     {
         $output = '';
-        $table_skin = new LSD_Skins_Table();
 
         switch ($key)
         {
             case 'title':
                 $output = '<h3 class="lsd-listing-title" ' . lsd_schema()->name() . '>' .
-                    LSD_Kses::element($table_skin->get_title_tag($listing)) .
+                    LSD_Kses::element($skin->get_title_tag($listing)) .
                     '</h3>';
                 break;
 
@@ -150,7 +149,7 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'image':
-                $output = LSD_Kses::element($listing->get_cover_image());
+                $output = LSD_Kses::element($listing->get_cover_image([390, 260], $skin->get_listing_link_method(), $skin->get_single_listing_style()));
                 break;
 
             case 'phone':

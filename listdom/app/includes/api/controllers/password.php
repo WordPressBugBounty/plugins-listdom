@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_API_Controllers_Password extends LSD_API_Controller
 {

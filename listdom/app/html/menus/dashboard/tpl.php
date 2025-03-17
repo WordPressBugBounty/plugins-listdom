@@ -12,7 +12,7 @@ defined('ABSPATH') || die();
     <?php endif; ?>
 
     <div class="about-text">
-        <?php echo sprintf(esc_html__("Thanks for using %s. Listdom is a great plugin for creating directory and listing websites. With Listdom you can show the listings in different skins and views such as List, Grid, Half Map etc.", 'listdom'), '<strong>Listdom</strong>'); ?>
+        <?php echo sprintf(esc_html__("Thank you for using %s! Listdom is a powerful plugin for creating directory and listing websites. It allows you to display listings in various skins and views, including List, Grid, Half Map, and more.", 'listdom'), '<strong>Listdom</strong>'); ?>
     </div>
 
     <?php LSD_Ads::display('dashboard-top'); ?>

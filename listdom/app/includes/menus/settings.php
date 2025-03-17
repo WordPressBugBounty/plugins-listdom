@@ -20,6 +20,8 @@ class LSD_Menus_Settings extends LSD_Menus
     {
         add_action('wp_ajax_lsd_save_settings', [$this, 'save_settings']);
         add_action('wp_ajax_lsd_save_dashboard', [$this, 'save_dashboard']);
+        add_action('wp_ajax_lsd_save_customizer', [$this, 'save_customizer']);
+        add_action('wp_ajax_lsd_reset_customizer', [$this, 'reset_customizer']);
         add_action('wp_ajax_lsd_save_details_page', [$this, 'save_details_page']);
         add_action('wp_ajax_lsd_save_addons', [$this, 'save_addons']);
         add_action('wp_ajax_lsd_save_advanced', [$this, 'save_advanced']);
@@ -154,6 +156,90 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Save final options
         update_option('lsd_settings', $final);
+
+        // Generate personalized CSS File
+        LSD_Personalize::generate();
+
+        // Print the response
+        $this->response(['success' => 1]);
+    }
+
+    public function save_customizer()
+    {
+        // Check Access
+        $this->check_access();
+
+        // Get Listdom options
+        $lsd = $_POST['lsd'] ?? [];
+
+        // Sanitization
+        array_walk_recursive($lsd, function (&$value)
+        {
+            $value = stripslashes($value);
+            $value = sanitize_text_field($value);
+        });
+
+        // Get current options
+        $current = get_option('lsd_customizer', []);
+        if (is_string($current) && trim($current) === '') $current = [];
+
+        // Merge new options with previous options
+        $final = array_merge($current, $lsd);
+
+        // Save final options
+        update_option('lsd_customizer', $final);
+
+        // Generate personalized CSS File
+        LSD_Personalize::generate();
+
+        // Print the response
+        $this->response(['success' => 1]);
+    }
+
+    public function reset_customizer()
+    {
+        // Check Access
+        $this->check_access();
+
+        // Get Listdom options
+        $category = $_POST['category'] ?? '';
+
+        // Reset Only a Category
+        if ($category)
+        {
+            // Get current options
+            $current = get_option('lsd_customizer', []);
+            if (is_string($current) && trim($current) === '') $current = [];
+
+            // Category Path
+            $paths = explode('.', trim($category, '. '));
+            $paths = array_reverse($paths);
+
+            // Default Options
+            $default = [];
+            $prev = [];
+
+            $p = 1;
+            foreach ($paths as $path)
+            {
+                $default = [];
+                $default[$path] = $p === 1 ? LSD_Customizer::defaults($category) : $prev;
+
+                $prev = $default;
+                $p++;
+            }
+
+            // Merge new options with previous options
+            $final = array_replace_recursive($current, $default);
+
+            // Save final options
+            update_option('lsd_customizer', $final);
+        }
+        // Reset All
+        else
+        {
+            update_option('lsd_customizer', LSD_Customizer::defaults());
+        }
 
         // Generate personalized CSS File
         LSD_Personalize::generate();

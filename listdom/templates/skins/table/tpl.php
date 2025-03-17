@@ -42,23 +42,27 @@ jQuery(document).ready(function()
 
         <?php if ($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module()); ?>
 
-        <div class="lsd-table-view-listings-wrapper">
-            <table class="lsd-listing-table">
-                <thead>
-                    <tr class="lsd-listing-head">
-                        <?php foreach ($titles as $key => $title): ?>
-                            <?php if (isset($columns[$key]['enabled']) && $columns[$key]['enabled'] == '1'): ?>
-                                <th>
-                                    <?php esc_html_e($title, 'listdom'); ?>
-                                </th>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </tr>
-                </thead>
-                <tbody class="lsd-listing-wrapper">
-                    <?php echo LSD_Kses::full($listings_html); ?>
-                </tbody>
-            </table>
+        <div class="lsd-h-scroll-shadow-wrapper">
+            <div class="lsd-h-scroll-shadow lsd-h-scroll-shadow-left"></div>
+            <div class="lsd-h-scroll-shadow lsd-h-scroll-shadow-right"></div>
+            <div class="lsd-h-scroll-shadow-content lsd-table-view-listings-wrapper">
+                <table class="lsd-listing-table">
+                    <thead>
+                        <tr class="lsd-listing-head">
+                            <?php foreach ($titles as $key => $title): ?>
+                                <?php if (isset($columns[$key]['enabled']) && $columns[$key]['enabled'] == '1'): ?>
+                                    <th>
+                                        <?php esc_html_e($title, 'listdom'); ?>
+                                    </th>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </tr>
+                    </thead>
+                    <tbody class="lsd-listing-wrapper">
+                        <?php echo LSD_Kses::full($listings_html); ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <?php echo LSD_Kses::element($this->get_pagination()); ?>

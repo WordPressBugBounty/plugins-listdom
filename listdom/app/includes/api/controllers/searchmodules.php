@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_API_Controllers_SearchModules extends LSD_API_Controller
 {
@@ -41,7 +39,7 @@ class LSD_API_Controllers_SearchModules extends LSD_API_Controller
         return $this->response([
             'data' => [
                 'success' => 1,
-                'searches' => LSD_API_Resources_SearchModule::get($id),
+                'module' => LSD_API_Resources_SearchModule::get($id),
             ],
             'status' => 200,
         ]);

@@ -12,14 +12,10 @@ defined('ABSPATH') || die();
             <?php echo LSD_Kses::element($dashboard->menus()); ?>
         </div>
         <div class="lsd-col-10">
-            <div class="lsd-row lsd-dashboard-listings-list">
-                <div class="lsd-col-12">
-                    <?php
-                        if (trim($this->content)) echo LSD_Kses::full($this->content);
-                        else echo LSD_Base::alert(esc_html__('Content Not Found.', 'listdom'), 'warning');
-                    ?>
-                </div>
-            </div>
+            <?php
+            if (trim($this->content)) echo LSD_Kses::full($this->content);
+            else echo LSD_Base::alert(esc_html__('Content Not Found.', 'listdom'), 'warning');
+            ?>
         </div>
     </div>
 </div>

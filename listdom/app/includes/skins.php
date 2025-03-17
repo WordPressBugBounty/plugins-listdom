@@ -66,6 +66,7 @@ class LSD_Skins extends LSD_Base
     public $widget = false;
     public $post_id;
     public $mapsearch = false;
+    public $autoplay = true;
     public $autoGPS = false;
     public $maxBounds = [];
     public $map_provider = 'leaflet';
@@ -163,9 +164,16 @@ class LSD_Skins extends LSD_Base
         $this->display_is_claimed = !isset($this->skin_options['display_is_claimed']) || $this->skin_options['display_is_claimed'];
         $this->display_share_buttons = !isset($this->skin_options['display_share_buttons']) || $this->skin_options['display_share_buttons'];
         $this->display_slider_arrows = !isset($this->skin_options['display_slider_arrows']) || $this->skin_options['display_slider_arrows'];
-        $this->columns = isset($this->skin_options['columns']) && $this->skin_options['columns'] ? sanitize_text_field($this->skin_options['columns']) : 3;
         $this->default_view = isset($this->skin_options['default_view']) ? sanitize_text_field($this->skin_options['default_view']) : 'grid';
         $this->description_length = isset($this->skin_options['description_length']) && is_numeric($this->skin_options['description_length']) ? $this->skin_options['description_length'] : 12;
+
+        $this->columns = isset($this->skin_options['columns']) && $this->skin_options['columns'] ? sanitize_text_field($this->skin_options['columns']) : 3;
+
+        // Style4 Columns
+        if ($this->style === 'style4') $this->columns = 2;
+
+        // Autoplay
+        $this->autoplay = !isset($this->skin_options['autoplay']) || $this->skin_options['autoplay'];
 
         // Map Search Options
         $this->mapsearch = isset($this->skin_options['mapsearch']) && $this->skin_options['mapsearch'];
@@ -787,7 +795,7 @@ class LSD_Skins extends LSD_Base
         return ob_get_clean();
     }
 
-    public function get_switcher_buttons()
+    public function get_switcher_buttons(bool $display_switcher = true)
     {
         ob_start();
         include lsd_template('elements/switcher.php');
@@ -801,7 +809,9 @@ class LSD_Skins extends LSD_Base
     public function get_title_tag(LSD_Entity_Listing $listing): string
     {
         $method = $this->get_listing_link_method();
-        return $listing->get_title_tag($method);
+        $style = $this->get_single_listing_style();
+
+        return $listing->get_title_tag($method, $style);
     }
 
     public function get_not_found_message(): string
@@ -816,6 +826,13 @@ class LSD_Skins extends LSD_Base
         return $this->isPro() && isset($this->skin_options['listing_link']) && trim($this->skin_options['listing_link'])
             ? $this->skin_options['listing_link']
             : 'normal';
+    }
+
+    public function get_single_listing_style()
+    {
+        return $this->isPro() && isset($this->skin_options['single_style']) && trim($this->skin_options['single_style'])
+            ? $this->skin_options['single_style']
+            : '';
     }
 
     public function get_map(bool $force_to_show = false, $limit = null)

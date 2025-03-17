@@ -19,6 +19,9 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
     {
         $shortcode_id = isset($atts['id']) ? (int) $atts['id'] : 0;
 
+        // Listdom Bar
+        (LSD_Bar::instance())->add($shortcode_id);
+
         $atts = wp_parse_args($override, apply_filters('lsd_shortcode_atts', $this->parse($shortcode_id, $atts)));
         $skin = $atts['lsd_display']['skin'] ?? $this->get_default_skin();
 

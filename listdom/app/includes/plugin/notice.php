@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Plugin Notice Class.
- *
- * @class LSD_Plugin_Notice
- * @version    1.0.0
- */
 class LSD_Plugin_Notice extends LSD_Base
 {
     // Define notices

@@ -110,19 +110,19 @@ class LSD_Main extends LSD_Base
         return get_option('start_of_week', 1);
     }
 
-    public static function grecaptcha_field($class = '')
+    public static function grecaptcha_field($class = ''): string
     {
         // Listdom Options
         $settings = LSD_Options::settings();
 
         // Recaptcha is not enabled!
-        if (!isset($settings['grecaptcha_status']) || !$settings['grecaptcha_status']) return null;
+        if (!isset($settings['grecaptcha_status']) || !$settings['grecaptcha_status']) return '';
 
         // Site Key
         $sitekey = isset($settings['grecaptcha_sitekey']) && trim($settings['grecaptcha_sitekey']) ? $settings['grecaptcha_sitekey'] : null;
 
         // Site key is empty!
-        if (!$sitekey) return null;
+        if (!$sitekey) return '';
 
         // Include JS Library
         $assets = new LSD_Assets();
@@ -230,7 +230,7 @@ class LSD_Main extends LSD_Base
      * @param $value
      * @return int|null
      */
-    public static function get_post_id_by_meta(string $key, $value)
+    public static function get_post_id_by_meta(string $key, $value): ?int
     {
         $db = new LSD_db();
         return $db->select("SELECT `post_id` FROM `#__postmeta` WHERE `meta_key`='" . esc_sql($key) . "' AND `meta_value`='" . esc_sql($value) . "'", 'loadResult');

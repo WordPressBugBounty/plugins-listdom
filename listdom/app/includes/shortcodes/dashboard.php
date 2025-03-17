@@ -55,6 +55,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Shortcode
         add_shortcode('listdom-dashboard', [$this, 'output']);
 
+        // Redirect Guest Users
+        add_action('wp', [$this, 'redirect']);
+
         // Save Listing
         add_action('wp_ajax_lsd_dashboard_listing_save', [$this, 'save']);
         add_action('wp_ajax_nopriv_lsd_dashboard_listing_save', [$this, 'save']);
@@ -98,18 +101,18 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         LSD_Payload::set('dashboard', $this);
 
         // Dashboard
-        if ($this->mode == 'manage') return $this->manage();
+        if ($this->mode === 'manage') return $this->manage();
         // Form
-        else if ($this->mode == 'form') return $this->form();
+        else if ($this->mode === 'form') return $this->form();
         // Other Modes
         else return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'error'), $this);
     }
 
     public function manage()
     {
-        if (!get_current_user_id() && !$this->guest_status)
+        if (!get_current_user_id())
         {
-            return $this->alert(sprintf(esc_html__("Unfortunately you don't have permission to view this page. Please %s first.", 'listdom'), '<a href="' . wp_login_url($this->current_url()) . '">' . esc_html__('login', 'listdom') . '</a>'), 'error');
+            return $this->auth();
         }
 
         // Listing Per Page
@@ -118,11 +121,14 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Current Page
         $paged = max(1, get_query_var('paged'));
 
+        // Status
+        $status = $_GET['status'] ?? '';
+
         // Get Listings
         $query = [
             'post_type' => LSD_Base::PTYPE_LISTING,
             'posts_per_page' => $this->limit,
-            'post_status' => ['publish', 'pending', 'draft', 'trash', LSD_Base::STATUS_HOLD, LSD_Base::STATUS_EXPIRED],
+            'post_status' => $status ?: ['publish', 'pending', 'draft', 'trash', LSD_Base::STATUS_HOLD, LSD_Base::STATUS_EXPIRED],
             'paged' => $paged,
         ];
 
@@ -162,6 +168,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function form()
     {
+        if (!get_current_user_id() && !$this->guest_status)
+        {
+            return $this->auth();
+        }
+
         if (!LSD_Capability::can('edit_listings', 'edit_posts') && !$this->guest_status)
         {
             return $this->alert(esc_html__("Unfortunately you don't have permission to create or edit listings.", 'listdom'), 'error');
@@ -194,6 +205,29 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         ob_start();
         include lsd_template('dashboard/form.php');
         return ob_get_clean();
+    }
+
+    public function redirect()
+    {
+        if (!get_current_user_id() && !$this->guest_status && isset($this->settings['submission_guest_redirect']) && $this->settings['submission_guest_redirect'] && is_page())
+        {
+            // Dashboard Page
+            $dashboard_page = LSD_Options::post_id('submission_page');
+
+            // Add Listing
+            $add_listing_page = LSD_Options::post_id('add_listing_page');
+
+            // Page
+            $page = get_post();
+
+            if (($dashboard_page || $add_listing_page) && in_array($page->ID, [$dashboard_page, $add_listing_page]))
+            {
+                $url = wp_login_url();
+
+                wp_redirect($url);
+                exit;
+            }
+        }
     }
 
     public function is_enabled($module)
@@ -448,7 +482,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         // Post Status
         $status = 'pending';
-        if (current_user_can('publish_posts')) $status = 'publish';
+        if (current_user_can('publish_posts')) $status = $lsd['listing_status'] ?? 'publish';
 
         // Filter Listing Status
         $status = apply_filters('lsd_default_listing_status', $status, $lsd);
@@ -473,6 +507,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             'post_name' => sanitize_title($post_title),
             'post_content' => $post_content,
             'post_excerpt' => $post_excerpt,
+            'post_status' => $status,
         ]);
 
         // Tags
@@ -515,7 +550,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         }
 
         // Publish Listing
-        if ($status == 'publish' && get_post_status($id) != 'published') wp_publish_post($id);
+        if ($status === 'publish' && get_post_status($id) != 'published') wp_publish_post($id);
 
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
@@ -741,5 +776,13 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $success = count($errors) ? 0 : 1;
 
         $this->response(['success' => $success, 'message' => $message, 'data' => $data]);
+    }
+
+    public function auth(): string
+    {
+        // Dashboard
+        ob_start();
+        include lsd_template('dashboard/auth.php');
+        return ob_get_clean();
     }
 }

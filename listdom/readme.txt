@@ -4,8 +4,8 @@ Donate link: https://webilia.com/
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.0.0
 Requires PHP: 7.2
-Tested up to: 6.7.1
-Stable tag: 3.9.0
+Tested up to: 6.7.2
+Stable tag: 4.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,7 +21,15 @@ Listdom has more than 80 different skins and views that are responsive and mobil
 ✅ [Support](https://webilia.com/support/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 ✅ [Live Chat](https://webilia.com/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 
-[youtube https://www.youtube.com/watch?v=t0SSLJTgRpI]
+== Fast Listdom Plugin Review 👇 ==
+Here are the key features of Listdom and how to use them:
+
+[youtube https://www.youtube.com/watch?v=du_96cv6BAw]
+
+== How to import Demo with Listdomer Theme 👇 ==
+Listdom has a dedicated theme called Listdomer that helps you to import full website demos: 
+
+[youtube https://www.youtube.com/watch?v=8tigW7yriZ8]
 
 == Listdom; The WordPress Directory Plugin by Webilia ==
 
@@ -48,6 +56,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Practical sort options (Title, Publish Date, Update Date, Comments, ID, Author, Random, Price, Most Viewed) on all applicable skins
 *   Ability to change default sort parameters
 *   Dropdown and List sorting style
+*   Powerful appearance customizer 
 *   Helpful dummy data to boost the start
 *   Override archive page design
 *   Font Awesome icons
@@ -123,6 +132,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Fully customizable different filters to show listings
 *   Hidden values and fields
 *   Search form shortcode
+*   Fields width settings
 
 **👉 Advanced Management Tools**
 
@@ -171,8 +181,6 @@ Discover more about Listdom through tutorials provided by web technicians.
 [youtube https://www.youtube.com/watch?v=pgPt1zDs85M]
 
 == The Premium Version of Listdom Classified Listing Plugin ==
-
-[youtube https://www.youtube.com/watch?v=VHDCQ6Jj_DM]
 
 For users seeking additional features and capabilities for a [WordPress directory plugin](https://webilia.com/listdom?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+directory+plugin), Webilia offers Listdom Pro, the premium version of Listdom. Listdom Pro provides advanced functionalities, enhancing the user experience and offering more control and customization options. It’s an excellent choice for those looking to take their business directory site to the next level.
 
@@ -370,6 +378,25 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 4.0.0 =
+* Added a comprehensive Game-Changer UI Customizer to Listdom Core.
+* [PRO] Introduced a new option to set a custom Single Listing Style for the Side by Side skin.
+* [PRO] Added a new option to customize the Single Listing Style for the Lightbox feature.
+* [PRO] Enabled an option to display the Single Listing Page in right, left, or bottom panels.
+* Added a built-in Authentication Form to the Frontend Dashboard.
+* Introduced an option to make a shortcode non-searchable.
+* Added a Zoom Level option for the Single Map element.
+* Added a Title Visibility option for search fields.
+* Introduced the Listdom Bar to help web designers easily access Listdom features from the frontend.
+* Enabled the ability to update Listing Status in the Frontend Dashboard.
+* Added a Listing Status Filter to the Frontend Dashboard.
+* Introduced an option to set Custom Listing Cards in the Half Map skin.
+* Improved the Table Skin for better usability.
+* [PRO] Enhanced the Side by Side skin with additional refinements.
+* Applied various UI and responsiveness improvements across Listdom views.
+* [PRO] Fixed issues related to Hierarchical Dropdowns.
+* Fixed compatibility issues with PHP 7.4 and lower.
 
 = 3.9.0 =
 * Added a Connected Shortcodes feature in the search builder, allowing multiple shortcodes to update dynamically with a single search widget.

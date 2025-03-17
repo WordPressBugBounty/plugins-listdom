@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Base Class.
- *
- * @class LSD_Base
- * @version    1.0.0
- */
 class LSD_Base
 {
     const PTYPE_LISTING = 'listdom-listing';
@@ -411,6 +403,9 @@ class LSD_Base
 
     public static function missFeatureMessage($feature = null, $multiple = false, $html = true): string
     {
+        // Include Function
+        if (!function_exists('is_plugin_active')) require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
         $feature_html = $feature
             ? ($html ? '<strong>' . esc_html($feature) . '</strong>' : $feature)
             : ($multiple ? esc_html__('These features', 'listdom') : esc_html__('This feature', 'listdom'));
@@ -431,7 +426,30 @@ class LSD_Base
 
     public static function missAddonMessage($addon = '', $feature = ''): string
     {
-        return sprintf(esc_html__('Activate the %s add-on to use the %s feature.', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '"><strong>' . esc_html__($addon, 'listdom')) . '</strong></a>', $feature);
+        return sprintf(esc_html__('Activate the %s add-on to use the %s feature.', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '"><strong>' . esc_html__($addon, 'listdom') . '</strong></a>'), $feature);
+    }
+
+    public static function optionalAddonsMessage(array $addon_features = []): string
+    {
+        $addons = '';
+        $features = '';
+        $count = count($addon_features);
+
+        $a = 1;
+        foreach ($addon_features as $addon_feature)
+        {
+            $a++;
+            $addons .= '<a href="' . LSD_Base::getAddonURL($addon_feature[0]) . '" target="_blank"><strong>' . ucfirst($addon_feature[0]) . '</strong></a>' . ($a === $count ? esc_html__(', and', 'listdom') . ' ' : ', ');
+            $features .= '<strong>' . $addon_feature[1] . '</strong>' . ($a === count($addon_features) ? esc_html__(', and', 'listdom') . ' ' : ', ');
+        }
+
+        return sprintf(
+            esc_html(
+                _n('To use the %s feature, you need to install %s add-on.', 'To use the %s features, you need to install %s add-ons.', $count, 'listdom')
+            ),
+            trim($features, ', '),
+            trim($addons, ', ')
+        );
     }
 
     public static function getActivationURL(): string
@@ -489,7 +507,7 @@ class LSD_Base
     /**
      * @return array
      */
-    public static function addons(): mixed
+    public static function addons()
     {
         return apply_filters('lsd_addons', []);
     }
@@ -565,6 +583,13 @@ class LSD_Base
         if (is_null($url) || trim($url) === '') $url = $this->current_url();
 
         return add_query_arg($key, $value, $url);
+    }
+
+    public function update_qs_var($key, $value, $url = ''): string
+    {
+        if (is_null($url) || trim($url) === '') $url = $this->current_url();
+
+        return add_query_arg($key, $value, remove_query_arg($key, $url));
     }
 
     public function add_qs_vars($vars, $url = ''): string
@@ -1856,6 +1881,9 @@ class LSD_Base
             'normal' => esc_html__('Same Window', 'listdom'),
             'blank' => esc_html__('New Window', 'listdom'),
             'lightbox' => esc_html__('Open in Lightbox', 'listdom'),
+            'right-panel' => esc_html__('Right Panel', 'listdom'),
+            'left-panel' => esc_html__('Left Panel', 'listdom'),
+            'bottom-panel' => esc_html__('Bottom Panel', 'listdom'),
             'disabled' => esc_html__('Disabled', 'listdom'),
         ];
     }

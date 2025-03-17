@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Listing Entity Class.
- *
- * @class LSD_Entity_Listing
- * @version    1.0.0
- */
 class LSD_Entity_Listing extends LSD_Entity
 {
     public $post;
@@ -197,7 +189,7 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID, $enable_link);
     }
 
-    public function get_categories(mixed $args = true, $multiple_categories = false, $color_method = 'bg', $enable_link = true)
+    public function get_categories($args = true, $multiple_categories = false, $color_method = 'bg', $enable_link = true)
     {
         if (!is_array($args))
         {
@@ -233,10 +225,10 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($size, $this->post->ID);
     }
 
-    public function get_cover_image($size = [390, 260], $link_method = 'normal')
+    public function get_cover_image($size = [390, 260], $link_method = 'normal', string $style = '')
     {
         $element = new LSD_Element_Image();
-        return $element->cover($size, $this->post->ID, $link_method);
+        return $element->cover($size, $this->post->ID, $link_method, $style);
     }
 
     public function get_image_slider($size = [390, 260])
@@ -248,7 +240,11 @@ class LSD_Entity_Listing extends LSD_Entity
     public function get_image_module($shortcode, $size = [390, 260])
     {
         if ($shortcode->image_method === 'slider') return $this->get_image_slider($size);
-        else return $this->get_cover_image($size, $shortcode->get_listing_link_method());
+        else return $this->get_cover_image(
+            $size,
+            $shortcode->get_listing_link_method(),
+            $shortcode->get_single_listing_style()
+        );
     }
 
     public function get_gallery($params = [])
@@ -540,16 +536,20 @@ class LSD_Entity_Listing extends LSD_Entity
         return $contacts;
     }
 
-    public function get_title_tag(string $method = 'normal'): string
+    public function get_title_tag(string $method = 'normal', string $style = ''): string
     {
         // Link is Enabled
-        if (in_array($method, ['normal', 'blank', 'lightbox']))
+        if (in_array($method, ['normal', 'blank', 'lightbox', 'right-panel', 'left-panel', 'bottom-panel']))
         {
             return '<a
                 data-listing-id="' . esc_attr($this->id()) . '"
+                data-listdom-style="' . $style . '"
                 href="' . esc_url(get_the_permalink($this->id())) . '"
                 ' . ($method === 'blank' ? 'target="_blank"' : '') . '
                 ' . ($method === 'lightbox' ? 'data-listdom-lightbox' : '') . '
+                ' . ($method === 'right-panel' ? 'data-listdom-panel="right"' : '') . '
+                ' . ($method === 'left-panel' ? 'data-listdom-panel="left"' : '') . '
+                ' . ($method === 'bottom-panel' ? 'data-listdom-panel="bottom"' : '') . '
                 ' . lsd_schema()->url() . '
             >' . LSD_Kses::element($this->get_title()) . '</a>';
         }

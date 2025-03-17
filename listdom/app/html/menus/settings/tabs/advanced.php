@@ -163,6 +163,23 @@ $post_types = LSD_Base::get_ptypes_and_tax(true);
                         </div>
 
                     </div>
+
+                    <div class="lsd-flex lsd-flex-col lsd-mt-4 lsd-flex-align-items-start lsd-gap-2">
+                        <div class="lsd-flex lsd-flex-row lsd-flex-content-start lsd-gap-4 lsd-mt-2">
+                            <div>
+                                <?php echo LSD_Form::switcher([
+                                    'id' => 'lsd_settings_fontawesome_status',
+                                    'value' => $settings['fontawesome_status'] ?? 1,
+                                    'name' => 'lsd[fontawesome_status]',
+                                ]); ?>
+                            </div>
+                            <div><?php echo LSD_Form::label([
+                                'title' => esc_html__('Font Awesome Status', 'listdom'),
+                                'for' => 'lsd_settings_fontawesome_status',
+                            ]); ?></div>
+                        </div>
+                        <p class="description lsd-mb-0"><?php esc_html_e("Disable the Listdom icon file (Font Awesome) if it is already being loaded by a third party.", 'listdom'); ?></p>
+                    </div>
                 </div>
                 <div class="lsd-accordion-title">
                     <div class="lsd-flex lsd-flex-row lsd-py-2">

@@ -22,19 +22,15 @@ else
 }
 ?>
 <div class="lsd-metabox lsd-metabox-sort-options">
-    <div class="lsd-mt-4">
-        <div class="lsd-form-row">
-            <div class="lsd-col-8">
-                <label for="lsd_sort_options_status"><?php esc_html_e('Display', 'listdom'); ?></label>
-            </div>
-            <div class="lsd-col-4 lsd-text-right">
-                <?php echo LSD_Form::switcher([
-                    'id' => 'lsd_sort_options_status',
-                    'toggle' => '#lsd_sort_options_toggle',
-                    'name' => 'lsd[sorts][display]',
-                    'value' => $sorts['display'] ?? '1'
-                ]); ?>
-            </div>
+    <div class="lsd-flex lsd-flex-row lsd-mt-4 lsd-mb-2">
+        <label for="lsd_sort_options_status"><?php esc_html_e('Display', 'listdom'); ?></label>
+        <div>
+            <?php echo LSD_Form::switcher([
+                'id' => 'lsd_sort_options_status',
+                'toggle' => '#lsd_sort_options_toggle',
+                'name' => 'lsd[sorts][display]',
+                'value' => $sorts['display'] ?? '1'
+            ]); ?>
         </div>
     </div>
     <div class="<?php echo isset($sorts['display']) && $sorts['display'] ? '' : 'lsd-util-hide'; ?>" id="lsd_sort_options_toggle">

@@ -18,7 +18,7 @@ $ids = $this->listings;
         <?php foreach ($columns as $key => $column): ?>
             <?php if (isset($column['enabled']) && $column['enabled'] == '1'): ?>
                 <td class="lsd-listing-<?php echo $key; ?>" <?php echo $fields->schema($key); ?>>
-                    <?php echo $fields->content($key, $listing); ?>
+                    <?php echo $fields->content($key, $listing, $this); ?>
                 </td>
             <?php endif; ?>
         <?php endforeach; ?>

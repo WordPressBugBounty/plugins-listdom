@@ -5,17 +5,17 @@ defined('ABSPATH') || die();
 /** @var LSD_Menus_Dashboard $this */
 ?>
 <div class="lsd-dashboard-wrap">
-    <div class="welcome-panel lsd-flex lsd-flex-col lsd-gap-5 lsd-flex-items-start lsd-flex-items-full-width">
+    <div class="welcome-panel lsd-flex lsd-flex-col lsd-gap-4 lsd-flex-items-start lsd-flex-items-full-width">
 
-        <?php if($count = LSD_Activation::getLicenseActivationRequiredCount()): ?>
-        <div class="lsd-alert lsd-warning lsd-px-5">
-            <p class="lsd-mb-0"><?php echo sprintf(esc_html__('%s of your installed products require activation. Please activate them as soon as possible using the license key you received upon purchase; otherwise, the functionality will cease.', 'listdom'), '<strong>('.$count.')</strong>'); ?></p>
-            <div>
-                <p class="lsd-mb-0 lsd-mt-2"><?php echo sprintf(esc_html__("If you have misplaced your license key or are unable to locate it, please don't hesitate to contact %s. We are here to assist you.", 'listdom'), '<strong><a href="'.LSD_Base::getSupportURL().'" target="_blank">'.esc_html__('Webilia Support', 'listdom').'</a></strong>'); ?></p>
-                <p class="lsd-mt-2"><?php echo sprintf(esc_html__("If, for any reason, you do not have a license key, you can obtain one from the %s.", 'listdom'), '<strong><a href="'.LSD_Base::getWebiliaShopURL().'" target="_blank">'.esc_html__('Webilia Website', 'listdom').'</a></strong>'); ?></p>
+        <?php if ($count = LSD_Activation::getLicenseActivationRequiredCount()): ?>
+            <div class="lsd-alert lsd-warning lsd-p-4 lsd-my-0">
+                <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(esc_html__('%s of your installed products require activation. Please activate them as soon as possible using the license key you received upon purchase; otherwise, the functionality will cease.', 'listdom'), '<strong>('.$count.')</strong>'); ?></p>
+                <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(esc_html__("If you have misplaced your license key or are unable to locate it, please don't hesitate to contact %s. We are here to assist you.", 'listdom'), '<strong><a href="'.LSD_Base::getSupportURL().'" target="_blank">'.esc_html__('Webilia Support', 'listdom').'</a></strong>'); ?></p>
+                <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(esc_html__("If, for any reason, you do not have a license key, you can obtain one from the %s.", 'listdom'), '<strong><a href="'.LSD_Base::getWebiliaShopURL().'" target="_blank">'.esc_html__('Webilia Website', 'listdom').'</a></strong>'); ?></p>
             </div>
-        </div>
         <?php endif; ?>
+
+        <?php do_action('lsd_home_content_top'); ?>
 
 		<div class="welcome-panel-content lsd-mb-0">
             <div class="lsd-flex lsd-flex-row">

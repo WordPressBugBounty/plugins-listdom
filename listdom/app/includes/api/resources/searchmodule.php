@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_API_Resources_SearchModule extends LSD_API_Resource
 {
@@ -28,7 +26,7 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
         foreach ($raw as $r => $row)
         {
             $filters = [];
-            if (isset($row['filters']) and is_array($row['filters']))
+            if (isset($row['filters']) && is_array($row['filters']))
             {
                 foreach ($row['filters'] as $k => $f)
                 {
@@ -43,7 +41,7 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                     {
                         case 'taxonomy':
 
-                            if ($method == 'dropdown-multiple' || $method == 'checkboxes') $keys = ['sf-' . $f['key'] . '[]'];
+                            if ($method === 'dropdown-multiple' || $method === 'checkboxes') $keys = ['sf-' . $f['key'] . '[]'];
 
                             $controller = new LSD_API_Controllers_Taxonomies();
 
@@ -64,8 +62,8 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                         case 'number':
 
                             $keys = ['sf-' . $f['key'] . '-eq'];
-                            if ($method == 'dropdown-plus') $keys = ['sf-' . $f['key'] . '-grq'];
-                            else if ($method == 'range')
+                            if ($method === 'dropdown-plus') $keys = ['sf-' . $f['key'] . '-grq'];
+                            else if ($method === 'range')
                             {
                                 $keys = [
                                     'sf-att-' . $f['key'] . '-grb-min',
@@ -80,7 +78,7 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                         case 'dropdown':
 
                             $keys = ['sf-' . $f['key'] . '-eq'];
-                            if ($method == 'dropdown-multiple' or $method == 'checkboxes') $keys = ['sf-' . $f['key'] . '-in[]'];
+                            if ($method === 'dropdown-multiple' || $method === 'checkboxes') $keys = ['sf-' . $f['key'] . '-in[]'];
 
                             $values = $helper->get_terms($f, true);
 
@@ -95,7 +93,7 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                             else if (strpos($f['key'], 'acf_true_false_') === 0) $acf_key = substr($f['key'], strlen('acf_true_false_'));
 
                             $keys = ['sf-acf-' . $acf_key . '-dra'];
-                            if ($method == 'dropdown-multiple' or $method == 'checkboxes') $keys = ['sf-acf-' . $acf_key . '-drm[]'];
+                            if ($method === 'dropdown-multiple' || $method === 'checkboxes') $keys = ['sf-acf-' . $acf_key . '-drm[]'];
 
                             $values = $helper->acf_field_data($acf_key, 'choices')[0] ?? [];
 
@@ -114,8 +112,8 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                         case 'price':
 
-                            if ($method == 'dropdown-plus') $keys = ['sf-att-' . $f['key'] . '-grq'];
-                            else if ($method == 'mm-input' || $method == 'range')
+                            if ($method === 'dropdown-plus') $keys = ['sf-att-' . $f['key'] . '-grq'];
+                            else if ($method === 'mm-input' || $method === 'range')
                             {
                                 $keys = [
                                     'sf-att-' . $f['key'] . '-bt-min',

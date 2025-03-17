@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 function lsd_map($listings = [], $args = [])
 {

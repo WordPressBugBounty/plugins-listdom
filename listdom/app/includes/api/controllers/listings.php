@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom API Listings Controller Class.
- *
- * @class LSD_API_Controllers_Listings
- * @version    1.0.0
- */
 class LSD_API_Controllers_Listings extends LSD_API_Controller
 {
     public function get(WP_REST_Request $request): WP_REST_Response
@@ -43,7 +35,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
     {
         $vars = $request->get_params();
 
-        $tax = (isset($vars['taxonomies']) && is_array($vars['taxonomies'])) ? $vars['taxonomies'] : [];
+        $tax = isset($vars['taxonomies']) && is_array($vars['taxonomies']) ? $vars['taxonomies'] : [];
         $post_title = isset($vars['title']) ? sanitize_text_field($vars['title']) : '';
         $post_content = $vars['content'] ?? '';
 
@@ -70,15 +62,15 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         wp_set_post_terms($id, $tags, LSD_Base::TAX_TAG);
 
         // Locations
-        $locations = (isset($tax[LSD_Base::TAX_LOCATION]) and is_array($tax[LSD_Base::TAX_LOCATION])) ? $tax[LSD_Base::TAX_LOCATION] : [];
+        $locations = isset($tax[LSD_Base::TAX_LOCATION]) && is_array($tax[LSD_Base::TAX_LOCATION]) ? $tax[LSD_Base::TAX_LOCATION] : [];
         wp_set_post_terms($id, $locations, LSD_Base::TAX_LOCATION);
 
         // Features
-        $features = (isset($tax[LSD_Base::TAX_FEATURE]) and is_array($tax[LSD_Base::TAX_FEATURE])) ? $tax[LSD_Base::TAX_FEATURE] : [];
+        $features = isset($tax[LSD_Base::TAX_FEATURE]) && is_array($tax[LSD_Base::TAX_FEATURE]) ? $tax[LSD_Base::TAX_FEATURE] : [];
         wp_set_post_terms($id, LSD_Taxonomies::name($features, LSD_Base::TAX_FEATURE), LSD_Base::TAX_FEATURE);
 
         // Labels
-        $labels = (isset($tax[LSD_Base::TAX_LABEL]) and is_array($tax[LSD_Base::TAX_LABEL])) ? $tax[LSD_Base::TAX_LABEL] : [];
+        $labels = isset($tax[LSD_Base::TAX_LABEL]) && is_array($tax[LSD_Base::TAX_LABEL]) ? $tax[LSD_Base::TAX_LABEL] : [];
         wp_set_post_terms($id, LSD_Taxonomies::name($labels, LSD_Base::TAX_LABEL), LSD_Base::TAX_LABEL);
 
         // Featured Image
@@ -205,7 +197,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         ]);
 
         // Trash
-        wp_delete_post($id);
+        wp_trash_post($id);
 
         // Trigger Action
         do_action('lsd_api_listing_trashed', $id, $request);
@@ -272,8 +264,8 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         $message = $request->get_param('message');
 
         // Required
-        if (!trim($name) || !trim($email) || !trim($phone) || !trim($message)) return $this->response([
-            'data' => new WP_Error('400', esc_html__("Name, Email, Phone and Message fields are required!", 'listdom')),
+        if (!trim($email) || !trim($message)) return $this->response([
+            'data' => new WP_Error('400', esc_html__("Email, and message fields are required!", 'listdom')),
             'status' => 400,
         ]);
 

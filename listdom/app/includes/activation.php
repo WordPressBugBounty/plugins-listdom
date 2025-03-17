@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom License Activation Class.
- *
- * @class LSD_Activation
- * @version    1.0.0
- */
 class LSD_Activation extends LSD_Base
 {
     public function init()
@@ -94,7 +86,7 @@ class LSD_Activation extends LSD_Base
         ]);
 
         // Activation
-        list($status, $message) = $licensing->activate($license_key);
+        [$status, $message] = $licensing->activate($license_key);
 
         // Reset Transient
         LSD_Licensing::reset($basename);
@@ -130,7 +122,7 @@ class LSD_Activation extends LSD_Base
         ]);
 
         // Activation
-        list($status, $message) = $licensing->deactivate($license_key);
+        [$status, $message] = $licensing->deactivate($license_key);
 
         // Reset Transient
         LSD_Licensing::reset($basename);

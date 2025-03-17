@@ -13,11 +13,13 @@ class LSD_Skins_Side extends LSD_Skins
     public $skin = 'side';
     public $default_style = 'style1';
     public $layout_width = '4060';
+    public $single_listing_style = '';
 
     public function after_start()
     {
         // Layout Width
         $this->layout_width = $this->skin_options['layout_width'] ?? '4060';
+        $this->single_listing_style = $this->skin_options['single_listing_style'] ?? '';
     }
 
     public function init()

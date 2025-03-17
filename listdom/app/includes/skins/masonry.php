@@ -14,6 +14,7 @@ class LSD_Skins_Masonry extends LSD_Skins
     public $default_style = 'style1';
     public $filter_by = LSD_Base::TAX_CATEGORY;
     public $list_view = false;
+    public $duration = 400;
 
     public function init()
     {
@@ -26,6 +27,9 @@ class LSD_Skins_Masonry extends LSD_Skins
 
         // List View
         $this->list_view = isset($this->skin_options['list_view']) && $this->skin_options['list_view'];
+
+        // Animation Duration
+        $this->duration = $this->skin_options['duration'] ?? 400;
     }
 
     public function filters(): string

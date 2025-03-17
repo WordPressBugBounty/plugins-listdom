@@ -6,13 +6,15 @@ defined('ABSPATH') || die();
 /** @var array $options */
 /** @var array $price_components */
 
+$single_styles = ['' => esc_html__('Inherit From Global Options', 'listdom')] + LSD_Styles::details();
+
 $side = $options['side'] ?? [];
-$missAddonMessages = [];
+$optional_addons = [];
 ?>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
-        <p class="description"><?php echo sprintf(esc_html__('Using the %s skin allows you to display a list of the directories and listings on one side and the single listing page on the other side.', 'listdom'), '<strong>'.esc_html__('Side by Side', 'listdom').'</strong>'); ?></p>
+        <p class="description"><?php echo sprintf(esc_html__('With the %s skin, you can display a list of directories and listings on one side and the single listing page on the other.', 'listdom'), '<strong>'.esc_html__('Side by Side', 'listdom').'</strong>'); ?></p>
     </div>
 </div>
 <?php if ($this->isLite()): ?>
@@ -40,10 +42,24 @@ $missAddonMessages = [];
         ]); ?>
     </div>
 </div>
+<div class="lsd-form-row">
+    <div class="lsd-col-2"><?php echo LSD_Form::label([
+        'title' => esc_html__('Single Listing', 'listdom'),
+        'for' => 'lsd_display_options_skin_side_single_listing_style',
+    ]); ?></div>
+    <div class="lsd-col-6">
+        <?php echo LSD_Form::select([
+            'id' => 'lsd_display_options_skin_side_single_listing_style',
+            'name' => 'lsd[display][side][single_listing_style]',
+            'options' => $single_styles,
+            'value' => $side['single_listing_style'] ?? '',
+        ]); ?>
+    </div>
+</div>
 
 <div class="lsd-form-group lsd-form-row-style-needed lsd-display-options-style-dependency lsd-display-options-style-dependency-style1" id="lsd_display_options_style">
-    <h3 class="lsd-mb-0 lsd-mt-1"><?php echo esc_html__("Elements Display Options", 'listdom'); ?></h3>
-    <p class="description lsd-mb-4"><?php echo esc_html__("You can simply change the visibility of each element that you want on listing card", 'listdom'); ?> </p>
+    <h3 class="lsd-my-0"><?php echo esc_html__("Elements", 'listdom'); ?></h3>
+    <p class="description lsd-mb-4"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
     <div class="lsd-flex lsd-gap-2">
         <div class="lsd-form-row lsd-display-options-builder-option">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
@@ -87,8 +103,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
         <?php endif; ?>
 
         <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
@@ -105,8 +120,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Compare', esc_html__('Compare icon', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['compare', esc_html__('Compare Icon', 'listdom')]; ?>
         <?php endif; ?>
 
         <?php if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
@@ -123,8 +137,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Reviews', esc_html__('Reviews Rate', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['reviews', esc_html__('Reviews Rate', 'listdom')]; ?>
         <?php endif; ?>
 
         <div class="lsd-form-row lsd-display-options-builder-option">
@@ -155,14 +168,13 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-    <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missFeatureMessage(esc_html__('Display Image', 'listdom'), true); ?>
-    <?php endif; ?>
+        <?php else: $optional_addons[] = ['pro', esc_html__('Display Image', 'listdom')]; ?>
+        <?php endif; ?>
     </div>
-    <?php if (count($missAddonMessages)): ?>
-    <div class="lsd-addon-alert lsd-mt-4">
-        <?php foreach ($missAddonMessages as $alert) echo LSD_Base::alert($alert,'warning'); ?>
-    </div>
+    <?php if (count($optional_addons)): ?>
+        <div class="lsd-alert-no-my lsd-mt-5">
+            <?php echo LSD_Base::alert(LSD_Base::optionalAddonsMessage($optional_addons),'warning'); ?>
+        </div>
     <?php endif; ?>
 </div>
 

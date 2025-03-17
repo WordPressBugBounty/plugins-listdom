@@ -7,12 +7,12 @@ defined('ABSPATH') || die();
 /** @var array $price_components */
 
 $grid = $options['grid'] ?? [];
-$missAddonMessages = [];
+$optional_addons = [];
 ?>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
-        <p class="description"><?php echo sprintf(esc_html__('Using the %s skin, you can show the directories and listings in a grid format. Also, you can include a map too.', 'listdom'), '<strong>'.esc_html__('Grid', 'listdom').'</strong>'); ?></p>
+        <p class="description"><?php echo sprintf(esc_html__('With the %s skin, you can display directories and listings in a grid format. Additionally, you have the option to include a map.', 'listdom'), '<strong>'.esc_html__('Grid', 'listdom').'</strong>'); ?></p>
     </div>
 </div>
 <div class="lsd-form-row">
@@ -34,11 +34,11 @@ $missAddonMessages = [];
     </div>
 </div>
 
-<div class="lsd-form-group lsd-form-row-style-needed lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4 lsd-display-options-style-dependency-style4" id="lsd_display_options_style">
-    <h3 class="lsd-mb-0 lsd-mt-1"><?php echo esc_html__("Elements Display Options", 'listdom'); ?></h3>
-    <p class="description lsd-mb-4"><?php echo esc_html__("You can simply change the visibility of each element that you want on listing card", 'listdom'); ?> </p>
+<div class="lsd-form-group lsd-form-row-style-needed lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4" id="lsd_display_options_style">
+    <h3 class="lsd-my-0"><?php echo esc_html__("Elements", 'listdom'); ?></h3>
+    <p class="description lsd-mb-4"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
     <div class="lsd-flex lsd-gap-2">
-        <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
+        <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style4">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Contact Info', 'listdom'),
                 'for' => 'lsd_display_options_skin_grid_display_contact_info',
@@ -69,7 +69,7 @@ $missAddonMessages = [];
         </div>
 
         <?php if (!isset($price_components['class']) || $price_components['class']): ?>
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Price Class', 'listdom'),
@@ -86,7 +86,7 @@ $missAddonMessages = [];
         </div>
         <?php endif; ?>
 
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Description', 'listdom'),
@@ -103,7 +103,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style3">
             <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Address', 'listdom'),
@@ -119,7 +119,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3">
             <div class="lsd-form-row ">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Work Hours', 'listdom'),
@@ -151,7 +151,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style4">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Share Buttons', 'listdom'),
@@ -167,7 +167,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2">
+        <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style4">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Price', 'listdom'),
                 'for' => 'lsd_display_options_skin_grid_display_price',
@@ -210,8 +210,7 @@ $missAddonMessages = [];
                 </div>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Claim', esc_html__('Is claimed', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['claim', esc_html__('Claim Status', 'listdom')]; ?>
         <?php endif; ?>
 
         <div class="lsd-form-row lsd-display-options-builder-option">
@@ -242,8 +241,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
         <?php endif; ?>
         <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
         <div class="lsd-form-row lsd-display-options-builder-option">
@@ -259,8 +257,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Compare', esc_html__('Compare icon', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['compare', esc_html__('Compare Icon', 'listdom')]; ?>
         <?php endif; ?>
 
         <?php if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
@@ -277,8 +274,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Reviews', esc_html__('Reviews Rate', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['reviews', esc_html__('Reviews Rate', 'listdom')]; ?>
         <?php endif; ?>
 
         <?php if ($this->isPro()): ?>
@@ -314,7 +310,6 @@ $missAddonMessages = [];
                         ]); ?>
                         <p class="description"><?php esc_html_e("Cover shows only featured image but slider shows all gallery images.", 'listdom'); ?></p>
                     </div>
-
                 </div>
             </div>
             <div class="lsd-display-options-skin-grid-image-options <?php echo !isset($grid['display_image']) || $grid['display_image'] ? '' : 'lsd-util-hide'; ?>">
@@ -337,10 +332,9 @@ $missAddonMessages = [];
                     </div>
                 </div>
             </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missFeatureMessage(esc_html__('Display Image', 'listdom'), true); ?>
+        <?php else: $optional_addons[] = ['pro', esc_html__('Display Image', 'listdom')]; ?>
         <?php endif; ?>
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
             <div class="lsd-form-row <?php echo !isset($grid['display_description']) || $grid['display_description'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_grid_description_length_wrapper">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Description Length', 'listdom'),
@@ -357,10 +351,10 @@ $missAddonMessages = [];
             </div>
         </div>
     </div>
-    <?php if (count($missAddonMessages)): ?>
-    <div class="lsd-addon-alert lsd-mt-4">
-        <?php foreach ($missAddonMessages as $alert) echo LSD_Base::alert($alert,'warning'); ?>
-    </div>
+    <?php if (count($optional_addons)): ?>
+        <div class="lsd-alert-no-my lsd-mt-5">
+            <?php echo LSD_Base::alert(LSD_Base::optionalAddonsMessage($optional_addons),'warning'); ?>
+        </div>
     <?php endif; ?>
 </div>
 
@@ -519,7 +513,7 @@ $missAddonMessages = [];
         do_action('lsd_shortcode_map_options', 'grid', $options);
     ?>
 </div>
-<div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style1">
+<div class="lsd-form-row lsd-display-options-style-not-for lsd-display-options-style-not-for-style4">
     <div class="lsd-col-2"><?php echo LSD_Form::label([
         'title' => esc_html__('Listings Per Row', 'listdom'),
         'for' => 'lsd_display_options_skin_grid_columns',
@@ -567,27 +561,4 @@ $missAddonMessages = [];
     </div>
 </div>
 
-<?php if ($this->isPro()): ?>
-<div class="lsd-form-row lsd-display-options-builder-option">
-    <div class="lsd-col-2"><?php echo LSD_Form::label([
-            'title' => esc_html__('Listing Link', 'listdom'),
-            'for' => 'lsd_display_options_skin_grid_listing_link',
-        ]); ?></div>
-    <div class="lsd-col-6">
-        <?php echo LSD_Form::select([
-            'id' => 'lsd_display_options_skin_grid_listing_link',
-            'name' => 'lsd[display][grid][listing_link]',
-            'value' => $grid['listing_link'] ?? 'normal',
-            'options' => LSD_Base::get_listing_link_methods(),
-        ]); ?>
-        <p class="description"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
-    </div>
-</div>
-<?php else: ?>
-<div class="lsd-form-row">
-    <div class="lsd-col-2"></div>
-    <div class="lsd-col-6">
-        <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Listing Link', 'listdom')); ?></p>
-    </div>
-</div>
-<?php endif;
+<?php $this->field_listing_link('grid', $grid);

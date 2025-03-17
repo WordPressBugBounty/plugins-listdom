@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom API Images Controller Class.
- *
- * @class LSD_API_Controllers_Images
- * @version    1.0.0
- */
 class LSD_API_Controllers_Images extends LSD_API_Controller
 {
     public function get(WP_REST_Request $request): WP_REST_Response
@@ -24,7 +16,7 @@ class LSD_API_Controllers_Images extends LSD_API_Controller
         ]);
     }
 
-    public function upload(WP_REST_Request $request)
+    public function upload(WP_REST_Request $request): WP_REST_Response
     {
         if (!current_user_can('upload_files')) return $this->response([
             'data' => new WP_Error(401, esc_html__("You're not authorized to upload images!", 'listdom')),

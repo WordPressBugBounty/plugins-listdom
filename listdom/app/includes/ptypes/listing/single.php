@@ -202,7 +202,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         return $output;
     }
 
-    public function get($content)
+    public function get($content, string $style = null)
     {
         global $post;
 
@@ -217,6 +217,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
         // Trigger Action
         do_action('lsd_listing_visited', $post);
+
+        // Force Style
+        if ($style)
+        {
+            $valid_styles = LSD_Styles::details();
+            if (isset($valid_styles[$style]) && $valid_styles[$style]) $this->style = $style;
+        }
 
         switch ($this->style)
         {
@@ -732,6 +739,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             'style' => $this->details_page_options['elements']['map']['style'] ?? null,
             'gplaces' => $this->details_page_options['elements']['map']['gplaces'] ?? 0,
             'infowindow' => $this->details_page_options['elements']['map']['infowindow'] ?? 1,
+            'zoomlevel' => $this->details_page_options['elements']['map']['zoomlevel'] ?? 14,
             'mapcontrols' => [
                 'zoom' => $this->details_page_options['elements']['map']['control_zoom'] ?? 'RIGHT_BOTTOM',
                 'maptype' => $this->details_page_options['elements']['map']['control_maptype'] ?? 'TOP_LEFT',

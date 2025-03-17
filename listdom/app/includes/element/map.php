@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_Element_Map extends LSD_Element
 {
@@ -35,6 +33,7 @@ class LSD_Element_Map extends LSD_Element
             'args' => $args['args'] ?? [],
             'direction' => apply_filters('lsd_map_direction', 0),
             'infowindow' => $args['infowindow'] ?? 1,
+            'zoomlevel' => $args['zoomlevel'] ?? 14,
         ]);
 
         return $this->content(
@@ -72,6 +71,15 @@ class LSD_Element_Map extends LSD_Element
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][infowindow]',
                 'options' => ['1' => esc_html__('Enabled', 'listdom'), '0' => esc_html__('Disabled', 'listdom')],
                 'value' => $data['infowindow'] ?? 0,
+            ]) . '
+        </div>
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_zoomlevel">' . esc_html__('Zoom Level', 'listdom') . '</label>
+            ' . LSD_Form::select([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_zoomlevel',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][zoomlevel]',
+                'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14, '15' => 15, '16' => 16],
+                'value' => $data['zoomlevel'] ?? 14,
             ]) . '
         </div>
         <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">

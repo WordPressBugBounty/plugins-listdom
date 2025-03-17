@@ -6,10 +6,10 @@ defined('ABSPATH') || die();
 /** @var array $products */
 ?>
 <div class="lsd-activation-wrap">
-    <?php foreach($products as $key => $product): ?>
+    <?php foreach ($products as $key => $product): ?>
     <?php
         $licensing = $product['licensing'] ?? null;
-        if(!$licensing) continue;
+        if (!$licensing) continue;
 
         $basename = $licensing->getBasename();
         $prefix = $licensing->getPrefix();
@@ -34,11 +34,11 @@ defined('ABSPATH') || die();
         </div>
     </div>
     <div class="lsd-activation-form-group lsd-accordion-panel <?php echo $valid === 1 ? 'lsd-activation-valid' : ''; ?>">
-        <?php if($valid !== 1): ?>
+        <?php if ($valid !== 1): ?>
             <div class="lsd-form-row lsd-activation-guide">
                 <div class="lsd-col-12">
                     <?php
-                    if(trim($license_key) && $valid === 0)
+                    if (trim($license_key) && $valid === 0)
                     {
                         echo $this->alert(
                             sprintf(
@@ -49,7 +49,7 @@ defined('ABSPATH') || die();
                             'error'
                         );
                     }
-                    elseif($valid === 0)
+                    elseif ($valid === 0)
                     {
                         echo $this->alert(
                             sprintf(
@@ -60,7 +60,7 @@ defined('ABSPATH') || die();
                             'warning'
                         );
                     }
-                    elseif($grace)
+                    elseif ($grace)
                     {
                         echo $this->alert(
                             sprintf(
@@ -109,7 +109,7 @@ defined('ABSPATH') || die();
                     <div class="lsd-col-12"><div id="<?php echo esc_attr($key); ?>_activation_alert"></div></div>
                 </div>
             </form>
-            <?php if($trial): ?>
+            <?php if ($trial): ?>
             <div class="lsd-form-row lsd-mb-0">
                 <div class="lsd-col-12">
                     <p class="lsd-mb-0"><?php echo sprintf(
@@ -119,6 +119,13 @@ defined('ABSPATH') || die();
                     ); ?></p>
                 </div>
             </div>
+            <?php endif; ?>
+            <?php if (isset($product['activation_notice']) && trim($product['activation_notice'])): ?>
+                <div class="lsd-form-row lsd-mb-0">
+                    <div class="lsd-col-12 lsd-alert-no-mb">
+                        <?php echo LSD_Kses::element($product['activation_notice']); ?>
+                    </div>
+                </div>
             <?php endif; ?>
         <?php else: ?>
             <div>

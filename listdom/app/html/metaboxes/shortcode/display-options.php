@@ -16,8 +16,8 @@ $selected_skin = $options['skin'] ?? '';
 $price_components = LSD_Options::price_components();
 ?>
 <div class="lsd-metabox lsd-metabox-display-options">
-    <div class="lsd-form-group lsd-skins-form-group">
-        <h3 class="lsd-mb-0 lsd-mt-1"><?php echo esc_html__("Skin", 'listdom'); ?></h3>
+    <div class="lsd-form-group lsd-skins-form-group lsd-mt-0">
+        <h3 class="lsd-my-0"><?php echo esc_html__("Skin", 'listdom'); ?></h3>
         <p class="description lsd-mb-4 lsd-mt-0"><?php echo esc_html__("Choose the skin for this shortcode.", 'listdom'); ?> </p>
 
         <div class="lsd-form-row lsd-m-0">

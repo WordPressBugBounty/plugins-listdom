@@ -362,12 +362,14 @@ class LSD_Search_Helper extends LSD_Base
     {
         $key = $filter['key'] ?? '';
         $title = $filter['title'] ?? '';
+        $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $ph = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
         $placeholders = explode(',', $ph);
 
         $all_terms = $filter['all_terms'] ?? 1;
         $predefined_terms = isset($filter['terms']) && is_array($filter['terms']) ? $filter['terms'] : [];
         $hide_empty = $filter['hide_empty'] ?? 0;
+        $level_status = $filter['level_status'] ?? 'dependant';
 
         $id = $args['id'] ?? null;
         $name = $args['name'] ?? 'sf-' . $key;
@@ -403,13 +405,13 @@ class LSD_Search_Helper extends LSD_Base
             $hierarchy[$level][] = $term;
         }
 
-        $output = '<div class="lsd-hierarchical-dropdowns" id="' . esc_attr($id) . '_wrapper" data-for="' . esc_attr($key) . '" data-id="' . esc_attr($id) . '" data-max-levels="' . esc_attr($max_levels) . '" data-name="' . esc_attr($name) . '" data-hide-empty="' . esc_attr($hide_empty) . '">';
+        $output = '<div class="lsd-hierarchical-dropdowns" id="' . esc_attr($id) . '_wrapper" data-for="' . esc_attr($key) . '" data-id="' . esc_attr($id) . '" data-max-levels="' . esc_attr($max_levels) . '" data-name="' . esc_attr($name) . '" data-hide-empty="' . esc_attr($hide_empty) . '" data-level-status="' . esc_attr($level_status) . '">';
         for ($l = 1; $l <= $max_levels; $l++)
         {
             $level_terms = isset($hierarchy[$l]) && is_array($hierarchy[$l]) ? $hierarchy[$l] : [];
             $placeholder = $placeholders[($l - 1)] ?? $placeholders[0];
 
-            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-level="' . esc_attr($l) . '" data-enhanced="0">';
+            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-level="' . esc_attr($l) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
             $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
 
             foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id || in_array($level_term->term_id, $current_parents)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';

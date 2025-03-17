@@ -46,6 +46,15 @@ class LSD_Hooks extends LSD_Base
         // There is no Search Options
         if (!$sf) return $atts;
 
+        // Shortcode Search Options
+        $search_options = isset($atts['lsd_search']) && is_array($atts['lsd_search']) ? $atts['lsd_search'] : [];
+
+        // Is Shortcode Searchable?
+        $searchable = $search_options['searchable'] ?? 1;
+
+        // Not Searchable
+        if (!$searchable) return $atts;
+
         // Target Shortcode
         $shortcode = isset($_GET['sf-shortcode']) && trim($_GET['sf-shortcode']) ? sanitize_text_field($_GET['sf-shortcode']) : null;
 
@@ -156,8 +165,11 @@ class LSD_Hooks extends LSD_Base
             // Side by Side Skin
             if (isset($_REQUEST['lsd-side']) && trim($_REQUEST['lsd-side'])) $classes .= 'lsd-side-skin';
 
+            // Style
+            $style = isset($_REQUEST['lsd-style']) && trim($_REQUEST['lsd-style']) ? $_REQUEST['lsd-style'] : null;
+
             // Output
-            echo (new LSD_Endpoints_Raw())->output($classes);
+            echo (new LSD_Endpoints_Raw())->output($classes, $style);
             exit;
         }
     }

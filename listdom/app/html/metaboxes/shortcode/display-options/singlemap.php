@@ -12,7 +12,7 @@ $mapsearch = $singlemap['mapsearch'] ?? '1';
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
-        <p class="description"><?php echo sprintf(esc_html__('Using the %s skin, you can show a simple and clean map with the directories and listings markers in your website.', 'listdom'), '<strong>'.esc_html__('Single Map', 'listdom').'</strong>'); ?></p>
+        <p class="description"><?php echo sprintf(esc_html__('With the %s skin, you can display a simple and clean map featuring directory and listing markers on your website.', 'listdom'), '<strong>'.esc_html__('Single Map', 'listdom').'</strong>'); ?></p>
     </div>
 </div>
 <div class="lsd-form-row">

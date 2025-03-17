@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Plugin Hooks Class.
- *
- * @class LSD_Plugin_Hooks
- * @version    1.0.0
- */
 class LSD_Plugin_Hooks
 {
     /**
@@ -119,6 +111,9 @@ class LSD_Plugin_Hooks
         {
             LSD_Plugin_Hooks::db_update();
         }
+
+        // Default Customizer
+        update_option('lsd_customizer', LSD_Options::customizer());
 
         // Generate personalized CSS File
         LSD_Personalize::generate();

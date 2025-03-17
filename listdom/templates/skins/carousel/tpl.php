@@ -19,7 +19,7 @@ jQuery(document).ready(function()
         atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
         items: "'.$this->columns.'",
         loop: "'.(count($this->listings) > $this->columns ? '1' : '0').'",
-        autoplay: true,
+        autoplay: '.($this->autoplay ? 'true' : 'false').',
         autoplayHoverPause: true,
         dots: true,
         nav: false,

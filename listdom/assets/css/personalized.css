@@ -1,6 +1,263 @@
-.lsd-color-m-txt{color: #2b93ff !important;}
-.lsd-color-m-bg{background-color: #2b93ff !important;}
-.lsd-color-m-brd{border-color: #2b93ff !important;}
-.lsd-font-m{font-family: "Lato", Arial, monospace;}
-.lsd-owl-carousel .owl-dots .owl-dot span{border-color: #2b93ff !important;}
-.lsd-owl-carousel .owl-dots .owl-dot.active span, .lsd-owl-carousel .owl-dots .owl-dot:hover span{background-color: #2b93ff !important;}
+:root {
+  --listdom-main-gbg1: #33c6ff;
+  --listdom-gap-tiny: 1px;
+  --listdom-gap-small: 2px;
+  --listdom-gap-compact: 4px;
+  --listdom-gap: 8px;
+  --listdom-gap-wide: 16px;
+  --listdom-gap-large: 32px;
+  --listdom-gap-huge: 64px;
+
+  /* Button Colors */
+  --listdom-primary-button-bg: #33c6ff; /* Primary Button Background Color */
+  --listdom-primary-button-bg-2: #306be6; /* Primary Button Background Color 2 */
+  --listdom-primary-button-text: #ffffff; /* Primary Button Text Color */
+  --listdom-primary-button-hover-bg: #306be6; /* Primary Button Hover Background Color */
+  --listdom-primary-button-hover-bg-2: #306be6; /* Primary Button Hover Background Color */
+  --listdom-primary-button-hover-text: #ffffff; /* Primary Button Hover Text Color */
+  --listdom-primary-button-border: 0px 0px 0px 0px; /* Primary Button Border */
+  --listdom-primary-button-border-style: none; /* Primary Button Border Style */
+  --listdom-primary-button-border-color: none; /* Primary Button Border Color */
+  --listdom-primary-button-border-hover: 0px 0px 0px 0px; /* Primary Button Hover Border */
+  --listdom-primary-button-border-hover-style: none; /* Primary Button Border hover Style */
+  --listdom-primary-button-border-hover-color: none; /* Primary Button Border hover color */
+  --listdom-primary-button-border-radius: 5px; /* Primary Button Border Radius */
+  --listdom-primary-button-hover-border-radius: 5px; /* Primary Button Border Radius */
+
+  --listdom-primary-button-font-family: "inherit", Arial, monospace;; /* Primary Button Typography */
+  --listdom-primary-button-font-weight: inherit; /* Primary Button Typography */
+  --listdom-primary-button-text-align: center; /* Primary Button Typography */
+  --listdom-primary-button-font-size: 15px; /* Primary Button Typography */
+  --listdom-primary-button-line-height: 32px; /* Primary Button Typography */
+
+  --listdom-search-button-bg: #33c6ff; /* Search Button Background Color */
+  --listdom-search-button-bg-2: #306be6; /* Search Button Background Color 2 */
+  --listdom-search-button-text: #ffffff; /* Search Button Text Color */
+  --listdom-search-button-hover-bg: #306be6; /* Search Button Hover Background Color */
+  --listdom-search-button-hover-bg-2: #306be6; /* Search Button Hover Background Color */
+  --listdom-search-button-hover-text: #ffffff; /* Search Button Hover Text Color */
+  --listdom-search-button-border: 0px 0px 0px 0px; /* Search Button Border */
+  --listdom-search-button-border-style: none; /* Search Button Border Style */
+  --listdom-search-button-border-color: none; /* Search Button Border Color */
+  --listdom-search-button-border-hover: 0px 0px 0px 0px; /* Search Button Hover Border */
+  --listdom-search-button-border-hover-style: none; /* Search Button Border hover Style */
+  --listdom-search-button-border-hover-color: none; /* Search Button Border hover color */
+  --listdom-search-button-border-radius: 5px; /* Search Button Border Radius */
+  --listdom-search-button-hover-border-radius: 5px; /* Search Button Border Radius */
+
+  --listdom-search-button-font-family: "inherit", Arial, monospace;; /* Search Button Typography */
+  --listdom-search-button-font-weight: inherit; /* Search Button Typography */
+  --listdom-search-button-text-align: center; /* Search Button Typography */
+  --listdom-search-button-font-size: 15px; /* Search Button Typography */
+  --listdom-search-button-line-height: 32px; /* Search Button Typography */
+
+  --listdom-pagination-button-bg: #33c6ff; /* Pagination Button Background Color */
+  --listdom-pagination-button-bg-2: #306be6; /* Pagination Button Background Color 2 */
+  --listdom-pagination-button-text: #ffffff; /* Pagination Button Text Color */
+  --listdom-pagination-button-hover-bg: #306be6; /* Pagination Button Hover Background Color */
+  --listdom-pagination-button-hover-bg-2: #306be6; /* Pagination Button Hover Background Color */
+  --listdom-pagination-button-hover-text: #ffffff; /* Pagination Button Hover Text Color */
+  --listdom-pagination-button-border: 0px 0px 0px 0px; /* Pagination Button Border */
+  --listdom-pagination-button-border-style: none; /* Pagination Button Border Style */
+  --listdom-pagination-button-border-color: none; /* Pagination Button Border Color */
+  --listdom-pagination-button-border-hover: 0px 0px 0px 0px; /* Pagination Button Hover Border */
+  --listdom-pagination-button-border-hover-style: none; /* Pagination Button Border hover Style */
+  --listdom-pagination-button-border-hover-color: none; /* Pagination Button Border hover color */
+  --listdom-pagination-button-border-radius: 5px; /* Pagination Button Border Radius */
+  --listdom-pagination-button-hover-border-radius: 5px; /* Pagination Button Border Radius */
+
+  --listdom-pagination-button-font-family: "inherit", Arial, monospace;; /* Pagination Button Typography */
+  --listdom-pagination-button-font-weight: inherit; /* Pagination Button Typography */
+  --listdom-pagination-button-text-align: center; /* Pagination Button Typography */
+  --listdom-pagination-button-font-size: 15px; /* Pagination Button Typography */
+  --listdom-pagination-button-line-height: 32px; /* Pagination Button Typography */
+
+  --listdom-secondary-button-bg: #e6f7ff; /* secondary Button Background Color */
+  --listdom-secondary-button-bg-2: #e6f7ff; /* secondary Button Background Color 2 */
+  --listdom-secondary-button-text: #0ab0fe; /* secondary Button Text Color */
+  --listdom-secondary-button-hover-bg: #306be6; /* secondary Button Hover Background Color */
+  --listdom-secondary-button-hover-bg-2: #306be6; /* secondary Button Hover Background Color */
+  --listdom-secondary-button-hover-text: #fff; /* secondary Button Hover Text Color */
+  --listdom-secondary-button-border: 1px 1px 1px 1px; /* secondary Button Border */
+  --listdom-secondary-button-border-style: solid; /* secondary Button Border Style */
+  --listdom-secondary-button-border-color: #bceaff; /* secondary Button Border Color */
+  --listdom-secondary-button-border-hover: 1px 1px 1px 1px; /* secondary Button Hover Border */
+  --listdom-secondary-button-border-hover-style: solid; /* secondary Button Border hover Style */
+  --listdom-secondary-button-border-hover-color: #bceaff; /* secondary Button Border hover color */
+  --listdom-secondary-button-border-radius: 4px; /* secondary Button Border Radius */
+  --listdom-secondary-button-hover-border-radius: 4px; /* secondary Button Border Radius */
+
+  --listdom-secondary-button-font-family: "inherit", Arial, monospace;; /* Secondary Button Typography */
+  --listdom-secondary-button-font-weight: inherit; /* Secondary Button Typography */
+  --listdom-secondary-button-text-align: center; /* Secondary Button Typography */
+  --listdom-secondary-button-font-size: 15px; /* Secondary Button Typography */
+  --listdom-secondary-button-line-height: 32px; /* Secondary Button Typography */
+
+  --listdom-solid-button-bg: #33c6ff; /* Solid Button Background Color */
+  --listdom-solid-button-bg-2: #33c6ff; /* Solid Button Background Color 2 */
+  --listdom-solid-button-text: #fff; /* Solid Button Text Color */
+  --listdom-solid-button-hover-bg: #29a6e1; /* Solid Button Hover Background Color */
+  --listdom-solid-button-hover-bg-2: #29a6e1; /* Solid Button Hover Background Color */
+  --listdom-solid-button-hover-text: #eee; /* Solid Button Hover Text Color */
+  --listdom-solid-button-border: 0px 0px 0px 0px; /* Solid Button Border */
+  --listdom-solid-button-border-style: none; /* Solid Button Border Style */
+  --listdom-solid-button-border-color: transparent; /* Solid Button Border Color */
+  --listdom-solid-button-border-hover: 0px 0px 0px 0px; /* Solid Button Hover Border */
+  --listdom-solid-button-border-hover-style: none; /* Solid Button Border hover Style */
+  --listdom-solid-button-border-hover-color: transparent; /* Solid Button Border hover color */
+  --listdom-solid-button-border-radius: 4px; /* Solid Button Border Radius */
+  --listdom-solid-button-hover-border-radius: 4px; /* Solid Button Border Radius */
+
+  --listdom-solid-button-font-family: "inherit", Arial, monospace;; /* Solid Button Typography */
+  --listdom-solid-button-font-weight: inherit; /* Solid Button Typography */
+  --listdom-solid-button-text-align: center; /* Solid Button Typography */
+  --listdom-solid-button-font-size: 15px; /* Solid Button Typography */
+  --listdom-solid-button-line-height: 32px; /* Solid Button Typography */
+
+  --listdom-form-input-bg-color: #fff; /* Input Background Color */
+  --listdom-form-input-text-color: #000; /* Input Text Color */
+  --listdom-form-input-border-width: 1px 1px 1px 1px; /* Input Border Width */
+  --listdom-form-input-border-style: solid; /* Input Border Style */
+  --listdom-form-input-border-color: #f4f5f7; /* Input Border Color */
+  --listdom-form-input-placeholder-text-color: #a4a8b5; /* Placeholder Text Color */
+  --listdom-form-input-focus-border-width: 1px 1px 1px 1px; /* Input Focus Border Width */
+  --listdom-form-input-focus-border-style: solid; /* Input Focus Border Style */
+  --listdom-form-input-focus-border-color: #306be6; /* Input Focus Border Color */
+  --listdom-form-input-focus-bg-color: #fff; /* Input Background Color */
+  --listdom-form-input-radius: 10px; /* Input Border Radius */
+  --listdom-form-input-focus-radius: 10px; /* Input Border Radius */
+
+  --listdom-form-input-font-family: "inherit", Arial, monospace;; /* General Form Typography */
+  --listdom-form-input-font-weight: inherit; /* General Form Typography */
+  --listdom-form-input-text-align: inherit; /* General Form Typography */
+  --listdom-form-input-font-size: 12px; /* General Form Typography */
+  --listdom-form-input-line-height: 32px; /* General Form Typography */
+
+  --listdom-search-form-bg-color: #fff; /* Input Background Color */
+  --listdom-search-form-input-bg-color: #fff; /* Input Background Color */
+  --listdom-search-form-input-text-color: #000; /* Input Text Color */
+  --listdom-search-form-input-border-width: 1px 1px 1px 1px; /* Input Border Width */
+  --listdom-search-form-input-border-style: solid; /* Input Border Style */
+  --listdom-search-form-input-border-color: #f4f5f7; /* Input Border Color */
+  --listdom-search-form-input-placeholder-text-color: #a4a8b5; /* Placeholder Text Color */
+  --listdom-search-form-input-focus-border-width: 1px 1px 1px 1px; /* Input Focus Border Width */
+  --listdom-search-form-input-focus-border-style: solid; /* Input Focus Border Style */
+  --listdom-search-form-input-focus-border-color: #306be6; /* Input Focus Border Color */
+  --listdom-search-form-input-focus-bg-color: #fff; /* Input Background Color */
+  --listdom-search-form-input-radius: 10px; /* Input Border Radius */
+  --listdom-search-form-input-focus-radius: 10px; /* Input Border Radius */
+  --listdom-search-form-input-icons-color: #33c6ff;
+
+  --listdom-search-form-input-font-family: "inherit", Arial, monospace;; /* Search Form Typography */
+  --listdom-search-form-input-font-weight: inherit; /* Search Form Typography */
+  --listdom-search-form-input-text-align: inherit; /* Search Form Typography */
+  --listdom-search-form-input-font-size: 12px; /* Search Form Typography */
+  --listdom-search-form-input-line-height: 32px; /* Search Form Typography */
+
+  --listdom-cloud-widget-bg-color: #dadadb; /* Cloud Widget Bg Color */
+  --listdom-cloud-widget-text-color: #3b3b3b; /* Cloud Widget Text Color */
+  --listdom-cloud-widget-hover-bg-color: #dadadb; /* Cloud Widget Hover Bg Color */
+  --listdom-cloud-widget-text-hover-color: #33c6ff; /* Cloud Widget Text Hover Color */
+  --listdom-cloud-widget-border: 0px 0px 0px 0px; /* Cloud Widget Border */
+  --listdom-cloud-widget-padding: 5px 10px 5px 10px; /* Cloud Widget Border */
+  --listdom-cloud-widget-border-style: none; /* Cloud Widget Border Style */
+  --listdom-cloud-widget-border-color: #ececec; /* Cloud Widget Border Color */
+  --listdom-cloud-widget-border-hover: 0px 0px 0px 0px; /* Cloud Widget Hover Border */
+  --listdom-cloud-widget-padding-hover: 5px 10px 5px 10px; /* Cloud Widget Hover Border */
+  --listdom-cloud-widget-border-hover-style: none; /* Cloud Widget Border hover style */
+  --listdom-cloud-widget-border-hover-color: #ececec; /* Cloud Widget Border hover color */
+  --listdom-cloud-widget-border-radius: 27px; /* Cloud Widget Border Radius */
+  --listdom-cloud-widget-hover-border-radius: 27px; /* Cloud Widget Border Radius */
+
+  --listdom-cloud-widget-font-family: "inherit", Arial, monospace;; /* Cloud Widget Typography */
+  --listdom-cloud-widget-font-weight: inherit; /* Cloud Widget Typography */
+  --listdom-cloud-widget-text-align: inherit; /* Cloud Widget Typography */
+  --listdom-cloud-widget-font-size: 13px; /* Cloud Widget Typography */
+  --listdom-cloud-widget-line-height: 26px; /* Cloud Widget Typography */
+
+  --listdom-terms-widget-bg-color: transparent; /* Terms Widget Bg Color */
+  --listdom-terms-widget-text-color: #8d919c; /* Terms Widget Text Color */
+  --listdom-terms-widget-hover-bg-color: transparent; /* Terms Widget Hover Bg Color */
+  --listdom-terms-widget-text-hover-color: #33c6ff; /* Terms Widget Text Hover Color */
+  --listdom-terms-widget-border: 0px 0px 0px 0px; /* Terms Widget Border */
+  --listdom-terms-widget-padding: 2px 2px 2px 2px; /* Terms Widget Border */
+  --listdom-terms-widget-border-style: none; /* Terms Widget Border Style */
+  --listdom-terms-widget-border-color: #ececec; /* Terms Widget Border Color */
+  --listdom-terms-widget-border-hover: 0px 0px 0px 0px; /* Terms Widget Hover Border */
+  --listdom-terms-widget-padding-hover: 2px 2px 2px 2px; /* Terms Widget Hover Border */
+  --listdom-terms-widget-border-hover-style: none; /* Terms Widget Border hover style */
+  --listdom-terms-widget-border-hover-color: #ececec; /* Terms Widget Border hover color */
+  --listdom-terms-widget-border-radius: 5px; /* Terms Widget Border Radius */
+  --listdom-terms-widget-hover-border-radius: 5px; /* Terms Widget Border Radius */
+
+  --listdom-terms-widget-font-family: "inherit", Arial, monospace;; /* Terms Widget Typography */
+  --listdom-terms-widget-font-weight: inherit; /* Terms Widget Typography */
+  --listdom-terms-widget-text-align: inherit; /* Terms Widget Typography */
+  --listdom-terms-widget-font-size: 13px; /* Terms Widget Typography */
+  --listdom-terms-widget-line-height: 26px; /* Terms Widget Typography */
+
+  /* FrontEnd Dashboard */
+  --listdom-dashboard-container-bg: #0ab0fe; /* Dashboard Container Background Color */
+  --listdom-dashboard-bg: #0ab0fe; /* Dashboard Background Color */
+  --listdom-dashboard-text: #fff; /* Dashboard Text Color */
+  --listdom-dashboard-icon: #fff; /* Dashboard Icon Color */
+  --listdom-dashboard-hover-bg: #24b7ff; /* Dashboard Hover Background Color */
+  --listdom-dashboard-hover-text: #fff; /* Dashboard Hover Text Color */
+  --listdom-dashboard-border: 1px 1px 1px 1px; /* Dashboard Border */
+  --listdom-dashboard-border-style: solid; /* Dashboard Border Style */
+  --listdom-dashboard-border-color: #0ab0fe; /* Dashboard Border Color */
+  --listdom-dashboard-border-hover: 1px 1px 1px 1px; /* Dashboard Hover Border */
+  --listdom-dashboard-border-hover-style: solid; /* Dashboard Border hover style */
+  --listdom-dashboard-border-hover-color: #ffffff29; /* Dashboard Border hover color */
+  --listdom-dashboard-border-radius: 5px; /* Dashboard Border Radius */
+  --listdom-dashboard-hover-border-radius: 5px; /* Dashboard Border Radius */
+
+  --listdom-dashboard-font-family: "inherit", Arial, monospace;; /* Dashboard Typography */
+  --listdom-dashboard-font-weight: inherit; /* Dashboard Typography */
+  --listdom-dashboard-text-align: inherit; /* Dashboard Typography */
+  --listdom-dashboard-font-size: 14px; /* Dashboard Typography */
+  --listdom-dashboard-line-height: 26px; /* Dashboard Typography */
+
+  --listdom-masonry-tabs-bg: #fff; /* Masonry Tabs Background Color */
+  --listdom-masonry-tabs-text: #0ab0fe; /* Masonry Tabs Text Color */
+  --listdom-masonry-tabs-hover-bg: #0ab0fe; /* Masonry Tabs Hover Background Color */
+  --listdom-masonry-tabs-hover-text: #fff; /* Masonry Tabs Hover Text Color */
+  --listdom-masonry-tabs-border: 0px 0px 0px 0px; /* Masonry Tabs Border */
+  --listdom-masonry-tabs-border-style: none; /* Masonry Tabs Border Style */
+  --listdom-masonry-tabs-border-color: inherit; /* Masonry Tabs Border Color */
+  --listdom-masonry-tabs-border-hover: 0px 0px 0px 0px; /* Masonry Tabs Hover Border */
+  --listdom-masonry-tabs-border-hover-style: none; /* Masonry Tabs Border hover style */
+  --listdom-masonry-tabs-border-hover-color: inherit; /* Masonry Tabs Border hover color */
+  --listdom-masonry-tabs-border-radius: 5px; /* Masonry Tabs Border Radius */
+  --listdom-masonry-tabs-hover-border-radius: 5px; /* Masonry Tabs Border Radius */
+
+  --listdom-reviews-tabs-bg: #fff; /* Reviews Tabs Background Color */
+  --listdom-reviews-tabs-text: #0ab0fe; /* Reviews Tabs Text Color */
+  --listdom-reviews-tabs-hover-bg: #0ab0fe; /* Reviews Tabs Hover Background Color */
+  --listdom-reviews-tabs-hover-text: #fff; /* Reviews Tabs Hover Text Color */
+  --listdom-reviews-tabs-border: 0px 0px 0px 0px; /* Reviews Tabs Border */
+  --listdom-reviews-tabs-border-style: none; /* Reviews Tabs Border Style */
+  --listdom-reviews-tabs-border-color: inherit; /* Reviews Tabs Border Color */
+  --listdom-reviews-tabs-border-hover: 0px 0px 0px 0px; /* Reviews Tabs Hover Border */
+  --listdom-reviews-tabs-border-hover-style: none; /* Reviews Tabs Border hover style */
+  --listdom-reviews-tabs-border-hover-color: inherit; /* Reviews Tabs Border hover color */
+  --listdom-reviews-tabs-border-radius: 5px; /* Reviews Tabs Border Radius */
+  --listdom-reviews-tabs-hover-border-radius: 5px; /* Reviews Tabs Border Radius */
+
+  --listdom-features-icons-bg-color: #e6f7ff;
+  --listdom-features-icons-text-color: #0ab0fe;
+
+  --listdom-single-ic: #33bdfc; /* Listdom Icon Color */
+  --listdom-single-ic2: #2b93ff; /* Listdom Icon Color 2 */
+  --listdom-single-sc: #fecc39; /* Listdom Star Color */
+  --listdom-single-ac: #a4a8b5; /* Listdom Active Color */
+  --listdom-single-sb-bg: #000000; /* Listdom Slider Button Background */
+  --listdom-single-sb-c: #ffffff; /* Listdom Slider Button Color */
+}
+
+.lsd-color-m-txt{color: #33c6ff !important;}
+.lsd-color-m-bg{background-color: #33c6ff ;}
+.lsd-color-m-brd{border-color: #33c6ff !important;}
+.lsd-font-m{font-family: "poppins", Arial, monospace;}
+.lsd-owl-carousel .owl-dots .owl-dot span{border-color: #33c6ff !important;}
+.lsd-owl-carousel .owl-dots .owl-dot.active span, .lsd-owl-carousel .owl-dots .owl-dot:hover span{background-color: #33c6ff !important;}

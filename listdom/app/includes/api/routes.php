@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_API_Routes extends LSD_API
 {
@@ -303,7 +301,7 @@ class LSD_API_Routes extends LSD_API
         // Addons Controller
         $addons = new LSD_API_Controllers_Addons();
 
-        // Search Listings
+        // Addons
         register_rest_route($this->namespace, 'addons', [
             'methods' => 'GET',
             'callback' => [$addons, 'get'],

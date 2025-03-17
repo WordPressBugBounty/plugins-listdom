@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Dashboard Terms Class.
- *
- * @class LSD_Dashboard_Terms
- * @version    1.0.0
- */
 class LSD_Dashboard_Terms extends LSD_Base
 {
     public static function category($args)

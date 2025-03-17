@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom API Logout Controller Class.
- *
- * @class LSD_API_Controllers_Logout
- * @version    1.0.0
- */
 class LSD_API_Controllers_Logout extends LSD_API_Controller
 {
     public function perform(WP_REST_Request $request): WP_REST_Response

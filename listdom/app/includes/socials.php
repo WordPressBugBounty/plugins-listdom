@@ -200,4 +200,33 @@ class LSD_Socials extends LSD_Base
 
         return $socials;
     }
+
+    public function values(int $id, string $method = 'profile'): array
+    {
+        // Social Options
+        $networks = LSD_Options::socials();
+
+        $values = [];
+        foreach ($networks as $network => $v)
+        {
+            $obj = $this->get($network, $v);
+
+            // Social Network is not Enabled
+            if (!$obj || !$obj->option($method)) continue;
+
+            if ($method === 'profile') $url = get_user_meta($id, 'lsd_'.$obj->key(), true);
+            else $url = get_post_meta($id, 'lsd_'.$obj->key(), true);
+
+            // Social Network is not filled
+            if (trim($url) === '') continue;
+
+            $values[] = [
+                'key' => $obj->key(),
+                'label' => $obj->label(),
+                'url' => $url
+            ];
+        }
+
+        return $values;
+    }
 }

@@ -133,22 +133,38 @@ jQuery(document).ready(function()
                     </div>
                     <div class="lsd-col-4">
 
-                        <div class="lsd-dashboard-submit">
+                        <div class="lsd-dashboard-box lsd-dashboard-submit">
                             <input type="hidden" name="id" value="<?php echo esc_attr($this->post->ID); ?>" id="lsd_dashboard_id">
                             <input type="hidden" name="action" value="lsd_dashboard_listing_save">
 
                             <?php LSD_Form::nonce('lsd_dashboard'); ?>
                             <?php /* Security Nonce */ LSD_Form::nonce('lsd_listing_cpt', '_lsdnonce'); ?>
 
+                            <?php if (current_user_can('publish_posts')): ?>
+                                <div class="lsd-dashboard-listing-status">
+                                    <?php echo LSD_Form::select([
+                                        'id' => 'lsd_listing_status',
+                                        'name' => 'lsd[listing_status]',
+                                        'value' => $this->post->post_status ?? 'publish',
+                                        'options' => [
+                                            'publish' => esc_html__('Published', 'listdom'),
+                                            'pending' => esc_html__('Pending Review', 'listdom'),
+                                            'draft' => esc_html__('Draft', 'listdom'),
+                                        ],
+                                        'required' => true,
+                                    ]); ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="lsd-dashboard-grecaptcha">
+                                <?php echo LSD_Main::grecaptcha_field(); ?>
+                            </div>
+
                             <button type="submit" class="lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>">
                                 <?php esc_html_e('Save', 'listdom'); ?>
                             </button>
 
                             <?php do_action('lsd_dashboard_after_submit_button', $this); ?>
-
-                            <div class="lsd-dashboard-grecaptcha">
-                                <?php echo LSD_Main::grecaptcha_field(); ?>
-                            </div>
                         </div>
 
                         <div class="lsd-dashboard-box lsd-dashboard-category">

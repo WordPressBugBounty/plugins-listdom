@@ -79,13 +79,13 @@ jQuery(document).ready(function()
                     'placeholder' => $password_placeholder
                 ], 'password');
             ?>
-            <div class="lsd-register-password-rules">
-                <?php esc_html_e('Password must contain at least:', 'listdom'); ?>
+            <div class="lsd-register-password-rules lsd-alert lsd-info">
+                <div class="lsd-mb-4"><?php esc_html_e('Password must contain at least:', 'listdom'); ?></div>
                 <ul>
-                    <li><?php esc_html_e('an uppercase letter','listdom'); ?></li>
-                    <li><?php esc_html_e('a lowercase letter','listdom'); ?></li>
-                    <li><?php esc_html_e('a number','listdom'); ?></li>
-                    <li><?php esc_html_e('a special character e.g. ~`! @#$%^&*()-_+={}[]|;:"<>,./?','listdom'); ?></li>
+                    <li><?php esc_html_e('An uppercase letter','listdom'); ?></li>
+                    <li><?php esc_html_e('A lowercase letter','listdom'); ?></li>
+                    <li><?php esc_html_e('A number','listdom'); ?></li>
+                    <li><?php esc_html_e('A special character e.g. ~`! @#$%^&*()-_+={}[]|;:"<>,./?','listdom'); ?></li>
                 </ul>
             </div>
         </div>

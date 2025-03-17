@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Builder Block Editor Class.
- *
- * @class LSD_Integrations_BE
- * @version    1.0.0
- */
 class LSD_Integrations_BE extends LSD_Integrations
 {
     private $settings;

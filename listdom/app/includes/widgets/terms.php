@@ -25,7 +25,7 @@ class LSD_Widgets_Terms extends WP_Widget
     public function widget($args, $instance)
     {
         // Before Widget
-        echo($args['before_widget'] ?? '');
+        echo ($args['before_widget'] ?? '');
 
         // Print the widget title
         if (!empty($instance['title']))
@@ -38,7 +38,7 @@ class LSD_Widgets_Terms extends WP_Widget
         echo '<div class="lsd-taxonomy-shortcode-wrapper lsd-taxonomy-shortcode-terms lsd-font-m">' . $shortcode->output($instance) . '</div>';
 
         // After Widget
-        echo($args['after_widget'] ?? '');
+        echo ($args['after_widget'] ?? '');
     }
 
     public function form($instance)

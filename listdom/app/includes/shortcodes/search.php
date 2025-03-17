@@ -49,6 +49,9 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         // Shortcode ID
         $this->id = $atts['id'] ?? 0;
 
+        // Listdom Bar
+        (LSD_Bar::instance())->add($this->id);
+
         // Attributes
         $this->atts = apply_filters('lsd_search_atts', $this->parse($this->id, $atts));
 
@@ -388,7 +391,9 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         else if ($method === 'dropdown-multiple')
         {
             $current = $this->current($name, explode(',', $default));
+            if (!is_array($current)) $current = [];
 
+            $output .= '<input type="hidden" name="' . esc_attr($name) . '[]" value="">';
             $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
 
             $terms = $this->helper->get_terms($filter);

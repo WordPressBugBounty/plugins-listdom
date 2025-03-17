@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_API_Resources_Listing extends LSD_API_Resource
 {
@@ -19,6 +17,7 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
         $max_price = $metas['lsd_price_max'] ?? null;
         $text_price = $metas['lsd_price_after'] ?? null;
         $currency = $metas['lsd_currency'] ?? null;
+        $price_class = $metas['lsd_price_class'] ?? 2;
 
         $price = $resource->render_price($min_price, $currency);
         if ($max_price) $price .= ' - ' . $resource->render_price($max_price, $currency);
@@ -44,7 +43,8 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
                     'label' => $status->label,
                 ],
                 'address' => $metas['lsd_address'] ?? null,
-                'price' => $price,
+                'price' => strip_tags($price),
+                'price_class' => $price_class,
                 'latitude' => $metas['lsd_latitude'] ?? null,
                 'longitude' => $metas['lsd_longitude'] ?? null,
                 'zoomlevel' => $metas['lsd_zoomlevel'] ?? null,
@@ -55,6 +55,8 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
                 'link' => $metas['lsd_link'] ?? null,
                 'email' => $metas['lsd_email'] ?? null,
                 'phone' => $metas['lsd_phone'] ?? null,
+                'website' => $metas['lsd_website'] ?? null,
+                'contact_address' => $metas['lsd_contact_address'] ?? null,
                 'remark' => $metas['lsd_remark'] ?? null,
                 'availability' => LSD_API_Resources_Availability::get($listing->ID),
                 'favorite' => apply_filters('lsd_is_favorite', 0, $listing->ID),
@@ -69,6 +71,7 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
                 'featured_image' => $thumbnail_id,
                 'gallery' => $gallery,
             ],
+            'socials' => (new LSD_Socials())->values($listing->ID, 'listing'),
             'taxonomies' => LSD_API_Resources_Taxonomy::listing($listing->ID),
             'attributes' => LSD_API_Resources_Attribute::listing($listing->ID),
             'media' => [

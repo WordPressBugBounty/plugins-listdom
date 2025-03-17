@@ -7,12 +7,12 @@ defined('ABSPATH') || die();
 /** @var array $price_components */
 
 $masonry = $options['masonry'] ?? [];
-$missAddonMessages = [];
+$optional_addons = [];
 ?>
 <div class="lsd-form-row">
     <div class="lsd-col-2"></div>
     <div class="lsd-col-10">
-        <p class="description"><?php echo sprintf(esc_html__('Using the %s skin, you can show a Grid or List view of the listings with a handy filtering option above them.', 'listdom'), '<strong>'.esc_html__('Masonry', 'listdom').'</strong>'); ?></p>
+        <p class="description"><?php echo sprintf(esc_html__('With the %s skin, you can display listings in either Grid or List view, with a convenient filtering option above them.', 'listdom'), '<strong>'.esc_html__('Masonry', 'listdom').'</strong>'); ?></p>
     </div>
 </div>
 <div class="lsd-form-row">
@@ -35,10 +35,10 @@ $missAddonMessages = [];
 </div>
 
 <div class="lsd-form-group lsd-form-row-style-needed lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4" id="lsd_display_options_style">
-    <h3 class="lsd-mb-0 lsd-mt-1"><?php echo esc_html__("Elements Display Options", 'listdom'); ?></h3>
-    <p class="description lsd-mb-4"><?php echo esc_html__("You can simply change the visibility of each element that you want on listing card", 'listdom'); ?> </p>
+    <h3 class="lsd-my-0"><?php echo esc_html__("Elements", 'listdom'); ?></h3>
+    <p class="description lsd-mb-4"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
     <div class="lsd-flex lsd-gap-2">
-        <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
+        <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style4">
             <div class="lsd-col-5"><?php echo LSD_Form::label([
                 'title' => esc_html__('Contact Info', 'listdom'),
                 'for' => 'lsd_display_options_skin_masonry_display_contact_info',
@@ -103,7 +103,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style3">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4">
             <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Address', 'listdom'),
@@ -151,7 +151,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style4">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Price', 'listdom'),
@@ -167,7 +167,7 @@ $missAddonMessages = [];
             </div>
         </div>
 
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style4">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Share Buttons', 'listdom'),
@@ -210,8 +210,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Favorite', esc_html__('Favorite icon', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
         <?php endif; ?>
 
         <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
@@ -228,8 +227,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Compare', esc_html__('Compare icon', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['compare', esc_html__('Compare Icon', 'listdom')]; ?>
         <?php endif; ?>
 
         <?php if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
@@ -246,8 +244,7 @@ $missAddonMessages = [];
                 ]); ?>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Reviews', esc_html__('Reviews Rate', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['reviews', esc_html__('Reviews Rate', 'listdom')]; ?>
         <?php endif; ?>
 
         <div class="lsd-form-row lsd-display-options-builder-option">
@@ -265,7 +262,7 @@ $missAddonMessages = [];
             </div>
         </div>
         <?php if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 <?php echo !isset($masonry['display_title']) || $masonry['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_masonry_is_claimed_wrapper">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4 <?php echo !isset($masonry['display_title']) || $masonry['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_masonry_is_claimed_wrapper">
             <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Claim Status', 'listdom'),
@@ -280,8 +277,7 @@ $missAddonMessages = [];
                 </div>
             </div>
         </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missAddonMessage('Claim', esc_html__('Is claimed', 'listdom')); ?>
+        <?php else: $optional_addons[] = ['claim', esc_html__('Claim Status', 'listdom')]; ?>
         <?php endif; ?>
 
         <?php if ($this->isPro()): ?>
@@ -339,8 +335,7 @@ $missAddonMessages = [];
                     </div>
                 </div>
             </div>
-        <?php else: ?>
-            <?php $missAddonMessages[] = LSD_Base::missFeatureMessage(esc_html__('Display Image', 'listdom'), true); ?>
+        <?php else: $optional_addons[] = ['pro', esc_html__('Display Image', 'listdom')]; ?>
         <?php endif; ?>
         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
             <div class="lsd-form-row <?php echo !isset($masonry['display_description']) || $masonry['display_description'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_masonry_description_length_wrapper">
@@ -359,10 +354,10 @@ $missAddonMessages = [];
             </div>
         </div>
     </div>
-    <?php if (count($missAddonMessages)): ?>
-    <div class="lsd-addon-alert lsd-mt-4">
-        <?php foreach ($missAddonMessages as $alert) echo LSD_Base::alert($alert,'warning'); ?>
-    </div>
+    <?php if (count($optional_addons)): ?>
+        <div class="lsd-alert-no-my lsd-mt-5">
+            <?php echo LSD_Base::alert(LSD_Base::optionalAddonsMessage($optional_addons),'warning'); ?>
+        </div>
     <?php endif; ?>
 </div>
 
@@ -399,7 +394,7 @@ $missAddonMessages = [];
         <p class="description"><?php echo sprintf(esc_html__("Number of the Listings per page. It should be a multiple of the %s option. For example if the %s is set to 3, then you should set the limit to 3, 6, 9, 12, 30, etc.", 'listdom'), '<strong>'.esc_html__('Listings Per Row', 'listdom').'</strong>', '<strong>'.esc_html__('Listings Per Row', 'listdom').'</strong>'); ?></p>
     </div>
 </div>
-<div class="lsd-form-row">
+<div class="lsd-form-row lsd-display-options-style-not-for lsd-display-options-style-not-for-style4 lsd-display-options-style-not-for-custom">
     <div class="lsd-col-2"><?php echo LSD_Form::label([
         'title' => esc_html__('List View', 'listdom'),
         'for' => 'lsd_display_options_skin_masonry_list_view',
@@ -414,7 +409,7 @@ $missAddonMessages = [];
         <p class="description"><?php esc_html_e("Display listings in the List view.", 'listdom'); ?></p>
     </div>
 </div>
-<div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style1 <?php echo isset($masonry['list_view']) && $masonry['list_view'] ? 'lsd-util-hide' : ''; ?>" id="lsd_display_options_skin_masonry_listing_per_row_option">
+<div class="lsd-form-row lsd-display-options-style-not-for lsd-display-options-style-not-for-style4 lsd-display-options-style-not-for-custom <?php echo isset($masonry['list_view']) && $masonry['list_view'] ? 'lsd-util-hide' : ''; ?>" id="lsd_display_options_skin_masonry_listing_per_row_option">
     <div class="lsd-col-2"><?php echo LSD_Form::label([
         'title' => esc_html__('Listings Per Row', 'listdom'),
         'for' => 'lsd_display_options_skin_masonry_columns',
@@ -429,27 +424,24 @@ $missAddonMessages = [];
     </div>
 </div>
 
-<?php if ($this->isPro()): ?>
-<div class="lsd-form-row lsd-display-options-builder-option">
-    <div class="lsd-col-2"><?php echo LSD_Form::label([
-            'title' => esc_html__('Listing Link', 'listdom'),
-            'for' => 'lsd_display_options_skin_masonry_listing_link',
-        ]); ?></div>
-    <div class="lsd-col-6">
-        <?php echo LSD_Form::select([
-            'id' => 'lsd_display_options_skin_masonry_listing_link',
-            'name' => 'lsd[display][masonry][listing_link]',
-            'value' => $masonry['listing_link'] ?? 'normal',
-            'options' => LSD_Base::get_listing_link_methods(),
-        ]); ?>
-        <p class="description"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
-    </div>
-</div>
-<?php else: ?>
 <div class="lsd-form-row">
-    <div class="lsd-col-2"></div>
+    <div class="lsd-col-2"><?php echo LSD_Form::label([
+        'title' => esc_html__('Animation Duration', 'listdom'),
+        'for' => 'lsd_display_options_skin_masonry_duration',
+    ]); ?></div>
     <div class="lsd-col-6">
-        <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Listing Link', 'listdom')); ?></p>
+        <?php echo LSD_Form::number([
+            'id' => 'lsd_display_options_skin_masonry_duration',
+            'name' => 'lsd[display][masonry][duration]',
+            'value' => $masonry['duration'] ?? '400',
+            'attributes' => [
+                'min' => 0,
+                'max' => 1000,
+                'step' => 1,
+            ]
+        ]); ?>
+        <p class="description"><?php esc_html_e("You can set the animation duration in milliseconds, with a default value of 400. Setting it to 0 will disable the animation.", 'listdom'); ?></p>
     </div>
 </div>
-<?php endif;
+
+<?php $this->field_listing_link('masonry', $masonry);

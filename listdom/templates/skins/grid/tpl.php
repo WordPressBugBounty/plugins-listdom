@@ -50,7 +50,7 @@ jQuery(document).ready(function()
             <?php echo LSD_Kses::form($this->get_sortbar()); ?>
 
             <div class="lsd-grid-view-listings-wrapper lsd-viewstyle-grid">
-                <div class="lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?> lsd-grid lsd-g-<?php echo $this->style === 'style4' ? '2' : esc_attr($this->columns); ?>-columns">
+                <div class="lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?> lsd-grid lsd-g-<?php echo esc_attr($this->columns); ?>-columns">
                     <?php echo LSD_Kses::full($listings_html); ?>
                 </div>
             </div>

@@ -2,12 +2,6 @@
 
 use Webilia\WP\Plugin\Licensing;
 
-/**
- * Listdom Licensing Class.
- *
- * @class LSD_Licensing
- * @version	1.0.0
- */
 class LSD_Licensing extends LSD_Base
 {
     /**
@@ -16,7 +10,7 @@ class LSD_Licensing extends LSD_Base
      */
     private static function getProductKey(string $basename): string
     {
-        return 'lsd_product_validation_'.str_replace(['/', '-'], '_', $basename);
+        return 'lsd_product_validation_' . str_replace(['/', '-'], '_', $basename);
     }
 
     /**
@@ -29,8 +23,8 @@ class LSD_Licensing extends LSD_Base
         // Product Key
         $key = self::getProductKey($basename);
 
-        $license_key_option = $prefix.'_purchase_code';
-        $activation_id_option = $prefix.'_activation_id';
+        $license_key_option = $prefix . '_purchase_code';
+        $activation_id_option = $prefix . '_activation_id';
 
         // Validation Status
         $valid = 0;
@@ -39,7 +33,7 @@ class LSD_Licensing extends LSD_Base
         $cached = get_transient($key);
 
         // Already Checked
-        if(is_numeric($cached)) $valid = (int) $cached;
+        if (is_numeric($cached)) $valid = (int) $cached;
         // Check Validation
         else
         {
@@ -52,34 +46,34 @@ class LSD_Licensing extends LSD_Base
             );
 
             // License is valid
-            if($licensing->isValid()) $valid = 1;
+            if ($licensing->isValid()) $valid = 1;
 
             // Check Trial
-            if(!$valid && LSD_Licensing::isTrial($prefix)) $valid = 2;
+            if (!$valid && LSD_Licensing::isTrial($prefix)) $valid = 2;
 
             // Grace Period
-            if(!$valid && LSD_Licensing::isGracePeriod($prefix)) $valid = 3;
+            if (!$valid && LSD_Licensing::isGracePeriod($prefix)) $valid = 3;
 
             // Valid
-            if($valid === 1)
+            if ($valid === 1)
             {
                 $expiry = 10 * DAY_IN_SECONDS;
 
                 // Remove Grace Period
-                delete_option($prefix.'_invalidated_at');
+                delete_option($prefix . '_invalidated_at');
             }
             // Trial Period
-            elseif($valid === 2) $expiry = DAY_IN_SECONDS;
+            else if ($valid === 2) $expiry = DAY_IN_SECONDS;
             // Invalid
             else
             {
                 $expiry = HOUR_IN_SECONDS;
 
                 // Start Grace Period
-                $grace_started = add_option($prefix.'_invalidated_at', current_time('timestamp'));
+                $grace_started = add_option($prefix . '_invalidated_at', current_time('timestamp'));
 
                 // Grace Period
-                if($grace_started) $valid = 3;
+                if ($grace_started) $valid = 3;
             }
 
             // Set to Transient
@@ -102,14 +96,14 @@ class LSD_Licensing extends LSD_Base
         $valid = self::isValid($basename, $prefix);
 
         // Run the Callback
-        if($valid) call_user_func($callable);
+        if ($valid) call_user_func($callable);
 
         // Add to Listdom Notifications when
         // the license is either invalid
         // or in a trial or grace period
-        if(!$valid || in_array($valid, [2, 3]))
+        if (!$valid || in_array($valid, [2, 3]))
         {
-            add_filter('lsd_license_activation_required', function(int $counter)
+            add_filter('lsd_license_activation_required', function (int $counter)
             {
                 return ++$counter;
             });
@@ -123,16 +117,16 @@ class LSD_Licensing extends LSD_Base
     public static function isTrial(string $prefix): bool
     {
         // Pro Addon
-        if($prefix === 'lsd') $prefix = 'lsdaddpro';
+        if ($prefix === 'lsd') $prefix = 'lsdaddpro';
 
         // Installation Time
-        $installed_at = (int) get_option($prefix.'_installed_at', 0);
+        $installed_at = (int) get_option($prefix . '_installed_at', 0);
 
         // Just Installed
-        if(!$installed_at) return true;
+        if (!$installed_at) return true;
 
         // Trial Period?
-        if(current_time('timestamp') - $installed_at <= (WEEK_IN_SECONDS * 2))
+        if (current_time('timestamp') - $installed_at <= (WEEK_IN_SECONDS * 2))
         {
             return true;
         }
@@ -147,13 +141,13 @@ class LSD_Licensing extends LSD_Base
     public static function isGracePeriod(string $prefix): bool
     {
         // Pro Addon
-        if($prefix === 'lsd') $prefix = 'lsdaddpro';
+        if ($prefix === 'lsd') $prefix = 'lsdaddpro';
 
         // Invalidation Time
-        $invalidated_at = (int) get_option($prefix.'_invalidated_at', 0);
+        $invalidated_at = (int) get_option($prefix . '_invalidated_at', 0);
 
         // Grace Period?
-        if($invalidated_at && current_time('timestamp') - $invalidated_at <= WEEK_IN_SECONDS)
+        if ($invalidated_at && current_time('timestamp') - $invalidated_at <= WEEK_IN_SECONDS)
         {
             return true;
         }
@@ -168,10 +162,10 @@ class LSD_Licensing extends LSD_Base
     public static function remainingTrialPeriod(string $prefix): int
     {
         // Pro Addon
-        if($prefix === 'lsd') $prefix = 'lsdaddpro';
+        if ($prefix === 'lsd') $prefix = 'lsdaddpro';
 
         // Installation Time
-        $installed_at = (int) get_option($prefix.'_installed_at', 0);
+        $installed_at = (int) get_option($prefix . '_installed_at', 0);
 
         // Expiry Time
         $expiry = $installed_at + (WEEK_IN_SECONDS * 2);
@@ -180,7 +174,7 @@ class LSD_Licensing extends LSD_Base
         $now = current_time('timestamp');
 
         // Trial Finished
-        if($now >= $expiry) return 0;
+        if ($now >= $expiry) return 0;
 
         // Diff Time
         $diff = $expiry - $now;
@@ -196,10 +190,10 @@ class LSD_Licensing extends LSD_Base
     public static function remainingGracePeriod(string $prefix): int
     {
         // Pro Addon
-        if($prefix === 'lsd') $prefix = 'lsdaddpro';
+        if ($prefix === 'lsd') $prefix = 'lsdaddpro';
 
         // Invalidation Time
-        $invalidated_at = (int) get_option($prefix.'_invalidated_at', 0);
+        $invalidated_at = (int) get_option($prefix . '_invalidated_at', 0);
 
         // Expiry Time
         $expiry = $invalidated_at + WEEK_IN_SECONDS;
@@ -208,7 +202,7 @@ class LSD_Licensing extends LSD_Base
         $now = current_time('timestamp');
 
         // Grace Finished
-        if($now >= $expiry) return 0;
+        if ($now >= $expiry) return 0;
 
         // Diff Time
         $diff = $expiry - $now;

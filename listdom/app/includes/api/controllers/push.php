@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom API Push Controller Class.
- *
- * @class LSD_API_Controllers_Push
- * @version    1.0.0
- */
 class LSD_API_Controllers_Push extends LSD_API_Controller
 {
     public function listing(WP_REST_Request $request): WP_REST_Response

@@ -4,12 +4,7 @@ namespace Webilia\WP;
 use Webilia\WP\Helpers\Arr;
 use Webilia\WP\Interfaces\Metabox as MetaboxInterface;
 use Webilia\WP\Interfaces\PostType;
-use WP_Post;
 
-/**
- * Class Metabox
- * @package Bookup
- */
 abstract class Metabox implements MetaboxInterface
 {
     const CONTEXT_ADVANCED = 'advanced';
@@ -76,10 +71,10 @@ abstract class Metabox implements MetaboxInterface
      * Register Metabox
      *
      * @param string $post_type
-     * @param WP_Post $post
+     * @param mixed $post
      * @return void
      */
-    public function register(string $post_type, WP_Post $post): void
+    public function register(string $post_type, $post): void
     {
         add_meta_box($this->id, $this->title, $this->callback, $this->PT, $this->context, $this->priority);
     }
@@ -93,10 +88,10 @@ abstract class Metabox implements MetaboxInterface
     }
 
     /**
-     * @param WP_Post $post
+     * @param mixed $post
      * @return void
      */
-    public function metabox(WP_Post $post): void
+    public function metabox($post): void
     {
         echo $this->output($post->ID);
     }

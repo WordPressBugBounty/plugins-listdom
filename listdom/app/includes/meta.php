@@ -38,6 +38,19 @@ class LSD_Meta extends LSD_Base
                     return get_post_permalink($id);
                 },
             ],
+            'author_url' => [
+                'key' => 'author_url',
+                'type' => LSD_Meta::URL,
+                'name' => esc_html__('Author URL', 'listdom'),
+                'get' => function ($key, $id)
+                {
+                    $post = get_post($id);
+
+                    return $post && isset($post->post_author)
+                        ? get_author_posts_url(get_the_author_meta('ID'))
+                        : '';
+                },
+            ],
             'post_title' => [
                 'key' => 'post_title',
                 'type' => LSD_Meta::TEXT,
@@ -54,6 +67,20 @@ class LSD_Meta extends LSD_Base
                 'get' => function ($key, $id)
                 {
                     return get_post_thumbnail_id($id);
+                },
+            ],
+            'author_avatar' => [
+                'key' => 'author_avatar',
+                'type' => LSD_Meta::URL,
+                'name' => esc_html__('Author Avatar', 'listdom'),
+                'get' => function ($key, $id)
+                {
+                    // Post
+                    $post = get_post($id);
+
+                    return $post && isset($post->post_author)
+                        ? get_avatar($post->post_author, 48)
+                        : '';
                 },
             ],
             'post_excerpt' => [
@@ -162,6 +189,20 @@ class LSD_Meta extends LSD_Base
 
                     return $post && isset($post->post_author)
                         ? get_user_meta($post->post_author, 'lsd_job_title', true)
+                        : '';
+                },
+            ],
+            'author_bio' => [
+                'key' => 'author_bio',
+                'type' => LSD_Meta::TEXT,
+                'name' => esc_html__('Author Bio', 'listdom'),
+                'get' => function ($key, $id)
+                {
+                    // Post
+                    $post = get_post($id);
+
+                    return $post && isset($post->post_author)
+                        ? get_user_meta($post->post_author, 'description', true)
                         : '';
                 },
             ],
@@ -355,16 +396,37 @@ class LSD_Meta extends LSD_Base
         {
             $obj = $sc->get($network, $values);
 
-            // Social Network is not Enabled
-            if (!$obj || !$obj->option('listing')) continue;
+            // Social Network for Listing
+            if ($obj && $obj->option('listing'))
+            {
+                $key = 'lsd_' . $obj->key();
+                $metas[$key] = [
+                    'key' => $key,
+                    'type' => LSD_Meta::URL,
+                    'name' => $obj->label(),
+                    'get' => $callback,
+                ];
+            }
 
-            $key = 'lsd_' . $obj->key();
-            $metas[$key] = [
-                'key' => $key,
-                'type' => LSD_Meta::URL,
-                'name' => $obj->label(),
-                'get' => $callback,
-            ];
+            // Social Network for Profile
+            if ($obj && $obj->option('profile'))
+            {
+                $key = 'author_' . $obj->key();
+                $metas[$key] = [
+                    'key' => $key,
+                    'type' => LSD_Meta::URL,
+                    'name' => sprintf(esc_html__('Author %s', 'listdom'), $obj->label()),
+                    'get' => function ($key, $id) use ($obj)
+                    {
+                        // Post
+                        $post = get_post($id);
+
+                        return $post && isset($post->post_author)
+                            ? get_user_meta($post->post_author, 'lsd_' . $obj->key(), true)
+                            : '';
+                    },
+                ];
+            }
         }
 
         // Attributes

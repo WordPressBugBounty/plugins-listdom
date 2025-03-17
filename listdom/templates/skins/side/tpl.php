@@ -21,6 +21,7 @@ jQuery(document).ready(function()
         atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
         load_more: "'.($this->pagination === 'loadmore' ? '1' : '0').'",
         infinite_scroll: "'.($this->pagination === 'scroll' ? '1' : '0').'",
+        single_listing_style: "'.$this->single_listing_style.'",
         next_page: "'.$this->next_page.'",
         limit: "'.$this->limit.'"
     });

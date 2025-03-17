@@ -36,6 +36,9 @@ class LSD_Builders extends LSD_Base
     {
         $template = get_post($template_id);
 
+        // Listdom Bar
+        (LSD_Bar::instance())->add($template_id);
+
         // Elementor
         if (
             class_exists(\LSDPACELM\Base::class) &&

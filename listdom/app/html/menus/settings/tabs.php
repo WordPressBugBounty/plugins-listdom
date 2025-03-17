@@ -8,6 +8,7 @@ $addon = apply_filters('lsd_is_addon_installed', false);
 ?>
 <h2 class="nav-tab-wrapper">
     <a class="nav-tab <?php echo $this->tab === '' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings')); ?>"><?php esc_html_e('General', 'listdom'); ?></a>
+    <a class="nav-tab <?php echo $this->tab === 'customizer' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer')); ?>"><?php esc_html_e('Customizer', 'listdom'); ?></a>
     <a class="nav-tab <?php echo $this->tab === 'frontend-dashboard' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard')); ?>"><?php esc_html_e('Frontend Dashboard', 'listdom'); ?></a>
     <a class="nav-tab <?php echo $this->tab === 'archive-slugs' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=archive-slugs')); ?>"><?php esc_html_e('Archive & Slugs', 'listdom'); ?></a>
 

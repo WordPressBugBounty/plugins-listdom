@@ -238,4 +238,53 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         $sorts = $lsd['sorts'] ?? [];
         update_post_meta($post_id, 'lsd_sorts', $sorts);
     }
+
+    public function field_listing_link(string $skin, array $options)
+    {
+        $single_styles = ['' => esc_html__('Inherit From Global Options', 'listdom')] + LSD_Styles::details();
+        $method = $options['listing_link'] ?? 'normal';
+        ?>
+        <div class="lsd-display-options-builder-option">
+            <?php if ($this->isPro()): ?>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Listing Link', 'listdom'),
+                        'for' => 'lsd_display_options_skin_' . $skin . '_listing_link',
+                    ]); ?></div>
+                    <div class="lsd-col-6">
+                        <?php echo LSD_Form::select([
+                            'id' => 'lsd_display_options_skin_' . $skin . '_listing_link',
+                            'name' => 'lsd[display][' . $skin . '][listing_link]',
+                            'value' => $method,
+                            'options' => LSD_Base::get_listing_link_methods(),
+                            'class' => 'lsd-do-listing-link',
+                        ]); ?>
+                        <p class="description"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
+                    </div>
+                </div>
+                <div class="lsd-form-row <?php echo in_array($method, ['lightbox', 'right-panel', 'left-panel', 'bottom-panel']) ? '' : 'lsd-util-hide'; ?> lsd-do-listing-link-dependent lsd-do-listing-link-dependent-lightbox lsd-do-listing-link-dependent-right-panel lsd-do-listing-link-dependent-left-panel lsd-do-listing-link-dependent-bottom-panel">
+                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                        'title' => esc_html__('Single Listing', 'listdom'),
+                        'for' => 'lsd_display_options_skin_' . $skin . '_single_style',
+                    ]); ?></div>
+                    <div class="lsd-col-6">
+                        <?php echo LSD_Form::select([
+                            'id' => 'lsd_display_options_skin_' . $skin . '_single_style',
+                            'name' => 'lsd[display][' . $skin . '][single_style]',
+                            'options' => $single_styles,
+                            'value' => $options['single_style'] ?? '',
+                        ]); ?>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-2"></div>
+                    <div class="lsd-col-6">
+                        <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Listing Link', 'listdom')); ?></p>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
 }

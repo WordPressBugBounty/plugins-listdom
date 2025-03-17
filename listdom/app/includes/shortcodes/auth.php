@@ -65,6 +65,14 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // User is Already Logged-in
         if (is_user_logged_in()) return $this->user_profile();
 
+        $redirect = $atts['redirect'] ?? '';
+
+        // Get Redirect from Request
+        if (isset($_REQUEST['redirect_to']) && trim($_REQUEST['redirect_to']))
+        {
+            $redirect = urldecode($_REQUEST['redirect_to']);
+        }
+
         ob_start();
         include lsd_template('auth/login.php');
         return ob_get_clean();

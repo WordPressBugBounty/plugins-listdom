@@ -19,7 +19,7 @@ jQuery(document).ready(function()
         atts: "' . http_build_query(['atts' => $this->atts], '', '&') . '",
         items: 1,
         loop: 1,
-        autoplay: true,
+        autoplay: '.($this->autoplay ? 'true' : 'false').',
         autoplayHoverPause: true,
         dots: false,
         nav: true,

@@ -169,7 +169,7 @@ $networks = LSD_Options::socials();
                         'name' => 'lsd[map_provider]',
                         'value' => $settings['map_provider'] ?? 'leaflet'
                     ]); ?>
-                    <p class="description"><?php esc_html_e("You can change the map provider in each shortcodes too.", 'listdom'); ?></p>
+                    <p class="description"><?php esc_html_e("You can also change the map provider in each shortcode.", 'listdom'); ?></p>
                 </div>
             </div>
             <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
@@ -184,7 +184,7 @@ $networks = LSD_Options::socials();
                             'name' => 'lsd[googlemaps_api_key]',
                             'value' => $settings['googlemaps_api_key'] ?? ''
                         ]); ?>
-                        <p class="description"><?php esc_html_e("Google API Key is mandatory. Otherwise the Google Maps doesn't work. You can get an API key from the Google.", 'listdom'); ?></p>
+                        <p class="description"><?php esc_html_e("A Google API Key is mandatory; otherwise, Google Maps will not function. You can obtain an API key from Google.", 'listdom'); ?></p>
                     </div>
                 </div>
             </div>
@@ -193,16 +193,16 @@ $networks = LSD_Options::socials();
                 <div class="lsd-map-provider-dependency lsd-map-provider-dependency-leaflet">
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Mapbox Access Token', 'listdom'),
-                                'for' => 'lsd_settings_mapbox_access_token',
-                            ]); ?></div>
+                            'title' => esc_html__('Mapbox Access Token', 'listdom'),
+                            'for' => 'lsd_settings_mapbox_access_token',
+                        ]); ?></div>
                         <div class="lsd-col-10">
                             <?php echo LSD_Form::text([
                                 'id' => 'lsd_settings_mapbox_access_token',
                                 'name' => 'lsd[mapbox_access_token]',
                                 'value' => $settings['mapbox_access_token'] ?? ''
                             ]); ?>
-                            <p class="description"><?php echo sprintf(esc_html__("If you want to use mapbox tiles you can get one from %s website otherwise the OSM tiles will be loaded in the maps.", 'listdom'), '<a href="https://mapbox.com" target="_blank">mapbox.com</a>'); ?></p>
+                            <p class="description"><?php echo sprintf(esc_html__("If you want to use Mapbox tiles, you can obtain a key from the %s website. Otherwise, OSM tiles will be used in the maps by default.", 'listdom'), '<a href="https://mapbox.com" target="_blank">mapbox.com</a>'); ?></p>
                         </div>
                     </div>
                 </div>
@@ -210,9 +210,9 @@ $networks = LSD_Options::socials();
 
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Default Zoom Level', 'listdom'),
-                        'for' => 'lsd_settings_map_backend_zl',
-                    ]); ?></div>
+                    'title' => esc_html__('Default Zoom Level', 'listdom'),
+                    'for' => 'lsd_settings_map_backend_zl',
+                ]); ?></div>
                 <div class="lsd-col-1">
                     <?php echo LSD_Form::select([
                         'id' => 'lsd_settings_map_backend_zl',
@@ -222,62 +222,62 @@ $networks = LSD_Options::socials();
                     ]); ?>
                 </div>
                 <div class="lsd-col-9">
-                    <p class="description"><?php esc_html_e("It's for Google Maps in Add/Edit Map Objects menu.", 'listdom'); ?></p>
+                    <p class="description"><?php esc_html_e("This setting applies to Google Maps in the Add Listing menu.", 'listdom'); ?></p>
                 </div>
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('GPS Zoom Level', 'listdom'),
-                        'for' => 'lsd_settings_map_gps_zl',
-                    ]); ?></div>
+                    'title' => esc_html__('GPS Zoom Level', 'listdom'),
+                    'for' => 'lsd_settings_map_gps_zl',
+                ]); ?></div>
                 <div class="lsd-col-10 lsd-col-inline">
-                    <p class="description"><?php echo sprintf(__("Change map zoom level to %s after detecting the geo point by GPS if current zoom level was less or equal to %s", 'listdom'), LSD_Form::select([
-                            'id' => 'lsd_settings_map_gps_zl',
-                            'name' => 'lsd[map_gps_zl]',
-                            'class' => 'lsd-d-inline',
-                            'value' => $settings['map_gps_zl'] ?? '',
-                            'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14]
-                        ]), LSD_Form::select([
-                            'id' => 'lsd_settings_map_gps_zl_current',
-                            'name' => 'lsd[map_gps_zl_current]',
-                            'value' => $settings['map_gps_zl_current'] ?? '',
-                            'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14]
-                        ])); ?></p>
+                    <p class="description"><?php echo sprintf(__("Adjust the map zoom level to %s after detecting the geo point via GPS, if the current zoom level is less than or equal to %s.", 'listdom'), LSD_Form::select([
+                        'id' => 'lsd_settings_map_gps_zl',
+                        'name' => 'lsd[map_gps_zl]',
+                        'class' => 'lsd-d-inline',
+                        'value' => $settings['map_gps_zl'] ?? '',
+                        'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14]
+                    ]), LSD_Form::select([
+                        'id' => 'lsd_settings_map_gps_zl_current',
+                        'name' => 'lsd[map_gps_zl_current]',
+                        'value' => $settings['map_gps_zl_current'] ?? '',
+                        'options' => ['4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, '11' => 11, '12' => 12, '13' => 13, '14' => 14]
+                    ])); ?></p>
                 </div>
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Default Latitude', 'listdom'),
-                        'for' => 'lsd_settings_map_backend_lt',
-                    ]); ?></div>
+                    'title' => esc_html__('Default Latitude', 'listdom'),
+                    'for' => 'lsd_settings_map_backend_lt',
+                ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::text([
                         'id' => 'lsd_settings_map_backend_lt',
                         'name' => 'lsd[map_backend_lt]',
                         'value' => $settings['map_backend_lt'] ?? '',
-                        'placeholder' => esc_html__("It's for Google Maps in Add/Edit Map Objects menu.", 'listdom')
+                        'placeholder' => esc_html__("This setting applies to Google Maps in the Add Listing menu.", 'listdom')
                     ]); ?>
                 </div>
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Default Longitude', 'listdom'),
-                        'for' => 'lsd_settings_map_backend_ln',
-                    ]); ?></div>
+                    'title' => esc_html__('Default Longitude', 'listdom'),
+                    'for' => 'lsd_settings_map_backend_ln',
+                ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::text([
                         'id' => 'lsd_settings_map_backend_ln',
                         'name' => 'lsd[map_backend_ln]',
                         'value' => $settings['map_backend_ln'] ?? '',
-                        'placeholder' => esc_html__("It's for Google Maps in Add/Edit Listing menu.", 'listdom')
+                        'placeholder' => esc_html__("This setting applies to Google Maps in the Add Listing menu.", 'listdom')
                     ]); ?>
                 </div>
             </div>
             <div class="lsd-form-row lsd-form-row-shape-display-options lsd-mt-5">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Shape Display Options', 'listdom'),
-                        'for' => 'lsd_settings_map_shape_options_fill_color',
-                    ]); ?></div>
+                    'title' => esc_html__('Shape Display Options', 'listdom'),
+                    'for' => 'lsd_settings_map_shape_options_fill_color',
+                ]); ?></div>
                 <div class="lsd-col-10">
                     <div class="lsd-form-row">
                         <div class="lsd-col-3">
@@ -348,9 +348,9 @@ $networks = LSD_Options::socials();
             <div>
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
-                            'title' => esc_html__('Google Geo-coding API key', 'listdom'),
-                            'for' => 'lsd_settings_google_geocoding_api_key',
-                        ]); ?></div>
+                        'title' => esc_html__('Google Geo-coding API key', 'listdom'),
+                        'for' => 'lsd_settings_google_geocoding_api_key',
+                    ]); ?></div>
                     <div class="lsd-col-10">
                         <?php echo LSD_Form::text([
                             'id' => 'lsd_settings_google_geocoding_api_key',
@@ -404,82 +404,6 @@ $networks = LSD_Options::socials();
                     ]); ?></div>
                 </div>
             <?php endforeach; ?>
-        </div>
-
-        <div class="lsd-accordion-title">
-            <div class="lsd-flex lsd-flex-row lsd-py-2">
-                <h3><?php esc_html_e('Display Options', 'listdom'); ?></h3>
-                <div class="lsd-accordion-icons">
-                    <i class="lsd-icon fa fa-plus"></i>
-                    <i class="lsd-icon fa fa-minus"></i>
-                </div>
-            </div>
-        </div>
-        <div class="lsd-settings-form-group lsd-accordion-panel">
-            <?php if(!LSD_Base::is_current_theme('listdomer')): ?>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Main Color', 'listdom'),
-                    'for' => 'lsd_settings_display_options_main_color',
-                ]); ?></div>
-                <div class="lsd-col-10">
-                    <div class="lsd-color-palette">
-                        <?php echo LSD_Form::colorpalette([
-                            'for' => '#lsd_settings_display_options_main_color',
-                            'value' => $settings['dply_main_color'] ?? '#2b93ff'
-                        ]); ?>
-                        <p class="description"><?php esc_html_e("Choose from one of the predefined colors to match your theme and achieve your desired look.", 'listdom'); ?></p>
-                    </div>
-                    <h3><?php esc_html_e('Or', 'listdom'); ?></h3>
-                    <div>
-                        <p class="description lsd-mb-2"><?php esc_html_e("Manually select your preferred color.", 'listdom'); ?></p>
-                        <?php echo LSD_Form::colorpicker([
-                            'id' => 'lsd_settings_display_options_main_color',
-                            'name' => 'lsd[dply_main_color]',
-                            'default' => '#2b93ff',
-                            'value' => $settings['dply_main_color'] ?? '#2b93ff'
-                        ]); ?>
-                    </div>
-                </div>
-            </div>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Main Font', 'listdom'),
-                    'for' => 'lsd_settings_display_options_main_font',
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::fontpicker([
-                        'id' => 'lsd_settings_display_options_main_font',
-                        'name' => 'lsd[dply_main_font]',
-                        'value' => $settings['dply_main_font'] ?? 'lato'
-                    ]); ?>
-                    <p class="description"><?php esc_html_e("Use your theme's font or a custom font if you prefer not to use the default font.", 'listdom'); ?></p>
-                </div>
-            </div>
-            <?php else: ?>
-                <p class="description lsd-alert lsd-info">
-                    <?php
-                    printf(
-                        esc_html__('You have listdomer theme installed. Use %s to manage the Listdom display options.', 'listdom'),
-                        '<a href="?page=listdomer-settings">' . esc_html__('Theme Settings', 'listdom') . '</a>'
-                    );
-                    ?>
-                </p>
-            <?php endif; ?>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Font Awesome Status', 'listdom'),
-                    'for' => 'lsd_settings_fontawesome_status',
-                ]); ?></div>
-                <div class="lsd-col-10">
-                    <?php echo LSD_Form::switcher([
-                        'id' => 'lsd_settings_fontawesome_status',
-                        'value' => $settings['fontawesome_status'] ?? 1,
-                        'name' => 'lsd[fontawesome_status]',
-                    ]); ?>
-                    <p class="description lsd-mb-0"><?php esc_html_e("Disable the Listdom icon file (Font Awesome) if it is already being loaded by a third party.", 'listdom'); ?></p>
-                </div>
-            </div>
         </div>
 
         <div class="lsd-accordion-title">

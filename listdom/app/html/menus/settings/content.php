@@ -19,6 +19,11 @@ switch ($this->tab)
         $this->include_html_file('menus/settings/tabs/frontend-dashboard.php');
         break;
 
+    case 'customizer':
+
+        $this->include_html_file('menus/settings/tabs/customizer.php');
+        break;
+
     case 'slugs':
 
         $this->include_html_file('menus/settings/tabs/slugs.php');

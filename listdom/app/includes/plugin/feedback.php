@@ -1,12 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Plugin Feedback Class.
- *
- * @class LSD_Plugin_Feedback
- */
 class LSD_Plugin_Feedback extends LSD_Base
 {
     public function init()

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom API Map Controller Class.
- *
- * @class LSD_API_Controllers_Map
- * @version    1.0.0
- */
 class LSD_API_Controllers_Map extends LSD_API_Controller
 {
     protected $id;
@@ -34,6 +26,8 @@ class LSD_API_Controllers_Map extends LSD_API_Controller
             'provider' => $details_page_options['elements']['map']['map_provider'] ?? LSD_Map_Provider::def(),
             'style' => $details_page_options['elements']['map']['style'] ?? null,
             'gplaces' => $details_page_options['elements']['map']['gplaces'] ?? 0,
+            'infowindow' => $details_page_options['elements']['map']['infowindow'] ?? 1,
+            'zoomlevel' => $details_page_options['elements']['map']['zoomlevel'] ?? 14,
             'mapcontrols' => [
                 'zoom' => $details_page_options['elements']['map']['control_zoom'] ?? 'RIGHT_BOTTOM',
                 'maptype' => $details_page_options['elements']['map']['control_maptype'] ?? 'TOP_LEFT',

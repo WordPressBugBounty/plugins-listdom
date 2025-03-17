@@ -21,6 +21,7 @@ jQuery(document).ready(function()
         ajax_url: "' . admin_url('admin-ajax.php', null) . '",
         atts: "' . http_build_query(['atts' => $this->atts], '', '&') . '",
         rtl: ' . (is_rtl() ? 'true' : 'false') . ',
+        duration: ' . ((int) $this->duration) . ',
     });
 });
 </script>');

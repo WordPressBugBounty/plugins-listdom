@@ -1,6 +1,4 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
 class LSD_API_Resources_Attribute extends LSD_API_Resource
 {
@@ -18,6 +16,9 @@ class LSD_API_Resources_Attribute extends LSD_API_Resource
         {
             // Term
             $term = get_term($attribute_id);
+
+            // Invalid Term
+            if (!$term || !isset($term->term_id)) continue;
 
             // Get all category status
             $all_categories = get_term_meta($term->term_id, 'lsd_all_categories', true);

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Integrations KC Class.
- *
- * @class LSD_Integrations_KC
- * @version    1.0.0
- */
 class LSD_Integrations_KC extends LSD_Integrations
 {
     public function init()

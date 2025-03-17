@@ -3,6 +3,60 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.0.0 <span>March 16th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added a comprehensive Game-Changer UI Customizer to Listdom Core.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("[PRO] Introduced a new option to set a custom Single Listing Style for the Side by Side skin.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("[PRO] Added a new option to customize the Single Listing Style for the Lightbox feature.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("[PRO] Enabled an option to display the Single Listing Page in right, left, or bottom panels.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added a built-in Authentication Form to the Frontend Dashboard.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Introduced an option to make a shortcode non-searchable.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added a Zoom Level option for the Single Map element.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added a Title Visibility option for search fields.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Introduced the Listdom Bar to help web designers easily access Listdom features from the frontend.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Enabled the ability to update Listing Status in the Frontend Dashboard.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added a Listing Status Filter to the Frontend Dashboard.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Introduced an option to set Custom Listing Cards in the Half Map skin.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e("Improved the Table Skin for better usability.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e("[PRO] Enhanced the Side by Side skin with additional refinements.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e("Applied various UI and responsiveness improvements across Listdom views.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("[PRO] Fixed issues related to Hierarchical Dropdowns.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("Fixed compatibility issues with PHP 7.4 and lower.", 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v3.9.0 <span>February 9th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>

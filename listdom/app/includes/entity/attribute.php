@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Attribute Entity Class.
- *
- * @class LSD_Entity_Attribute
- * @version    1.0.0
- */
 class LSD_Entity_Attribute extends LSD_Base
 {
     protected $term_id;
