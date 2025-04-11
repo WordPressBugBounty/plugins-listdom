@@ -70,7 +70,7 @@ jQuery(document).ready(function()
             objects: '.json_encode($objects, JSON_NUMERIC_CHECK).',
             args: "'.http_build_query(['args'=>$args], '', '&').'",
             richmarker: "'.$assets->lsd_asset_url('packages/richmarker/richmarker.min.js').'",
-            infobox: "'.$assets->lsd_asset_url('js/infobox.min.js').'",
+            infobox: "'.$assets->lsd_asset_url('packages/infobox/infobox.min.js').'",
             clustering: '.(isset($args['clustering']) && $args['clustering'] ? '"'.$assets->lsd_asset_url('packages/clusterer/markerclusterer.min.js').'"' : 'false').',
             clustering_images: "'.$assets->lsd_asset_url(isset($args['clustering_images']) && trim($args['clustering_images']) ? $args['clustering_images'] : 'img/cluster1/m').'",
             styles: '.(trim($style) != '' ? $assets->get_googlemap_style($style) : "''").',

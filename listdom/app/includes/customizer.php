@@ -53,7 +53,7 @@ class LSD_Customizer
         return $values;
     }
 
-    public static function defaults(string $key = ''): array
+    public static function defaults(string $key = '')
     {
         // Options
         $options = (new LSD_Customizer())->options();

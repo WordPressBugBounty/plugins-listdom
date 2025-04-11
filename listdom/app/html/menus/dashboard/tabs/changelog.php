@@ -3,6 +3,12 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.1.1 <span>April 11th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("Fixed a couple of minor issues.", 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v4.1.0 <span>April 10th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>
