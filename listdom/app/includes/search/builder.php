@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Search Builder Class.
- *
- * @class LSD_Search_Builder
- * @version    1.0.0
- */
 class LSD_Search_Builder extends LSD_Base
 {
     /**

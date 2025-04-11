@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Ads Class.
- *
- * @class LSD_Ads
- * @version    1.0.0
- */
 class LSD_Ads extends LSD_Base
 {
     public static function display($position)

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Assets Class.
- *
- * @class LSD_Assets
- * @version    1.0.0
- */
 class LSD_Assets extends LSD_Base
 {
     /**
@@ -40,6 +32,17 @@ class LSD_Assets extends LSD_Base
 
         // Load Google Maps async
         add_filter('script_loader_tag', [$this, 'async_googlemaps'], 99, 2);
+
+        // Elementor
+        add_action('elementor/editor/after_enqueue_scripts', function ()
+        {
+            wp_enqueue_script('lsd-elementor-editor', $this->lsd_asset_url('js/elementor-editor.min.js'), ['jquery'], LSD_Assets::version());
+        });
+
+        add_action('elementor/frontend/after_enqueue_scripts', function ()
+        {
+            wp_enqueue_script('lsd-elementor-preview', $this->lsd_asset_url('js/elementor-preview.min.js'), ['jquery', 'lsd-frontend'], LSD_Assets::version(), true);
+        });
     }
 
     public function site()
@@ -196,10 +199,10 @@ class LSD_Assets extends LSD_Base
         $base = new LSD_Base();
 
         // Include Select2 JavaScript file
-        wp_enqueue_script('lightslider', $base->lsd_asset_url('packages/lightslider/js/lightslider.js'), [], LSD_Assets::version());
+        wp_enqueue_script('lightslider', $base->lsd_asset_url('packages/lightslider/js/lightslider.min.js'), [], LSD_Assets::version());
 
         // Include Select2 CSS file
-        wp_enqueue_style('lightslider', $base->lsd_asset_url('packages/lightslider/css/lightslider.css'), [], LSD_Assets::version());
+        wp_enqueue_style('lightslider', $base->lsd_asset_url('packages/lightslider/css/lightslider.min.css'), [], LSD_Assets::version());
     }
 
     public static function select2()
@@ -370,6 +373,12 @@ class LSD_Assets extends LSD_Base
         self::params($string);
     }
 
+    public static function footerOrPreview($string)
+    {
+        if (class_exists(\Elementor\Plugin::class) && \Elementor\Plugin::instance()->editor->is_edit_mode()) echo $string;
+        else self::footer($string);
+    }
+
     public static function params($param, $key = 'footer')
     {
         // Closure
@@ -469,14 +478,14 @@ class LSD_Assets extends LSD_Base
             if (trim($base))
             {
                 foreach ([
-                     'listdom-settings',
-                     'listdom-ix',
-                     LSD_Base::WELCOME_SLUG,
-                     'listdom-addons',
-                     'toplevel_page_listdom',
-                     'widgets',
-                     'plugins',
-                 ] as $menu_id)
+                    'listdom-settings',
+                    'listdom-ix',
+                    LSD_Base::WELCOME_SLUG,
+                    'listdom-addons',
+                    'toplevel_page_listdom',
+                    'widgets',
+                    'plugins',
+                ] as $menu_id)
                 {
                     if (strpos($base, $menu_id) !== false) return true;
                 }

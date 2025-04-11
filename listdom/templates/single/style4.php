@@ -37,37 +37,37 @@ $rate_summary = $this->entity->get_rate_stars('summary');
 ?>
 <div class="lsd-row listdom-single-top">
     <div class="lsd-col-8">
-            <?php if ($categories) echo LSD_Kses::element($categories); ?>
+        <?php if ($categories) echo LSD_Kses::element($categories); ?>
 
-            <div class="listdom-single-title-wrapper">
-                <?php if ($title) echo LSD_Kses::element($title); ?>
-                <?php if ($contact_info) echo LSD_Kses::element($contact_info); ?>
+        <div class="listdom-single-title-wrapper">
+            <?php if ($title) echo LSD_Kses::element($title); ?>
+            <?php if ($contact_info) echo LSD_Kses::element($contact_info); ?>
 
-                <?php echo $this->entity->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="' . esc_attr__('Verified', 'listdom') . '"></i>' : ''; ?>
+            <?php echo $this->entity->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="' . esc_attr__('Verified', 'listdom') . '"></i>' : ''; ?>
+        </div>
+
+        <?php if ($minified_availability || $claim || $discussion_status || $rate_summary): ?>
+            <div class="listdom-single-top-bottom">
+
+                <?php if ($minified_availability): ?>
+                    <div class="lsd-single-availability-top">
+                        <?php echo LSD_Kses::element($minified_availability); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($claim) echo LSD_Kses::element($claim); ?>
+
+                <?php if ($discussion_status): ?>
+                    <div class="listdom-write-a-review-button">
+                        <a href="#lsd-discussion">
+                            <?php esc_html_e('Submit a Review', 'listdom'); ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($rate_summary) echo LSD_Kses::element($rate_summary); ?>
             </div>
-
-            <?php if ($minified_availability || $claim || $discussion_status || $rate_summary): ?>
-                <div class="listdom-single-top-bottom">
-
-                    <?php if ($minified_availability): ?>
-                        <div class="lsd-single-availability-top">
-                            <?php echo LSD_Kses::element($minified_availability); ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ($claim) echo LSD_Kses::element($claim); ?>
-
-                    <?php if ($discussion_status): ?>
-                        <div class="listdomer-write-a-review-button">
-                            <a href="#lsd-discussion">
-                                <?php esc_html_e('Submit a Review', 'listdom'); ?>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ($rate_summary) echo LSD_Kses::element($rate_summary); ?>
-                </div>
-            <?php endif; ?>
+        <?php endif; ?>
     </div>
     <div class="lsd-col-4 lsd-single-avatar-wrapper">
         <?php echo LSD_Kses::element($image); ?>

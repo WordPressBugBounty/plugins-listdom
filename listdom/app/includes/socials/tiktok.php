@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Socials - Tiktok Class.
- *
- * @class LSD_Socials_Tiktok
- * @version    1.0.0
- */
 class LSD_Socials_Tiktok extends LSD_Socials
 {
     public function __construct()

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Widgets Ta Class.
- *
- * @class LSD_Widgets_TaxonomyCloud
- * @version    1.0.0
- */
 class LSD_Widgets_TaxonomyCloud extends WP_Widget
 {
     public $LSD;

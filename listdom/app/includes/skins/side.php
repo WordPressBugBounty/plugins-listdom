@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Skins Side by Side Class.
- *
- * @class LSD_Skins_Side
- * @version    1.0.0
- */
 class LSD_Skins_Side extends LSD_Skins
 {
     public $skin = 'side';

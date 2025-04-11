@@ -1,10 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Import / Export class.
- */
 class LSD_IX extends LSD_Base
 {
     protected $db;

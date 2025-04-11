@@ -33,6 +33,7 @@ $dropdown_style = $data['dropdown_style'] ?? 'enhanced';
 $display_all_terms = $data['all_terms'] ?? 1;
 $terms = isset($data['terms']) && is_array($data['terms']) ? $data['terms'] : [];
 $width = $data['width'] ?? '3';
+$items_per_row = $data['items_per_row'] ?? '12';
 
 $min = $data['min'] ?? 0;
 $max = $data['max'] ?? 100;
@@ -223,6 +224,28 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
             </div>
             <?php endif; ?>
 
+            <div class="lsd-search-method-dependant lsd-search-method-checkboxes lsd-search-method-radio">
+                <div class="lsd-search-field-param">
+                    <label for="lsd_fields_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_items_per_row"><?php esc_html_e('Columns', 'listdom'); ?></label>
+                    <?php echo LSD_Form::select([
+                        'id' => 'items-per-row-' . esc_attr($key),
+                        'name' => 'lsd[fields]['.esc_attr($i).'][filters]['.esc_attr($key).'][items_per_row]',
+                        'options' => [
+                            '12' => esc_html__('1 Columns', 'listdom'),
+                            '6' => esc_html__('2 Columns', 'listdom'),
+                            '4' => esc_html__('3 Columns', 'listdom'),
+                            '3' => esc_html__('4 Columns', 'listdom'),
+                            '2' => esc_html__('6 Columns', 'listdom'),
+                        ],
+                        'value' => $items_per_row ?: '12',
+                        'class' => 'lsd-m-0',
+                        'attributes' => [
+                            'data-i' => esc_attr($i),
+                            'data-key' => esc_attr($key),
+                        ],
+                    ]); ?>
+                </div>
+            </div>
         </div>
     </div>
 </div>

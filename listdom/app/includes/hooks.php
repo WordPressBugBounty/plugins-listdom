@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom General Hooks Class.
- *
- * @class LSD_Hooks
- * @version    1.0.0
- */
 class LSD_Hooks extends LSD_Base
 {
     public function init()

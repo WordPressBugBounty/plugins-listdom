@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Color Class.
- *
- * @class LSD_Color
- * @version    1.0.0
- */
 class LSD_Color extends LSD_Base
 {
     public static function text_color($bg_color = null): string

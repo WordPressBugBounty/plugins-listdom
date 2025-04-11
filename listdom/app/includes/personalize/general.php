@@ -19,7 +19,8 @@ class LSD_Personalize_General extends LSD_Personalize
         $CSS = str_replace('((gap_huge))', $huge.'px', $CSS);
 
         $CSS = str_replace('((dply_main_color))', $settings['colors']['_']['primary_color'] ?? 'inherit', $CSS);
-        return str_replace('((dply_main_font))', $settings['fonts']['_']['primary_font']['family'] ?? 'Poppins', $CSS);
+
+        return str_replace('((dply_main_font))', self::font_family($settings['fonts']['_']['primary_font']['family'] ?? 'Poppins'), $CSS);
     }
 
     public static function gaps(int $base): array

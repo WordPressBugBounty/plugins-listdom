@@ -6,7 +6,7 @@ switch ($this->tab)
 {
     case 'single-listing':
 
-        $this->include_html_file('menus/settings/tabs/details-page.php');
+        $this->include_html_file('menus/settings/tabs/single-listing.php');
         break;
 
     case 'archive-slugs':

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Widgets All Listings Class.
- *
- * @class LSD_Widgets_Alllistings
- * @version    1.0.0
- */
 class LSD_Widgets_Alllistings extends WP_Widget
 {
     public $LSD;

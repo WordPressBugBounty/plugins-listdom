@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom General AJAX Class.
- *
- * @class LSD_Ajax
- * @version    1.0.0
- */
 class LSD_Ajax extends LSD_Base
 {
     public function init()

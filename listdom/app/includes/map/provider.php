@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Map Provider Class.
- *
- * @class LSD_Map_Provider
- * @version    1.0.0
- */
 class LSD_Map_Provider extends LSD_Base
 {
     public static function get($provider = null)

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Payload Class.
- *
- * @class LSD_Payload
- * @version    1.0.0
- */
 class LSD_Payload extends LSD_Base
 {
     protected static $vars;

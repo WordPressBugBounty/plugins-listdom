@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Rewrite Rules Class.
- *
- * @class LSD_RewriteRules
- * @version    1.0.0
- */
 class LSD_RewriteRules extends LSD_Base
 {
     public static function todo()

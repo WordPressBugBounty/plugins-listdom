@@ -1,10 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom ID class.
- */
 class LSD_id
 {
     /**

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Upgrade Class.
- *
- * @class LSD_Upgrade
- * @version    1.0.0
- */
 class LSD_Upgrade extends LSD_Base
 {
     public function init()
@@ -44,6 +36,7 @@ class LSD_Upgrade extends LSD_Base
         if (version_compare($version, '3.4.0', '<')) $this->v340();
         if (version_compare($version, '3.5.0', '<')) $this->v350();
         if (version_compare($version, '3.8.0', '<')) $this->v380();
+        if (version_compare($version, '4.1.0', '<')) $this->v410();
     }
 
     private function socials()
@@ -664,5 +657,33 @@ class LSD_Upgrade extends LSD_Base
         ]);
 
         foreach ($listings as $listing) add_post_meta($listing->ID, 'lsd_visits', 0, true);
+    }
+
+    private function v410()
+    {
+        // Contact Notification
+        $post_id = wp_insert_post([
+            'post_type' => LSD_Base::PTYPE_NOTIFICATION,
+            'post_status' => 'publish',
+            'post_title' => 'Profile Contact By #name#!',
+            'post_content' => '',
+        ]);
+
+        update_post_meta($post_id, 'lsd_hook', 'lsd_profile_contact');
+        update_post_meta($post_id, 'lsd_original_to', 1);
+        update_post_meta($post_id, 'lsd_to', '');
+        update_post_meta($post_id, 'lsd_cc', '');
+        update_post_meta($post_id, 'lsd_bcc', '');
+        update_post_meta($post_id, 'lsd_content', 'Hi,
+
+        You have received a new contact request from your profile page at #profile_link#
+        
+        Name: #name#
+        Email: #email#
+        Phone: #phone#
+        Message: #message#
+        
+        Regards,
+        #site_name#');
     }
 }

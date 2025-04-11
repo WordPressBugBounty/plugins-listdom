@@ -19,7 +19,7 @@ $account_redirect = $account_link ?: ($dashboard_page ? get_page_link($dashboard
 ?>
 <div class="lsd-logged-in-wrapper">
     <div class="lsd-user-avatar">
-        <?php echo LSD_User::get_user_avatar(70); ?>
+        <?php echo LSD_User::get_user_avatar('', 70); ?>
         <span class="lsd-user-display-name">
             <?php echo sprintf(esc_html__('Hi %s 👋', 'listdom'), $user['display_name'] ?? ''); ?>
         </span>

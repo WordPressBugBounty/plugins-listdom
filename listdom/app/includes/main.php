@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Main Class.
- *
- * @class LSD_Main
- * @version    1.0.0
- */
 class LSD_Main extends LSD_Base
 {
     public function get_installed_db_version()

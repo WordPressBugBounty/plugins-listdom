@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Duplicate Data Class.
- *
- * @class LSD_Duplicate
- * @version 1.0.0
- */
 class LSD_Duplicate
 {
     private $post_type;

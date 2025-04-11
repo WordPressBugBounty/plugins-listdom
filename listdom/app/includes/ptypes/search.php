@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Search Post Types Class.
- *
- * @class LSD_PTypes_Search
- * @version    1.0.0
- */
 class LSD_PTypes_Search extends LSD_PTypes
 {
     public $PT;
@@ -100,6 +92,7 @@ class LSD_PTypes_Search extends LSD_PTypes
     public function register_metaboxes()
     {
         add_meta_box('lsd_metabox_form', esc_html__('Form', 'listdom'), [$this, 'metabox_form'], $this->PT, 'side');
+        add_meta_box('lsd_metabox_more_options', esc_html__('More Options', 'listdom'), [$this, 'metabox_more_options'], $this->PT, 'side');
         add_meta_box('lsd_metabox_results', esc_html__('Search Results', 'listdom'), [$this, 'metabox_results'], $this->PT, 'side');
         add_meta_box('lsd_metabox_shortcode', esc_html__('Shortcode', 'listdom'), [$this, 'metabox_shortcode'], $this->PT, 'side');
         add_meta_box('lsd_metabox_fields', esc_html__('Fields', 'listdom'), [$this, 'metabox_fields'], $this->PT, 'normal', 'high');
@@ -109,6 +102,12 @@ class LSD_PTypes_Search extends LSD_PTypes
     {
         // Generate output
         include $this->include_html_file('metaboxes/search/form.php', ['return_path' => true]);
+    }
+
+    public function metabox_more_options($post)
+    {
+        // Generate output
+        include $this->include_html_file('metaboxes/search/more-options.php', ['return_path' => true]);
     }
 
     public function metabox_results($post)
@@ -158,6 +157,7 @@ class LSD_PTypes_Search extends LSD_PTypes
          */
 
         $form = $lsd['form'] ?? [];
+        $more_options = $lsd['more_options'] ?? [];
 
         // Target Page Mode
         if (isset($form['page']) && trim($form['page']))
@@ -177,6 +177,7 @@ class LSD_PTypes_Search extends LSD_PTypes
 
         // Save Form Options
         update_post_meta($post_id, 'lsd_form', $form);
+        update_post_meta($post_id, 'lsd_more_options', $more_options);
     }
 
     public function params()

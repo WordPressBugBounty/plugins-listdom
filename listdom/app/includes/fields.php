@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Fields Class.
- *
- * @class LSD_Fields
- * @version    1.0.0
- */
 class LSD_Fields extends LSD_Base
 {
     public function titles(array $fields = []): array

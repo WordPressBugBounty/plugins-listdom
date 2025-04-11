@@ -52,8 +52,17 @@ defined('ABSPATH') || die();
 
         <?php (new LSD_Plugin_Notice())->display('review', true); ?>
 
-        <h2><?php esc_html_e('Changelog', 'listdom'); ?></h2>
-        <div class="lsd-changelog-wrapper"><?php $this->include_html_file('menus/dashboard/tabs/changelog.php'); ?></div>
+        <div class="lsd-flex lsd-flex-row lsd-flex-items-stretch lsd-gap-4">
+            <div>
+                <h3 class="lsd-mb-3"><?php esc_html_e('Quick Setup', 'listdom'); ?></h3>
+                <iframe width="640" height="360" src="https://www.youtube-nocookie.com/embed/du_96cv6BAw?si=E1LwDdzdgdZNXpkw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+            <div>
+                <h3 class="lsd-mb-3"><?php esc_html_e('Changelog', 'listdom'); ?></h3>
+                <div class="lsd-changelog-wrapper"><?php $this->include_html_file('menus/dashboard/tabs/changelog.php'); ?></div>
+            </div>
+        </div>
+
         <div class="lsd-credit-wrapper"><?php $this->include_html_file('menus/dashboard/tabs/credits.php'); ?></div>
 
     </div>

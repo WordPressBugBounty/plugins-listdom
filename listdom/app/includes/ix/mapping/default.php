@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom IX Mapping Default Value Class.
- *
- * @class LSD_IX_Mapping_Default
- * @version    1.0.0
- */
 class LSD_IX_Mapping_Default
 {
     public function date($args)

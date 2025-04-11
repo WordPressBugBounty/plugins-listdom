@@ -495,7 +495,7 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function image_class_wrapper(): string
     {
-        return (has_post_thumbnail($this->post->ID) ? 'lsd-has-image' : 'lsd-has-no-image');
+        return has_post_thumbnail($this->post->ID) ? 'lsd-has-image' : 'lsd-has-no-image';
     }
 
     public function get_meta($key)

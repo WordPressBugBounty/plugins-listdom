@@ -263,7 +263,7 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
                 <button class="button lsd-remove-gallery-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($gallery) ? '' : 'lsd-util-hide'; ?>" data-for="#lsd_listing_gallery" type="button"><?php esc_html_e('Remove All Images', 'listdom'); ?></button>
 			</div>
         </div>
-        <?php if (($gallery_method === 'uploader')): ?>
+        <?php if ($gallery_method === 'uploader'): ?>
         <div class="lsd-form-row">
             <?php if ($dashboard && trim($gallery_max_size)): ?>
             <p class="description"><?php echo sprintf(esc_html__('Maximum Allowed Image Size: %s KB', 'listdom'), $gallery_max_size); ?></p>

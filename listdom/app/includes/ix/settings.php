@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom IX Settings.
- *
- * @class LSD_IX_Settings
- * @version    1.0.0
- */
 class LSD_IX_Settings extends LSD_Base
 {
     public function init()

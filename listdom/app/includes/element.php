@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Element Class.
- *
- * @class LSD_Element
- * @version    1.0.0
- */
 class LSD_Element extends LSD_Base
 {
     public $key;
@@ -32,7 +24,7 @@ class LSD_Element extends LSD_Base
     public function form($data = [])
     {
         // Disabled in Lite
-        if ($this->isLite() && $this->pro_needed) return '<div class="lsd-form-row">
+        if ($this->isLite() && $this->pro()) return '<div class="lsd-form-row">
             <div class="lsd-col-12 lsd-handler">
                 <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . ']" />
                 <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . '][enabled]" value="0" />
@@ -152,6 +144,11 @@ class LSD_Element extends LSD_Base
         if (!class_exists($element)) return apply_filters('lsd_addon_elements', false, $key);
 
         return new $element();
+    }
+
+    public function pro(): bool
+    {
+        return $this->pro_needed;
     }
 
     /**

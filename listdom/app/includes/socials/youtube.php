@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Socials - YouTube Class.
- *
- * @class LSD_Socials_Youtube
- * @version    1.0.0
- */
 class LSD_Socials_Youtube extends LSD_Socials
 {
     public function __construct()

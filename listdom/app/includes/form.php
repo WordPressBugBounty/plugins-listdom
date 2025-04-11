@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Form Class.
- *
- * @class LSD_Form
- * @version    1.0.0
- */
 class LSD_Form extends LSD_Base
 {
     public static function label($args = [])
@@ -537,7 +529,6 @@ class LSD_Form extends LSD_Base
         if (!count($args)) return false;
 
         $placeholder = isset($args['placeholder']) && trim($args['placeholder']) ? $args['placeholder'] : '';
-        $description = isset($args['description']) && trim($args['description']) ? $args['description'] : '';
         $name = isset($args['name']) && trim($args['name']) ? $args['name'] : 'lsd[team]';
         $id = isset($args['id']) && trim($args['id']) ? $args['id'] : 'lsd_autosuggest_append';
         $input_id = isset($args['input_id']) && trim($args['input_id']) ? $args['input_id'] : '';
@@ -549,6 +540,9 @@ class LSD_Form extends LSD_Base
         $source = isset($args['source']) && trim($args['source']) ? $args['source'] : '';
         $toggle = isset($args['toggle']) && trim($args['toggle']) ? $args['toggle'] : '';
         $values = isset($args['values']) && is_array($args['values']) ? $args['values'] : [];
+
+        $description = isset($args['description']) && trim($args['description']) ? $args['description'] : '';
+        $description_class = isset($args['description_class']) && trim($args['description_class']) ? $args['description_class'] : '';
 
         $current = '';
         foreach ($values as $value)
@@ -583,7 +577,7 @@ class LSD_Form extends LSD_Base
         $output .= '<div class="lsd-autosuggest-current" id="' . esc_attr($id) . '">' . $current . '</div>';
 
         // Show Help
-        if (trim($description)) $output .= '<p class="description">' . esc_html($description) . '</p>';
+        if (trim($description)) $output .= '<p class="description '.$description_class.'">' . esc_html($description) . '</p>';
 
         // Close Wrapper
         $output .= '</div>';

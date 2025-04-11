@@ -8,10 +8,20 @@ defined('ABSPATH') || die();
 $values = LSD_Options::customizer();
 
 // Options
-$options = LSD_Customizer::options();
+$options = (new LSD_Customizer())->options();
 ?>
 <div class="lsd-settings-wrap" id="lsd_settings_display_options">
-    <form id="lsd_settings_reset" class="lsd-flex lsd-flex-row lsd-flex-items-stretch lsd-flex-content-end lsd-gap-3 lsd-mt-4">
+
+    <?php if (class_exists(\LSDPACELM\Base::class) || class_exists(\LSDPACDIV\Base::class)): ?>
+    <div class="lsd-mt-4">
+        <div class="lsd-alert lsd-warning">
+            <strong><?php esc_html_e('Heads Up!', 'listdom'); ?></strong>
+            <?php echo sprintf(esc_html__("If you're using a page builder like %s, %s or %s, we recommend managing your styles (colors, typography, spacing, etc.) directly through the page builder’s controls. Changes made in this Customizer may not affect elements created with a page builder but can still apply to parts of the site not built with one.", 'listdom'), '<strong>'.esc_html__('Elementor', 'listdom').'</strong>', '<strong>'.esc_html__('Bricks', 'listdom').'</strong>', '<strong>'.esc_html__('Divi', 'listdom').'</strong>'); ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <form id="lsd_settings_reset" class="lsd-flex lsd-flex-row lsd-flex-items-stretch lsd-flex-content-end lsd-gap-3 lsd-my-4">
         <input id="lsd_reset_confirm" class="lsd-min-w-300 lsd-px-3" placeholder="<?php esc_attr_e("Type 'reset' to confirm your action.", 'listdom'); ?>" title="<?php esc_attr_e('Confirm'); ?>">
         <?php LSD_Form::nonce('lsd_settings_form'); ?>
         <button type="submit" class="button button-secondary" id="lsd_settings_reset_button"><?php esc_html_e('Reset all options', 'listdom'); ?></button>
@@ -35,7 +45,7 @@ $options = LSD_Customizer::options();
         </div>
         <div class="lsd-accordion-panel <?php echo $c === 1 ? 'lsd-accordion-open' : ''; ?>">
             <?php if (isset($category['sections']) && is_array($category['sections']) && (count($category['sections']) > 1 || (isset($category['display_sections_force']) && $category['display_sections_force']))): ?>
-                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mb-4" data-for=".lsd-customizer-<?php echo esc_attr($ck); ?>-tab-switcher-content">
+                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mb-4" data-for=".lsd-customizer-<?php echo esc_attr($ck); ?>-category-tab-switcher-content">
                     <?php $s = 0; foreach ($category['sections'] as $sk => $section): $s++; ?>
                         <li data-tab="customizer-<?php echo esc_attr($ck); ?>-<?php echo esc_attr($sk); ?>" class="<?php echo $s === 1 ? 'lsd-sub-tabs-active' : ''; ?>"><a href="#"><?php echo esc_html($section['title'] ?? ''); ?></a></li>
                     <?php endforeach; ?>
@@ -44,7 +54,7 @@ $options = LSD_Customizer::options();
 
             <?php if (isset($category['sections']) && is_array($category['sections'])): ?>
                 <?php $inherit = 0; $s = 0; foreach ($category['sections'] as $sk => $section): $s++; ?>
-                    <div class="lsd-tab-switcher-content lsd-customizer-<?php echo esc_attr($ck); ?>-tab-switcher-content <?php echo $s === 1 ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-customizer-<?php echo esc_attr($ck); ?>-<?php echo esc_attr($sk); ?>-content">
+                    <div class="lsd-tab-switcher-content lsd-customizer-<?php echo esc_attr($ck); ?>-category-tab-switcher-content <?php echo $s === 1 ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-customizer-<?php echo esc_attr($ck); ?>-<?php echo esc_attr($sk); ?>-content">
                         <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-4">
                             <?php if (isset($section['description']) && trim($section['description'])): ?>
                                 <p class="description lsd-my-0"><?php echo esc_html($section['description']); ?></p>
@@ -87,16 +97,16 @@ $options = LSD_Customizer::options();
 
                                                 <?php if (isset($group['divisions']) && is_array($group['divisions']) && count($group['divisions'])): ?>
                                                     <?php if(count($group['divisions']) > 1): ?>
-                                                    <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mb-4" data-for=".lsd-customizer-<?php echo esc_attr($gk); ?>-tab-switcher-content">
+                                                    <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mb-4" data-for=".lsd-customizer-<?php echo esc_attr($ck); ?>-<?php echo esc_attr($sk); ?>-<?php echo esc_attr($gk); ?>-division-tab-switcher-content">
                                                         <?php $d = 0; foreach ($group['divisions'] as $dk => $division): if (!isset($division['title']) || trim($division['title']) === '') continue; $d++; ?>
-                                                            <li data-tab="customizer-<?php echo esc_attr($gk); ?>-<?php echo esc_attr($dk); ?>" class="<?php echo $d === 1 ? 'lsd-sub-tabs-active' : ''; ?>"><a href="#"><?php echo esc_html($division['title'] ?? ''); ?></a></li>
+                                                            <li data-tab="customizer-<?php echo esc_attr($ck); ?>-<?php echo esc_attr($sk); ?>-<?php echo esc_attr($gk); ?>-<?php echo esc_attr($dk); ?>" class="<?php echo $d === 1 ? 'lsd-sub-tabs-active' : ''; ?>"><a href="#"><?php echo esc_html($division['title']); ?></a></li>
                                                         <?php endforeach; ?>
                                                     </ul>
                                                     <?php endif; ?>
 
                                                     <div class="lsd-customizer-division-wrapper">
                                                         <?php $d = 0; foreach ($group['divisions'] as $dk => $division): $d++; ?>
-                                                            <div class="lsd-tab-switcher-content lsd-customizer-<?php echo esc_attr($gk); ?>-tab-switcher-content <?php echo $d === 1 ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-customizer-<?php echo esc_attr($gk); ?>-<?php echo esc_attr($dk); ?>-content">
+                                                            <div class="lsd-tab-switcher-content lsd-customizer-<?php echo esc_attr($ck); ?>-<?php echo esc_attr($sk); ?>-<?php echo esc_attr($gk); ?>-division-tab-switcher-content <?php echo $d === 1 ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-customizer-<?php echo esc_attr($ck); ?>-<?php echo esc_attr($sk); ?>-<?php echo esc_attr($gk); ?>-<?php echo esc_attr($dk); ?>-content">
                                                                 <?php if (isset($division['fields']) && is_array($division['fields'])): ?>
                                                                     <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-4">
                                                                         <?php foreach ($division['fields'] as $fk => $field): ?>

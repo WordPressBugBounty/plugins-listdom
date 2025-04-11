@@ -13,6 +13,9 @@ $styles = LSD_Options::styles();
 
 // Post Types & Their Taxonomies
 $post_types = LSD_Base::get_ptypes_and_tax(true);
+
+// Ensure Taxonomies Generate Once
+$did_taxonomies = [];
 ?>
 <div class="lsd-settings-wrap" id="lsd_settings_advanced_wrapper">
     <div class="lsd-form-row lsd-my-0">
@@ -67,7 +70,7 @@ $post_types = LSD_Base::get_ptypes_and_tax(true);
                                         <li data-tab="<?php echo esc_attr($post_type->name); ?>" class="lsd-sub-tabs-active">
                                             <a href="#"><?php echo esc_html($post_type->label); ?></a>
                                         </li>
-                                        <?php foreach ($taxonomies as $taxonomy_key => $taxonomy): ?>
+                                        <?php foreach ($taxonomies as $taxonomy_key => $taxonomy): if (isset($did_taxonomies[$taxonomy_key])) continue; ?>
                                             <li data-tab="<?php echo esc_attr($taxonomy->name); ?>">
                                                 <a href="#"><?php echo esc_html($taxonomy->label); ?></a>
                                             </li>
@@ -115,7 +118,7 @@ $post_types = LSD_Base::get_ptypes_and_tax(true);
                                             </div>
                                         </div>
 
-                                        <?php foreach ($taxonomies as $taxonomy_key => $taxonomy): ?>
+                                        <?php foreach ($taxonomies as $taxonomy_key => $taxonomy): if (isset($did_taxonomies[$taxonomy_key])) continue; $did_taxonomies[$taxonomy_key] = 1; ?>
                                             <div class="lsd-tab-switcher-content lsd-tab-switcher-content-details-<?php echo $post_type->name; ?>" id="lsd-tab-switcher-<?php echo esc_attr($taxonomy->name); ?>-content">
                                                 <div class="lsd-flex lsd-flex-row lsd-flex-content-start lsd-gap-4 lsd-mt-3">
                                                     <div>

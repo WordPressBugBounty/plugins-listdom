@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Schema Class.
- *
- * @class LSD_Schema
- * @version    1.0.0
- */
 class LSD_Schema extends LSD_Base
 {
     /**

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Socials Class.
- *
- * @class LSD_Socials
- * @version    1.0.0
- */
 class LSD_Socials extends LSD_Base
 {
     public $path;

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Settings Menu Class.
- *
- * @class LSD_Menus_Settings
- * @version    1.0.0
- */
 class LSD_Menus_Settings extends LSD_Menus
 {
     public function __construct()

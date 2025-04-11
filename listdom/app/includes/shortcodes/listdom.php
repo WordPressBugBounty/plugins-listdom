@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Main Shortcode Class.
- *
- * @class LSD_Shortcodes_Listdom
- * @version    1.0.0
- */
 class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 {
     public function init()

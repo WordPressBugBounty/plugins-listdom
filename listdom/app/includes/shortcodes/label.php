@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Label Shortcode Class.
- *
- * @class LSD_Shortcodes_Label
- * @version    1.0.0
- */
 class LSD_Shortcodes_Label extends LSD_Shortcodes_Taxonomy
 {
     // Taxonomy

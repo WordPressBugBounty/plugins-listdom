@@ -1,23 +1,16 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Search Shortcode Class.
- *
- * @class LSD_Shortcodes_Search
- * @version    1.0.0
- */
 class LSD_Shortcodes_Search extends LSD_Shortcodes
 {
     public $id;
     public $atts;
     public $filters;
     public $form;
+    public $more_options;
     public $sf;
     public $col_filter;
     public $col_button;
-    public $more_options;
+    public $is_more_options;
     public $settings;
     public $ajax;
     public $connected_shortcodes = [];
@@ -44,7 +37,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-search');
         if (trim($pre)) return $pre;
 
-        $this->more_options = false;
+        $this->is_more_options = false;
 
         // Shortcode ID
         $this->id = $atts['id'] ?? 0;
@@ -60,6 +53,9 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         // Form
         $this->form = $this->atts['lsd_form'] ?? [];
+
+        // More Options
+        $this->more_options = $this->atts['lsd_more_options'] ?? [];
 
         // AJAX Search
         $this->ajax = $atts['ajax'] ?? ($this->form['ajax'] ?? 0);
@@ -114,14 +110,15 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $filters = isset($args['filters']) && is_array($args['filters']) ? $args['filters'] : [];
 
         $buttons = isset($args['buttons']) && (
-            (is_string($args['buttons']) && $args['buttons']) || (is_array($args['buttons']) && $args['buttons']['status'])
-        );
+                (is_string($args['buttons']) && $args['buttons']) || (is_array($args['buttons']) && $args['buttons']['status'])
+            );
 
         $row = '';
         if ($type === 'row')
         {
             // Visible Filters
-            $visible_filters = array_filter($filters, function($filter) {
+            $visible_filters = array_filter($filters, function ($filter)
+            {
                 return !isset($filter['visibility']) || $filter['visibility'];
             });
 
@@ -129,7 +126,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             [$this->col_filter, $this->col_button] = $this->helper->column(count($visible_filters), $buttons);
 
             // Row container
-            $row .= '<div class="lsd-search-row ' . ($this->more_options ? 'lsd-search-included-in-more' : '') . '"><div class="lsd-row lsd-grid-container">';
+            $row .= '<div class="lsd-search-row ' . ($this->is_more_options ? 'lsd-search-included-in-more ' : '') . '"><div class="lsd-row lsd-grid-container">';
 
             // Filters
             foreach ($filters as $filter)
@@ -151,10 +148,14 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         }
         else
         {
-            $this->more_options = true;
+            $this->is_more_options = true;
 
-            $row .= '<div class="lsd-search-row-more-options">';
-            $row .= '<span class="lsd-search-more-options"> ' . esc_html__('More Options', 'listdom') . '<i class="lsd-icon fa fa-plus"></i></span>';
+            $mo_button = $this->more_options['button'] ?? esc_html__('More Options', 'listdom');
+            $mo_type = $this->more_options['type'] ?? 'normal';
+            $mo_width = isset($this->more_options['type']) && $this->more_options['type'] === 'popup' ? (int) $this->more_options['width'] : 60;
+
+            $row .= '<div class="lsd-search-row-more-options" data-width="' . esc_attr($mo_width) . '" data-type="' . esc_attr($mo_type) . '">';
+            $row .= '<span class="lsd-search-more-options"> ' . esc_html($mo_button) . '<i class="lsd-icon fa fa-plus"></i></span>';
             $row .= '</div>';
         }
 
@@ -336,21 +337,38 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         return $output;
     }
 
-    public function field_taxonomy_hierarchy($name, $current, $all_terms, $predefined_terms, $terms, $render_type): string
+    public function field_taxonomy_hierarchy($name, $current, $all_terms, $predefined_terms, $terms, $render_type, $items_per_row = 12): string
     {
         if (!is_array($current) && $current) $current = [$current];
         else if (!is_array($current)) $current = [];
 
-        $render = '<ul class="lsd-hierarchy-list">';
+        $render = '<ul class="lsd-hierarchy-list lsd-grid-container">';
         foreach ($terms as $key => $term)
         {
             // Term is not in the predefined terms
             if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$key])) continue;
 
-            $render .= '<li ' . (isset($term['children']) && $term['children'] ? ' class="children"' : '') . '>';
+            $render .= '<li class="lsd-col-span-' . esc_attr($items_per_row) . '"' . (isset($term['children']) && $term['children'] ? ' class="children"' : '') . '>';
 
             if ($render_type === 'checkboxes') $render .= '<label class="lsd-search-checkbox-label"><input type="checkbox" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" value="' . esc_attr($key) . '" ' . (in_array($key, $current) ? 'checked="checked"' : '') . '>' . esc_html($term["name"]) . '</label>';
-            if (isset($term['children']) && $term['children']) $render .= $this->field_taxonomy_hierarchy($name, $current, $all_terms, $predefined_terms, $term['children'], $render_type);
+            if (isset($term['children']) && $term['children'])
+            {
+                if ($items_per_row == 12)
+                {
+                    $render .= $this->field_taxonomy_hierarchy($name, $current, $all_terms, $predefined_terms, $term['children'], $render_type, $items_per_row);
+                }
+                else
+                {
+                    foreach ($term['children'] as $child_key => $child_term)
+                    {
+                        $render .= '<li class="lsd-col-span-' . esc_attr($items_per_row) . '">';
+
+                        if ($render_type === 'checkboxes') $render .= '<label class="lsd-search-checkbox-label"><input type="checkbox" class="' . esc_attr($child_key) . '" name="' . esc_attr($name) . '[]" value="' . esc_attr($child_key) . '" ' . (in_array($child_key, $current) ? 'checked="checked"' : '') . '>' . esc_html($child_term["name"]) . '</label>';
+
+                        $render .= '</li>';
+                    }
+                }
+            }
 
             $render .= '</li>';
         }
@@ -368,6 +386,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
         $all_terms = $filter['all_terms'] ?? 1;
+        $items_per_row = $filter['items_per_row'] ?? 12;
         $predefined_terms = isset($filter['terms']) && is_array($filter['terms']) ? $filter['terms'] : [];
 
         $id = 'lsd_search_' . $this->id . '_' . $key;
@@ -419,18 +438,20 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             // Required for the AJAX search to work
             $output .= '<input type="hidden" name="' . esc_attr($name) . '[]">';
 
-            $output .= $this->field_taxonomy_hierarchy($name, $current, $all_terms, $predefined_terms, $terms, 'checkboxes');
+            $output .= $this->field_taxonomy_hierarchy($name, $current, $all_terms, $predefined_terms, $terms, 'checkboxes', $items_per_row);
         }
         else if ($method === 'radio')
         {
             $terms = $this->helper->get_terms($filter);
+            $output .= '<div class="lsd-grid-container">';
             foreach ($terms as $key => $term)
             {
                 // Term is not in the predefined terms
                 if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$key])) continue;
 
-                $output .= '<label class="lsd-search-radio-label"><input type="radio" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" value="' . esc_attr($key) . '" ' . ($current == $key ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
+                $output .= '<label class="lsd-search-radio-label lsd-col-span-' . esc_attr($items_per_row) . '"><input type="radio" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" value="' . esc_attr($key) . '" ' . ($current == $key ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
             }
+            $output .= '</div>';
         }
         else if ($method === 'hierarchical' && $this->isPro())
         {

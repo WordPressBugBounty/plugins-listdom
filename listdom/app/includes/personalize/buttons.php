@@ -40,8 +40,8 @@ class LSD_Personalize_Buttons extends LSD_Personalize
             'hover_bg_color' => sanitize_text_field($hover['bg1']),
             'hover_bg_color_2' => sanitize_text_field($hover['bg2']),
             'hover_text_color' => sanitize_text_field($hover['text']),
-            'border' => self::get_border($normal['border'] ?? []),
-            'border_hover' => self::get_border($hover['border'] ?? []),
+            'border' => $normal['border'] ?? [],
+            'border_hover' => $hover['border'] ?? [],
             'hover_border_radius' => sanitize_text_field($hover['border']['radius']) . 'px',
 
             'family' => sanitize_text_field($normal['typography']['family']),
@@ -82,7 +82,7 @@ class LSD_Personalize_Buttons extends LSD_Personalize
             $CSS = str_replace("(({$button_type}_button_hover_border_radius))", $settings['hover_border_radius'], $CSS);
 
             // Typography
-            $CSS = str_replace("(({$button_type}_button_font_family))", $settings['family'], $CSS);
+            $CSS = str_replace("(({$button_type}_button_font_family))", self::font_family($settings['family'] ?? ''), $CSS);
             $CSS = str_replace("(({$button_type}_button_font_weight))", $settings['weight'], $CSS);
             $CSS = str_replace("(({$button_type}_button_text_align))", $settings['align'], $CSS);
             $CSS = str_replace("(({$button_type}_button_font_size))", $settings['size'], $CSS);
@@ -90,16 +90,5 @@ class LSD_Personalize_Buttons extends LSD_Personalize
         }
 
         return $CSS;
-    }
-
-    /**
-     * Returns the formatted border CSS for the given border settings.
-     *
-     * @param array $border The border settings.
-     * @return string The border CSS string.
-     */
-    private static function borders(array $border): string
-    {
-        return sprintf('%s %s %s %s', $border['top'], $border['right'], $border['bottom'], $border['left']);
     }
 }

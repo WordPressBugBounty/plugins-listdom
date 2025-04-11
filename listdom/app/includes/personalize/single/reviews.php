@@ -30,14 +30,14 @@ class LSD_Personalize_Single_Reviews extends LSD_Personalize_Single
         return [
             'bg_color' => sanitize_text_field($normal['bg_color']),
             'text_color' => sanitize_text_field($normal['text_color']),
-            'border' => self::get_border($normal['border'] ?? []),
+            'border' => $normal['border'] ?? [],
             'border_style' => $normal['border']['style'],
             'border_color' => $normal['border']['color'] ?: 'inherit',
             'border_radius' => sanitize_text_field($normal['border']['radius']) . 'px',
 
             'hover_bg_color' => sanitize_text_field($hover['bg_color']),
             'hover_text_color' => sanitize_text_field($hover['text_color']),
-            'border_hover' => self::get_border($hover['border'] ?? []),
+            'border_hover' => $hover['border'] ?? [],
             'border_hover_style' => $hover['border']['style'],
             'border_hover_color' => $hover['border']['color'] ?: 'inherit',
             'hover_border_radius' => sanitize_text_field($hover['border']['radius']) . 'px',
@@ -74,16 +74,5 @@ class LSD_Personalize_Single_Reviews extends LSD_Personalize_Single
         }
 
         return $CSS;
-    }
-
-    /**
-     * Returns the formatted border CSS for the given border settings.
-     *
-     * @param array $border The border settings.
-     * @return string The border CSS string.
-     */
-    private static function borders(array $border): string
-    {
-        return sprintf('%s %s %s %s', $border['top'], $border['right'], $border['bottom'], $border['left']);
     }
 }

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Widgets Class.
- *
- * @class LSD_Widgets
- * @version    1.0.0
- */
 class LSD_Widgets extends LSD_Base
 {
     public function init()

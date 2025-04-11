@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Lite Class.
- *
- * @class LSD_Lite
- * @version    1.0.0
- */
 class LSD_Lite extends LSD_Base
 {
     public function init()

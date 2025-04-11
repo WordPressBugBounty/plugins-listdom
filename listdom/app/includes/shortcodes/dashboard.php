@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Dashboard Shortcode Class.
- *
- * @class LSD_Shortcodes_Dashboard
- * @version    1.0.0
- */
 class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 {
     public $atts = [];
@@ -73,6 +65,14 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Upload Gallery
         add_action('wp_ajax_lsd_dashboard_listing_upload_gallery', [$this, 'gallery']);
         add_action('wp_ajax_nopriv_lsd_dashboard_listing_upload_gallery', [$this, 'gallery']);
+
+        // Upload Profile Image
+        add_action('wp_ajax_lsd_dashboard_upload_profile_image', [$this, 'upload']);
+        add_action('wp_ajax_nopriv_lsd_dashboard_upload_profile_image', [$this, 'upload']);
+
+        // Save Profile
+        add_action('wp_ajax_lsd_dashboard_profile_save', [$this, 'save_profile']);
+        add_action('wp_ajax_nopriv_lsd_dashboard_profile_save', [$this, 'save_profile']);
     }
 
     public function output($atts = [])
@@ -104,6 +104,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if ($this->mode === 'manage') return $this->manage();
         // Form
         else if ($this->mode === 'form') return $this->form();
+        // Profile
+        else if ($this->mode === 'profile') return $this->profile();
         // Other Modes
         else return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'error'), $this);
     }
@@ -207,6 +209,19 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         return ob_get_clean();
     }
 
+    public function profile()
+    {
+        if (!get_current_user_id())
+        {
+            return $this->auth();
+        }
+
+        // Dashboard
+        ob_start();
+        include lsd_template('dashboard/profile.php');
+        return ob_get_clean();
+    }
+
     public function redirect()
     {
         if (!get_current_user_id() && !$this->guest_status && isset($this->settings['submission_guest_redirect']) && $this->settings['submission_guest_redirect'] && is_page())
@@ -295,6 +310,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Add Listing Menu
         if (LSD_Capability::can('edit_listings', 'edit_posts') || $this->guest_status) $menus['form'] = ['label' => esc_html__('Add Listing', 'listdom'), 'id' => 'lsd_dashboard_menus_form', 'url' => $this->add_qs_var('mode', 'form', $this->url), 'icon' => 'far fa-plus-square'];
 
+        // Profile Menu
+        if (get_current_user_id()) $menus['profile'] = ['label' => esc_html__('Profile Setting', 'listdom'), 'id' => 'lsd_dashboard_menus_profile', 'url' => $this->add_qs_var('mode', 'profile', $this->url), 'icon' => 'fas fa-user'];
+
         // Logout Menu
         if (get_current_user_id()) $menus['logout'] = ['label' => esc_html__('Logout', 'listdom'), 'id' => 'lsd_dashboard_menus_logout', 'url' => wp_logout_url(), 'icon' => 'fas fa-sign-out-alt'];
 
@@ -377,11 +395,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if (!get_current_user_id() && $guest_registration === 'submission' && strlen($guest_password) < 8) $this->response(['success' => 0, 'message' => esc_html__('Please insert your password! It should be at-least 8 characters.', 'listdom')]);
 
         // Gallery
-        if (isset($lsd['_gallery']) && is_array($lsd['_gallery']))
-        {
-            $lsd['gallery'] = $lsd['_gallery'];
-            unset($lsd['_gallery']);
-        }
+        if (isset($lsd['_gallery']) && is_array($lsd['_gallery'])) $lsd['gallery'] = $lsd['_gallery'];
 
         // Embeds
         if (isset($lsd['_embeds']) && is_array($lsd['_embeds']))
@@ -410,7 +424,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $capability = $field['capability'] ?? null;
 
             // Current user is not permitted
-            if ($capability && !LSD_Capability::can($capability)) continue;
+            if ($capability && !$this->guest_status && !LSD_Capability::can($capability)) continue;
 
             $value = null;
             if (isset($lsd[$f])) $value = $lsd[$f];
@@ -482,11 +496,14 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         // Post Status
         $status = 'pending';
-        if (current_user_can('publish_posts')) $status = $lsd['listing_status'] ?? 'publish';
+        if (current_user_can('publish_posts')) $status = 'publish';
 
         // Filter Listing Status
         $status = apply_filters('lsd_default_listing_status', $status, $lsd);
         $status = apply_filters('lsd_dashboard_listing_status', $status, $lsd);
+
+        // Status by Request
+        if (current_user_can('publish_posts') && isset($lsd['listing_status']) && trim($lsd['listing_status'])) $status = $lsd['listing_status'];
 
         // Create New Listing
         if ($id <= 0)
@@ -569,6 +586,93 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $this->response(['success' => 1, 'message' => $message, 'data' => ['id' => $id]]);
     }
 
+    public function save_profile()
+    {
+        // Nonce is not set!
+        if (!isset($_POST['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing!', 'listdom')]);
+
+        // Nonce is not valid!
+        if (!wp_verify_nonce(sanitize_text_field($_POST['_wpnonce']), 'lsd_dashboard_profile')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is not valid!', 'listdom')]);
+
+        $user_id = get_current_user_id();
+        if (!$user_id) $this->response(['success' => 0, 'message' => esc_html__('User not found!', 'listdom')]);
+
+        $lsd = $_POST['lsd'] ?? [];
+
+        // Sanitization
+        array_walk_recursive($lsd, 'sanitize_text_field');
+
+        // Save the Data
+        $user_data = [
+            'ID' => $user_id,
+            'first_name' => $lsd['first_name'] ?? '',
+            'last_name' => $lsd['last_name'] ?? '',
+            'description' => $lsd['bio'] ?? '',
+            'user_email' => $lsd['email'] ?? '',
+        ];
+
+        // Update core user fields
+        wp_update_user($user_data);
+
+        $meta_keys = [
+            'lsd_job_title' => 'job_title',
+            'lsd_profile_image' => 'profile_image',
+            'lsd_hero_image' => 'hero_image',
+            'lsd_phone' => 'phone',
+            'lsd_mobile' => 'mobile',
+            'lsd_website' => 'website',
+            'lsd_fax' => 'fax',
+            'lsd_facebook' => 'facebook',
+            'lsd_twitter' => 'twitter',
+            'lsd_pinterest' => 'pinterest',
+            'lsd_linkedin' => 'linkedin',
+            'lsd_instagram' => 'instagram',
+            'lsd_whatsapp' => 'whatsapp',
+            'lsd_youtube' => 'youtube',
+            'lsd_tiktok' => 'tiktok',
+            'lsd_telegram' => 'telegram',
+        ];
+
+        // Update user meta
+        foreach ($meta_keys as $meta_key => $field_name)
+        {
+            if (isset($lsd[$field_name]))
+            {
+                update_user_meta($user_id, $meta_key, $lsd[$field_name]);
+            }
+        }
+
+        // Password Validation and Update
+        if (!empty($lsd['password']) && !empty($lsd['confirm_password']))
+        {
+            if (strlen($lsd['password']) < 6)
+            {
+                $this->response(['success' => 0, 'message' => esc_html__('Password must be at least 6 characters long!', 'listdom')]);
+            }
+
+            if ($lsd['password'] !== $lsd['confirm_password'])
+            {
+                $this->response(['success' => 0, 'message' => esc_html__('Passwords do not match!', 'listdom')]);
+            }
+
+            // Update Password
+            wp_set_password($lsd['password'], $user_id);
+
+            // Success Message
+            echo json_encode(['success' => 1, 'message' => esc_html__('Password updated successfully! Please log in again.', 'listdom')], JSON_NUMERIC_CHECK);
+
+            // Force the user to re-login
+            wp_destroy_current_session();
+            wp_clear_auth_cookie();
+            wp_set_current_user(0);
+
+            exit;
+        }
+
+        // Success response
+        $this->response(['success' => 1, 'message' => esc_html__('The Profile has been updated.', 'listdom')]);
+    }
+
     public function get_restriction_rules(): array
     {
         return apply_filters('lsd_dashboard_restriction_rules', [
@@ -588,7 +692,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if (!isset($_POST['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing!', 'listdom')]);
 
         // Nonce is not valid!
-        if (!wp_verify_nonce(sanitize_text_field($_POST['_wpnonce']), 'lsd_dashboard')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is not valid!', 'listdom')]);
+        if (
+            !wp_verify_nonce(sanitize_text_field($_POST['_wpnonce']), 'lsd_dashboard') &&
+            !wp_verify_nonce(sanitize_text_field($_POST['_wpnonce']), 'lsd_dashboard_profile')
+        ) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is not valid!', 'listdom')]);
 
         // Include the function
         if (!function_exists('wp_handle_upload')) require_once ABSPATH . 'wp-admin/includes/file.php';

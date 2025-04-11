@@ -3,6 +3,48 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.1.0 <span>April 10th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added public profile functionality.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added user profile settings to the frontend dashboard.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Introduced new user directory shortcode.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added support to open additional search options in a popup.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added a setting to customize the "More Options" label in the search widget.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added new customization options in the UI Customizer.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("[PRO] Added the ability to exclude listings from shortcodes by tags or authors.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added an option to display checkbox and radio fields in multiple columns in the search widget.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e("Enhanced the performance of sliders and carousels.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e("Improved the Map Bar responsiveness on smaller screens.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("Resolved search widget positioning issues in specific skins.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("Fixed a conflict with advanced asset loading feature.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("Fixed an issue where listing status could not be updated from the frontend dashboard.", 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v4.0.0 <span>March 16th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>

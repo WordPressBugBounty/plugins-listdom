@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Socials - Linkedin Class.
- *
- * @class LSD_Socials_Linkedin
- * @version    1.0.0
- */
 class LSD_Socials_Linkedin extends LSD_Socials
 {
     public function __construct()

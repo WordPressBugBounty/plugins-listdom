@@ -701,6 +701,59 @@ $settings = LSD_Options::settings();
 
         <div class="lsd-accordion-title">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
+                <h3><?php esc_html_e('Profile & User Directory', 'listdom'); ?></h3>
+                <div class="lsd-accordion-icons">
+                    <i class="lsd-icon fa fa-plus"></i>
+                    <i class="lsd-icon fa fa-minus"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="lsd-auth-form-group lsd-accordion-panel">
+            <h3 class="lsd-mt-0"><?php esc_html_e('User Profile', 'listdom'); ?></h3>
+            <p class="description lsd-mb-4"><?php echo sprintf(esc_html__('In order to use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-profile]</code>'); ?></p>
+
+            <div class="lsd-form-row">
+                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Profile Page', 'listdom'),
+                    'for' => 'lsd_author_profile_page',
+                ]); ?></div>
+                <div class="lsd-col-4">
+                    <?php echo LSD_Form::pages([
+                        'id' => 'lsd_author_profile_page',
+                        'name' => 'lsd[profile][page]',
+                        'show_empty' => true,
+                        'value' => $auth['profile']['page']
+                    ]); ?>
+                </div>
+            </div>
+
+            <div class="lsd-form-row">
+                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Author Listings Shortcode', 'listdom'),
+                    'for' => 'lsd_author_shortcode',
+                ]); ?></div>
+                <div class="lsd-col-4">
+                    <?php echo LSD_Form::shortcodes([
+                        'id' => 'lsd_author_shortcode',
+                        'name' => 'lsd[profile][shortcode]',
+                        'value' => $auth['profile']['shortcode'] ?? '',
+                        'only_archive_skins' => true,
+                        'show_empty' => true,
+                    ]); ?>
+                </div>
+            </div>
+
+            <h3 class="lsd-mt-5"><?php esc_html_e('User Directory', 'listdom'); ?></h3>
+            <p class="description lsd-mb-4"><?php echo sprintf(esc_html__("To use the user directory, you can place the %s shortcode on any page. The shortcode supports both List and Grid styles. Feel free to use one of the following shortcodes:", 'listdom'), '<code>[listdom-users]</code>'); ?></p>
+            <ul>
+                <li class="lsd-mb-2">[listdom-users style="list" limit="24"]</li>
+                <li>[listdom-users style="grid" limit="12" columns="3"]</li>
+            </ul>
+        </div>
+
+        <div class="lsd-accordion-title">
+            <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php esc_html_e('Logged In Users', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
                     <i class="lsd-icon fa fa-plus"></i>

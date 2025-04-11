@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Collections.
- *
- * @class LSD_Collections
- * @version    1.0.0
- */
 abstract class LSD_Collections
 {
     protected $key;

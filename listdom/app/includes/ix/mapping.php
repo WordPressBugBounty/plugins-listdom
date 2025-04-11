@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom IX Mapping Class.
- *
- * @class LSD_IX_Mapping
- * @version    1.0.0
- */
 class LSD_IX_Mapping extends LSD_IX
 {
     public function listdom_fields()

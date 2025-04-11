@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom User Class.
- *
- * @class LSD_User
- * @version    1.0.0
- */
 class LSD_User extends LSD_Base
 {
     public static function create(string $email)
@@ -158,7 +150,7 @@ class LSD_User extends LSD_Base
                 $user_id = $registered;
                 if (trim($fullname))
                 {
-                    list($first_name, $last_name) = LSD_Main::get_name_parts(sanitize_text_field($fullname));
+                    [$first_name, $last_name] = LSD_Main::get_name_parts(sanitize_text_field($fullname));
 
                     // Update User
                     wp_update_user([
@@ -178,33 +170,68 @@ class LSD_User extends LSD_Base
         return $user_id;
     }
 
-    public static function get_user_avatar($size = 96)
+    public static function get_user_avatar($id_or_email = null, $size = 96)
     {
-        $user_id = get_current_user_id();
-        if (!$user_id) return '';
+        if (!$id_or_email)
+        {
+            $user_id = get_current_user_id();
+            if (!$user_id) return '';
 
-        return get_avatar($user_id, $size);
+            $id_or_email = $user_id;
+        }
+
+        return get_avatar($id_or_email, $size);
     }
 
-    public static function get_user_info(): array
+    public static function get_user_info($username = ''): array
     {
-        $user_id = get_current_user_id();
-        if (!$user_id) return [];
+        if ($username)
+        {
+            if (is_numeric($username)) $user = get_user_by('ID', $username);
+            else $user = get_user_by('login', $username);
+        }
+        else
+        {
+            $user_id = get_current_user_id();
+            if (!$user_id) return [];
 
-        // Get user data
-        $user = get_userdata($user_id);
-        if (!$user) return [];
+            $user = get_userdata($user_id);
+        }
 
-        // Get user display name
-        $display_name = $user->display_name;
-
-        // Get user email
-        $email = $user->user_email;
-
-        return [
-            'display_name' => $display_name,
-            'email' => $email,
+        $meta_keys = [
+            'lsd_profile_image' => 'profile_image',
+            'lsd_hero_image' => 'hero_image',
+            'lsd_job_title' => 'job_title',
+            'description' => 'bio',
+            'lsd_phone' => 'phone',
+            'lsd_mobile' => 'mobile',
+            'lsd_website' => 'website',
+            'lsd_fax' => 'fax',
+            'lsd_facebook' => 'facebook',
+            'lsd_twitter' => 'twitter',
+            'lsd_pinterest' => 'pinterest',
+            'lsd_linkedin' => 'linkedin',
+            'lsd_instagram' => 'instagram',
+            'lsd_whatsapp' => 'whatsapp',
+            'lsd_youtube' => 'youtube',
+            'lsd_tiktok' => 'tiktok',
+            'lsd_telegram' => 'telegram',
         ];
+
+        $user_meta = [];
+        foreach ($meta_keys as $meta_key => $field_name)
+        {
+            $user_meta[$field_name] = get_user_meta($user->ID, $meta_key, true) ?: '';
+        }
+
+        return array_merge([
+            'ID' => $user->ID,
+            'display_name' => $user->display_name,
+            'email' => $user->user_email,
+            'description' => $user->description,
+            'first_name' => $user->first_name ?: '',
+            'last_name' => $user->last_name ?: '',
+        ], $user_meta);
     }
 
     public static function send_forgot_password_email(WP_User $user): bool
@@ -224,5 +251,41 @@ class LSD_User extends LSD_Base
         $message .= '<a href="' . esc_url($reset_link) . '">' . esc_url($reset_link) . '</a>' . "\r\n";
 
         return wp_mail($user->user_email, __('Password Reset Request', 'listdom'), $message);
+    }
+
+    public static function profile_link(int $id): string
+    {
+        $auth = LSD_Options::auth();
+
+        $profile_page_id = isset($auth['profile']['page']) && $auth['profile']['page'] ? $auth['profile']['page'] : 0;
+        $profile_page = $profile_page_id ? get_post($profile_page_id) : null;
+
+        // Listdom Profile Page
+        if ($profile_page instanceof WP_Post && $profile_page->post_status === 'publish')
+        {
+            // User
+            $user = get_user($id);
+
+            if ($user && isset($user->user_login))
+            {
+                // URL Structure
+                $structure = get_option('permalink_structure');
+
+                // URL
+                $url = get_permalink($profile_page);
+
+                // Main
+                $main = new LSD_Main();
+
+                $slug = $user->user_login;
+                if (is_email($slug)) $slug = $user->ID;
+
+                // Generate URL
+                if ($structure) return trim($url, '/ ').'/'.sanitize_title($slug);
+                else return $main->add_qs_var('user', sanitize_title($slug), $url);
+            }
+        }
+
+        return get_author_posts_url($id);
     }
 }

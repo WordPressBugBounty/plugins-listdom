@@ -2,7 +2,7 @@
 
 class LSD_Customizer_Forms extends LSD_Customizer
 {
-    public static function options($fields = []): array
+    public function options($fields = []): array
     {
         return [
             'forms' => [
@@ -10,90 +10,280 @@ class LSD_Customizer_Forms extends LSD_Customizer
                 'sections' => [
                     'general_forms' => [
                         'title' => esc_html__('General', 'listdom'),
-                        'groups' => self::get_form_groups(),
+                        'groups' => $this->general_groups(),
                     ],
                     'search_forms' => [
                         'title' => esc_html__('Search', 'listdom'),
-                        'inherit' => [
-                            'key' => 'forms.general_forms',
-                            'text' => esc_html__('Inherit from General Forms.', 'listdom'),
-                            'enabled' => 0,
-                        ],
-                        'groups' => self::get_form_groups(true),
+                        'groups' => $this->search_groups(),
+                    ],
+                    'auth_forms' => [
+                        'title' => esc_html__('Authentication', 'listdom'),
+                        'groups' => $this->auth_groups(),
                     ],
                 ],
             ],
         ];
     }
 
-    private static function get_form_groups($is_search_form = false): array
+    private function general_groups(): array
     {
         return [
-            'normal' => [
-                'title' => esc_html__('Normal', 'listdom'),
-                'sub_title' => esc_html__("Define the form's appearance in normal state.", 'listdom'),
+            'inputs' => [
+                'title' => esc_html__('Inputs', 'listdom'),
+                'sub_title' => esc_html__("Define the input's appearance.", 'listdom'),
                 'divisions' => [
-                    '_' => [
-                        'fields' => self::fields([
-                            'typography' => [
-                                'size' => 12,
-                                'line_height' => 32,
-                            ]
-                        ], [], $is_search_form),
+                    'normal' => [
+                        'title' => esc_html__('Normal', 'listdom'),
+                        'fields' => $this->fields(['typography' => ['size' => 12, 'line_height' => 32]], ['input_bg_color', 'text', 'placeholder', 'border', 'typography']),
                     ],
-                ],
-            ],
-            'hover' => [
-                'title' => esc_html__('Hover / Focus', 'listdom'),
-                'sub_title' => esc_html__("Define the form's appearance in hover state.", 'listdom'),
-                'divisions' => [
-                    '_' => [
-                        'fields' => self::fields(['border' => ['color' => '#306be6']], ['input_bg_color', 'border'], $is_search_form),
+                    'hover' => [
+                        'title' => esc_html__('Hover / Focus', 'listdom'),
+                        'fields' => $this->fields(['border' => ['color' => '#306be6']], ['input_bg_color', 'border']),
                     ],
                 ],
             ],
         ];
     }
 
-    public static function fields($defaults = [], $selected_fields_key = [], $is_search_form = false): array
+    private function search_groups(): array
+    {
+        return [
+            'form' => [
+                'title' => esc_html__('Form', 'listdom'),
+                'sub_title' => esc_html__("Define the form's appearance.", 'listdom'),
+                'divisions' => [
+                    '_' => [
+                        'fields' => $this->fields([], ['form_bg_color']),
+                    ],
+                ]
+            ],
+            'icon' => [
+                'title' => esc_html__('Icon', 'listdom'),
+                'sub_title' => esc_html__("Define the icon's appearance.", 'listdom'),
+                'divisions' => [
+                    '_' => [
+                        'fields' => $this->fields([], ['icon_color']),
+                    ],
+                ]
+            ],
+            'inputs' => [
+                'title' => esc_html__('Inputs', 'listdom'),
+                'sub_title' => esc_html__("Define the input's appearance.", 'listdom'),
+                'divisions' => [
+                    'normal' => [
+                        'title' => esc_html__('Normal', 'listdom'),
+                        'fields' => $this->fields(['typography' => ['size' => 12, 'line_height' => 32]], ['input_bg_color', 'text', 'placeholder', 'border', 'typography']),
+                    ],
+                    'hover' => [
+                        'title' => esc_html__('Hover / Focus', 'listdom'),
+                        'fields' => $this->fields(['border' => ['color' => '#306be6']], ['input_bg_color', 'border']),
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private function auth_groups(): array
+    {
+        return [
+            'box' => [
+                'title' => esc_html__('Box', 'listdom'),
+                'sub_title' => esc_html__("Define the box's appearance.", 'listdom'),
+                'divisions' => [
+                    '_' => [
+                        'fields' => [
+                            'bg' => [
+                                'type' => 'color',
+                                'title' => esc_html__('Background Color', 'listdom'),
+                                'default' => '',
+                            ],
+                            'padding' => [
+                                'type' => 'padding',
+                                'title' => esc_html__('Padding', 'listdom'),
+                                'default' => [
+                                    'top' => 0,
+                                    'right' => 0,
+                                    'bottom' => 0,
+                                    'left' => 0,
+                                ],
+                            ],
+                            'border' => [
+                                'type' => 'border',
+                                'title' => esc_html__('Border', 'listdom'),
+                                'default' => [
+                                    'top' => 0,
+                                    'right' => 0,
+                                    'bottom' => 0,
+                                    'left' => 0,
+                                    'style' => 'none',
+                                    'color' => '',
+                                    'radius' => 0,
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            ],
+            'tabs' => [
+                'title' => esc_html__('Tabs', 'listdom'),
+                'sub_title' => esc_html__("Define the tabs appearance.", 'listdom'),
+                'divisions' => [
+                    'normal' => [
+                        'title' => esc_html__('Normal', 'listdom'),
+                        'fields' => $this->tab_fields([
+                            'bg1' => '#ffffff',
+                            'bg2' => '#ffffff',
+                            'text' => '#306be6',
+                        ]),
+                    ],
+                    'hover' => [
+                        'title' => esc_html__('Hover', 'listdom'),
+                        'fields' => $this->tab_fields([
+                            'bg1' => '#306be6',
+                            'bg2' => '#306be6',
+                            'text' => '#ffffff',
+                        ]),
+                    ],
+                    'active' => [
+                        'title' => esc_html__('Active', 'listdom'),
+                        'fields' => $this->tab_fields([
+                            'bg1' => '#33c6ff',
+                            'bg2' => '#306be6',
+                            'text' => '#ffffff',
+                            'border' => [
+                                'top' => 0,
+                                'right' => 0,
+                                'bottom' => 0,
+                                'left' => 0,
+                                'style' => 'none',
+                                'color' => '',
+                            ],
+                        ]),
+                    ],
+                ],
+            ],
+            'labels' => [
+                'title' => esc_html__('Labels', 'listdom'),
+                'sub_title' => esc_html__("Define the label's appearance.", 'listdom'),
+                'divisions' => [
+                    '_' => [
+                        'fields' => $this->fields([
+                            'typography' => [
+                                'size' => 12,
+                                'line_height' => 26,
+                                'align' => 'left'
+                            ]
+                        ], ['text', 'typography']),
+                    ]
+                ],
+            ],
+        ];
+    }
+
+    public function fields($defaults = [], array $include = []): array
     {
         $fields = [
-            'input_bg_color' => self::color_field('Input Background Color', 'input_bg_color', $defaults, '#fff'),
-            'text' => self::color_field('Text Color', 'text', $defaults, '#000'),
-            'placeholder' => self::color_field('Placeholder Color', 'placeholder', $defaults, '#a4a8b5'),
+            'input_bg_color' => $this->fields->color(
+                esc_html__('Background Color', 'listdom'),
+                $defaults['input_bg_color'] ?? '#ffffff'
+            ),
+            'text' => $this->fields->color(
+                esc_html__('Text Color', 'listdom'),
+                $defaults['text'] ?? '#000000'
+            ),
+            'placeholder' => $this->fields->color(
+                esc_html__('Placeholder Color', 'listdom'),
+                $defaults['placeholder'] ?? '#a4a8b5'
+            ),
             'border' => [
                 'type' => 'border',
                 'title' => esc_html__('Border', 'listdom'),
                 'default' => array_merge([
-                    'top' => 1, 'right' => 1, 'bottom' => 1, 'left' => 1,
-                    'style' => 'solid', 'color' => '#f4f5f7', 'radius' => 10,
+                    'top' => 1,
+                    'right' => 1,
+                    'bottom' => 1,
+                    'left' => 1,
+                    'style' => 'solid',
+                    'color' => '#f4f5f7',
+                    'radius' => 10,
                 ], $defaults['border'] ?? []),
             ],
             'typography' => [
                 'type' => 'typography',
                 'title' => esc_html__('Typography', 'listdom'),
                 'default' => array_merge([
-                    'family' => 'inherit', 'weight' => 'inherit', 'align' => 'inherit',
-                    'size' => 'inherit', 'line_height' => 'inherit',
+                    'family' => 'inherit',
+                    'weight' => 'inherit',
+                    'align' => 'inherit',
+                    'size' => 'inherit',
+                    'line_height' => 'inherit',
                 ], $defaults['typography'] ?? []),
             ],
+            'form_bg_color' => $this->fields->color(
+                esc_html__('Background Color', 'listdom'),
+                $defaults['form_bg_color'] ?? '#ffffff'
+            ),
+            'icon_color' => $this->fields->color(
+                esc_html__('Icon Color', 'listdom'),
+                $defaults['icon_color'] ?? '#33c6ff'
+            )
         ];
 
-        if ($is_search_form)
-        {
-            $fields['form_bg_color'] = self::color_field('Form Background Color', 'form_bg_color', $defaults, '#fff');
-            $fields['icon_color'] = self::color_field('Icon Color', 'icon_color', $defaults, '#33c6ff');
-        }
-
-        return empty($selected_fields_key) ? $fields : array_intersect_key($fields, array_flip($selected_fields_key));
+        return empty($include) ? $fields : array_intersect_key($fields, array_flip($include));
     }
 
-    private static function color_field($title, $key, $defaults, $default_color): array
+    public function tab_fields(array $defaults = []): array
     {
         return [
-            'type' => 'color',
-            'title' => esc_html__($title, 'listdom'),
-            'default' => $defaults[$key] ?? $default_color,
+            'bg1' => [
+                'type' => 'color',
+                'title' => esc_html__('Background Color 1', 'listdom'),
+                'default' => $defaults['bg1'] ?? '#306be6',
+            ],
+            'bg2' => [
+                'type' => 'color',
+                'title' => esc_html__('Background Color 2', 'listdom'),
+                'default' => $defaults['bg2'] ?? '#306be6',
+            ],
+            'text' => [
+                'type' => 'color',
+                'title' => esc_html__('Text Color', 'listdom'),
+                'default' => $defaults['text'] ?? '',
+            ],
+            'border' => [
+                'type' => 'border',
+                'title' => esc_html__('Border', 'listdom'),
+                'default' => [
+                    'top' => $defaults['border']['top'] ?? 1,
+                    'right' => $defaults['border']['right'] ?? 1,
+                    'bottom' => $defaults['border']['bottom'] ?? 1,
+                    'left' => $defaults['border']['left'] ?? 1,
+                    'style' => $defaults['border']['style'] ?? 'solid',
+                    'color' => $defaults['border']['color'] ?? '#306be6',
+                    'radius' => $defaults['border']['radius'] ?? 4,
+                ],
+            ],
+            'padding' => [
+                'type' => 'padding',
+                'title' => esc_html__('Padding', 'listdom'),
+                'default' => [
+                    'top' => $defaults['padding']['top'] ?? 0,
+                    'right' => $defaults['padding']['right'] ?? 16,
+                    'bottom' => $defaults['padding']['bottom'] ?? 0,
+                    'left' => $defaults['padding']['left'] ?? 16,
+                ],
+            ],
+            'typography' => [
+                'type' => 'typography',
+                'title' => esc_html__('Typography', 'listdom'),
+                'default' => [
+                    'family' => $defaults['typography']['family'] ?? 'inherit',
+                    'weight' => $defaults['typography']['weight'] ?? 400,
+                    'align' => $defaults['typography']['align'] ?? 'center',
+                    'size' => $defaults['typography']['size'] ?? 14,
+                    'line_height' => $defaults['typography']['line_height'] ?? 38,
+                ],
+            ],
         ];
     }
 }

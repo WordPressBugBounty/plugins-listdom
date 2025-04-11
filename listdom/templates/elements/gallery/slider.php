@@ -17,10 +17,8 @@ $gallery = $this->get_gallery($post_id , $include_thumbnail);
 // There is no Gallery!
 if (!count($gallery)) return '';
 
-$imageItemProp = 'itemprop="https://schema.org/image"';
-
 $assets = new LSD_Assets();
-$assets->footer('<script>
+$assets->footerOrPreview('<script>
 jQuery(document).ready(function()
 {
     jQuery(".lsd-gallery-slider").listdomGallerySlider({
@@ -47,7 +45,7 @@ jQuery(document).ready(function()
 
                 echo '<div class="lsd-gallery-item">
                     <a href="' . esc_url($full[0]) . '" ' . lsd_schema()->associatedMedia() . '>
-                        <img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" ' . $imageItemProp . '>
+                        <img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" itemprop="https://schema.org/image">
                     </a>
                 </div>';
             }

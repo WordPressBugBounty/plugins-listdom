@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Compatibility Class.
- *
- * @class LSD_Compatibility
- * @version    1.0.0
- */
 class LSD_Compatibility extends LSD_Base
 {
     public $tx_html_tag = '';

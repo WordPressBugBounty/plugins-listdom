@@ -2,7 +2,7 @@
 
 class LSD_Customizer_Buttons extends LSD_Customizer
 {
-    public static function options($fields = []): array
+    public function options($fields = []): array
     {
         // Button Groups
         $button_groups = [

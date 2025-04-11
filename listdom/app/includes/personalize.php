@@ -47,40 +47,39 @@ class LSD_Personalize extends LSD_Base
     }
 
     /**
-     * Retrieves and sanitizes border settings for the button styles.
+     * Returns the formatted border CSS for the given border settings.
      *
      * @param array $border The border settings.
-     * @return array An associative array containing the border settings.
+     * @return string The border CSS string.
      */
-    protected static function get_border(array $border): array
+    protected static function borders(array $border): string
     {
-        if (empty($border)) return [];
-
-        return [
-            'top' => sanitize_text_field($border['top']) . 'px',
-            'right' => sanitize_text_field($border['right']) . 'px',
-            'bottom' => sanitize_text_field($border['bottom']) . 'px',
-            'left' => sanitize_text_field($border['left']) . 'px',
-            'style' => sanitize_text_field($border['style']),
-            'color' => sanitize_text_field($border['color'] ?? ''),
-        ];
+        return sprintf('%s %s %s %s',
+            isset($border['top']) ? sanitize_text_field($border['top']) . 'px' : 'inherit',
+            isset($border['right']) ? sanitize_text_field($border['right']) . 'px' : 'inherit',
+            isset($border['bottom']) ? sanitize_text_field($border['bottom']) . 'px' : 'inherit',
+            isset($border['left']) ? sanitize_text_field($border['left']) . 'px' : 'inherit'
+        );
     }
 
     /**
-     * Retrieves and sanitizes border settings for the button styles.
+     * Returns the formatted border CSS for the given border settings.
      *
      * @param array $padding The border settings.
-     * @return array An associative array containing the border settings.
+     * @return string The border CSS string.
      */
-    protected static function get_padding(array $padding): array
+    protected static function paddings(array $padding): string
     {
-        if (empty($padding)) return [];
+        return sprintf('%s %s %s %s',
+            isset($padding['top']) ? sanitize_text_field($padding['top']) . 'px' : 'inherit',
+            isset($padding['right']) ? sanitize_text_field($padding['right']) . 'px' : 'inherit',
+            isset($padding['bottom']) ? sanitize_text_field($padding['bottom']) . 'px' : 'inherit',
+            isset($padding['left']) ? sanitize_text_field($padding['left']) . 'px' : 'inherit'
+        );
+    }
 
-        return [
-            'top' => sanitize_text_field($padding['top']) . 'px',
-            'right' => sanitize_text_field($padding['right']) . 'px',
-            'bottom' => sanitize_text_field($padding['bottom']) . 'px',
-            'left' => sanitize_text_field($padding['left']) . 'px',
-        ];
+    protected static function font_family(string $family = ''): string
+    {
+        return trim($family) && $family !== 'inherit' ? '"' . ucfirst($family) . '", Arial, monospace' : 'inherit';
     }
 }

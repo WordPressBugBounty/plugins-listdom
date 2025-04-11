@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Dummy Data Class.
- *
- * @class LSD_Dummy
- * @version    1.0.0
- */
 class LSD_Dummy extends LSD_Base
 {
     public function init()

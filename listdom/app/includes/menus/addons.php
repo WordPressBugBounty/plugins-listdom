@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Addons Menu Class.
- *
- * @class LSD_Menus_Addons
- * @version    1.0.0
- */
 class LSD_Menus_Addons extends LSD_Menus
 {
     public function output()

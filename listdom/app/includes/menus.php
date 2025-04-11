@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Menus Class.
- *
- * @class LSD_Menus
- * @version    1.0.0
- */
 class LSD_Menus extends LSD_Base
 {
     protected $dashboard;

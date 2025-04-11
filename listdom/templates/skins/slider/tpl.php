@@ -9,7 +9,7 @@ $listings_html = $this->listings_html();
 
 // Add List Skin JS codes to footer
 $assets = new LSD_Assets();
-$assets->footer('<script>
+$assets->footerOrPreview('<script>
 jQuery(document).ready(function()
 {
     jQuery("#lsd_skin' . $this->id . '").listdomSliderSkin(

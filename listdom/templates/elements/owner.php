@@ -48,7 +48,7 @@ $current_id = get_current_user_id();
                     <?php if ($display_name): ?>
 					<h4 class="lsd-owner-name" <?php echo lsd_schema()->name(); ?>>
 						<?php if ($author_link): ?>
-							<a href="<?php echo esc_url(get_author_posts_url($owner_id)); ?>">
+							<a href="<?php echo esc_url_raw(LSD_User::profile_link($owner_id)); ?>">
 								<?php echo esc_html(get_the_author_meta('display_name', $owner_id)); ?>
 							</a>
 						<?php else: echo esc_html(get_the_author_meta('display_name', $owner_id)); ?>

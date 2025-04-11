@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Socials - Facebook Class.
- *
- * @class LSD_Socials_Facebook
- * @version    1.0.0
- */
 class LSD_Socials_Facebook extends LSD_Socials
 {
     public function __construct()

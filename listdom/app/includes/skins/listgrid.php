@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Skins ListGrid Class.
- *
- * @class LSD_Skins_Listgrid
- * @version    1.0.0
- */
 class LSD_Skins_Listgrid extends LSD_Skins
 {
     public $skin = 'listgrid';

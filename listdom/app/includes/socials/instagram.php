@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Socials - Instagram Class.
- *
- * @class LSD_Socials_Instagram
- * @version    1.0.0
- */
 class LSD_Socials_Instagram extends LSD_Socials
 {
     public function __construct()

@@ -1,14 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom IX Array.
- * Used in CSV and Excel
- *
- * @class LSD_IX_Array
- * @version    1.0.0
- */
 abstract class LSD_IX_Array extends LSD_IX
 {
     /**

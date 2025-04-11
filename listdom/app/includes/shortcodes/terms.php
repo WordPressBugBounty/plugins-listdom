@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Terms Shortcode Class.
- *
- * @class LSD_Shortcodes_Terms
- * @version    1.0.0
- */
 class LSD_Shortcodes_Terms extends LSD_Shortcodes
 {
     protected $atts = [];

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Query Class.
- *
- * @class LSD_Query
- * @version    1.0.0
- */
 class LSD_Query extends LSD_Base
 {
     public static function attribute($key, $value)

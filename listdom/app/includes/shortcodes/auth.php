@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Auth Class.
- *
- * @class LSD_Shortcodes_Auth
- * @version    1.0.0
- */
 class LSD_Shortcodes_Auth extends LSD_Base
 {
     public function init()
@@ -135,7 +127,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
         ];
 
         // Redirect Url
-        $redirect_to = sanitize_text_field($_POST['redirect_to']);
+        $redirect_to = isset($_POST['redirect_to']) && $_POST['redirect_to']
+            ? sanitize_text_field($_POST['redirect_to'])
+            : '';
 
         // Attempt to log in
         $user = wp_signon($credentials, false);
@@ -144,7 +138,11 @@ class LSD_Shortcodes_Auth extends LSD_Base
         if (is_wp_error($user)) $this->response(['success' => 0, 'message' => esc_html__('Invalid username or password.', 'listdom')]);
 
         // Valid Login
-        $this->response(['success' => 1, 'message' => esc_html__('Login Successful.', 'listdom'), 'redirect' => $redirect_to]);
+        $this->response([
+            'success' => 1,
+            'message' => esc_html__('Login Successful.', 'listdom'),
+            'redirect' => $this->validate_redirect($redirect_to),
+        ]);
     }
 
     public function signup()
@@ -208,7 +206,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $this->response([
             'success' => 1,
             'message' => esc_html__('Registration successful.', 'listdom'),
-            'redirect' => $auth['register']['login_after_register'] == 1 ? $_POST['lsd_redirect'] : '',
+            'redirect' => $auth['register']['login_after_register'] == 1 ? $this->validate_redirect($_POST['lsd_redirect'] ?? '') : '',
         ]);
     }
 
@@ -237,7 +235,10 @@ class LSD_Shortcodes_Auth extends LSD_Base
             ]);
         }
 
-        $this->response(['success' => 0, 'message' => esc_html__('Forgot password email could not be sent.', 'listdom')]);
+        $this->response([
+            'success' => 0,
+            'message' => esc_html__('Forgot password email could not be sent.', 'listdom'),
+        ]);
     }
 
     public function logout_redirect()
@@ -381,6 +382,14 @@ class LSD_Shortcodes_Auth extends LSD_Base
             wp_redirect($this->get_forgot_url($_GET['redirect_to'] ?? ''));
             exit;
         }
+    }
+
+    public function validate_redirect(string $url)
+    {
+        return wp_validate_redirect(
+            $url,
+            apply_filters('wp_safe_redirect_fallback', admin_url(), 302)
+        );
     }
 
     private function option($key)

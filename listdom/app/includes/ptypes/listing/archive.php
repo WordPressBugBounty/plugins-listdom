@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Listing Post Types Archive Class.
- *
- * @class LSD_PTypes_Listing_Archive
- * @version    1.0.0
- */
 class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
 {
     protected $entity;

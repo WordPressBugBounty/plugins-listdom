@@ -1,19 +1,12 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Notifications Email Prepare Class.
- *
- * @class LSD_Notifications_Email_Prepare
- * @version    1.0.0
- */
 class LSD_Notifications_Email_Prepare extends LSD_Notifications
 {
     public function init()
     {
         // Contact Email
         add_action('lsd_contact_owner', [$this, 'contact']);
+        add_action('lsd_profile_contact', [$this, 'profile']);
 
         // New Listing
         add_action('lsd_new_listing', [$this, 'new_listing']);
@@ -28,6 +21,11 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
     public function contact($args): array
     {
         return $this->form($args, 'lsd_contact_owner');
+    }
+  
+    public function profile($args): array
+    {
+        return $this->form($args, 'lsd_profile_contact');
     }
 
     public function new_listing($listing_id): array
@@ -154,10 +152,14 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         $listing_id = $args['post_id'] ?? null;
         $owner_id = get_post_field('post_author', $listing_id);
 
+        $user_id = $args['user_id'] ?? null;
+        if ($user_id && get_user_by('id', $user_id)) $owner_id = $user_id;
+
         $name = isset($args['name']) && trim($args['name']) ? $args['name'] : 'N/A';
         $email = $args['email'] ?? '';
         $phone = isset($args['phone']) && trim($args['phone']) ? $args['phone'] : 'N/A';
         $message = $args['message'] ?? '';
+        $profile_link = LSD_User::profile_link($owner_id);
 
         // Results
         $mails = [];
@@ -190,6 +192,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
                 $$item = str_replace('#email#', $email, $$item);
                 $$item = str_replace('#phone#', $phone, $$item);
                 $$item = str_replace('#message#', '<i>' . nl2br($message) . '</i>', $$item);
+                $$item = str_replace('#profile_link#', $profile_link, $$item);
             }
 
             $sender = new LSD_Notifications_Email_Sender();

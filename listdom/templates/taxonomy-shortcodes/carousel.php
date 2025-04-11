@@ -6,8 +6,8 @@ defined('ABSPATH') || die();
 
 // Add List Skin JS codes to footer
 $assets = new LSD_Assets();
-$assets->footer('<script>
-jQuery(document).on("ready", function()
+$assets->footerOrPreview('<script>
+jQuery(document).ready(function()
 {
     jQuery("#lsd_terms_carousel_'.$this->id.'").owlCarousel(
     {

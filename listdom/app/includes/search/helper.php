@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Search Helper Class.
- *
- * @class LSD_Search_Helper
- * @version    1.0.0
- */
 class LSD_Search_Helper extends LSD_Base
 {
     public function get_type_by_key($key)

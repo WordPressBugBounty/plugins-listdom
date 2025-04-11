@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Skins Class.
- *
- * @class LSD_Skins
- * @version    1.0.0
- */
 class LSD_Skins extends LSD_Base
 {
     public $args = [];
@@ -236,7 +228,7 @@ class LSD_Skins extends LSD_Base
         $this->args['meta_query'] = $this->query_meta();
 
         // Author
-        $this->args['author'] = $this->query_author();
+        $this->query_author();
 
         // Include / Exclude
         $this->query_ixclude();
@@ -277,11 +269,11 @@ class LSD_Skins extends LSD_Base
         $tax_query = ['relation' => 'AND'];
 
         foreach ([
-                     LSD_Base::TAX_CATEGORY,
-                     LSD_Base::TAX_LOCATION,
-                     LSD_Base::TAX_FEATURE,
-                     LSD_Base::TAX_LABEL,
-                 ] as $tax)
+            LSD_Base::TAX_CATEGORY,
+            LSD_Base::TAX_LOCATION,
+            LSD_Base::TAX_FEATURE,
+            LSD_Base::TAX_LABEL,
+        ] as $tax)
         {
             if (isset($this->filter_options[$tax]) && is_array($this->filter_options[$tax]) && count($this->filter_options[$tax]))
             {
@@ -304,7 +296,7 @@ class LSD_Skins extends LSD_Base
             }
         }
 
-        // Tags
+        // Tags Include
         if (isset($this->filter_options[LSD_Base::TAX_TAG]))
         {
             if (is_array($this->filter_options[LSD_Base::TAX_TAG]))
@@ -323,6 +315,29 @@ class LSD_Skins extends LSD_Base
                     'field' => 'name',
                     'terms' => explode(',', sanitize_text_field(trim($this->filter_options[LSD_Base::TAX_TAG], ', '))),
                     'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_operator', 'IN', LSD_Base::TAX_TAG),
+                ];
+            }
+        }
+
+        // Tags Exclude
+        if (isset($this->exclude_options[LSD_Base::TAX_TAG]))
+        {
+            if (is_array($this->exclude_options[LSD_Base::TAX_TAG]))
+            {
+                $tax_query[] = [
+                    'taxonomy' => LSD_Base::TAX_TAG,
+                    'field' => 'term_id',
+                    'terms' => $this->exclude_options[LSD_Base::TAX_TAG],
+                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_exclude_operator', 'NOT IN', LSD_Base::TAX_TAG),
+                ];
+            }
+            else if (trim($this->exclude_options[LSD_Base::TAX_TAG]))
+            {
+                $tax_query[] = [
+                    'taxonomy' => LSD_Base::TAX_TAG,
+                    'field' => 'name',
+                    'terms' => explode(',', sanitize_text_field(trim($this->exclude_options[LSD_Base::TAX_TAG], ', '))),
+                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_exclude_operator', 'NOT IN', LSD_Base::TAX_TAG),
                 ];
             }
         }
@@ -367,17 +382,19 @@ class LSD_Skins extends LSD_Base
         return $meta_query;
     }
 
-    public function query_author(): string
+    public function query_author(): void
     {
-        $authors = '';
-
-        // Authors
+        // Include
         if (isset($this->filter_options['authors']) && is_array($this->filter_options['authors']) && count($this->filter_options['authors']))
         {
-            $authors = sanitize_text_field(implode(',', $this->filter_options['authors']));
+            $this->args['author__in'] = array_map('sanitize_text_field', $this->filter_options['authors']);
         }
 
-        return $authors;
+        // Exclude
+        if (isset($this->exclude_options['authors']) && is_array($this->exclude_options['authors']) && count($this->exclude_options['authors']))
+        {
+            $this->args['author__not_in'] = array_map('sanitize_text_field', $this->exclude_options['authors']);
+        }
     }
 
     public function query_ixclude()
@@ -857,12 +874,12 @@ class LSD_Skins extends LSD_Base
         ]);
     }
 
-    public function get_left_bar(): string
+    public function get_left_bar(bool $map = true, bool $search = true): string
     {
         $content = '';
 
         // Map
-        if ($this->map_provider && $this->map_position === 'left')
+        if ($map && $this->map_provider && $this->map_position === 'left')
         {
             $content .= '<div class="lsd-map-left-wrapper">';
             $content .= $this->get_map(true);
@@ -870,17 +887,17 @@ class LSD_Skins extends LSD_Base
         }
 
         // Search
-        if ($this->sm_shortcode && $this->sm_position === 'left') $content .= LSD_Kses::form($this->get_search_module());
+        if ($search && $this->sm_shortcode && $this->sm_position === 'left') $content .= LSD_Kses::form($this->get_search_module());
 
         return trim($content) ? '<div class="lsd-skin-left-bar-wrapper">' . $content . '</div>' : '';
     }
 
-    public function get_right_bar(): string
+    public function get_right_bar(bool $map = true, bool $search = true): string
     {
         $content = '';
 
         // Map
-        if ($this->map_provider && $this->map_position === 'right')
+        if ($map && $this->map_provider && $this->map_position === 'right')
         {
             $content .= '<div class="lsd-map-right-wrapper">';
             $content .= $this->get_map(true);
@@ -888,26 +905,26 @@ class LSD_Skins extends LSD_Base
         }
 
         // Search
-        if ($this->sm_shortcode && $this->sm_position === 'right') $content .= LSD_Kses::form($this->get_search_module());
+        if ($search && $this->sm_shortcode && $this->sm_position === 'right') $content .= LSD_Kses::form($this->get_search_module());
 
         return trim($content) ? '<div class="lsd-skin-right-bar-wrapper">' . $content . '</div>' : '';
     }
 
-    public function get_bar_class(): string
+    public function get_bar_class(bool $map = true, bool $search = true): string
     {
         $left = false;
         $right = false;
 
         // Left Bar
         if (
-            ($this->map_provider && $this->map_position === 'left')
-            || ($this->sm_shortcode && $this->sm_position === 'left')
+            ($map && $this->map_provider && $this->map_position === 'left')
+            || ($search && $this->sm_shortcode && $this->sm_position === 'left')
         ) $left = true;
 
         // right Bar
         if (
-            ($this->map_provider && $this->map_position === 'right')
-            || ($this->sm_shortcode && $this->sm_position === 'right')
+            ($map && $this->map_provider && $this->map_position === 'right')
+            || ($search && $this->sm_shortcode && $this->sm_position === 'right')
         ) $right = true;
 
         // Both Bars Enabled

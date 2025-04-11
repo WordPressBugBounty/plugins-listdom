@@ -1,34 +1,43 @@
 <?php
 
-abstract class LSD_Customizer
+class LSD_Customizer
 {
-    abstract static function fields($defaults = []): array;
+    protected $fields;
 
-    public static function options(): array
+    public function __construct()
+    {
+        $this->fields = new LSD_Customizer_Fields();
+    }
+
+    public function options(): array
     {
         $options = [];
 
-        $options = array_merge_recursive($options, LSD_Customizer_General::options());
-        $options = array_merge_recursive($options, LSD_Customizer_Buttons::options());
-        $options = array_merge_recursive($options, LSD_Customizer_Forms::options());
-        $options = array_merge_recursive($options, LSD_Customizer_Single::options());
-        $options = array_merge_recursive($options, LSD_Customizer_Skins::options());
-        $options = array_merge_recursive($options, LSD_Customizer_Taxonomies::options());
-        $options = array_merge_recursive($options, LSD_Customizer_Dashboard::options());
+        $options = array_merge_recursive($options, (new LSD_Customizer_General())->options());
+        $options = array_merge_recursive($options, (new LSD_Customizer_Buttons())->options());
+        $options = array_merge_recursive($options, (new LSD_Customizer_Forms())->options());
+        $options = array_merge_recursive($options, (new LSD_Customizer_Single())->options());
+        $options = array_merge_recursive($options, (new LSD_Customizer_Skins())->options());
+        $options = array_merge_recursive($options, (new LSD_Customizer_Taxonomies())->options());
+        $options = array_merge_recursive($options, (new LSD_Customizer_Dashboard())->options());
 
         return apply_filters('lsd_customizer_options', $options);
     }
 
     public static function values(string $key = '')
     {
+        // Stored Options
         $values = (array) get_option('lsd_customizer', []);
+
+        // Default Options
+        if (!count($values)) $values = LSD_Customizer::defaults($key);
 
         if ($key)
         {
             $paths = explode('.', $key);
             foreach ($paths as $path)
             {
-                if (!$path) break;
+                if (!$path || !isset($values[$path])) break;
                 $values = $values[$path];
             }
 
@@ -47,7 +56,7 @@ abstract class LSD_Customizer
     public static function defaults(string $key = ''): array
     {
         // Options
-        $options = LSD_Customizer::options();
+        $options = (new LSD_Customizer())->options();
 
         $default = [];
         foreach ($options as $ck => $category)
@@ -92,8 +101,7 @@ abstract class LSD_Customizer
 
     public static function pairs(): array
     {
-        $settings = LSD_Options::customizer();
-        $options = LSD_Customizer::options();
+        $options = (new LSD_Customizer())->options();
 
         $values = [];
         $pairs = [];
@@ -142,6 +150,7 @@ abstract class LSD_Customizer
             if ($weight === 'inherit') $weight = '';
 
             $font = ucwords(str_replace('-', ' ', $typography['family']));
+
             if (!isset($fonts[$font])) $fonts[$font] = $weight;
             else $fonts[$font] .= ',' . $weight;
         }

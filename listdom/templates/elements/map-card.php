@@ -10,7 +10,7 @@ $availability = $this->listing->get_availability(true);
 $phone = $this->listing->get_meta('lsd_phone');
 $website = $this->listing->get_meta('lsd_website');
 ?>
-<div class="lsd-map-card-wrapper lsd-map-card-style1 lsd-font-m">
+<div class="lsd-map-card-wrapper lsd-map-card-style1 lsd-font-m lsd-tablet-hidden">
 	<div class="lsd-map-card-body">
 		<h4 class="lsd-listing-title">
 			<a data-listing-id="<?php echo esc_attr($post_id); ?>" href="<?php echo esc_url(get_permalink($post_id)); ?>" aria-label="<?php echo esc_attr($this->listing->get_title()); ?>"><?php echo LSD_Kses::element($this->listing->get_title()); ?></a>
@@ -19,17 +19,17 @@ $website = $this->listing->get_meta('lsd_website');
 			<?php echo LSD_Kses::element($this->listing->get_address(false)); ?>
 		</div>
 
-		<?php if(trim($availability)): ?>
+		<?php if (trim($availability)): ?>
 		<div class="lsd-listing-availability">
 			<?php echo LSD_Kses::element($availability); ?>
 		</div>
 		<?php endif; ?>
 
-		<?php if(trim($phone) || trim($website)): ?>
+		<?php if (trim($phone) || trim($website)): ?>
 			<div class="lsd-listing-phone-website">
-				<?php if($phone): ?>
+				<?php if ($phone): ?>
 					<a href="tel:<?php echo esc_attr($phone); ?>"><?php echo esc_html($phone); ?></a>
-				<?php elseif($website): ?>
+				<?php elseif ($website): ?>
 					<a href="<?php echo esc_attr($website); ?>" target="_blank"><?php echo esc_html(LSD_Base::remove_protocols($website)); ?></a>
 				<?php endif; ?>
 			</div>

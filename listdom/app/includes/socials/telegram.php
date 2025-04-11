@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Socials - Telegram Class.
- *
- * @class LSD_Socials_Telegram
- * @version    1.0.0
- */
 class LSD_Socials_Telegram extends LSD_Socials
 {
     public function __construct()

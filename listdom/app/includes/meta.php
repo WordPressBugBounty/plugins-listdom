@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Meta Class.
- *
- * @class LSD_Meta
- * @version    1.0.0
- */
 class LSD_Meta extends LSD_Base
 {
     const URL = 'url';

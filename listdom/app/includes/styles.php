@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Styles Class.
- *
- * @class LSD_Styles
- * @version    1.0.0
- */
 class LSD_Styles extends LSD_Base
 {
     public static function render($skin)

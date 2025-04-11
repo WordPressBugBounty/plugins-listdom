@@ -28,25 +28,31 @@ jQuery(document).ready(function()
 });
 </script>');
 ?>
-<div class="lsd-skin-wrapper lsd-side-view-wrapper <?php if($this->sm_shortcode) echo 'lsd-search-position-' . esc_attr($this->sm_position); ?> <?php echo esc_attr($this->html_class); ?> lsd-style-<?php echo esc_attr($this->style); ?> lsd-font-m" id="lsd_skin<?php echo esc_attr($this->id); ?>" data-next-page="<?php echo esc_attr($this->next_page); ?>">
-    <?php if ($this->sm_shortcode && in_array($this->sm_position, ['top', 'left', 'right'])) echo LSD_Kses::form($this->get_search_module()); ?>
+<div class="lsd-skin-wrapper lsd-side-view-wrapper <?php echo sanitize_html_class($this->get_bar_class()); ?> <?php echo esc_attr($this->html_class); ?> lsd-style-<?php echo esc_attr($this->style); ?> lsd-font-m" id="lsd_skin<?php echo esc_attr($this->id); ?>" data-next-page="<?php echo esc_attr($this->next_page); ?>">
+    <?php echo LSD_Kses::form($this->get_left_bar()); ?>
 
-    <div class="lsd-side-scaffold lsd-side-scaffold-width-<?php echo esc_attr($this->layout_width); ?>">
-        <div class="lsd-list-wrapper lsd-side-listings">
-            <?php if ($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module('sidebar')); ?>
-            <?php echo LSD_Kses::form($this->get_sortbar()); ?>
-            <div class="lsd-side-view-listings-wrapper">
-                <div class="lsd-listing-wrapper">
-                    <?php echo LSD_Kses::full($listings_html); ?>
+    <div class="lsd-skin-main-bar-wrapper">
+        <?php if ($this->sm_shortcode && $this->sm_position === 'top') echo LSD_Kses::form($this->get_search_module()); ?>
+
+        <div class="lsd-side-scaffold lsd-side-scaffold-width-<?php echo esc_attr($this->layout_width); ?>">
+            <div class="lsd-list-wrapper lsd-side-listings">
+                <?php if ($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module('sidebar')); ?>
+                <?php echo LSD_Kses::form($this->get_sortbar()); ?>
+                <div class="lsd-side-view-listings-wrapper">
+                    <div class="lsd-listing-wrapper">
+                        <?php echo LSD_Kses::full($listings_html); ?>
+                    </div>
                 </div>
+                <?php echo LSD_Kses::element($this->get_pagination()); ?>
             </div>
-            <?php echo LSD_Kses::element($this->get_pagination()); ?>
+            <div class="lsd-side-details">
+                <div class="lsd-side-details-close"><i class="lsd-icon fa fa-window-close"></i></div>
+                <div class="lsd-side-details-iframe"></div>
+            </div>
         </div>
-        <div class="lsd-side-details">
-            <div class="lsd-side-details-close"><i class="lsd-icon fa fa-window-close"></i></div>
-            <div class="lsd-side-details-iframe"></div>
-        </div>
+
+        <?php if ($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
     </div>
 
-    <?php if ($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
+    <?php echo LSD_Kses::form($this->get_right_bar()); ?>
 </div>

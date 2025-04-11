@@ -4,8 +4,8 @@ Donate link: https://webilia.com/
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.0.0
 Requires PHP: 7.2
-Tested up to: 6.7.2
-Stable tag: 4.0.0
+Tested up to: 6.8.0
+Stable tag: 4.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -378,6 +378,21 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 4.1.0 =
+* Added public profile functionality.
+* Added user profile settings to the frontend dashboard.
+* Introduced new user directory shortcode.
+* Added support to open additional search options in a popup.
+* Added a setting to customize the "More Options" label in the search widget.
+* Added new customization options in the UI Customizer.
+* [PRO] Added the ability to exclude listings from shortcodes by tags or authors.
+* Added an option to display checkbox and radio fields in multiple columns in the search widget.
+* Enhanced the performance of sliders and carousels.
+* Improved the Map Bar responsiveness on smaller screens.
+* Resolved search widget positioning issues in specific skins.
+* Fixed a conflict with advanced asset loading feature.
+* Fixed an issue where listing status could not be updated from the frontend dashboard.
 
 = 4.0.0 =
 * Added a comprehensive Game-Changer UI Customizer to Listdom Core.

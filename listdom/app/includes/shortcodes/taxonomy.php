@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Taxonomy Shortcode Class.
- *
- * @class LSD_Shortcodes_Taxonomy
- * @version    1.0.0
- */
 class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
 {
     protected $TX;
@@ -18,16 +10,6 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
     protected $valid_styles = [];
     protected $columns = 1;
     protected $hierarchical = false;
-
-    public function __construct()
-    {
-        // Unique ID
-        $this->id = LSD_id::get(mt_rand(100, 999));
-    }
-
-    public function init()
-    {
-    }
 
     public function output($atts = [])
     {
@@ -52,6 +34,9 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
 
             return $this->alert(sprintf(esc_html__('Style is invalid! Valid styles are: %s', 'listdom'), trim($valid_styles, ', ')), 'warning');
         }
+
+        // Unique ID
+        $this->id = LSD_id::get(mt_rand(1000, 9999));
 
         // Hierarchical
         $this->hierarchical = isset($this->atts['hierarchical']) && $this->atts['hierarchical'];
@@ -157,6 +142,6 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         // Generate output
         ob_start();
         include lsd_template('taxonomy-shortcodes/carousel.php');
-        return LSD_Kses::element(ob_get_clean());
+        return LSD_Kses::full(ob_get_clean());
     }
 }

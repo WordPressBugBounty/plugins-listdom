@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom IX General Class.
- *
- * @class LSD_IX_Listdom
- * @version    1.0.0
- */
 class LSD_IX_Listdom extends LSD_IX
 {
     public function json()

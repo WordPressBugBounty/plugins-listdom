@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Dashboard Class.
- *
- * @class LSD_Dashboard
- * @version    1.0.0
- */
 class LSD_Dashboard extends LSD_Base
 {
     public function init()

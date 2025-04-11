@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom API Class.
- *
- * @class LSD_API
- * @version    1.0.0
- */
 class LSD_API extends LSD_Base
 {
     public $namespace = 'listdom/v1';

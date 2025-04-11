@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Statuses Class.
- *
- * @class LSD_Statuses
- * @version    1.0.0
- */
 class LSD_Statuses extends LSD_Base
 {
     protected $statuses;

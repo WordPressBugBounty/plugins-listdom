@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Flash Message Class.
- *
- * @class LSD_Flash
- * @version    1.0.0
- */
 class LSD_Flash extends LSD_Base
 {
     public static function add($message, $class = 'info')

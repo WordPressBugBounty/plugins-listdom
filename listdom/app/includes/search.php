@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Search Class.
- *
- * @class LSD_Search
- * @version    1.0.0
- */
 class LSD_Search extends LSD_Base
 {
     public function init()

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Shortcodes Class.
- *
- * @class LSD_Shortcodes
- * @version    1.0.0
- */
 class LSD_Shortcodes extends LSD_Base
 {
     public function init()
@@ -41,6 +33,9 @@ class LSD_Shortcodes extends LSD_Base
 
         // Auth Shortcode
         (new LSD_Shortcodes_Auth())->init();
+
+        // Profile Shortcode
+        (new LSD_Shortcodes_Profile())->init();
     }
 
     public function parse($post_id, $atts = []): array

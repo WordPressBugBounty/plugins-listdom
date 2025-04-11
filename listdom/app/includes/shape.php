@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Entity Class.
- *
- * @class LSD_Shape
- * @version    1.0.0
- */
 class LSD_Shape extends LSD_Base
 {
     public static function get(array $args = [])

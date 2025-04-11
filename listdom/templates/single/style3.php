@@ -40,12 +40,12 @@ $rate_summary = $this->entity->get_rate_stars('summary');
     <div class="lsd-col-12">
         <div class="lsd-full-width-banner-gallery">
             <div class="lsd-single-image-wrapper">
-                <?php if($gallery) echo LSD_Kses::element($gallery); ?>
+                <?php if ($gallery) echo LSD_Kses::element($gallery); ?>
 
-                <?php if($labels || $favorite): ?>
+                <?php if ($labels || $favorite): ?>
                     <?php
-                        if($labels) echo LSD_Kses::element($labels);
-                        if($favorite) echo LSD_Kses::element($favorite);
+                    if ($labels) echo LSD_Kses::element($labels);
+                    if ($favorite) echo LSD_Kses::element($favorite);
                     ?>
                 <?php endif; ?>
             </div>
@@ -55,57 +55,57 @@ $rate_summary = $this->entity->get_rate_stars('summary');
 <div class="lsd-row">
     <div class="lsd-col-8">
         <div class="listdom-single-top">
-            <?php if($categories) echo LSD_Kses::element($categories); ?>
+            <?php if ($categories) echo LSD_Kses::element($categories); ?>
 
             <div class="listdom-single-title-wrapper">
-                <?php if($title) echo LSD_Kses::element($title); ?>
+                <?php if ($title) echo LSD_Kses::element($title); ?>
                 <?php echo $this->entity->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="' . esc_attr__('Verified', 'listdom') . '"></i>' : ''; ?>
             </div>
 
-            <?php if($minified_availability || $claim || $discussion_status || $rate_summary): ?>
+            <?php if ($minified_availability || $claim || $discussion_status || $rate_summary): ?>
                 <div class="listdom-single-top-bottom">
 
-                    <?php if($minified_availability): ?>
+                    <?php if ($minified_availability): ?>
                         <div class="lsd-single-availability-top">
                             <?php echo LSD_Kses::element($minified_availability); ?>
                         </div>
                     <?php endif; ?>
 
-                    <?php if($claim) echo LSD_Kses::element($claim); ?>
+                    <?php if ($claim) echo LSD_Kses::element($claim); ?>
 
-                    <?php if($discussion_status): ?>
-                        <div class="listdomer-write-a-review-button">
+                    <?php if ($discussion_status): ?>
+                        <div class="listdom-write-a-review-button">
                             <a href="#lsd-discussion">
                                 <?php esc_html_e('Submit a Review', 'listdom'); ?>
                             </a>
                         </div>
                     <?php endif; ?>
 
-                    <?php if($rate_summary) echo LSD_Kses::element($rate_summary); ?>
+                    <?php if ($rate_summary) echo LSD_Kses::element($rate_summary); ?>
                 </div>
             <?php endif; ?>
 
         </div>
 
-        <?php if($excerpt) echo LSD_Kses::element($excerpt); ?>
+        <?php if ($excerpt) echo LSD_Kses::element($excerpt); ?>
 
-        <?php if($image): ?>
+        <?php if ($image): ?>
             <div class="lsd-single-image-wrapper"><?php echo LSD_Kses::element($image); ?></div>
         <?php endif; ?>
 
-        <?php if($features) echo LSD_Kses::element($features); ?>
-        <?php if($content) echo LSD_Kses::element($content); ?>
+        <?php if ($features) echo LSD_Kses::element($features); ?>
+        <?php if ($content) echo LSD_Kses::element($content); ?>
 
         {ads}
 
-        <?php if($attributes) echo LSD_Kses::element($attributes); ?>
+        <?php if ($attributes) echo LSD_Kses::element($attributes); ?>
 
         {acf}
 
-        <?php if($embeds) echo LSD_Kses::rich($embeds); ?>
-        <?php if($video) echo LSD_Kses::rich($video); ?>
+        <?php if ($embeds) echo LSD_Kses::rich($embeds); ?>
+        <?php if ($video) echo LSD_Kses::rich($video); ?>
 
-        <?php if($remark) echo LSD_Kses::element($remark); ?>
+        <?php if ($remark) echo LSD_Kses::element($remark); ?>
 
         {auction}
         {booking}
@@ -113,33 +113,33 @@ $rate_summary = $this->entity->get_rate_stars('summary');
         {application}
         {stats}
 
-        <?php if($tags) echo LSD_Kses::element($tags); ?>
-        <?php if($share) echo LSD_Kses::element($share); ?>
+        <?php if ($tags) echo LSD_Kses::element($tags); ?>
+        <?php if ($share) echo LSD_Kses::element($share); ?>
 
         {franchise}
 
     </div>
     <div class="lsd-col-4 lsd-single-page-section-right-col lsd-flex lsd-flex-col lsd-flex-content-start lsd-flex-items-stretch lsd-gap-4">
 
-        <?php if($owner) echo LSD_Kses::form($owner); ?>
-        <?php if($price) echo '<div class="lsd-single-page-price lsd-single-page-section">' . LSD_Kses::element($price) . '</div>'; ?>
-        <?php if($availability) echo LSD_Kses::element($availability); ?>
-        <?php if($map) echo LSD_Kses::form($map); ?>
+        <?php if ($owner) echo LSD_Kses::form($owner); ?>
+        <?php if ($price) echo '<div class="lsd-single-page-price lsd-single-page-section">' . LSD_Kses::element($price) . '</div>'; ?>
+        <?php if ($availability) echo LSD_Kses::element($availability); ?>
+        <?php if ($map) echo LSD_Kses::form($map); ?>
 
-        <?php if($locations || $address): ?>
+        <?php if ($locations || $address): ?>
             <div class="lsd-single-page-section-map-top">
-                <?php if($locations) echo LSD_Kses::element($locations); ?>
-                <?php if($address) echo LSD_Kses::element($address); ?>
+                <?php if ($locations) echo LSD_Kses::element($locations); ?>
+                <?php if ($address) echo LSD_Kses::element($address); ?>
             </div>
         <?php endif; ?>
 
         {locallogic}
 
-        <?php if($contact_info) echo LSD_Kses::element($contact_info); ?>
+        <?php if ($contact_info) echo LSD_Kses::element($contact_info); ?>
 
         {team}
 
-        <?php if($abuse) echo LSD_Kses::form($abuse); ?>
+        <?php if ($abuse) echo LSD_Kses::form($abuse); ?>
 
     </div>
 </div>

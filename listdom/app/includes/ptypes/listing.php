@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Listing Post Types Class.
- *
- * @class LSD_PTypes_Listing
- * @version    1.0.0
- */
 class LSD_PTypes_Listing extends LSD_PTypes
 {
     public $PT;

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Skins Table Class.
- *
- * @class LSD_Skins_Table
- * @version    1.0.0
- */
 class LSD_Skins_Table extends LSD_Skins
 {
     public $skin = 'table';

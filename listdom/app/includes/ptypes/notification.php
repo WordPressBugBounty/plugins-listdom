@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Notification Post Types Class.
- *
- * @class LSD_PTypes_Notification
- * @version    1.0.0
- */
 class LSD_PTypes_Notification extends LSD_PTypes
 {
     public $PT;

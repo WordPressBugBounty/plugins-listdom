@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Kses Class.
- *
- * @class LSD_Kses
- * @version    1.0.0
- */
 class LSD_Kses extends LSD_Base
 {
     static $allowed_html_form = null;

@@ -452,6 +452,21 @@ class LSD_Base
         );
     }
 
+    public static function human_comma_separate(array $words = []): string
+    {
+        $string = '';
+
+        $count = count($words);
+        $a = 1;
+        foreach ($words as $word)
+        {
+            $a++;
+            $string .= '<strong>' . ucfirst($word) . '</strong>' . ($a === $count ? esc_html__(', and', 'listdom') . ' ' : ', ');
+        }
+
+        return trim($string, ', ');
+    }
+
     public static function getActivationURL(): string
     {
         return admin_url('admin.php?page=listdom&tab=activation');
@@ -2144,4 +2159,10 @@ class LSD_Base
         return apply_filters('lsd_is_listdom_page', $status);
     }
 
+    public static function is_url(string $url): bool
+    {
+        if (strtolower(esc_url_raw($url)) === strtolower($url)) return true;
+
+        return false;
+    }
 }

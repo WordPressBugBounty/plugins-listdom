@@ -1,10 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom DataBase class.
- */
 class LSD_db extends LSD_Base
 {
     /**

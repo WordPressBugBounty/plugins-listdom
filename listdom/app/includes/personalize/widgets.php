@@ -34,16 +34,16 @@ class LSD_Personalize_Widgets extends LSD_Personalize
         return [
             'bg_color' => sanitize_text_field($normal['bg']),
             'text_color' => sanitize_text_field($normal['text']),
-            'border' => self::get_border($normal['border'] ?? []),
-            'padding' => self::get_padding($normal['padding'] ?? []),
+            'border' => $normal['border'] ?? [],
+            'padding' => $normal['padding'] ?? [],
             'border_style' => $normal['border']['style'],
             'border_color' => $normal['border']['color'],
             'border_radius' => sanitize_text_field($normal['border']['radius']) . 'px',
 
             'hover_bg_color' => sanitize_text_field($hover['bg']),
             'hover_text_color' => sanitize_text_field($hover['text']),
-            'border_hover' => self::get_border($hover['border'] ?? []),
-            'padding_hover' => self::get_padding($hover['padding'] ?? []),
+            'border_hover' => $hover['border'] ?? [],
+            'padding_hover' => $hover['padding'] ?? [],
             'border_hover_style' => $hover['border']['style'],
             'border_hover_color' => $hover['border']['color'],
             'hover_border_radius' => sanitize_text_field($hover['border']['radius']) . 'px',
@@ -90,7 +90,7 @@ class LSD_Personalize_Widgets extends LSD_Personalize
             $CSS = str_replace("(({$widget_type}_widget_hover_border_radius))", $settings['hover_border_radius'], $CSS);
 
             // Typography
-            $CSS = str_replace("(({$widget_type}_widget_font_family))", $settings['family'], $CSS);
+            $CSS = str_replace("(({$widget_type}_widget_font_family))", self::font_family($settings['family'] ?? ''), $CSS);
             $CSS = str_replace("(({$widget_type}_widget_font_weight))", $settings['weight'], $CSS);
             $CSS = str_replace("(({$widget_type}_widget_text_align))", $settings['align'], $CSS);
             $CSS = str_replace("(({$widget_type}_widget_font_size))", $settings['size'], $CSS);
@@ -98,27 +98,5 @@ class LSD_Personalize_Widgets extends LSD_Personalize
         }
 
         return $CSS;
-    }
-
-    /**
-     * Returns the formatted border CSS for the given border settings.
-     *
-     * @param array $border The border settings.
-     * @return string The border CSS string.
-     */
-    private static function borders(array $border): string
-    {
-        return sprintf('%s %s %s %s', $border['top'], $border['right'], $border['bottom'], $border['left']);
-    }
-
-    /**
-     * Returns the formatted border CSS for the given border settings.
-     *
-     * @param array $padding The border settings.
-     * @return string The border CSS string.
-     */
-    private static function paddings(array $padding): string
-    {
-        return sprintf('%s %s %s %s', $padding['top'], $padding['right'], $padding['bottom'], $padding['left']);
     }
 }

@@ -2,110 +2,127 @@
 
 class LSD_Personalize_Forms extends LSD_Personalize
 {
-    /**
-     * Generates personalized form styles and applies them to the CSS.
-     *
-     * @param string $CSS The raw CSS content. If null, loads the default CSS.
-     * @return string Modified CSS with personalized form styles.
-     */
     public static function make(string $CSS): string
     {
-        $form_types = ['general', 'search'];
-        $form_settings = [];
+        $CSS = self::general($CSS);
+        $CSS = self::search($CSS);
 
-        foreach ($form_types as $type) $form_settings[$type] = self::forms($type);
-
-        return self::replacement($CSS, $form_settings);
+        return self::auth($CSS);
     }
 
-    /**
-     * Retrieves and sanitizes form input settings for a given form type.
-     *
-     * @param string $form_type The type of form (e.g., 'form', 'search_form').
-     * @return array Sanitized form input settings.
-     */
-    private static function forms(string $form_type): array
+    private static function general(string $CSS): string
     {
-        $form_settings = LSD_Options::customizer("forms.{$form_type}_forms");
+        $config = LSD_Options::customizer('forms.general_forms');
 
-        $normal = $form_settings['normal']['_'] ?? [];
-        $hover = $form_settings['hover']['_'] ?? [];
+        $normal = $config['inputs']['normal'] ?? [];
+        $hover = $config['inputs']['hover'] ?? [];
 
-        $fields = [
-            'bg_color' => sanitize_text_field($normal['input_bg_color']),
-            'text_color' => sanitize_text_field($normal['text']),
-            'placeholder_color' => sanitize_text_field($normal['placeholder']),
-            'border' => self::get_border($normal['border'] ?? []),
-            'border_radius' => sanitize_text_field($normal['border']['radius']) . 'px',
-            'hover_bg_color' => sanitize_text_field($hover['input_bg_color']),
-            'hover_border' => self::get_border($hover['border'] ?? []),
-            'hover_border_radius' => sanitize_text_field($hover['border']['radius']) . 'px',
+        // Normal state (non-hover settings)
+        $CSS = str_replace("((general_form_input_bg_color))", sanitize_text_field($normal['input_bg_color'] ?: 'inherit'), $CSS);
 
-            'family' => sanitize_text_field($normal['typography']['family']),
-            'weight' => sanitize_text_field($normal['typography']['weight']),
-            'align' => sanitize_text_field($normal['typography']['align']),
-            'size' => sanitize_text_field($normal['typography']['size']) . 'px',
-            'line_height' => sanitize_text_field($normal['typography']['line_height']) . 'px',
-        ];
+        $CSS = str_replace("((general_form_input_text_color))", sanitize_text_field($normal['text'] ?: 'inherit'), $CSS);
+        $CSS = str_replace("((general_form_input_placeholder_text_color))", sanitize_text_field($normal['placeholder'] ?: 'inherit'), $CSS);
+        $CSS = str_replace("((general_form_input_border_width))", self::borders($normal['border'] ?? []), $CSS);
+        $CSS = str_replace("((general_form_input_border_style))", sanitize_text_field($normal['border']['style']), $CSS);
+        $CSS = str_replace("((general_form_input_border_color))", sanitize_text_field($normal['border']['color']), $CSS);
+        $CSS = str_replace("((general_form_input_border_radius))", sanitize_text_field($normal['border']['radius']) . 'px', $CSS);
 
-        if ($form_type === 'search')
+        // Hover state settings
+        $CSS = str_replace("((general_form_input_hover_bg_color))", sanitize_text_field($hover['input_bg_color'] ?: 'inherit'), $CSS);
+        $CSS = str_replace("((general_form_input_hover_border_width))", self::borders($hover['border'] ?? []), $CSS);
+        $CSS = str_replace("((general_form_input_hover_border_style))", sanitize_text_field($hover['border']['style']), $CSS);
+        $CSS = str_replace("((general_form_input_hover_border_color))", sanitize_text_field($hover['border']['color']), $CSS);
+        $CSS = str_replace("((general_form_input_hover_border_radius))", sanitize_text_field($hover['border']['radius']) . 'px', $CSS);
+
+        // Typography
+        $CSS = str_replace("((general_form_input_font_family))", self::font_family($normal['typography']['family'] ?? ''), $CSS);
+        $CSS = str_replace("((general_form_input_font_weight))", sanitize_text_field($normal['typography']['weight']), $CSS);
+        $CSS = str_replace("((general_form_input_text_align))", sanitize_text_field($normal['typography']['align']), $CSS);
+        $CSS = str_replace("((general_form_input_font_size))", sanitize_text_field($normal['typography']['size']) . 'px', $CSS);
+
+        return str_replace("((general_form_input_line_height))", sanitize_text_field($normal['typography']['line_height']) . 'px', $CSS);
+    }
+
+    private static function search(string $CSS): string
+    {
+        $config = LSD_Options::customizer('forms.search_forms');
+
+        $form = $config['form']['_'] ?? [];
+        $icon = $config['icon']['_'] ?? [];
+        $normal = $config['inputs']['normal'] ?? [];
+        $hover = $config['inputs']['hover'] ?? [];
+
+        $CSS = str_replace("((search_form_bg_color))", sanitize_text_field($form['form_bg_color'] ?: 'inherit'), $CSS);
+        $CSS = str_replace("((search_form_input_icons_color))", sanitize_text_field($icon['icon_color'] ?: 'inherit'), $CSS);
+
+        // Normal state (non-hover settings)
+        $CSS = str_replace("((search_form_input_bg_color))", sanitize_text_field($normal['input_bg_color'] ?: 'inherit'), $CSS);
+
+        $CSS = str_replace("((search_form_input_text_color))", sanitize_text_field($normal['text'] ?: 'inherit'), $CSS);
+        $CSS = str_replace("((search_form_input_placeholder_text_color))", sanitize_text_field($normal['placeholder'] ?: 'inherit'), $CSS);
+        $CSS = str_replace("((search_form_input_border_width))", self::borders($normal['border'] ?? []), $CSS);
+        $CSS = str_replace("((search_form_input_border_style))", sanitize_text_field($normal['border']['style']), $CSS);
+        $CSS = str_replace("((search_form_input_border_color))", sanitize_text_field($normal['border']['color']), $CSS);
+        $CSS = str_replace("((search_form_input_border_radius))", sanitize_text_field($normal['border']['radius']) . 'px', $CSS);
+
+        // Hover state settings
+        $CSS = str_replace("((search_form_input_hover_bg_color))", sanitize_text_field($hover['input_bg_color'] ?: 'inherit'), $CSS);
+        $CSS = str_replace("((search_form_input_hover_border_width))", self::borders($hover['border'] ?? []), $CSS);
+        $CSS = str_replace("((search_form_input_hover_border_style))", sanitize_text_field($hover['border']['style']), $CSS);
+        $CSS = str_replace("((search_form_input_hover_border_color))", sanitize_text_field($hover['border']['color']), $CSS);
+        $CSS = str_replace("((search_form_input_hover_border_radius))", sanitize_text_field($hover['border']['radius']) . 'px', $CSS);
+
+        // Typography
+        $CSS = str_replace("((search_form_input_font_family))", self::font_family($normal['typography']['family'] ?? ''), $CSS);
+        $CSS = str_replace("((search_form_input_font_weight))", sanitize_text_field($normal['typography']['weight']), $CSS);
+        $CSS = str_replace("((search_form_input_text_align))", sanitize_text_field($normal['typography']['align']), $CSS);
+        $CSS = str_replace("((search_form_input_font_size))", sanitize_text_field($normal['typography']['size']) . 'px', $CSS);
+
+        return str_replace("((search_form_input_line_height))", sanitize_text_field($normal['typography']['line_height']) . 'px', $CSS);
+    }
+
+    private static function auth(string $CSS): string
+    {
+        $config = LSD_Options::customizer('forms.auth_forms');
+
+        $box = $config['box']['_'] ?? [];
+        $labels = $config['labels']['_'] ?? [];
+
+        // Box
+        $CSS = str_replace('((auth_forms_box_bg))', sanitize_text_field($box['bg'] ?: 'transparent'), $CSS);
+        $CSS = str_replace('((auth_forms_box_padding))', self::paddings($box['padding'] ?? []), $CSS);
+        $CSS = str_replace('((auth_forms_box_border))', self::borders($box['border'] ?? []), $CSS);
+        $CSS = str_replace('((auth_forms_box_border_style))', sanitize_text_field($box['border']['style'] ?: 'none'), $CSS);
+        $CSS = str_replace('((auth_forms_box_border_color))', sanitize_text_field($box['border']['color'] ?: 'transparent'), $CSS);
+        $CSS = str_replace('((auth_forms_box_border_radius))', sanitize_text_field($box['border']['radius'] ?: 0) . 'px', $CSS);
+
+        // Tabs
+        foreach (['normal', 'hover', 'active'] as $state)
         {
-            $fields['form_bg_color'] = isset($normal['form_bg_color']) ? sanitize_text_field($normal['form_bg_color']) : '#fff';
-            $fields['icon_color'] = isset($normal['icon_color']) ? sanitize_text_field($normal['icon_color']) : '#33c6ff';
+            $tab = $config['tabs'][$state] ?? [];
+
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_bg1))', sanitize_text_field($tab['bg1'] ?: 'transparent'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_bg2))', sanitize_text_field($tab['bg2'] ?: 'transparent'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_text))', sanitize_text_field($tab['text'] ?: 'inherit'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_border))', self::borders($tab['border'] ?? []), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_border_style))', sanitize_text_field($tab['border']['style'] ?: 'none'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_border_color))', sanitize_text_field($tab['border']['color'] ?: 'inherit'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_border_radius))', sanitize_text_field($tab['border']['radius'] ?: 0) . 'px', $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_padding))', self::paddings($tab['padding'] ?? []), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_family))', self::font_family($tab['typography']['family'] ?? ''), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_weight))', sanitize_text_field($tab['typography']['weight'] ?: 'inherit'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_text_align))', sanitize_text_field($tab['typography']['align'] ?: 'inherit'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_size))', sanitize_text_field($tab['typography']['size'] ? $tab['typography']['size'] . 'px' : 'inherit'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_line_height))', sanitize_text_field($tab['typography']['line_height'] ? $tab['typography']['line_height'] . 'px' : 'inherit'), $CSS);
         }
 
-        return $fields;
-    }
+        // Labels
+        $CSS = str_replace('((auth_forms_labels_color))', sanitize_text_field($labels['text'] ?: 'inherit'), $CSS);
+        $CSS = str_replace('((auth_forms_labels_font_family))', self::font_family($labels['typography']['family'] ?? ''), $CSS);
+        $CSS = str_replace('((auth_forms_labels_font_weight))', sanitize_text_field($labels['typography']['weight'] ?: 'inherit'), $CSS);
+        $CSS = str_replace('((auth_forms_labels_text_align))', sanitize_text_field($labels['typography']['align'] ?: 'inherit'), $CSS);
+        $CSS = str_replace('((auth_forms_labels_font_size))', sanitize_text_field($labels['typography']['size'] ? $labels['typography']['size'] . 'px' : 'inherit'), $CSS);
 
-    /**
-     * Replaces form input settings placeholders in the CSS with actual values.
-     *
-     * @param string $CSS The raw CSS content.
-     * @param array $forms_settings The form settings to apply.
-     * @return string Modified CSS.
-     */
-    private static function replacement(string $CSS, array $forms_settings): string
-    {
-        foreach ($forms_settings as $form_type => $settings)
-        {
-            // Normal state (non-hover settings)
-            $CSS = str_replace("(({$form_type}_form_input_bg_color))", $settings['bg_color'], $CSS);
-            if ($form_type === 'search') $CSS = str_replace("(({$form_type}_form_bg_color))", $settings['form_bg_color'], $CSS);
-
-            $CSS = str_replace("(({$form_type}_form_input_text_color))", $settings['text_color'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_placeholder_text_color))", $settings['placeholder_color'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_border_width))", self::borders($settings['border']), $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_border_style))", $settings['border']['style'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_border_color))", $settings['border']['color'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_border_radius))", $settings['border_radius'], $CSS);
-            if ($form_type === 'search') $CSS = str_replace("(({$form_type}_form_input_icons_color))", $settings['icon_color'], $CSS);
-
-            // Hover state settings
-            $CSS = str_replace("(({$form_type}_form_input_hover_bg_color))", $settings['hover_bg_color'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_hover_border_width))", self::borders($settings['hover_border']), $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_hover_border_style))", $settings['hover_border']['style'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_hover_border_color))", $settings['hover_border']['color'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_hover_border_radius))", $settings['hover_border_radius'], $CSS);
-
-            // Typography
-            $CSS = str_replace("(({$form_type}_form_input_font_family))", $settings['family'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_font_weight))", $settings['weight'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_text_align))", $settings['align'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_font_size))", $settings['size'], $CSS);
-            $CSS = str_replace("(({$form_type}_form_input_line_height))", $settings['line_height'], $CSS);
-        }
-
-        return $CSS;
-    }
-
-    /**
-     * Returns the formatted border CSS for the given border settings.
-     *
-     * @param array $border The border settings.
-     * @return string The border CSS string.
-     */
-    private static function borders(array $border): string
-    {
-        return sprintf('%s %s %s %s', $border['top'], $border['right'], $border['bottom'], $border['left']);
+        return str_replace('((auth_forms_labels_line_height))', sanitize_text_field($labels['typography']['line_height'] ? $labels['typography']['line_height'] . 'px' : 'inherit'), $CSS);
     }
 }

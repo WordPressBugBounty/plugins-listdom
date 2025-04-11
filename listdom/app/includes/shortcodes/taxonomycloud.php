@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Taxonomy Cloud Shortcode Class.
- *
- * @class LSD_Shortcodes_TaxonomyCloud
- * @version    1.0.0
- */
 class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
 {
     protected $atts = [];

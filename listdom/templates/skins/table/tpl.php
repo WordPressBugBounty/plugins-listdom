@@ -34,39 +34,45 @@ jQuery(document).ready(function()
 });
 </script>');
 ?>
-<div class="lsd-skin-wrapper lsd-table-view-wrapper <?php if ($this->sm_shortcode) echo 'lsd-search-position-' . esc_attr($this->sm_position); ?> <?php echo esc_attr($this->html_class); ?> lsd-style-<?php echo esc_attr($this->style); ?> lsd-font-m" id="lsd_skin<?php echo esc_attr($this->id); ?>" data-next-page="<?php echo esc_attr($this->next_page); ?>">
-    <?php if ($this->sm_shortcode && in_array($this->sm_position, ['top', 'left', 'right'])) echo LSD_Kses::form($this->get_search_module()); ?>
+<div class="lsd-skin-wrapper lsd-table-view-wrapper <?php echo sanitize_html_class($this->get_bar_class()); ?> <?php echo esc_attr($this->html_class); ?> lsd-style-<?php echo esc_attr($this->style); ?> lsd-font-m" id="lsd_skin<?php echo esc_attr($this->id); ?>" data-next-page="<?php echo esc_attr($this->next_page); ?>">
+    <?php echo LSD_Kses::form($this->get_left_bar()); ?>
 
-    <div class="lsd-list-wrapper">
-        <?php echo LSD_Kses::form($this->get_sortbar()); ?>
+    <div class="lsd-skin-main-bar-wrapper">
+        <?php if ($this->sm_shortcode && $this->sm_position === 'top') echo LSD_Kses::form($this->get_search_module()); ?>
 
-        <?php if ($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module()); ?>
+        <div class="lsd-list-wrapper">
+            <?php echo LSD_Kses::form($this->get_sortbar()); ?>
 
-        <div class="lsd-h-scroll-shadow-wrapper">
-            <div class="lsd-h-scroll-shadow lsd-h-scroll-shadow-left"></div>
-            <div class="lsd-h-scroll-shadow lsd-h-scroll-shadow-right"></div>
-            <div class="lsd-h-scroll-shadow-content lsd-table-view-listings-wrapper">
-                <table class="lsd-listing-table">
-                    <thead>
-                        <tr class="lsd-listing-head">
-                            <?php foreach ($titles as $key => $title): ?>
-                                <?php if (isset($columns[$key]['enabled']) && $columns[$key]['enabled'] == '1'): ?>
-                                    <th>
-                                        <?php esc_html_e($title, 'listdom'); ?>
-                                    </th>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </tr>
-                    </thead>
-                    <tbody class="lsd-listing-wrapper">
-                        <?php echo LSD_Kses::full($listings_html); ?>
-                    </tbody>
-                </table>
+            <?php if ($this->sm_shortcode && $this->sm_position === 'before_listings') echo LSD_Kses::form($this->get_search_module()); ?>
+
+            <div class="lsd-h-scroll-shadow-wrapper">
+                <div class="lsd-h-scroll-shadow lsd-h-scroll-shadow-left"></div>
+                <div class="lsd-h-scroll-shadow lsd-h-scroll-shadow-right"></div>
+                <div class="lsd-h-scroll-shadow-content lsd-table-view-listings-wrapper">
+                    <table class="lsd-listing-table">
+                        <thead>
+                            <tr class="lsd-listing-head">
+                                <?php foreach ($titles as $key => $title): ?>
+                                    <?php if (isset($columns[$key]['enabled']) && $columns[$key]['enabled'] == '1'): ?>
+                                        <th>
+                                            <?php esc_html_e($title, 'listdom'); ?>
+                                        </th>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </tr>
+                        </thead>
+                        <tbody class="lsd-listing-wrapper">
+                            <?php echo LSD_Kses::full($listings_html); ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <?php echo LSD_Kses::element($this->get_pagination()); ?>
         </div>
 
-        <?php echo LSD_Kses::element($this->get_pagination()); ?>
+        <?php if ($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
     </div>
 
-    <?php if ($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
+    <?php echo LSD_Kses::form($this->get_right_bar()); ?>
 </div>

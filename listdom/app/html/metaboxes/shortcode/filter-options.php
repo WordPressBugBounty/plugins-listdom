@@ -135,8 +135,40 @@ $walker = new LSD_Walker_Taxonomy();
     <div class="lsd-accordion-panel">
         <div class="lsd-form-row">
             <div class="lsd-col-12">
-                <input title="<?php esc_attr_e('Tags', 'listdom'); ?>" id="lsd_filter_options_tag" type="text" name="lsd[filter][<?php echo LSD_Base::TAX_TAG; ?>]" value="<?php echo(isset($options[LSD_Base::TAX_TAG]) ? esc_attr($options[LSD_Base::TAX_TAG]) : ''); ?>" class="widefat"/>
-                <p class="description lsd-mb-0"><?php esc_html_e('Insert your desired tags separated by comma to filter the listings based on them. Leave empty to show the listings of all tags.', 'listdom'); ?></p>
+                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" data-for=".lsd-tab-switcher-content-tag">
+                    <li data-tab="include-tags" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Include', 'listdom'); ?></a></li>
+                    <li data-tab="exclude-tags" class=""><a href="#"><?php esc_html_e('Exclude', 'listdom'); ?></a></li>
+                </ul>
+
+                <div class="lsd-tab-switcher-content lsd-tab-switcher-content-tag lsd-tab-switcher-content-active" id="lsd-tab-switcher-include-tags-content">
+                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a tag it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
+                    <div class="lsd-tags">
+                        <?php echo LSD_Form::taxonomy(LSD_Base::TAX_TAG, [
+                            'id' => 'lsd_include_' . LSD_Base::TAX_TAG,
+                            'value' => $options[LSD_Base::TAX_TAG] ?? [],
+                            'name' => 'lsd[filter][' . LSD_Base::TAX_TAG . '][]',
+                            'attributes' => [
+                                'multiple' => 'multiple',
+                            ]
+                        ]); ?>
+                    </div>
+                </div>
+                <div class="lsd-tab-switcher-content lsd-tab-switcher-content-tag lsd-alert-no-mb" id="lsd-tab-switcher-exclude-tags-content">
+                    <?php if (LSD_Base::isPro()): ?>
+                        <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a tag it will be excluded from shortcode results.", 'listdom'); ?></p>
+                        <div class="lsd-tags">
+                            <?php echo LSD_Form::taxonomy(LSD_Base::TAX_TAG, [
+                                'id' => 'lsd_exclude_' . LSD_Base::TAX_TAG,
+                                'value' => $exclude[LSD_Base::TAX_TAG] ?? [],
+                                'name' => 'lsd[exclude][' . LSD_Base::TAX_TAG . '][]',
+                                'attributes' => [
+                                    'multiple' => 'multiple',
+                                ]
+                            ]); ?>
+                        </div>
+                    <?php else: echo LSD_Base::alert(LSD_Base::missFeatureMessage(esc_html__('Exclusion Filter', 'listdom')), 'warning'); ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -249,7 +281,7 @@ $walker = new LSD_Walker_Taxonomy();
     <div class="lsd-accordion-panel">
         <div class="lsd-row">
             <div class="lsd-col-12">
-                <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you want to filter listings based on attributes, fill in the following fields. Otherwise, leave them empty to skip filtering.", 'listdom'); ?></p>
+                <p class="description lsd-mt-0 lsd-mb-2"><?php esc_html_e("If you want to filter listings based on attributes, fill in the following fields. Otherwise, leave them empty to skip filtering.", 'listdom'); ?></p>
                 <?php if ($this->isLite()): echo LSD_Base::alert(LSD_Base::missFeatureMessage(esc_html__('Attributes Filter', 'listdom')), 'warning'); ?>
                 <?php else: ?>
                 <div class="lsd-attributes">
@@ -345,10 +377,15 @@ $walker = new LSD_Walker_Taxonomy();
         </div>
     </div>
     <div class="lsd-accordion-panel">
-        <div class="lsd-form-row">
+        <div class="lsd-row">
             <div class="lsd-col-12">
-                <p class="description"><?php esc_html_e("Don't select any option if you don't want to filter the listings by authors.", 'listdom'); ?></p>
-                <?php if ($number_of_users > 20): ?>
+                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" data-for=".lsd-tab-switcher-content-authors">
+                    <li data-tab="include-authors" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Include', 'listdom'); ?></a></li>
+                    <li data-tab="exclude-authors"><a href="#"><?php esc_html_e('Exclude', 'listdom'); ?></a></li>
+                </ul>
+
+                <div class="lsd-tab-switcher-content lsd-tab-switcher-content-authors lsd-tab-switcher-content-active" id="lsd-tab-switcher-include-authors-content">
+                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("Don't select any option if you don't want to filter the listings by authors.", 'listdom'); ?></p>
                     <?php echo LSD_Form::autosuggest([
                         'source' => 'users',
                         'name' => 'lsd[filter][authors]',
@@ -358,26 +395,28 @@ $walker = new LSD_Walker_Taxonomy();
                         'values' => $options['authors'] ?? [],
                         'placeholder' => esc_html__("Enter at least 3 characters of the author's name ...", 'listdom'),
                         'description' => esc_html__('You can select multiple authors.', 'listdom'),
+                        'description_class' => 'lsd-mb-0',
                     ]); ?>
-                <?php else: ?>
-                    <ul class="lsd-authors">
-                        <?php
-                            $authors = get_users([
-                                'role__not_in' => ['subscriber', 'contributor'],
-                                'orderby' => 'post_count',
-                                'order' => 'DESC',
-                                'number' => '-1',
-                                'fields' => ['ID', 'display_name']
-                            ]);
+                </div>
 
-                            $selected_authors = $options['authors'] ?? [];
-                            foreach ($authors as $author)
-                            {
-                                echo '<li><label><input id="in_lsd_author_' . esc_attr($author->ID) . '" name="lsd[filter][authors][]" type="checkbox" value="' . esc_attr($author->ID) . '" ' . (in_array($author->ID, $selected_authors) ? 'checked="checked"' : '') . ' /> ' . esc_html($author->display_name) . '</label></li>';
-                            }
-                        ?>
-                    </ul>
-                <?php endif; ?>
+                <div class="lsd-tab-switcher-content lsd-tab-switcher-content-authors lsd-alert-no-mb" id="lsd-tab-switcher-exclude-authors-content">
+                    <?php if (LSD_Base::isPro()): ?>
+                        <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add an author, their listings will be excluded from the results.", 'listdom'); ?></p>
+                        <?php echo LSD_Form::autosuggest([
+                            'source' => 'users',
+                            'name' => 'lsd[exclude][authors]',
+                            'id' => 'lsd_exclude_author',
+                            'input_id' => 'ex_lsd_author',
+                            'suggestions' => 'lsd_exclude_author_suggestions',
+                            'values' => $exclude['authors'] ?? [],
+                            'placeholder' => esc_html__("Enter at least 3 characters of the author's name ...", 'listdom'),
+                            'description' => esc_html__('You can select multiple authors.', 'listdom'),
+                            'description_class' => 'lsd-mb-0',
+                        ]); ?>
+                    <?php else: ?>
+                        <?php echo LSD_Base::alert(LSD_Base::missFeatureMessage(esc_html__('Exclusion Filter', 'listdom')), 'warning'); ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>

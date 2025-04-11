@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Simplemap Shortcode Class.
- *
- * @class LSD_Shortcodes_Simplemap
- * @version    1.0.0
- */
 class LSD_Shortcodes_Simplemap extends LSD_Shortcodes
 {
     public function init()

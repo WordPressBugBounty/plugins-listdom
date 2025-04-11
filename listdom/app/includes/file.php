@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom File Class.
- *
- * @class LSD_File
- * @version    1.0.0
- */
 class LSD_File extends LSD_Base
 {
     public static function read($path)

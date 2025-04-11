@@ -1,16 +1,7 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Add Listing Shortcode Class.
- *
- * @class LSD_Shortcodes_AddListing
- * @version    1.0.0
- */
 class LSD_Shortcodes_AddListing extends LSD_Shortcodes_Dashboard
 {
-    public $form_type;
     public $add_listing;
 
     public function __construct()
@@ -61,7 +52,7 @@ class LSD_Shortcodes_AddListing extends LSD_Shortcodes_Dashboard
         LSD_Payload::set('add_listing', $this);
 
         // Form
-        if ($this->mode == 'form') return $this->add_listing();
+        if ($this->mode === 'form') return $this->add_listing();
         // Subscription Modes
         else return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'error'), $this);
     }

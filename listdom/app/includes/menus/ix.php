@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Import / Export Menu Class.
- *
- * @class LSD_Menus_IX
- * @version    1.0.0
- */
 class LSD_Menus_IX extends LSD_Menus
 {
     public function __construct()

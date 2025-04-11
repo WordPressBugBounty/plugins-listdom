@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Endpoints Class.
- *
- * @class LSD_Endpoints
- * @version    1.0.0
- */
 class LSD_Endpoints extends LSD_Base
 {
     public function init()

@@ -13,9 +13,6 @@ $category = $entity->get_data_category();
 // All Categories
 $all_categories = LSD_Taxonomies_Category::get_terms();
 
-// Form Type
-$form_type = $this->form_type;
-
 // Objects
 $postType = new LSD_PTypes_Listing();
 $gallery_max_size = $this->settings['submission_max_image_upload_size'] ?? '';
@@ -36,7 +33,7 @@ jQuery(document).ready(function()
 <div class="lsd-dashboard lsd-dashboard-form" id="lsd_dashboard" data-job-addon-installed="<?php echo class_exists(LSDADDJOB::class) || class_exists(\LSDPACJOB\Base::class) ? 1 : 0; ?>">
 
     <div class="lsd-row">
-        <?php if (!$form_type): ?>
+        <?php if (!$this->form_type): ?>
             <div class="lsd-col-2 lsd-dashboard-menus-wrapper">
                 <?php echo LSD_Kses::element($this->menus()); ?>
             </div>
@@ -261,21 +258,22 @@ jQuery(document).ready(function()
                         <?php if ($this->is_enabled('image') && ($this->guest_status || LSD_Capability::can('upload_files'))): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-featured-image">
                             <h4><?php esc_html_e('Featured Image', 'listdom'); ?><?php $this->required_html('featured_image'); ?></h4>
-                            <div>
+                            <div class="lsd-flex lsd-flex-col lsd-gap-2">
                                 <?php
-                                $attachment_id = get_post_thumbnail_id($this->post->ID);
+                                    $attachment_id = get_post_thumbnail_id($this->post->ID);
 
-                                $featured_image = wp_get_attachment_image_src($attachment_id, 'medium');
-                                if (isset($featured_image[0])) $featured_image = $featured_image[0];
+                                    $featured_image = wp_get_attachment_image_src($attachment_id, 'medium');
+                                    if (isset($featured_image[0])) $featured_image = $featured_image[0];
                                 ?>
                                 <div class="lsd-col-12" id="lsd_listing_featured_image_message"></div>
                                 <span id="lsd_dashboard_featured_image_preview"><?php echo trim($featured_image) ? '<img src="'.esc_url($featured_image).'" />' : ''; ?></span>
                                 <input type="hidden" id="lsd_featured_image" name="lsd[featured_image]" value="<?php echo esc_attr($attachment_id); ?>">
-                                <input type="file" id="lsd_featured_image_file">
+                                <input class="lsd-util-hide" type="file" id="lsd_featured_image_file">
+                                <label for="lsd_featured_image_file" class="lsd-choose-file"><?php echo esc_html__('Choose Image', 'listdom'); ?></label>
                                 <p class="description"><?php sprintf(esc_html__('The uploaded image exceeds the maximum allowed size of %s KB.', 'listdom'), $gallery_max_size)?></p>
 
                                 <div class="lsd-dashboard-feature-image-remove-wrapper">
-                                    <span id="lsd_featured_image_remove_button" class="lsd-remove-image-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo (trim($featured_image) ? '' : 'lsd-util-hide'); ?>">
+                                    <span id="lsd_featured_image_remove_button" class="lsd-remove-image-button <?php echo esc_attr($this->get_text_class()); ?> <?php echo trim($featured_image) ? '' : 'lsd-util-hide'; ?>">
                                         <?php esc_html_e('Remove Image', 'listdom'); ?>
                                     </span>
                                 </div>

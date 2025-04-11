@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Widgets SimpleMap Class.
- *
- * @class LSD_Widgets_SimpleMap
- * @version    1.0.0
- */
 class LSD_Widgets_SimpleMap extends WP_Widget
 {
     public $LSD;

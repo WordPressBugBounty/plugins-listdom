@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Tags Shortcode Class.
- *
- * @class LSD_Shortcodes_Tags
- * @version    1.0.0
- */
 class LSD_Shortcodes_Tag extends LSD_Shortcodes_Taxonomy
 {
     // Taxonomy

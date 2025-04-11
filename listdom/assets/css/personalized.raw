@@ -24,7 +24,7 @@
   --listdom-primary-button-border-radius: ((primary_button_border_radius)); /* Primary Button Border Radius */
   --listdom-primary-button-hover-border-radius: ((primary_button_hover_border_radius)); /* Primary Button Border Radius */
 
-  --listdom-primary-button-font-family: "((primary_button_font_family))", Arial, monospace;; /* Primary Button Typography */
+  --listdom-primary-button-font-family: ((primary_button_font_family)); /* Primary Button Typography */
   --listdom-primary-button-font-weight: ((primary_button_font_weight)); /* Primary Button Typography */
   --listdom-primary-button-text-align: ((primary_button_text_align)); /* Primary Button Typography */
   --listdom-primary-button-font-size: ((primary_button_font_size)); /* Primary Button Typography */
@@ -45,7 +45,7 @@
   --listdom-search-button-border-radius: ((search_button_border_radius)); /* Search Button Border Radius */
   --listdom-search-button-hover-border-radius: ((search_button_hover_border_radius)); /* Search Button Border Radius */
 
-  --listdom-search-button-font-family: "((search_button_font_family))", Arial, monospace;; /* Search Button Typography */
+  --listdom-search-button-font-family: ((search_button_font_family)); /* Search Button Typography */
   --listdom-search-button-font-weight: ((search_button_font_weight)); /* Search Button Typography */
   --listdom-search-button-text-align: ((search_button_text_align)); /* Search Button Typography */
   --listdom-search-button-font-size: ((search_button_font_size)); /* Search Button Typography */
@@ -66,7 +66,7 @@
   --listdom-pagination-button-border-radius: ((pagination_button_border_radius)); /* Pagination Button Border Radius */
   --listdom-pagination-button-hover-border-radius: ((pagination_button_hover_border_radius)); /* Pagination Button Border Radius */
 
-  --listdom-pagination-button-font-family: "((pagination_button_font_family))", Arial, monospace;; /* Pagination Button Typography */
+  --listdom-pagination-button-font-family: ((pagination_button_font_family)); /* Pagination Button Typography */
   --listdom-pagination-button-font-weight: ((pagination_button_font_weight)); /* Pagination Button Typography */
   --listdom-pagination-button-text-align: ((pagination_button_text_align)); /* Pagination Button Typography */
   --listdom-pagination-button-font-size: ((pagination_button_font_size)); /* Pagination Button Typography */
@@ -87,7 +87,7 @@
   --listdom-secondary-button-border-radius: ((secondary_button_border_radius)); /* secondary Button Border Radius */
   --listdom-secondary-button-hover-border-radius: ((secondary_button_hover_border_radius)); /* secondary Button Border Radius */
 
-  --listdom-secondary-button-font-family: "((secondary_button_font_family))", Arial, monospace;; /* Secondary Button Typography */
+  --listdom-secondary-button-font-family: ((secondary_button_font_family)); /* Secondary Button Typography */
   --listdom-secondary-button-font-weight: ((secondary_button_font_weight)); /* Secondary Button Typography */
   --listdom-secondary-button-text-align: ((secondary_button_text_align)); /* Secondary Button Typography */
   --listdom-secondary-button-font-size: ((secondary_button_font_size)); /* Secondary Button Typography */
@@ -108,7 +108,7 @@
   --listdom-solid-button-border-radius: ((solid_button_border_radius)); /* Solid Button Border Radius */
   --listdom-solid-button-hover-border-radius: ((solid_button_hover_border_radius)); /* Solid Button Border Radius */
 
-  --listdom-solid-button-font-family: "((solid_button_font_family))", Arial, monospace;; /* Solid Button Typography */
+  --listdom-solid-button-font-family: ((solid_button_font_family)); /* Solid Button Typography */
   --listdom-solid-button-font-weight: ((solid_button_font_weight)); /* Solid Button Typography */
   --listdom-solid-button-text-align: ((solid_button_text_align)); /* Solid Button Typography */
   --listdom-solid-button-font-size: ((solid_button_font_size)); /* Solid Button Typography */
@@ -127,7 +127,7 @@
   --listdom-form-input-radius: ((general_form_input_border_radius)); /* Input Border Radius */
   --listdom-form-input-focus-radius: ((general_form_input_hover_border_radius)); /* Input Border Radius */
 
-  --listdom-form-input-font-family: "((general_form_input_font_family))", Arial, monospace;; /* General Form Typography */
+  --listdom-form-input-font-family: ((general_form_input_font_family)); /* General Form Typography */
   --listdom-form-input-font-weight: ((general_form_input_font_weight)); /* General Form Typography */
   --listdom-form-input-text-align: ((general_form_input_text_align)); /* General Form Typography */
   --listdom-form-input-font-size: ((general_form_input_font_size)); /* General Form Typography */
@@ -148,7 +148,7 @@
   --listdom-search-form-input-focus-radius: ((search_form_input_hover_border_radius)); /* Input Border Radius */
   --listdom-search-form-input-icons-color: ((search_form_input_icons_color));
 
-  --listdom-search-form-input-font-family: "((search_form_input_font_family))", Arial, monospace;; /* Search Form Typography */
+  --listdom-search-form-input-font-family: ((search_form_input_font_family)); /* Search Form Typography */
   --listdom-search-form-input-font-weight: ((search_form_input_font_weight)); /* Search Form Typography */
   --listdom-search-form-input-text-align: ((search_form_input_text_align)); /* Search Form Typography */
   --listdom-search-form-input-font-size: ((search_form_input_font_size)); /* Search Form Typography */
@@ -169,7 +169,7 @@
   --listdom-cloud-widget-border-radius: ((cloud_widget_border_radius)); /* Cloud Widget Border Radius */
   --listdom-cloud-widget-hover-border-radius: ((cloud_widget_hover_border_radius)); /* Cloud Widget Border Radius */
 
-  --listdom-cloud-widget-font-family: "((cloud_widget_font_family))", Arial, monospace;; /* Cloud Widget Typography */
+  --listdom-cloud-widget-font-family: ((cloud_widget_font_family)); /* Cloud Widget Typography */
   --listdom-cloud-widget-font-weight: ((cloud_widget_font_weight)); /* Cloud Widget Typography */
   --listdom-cloud-widget-text-align: ((cloud_widget_text_align)); /* Cloud Widget Typography */
   --listdom-cloud-widget-font-size: ((cloud_widget_font_size)); /* Cloud Widget Typography */
@@ -190,13 +190,13 @@
   --listdom-terms-widget-border-radius: ((terms_widget_border_radius)); /* Terms Widget Border Radius */
   --listdom-terms-widget-hover-border-radius: ((terms_widget_hover_border_radius)); /* Terms Widget Border Radius */
 
-  --listdom-terms-widget-font-family: "((terms_widget_font_family))", Arial, monospace;; /* Terms Widget Typography */
+  --listdom-terms-widget-font-family: ((terms_widget_font_family)); /* Terms Widget Typography */
   --listdom-terms-widget-font-weight: ((terms_widget_font_weight)); /* Terms Widget Typography */
   --listdom-terms-widget-text-align: ((terms_widget_text_align)); /* Terms Widget Typography */
   --listdom-terms-widget-font-size: ((terms_widget_font_size)); /* Terms Widget Typography */
   --listdom-terms-widget-line-height: ((terms_widget_line_height)); /* Terms Widget Typography */
 
-  /* FrontEnd Dashboard */
+  /* Frontend Dashboard */
   --listdom-dashboard-container-bg: ((dashboard_container_bg_color)); /* Dashboard Container Background Color */
   --listdom-dashboard-bg: ((dashboard_bg_color)); /* Dashboard Background Color */
   --listdom-dashboard-text: ((dashboard_text_color)); /* Dashboard Text Color */
@@ -212,11 +212,64 @@
   --listdom-dashboard-border-radius: ((dashboard_border_radius)); /* Dashboard Border Radius */
   --listdom-dashboard-hover-border-radius: ((dashboard_hover_border_radius)); /* Dashboard Border Radius */
 
-  --listdom-dashboard-font-family: "((dashboard_font_family))", Arial, monospace;; /* Dashboard Typography */
+  --listdom-dashboard-font-family: ((dashboard_font_family)); /* Dashboard Typography */
   --listdom-dashboard-font-weight: ((dashboard_font_weight)); /* Dashboard Typography */
   --listdom-dashboard-text-align: ((dashboard_text_align)); /* Dashboard Typography */
   --listdom-dashboard-font-size: ((dashboard_font_size)); /* Dashboard Typography */
   --listdom-dashboard-line-height: ((dashboard_line_height)); /* Dashboard Typography */
+
+  /* Frontend Dashboard - Auth */
+  --listdom-auth-form-box-bg: ((auth_forms_box_bg));
+  --listdom-auth-form-box-padding: ((auth_forms_box_padding));
+  --listdom-auth-form-box-border: ((auth_forms_box_border));
+  --listdom-auth-form-box-border-style: ((auth_forms_box_border_style));
+  --listdom-auth-form-box-border-color: ((auth_forms_box_border_color));
+  --listdom-auth-form-box-border-radius: ((auth_forms_box_border_radius));
+  --listdom-auth-form-label-color: ((auth_forms_labels_color));
+  --listdom-auth-form-label-font-family: ((auth_forms_labels_font_family));
+  --listdom-auth-form-label-font-weight: ((auth_forms_labels_font_weight));
+  --listdom-auth-form-label-text-align: ((auth_forms_labels_text_align));
+  --listdom-auth-form-label-font-size: ((auth_forms_labels_font_size));
+  --listdom-auth-form-label-line-height: ((auth_forms_labels_line_height));
+  --listdom-auth-form-tabs-normal-bg1: ((auth_forms_tabs_normal_bg1));
+  --listdom-auth-form-tabs-normal-bg2: ((auth_forms_tabs_normal_bg2));
+  --listdom-auth-form-tabs-normal-text: ((auth_forms_tabs_normal_text));
+  --listdom-auth-form-tabs-normal-border: ((auth_forms_tabs_normal_border));
+  --listdom-auth-form-tabs-normal-border-style: ((auth_forms_tabs_normal_border_style));
+  --listdom-auth-form-tabs-normal-border-color: ((auth_forms_tabs_normal_border_color));
+  --listdom-auth-form-tabs-normal-border-radius: ((auth_forms_tabs_normal_border_radius));
+  --listdom-auth-form-tabs-normal-padding: ((auth_forms_tabs_normal_padding));
+  --listdom-auth-form-tabs-normal-font-family: ((auth_forms_tabs_normal_font_family));
+  --listdom-auth-form-tabs-normal-font-weight: ((auth_forms_tabs_normal_font_weight));
+  --listdom-auth-form-tabs-normal-text-align: ((auth_forms_tabs_normal_text_align));
+  --listdom-auth-form-tabs-normal-font-size: ((auth_forms_tabs_normal_font_size));
+  --listdom-auth-form-tabs-normal-line-height: ((auth_forms_tabs_normal_line_height));
+  --listdom-auth-form-tabs-hover-bg1: ((auth_forms_tabs_hover_bg1));
+  --listdom-auth-form-tabs-hover-bg2: ((auth_forms_tabs_hover_bg2));
+  --listdom-auth-form-tabs-hover-text: ((auth_forms_tabs_hover_text));
+  --listdom-auth-form-tabs-hover-border: ((auth_forms_tabs_hover_border));
+  --listdom-auth-form-tabs-hover-border-style: ((auth_forms_tabs_hover_border_style));
+  --listdom-auth-form-tabs-hover-border-color: ((auth_forms_tabs_hover_border_color));
+  --listdom-auth-form-tabs-hover-border-radius: ((auth_forms_tabs_hover_border_radius));
+  --listdom-auth-form-tabs-hover-padding: ((auth_forms_tabs_hover_padding));
+  --listdom-auth-form-tabs-hover-font-family: ((auth_forms_tabs_hover_font_family));
+  --listdom-auth-form-tabs-hover-font-weight: ((auth_forms_tabs_hover_font_weight));
+  --listdom-auth-form-tabs-hover-text-align: ((auth_forms_tabs_hover_text_align));
+  --listdom-auth-form-tabs-hover-font-size: ((auth_forms_tabs_hover_font_size));
+  --listdom-auth-form-tabs-hover-line-height: ((auth_forms_tabs_hover_line_height));
+  --listdom-auth-form-tabs-active-bg1: ((auth_forms_tabs_active_bg1));
+  --listdom-auth-form-tabs-active-bg2: ((auth_forms_tabs_active_bg2));
+  --listdom-auth-form-tabs-active-text: ((auth_forms_tabs_active_text));
+  --listdom-auth-form-tabs-active-border: ((auth_forms_tabs_active_border));
+  --listdom-auth-form-tabs-active-border-style: ((auth_forms_tabs_active_border_style));
+  --listdom-auth-form-tabs-active-border-color: ((auth_forms_tabs_active_border_color));
+  --listdom-auth-form-tabs-active-border-radius: ((auth_forms_tabs_active_border_radius));
+  --listdom-auth-form-tabs-active-padding: ((auth_forms_tabs_active_padding));
+  --listdom-auth-form-tabs-active-font-family: ((auth_forms_tabs_active_font_family));
+  --listdom-auth-form-tabs-active-font-weight: ((auth_forms_tabs_active_font_weight));
+  --listdom-auth-form-tabs-active-text-align: ((auth_forms_tabs_active_text_align));
+  --listdom-auth-form-tabs-active-font-size: ((auth_forms_tabs_active_font_size));
+  --listdom-auth-form-tabs-active-line-height: ((auth_forms_tabs_active_line_height));
 
   --listdom-masonry-tabs-bg: ((masonry_tabs_bg_color)); /* Masonry Tabs Background Color */
   --listdom-masonry-tabs-text: ((masonry_tabs_text_color)); /* Masonry Tabs Text Color */
@@ -258,6 +311,6 @@
 .lsd-color-m-txt{color: ((dply_main_color)) !important;}
 .lsd-color-m-bg{background-color: ((dply_main_color)) ;}
 .lsd-color-m-brd{border-color: ((dply_main_color)) !important;}
-.lsd-font-m{font-family: "((dply_main_font))", Arial, monospace;}
+.lsd-font-m{font-family: ((dply_main_font));}
 .lsd-owl-carousel .owl-dots .owl-dot span{border-color: ((dply_main_color)) !important;}
 .lsd-owl-carousel .owl-dots .owl-dot.active span, .lsd-owl-carousel .owl-dots .owl-dot:hover span{background-color: ((dply_main_color)) !important;}

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Category Taxonomy Class.
- *
- * @class LSD_Taxonomies_Category
- * @version    1.0.0
- */
 class LSD_Taxonomies_Category extends LSD_Taxonomies
 {
     public function init()
@@ -215,8 +207,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
                 <p class="description"><?php esc_html_e("Schema Item Type (https://schema.org/)", 'listdom'); ?></p>
             </td>
         </tr>
-    <?php endif; ?>
-        <?php
+        <?php endif;
     }
 
     public function save_metadata($term_id): bool

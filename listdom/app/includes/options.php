@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Main Class.
- *
- * @class LSD_Options
- * @version    1.0.0
- */
 class LSD_Options extends LSD_Base
 {
     public static function settings(): array
@@ -369,6 +361,10 @@ class LSD_Options extends LSD_Base
                     'logout' => [
                         'redirect' => get_option('page_on_front') ?? 0,
                     ],
+                    'profile' => [
+                        'page' => get_option('page_on_front') ?? 0,
+                        'shortcode' => 'list',
+                    ],
                 ];
                 break;
 
@@ -568,4 +564,3 @@ class LSD_Options extends LSD_Base
         update_option($key, $final);
     }
 }
-

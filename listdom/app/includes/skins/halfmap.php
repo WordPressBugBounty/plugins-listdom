@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Skins Half Map Class.
- *
- * @class LSD_Skins_Halfmap
- * @version    1.0.0
- */
 class LSD_Skins_Halfmap extends LSD_Skins
 {
     public $skin = 'halfmap';

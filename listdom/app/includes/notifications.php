@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Notifications Class.
- *
- * @class LSD_Notifications
- * @version    1.0.0
- */
 class LSD_Notifications extends LSD_Base
 {
     public function init()
@@ -29,6 +21,7 @@ class LSD_Notifications extends LSD_Base
     {
         $hooks = [
             'lsd_contact_owner' => esc_html__('Contact Owner', 'listdom'),
+            'lsd_profile_contact' => esc_html__('Profile Contact', 'listdom'),
             'lsd_new_listing' => esc_html__('New Listing', 'listdom'),
             'lsd_listing_status_changed' => esc_html__('Listing Status Changed', 'listdom'),
             'lsd_listing_report_abuse' => esc_html__('Abuse Report', 'listdom'),
@@ -46,6 +39,13 @@ class LSD_Notifications extends LSD_Base
                 'phone' => esc_html__('Phone field of the contact form', 'listdom'),
                 'message' => esc_html__('Sent message', 'listdom'),
                 'listing_link' => esc_html__('Link to the listing', 'listdom'),
+            ],
+            'lsd_profile_contact' => [
+                'name' => esc_html__('Name field of the contact form', 'listdom'),
+                'email' => esc_html__('Email field of the contact form', 'listdom'),
+                'phone' => esc_html__('Phone field of the contact form', 'listdom'),
+                'message' => esc_html__('Sent message', 'listdom'),
+                'profile_link' => esc_html__('Link of the Profile', 'listdom'),
             ],
             'lsd_new_listing' => [
                 'listing_status' => esc_html__('Status of new listing', 'listdom'),

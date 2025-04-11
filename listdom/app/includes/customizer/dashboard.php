@@ -2,9 +2,25 @@
 
 class LSD_Customizer_Dashboard extends LSD_Customizer
 {
-    public static function options($fields = []): array
+    public function options($fields = []): array
     {
-        $dashboard_groups = [
+        return [
+            'dashboard' => [
+                'title' => esc_html__('Frontend Dashboard', 'listdom'),
+                'display_sections_force' => 1,
+                'sections' => [
+                    'menu' => [
+                        'title' => esc_html__('Menu', 'listdom'),
+                        'groups' => self::menu_groups(),
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    public static function menu_groups(): array
+    {
+        return [
             'normal' => [
                 'title' => esc_html__('Normal', 'listdom'),
                 'sub_title' => esc_html__("Define the frontend dashboard's appearance in normal state.", 'listdom'),
@@ -14,7 +30,7 @@ class LSD_Customizer_Dashboard extends LSD_Customizer
                             'typography' => [
                                 'size' => 14,
                                 'line_height' => 26,
-                            ]
+                            ],
                         ]),
                     ],
                 ],
@@ -30,19 +46,6 @@ class LSD_Customizer_Dashboard extends LSD_Customizer
                                 'color' => '#ffffff29',
                             ],
                         ], ['bg_color', 'text_color', 'border']),
-                    ],
-                ],
-            ],
-        ];
-
-        return [
-            'dashboard' => [
-                'title' => esc_html__('Frontend Dashboard', 'listdom'),
-                'display_sections_force' => 1,
-                'sections' => [
-                    'menu' => [
-                        'title' => esc_html__('Menu', 'listdom'),
-                        'groups' => $dashboard_groups,
                     ],
                 ],
             ],

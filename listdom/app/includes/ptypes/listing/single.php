@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Listing Post Types Single Class.
- *
- * @class LSD_PTypes_Listing_Single
- * @version    1.0.0
- */
 class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 {
     protected $pattern;
@@ -168,7 +160,15 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             $theme_template = isset($this->details_page_options['general']['theme_template']) && trim($this->details_page_options['general']['theme_template']) ? $this->details_page_options['general']['theme_template'] : null;
             if ($theme_template)
             {
+                // WordPress Method
                 $located_template = locate_template($theme_template);
+
+                // Elementor Fix
+                if (!$located_template && class_exists(\Elementor\Modules\PageTemplates\Module::class))
+                {
+                    $module = new \Elementor\Modules\PageTemplates\Module();
+                    $located_template = $module->get_template_path($theme_template);
+                }
 
                 // Template Found
                 if ($located_template) $template = $located_template;

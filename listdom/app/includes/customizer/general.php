@@ -2,7 +2,7 @@
 
 class LSD_Customizer_General extends LSD_Customizer
 {
-    public static function options($fields = []): array
+    public function options($fields = []): array
     {
         return [
             'general' => [
@@ -16,11 +16,10 @@ class LSD_Customizer_General extends LSD_Customizer
                                 'divisions' => [
                                     '_' => [
                                         'fields' => [
-                                            'primary_color' => [
-                                                'type' => 'color',
-                                                'title' => esc_html__('General Color', 'listdom'),
-                                                'default' => '#33c6ff',
-                                            ],
+                                            'primary_color' => $this->fields->color(
+                                                esc_html__('General Color', 'listdom'),
+                                                '#33c6ff'
+                                            ),
                                         ],
                                     ],
                                 ],

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Integrations Class.
- *
- * @class LSD_Integrations
- * @version    1.0.0
- */
 class LSD_Integrations extends LSD_Base
 {
     public function init()

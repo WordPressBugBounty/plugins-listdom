@@ -29,7 +29,7 @@ if (!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
                 <div class="lsd-title <?php if (!$have_icon) echo 'lsd-title-full'; ?>">
                     <span class="lsd-tax-title"><?php echo esc_html($term->name); ?></span>
                     <?php if (isset($this->atts['show_count']) && $this->atts['show_count']): ?>
-                        <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdomer-core'), $term->count); ?></span>
+                        <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdom'), $term->count); ?></span>
                     <?php endif; ?>
                 </div>
             </a>
@@ -42,7 +42,7 @@ if (!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
                         <div class="lsd-title">
                             <span class="lsd-tax-title"><?php echo esc_html($child->name); ?></span>
                             <?php if (isset($this->atts['show_count']) && $this->atts['show_count']): ?>
-                                <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdomer-core'), $child->count); ?></span>
+                                <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdom'), $child->count); ?></span>
                             <?php endif; ?>
                         </div>
                     </a>

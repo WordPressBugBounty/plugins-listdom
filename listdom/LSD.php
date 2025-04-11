@@ -1,13 +1,7 @@
 <?php
-// no direct access
+// No Direct Access
 defined('ABSPATH') || die();
 
-/**
- * Main Listdom Class.
- *
- * @class Listdom
- * @version 1.0.0
- */
 final class Listdom
 {
     /**
@@ -15,7 +9,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '4.0.0';
+    public $version = '4.1.0';
 
     /**
      * The single instance of the class.
@@ -283,7 +277,7 @@ final class Listdom
  * @return Listdom
  * @since  1.0.0
  */
-function listdom()
+function listdom(): Listdom
 {
     return Listdom::instance();
 }

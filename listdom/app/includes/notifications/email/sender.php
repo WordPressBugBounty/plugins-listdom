@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Notifications Email Sender Class.
- *
- * @class LSD_Notifications_Email_Sender
- * @version    1.0.0
- */
 class LSD_Notifications_Email_Sender extends LSD_Notifications
 {
     public $to;

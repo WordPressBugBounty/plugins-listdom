@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Life Cycle Class.
- *
- * @class LSD_LifeCycle
- * @version    1.0.0
- */
 class LSD_LifeCycle extends LSD_Base
 {
     public static $body_started = false;

@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Slug Class.
- *
- * @class LSD_Color
- * @version    1.0.0
- */
 class LSD_Slug extends LSD_Base
 {
     public static function get(): string

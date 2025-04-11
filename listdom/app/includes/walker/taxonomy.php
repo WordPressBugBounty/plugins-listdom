@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Taxonomy Walker Class.
- *
- * @class LSD_Walker_Taxonomy
- * @version    1.0.0
- */
 class LSD_Walker_Taxonomy extends Walker_Category_Checklist
 {
     public function start_el(&$output, $category, $depth = 0, $args = [], $id = 0)

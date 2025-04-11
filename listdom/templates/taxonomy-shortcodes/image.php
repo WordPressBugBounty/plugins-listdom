@@ -35,7 +35,7 @@ $image_sizes = [
                     <h3 class="lsd-title"><?php echo esc_html($term->name); ?></h3>
 
                     <?php if (isset($this->atts['show_count']) && $this->atts['show_count']): ?>
-                        <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdomer-core'), $term->count); ?></span>
+                        <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdom'), $term->count); ?></span>
                     <?php endif; ?>
                 </a>
             </div>

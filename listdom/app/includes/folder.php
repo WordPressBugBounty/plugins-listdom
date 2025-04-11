@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Folder Class.
- *
- * @class LSD_Folder
- * @version    1.0.0
- */
 class LSD_Folder extends LSD_Base
 {
     public static function files($path, $filter = '.')

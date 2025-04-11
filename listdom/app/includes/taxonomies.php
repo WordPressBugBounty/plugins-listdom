@@ -1,13 +1,5 @@
 <?php
-// no direct access
-defined('ABSPATH') || die();
 
-/**
- * Listdom Taxonomies Class.
- *
- * @class LSD_Taxonomies
- * @version    1.0.0
- */
 class LSD_Taxonomies extends LSD_Base
 {
     public function init()
