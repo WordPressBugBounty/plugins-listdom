@@ -28,6 +28,7 @@ class LSD_IX_Settings extends LSD_Base
         // Settings Content
         $content = [
             'settings' => $settings,
+            'customizer' => LSD_Options::customizer(),
             'auth' => LSD_Options::auth(),
             'styles' => LSD_Options::styles(),
             'details_page' => LSD_Options::details_page(),
@@ -110,6 +111,11 @@ class LSD_IX_Settings extends LSD_Base
         // Merge Settings
         update_option('lsd_settings', array_merge(
             LSD_Options::settings(), isset($options['settings']) && is_array($options['settings']) ? $options['settings'] : []
+        ));
+
+        // Merge Customizer
+        update_option('lsd_customizer', array_merge(
+            LSD_Options::customizer(), isset($options['customizer']) && is_array($options['customizer']) ? $options['customizer'] : []
         ));
 
         // Merge Auth

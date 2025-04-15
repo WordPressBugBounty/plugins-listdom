@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.0.0
 Requires PHP: 7.2
 Tested up to: 6.8.0
-Stable tag: 4.1.1
+Stable tag: 4.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -378,6 +378,9 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 4.1.2 =
+* Enhanced the settings importer / exporter.
 
 = 4.1.1 =
 * Fixed a couple of minor issues.
