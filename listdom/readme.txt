@@ -1,15 +1,22 @@
 === Listdom – Business Directory and Classified Ads Listings WordPress Plugin ===
 Contributors: webilia
-Donate link: https://webilia.com/
-Tags: business directory, listings, classifieds, local business directory, directory plugin
+Donate link: https://listdom.net
+Tags: business directory, listings, classifieds, local business directory, geolocation, Google maps, classified ads, directory plugin
 Requires at least: 4.0.0
 Requires PHP: 7.2
 Tested up to: 6.8.0
-Stable tag: 4.1.2
+Stable tag: 4.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WordPress directory and listing plugin for advanced classifieds with 80+ skins and styles, compatible with OpenStreetMaps, Google Maps, and reCAPTCHA.
+Create any WordPress directory or classifieds site in minutes. 80+ responsive skins, search form builder, user profile, front-end dashboard. Compatible with Google Maps and reCAPTCHA.
+
+== Table of Contents ==
+- [Setup Video](#fast-listdom-plugin-review)
+- [Features](#free-wordpress-listing-plugin-features)
+- [Pro Features](#the-premium-version-of-listdom-classified-listing-plugin)
+- [Screenshots](#screenshots)
+- [FAQs](#frequently-asked-questions)
 
 == Description ==
 
@@ -18,10 +25,10 @@ Listdom has more than 80 different skins and views that are responsive and mobil
 
 ✅ [Demo](https://demo.webilia.com/listdom/)
 ✅ [Documentation](https://webilia.com/docs/listdom/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
-✅ [Support](https://webilia.com/support/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
-✅ [Live Chat](https://webilia.com/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
+✅ [Support](https://listdom.net/support/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
+✅ [Live Chat](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 
-== Fast Listdom Plugin Review 👇 ==
+== Fast Listdom Plugin Review ==
 Here are the key features of Listdom and how to use them:
 
 [youtube https://www.youtube.com/watch?v=du_96cv6BAw]
@@ -33,7 +40,7 @@ Listdom has a dedicated theme called Listdomer that helps you to import full web
 
 == Listdom; The WordPress Directory Plugin by Webilia ==
 
-Listdom is a robust WordPress directory plugin developed by Webilia. This [WordPress classified plugin](https://webilia.com/listdom/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+classified+plugin) enables you to create a fully functional directory and listing site. Designed with user-friendliness in mind, it helps users with varying levels of coding expertise. With Listdom, you can create a WordPress business directory that aligns with your specific needs and preferences.
+Listdom is a robust WordPress directory plugin developed by Webilia. This [WordPress classified plugin](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+classified+plugin) enables you to create a fully functional directory and listing site. Designed with user-friendliness in mind, it helps users with varying levels of coding expertise. With Listdom, you can create a WordPress business directory that aligns with your specific needs and preferences.
 
 == Free WordPress Listing Plugin Features ==
 
@@ -100,6 +107,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Image size limits on frontend listing submission
 *   Maximum description length restriction
 *   Maximum number of tags restriction
+*   Directory author profile (User profile)
 
 **👉 Directory Management**
 
@@ -129,6 +137,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 **👉 Search and Filter Options of Listdom WordPress Directory Plugin**
 
 *   Complete search form builder
+*   Display search fields in popup 
 *   Fully customizable different filters to show listings
 *   Hidden values and fields
 *   Search form shortcode
@@ -182,7 +191,7 @@ Discover more about Listdom through tutorials provided by web technicians.
 
 == The Premium Version of Listdom Classified Listing Plugin ==
 
-For users seeking additional features and capabilities for a [WordPress directory plugin](https://webilia.com/listdom?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+directory+plugin), Webilia offers Listdom Pro, the premium version of Listdom. Listdom Pro provides advanced functionalities, enhancing the user experience and offering more control and customization options. It’s an excellent choice for those looking to take their business directory site to the next level.
+For users seeking additional features and capabilities for a [WordPress directory plugin](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+directory+plugin), Webilia offers Listdom Pro, the premium version of Listdom. Listdom Pro provides advanced functionalities, enhancing the user experience and offering more control and customization options. It’s an excellent choice for those looking to take their business directory site to the next level.
 
 **👉 Pro Add-on of The Listdom Classified Listing Plugin**
 
@@ -251,7 +260,7 @@ Listdom can be used for everything from restaurant listings to local directories
 *   Pet Shop Directory
 *   and More…
 
-Our [WordPress directory plugin](https://webilia.com/listdom?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+directory+plugin) is actively utilized by our community to build relationships, support communities, and enhance web traffic in a variety of ways. For instance,
+Our [WordPress directory plugin](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+directory+plugin) is actively utilized by our community to build relationships, support communities, and enhance web traffic in a variety of ways. For instance,
 
 *   Help individuals discover resources in a city or small community, such as listings for sports clubs, a church directory, local farms offering produce, and the Chamber of Commerce.
 *   Set up a listing manager service for professionals such as therapists, electricians, plumbers, house cleaners, locksmiths, wedding vendors, veterinarians, consultants, photographers, artists, authors, and so on.
@@ -308,7 +317,7 @@ Listdom also offers about 30 add-ons to enhance the functionality of your WordPr
 *   PMS (Paid Member Subscriptions plugin) Addon
 *   Memberpress plugin Addon 
 
-You can see the details of the addons on [Webilia](https://webilia.com/pricing/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Webilia) website.
+You can see the details of the addons on [Listdom](https://listdom.net/pricing/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Listdom) website.
 
 == Listdomer: The Compatible WordPress Directory Theme by Webilia ==
 
@@ -331,10 +340,29 @@ While Listdom and Listdomer both offer free versions, they also provide enhanced
 
 == Installation ==
 
-For installing Listdom please follow below steps:
+Follow these steps to install **Listdom** on your WordPress website:
 
-1. Install it either via the WordPress.org plugin directory, or by uploading the files to your server.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
+**✅ Method 1: Install via WordPress Dashboard**
+
+1. **Log in** to your WordPress admin dashboard.
+2. Go to **Plugins > Add New**.
+3. In the search bar, type **Listdom** and press **Enter**.
+4. Click the **Install Now** button next to the Listdom plugin.
+5. Once installed, click **Activate**.
+
+**✅ Method 2: Upload the Plugin Manually**
+
+1. **Download** the Listdom plugin `.zip` file from the current page.
+2. Log in to your WordPress admin dashboard.
+3. Go to **Plugins > Add New > Upload Plugin**.
+4. Click **Choose File**, select the downloaded `.zip` file, and click **Install Now**.
+5. After installation, click **Activate Plugin**.
+
+**🎉 What’s Next?**
+
+- Once activated, a new **Listdom** menu will appear in your WordPress dashboard.
+- Use the **Setup Wizard** to start configuring your directory.
+- Start adding listings under the **Listings** menu.
 
 == Frequently Asked Questions ==
 
@@ -344,7 +372,7 @@ Absolutely! Listdom supports Google Maps! Also, Listdom PRO includes OpenStreetM
 
 = Does Listdom support custom fields? =
 
-Yes, of course! You're able to create your desired custom fields using Attributes in Listdom Pro. You're even able to create category-specific fields!
+Yes, of course! You're able to create your desired custom fields using Attributes in Listdom Pro add-on. You're even able to create category-specific fields!
 
 = Is it possible to manage single listing page modules? =
 
@@ -352,11 +380,19 @@ Yes, using our advanced configuration options you're able to disable/enable the 
 
 = Do I have to use Google Maps? it's a little expensive! =
 
-Listdom PRO supports free OpenStreetMap! Also, it's possible to use both of them at once! For example in the single listing page you can use Google Maps but in List, Grid and other skins you can use OpenStreetMap.
+Listdom Pro add-on supports free OpenStreetMap! Also, it's possible to use both of them at once! For example in the single listing page you can use Google Maps but in List, Grid and other skins you can use OpenStreetMap.
 
 = I like to use OpenStreetMap but with more beautiful tiles! What can I do? =
 
 You're able to insert your Mapbox API key in configuration options and use Mapbox tiles instead of OpenStreetMap tiles.
+
+= Which page builders are supported? =
+
+Listdom uses shortcodes to display the listings grid, carousel, etc. so you can insert the shortcodes into any page builder.
+
+= How do I translate Listdom? =
+
+You can translate Listdom using translation plugins like Loco Translate or by creating .po/.mo language files for your desired language.
 
 == Screenshots ==
 
@@ -378,6 +414,19 @@ You're able to insert your Mapbox API key in configuration options and use Mapbo
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 4.2.0 =
+* Moved custom fields feature from Listdom Pro to Listdom Lite.
+* Introduced responsive search builder to create different search forms per device type.
+* Added new UI Customizer options for price fields and user profiles.
+* Added an option to exclude the featured image from the listing gallery.
+* Added camera control options to the map widget.
+* Added dropdown and checkbox field types for tags in the frontend dashboard.
+* Added linear layout option for the listing gallery element.
+* Added an option to customize the search button label.
+* Improved responsiveness of search forms and range slider fields on the frontend.
+* Enhanced dropdown field usability in the frontend dashboard.
+* Fixed various UI issues in the table skin.
 
 = 4.1.2 =
 * Enhanced the settings importer / exporter.

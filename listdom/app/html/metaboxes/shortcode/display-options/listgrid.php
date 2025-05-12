@@ -282,19 +282,19 @@ $optional_addons = [];
 
         <?php if ($this->isPro()): ?>
             <div class="lsd-form-row lsd-display-options-builder-option">
-                    <div class="lsd-col-5"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Image', 'listdom'),
-                        'for' => 'lsd_display_options_skin_listgrid_display_image',
-                    ]); ?></div>
-                    <div class="lsd-col-6">
-                        <?php echo LSD_Form::switcher([
-                            'id' => 'lsd_display_options_skin_listgrid_display_image',
-                            'name' => 'lsd[display][listgrid][display_image]',
-                            'value' => $listgrid['display_image'] ?? '1',
-                            'toggle' => '.lsd-display-options-skin-listgrid-image-options'
-                        ]); ?>
-                    </div>
+                <div class="lsd-col-5"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Image', 'listdom'),
+                    'for' => 'lsd_display_options_skin_listgrid_display_image',
+                ]); ?></div>
+                <div class="lsd-col-6">
+                    <?php echo LSD_Form::switcher([
+                        'id' => 'lsd_display_options_skin_listgrid_display_image',
+                        'name' => 'lsd[display][listgrid][display_image]',
+                        'value' => $listgrid['display_image'] ?? '1',
+                        'toggle' => '.lsd-display-options-skin-listgrid-image-options'
+                    ]); ?>
                 </div>
+            </div>
             <div class="lsd-display-options-skin-listgrid-image-options <?php echo !isset($listgrid['display_image']) || $listgrid['display_image'] ? '' : 'lsd-util-hide'; ?>">
                 <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([

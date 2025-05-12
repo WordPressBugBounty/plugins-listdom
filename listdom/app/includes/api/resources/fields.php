@@ -343,7 +343,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         }
 
         // Attributes
-        if (self::is_enabled('attributes') and $resource->isPro())
+        if (self::is_enabled('attributes'))
         {
             // Attributes
             $terms = LSD_Main::get_attributes();

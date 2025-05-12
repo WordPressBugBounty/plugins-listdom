@@ -238,6 +238,7 @@ class LSD_Options extends LSD_Base
                     'gps' => 'RIGHT_BOTTOM',
                     'scale' => '0',
                     'fullscreen' => '1',
+                    'camera' => '0',
                 ];
                 break;
 
@@ -380,6 +381,7 @@ class LSD_Options extends LSD_Base
                         'shortcodes' => 1,
                         'frontend_dashboard' => 1,
                         'attributes' => 1,
+                        'profile' => 1,
                     ],
                 ];
                 break;
@@ -391,7 +393,7 @@ class LSD_Options extends LSD_Base
                     'currency_position' => 'before',
                     'timepicker_format' => 24,
                     'listing_link_status' => 1,
-                    'address_placeholder' => __('123 Main St, Unit X, City, State, Zipcode', 'listdom'),
+                    'address_placeholder' => '123 Main St, Unit X, City, State, Zipcode',
                     'map_provider' => 'googlemap',
                     'map_gps_zl' => 13,
                     'map_gps_zl_current' => 7,
@@ -429,6 +431,7 @@ class LSD_Options extends LSD_Base
                     'price_component_class' => 1,
                     'submission_tax_listdom-location_method' => 'checkboxes',
                     'submission_tax_listdom-feature_method' => 'checkboxes',
+                    'submission_tax_listdom-tag_method' => 'textarea',
                     'submission_module' => [
                         'address' => 1,
                         'price' => 1,

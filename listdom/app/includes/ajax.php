@@ -19,7 +19,7 @@ class LSD_Ajax extends LSD_Base
 
     public function search()
     {
-        $args = (isset($_POST['args']) and is_array($_POST['args'])) ? $_POST['args'] : [];
+        $args = isset($_POST['args']) && is_array($_POST['args']) ? $_POST['args'] : [];
 
         // Get From Request
         if (!count($args)) $args = $_POST;
@@ -27,7 +27,7 @@ class LSD_Ajax extends LSD_Base
         // Sanitization
         array_walk_recursive($args, 'sanitize_text_field');
 
-        $atts = (isset($args['atts']) and is_array($args['atts'])) ? $args['atts'] : [];
+        $atts = isset($args['atts']) && is_array($args['atts']) ? $args['atts'] : [];
 
         // Listdom Shortcode
         $LSD = new LSD_Shortcodes_Listdom();
@@ -53,7 +53,7 @@ class LSD_Ajax extends LSD_Base
 
         // Get Map Objects
         $archive = new LSD_PTypes_Listing_Archive();
-        $objects = $archive->render_map_objects($SKO->search(), $args);
+        $objects = $archive->render_map_objects($SKO->search(), ['sidebar' => class_exists(LSDPACAM\Base::class)]);
 
         // Change the limit
         $SKO->setLimit();

@@ -12,8 +12,13 @@ class LSD_Personalize extends LSD_Base
         $CSS = LSD_Personalize_Forms::make($CSS);
         $CSS = LSD_Personalize_Widgets::make($CSS);
         $CSS = LSD_Personalize_Dashboard::make($CSS);
+        $CSS = LSD_Personalize_Profile::make($CSS);
         $CSS = LSD_Personalize_Skins::make($CSS);
         $CSS = LSD_Personalize_Single::make($CSS);
+
+        // Remove Comments & New Lines
+        $CSS = preg_replace('!/\*.*?\*/!s', '', $CSS);
+        $CSS = trim(preg_replace('/\s+/', ' ', $CSS));
 
         // Blog ID
         $blog_id = get_current_blog_id();

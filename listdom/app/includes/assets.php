@@ -41,6 +41,7 @@ class LSD_Assets extends LSD_Base
 
         add_action('elementor/frontend/after_enqueue_scripts', function ()
         {
+            $this->isotope();
             wp_enqueue_script('lsd-elementor-preview', $this->lsd_asset_url('js/elementor-preview.min.js'), ['jquery', 'lsd-frontend'], LSD_Assets::version(), true);
         });
     }
@@ -83,6 +84,9 @@ class LSD_Assets extends LSD_Base
 
         // Include light-slider
         $this->lightslider();
+
+        // Include no-ui-slider
+        $this->nouislider();
     }
 
     public function admin()
@@ -214,6 +218,17 @@ class LSD_Assets extends LSD_Base
 
         // Include Select2 CSS file
         wp_enqueue_style('select2', $base->lsd_asset_url('packages/select2/select2.min.css'), [], LSD_Assets::version());
+    }
+
+    public static function nouislider()
+    {
+        $base = new LSD_Base();
+
+        // Include no-ui-slider JavaScript file
+        wp_enqueue_script('no-ui-slider', $base->lsd_asset_url('packages/nouislider/nouislider.min.js'), [], LSD_Assets::version());
+
+        // Include no-ui-slider CSS file
+        wp_enqueue_style('no-ui-slider', $base->lsd_asset_url('packages/nouislider/nouislider.min.css'), [], LSD_Assets::version());
     }
 
     public static function lightbox()

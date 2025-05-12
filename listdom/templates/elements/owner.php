@@ -18,6 +18,7 @@ $display_website = isset($this->args['display_website']) && $this->args['display
 $display_fax = !isset($this->args['display_fax']) || $this->args['display_fax'];
 $display_form = !isset($this->args['display_form']) || $this->args['display_form'];
 $author_link = isset($this->args['author_link']) && $this->args['author_link'];
+$link_avatar = isset($this->args['link_avatar']) && $this->args['link_avatar'];
 $field_name = !isset($this->args['name_field']) || $this->args['name_field'];
 $field_phone = !isset($this->args['phone_field']) || $this->args['phone_field'];
 
@@ -41,7 +42,12 @@ $current_id = get_current_user_id();
 			<div class="lsd-owner-first-part">
         		<?php if($display_avatar) :?>
                     <div class="lsd-owner-image-wrapper">
-                        <?php echo get_avatar($owner_id, 250); ?>
+                        <?php if ($link_avatar): ?>
+                            <a href="<?php echo esc_url_raw(LSD_User::profile_link($owner_id)); ?>">
+                                <?php echo get_avatar($owner_id, 250); ?>
+                            </a>
+                            <?php else: echo get_avatar($owner_id, 250); ?>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
         		<div class="lsd-owner-information-part-1">

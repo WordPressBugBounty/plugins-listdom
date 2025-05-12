@@ -2,20 +2,45 @@
 
 class LSD_Search_Helper extends LSD_Base
 {
+    public static function get_search_fields(int $search_form_id, string $device = 'desktop'): array
+    {
+        // Desktop Fields
+        $search_fields = get_post_meta($search_form_id, 'lsd_fields', true);
+
+        $devices = get_post_meta($search_form_id, 'lsd_devices', true);
+        if (!is_array($devices)) $devices = [];
+
+        // Tablet Fields
+        if ($device === 'tablet' && isset($devices['tablet']['inherit']) && !$devices['tablet']['inherit'])
+        {
+            $search_fields = get_post_meta($search_form_id, 'lsd_tablet', true);
+        }
+        // Mobile Fields
+        else if ($device === 'mobile' && isset($devices['mobile']['inherit']) && !$devices['mobile']['inherit'])
+        {
+            $search_fields = get_post_meta($search_form_id, 'lsd_mobile', true);
+        }
+
+        return !is_array($search_fields) ? [] : $search_fields;
+    }
+
     public function get_type_by_key($key)
     {
+        // Taxonomy
         if (in_array($key, $this->taxonomies())) return 'taxonomy';
-        else if (strpos($key, 'att') !== false)
+        // Attributes
+        else if (strpos($key, 'att-') !== false)
         {
-            $ex = explode('-', $key);
-            return get_term_meta($ex[1], 'lsd_field_type', true);
+            $id = LSD_Main::get_attr_id(substr($key, 4));
+
+            return get_term_meta($id, 'lsd_field_type', true);
         }
+        // Meta Fields
         else if ($key == 'price') return 'price';
         else if ($key == 'class') return 'class';
         else if ($key == 'address') return 'address';
         else if ($key == 'period') return 'period';
         else if (in_array($key, ['adults', 'children'])) return 'numeric';
-
         // ACF
         else if (strpos($key, 'acf_number_') === 0) return 'number';
         else if (strpos($key, 'acf_text_') === 0 || strpos($key, 'acf_email_') === 0) return 'text';
@@ -94,9 +119,9 @@ class LSD_Search_Helper extends LSD_Base
 
             return $hierarchy ? $this->get_terms_hierarchy($terms) : $terms;
         }
-        else if (strpos($key, 'att') !== false)
+        else if (strpos($key, 'att-') !== false)
         {
-            $ex = explode('-', $key);
+            $id = LSD_Main::get_attr_id(substr($key, 4));
             $hide_empty = $filter['hide_empty'] ?? 1;
 
             if ($hide_empty)
@@ -105,11 +130,11 @@ class LSD_Search_Helper extends LSD_Base
                 if ($numeric) $order = "CAST(`meta_value` as unsigned)";
 
                 $db = new LSD_db();
-                $results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($ex[1]) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
+                $results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($id) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
             }
             else
             {
-                $values_str = get_term_meta($ex[1], 'lsd_values', true);
+                $values_str = get_term_meta($id, 'lsd_values', true);
                 $results = explode(',', trim($values_str, ', '));
             }
 
@@ -482,5 +507,22 @@ class LSD_Search_Helper extends LSD_Base
         }
 
         return $options;
+    }
+
+    public function standardize_key(string $key, bool $search = true): string
+    {
+        if (strpos($key, 'att-') !== false)
+        {
+            if ($search)
+            {
+                $id = LSD_Main::get_attr_id(substr($key, 4));
+                return 'att-'.$id;
+            }
+
+            $slug = LSD_Main::get_attr_slug(substr($key, 4));
+            return 'att-'.$slug;
+        }
+
+        return $key;
     }
 }

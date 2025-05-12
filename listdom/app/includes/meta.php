@@ -37,9 +37,10 @@ class LSD_Meta extends LSD_Base
                 'get' => function ($key, $id)
                 {
                     $post = get_post($id);
+                    $auth = LSD_Options::auth();
 
                     return $post && isset($post->post_author)
-                        ? get_author_posts_url(get_the_author_meta('ID'))
+                        ? LSD_User::profile_link($post->post_author)
                         : '';
                 },
             ],

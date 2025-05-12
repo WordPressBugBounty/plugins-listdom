@@ -47,6 +47,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Shortcode
         add_shortcode('listdom-dashboard', [$this, 'output']);
 
+        // Attributes Form
+        add_action('lsd_dashboard_attributes_metabox', [$this, 'attributes']);
+
         // Redirect Guest Users
         add_action('wp', [$this, 'redirect']);
 
@@ -220,6 +223,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         ob_start();
         include lsd_template('dashboard/profile.php');
         return ob_get_clean();
+    }
+
+    public function attributes(LSD_Shortcodes_Dashboard $dashboard)
+    {
+        $attributes = new LSD_Taxonomies_Attribute();
+        $attributes->metabox_attributes($dashboard->post);
     }
 
     public function redirect()
@@ -530,7 +539,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Tags
         if ($this->is_enabled('tags'))
         {
-            $tags = isset($_POST['tags']) ? sanitize_text_field($_POST['tags']) : '';
+            $tags = isset($_POST['tags']) && is_array($_POST['tags'])
+                ? LSD_Taxonomies::name($_POST['tags'], LSD_Base::TAX_TAG)
+                : (isset($_POST['tags']) ? sanitize_text_field($_POST['tags']) : '');
+
             wp_set_post_terms($id, $tags, LSD_Base::TAX_TAG);
         }
 

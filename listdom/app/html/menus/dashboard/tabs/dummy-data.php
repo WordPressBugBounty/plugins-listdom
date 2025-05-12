@@ -77,21 +77,17 @@ $missFeatureMessages = [];
                     'value' => $dummy['dummy']['labels'] ?? 0,
                 ]); ?></div>
             </div>
-            <?php if($this->isPro()): ?>
-                <div class="lsd-form-row">
-                    <div class="lsd-col-6"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Attributes', 'listdom'),
-                        'for' => 'lsd_dummy_attributes',
-                    ]); ?></div>
-                    <div class="lsd-col-6"><?php echo LSD_Form::switcher([
-                        'id' => 'lsd_dummy_attributes',
-                        'name' => 'lsd[dummy][attributes]',
-                        'value' => $dummy['dummy']['attributes'] ?? 0,
-                    ]); ?></div>
-                </div>
-            <?php else: ?>
-                <?php $missFeatureMessages[] = $this->missFeatureMessage(esc_html__('Attributes', 'listdom')); ?>
-            <?php endif; ?>
+            <div class="lsd-form-row">
+                <div class="lsd-col-6"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Attributes', 'listdom'),
+                    'for' => 'lsd_dummy_attributes',
+                ]); ?></div>
+                <div class="lsd-col-6"><?php echo LSD_Form::switcher([
+                    'id' => 'lsd_dummy_attributes',
+                    'name' => 'lsd[dummy][attributes]',
+                    'value' => $dummy['dummy']['attributes'] ?? 0,
+                ]); ?></div>
+            </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-6"><?php echo LSD_Form::label([
                     'title' => esc_html__('Frontend Dashboard', 'listdom'),
@@ -112,6 +108,18 @@ $missFeatureMessages = [];
                     'id' => 'lsd_dummy_shortcodes',
                     'name' => 'lsd[dummy][shortcodes]',
                     'value' => $dummy['dummy']['shortcodes'] ?? 0,
+                ]); ?></div>
+            </div>
+
+            <div class="lsd-form-row">
+                <div class="lsd-col-6"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Profile', 'listdom'),
+                    'for' => 'lsd_dummy_profile',
+                ]); ?></div>
+                <div class="lsd-col-6"><?php echo LSD_Form::switcher([
+                    'id' => 'lsd_dummy_profile',
+                    'name' => 'lsd[dummy][profile]',
+                    'value' => $dummy['dummy']['profile'] ?? 1,
                 ]); ?></div>
             </div>
         </div>

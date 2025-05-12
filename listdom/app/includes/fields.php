@@ -328,10 +328,17 @@ class LSD_Fields extends LSD_Base
         {
             return implode(', ', $field['value']);
         }
+        else if ($type === 'icon_picker')
+        {
+            $icon = get_field($field['name'], $listing_id);
+
+            if (filter_var($icon, FILTER_VALIDATE_URL)) return '<img alt="" src="'.esc_url($icon).'">';
+            else return '<span class="dashicons '.sanitize_html_class($icon).'"></span>';
+        }
         else if (!is_array($field['value']))
         {
             $value = trim($field['value']) ? $field['value'] : '';
-            if (trim($value) == '') $value = get_post_meta($listing_id, $field['name'], true);
+            if (trim($value) === '') $value = get_post_meta($listing_id, $field['name'], true);
 
             return $value;
         }

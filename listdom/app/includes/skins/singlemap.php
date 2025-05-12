@@ -15,7 +15,7 @@ class LSD_Skins_Singlemap extends LSD_Skins
     public function after_start()
     {
         // Sidebar Options
-        $this->sidebar = isset($this->skin_options['sidebar']) && $this->skin_options['sidebar'];
+        $this->sidebar = isset($this->skin_options['sidebar']) && $this->skin_options['sidebar'] && class_exists(LSDPACAM\Base::class);
         $this->sidebar_search = !isset($this->skin_options['sidebar_search']) || $this->skin_options['sidebar_search'];
 
         $this->tablet_limit = isset($this->skin_options['sidebar_tablet_limit']) && $this->skin_options['sidebar_tablet_limit']

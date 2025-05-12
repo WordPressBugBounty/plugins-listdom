@@ -32,7 +32,11 @@ $image_sizes = [
 
                     <?php echo $image_id ? '<div class="lsd-image">'.wp_get_attachment_image($image_id, $image_sizes[$size]).'</div>' : ''; ?>
 
-                    <h3 class="lsd-title"><?php echo esc_html($term->name); ?></h3>
+                    <h3 class="lsd-title">
+                        <span>
+                            <?php echo esc_html($term->name); ?>
+                        </span>
+                    </h3>
 
                     <?php if (isset($this->atts['show_count']) && $this->atts['show_count']): ?>
                         <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdom'), $term->count); ?></span>

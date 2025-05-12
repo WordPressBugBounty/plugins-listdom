@@ -20,6 +20,7 @@ class LSD_Customizer
         $options = array_merge_recursive($options, (new LSD_Customizer_Skins())->options());
         $options = array_merge_recursive($options, (new LSD_Customizer_Taxonomies())->options());
         $options = array_merge_recursive($options, (new LSD_Customizer_Dashboard())->options());
+        $options = array_merge_recursive($options, (new LSD_Customizer_Profile())->options());
 
         return apply_filters('lsd_customizer_options', $options);
     }

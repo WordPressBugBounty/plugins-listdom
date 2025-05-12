@@ -92,11 +92,7 @@ class LSD_Main extends LSD_Base
         foreach ($rest as $label) $labels[] = $label;
         return apply_filters('lsd_weekdays', $labels);
     }
-
-    /**
-     * Get First of The Week from WordPress Options
-     * @return mixed
-     */
+    
     public static function get_first_day_of_week()
     {
         return get_option('start_of_week', 1);
@@ -217,11 +213,6 @@ class LSD_Main extends LSD_Base
         return isset($sf['min_latitude'], $sf['max_latitude'], $sf['min_longitude'], $sf['max_longitude']);
     }
 
-    /**
-     * @param string $key
-     * @param $value
-     * @return int|null
-     */
     public static function get_post_id_by_meta(string $key, $value): ?int
     {
         $db = new LSD_db();
@@ -276,12 +267,28 @@ class LSD_Main extends LSD_Base
         return $attributes;
     }
 
-    /**
-     * What type of request is this?
-     *
-     * @param string $type admin, ajax, cron or frontend.
-     * @return bool
-     */
+    public static function get_attr_id($id): int
+    {
+        if (!is_numeric($id))
+        {
+            $term = get_term_by('slug', $id, LSD_Base::TAX_ATTRIBUTE);
+            return $term->term_id ?? 0;
+        }
+
+        return (int) $id;
+    }
+
+    public static function get_attr_slug($slug): string
+    {
+        if (is_numeric($slug))
+        {
+            $term = get_term($slug);
+            return $term->slug ?? '';
+        }
+
+        return $slug;
+    }
+
     public function is_request(string $type): bool
     {
         switch ($type)

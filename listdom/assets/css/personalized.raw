@@ -300,12 +300,116 @@
   --listdom-features-icons-bg-color: ((features_icons_bg_color));
   --listdom-features-icons-text-color: ((features_icons_text_color));
 
+  --listdom-price-bg-color: ((price_bg_color)); /* Price Bg Color */
+  --listdom-price-text-color: ((price_text_color)); /* Price Text Color */
+  --listdom-price-hover-bg-color: ((price_hover_bg_color)); /* Price Hover Bg Color */
+  --listdom-price-text-hover-color: ((price_hover_text_color)); /* Price Text Hover Color */
+  --listdom-price-border: ((price_border)); /* Price Border */
+  --listdom-price-padding: ((price_padding)); /* Price Border */
+  --listdom-price-border-style: ((price_border_style)); /* Price Border Style */
+  --listdom-price-border-color: ((price_border_color)); /* Price Border Color */
+  --listdom-price-border-hover: ((price_border_hover)); /* Price Hover Border */
+  --listdom-price-padding-hover: ((price_padding_hover)); /* Price Hover Border */
+  --listdom-price-border-hover-style: ((price_border_hover_style)); /* Price Border hover style */
+  --listdom-price-border-hover-color: ((price_border_hover_color)); /* Price Border hover color */
+  --listdom-price-border-radius: ((price_border_radius)); /* Price Border Radius */
+  --listdom-price-hover-border-radius: ((price_hover_border_radius)); /* Price Border Radius */
+  --listdom-price-font-family: ((price_font_family)); /* Price Typography */
+  --listdom-price-font-weight: ((price_font_weight)); /* Price Typography */
+  --listdom-price-text-align: ((price_text_align)); /* Price Typography */
+  --listdom-price-font-size: ((price_font_size)); /* Price Typography */
+  --listdom-price-line-height: ((price_line_height)); /* Price Typography */
+
   --listdom-single-ic: #33bdfc; /* Listdom Icon Color */
   --listdom-single-ic2: #2b93ff; /* Listdom Icon Color 2 */
   --listdom-single-sc: #fecc39; /* Listdom Star Color */
   --listdom-single-ac: #a4a8b5; /* Listdom Active Color */
   --listdom-single-sb-bg: #000000; /* Listdom Slider Button Background */
   --listdom-single-sb-c: #ffffff; /* Listdom Slider Button Color */
+
+  /* Profile */
+  --listdom-profile-container-bg: ((profile_container_bg_color)); /* Profile Container Background Color */
+  --listdom-profile-border: ((profile_container_border)); /* Profile Border */
+  --listdom-profile-border-style: ((profile_container_border_style)); /* Profile Border Style */
+  --listdom-profile-border-color: ((profile_container_border_color)); /* Profile Border Color */
+  --listdom-profile-border-radius: ((profile_container_border_radius)); /* Profile Border Radius */
+  --listdom-profile-padding: ((profile_container_padding)); /* Profile Border Radius */
+
+  --listdom-profile-title-text-color: ((profile_title_text_color)); /* Profile Title Color */
+  --listdom-profile-title-font-family: ((profile_title_font_family)); /* Profile Typography */
+  --listdom-profile-title-font-weight: ((profile_title_font_weight)); /* Profile Typography */
+  --listdom-profile-title-text-align: ((profile_title_text_align)); /* Profile Typography */
+  --listdom-profile-title-font-size: ((profile_title_font_size)); /* Profile Typography */
+  --listdom-profile-title-line-height: ((profile_title_line_height)); /* Profile Typography */
+
+  --listdom-profile-name-text-color: ((profile_name_text_color)); /* Profile Title Color */
+  --listdom-profile-name-font-family: ((profile_name_font_family)); /* Profile Typography */
+  --listdom-profile-name-font-weight: ((profile_name_font_weight)); /* Profile Typography */
+  --listdom-profile-name-text-align: ((profile_name_text_align)); /* Profile Typography */
+  --listdom-profile-name-font-size: ((profile_name_font_size)); /* Profile Typography */
+  --listdom-profile-name-line-height: ((profile_name_line_height)); /* Profile Typography */
+
+  --listdom-profile-job-title-text-color: ((profile_job_title_text_color)); /* Profile Title Color */
+  --listdom-profile-job-title-font-family: ((profile_job_title_font_family)); /* Profile Typography */
+  --listdom-profile-job-title-font-weight: ((profile_job_title_font_weight)); /* Profile Typography */
+  --listdom-profile-job-title-text-align: ((profile_job_title_text_align)); /* Profile Typography */
+  --listdom-profile-job-title-font-size: ((profile_job_title_font_size)); /* Profile Typography */
+  --listdom-profile-job-title-line-height: ((profile_job_title_line_height)); /* Profile Typography */
+
+  --listdom-profile-count-text-color: ((profile_count_text_color)); /* Profile Title Color */
+  --listdom-profile-count-icon-color: ((profile_count_icon_color)); /* Profile Title Color */
+  --listdom-profile-count-font-family: ((profile_count_font_family)); /* Profile Typography */
+  --listdom-profile-count-font-weight: ((profile_count_font_weight)); /* Profile Typography */
+  --listdom-profile-count-text-align: ((profile_count_text_align)); /* Profile Typography */
+  --listdom-profile-count-font-size: ((profile_count_font_size)); /* Profile Typography */
+  --listdom-profile-count-line-height: ((profile_count_line_height)); /* Profile Typography */
+
+  --listdom-profile-contact-info-text-color: ((profile_contact_info_text_color)); /* Profile Title Color */
+  --listdom-profile-contact-info-icon-color: ((profile_contact_info_icon_color)); /* Profile Title Color */
+  --listdom-profile-contact-info-socials-icon-color: ((profile_contact_info_socials_icon_color)); /* Profile Title Color */
+  --listdom-profile-contact-info-font-family: ((profile_contact_info_font_family)); /* Profile Typography */
+  --listdom-profile-contact-info-font-weight: ((profile_contact_info_font_weight)); /* Profile Typography */
+  --listdom-profile-contact-info-text-align: ((profile_contact_info_text_align)); /* Profile Typography */
+  --listdom-profile-contact-info-font-size: ((profile_contact_info_font_size)); /* Profile Typography */
+  --listdom-profile-contact-info-line-height: ((profile_contact_info_line_height)); /* Profile Typography */
+
+  --listdom-profile-bio-text-color: ((profile_bio_text_color)); /* Profile Title Color */
+  --listdom-profile-bio-font-family: ((profile_bio_font_family)); /* Profile Typography */
+  --listdom-profile-bio-font-weight: ((profile_bio_font_weight)); /* Profile Typography */
+  --listdom-profile-bio-text-align: ((profile_bio_text_align)); /* Profile Typography */
+  --listdom-profile-bio-font-size: ((profile_bio_font_size)); /* Profile Typography */
+  --listdom-profile-bio-line-height: ((profile_bio_line_height)); /* Profile Typography */
+
+  /* Users */
+  --listdom-user-profile-container-bg: ((user_profile_container_bg_color)); /* Profile Container Background Color */
+  --listdom-user-profile-border: ((user_profile_container_border)); /* Profile Border */
+  --listdom-user-profile-border-style: ((user_profile_container_border_style)); /* Profile Border Style */
+  --listdom-user-profile-border-color: ((user_profile_container_border_color)); /* Profile Border Color */
+  --listdom-user-profile-border-radius: ((user_profile_container_border_radius)); /* Profile Border Radius */
+  --listdom-user-profile-padding: ((user_profile_container_padding)); /* Profile Border Radius */
+
+  --listdom-user-profile-name-text-color: ((user_profile_name_text_color)); /* Profile Title Color */
+  --listdom-user-profile-name-font-family: ((user_profile_name_font_family)); /* Profile Typography */
+  --listdom-user-profile-name-font-weight: ((user_profile_name_font_weight)); /* Profile Typography */
+  --listdom-user-profile-name-text-align: ((user_profile_name_text_align)); /* Profile Typography */
+  --listdom-user-profile-name-font-size: ((user_profile_name_font_size)); /* Profile Typography */
+  --listdom-user-profile-name-line-height: ((user_profile_name_line_height)); /* Profile Typography */
+
+  --listdom-user-profile-job-title-text-color: ((user_profile_job_title_text_color)); /* Profile Title Color */
+  --listdom-user-profile-job-title-font-family: ((user_profile_job_title_font_family)); /* Profile Typography */
+  --listdom-user-profile-job-title-font-weight: ((user_profile_job_title_font_weight)); /* Profile Typography */
+  --listdom-user-profile-job-title-text-align: ((user_profile_job_title_text_align)); /* Profile Typography */
+  --listdom-user-profile-job-title-font-size: ((user_profile_job_title_font_size)); /* Profile Typography */
+  --listdom-user-profile-job-title-line-height: ((user_profile_job_title_line_height)); /* Profile Typography */
+
+  --listdom-user-profile-contact-info-icon-color: ((user_profile_contact_info_icon_color)); /* Profile Title Color */
+
+  --listdom-user-profile-bio-text-color: ((user_profile_bio_text_color)); /* Profile Title Color */
+  --listdom-user-profile-bio-font-family: ((user_profile_bio_font_family)); /* Profile Typography */
+  --listdom-user-profile-bio-font-weight: ((user_profile_bio_font_weight)); /* Profile Typography */
+  --listdom-user-profile-bio-text-align: ((user_profile_bio_text_align)); /* Profile Typography */
+  --listdom-user-profile-bio-font-size: ((user_profile_bio_font_size)); /* Profile Typography */
+  --listdom-user-profile-bio-line-height: ((user_profile_bio_line_height)); /* Profile Typography */
 }
 
 .lsd-color-m-txt{color: ((dply_main_color)) !important;}

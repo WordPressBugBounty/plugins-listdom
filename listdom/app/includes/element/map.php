@@ -27,6 +27,7 @@ class LSD_Element_Map extends LSD_Element
             'id' => $post_id,
             'canvas_class' => 'lsd-map-canvas',
             'mapstyle' => $args['style'] ?? null,
+            'map_height' => $args['map_height'] ?? null,
             'gplaces' => $args['gplaces'] ?? 0,
             'onclick' => isset($args['onclick']) && $args['onclick'] === 'none' ? $args['onclick'] : 'infowindow',
             'mapcontrols' => $args['mapcontrols'] ?? [],
@@ -133,6 +134,15 @@ class LSD_Element_Map extends LSD_Element
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][control_scale]',
                 'options' => ['0' => esc_html__('Disabled', 'listdom'), '1' => esc_html__('Enabled', 'listdom')],
                 'value' => $data['control_scale'] ?? '0',
+            ]) . '
+        </div>
+        <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
+            <label for="lsd_elements_' . esc_attr($this->key) . '_control_camera">' . esc_html__('Camera Control', 'listdom') . '</label>
+            ' . LSD_Form::select([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_control_camera',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][control_camera]',
+                'options' => ['0' => esc_html__('Disabled', 'listdom'), '1' => esc_html__('Enabled', 'listdom')],
+                'value' => $data['control_camera'] ?? '0',
             ]) . '
         </div>
         <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">

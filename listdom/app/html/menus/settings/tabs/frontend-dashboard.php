@@ -274,7 +274,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
             </div>
         </div>
         <div class="lsd-settings-form-group lsd-accordion-panel">
-            <?php foreach ([LSD_Base::TAX_LOCATION => esc_html__('Locations'), LSD_Base::TAX_FEATURE => esc_html__('Features'),] as $tax => $label): ?>
+            <?php foreach ([LSD_Base::TAX_LOCATION => esc_html__('Locations'), LSD_Base::TAX_FEATURE => esc_html__('Features')] as $tax => $label): ?>
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
                         'title' => esc_html__($label, 'listdom'),
@@ -293,6 +293,24 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                     </div>
                 </div>
             <?php endforeach; ?>
+            <div class="lsd-form-row">
+                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Tags', 'listdom'),
+                    'for' => 'lsd_settings_tax_' . LSD_Base::TAX_TAG . '_method',
+                ]); ?></div>
+                <div class="lsd-col-4">
+                    <?php echo LSD_Form::select([
+                        'id' => 'lsd_settings_tax_' . LSD_Base::TAX_TAG . '_method',
+                        'options' => [
+                            'textarea' => esc_html__('Text Input', 'listdom'),
+                            'checkboxes' => esc_html__('Checkboxes', 'listdom'),
+                            'dropdown' => esc_html__('Dropdown', 'listdom'),
+                        ],
+                        'value' => $settings['submission_tax_' . LSD_Base::TAX_TAG . '_method'] ?? 'textarea',
+                        'name' => 'lsd[submission_tax_' . LSD_Base::TAX_TAG . '_method]',
+                    ]); ?>
+                </div>
+            </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
                     'title' => esc_html__('Gallery Method', 'listdom'),

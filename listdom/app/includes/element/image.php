@@ -58,7 +58,7 @@ class LSD_Element_Image extends LSD_Element
         );
     }
 
-    public function slider($size = [350, 220], $post_id = null)
+    public function slider($size = [350, 220], $post_id = null, $link_method = 'normal', string $style = '')
     {
         if (is_null($post_id))
         {

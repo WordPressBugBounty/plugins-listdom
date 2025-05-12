@@ -240,9 +240,9 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
             <?php if ($this->isPro()): ?>
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
-                            'title' => esc_html__('Listing Link', 'listdom'),
-                            'for' => 'lsd_display_options_skin_' . $skin . '_listing_link',
-                        ]); ?></div>
+                        'title' => esc_html__('Listing Link', 'listdom'),
+                        'for' => 'lsd_display_options_skin_' . $skin . '_listing_link',
+                    ]); ?></div>
                     <div class="lsd-col-6">
                         <?php echo LSD_Form::select([
                             'id' => 'lsd_display_options_skin_' . $skin . '_listing_link',

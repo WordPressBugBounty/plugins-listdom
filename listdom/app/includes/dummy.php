@@ -41,6 +41,7 @@ class LSD_Dummy extends LSD_Base
         $import_attributes = isset($dummy['attributes']) && $dummy['attributes'];
         $import_shortcodes = isset($dummy['shortcodes']) && $dummy['shortcodes'];
         $import_frontend_dashboard = isset($dummy['frontend_dashboard']) && $dummy['frontend_dashboard'];
+        $import_profile = isset($dummy['profile']) && $dummy['profile'];
 
         if ($import_categories)
         {
@@ -163,7 +164,7 @@ class LSD_Dummy extends LSD_Base
             }
         }
 
-        if ($this->isPro() && $import_attributes)
+        if ($import_attributes)
         {
             // Attributes
             foreach ([
@@ -628,6 +629,16 @@ class LSD_Dummy extends LSD_Base
             wp_insert_post([
                 'post_title' => 'Manage Listings',
                 'post_content' => '[listdom-dashboard]',
+                'post_type' => 'page',
+                'post_status' => 'publish',
+            ]);
+        }
+
+        if ($import_profile && !post_exists('Profile', '[listdom-profile]'))
+        {
+            wp_insert_post([
+                'post_title' => 'Profile',
+                'post_content' => '[listdom-profile]',
                 'post_type' => 'page',
                 'post_status' => 'publish',
             ]);

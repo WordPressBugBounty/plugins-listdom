@@ -281,7 +281,7 @@ class LSD_User extends LSD_Base
                 if (is_email($slug)) $slug = $user->ID;
 
                 // Generate URL
-                if ($structure) return trim($url, '/ ').'/'.sanitize_title($slug);
+                if ($structure) return trim($url, '/ ') . '/' . sanitize_title($slug);
                 else return $main->add_qs_var('user', sanitize_title($slug), $url);
             }
         }

@@ -10,14 +10,10 @@ class LSD_Element_Attributes extends LSD_Element
         parent::__construct();
 
         $this->label = esc_html__('Attributes', 'listdom');
-        $this->pro_needed = true;
     }
 
     public function get($post_id = null, $show_icons = 0, $show_attribute_title = 1)
     {
-        // Disabled in Lite
-        if ($this->isLite()) return false;
-
         if (is_null($post_id))
         {
             global $post;

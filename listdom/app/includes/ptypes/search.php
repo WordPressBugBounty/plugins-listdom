@@ -92,7 +92,6 @@ class LSD_PTypes_Search extends LSD_PTypes
     public function register_metaboxes()
     {
         add_meta_box('lsd_metabox_form', esc_html__('Form', 'listdom'), [$this, 'metabox_form'], $this->PT, 'side');
-        add_meta_box('lsd_metabox_more_options', esc_html__('More Options', 'listdom'), [$this, 'metabox_more_options'], $this->PT, 'side');
         add_meta_box('lsd_metabox_results', esc_html__('Search Results', 'listdom'), [$this, 'metabox_results'], $this->PT, 'side');
         add_meta_box('lsd_metabox_shortcode', esc_html__('Shortcode', 'listdom'), [$this, 'metabox_shortcode'], $this->PT, 'side');
         add_meta_box('lsd_metabox_fields', esc_html__('Fields', 'listdom'), [$this, 'metabox_fields'], $this->PT, 'normal', 'high');
@@ -102,12 +101,6 @@ class LSD_PTypes_Search extends LSD_PTypes
     {
         // Generate output
         include $this->include_html_file('metaboxes/search/form.php', ['return_path' => true]);
-    }
-
-    public function metabox_more_options($post)
-    {
-        // Generate output
-        include $this->include_html_file('metaboxes/search/more-options.php', ['return_path' => true]);
     }
 
     public function metabox_results($post)
@@ -148,16 +141,32 @@ class LSD_PTypes_Search extends LSD_PTypes
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
 
-        // Fields Options
-        $fields = $lsd['fields'] ?? [];
-        update_post_meta($post_id, 'lsd_fields', $fields);
+        // Desktop Fields
+        $desktop = $lsd['fields'] ?? [];
+        update_post_meta($post_id, 'lsd_fields', $desktop);
+
+        // Tablet Fields
+        $tablet = $lsd['tablet'] ?? [];
+        update_post_meta($post_id, 'lsd_tablet', $tablet);
+
+        // Mobile Fields
+        $mobile = $lsd['mobile'] ?? [];
+        update_post_meta($post_id, 'lsd_mobile', $mobile);
+
+        // Devices
+        $devices = $lsd['devices'] ?? [];
+
+        // Force to Inherit
+        if (!count($tablet)) $devices['tablet']['inherit'] = 1;
+        if (!count($mobile)) $devices['mobile']['inherit'] = 1;
+
+        update_post_meta($post_id, 'lsd_devices', $devices);
 
         /**
          * Form Options
          */
 
         $form = $lsd['form'] ?? [];
-        $more_options = $lsd['more_options'] ?? [];
 
         // Target Page Mode
         if (isset($form['page']) && trim($form['page']))
@@ -177,17 +186,17 @@ class LSD_PTypes_Search extends LSD_PTypes
 
         // Save Form Options
         update_post_meta($post_id, 'lsd_form', $form);
-        update_post_meta($post_id, 'lsd_more_options', $more_options);
     }
 
     public function params()
     {
+        $device_key = isset($_POST['device_key']) ? sanitize_text_field($_POST['device_key']) : 'fields';
         $i = isset($_POST['i']) ? sanitize_text_field($_POST['i']) : 1;
         $key = isset($_POST['key']) ? sanitize_text_field($_POST['key']) : null;
         $title = isset($_POST['title']) ? trim(sanitize_text_field($_POST['title'])) : null;
 
         $builder = new LSD_Search_Builder();
-        $html = $builder->params($key, ['title' => $title], $i);
+        $html = $builder->params($device_key, $key, ['title' => $title], $i);
 
         $this->response(['success' => 1, 'html' => $html]);
     }
@@ -195,9 +204,13 @@ class LSD_PTypes_Search extends LSD_PTypes
     public function row()
     {
         $i = isset($_POST['i']) ? sanitize_text_field($_POST['i']) : 1;
+        $post_id = isset($_POST['post_id']) ? sanitize_text_field($_POST['post_id']) : 0;
+        $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : 'row';
+        $device_key = isset($_POST['device_key']) ? sanitize_text_field($_POST['device_key']) : 'fields';
 
         $builder = new LSD_Search_Builder();
-        $html = $builder->row([
+        $html = $builder->row($post_id, $device_key, [
+            'type' => $type,
             'buttons' => 0,
         ], $i);
 

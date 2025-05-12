@@ -150,10 +150,8 @@ class LSD_Upgrade extends LSD_Base
         $taxonomies = [
             LSD_Base::TAX_CATEGORY,
             LSD_Base::TAX_FEATURE,
+            LSD_Base::TAX_ATTRIBUTE
         ];
-
-        // Add Attributes to Taxonomies
-        if ($this->isPro()) $taxonomies[] = LSD_Base::TAX_ATTRIBUTE;
 
         // Icons to be Replaced
         $icons = [

@@ -213,9 +213,22 @@ jQuery(document).ready(function()
                                 $terms = wp_get_post_terms($this->post->ID, LSD_Base::TAX_TAG);
 
                                 $tags = '';
-                                if(is_array($terms) && count($terms)) foreach($terms as $term) $tags .= $term->name.',';
+                                if (is_array($terms) && count($terms)) foreach ($terms as $term) $tags .= $term->name.',';
+
+                                echo LSD_Dashboard_Terms::tags([
+                                    'taxonomy' => LSD_Base::TAX_TAG,
+                                    'name' => 'tags',
+                                    'id' => 'lsd_dashboard_tags',
+                                    'level' => 0,
+                                    'rows' => 3,
+                                    'post_id' => $this->post->ID,
+                                    'hide_empty' => 0,
+                                    'orderby' => 'name',
+                                    'order' => 'ASC',
+                                    'placeholder' => esc_attr__('Tag1,Tag2,Tag3', 'listdom'),
+                                    'selected' => stripslashes(trim($tags, ', '))
+                                ]);
                             ?>
-                            <textarea name="tags" id="lsd_dashboard_tags" rows="3" placeholder="<?php esc_attr_e('Tag1,Tag2,Tag3', 'listdom'); ?>"><?php echo esc_textarea(stripslashes(trim($tags, ', '))); ?></textarea>
                         </div>
                         <?php endif; ?>
 

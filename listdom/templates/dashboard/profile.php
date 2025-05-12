@@ -26,7 +26,6 @@ jQuery(document).ready(function()
         </div>
         <div class="lsd-col-10">
             <div class="lsd-dashboard-profile-wrapper">
-                <div id="lsd_dashboard_profile_message" class="lsd-alert-no-mt"></div>
                 <form id="lsd_dashboard_profile" enctype="multipart/form-data">
                     <div class="lsd-row">
                         <div class="lsd-col-2">
@@ -291,13 +290,17 @@ jQuery(document).ready(function()
                     </div>
                     <div class="lsd-row">
                         <div class="lsd-col-2"></div>
-                        <div class="lsd-dashboard-box lsd-dashboard-profile-submit lsd-col-6">
+                        <div class="lsd-dashboard-box lsd-dashboard-profile-submit lsd-col-8">
                             <input type="hidden" name="action" value="lsd_dashboard_profile_save">
                             <?php LSD_Form::nonce('lsd_dashboard_profile'); ?>
 
-                            <button type="submit" class="lsd-color-m-bg w-50 <?php echo esc_attr($this->get_text_class()); ?>">
-                                <?php esc_html_e('Save', 'listdom'); ?>
-                            </button>
+                            <div class="lsd-flex lsd-flex-col lsd-flex-align-items-start lsd-gap-2">
+                                <button type="submit" class="lsd-color-m-bg w-50 <?php echo esc_attr($this->get_text_class()); ?>">
+                                    <?php esc_html_e('Save', 'listdom'); ?>
+                                </button>
+
+                                <div id="lsd_dashboard_profile_message" class="lsd-alert-no-mt"></div>
+                            </div>
                         </div>
                     </div>
                 </form>

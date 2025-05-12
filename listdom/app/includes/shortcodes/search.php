@@ -4,9 +4,12 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 {
     public $id;
     public $atts;
-    public $filters;
+    public $desktop;
+    public $tablet;
+    public $mobile;
+    public $devices;
+    public $device_key = '';
     public $form;
-    public $more_options;
     public $sf;
     public $col_filter;
     public $col_button;
@@ -48,14 +51,24 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         // Attributes
         $this->atts = apply_filters('lsd_search_atts', $this->parse($this->id, $atts));
 
-        // Filters
-        $this->filters = $this->atts['lsd_fields'] ?? [];
+        // Desktop
+        $this->desktop = isset($this->atts['lsd_fields']) && is_array($this->atts['lsd_fields']) ? $this->atts['lsd_fields'] : [];
+
+        // Tablet
+        $this->tablet = isset($this->atts['lsd_tablet']) && is_array($this->atts['lsd_tablet']) ? $this->atts['lsd_tablet'] : [];
+
+        // Mobile
+        $this->mobile = isset($this->atts['lsd_mobile']) && is_array($this->atts['lsd_mobile']) ? $this->atts['lsd_mobile'] : [];
+
+        // Devices
+        $this->devices = $this->atts['lsd_devices'] ?? [];
+
+        // Inherit from Desktop?
+        if (!isset($this->devices['tablet']['inherit']) || $this->devices['tablet']['inherit']) $this->tablet = $this->desktop;
+        if (!isset($this->devices['mobile']['inherit']) || $this->devices['mobile']['inherit']) $this->mobile = $this->desktop;
 
         // Form
         $this->form = $this->atts['lsd_form'] ?? [];
-
-        // More Options
-        $this->more_options = $this->atts['lsd_more_options'] ?? [];
 
         // AJAX Search
         $this->ajax = $atts['ajax'] ?? ($this->form['ajax'] ?? 0);
@@ -110,8 +123,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $filters = isset($args['filters']) && is_array($args['filters']) ? $args['filters'] : [];
 
         $buttons = isset($args['buttons']) && (
-                (is_string($args['buttons']) && $args['buttons']) || (is_array($args['buttons']) && $args['buttons']['status'])
-            );
+            (is_string($args['buttons']) && $args['buttons']) || (is_array($args['buttons']) && $args['buttons']['status'])
+        );
 
         $row = '';
         if ($type === 'row')
@@ -136,8 +149,11 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
                 // Manual Width
                 $col_class = isset($filter['width']) && $filter['width'] ? 'lsd-col-span-' . ((int) $filter['width']) : $this->col_filter;
 
+                $field = $this->filter($filter);
+                if (!$field) continue;
+
                 $row .= '<div class="lsd-search-filter ' . sanitize_html_class($col_class) . ' ' . sanitize_html_class(!$visibility ? 'lsd-search-field-hidden' : '') . '">';
-                $row .= $this->filter($filter);
+                $row .= $field;
                 $row .= '</div>';
             }
 
@@ -150,11 +166,13 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         {
             $this->is_more_options = true;
 
-            $mo_button = $this->more_options['button'] ?? esc_html__('More Options', 'listdom');
-            $mo_type = $this->more_options['type'] ?? 'normal';
-            $mo_width = isset($this->more_options['type']) && $this->more_options['type'] === 'popup' ? (int) $this->more_options['width'] : 60;
+            $more_options = isset($args['more_options']) && is_array($args['more_options']) ? $args['more_options'] : ($this->atts['lsd_more_options'] ?? []);
 
-            $row .= '<div class="lsd-search-row-more-options" data-width="' . esc_attr($mo_width) . '" data-type="' . esc_attr($mo_type) . '">';
+            $mo_button = $more_options['button'] ?? esc_html__('More Options', 'listdom');
+            $mo_type = $more_options['type'] ?? 'normal';
+            $mo_width = isset($more_options['type']) && $more_options['type'] === 'popup' ? (int) $more_options['width'] : 60;
+
+            $row .= '<div class="lsd-search-row-more-options" data-for=".lsd-search-devices-' . esc_attr($this->device_key) . '" data-width="' . esc_attr($mo_width) . '" data-type="' . esc_attr($mo_type) . '">';
             $row .= '<span class="lsd-search-more-options"> ' . esc_html($mo_button) . '<i class="lsd-icon fa fa-plus"></i></span>';
             $row .= '</div>';
         }
@@ -164,9 +182,14 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
     private function buttons(array $args = []): string
     {
-        // Manual & Auto Width
+        // Alignment & Width
         $width = $args['buttons']['width'] ?? (int) preg_replace('/\D/', '', $this->col_button);
         $alignment = $args['buttons']['alignment'] ?? 'left';
+
+        // Label
+        $label = isset($args['buttons']['label']) && trim($args['buttons']['label'])
+            ? $args['buttons']['label']
+            : __('Search', 'listdom');
 
         $total = 12;
         $remaining = $total - $width;
@@ -188,7 +211,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         // Submit Button
         $buttons .= '<div class="lsd-search-buttons-submit">';
         $buttons .= '<button type="submit" class="lsd-search-button lsd-color-m-bg ' . sanitize_html_class(LSD_Main::get_text_class()) . '">';
-        $buttons .= esc_html__('Search', 'listdom') . '</button></div>';
+        $buttons .= esc_html($label) . '</button></div>';
 
         $buttons .= '</div>';
 
@@ -248,7 +271,12 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? null;
         if (!$key) return $output;
 
+        // Field Type
         $type = $this->helper->get_type_by_key($key);
+
+        // Invalid Type
+        if (!$type) return $output;
+
         switch ($type)
         {
             case 'textsearch':
@@ -325,8 +353,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $title = $filter['title'] ?? '';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $name = 'sf-' . $key;
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
+        $name = 'sf-' . $this->helper->standardize_key($key);
 
         $default = $filter['default_value'] ?? '';
         $current = $this->current($name, $default);
@@ -389,15 +417,16 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $items_per_row = $filter['items_per_row'] ?? 12;
         $predefined_terms = isset($filter['terms']) && is_array($filter['terms']) ? $filter['terms'] : [];
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $name = 'sf-' . $key;
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
+        $name = 'sf-' . $this->helper->standardize_key($key);
 
         $default = $filter['default_value'] ?? '';
         if (trim($default) && !is_numeric($default) && $filter['method'] !== 'text-input') $default = $this->helper->get_term_id($key, $default);
 
         $current = $this->current($name, $default);
 
-        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $label = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '';
 
         if ($method === 'dropdown')
         {
@@ -462,7 +491,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             ]);
         }
 
-        return $output;
+        return trim($output) ? $label.$output : '';
     }
 
     public function field_text($filter): string
@@ -470,14 +499,14 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? '';
         $default = $filter['default_value'] ?? '';
 
-        $name = 'sf-' . $key . '-lk';
+        $name = 'sf-' . $this->helper->standardize_key($key) . '-lk';
 
         if (strpos($key, 'acf_email_') === 0 || strpos($key, 'acf_text_') === 0)
         {
             $key = str_replace('acf_email_', '', $key);
             $key = str_replace('acf_text_', '', $key);
 
-            $name = 'sf-acf-' . $key . '-atx';
+            $name = 'sf-acf-' . $this->helper->standardize_key($key) . '-atx';
         }
 
         $id = 'lsd_search_' . $this->id . '_' . $key;
@@ -501,17 +530,17 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         {
             $key = str_replace('acf_number_', '', $key);
 
-            $name = 'sf-acf-' . $key . '-nma';
-            $dropdown_name = 'sf-acf-' . $key . '-nmd';
-            $min_name = 'sf-acf-' . $key . '-ara-min';
-            $max_name = 'sf-acf-' . $key . '-ara-max';
+            $name = 'sf-acf-' . $this->helper->standardize_key($key) . '-nma';
+            $dropdown_name = 'sf-acf-' . $this->helper->standardize_key($key) . '-nmd';
+            $min_name = 'sf-acf-' . $this->helper->standardize_key($key) . '-ara-min';
+            $max_name = 'sf-acf-' . $this->helper->standardize_key($key) . '-ara-max';
         }
         else
         {
-            $name = 'sf-' . $key . '-eq';
-            $dropdown_name = 'sf-' . $key . '-grq';
-            $min_name = 'sf-' . $key . '-grb-min';
-            $max_name = 'sf-' . $key . '-grb-max';
+            $name = 'sf-' . $this->helper->standardize_key($key) . '-eq';
+            $dropdown_name = 'sf-' . $this->helper->standardize_key($key) . '-grq';
+            $min_name = 'sf-' . $this->helper->standardize_key($key) . '-grb-min';
+            $max_name = 'sf-' . $this->helper->standardize_key($key) . '-grb-max';
         }
 
         $min_current = $this->current($min_name, $default);
@@ -546,13 +575,14 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $name = 'sf-' . $key . '-eq';
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
+        $name = 'sf-' . $this->helper->standardize_key($key) . '-eq';
 
         $default = $filter['default_value'] ?? '';
         $current = $this->current($name, $default);
 
-        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $label = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '';
 
         if ($method === 'dropdown')
         {
@@ -566,7 +596,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         }
         else if ($method === 'dropdown-multiple')
         {
-            $name = 'sf-' . $key . '-in';
+            $name = 'sf-' . $this->helper->standardize_key($key) . '-in';
             $current = $this->current($name, explode(',', $default));
 
             $output .= '<select name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
@@ -582,7 +612,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         }
         else if ($method === 'checkboxes')
         {
-            $name = 'sf-' . $key . '-in';
+            $name = 'sf-' . $this->helper->standardize_key($key) . '-in';
             $current = $this->current($name, explode(',', $default));
 
             $terms = $this->helper->get_terms($filter, true);
@@ -596,7 +626,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             foreach ($terms as $term) $output .= '<label><input type="radio" name="' . esc_attr($name) . '" value="' . esc_attr($term) . '" ' . ($term == $current ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
         }
 
-        return $output;
+        return trim($output) ? $label.$output : '';
     }
 
     public function field_price($filter): string
@@ -609,7 +639,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $min_placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
         $max_placeholder = isset($filter['max_placeholder']) && trim($filter['max_placeholder']) ? $filter['max_placeholder'] : $title;
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
 
         $min_default = $filter['default_value'] ?? '';
         $max_default = $filter['max_default_value'] ?? '';
@@ -626,7 +656,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $increment = $filter['increment'] ?? 10;
             $th_separator = isset($filter['th_separator']) && $filter['th_separator'];
 
-            $name = 'sf-att-' . $key . '-grq';
+            $name = 'sf-att-' . $this->helper->standardize_key($key) . '-grq';
             $current = $this->current($name, $min_default);
 
             $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($min_placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
@@ -645,10 +675,10 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         }
         else if ($method === 'mm-input')
         {
-            $min_name = 'sf-att-' . $key . '-bt-min';
+            $min_name = 'sf-att-' . $this->helper->standardize_key($key) . '-bt-min';
             $min_current = $this->current($min_name, $min_default);
 
-            $max_name = 'sf-att-' . $key . '-bt-max';
+            $max_name = 'sf-att-' . $this->helper->standardize_key($key) . '-bt-max';
             $max_current = $this->current($max_name, $max_default);
 
             $output .= '<div class="lsd-search-mm-input">';
@@ -658,9 +688,9 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         }
         else if ($method === 'range')
         {
-            $min_name = 'sf-att-' . $key . '-bt-min';
+            $min_name = 'sf-att-' . $this->helper->standardize_key($key) . '-bt-min';
             $min_current = $this->current($min_name, $min_default);
-            $max_name = 'sf-att-' . $key . '-bt-max';
+            $max_name = 'sf-att-' . $this->helper->standardize_key($key) . '-bt-max';
             $max_current = $this->current($max_name, $max_default);
             $prepend = $filter['prepend'] ?? '';
             $min = $filter['min'] ?? 0;
@@ -684,6 +714,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         $output .= $method === 'range' ? '</div>' : '';
         $output .= '</div>';
+
         return $output;
     }
 
@@ -695,16 +726,17 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
 
         $default = $filter['default_value'] ?? '';
         if (!is_numeric($default)) $default = substr_count($default, '$');
 
-        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $label = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '';
 
         if ($method === 'dropdown')
         {
-            $name = 'sf-att-' . $key . '-eq';
+            $name = 'sf-att-' . $this->helper->standardize_key($key) . '-eq';
             $current = $this->current($name, $default);
 
             $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
@@ -718,7 +750,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '</select>';
         }
 
-        return $output;
+        return trim($output) ? $label.$output : '';
     }
 
     public function field_address($filter): string
@@ -728,11 +760,12 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $title = $filter['title'] ?? '';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $name = 'sf-att-' . $key . '-lk';
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
+        $name = 'sf-att-' . $this->helper->standardize_key($key) . '-lk';
 
         $default = $filter['default_value'] ?? '';
-        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $label = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '';
 
         if ($method === 'text-input')
         {
@@ -806,7 +839,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '</div>';
         }
 
-        return $output;
+        return trim($output) ? $label.$output : '';
     }
 
     public function field_period($filter): string
@@ -823,8 +856,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
         $format = $this->settings['datepicker_format'] ?? 'yyyy-mm-dd';
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $name = 'sf-' . $key;
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
+        $name = 'sf-' . $this->helper->standardize_key($key);
 
         $default = $filter['default_value'] ?? '';
         $current = $this->current($name, $default);
@@ -849,8 +882,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = str_replace('acf_radio_', '', $key);
         $key = str_replace('acf_checkbox_', '', $key);
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $name = 'sf-acf-' . $key . '-dra';
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
+        $name = 'sf-acf-' . $this->helper->standardize_key($key) . '-dra';
         $default = $filter['default_value'] ?? '';
         $current = $this->current($name, $default);
 
@@ -858,7 +891,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
         $acf_options = $this->helper->acf_field_data($key, 'choices')[0] ?? [];
 
-        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $label = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output = '';
 
         if ($method === 'dropdown')
         {
@@ -873,7 +907,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         }
         else if ($method === 'dropdown-multiple')
         {
-            $name = 'sf-acf-' . $key . '-drm';
+            $name = 'sf-acf-' . $this->helper->standardize_key($key) . '-drm';
             $current = $this->current($name, explode(',', $default));
             $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
 
@@ -891,7 +925,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         else if ($method === 'checkboxes')
         {
             $current = $this->current($name, explode(',', $default));
-            $name = 'sf-acf-' . $key . '-drm';
+            $name = 'sf-acf-' . $this->helper->standardize_key($key) . '-drm';
 
             $output .= $this->field_acf_hierarchy($name, $current, $acf_options);
         }
@@ -903,7 +937,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             }
         }
 
-        return $output;
+        return trim($output) ? $label.$output : '';
     }
 
     public function field_acf_hierarchy($name, $current, $choices): string
@@ -932,10 +966,10 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $max_default = $filter['max_default_value'] ?? '';
 
         $output = '';
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $min_name = 'sf-acf-' . $key . '-ara-min';
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
+        $min_name = 'sf-acf-' . $this->helper->standardize_key($key) . '-ara-min';
         $min_current = $this->current($min_name, $default);
-        $max_name = 'sf-acf-' . $key . '-ara-max';
+        $max_name = 'sf-acf-' . $this->helper->standardize_key($key) . '-ara-max';
         $max_current = $this->current($max_name, $max_default);
 
         $title = $filter['title'] ?? '';
@@ -970,8 +1004,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = str_replace('acf_true_false_', '', $key);
 
         $output = '';
-        $id = 'lsd_search_' . $this->id . '_' . $key;
-        $name = 'sf-acf-' . $key . '-trf';
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
+        $name = 'sf-acf-' . $this->helper->standardize_key($key) . '-trf';
         $current = $this->current($name, '');
         $title = $filter['title'] ?? '';
         $default_value = $this->helper->acf_field_data($key, 'default_value')[0] ?? 0;
@@ -986,5 +1020,34 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $output .= '</div>';
 
         return $output;
+    }
+
+    public function device(string $action, bool $criteria = false, string $device = 'desktop')
+    {
+        $this->is_more_options = false;
+        $this->device_key = $device;
+
+        if ($device === 'tablet') $filters = $this->tablet;
+        else if ($device === 'mobile') $filters = $this->mobile;
+        else $filters = $this->desktop;
+
+        $inherit = false;
+        if ($device === 'desktop' || !isset($this->devices[$device]['inherit']) || $this->devices[$device]['inherit']) $inherit = true;
+        ?>
+        <div class="lsd-search-devices-<?php echo esc_attr($device); ?>">
+            <form action="<?php echo esc_url($action); ?>" class="lsd-search-form <?php echo !$inherit ? 'lsd-search-not-inherit' : ''; ?>">
+                <?php
+                $HTML = '';
+                foreach ($filters as $row) $HTML .= $this->row($row);
+
+                // Display Criteria
+                if ($criteria) $HTML .= $this->criteria();
+
+                // Print the Search Form
+                echo apply_filters('lsd_search_form_html', $HTML, $filters, $device);
+                ?>
+            </form>
+        </div>
+        <?php
     }
 }

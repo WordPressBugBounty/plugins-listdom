@@ -16,9 +16,10 @@ class LSD_Dashboard_Terms extends LSD_Base
         $settings = LSD_Options::settings();
 
         // Field Method
-        $method = (isset($settings['submission_tax_' . $args['taxonomy'] . '_method']) and trim($settings['submission_tax_' . $args['taxonomy'] . '_method'])) ? $settings['submission_tax_' . $args['taxonomy'] . '_method'] : 'checkboxes';
+        $method = isset($settings['submission_tax_' . $args['taxonomy'] . '_method']) && trim($settings['submission_tax_' . $args['taxonomy'] . '_method']) ? $settings['submission_tax_' . $args['taxonomy'] . '_method'] : 'checkboxes';
 
-        if ($method == 'dropdown')
+        // Dropdown
+        if ($method === 'dropdown')
         {
             $args['multiple'] = true;
             $args['selected'] = isset($args['post_id']) ? wp_get_post_terms($args['post_id'], $args['taxonomy'], ['fields' => 'ids']) : [];
@@ -26,7 +27,13 @@ class LSD_Dashboard_Terms extends LSD_Base
 
             return LSD_Dashboard_Terms::dropdown($args);
         }
+        // Textarea Input
+        else if ($method === 'textarea')
+        {
+            return LSD_Dashboard_Terms::textarea($args);
+        }
 
+        // Checkbox
         return LSD_Dashboard_Terms::checkboxes($args);
     }
 
@@ -36,6 +43,14 @@ class LSD_Dashboard_Terms extends LSD_Base
 
         // Apply Filters
         return apply_filters('lsd_dashboard_locations_options', $output, $args);
+    }
+
+    public static function tags($args)
+    {
+        $output = self::taxonomy($args);
+
+        // Apply Filters
+        return apply_filters('lsd_dashboard_tags_options', $output, $args);
     }
 
     public static function features($args)
@@ -114,6 +129,28 @@ class LSD_Dashboard_Terms extends LSD_Base
         $output .= '</select>';
 
         return $output;
+    }
+
+    public static function textarea($args = []): string
+    {
+        $name = $args['name'] ?? '';
+        $id = $args['id'] ?? '';
+        $placeholder = $args['placeholder'] ?? '';
+        $class = $args['class'] ?? 'postform';
+        $rows = $args['rows'] ?? 3;
+        $required = isset($args['required']) && $args['required'];
+
+        $selected = isset($args['selected']) && is_string($args['selected'])
+            ? stripslashes(trim($args['selected'], ', '))
+            : '';
+
+        return '<textarea
+            name="' . esc_attr($name) . '"
+            id="' . esc_attr($id) . '"
+            class="' . esc_attr($class) . '"
+            rows="' . esc_attr($rows) . '" ' . ($required ? 'required' : '') . '
+            placeholder="' . esc_attr($placeholder) . '"
+        >' . esc_textarea($selected) . '</textarea>';
     }
 
     public static function options($args, $parent = 0, $selected = null, $level = 0): string

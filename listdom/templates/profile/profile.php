@@ -26,6 +26,12 @@ $listings = get_posts([
 
 $current_user = wp_get_current_user();
 $current_id = $current_user->ID;
+
+$user_object = get_userdata($user['ID']);
+$user_roles = (array) $user_object->roles;
+
+// Check if user has allowed role
+$allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
 ?>
 <div class="lsd-profile-wrapper lsd-mb-4">
     <div class="lsd-hero-image">
@@ -41,16 +47,18 @@ $current_id = $current_user->ID;
 
     <div class="lsd-profile-details">
         <div class="lsd-profile-box lsd-profile-name-section lsd-flex lsd-flex-align-items-center lsd-flex-row lsd-flex-wrap lsd-gap-4">
-            <div class="lsd-flex lsd-gap-5 lsd-flex-align-items-center">
+            <div class="lsd-flex lsd-gap-5 lsd-flex-align-items-center lsd-name-section">
                 <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-flex-items-start">
                     <h2 class="lsd-profile-name"><?php echo !empty($user['first_name']) || !empty($user['last_name']) ? $user['first_name'] .' '. $user['last_name'] : esc_html($user['display_name'] ?? ''); ?></h2>
                     <p class="lsd-job-title"><?php echo esc_html($user['job_title'] ?? ''); ?></p>
                 </div>
-                <div class="lsd-flex lsd-gap-2 lsd-flex-align-items-center lsd-flex-content-center lsd-author-listing-count">
+                <div class="lsd-flex lsd-gap-2 lsd-author-listing-count">
                     <i class="lsd-icon fa fa-clone"></i>
                     <div class="lsd-flex lsd-gap-1 lsd-flex-align-items-center">
-                        <span><?php echo count($listings);  ?> </span>
-                        <span><?php echo count($listings) > 1 ? esc_html__('Listings', 'listdom') : esc_html__('Listing', 'listdom'); ?></span>
+                        <a href="#author_listings">
+                            <span><?php echo count($listings);  ?> </span>
+                            <span><?php echo count($listings) > 1 ? esc_html__('Listings', 'listdom') : esc_html__('Listing', 'listdom'); ?></span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -138,7 +146,7 @@ $current_id = $current_user->ID;
 
         <div class="lsd-grid lsd-g-6-columns">
             <div class="lsd-profile-box lsd-col-span-2 lsd-flex lsd-flex-col lsd-flex-align-items-start lsd-gap-4">
-                <h3><?php esc_html_e('Contact Info', 'listdom'); ?></h3>
+                <h3 class="lsd-profile-title"><?php esc_html_e('Contact Info', 'listdom'); ?></h3>
                 <div class="lsd-profile-information">
                     <?php if (!empty($user['mobile'])): ?>
                         <div class="lsd-profile-mobile" title="<?php esc_attr_e('Mobile', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
@@ -182,15 +190,15 @@ $current_id = $current_user->ID;
                 </div>
             </div>
             <div class="lsd-profile-box lsd-col-span-4">
-                <h3><?php esc_html_e('About', 'listdom'); ?></h3>
-                <p><?php echo esc_html($user['bio'] ?? esc_html__('No bio available', 'listdom')); ?></p>
+                <h3 class="lsd-profile-title"><?php esc_html_e('About', 'listdom'); ?></h3>
+                <p class="lsd-profile-bio"><?php echo esc_html($user['bio'] ?? esc_html__('No bio available', 'listdom')); ?></p>
             </div>
         </div>
-
-        <div class="lsd-profile-box">
-            <h3><?php esc_html_e('Author Listing', 'listdom'); ?></h3>
-            <div class="lsd-author-listing">
-                <?php
+        <?php if (array_intersect($allowed_roles, $user_roles)) : ?>
+            <div class="lsd-profile-box" id="author_listings">
+                <h3 class="lsd-profile-title"><?php esc_html_e('Author Listing', 'listdom'); ?></h3>
+                <div class="lsd-author-listing">
+                    <?php
                     $LSD = new LSD_Shortcodes_Listdom();
                     echo $LSD->output([
                         'id' => $shortcode,
@@ -199,8 +207,9 @@ $current_id = $current_user->ID;
                             'authors' => [$user['ID']],
                         ],
                     ]);
-                ?>
+                    ?>
+                </div>
             </div>
-        </div>
+        <?php endif; ?>
     </div>
 </div>

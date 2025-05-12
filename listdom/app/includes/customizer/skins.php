@@ -2,7 +2,7 @@
 
 class LSD_Customizer_Skins extends LSD_Customizer
 {
-    public function options($fields = []): array
+    public function options(): array
     {
         return [
             'skins' => [

@@ -116,8 +116,6 @@ foreach ($columns as $key => $row) if (!isset($fields_data[$key])) unset($column
             </div>
 
             <?php
-                if (LSD_Base::isLite()) $optional_addons[] = ['pro', esc_html__('Attributes', 'listdom')];
-
                 if (!class_exists(LSDADDACF::class) && !class_exists(\LSDPACACF\Base::class)) $optional_addons[] = ['acf', esc_html__('ACF Fields', 'listdom')];
                 if (!class_exists(LSDADDCMP::class) && !class_exists(\LSDPACCMP\Base::class)) $optional_addons[] = ['compare', esc_html__('Compare Rate', 'listdom')];
                 if (!class_exists(LSDADDFAV::class) && !class_exists(\LSDPACFAV\Base::class)) $optional_addons[] = ['favorites', esc_html__('Favorite Icon', 'listdom')];

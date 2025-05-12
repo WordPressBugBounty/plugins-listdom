@@ -4,25 +4,29 @@ class LSD_Taxonomies extends LSD_Base
 {
     public function init()
     {
+        // Listing Attribute
+        $attribute = new LSD_Taxonomies_Attribute();
+        $attribute->init();
+
         // Listing Category
-        $Category = new LSD_Taxonomies_Category();
-        $Category->init();
+        $category = new LSD_Taxonomies_Category();
+        $category->init();
 
         // Listing Location
-        $Location = new LSD_Taxonomies_Location();
-        $Location->init();
+        $location = new LSD_Taxonomies_Location();
+        $location->init();
 
         // Listing Tag
-        $Tag = new LSD_Taxonomies_Tag();
-        $Tag->init();
+        $tag = new LSD_Taxonomies_Tag();
+        $tag->init();
 
         // Listing Feature
-        $Feature = new LSD_Taxonomies_Feature();
-        $Feature->init();
+        $feature = new LSD_Taxonomies_Feature();
+        $feature->init();
 
         // Listing Label
-        $Label = new LSD_Taxonomies_Label();
-        $Label->init();
+        $label = new LSD_Taxonomies_Label();
+        $label->init();
 
         // Redirect to Archive Page
         add_filter('init', [$this, 'redirect'], 999);
@@ -183,7 +187,7 @@ class LSD_Taxonomies extends LSD_Base
         else
         {
             $term = get_term_by('term_id', $term, $taxonomy);
-            return $term ? $term->name : null;
+            return $term ? $term->name : '';
         }
     }
 

@@ -23,6 +23,7 @@ class LSD_Element_Gallery extends LSD_Element
         // Template
         $tpl = 'elements/gallery/lightbox.php';
         if (isset($params['style']) && $params['style'] === 'slider') $tpl = 'elements/gallery/slider.php';
+        if (isset($params['style']) && $params['style'] === 'linear') $tpl = 'elements/gallery/linear.php';
 
         // Generate output
         ob_start();
@@ -71,10 +72,11 @@ class LSD_Element_Gallery extends LSD_Element
             ' . LSD_Form::select([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_style',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][style]',
-                'value' => $data['style'] ?? 'lightbox',
+                'value' => $data['style'] ?? 'list',
                 'options' => [
-                    'lightbox' => esc_html__('List', 'listdom'),
+                    'list' => esc_html__('List', 'listdom'),
                     'slider' => esc_html__('Slider', 'listdom'),
+                    'linear' => esc_html__('Linear Gallery', 'listdom'),
                 ],
             ]) . '
         </div>

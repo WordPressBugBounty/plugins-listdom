@@ -20,13 +20,6 @@ class LSD_Base
     const REQ_HTML = '<span class="lsd-required">*</span>';
     const WELCOME_SLUG = 'listdom-welcome';
 
-    /**
-     * @todo Remove
-     */
-    public function __construct()
-    {
-    }
-
     public function include_html_file($file = '', $args = [])
     {
         // File is empty
@@ -474,7 +467,7 @@ class LSD_Base
 
     public static function getAddonURL($addon): string
     {
-        return 'https://webilia.com/products/listdom-' . strtolower($addon) . '-addon';
+        return 'https://listdom.net/products/listdom-' . strtolower($addon) . '-addon';
     }
 
     public static function getUpgradeURL(): string
@@ -494,12 +487,12 @@ class LSD_Base
 
     public static function getSupportURL(): string
     {
-        return self::addUtmParameters('https://webilia.com/support/');
+        return self::addUtmParameters('https://listdom.net/support/');
     }
 
     public static function getListdomDocsURL(): string
     {
-        return self::addUtmParameters('https://webilia.com/docs/doc-category/listdom');
+        return self::addUtmParameters('https://webilia.com/docs/listdom/');
     }
 
     public static function getListdomWelcomeWizardUrl(): string

@@ -745,6 +745,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
                 'maptype' => $this->details_page_options['elements']['map']['control_maptype'] ?? 'TOP_LEFT',
                 'streetview' => $this->details_page_options['elements']['map']['control_streetview'] ?? 'RIGHT_BOTTOM',
                 'scale' => $this->details_page_options['elements']['map']['control_scale'] ?? '0',
+                'camera' => $this->details_page_options['elements']['map']['control_camera'] ?? '0',
                 'fullscreen' => $this->details_page_options['elements']['map']['control_fullscreen'] ?? '1',
             ],
             'args' => $this->details_page_options['elements']['map'],
@@ -796,7 +797,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
     {
         $gallery = $this->entity->get_gallery([
             'lightbox' => $this->details_page_options['elements']['gallery']['lightbox'] ?? 1,
-            'style' => $style ?: ($this->details_page_options['elements']['gallery']['style'] ?? 'lightbox'),
+            'style' => $style ?: ($this->details_page_options['elements']['gallery']['style'] ?? 'list'),
             'thumbnail_status' => $this->details_page_options['elements']['gallery']['thumbnail_status'] ?? 'image',
             'include_thumbnail' => ($this->details_page_options['elements']['gallery']['thumbnail'] ?? 0),
         ]);

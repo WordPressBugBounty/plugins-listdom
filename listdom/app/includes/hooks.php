@@ -23,7 +23,7 @@ class LSD_Hooks extends LSD_Base
         {
             $links = array_merge($links, [
                 'documentation' => '<a href="https://webilia.com/docs/listdom/" target="_blank"><strong>' . esc_html__('Documentation', 'listdom') . '</strong></a>',
-                'support' => '<a href="https://webilia.com/support/" target="_blank">' . esc_html__('Support', 'listdom') . '</a>',
+                'support' => '<a href="https://listdom.net/support/" target="_blank">' . esc_html__('Support', 'listdom') . '</a>',
             ]);
         }
 

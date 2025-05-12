@@ -21,7 +21,7 @@ class LSD_Search_Builder extends LSD_Base
 
             foreach ($row['filters'] as $key => $data)
             {
-                $existings[] = $key;
+                $existings[] = $this->helper->standardize_key($key, false);
             }
         }
 
@@ -100,28 +100,25 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Attributes
-        if ($this->isPro())
+        // Attributes
+        $attributes = LSD_Main::get_attributes();
+
+        foreach ($attributes as $attribute)
         {
-            // Attributes
-            $attributes = LSD_Main::get_attributes();
+            $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
+            $key = 'att-' . $attribute->slug;
 
-            foreach ($attributes as $attribute)
-            {
-                $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
-                $key = 'att-' . $attribute->term_id;
+            // Skip URL, Email and Separator Fields
+            if (in_array($type, ['url', 'email', 'separator'])) continue;
+            if (in_array($key, $existings)) continue;
 
-                // Skip URL, Email and Separator Fields
-                if (in_array($type, ['url', 'email', 'separator'])) continue;
-                if (in_array($key, $existings)) continue;
-
-                $fields[] = [
-                    'type' => 'attribute',
-                    'key' => $key,
-                    'title' => $attribute->name,
-                    'description' => esc_html__('Attributes', 'listdom'),
-                    'methods' => $this->getFieldMethods($type),
-                ];
-            }
+            $fields[] = [
+                'type' => 'attribute',
+                'key' => $key,
+                'title' => $attribute->name,
+                'description' => esc_html__('Attributes', 'listdom'),
+                'methods' => $this->getFieldMethods($type),
+            ];
         }
 
         // Apply Filters
@@ -143,7 +140,11 @@ class LSD_Search_Builder extends LSD_Base
         }
 
         // Single Field
-        if ($key) return isset($pairs[$key]) && is_array($pairs[$key]) ? $pairs[$key] :  [];
+        if ($key)
+        {
+            $key = $this->helper->standardize_key($key, false);
+            return isset($pairs[$key]) && is_array($pairs[$key]) ? $pairs[$key] : [];
+        }
 
         // All Fields
         return $pairs;
@@ -230,7 +231,19 @@ class LSD_Search_Builder extends LSD_Base
         return $methods[$type] ?? [];
     }
 
-    public function params($key, $data, $index)
+    public function device(string $device, WP_Post $post)
+    {
+        // Generate output
+        return $this->include_html_file('metaboxes/search/device.php', [
+            'return_output' => true,
+            'parameters' => [
+                'device' => $device,
+                'post' => $post,
+            ],
+        ]);
+    }
+
+    public function params(string $device_key, $key, $data, $index)
     {
         $type = $this->helper->get_type_by_key($key);
         $methods = $this->getFieldMethods($type, $key);
@@ -238,11 +251,15 @@ class LSD_Search_Builder extends LSD_Base
         // Original Field Data
         $field = $this->getAllFields($key);
 
+        // Invalid Field
+        if (!count($field)) return '';
+
         // Generate output
         return $this->include_html_file('metaboxes/search/params.php', [
             'return_output' => true,
             'parameters' => [
-                'key' => $key,
+                'device_key' => $device_key,
+                'key' => $this->helper->standardize_key($key, false),
                 'data' => $data,
                 'field' => $field,
                 'type' => $type,
@@ -253,12 +270,14 @@ class LSD_Search_Builder extends LSD_Base
         ]);
     }
 
-    public function row($row, $index)
+    public function row(int $post_id, string $device_key, $row, $index)
     {
         // Generate output
         return $this->include_html_file('metaboxes/search/row.php', [
             'return_output' => true,
             'parameters' => [
+                'device_key' => $device_key,
+                'post_id' => $post_id,
                 'row' => $row,
                 'i' => $index,
             ],

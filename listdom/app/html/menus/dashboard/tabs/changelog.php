@@ -3,6 +3,42 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.2.0 <span>May 11th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Moved custom fields feature from Listdom Pro to Listdom Lite.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Introduced responsive search builder to create different search forms per device type.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added new UI Customizer options for price fields and user profiles.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added an option to exclude the featured image from the listing gallery.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added camera control options to the map widget.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added dropdown and checkbox field types for tags in the frontend dashboard.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added linear layout option for the listing gallery element.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added an option to customize the search button label.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e("Improved responsiveness of search forms and range slider fields on the frontend.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e("Enhanced dropdown field usability in the frontend dashboard.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("Fixed various UI issues in the table skin.", 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v4.1.2 <span>April 14th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>

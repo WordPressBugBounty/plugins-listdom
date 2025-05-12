@@ -14,7 +14,7 @@ $addons = $this->get();
     <?php LSD_Ads::display('addons-top'); ?>
 
     <?php if (!$addons): ?>
-    <p><?php echo LSD_Main::alert(sprintf(esc_html__('It seems there is a problem to get list of addons from Webilia server. Please try again later or check our website at %s', 'listdom'), '<a href="https://webilia.com" target="_blank"><strong>webilia.com</strong></a>'), 'warning'); ?></p>
+    <p><?php echo LSD_Main::alert(sprintf(esc_html__('It seems there is a problem to get list of addons from Webilia server. Please try again later or check our website at %s', 'listdom'), '<a href="https://listdom.net" target="_blank"><strong>listdom.net</strong></a>'), 'warning'); ?></p>
     <?php else: ?>
     <div class="lsd-addons">
         <div class="lsd-addons-list">

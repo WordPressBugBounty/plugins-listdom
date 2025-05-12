@@ -231,15 +231,19 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->cover($size, $this->post->ID, $link_method, $style);
     }
 
-    public function get_image_slider($size = [390, 260])
+    public function get_image_slider($size = [390, 260], $link_method = 'normal', string $style = '')
     {
         $element = new LSD_Element_Image();
-        return $element->slider($size, $this->post->ID);
+        return $element->slider($size, $this->post->ID, $link_method, $style);
     }
 
     public function get_image_module($shortcode, $size = [390, 260])
     {
-        if ($shortcode->image_method === 'slider') return $this->get_image_slider($size);
+        if ($shortcode->image_method === 'slider') return $this->get_image_slider(
+            $size,
+            $shortcode->get_listing_link_method(),
+            $shortcode->get_single_listing_style()
+        );
         else return $this->get_cover_image(
             $size,
             $shortcode->get_listing_link_method(),

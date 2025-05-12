@@ -153,6 +153,15 @@ class LSD_Element_Owner extends LSD_Element
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][author_link]',
                 'value' => $data['author_link'] ?? 0,
             ]) . '
+        </div>  
+        <div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_link_avatar">' . esc_html__('Avatar Link', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_link_avatar',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][link_avatar]',
+                'value' => $data['link_avatar'] ?? 0,
+            ]) . '
         </div>';
+        
     }
 }

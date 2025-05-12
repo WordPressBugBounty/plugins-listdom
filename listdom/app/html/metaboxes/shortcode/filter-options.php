@@ -282,8 +282,6 @@ $walker = new LSD_Walker_Taxonomy();
         <div class="lsd-row">
             <div class="lsd-col-12">
                 <p class="description lsd-mt-0 lsd-mb-2"><?php esc_html_e("If you want to filter listings based on attributes, fill in the following fields. Otherwise, leave them empty to skip filtering.", 'listdom'); ?></p>
-                <?php if ($this->isLite()): echo LSD_Base::alert(LSD_Base::missFeatureMessage(esc_html__('Attributes Filter', 'listdom')), 'warning'); ?>
-                <?php else: ?>
                 <div class="lsd-attributes">
                     <?php if (count($attributes)): ?>
                         <?php foreach ($attributes as $attr): ?>
@@ -362,7 +360,6 @@ $walker = new LSD_Walker_Taxonomy();
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
-                <?php endif; ?>
             </div>
         </div>
     </div>

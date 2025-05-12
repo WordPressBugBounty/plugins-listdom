@@ -5,7 +5,7 @@ defined('ABSPATH') || die();
 /** @var WP_Post $post */
 
 $form = get_post_meta($post->ID, 'lsd_form', true);
-if(!is_array($form)) $form = [];
+if (!is_array($form)) $form = [];
 ?>
 <div class="lsd-metabox lsd-search-form-metabox">
     <div class="lsd-row">

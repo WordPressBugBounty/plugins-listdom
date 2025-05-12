@@ -8,10 +8,13 @@ $action = isset($this->form['page']) ? get_page_link($this->form['page']) : home
 if (is_tax() && isset($this->form['page']) && !trim($this->form['page'])) $action = get_term_link(get_queried_object()->term_id);
 
 $shortcode = isset($this->form['shortcode']) && trim($this->form['shortcode']) ? $this->form['shortcode'] : '';
-$criteria = $this->form['criteria'] ?? 0;
+$criteria = (bool) ($this->form['criteria'] ?? 0);
 
 $style = isset($this->form['style']) && trim($this->form['style']) ? trim(strtolower($this->form['style'])) : 'default';
 if (isset($this->atts['style']) && trim($this->atts['style'])) $style = $this->atts['style'];
+
+// No Fields!
+if (!count($this->desktop) && !count($this->tablet) && !count($this->mobile)) return '';
 
 // Add JS codes to footer
 $assets = new LSD_Assets();
@@ -34,23 +37,12 @@ jQuery(document).ready(function()
 });
 </script>');
 ?>
-<div class="lsd-search lsd-search-style-<?php echo esc_attr($style); ?> lsd-search-default-style" id="lsd_search_<?php echo esc_attr($this->id); ?>">
+<div class="lsd-search lsd-search-style-<?php echo esc_attr($style); ?> lsd-search-default-style lsd-search-<?php echo esc_attr($this->id); ?>" id="lsd_search_<?php echo esc_attr($this->id); ?>">
 
-    <?php if (is_array($this->filters) && count($this->filters)): ?>
-    <form action="<?php echo esc_url($action); ?>" class="lsd-search-form">
-        <?php
-            $HTML = '';
-            foreach ($this->filters as $row) $HTML .= $this->row($row);
-
-            // Display Criteria
-            if ($criteria) $HTML .= $this->criteria();
-
-            // Print the Search Form
-            echo apply_filters('lsd_search_form_html', $HTML);
-        ?>
-    </form>
-    <?php else: ?>
-    <?php echo current_user_can('administrator') ? $this->alert(sprintf(esc_html__("No filter specified for this search form. You can add some using %s.", 'listdom'), '<a href="'.get_edit_post_link($this->id).'">'.esc_html__('search builder', 'listdom').'</a>')) : ''; ?>
-    <?php endif; ?>
+    <div class="lsd-search-devices-wrapper">
+        <?php if (count($this->desktop)) $this->device($action, $criteria); ?>
+        <?php if (count($this->tablet)) $this->device($action, $criteria, 'tablet'); ?>
+        <?php if (count($this->mobile)) $this->device($action, $criteria, 'mobile'); ?>
+    </div>
 
 </div>

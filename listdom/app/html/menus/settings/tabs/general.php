@@ -25,6 +25,7 @@ $networks = LSD_Options::socials();
             </div>
         </div>
         <div class="lsd-settings-form-group lsd-accordion-panel lsd-accordion-open">
+            <h3 class="lsd-mb-4 lsd-mt-0"><?php esc_html_e('Date & Time', 'listdom'); ?></h3>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
                     'title' => esc_html__('Date Picker Format', 'listdom'),
@@ -48,9 +49,9 @@ $networks = LSD_Options::socials();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Time Picker Format', 'listdom'),
-                        'for' => 'lsd_settings_timepicker_format',
-                    ]); ?></div>
+                    'title' => esc_html__('Time Picker Format', 'listdom'),
+                    'for' => 'lsd_settings_timepicker_format',
+                ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::select([
                         'id' => 'lsd_settings_timepicker_format',
@@ -63,25 +64,12 @@ $networks = LSD_Options::socials();
                     ]); ?>
                 </div>
             </div>
+            <h3 class="lsd-my-4"><?php esc_html_e('Currency', 'listdom'); ?></h3>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Listing Custom Link', 'listdom'),
-                        'for' => 'lsd_settings_listing_link_status',
-                    ]); ?></div>
-                <div class="lsd-col-4">
-                    <?php echo LSD_Form::switcher([
-                        'id' => 'lsd_settings_listing_link_status',
-                        'name' => 'lsd[listing_link_status]',
-                        'value' => $settings['listing_link_status'] ?? '1',
-                    ]); ?>
-                    <p class="description"><?php esc_html_e("You can disable the listing custom link field.", 'listdom'); ?></p>
-                </div>
-            </div>
-            <div class="lsd-form-row">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Currency Position', 'listdom'),
-                        'for' => 'lsd_settings_currency_position',
-                    ]); ?></div>
+                    'title' => esc_html__('Currency Position', 'listdom'),
+                    'for' => 'lsd_settings_currency_position',
+                ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::select([
                         'id' => 'lsd_settings_currency_position',
@@ -98,37 +86,71 @@ $networks = LSD_Options::socials();
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Default Currency', 'listdom'),
-                        'for' => 'lsd_settings_default_currency',
-                    ]); ?></div>
+                    'title' => esc_html__('Default Currency', 'listdom'),
+                    'for' => 'lsd_settings_default_currency',
+                ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::currency([
                         'id' => 'lsd_settings_default_currency',
                         'name' => 'lsd[default_currency]',
                         'value' => $settings['default_currency'] ?? ''
                     ]); ?>
-                    <p class="description"><?php esc_html_e("Select the default currency used in the listings.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-0"><?php esc_html_e("Select the default currency used in the listings.", 'listdom'); ?></p>
+                </div>
+            </div>
+            <h3 class="lsd-my-4"><?php esc_html_e('Listing', 'listdom'); ?></h3>
+            <div class="lsd-form-row">
+                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Listing Custom Link', 'listdom'),
+                    'for' => 'lsd_settings_listing_link_status',
+                ]); ?></div>
+                <div class="lsd-col-4">
+                    <?php echo LSD_Form::switcher([
+                        'id' => 'lsd_settings_listing_link_status',
+                        'name' => 'lsd[listing_link_status]',
+                        'value' => $settings['listing_link_status'] ?? '1',
+                    ]); ?>
+                    <p class="description lsd-mb-3"><?php esc_html_e("You can disable the listing custom link field.", 'listdom'); ?></p>
                 </div>
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Address Placeholder', 'listdom'),
-                        'for' => 'lsd_settings_address_placeholder',
-                    ]); ?></div>
+                    'title' => esc_html__('Include Featured Image in Gallery', 'listdom'),
+                    'for' => 'lsd_settings_gallery_featured_image',
+                ]); ?></div>
+                <div class="lsd-col-4">
+                    <?php echo LSD_Form::select([
+                        'id' => 'lsd_settings_gallery_featured_image',
+                        'name' => 'lsd[gallery_featured_image]',
+                        'value' => $settings['gallery_featured_image'] ?? 'always',
+                        'options' => [
+                            'always' => esc_html__('Always include', 'listdom'),
+                            'fallback' => esc_html__('Only if no other gallery images', 'listdom'),
+                            'never' => esc_html__('Do not include', 'listdom'),
+                        ],
+                    ]); ?>
+                    <p class="description lsd-mb-3"><?php esc_html_e('Choose whether the featured image should appear in the image gallery on listing pages.', "listdom"); ?></p>
+                </div>
+            </div>
+            <div class="lsd-form-row">
+                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Address Placeholder', 'listdom'),
+                    'for' => 'lsd_settings_address_placeholder',
+                ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::text([
                         'id' => 'lsd_settings_address_placeholder',
                         'name' => 'lsd[address_placeholder]',
                         'value' => $settings['address_placeholder'] ?? __('123 Main St, Unit X, City, State, Zipcode', 'listdom')
                     ]); ?>
-                    <p class="description"><?php esc_html_e("This will appear as the placeholder for address fields in the listing editor.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-3"><?php esc_html_e("This will appear as the placeholder for address fields in the listing editor.", 'listdom'); ?></p>
                 </div>
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('No Listing Message', 'listdom'),
-                        'for' => 'lsd_settings_no_listings_message',
-                    ]); ?></div>
+                    'title' => esc_html__('No Listing Message', 'listdom'),
+                    'for' => 'lsd_settings_no_listings_message',
+                ]); ?></div>
                 <div class="lsd-col-4">
                     <?php echo LSD_Form::textarea([
                         'id' => 'lsd_settings_no_listings_message',
@@ -153,7 +175,7 @@ $networks = LSD_Options::socials();
         </div>
         <div class="lsd-settings-form-group lsd-accordion-panel">
 
-            <?php if($this->isLite()): ?>
+            <?php if ($this->isLite()): ?>
                 <div class="lsd-mb-4 lsd-alert-no-mt"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('OpenStreetMap & Mapbox', 'listdom'), true), 'warning'); ?></div>
             <?php endif; ?>
 

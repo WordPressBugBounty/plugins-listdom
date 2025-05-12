@@ -5,12 +5,12 @@ class LSD_PTypes extends LSD_Base
     public function init()
     {
         // Listings Post Type
-        $Listings = new LSD_PTypes_Listing();
-        $Listings->init();
+        $listings = new LSD_PTypes_Listing();
+        $listings->init();
 
         // Shortcode Post Type
-        $Shortcode = new LSD_PTypes_Shortcode();
-        $Shortcode->init();
+        $shortcode = new LSD_PTypes_Shortcode();
+        $shortcode->init();
 
         // Render No Item Screen
         add_action('manage_posts_extra_tablenav', [$this, 'create_first_item']);

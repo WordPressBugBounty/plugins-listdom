@@ -39,7 +39,10 @@ class LSD_Shortcodes_Profile extends LSD_Base
         // If no username, check if user is logged in
         if (!$username)
         {
-            if (!is_user_logged_in()) return '';
+            if (!is_user_logged_in()) {
+                echo '<div class="lsd-p-5">'. do_shortcode('[listdom-auth]') . '</div>';
+                return '';
+            }
 
             $user = wp_get_current_user();
             $username = $user->user_login;
