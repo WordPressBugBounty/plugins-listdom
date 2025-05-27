@@ -419,7 +419,7 @@ class LSD_Base
 
     public static function missAddonMessage($addon = '', $feature = ''): string
     {
-        return sprintf(esc_html__('Activate the %s add-on to use the %s feature.', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '"><strong>' . esc_html__($addon, 'listdom') . '</strong></a>'), $feature);
+        return sprintf(esc_html__('Activate the %s add-on to use the %s feature.', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '" target="_blank"><strong>' . esc_html__($addon, 'listdom') . '</strong></a>'), '<strong>'.$feature.'</strong>');
     }
 
     public static function optionalAddonsMessage(array $addon_features = []): string
@@ -467,7 +467,7 @@ class LSD_Base
 
     public static function getAddonURL($addon): string
     {
-        return 'https://listdom.net/products/listdom-' . strtolower($addon) . '-addon';
+        return 'https://listdom.net/products/listdom-' . str_replace(' ', '-', strtolower($addon)) . '-addon';
     }
 
     public static function getUpgradeURL(): string
@@ -1881,6 +1881,16 @@ class LSD_Base
 
         // Apply Filters
         return apply_filters('lsd_clustering_icons', $icons);
+    }
+
+    public static function get_pagination_methods(): array
+    {
+        return [
+            'loadmore' => esc_html__('Load More Button', 'listdom'),
+            'scroll' => esc_html__('Infinite Scroll', 'listdom'),
+            'numeric' => esc_html__('Numeric', 'listdom'),
+            'disabled' => esc_html__('Disabled', 'listdom'),
+        ];
     }
 
     public static function get_listing_link_methods(): array

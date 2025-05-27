@@ -152,6 +152,111 @@ class LSD_Customizer_Single extends LSD_Customizer
                             ],
                         ],
                     ],
+                    'breadcrumb' => [
+                        'title' => esc_html__('Breadcrumb', 'listdom'),
+                        'groups' => [
+                            'breadcrumb' => [
+                                'title' => esc_html__('Breadcrumb', 'listdom'),
+                                'divisions' => [
+                                    'home' => [
+                                        'title' => esc_html__('Home', 'listdom'),
+                                        'fields' => [
+                                            'gap' => [
+                                                'type' => 'select',
+                                                'title' => esc_html__('Icon Gap (Pixels)', 'listdom'),
+                                                'default' => 6,
+                                                'options' => [
+                                                    4 => 4,
+                                                    6 => 6,
+                                                    8 => 8,
+                                                    10 => 10,
+                                                    12 => 12,
+                                                    14 => 14,
+                                                    16 => 16,
+                                                    18 => 18,
+                                                    20 => 20,
+                                                ],
+                                            ],
+                                            'text_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Text Color', 'listdom'),
+                                                'default' => '#0ab0fe',
+                                            ],
+                                            'icon_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Icon Color', 'listdom'),
+                                                'default' => '#0ab0fe',
+                                            ],
+                                            'typography' => [
+                                                'type' => 'typography',
+                                                'title' => esc_html__('Typography', 'listdom'),
+                                                'default' => [
+                                                    'family' => $defaults['typography']['family'] ?? 'poppins',
+                                                    'weight' => $defaults['typography']['weight'] ?? 'inherit',
+                                                    'align' => $defaults['typography']['align'] ?? 'inherit',
+                                                    'size' => $defaults['typography']['size'] ?? '16',
+                                                    'line_height' => $defaults['typography']['line_height'] ?? '25',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'taxonomy' => [
+                                        'title' => esc_html__('Taxonomy', 'listdom'),
+                                        'fields' => [
+                                            'text_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Text Color', 'listdom'),
+                                                'default' => '#0ab0fe',
+                                            ],
+                                            'typography' => [
+                                                'type' => 'typography',
+                                                'title' => esc_html__('Typography', 'listdom'),
+                                                'default' => [
+                                                    'family' => $defaults['typography']['family'] ?? 'poppins',
+                                                    'weight' => $defaults['typography']['weight'] ?? 'inherit',
+                                                    'align' => $defaults['typography']['align'] ?? 'inherit',
+                                                    'size' => $defaults['typography']['size'] ?? '16',
+                                                    'line_height' => $defaults['typography']['line_height'] ?? '25',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'current' => [
+                                        'title' => esc_html__('Current', 'listdom'),
+                                        'fields' => [
+                                            'text_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Text Color', 'listdom'),
+                                                'default' => '#444',
+                                            ],
+                                            'typography' => [
+                                                'type' => 'typography',
+                                                'title' => esc_html__('Typography', 'listdom'),
+                                                'default' => [
+                                                    'family' => $defaults['typography']['family'] ?? 'poppins',
+                                                    'weight' => $defaults['typography']['weight'] ?? 600,
+                                                    'align' => $defaults['typography']['align'] ?? 'inherit',
+                                                    'size' => $defaults['typography']['size'] ?? '16',
+                                                    'line_height' => $defaults['typography']['line_height'] ?? '25',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+
+                                    'separator' => [
+                                        'title' => esc_html__('Separator', 'listdom'),
+                                        'fields' => [
+                                            'text_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Text Color', 'listdom'),
+                                                'default' => '#999',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ];

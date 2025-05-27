@@ -18,7 +18,7 @@ class LSD_Dashboard extends LSD_Base
             ['label' => esc_html__('Contact Details', 'listdom'), 'key' => 'contact'],
             ['label' => esc_html__('Remark', 'listdom'), 'key' => 'remark'],
             ['label' => esc_html__('Gallery', 'listdom'), 'key' => 'gallery'],
-            ['label' => esc_html__('Attributes', 'listdom'), 'key' => 'attributes'],
+            ['label' => esc_html__('Custom Fields', 'listdom'), 'key' => 'attributes'],
             ['label' => esc_html__('Locations', 'listdom'), 'key' => 'locations'],
             ['label' => esc_html__('Tags', 'listdom'), 'key' => 'tags'],
             ['label' => esc_html__('Features', 'listdom'), 'key' => 'features'],

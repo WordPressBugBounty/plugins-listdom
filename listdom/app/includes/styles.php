@@ -33,6 +33,20 @@ class LSD_Styles extends LSD_Base
         ], 'cover');
     }
 
+    public static function accordion()
+    {
+        return LSD_Styles::filter([
+            'style1' => esc_html__('Style 1', 'listdom'),
+        ], 'accordion');
+    }
+
+    public static function mosaic()
+    {
+        return LSD_Styles::filter([
+            'style1' => esc_html__('Style 1', 'listdom'),
+        ], 'mosaic');
+    }
+
     public static function grid()
     {
         return LSD_Styles::filter([

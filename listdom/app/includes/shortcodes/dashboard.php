@@ -227,8 +227,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function attributes(LSD_Shortcodes_Dashboard $dashboard)
     {
-        $attributes = new LSD_Taxonomies_Attribute();
-        $attributes->metabox_attributes($dashboard->post);
+        (new LSD_PTypes_Listing())
+            ->metabox_attributes($dashboard->post);
     }
 
     public function redirect()

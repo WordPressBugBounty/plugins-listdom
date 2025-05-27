@@ -30,6 +30,7 @@ class LSD_Skins extends LSD_Base
     public $default_style;
     public $load_more = false;
     public $pagination = 'loadmore';
+
     public $display_title = true;
     public $display_is_claimed = true;
     public $display_labels = false;
@@ -94,6 +95,8 @@ class LSD_Skins extends LSD_Base
         (new LSD_Skins_Carousel())->init();
         (new LSD_Skins_Slider())->init();
         (new LSD_Skins_Masonry())->init();
+        (new LSD_Skins_Accordion())->init();
+        (new LSD_Skins_Mosaic())->init();
     }
 
     public function start($atts)
@@ -112,6 +115,9 @@ class LSD_Skins extends LSD_Base
         $this->sm_shortcode = isset($this->search_options['shortcode']) && trim($this->search_options['shortcode']) ? $this->search_options['shortcode'] : null;
         $this->sm_position = isset($this->search_options['position']) && trim($this->search_options['position']) ? $this->search_options['position'] : 'top';
         $this->sm_ajax = isset($this->search_options['ajax']) && trim($this->search_options['ajax']) !== '' ? (int) $this->search_options['ajax'] : 0;
+
+        // Requested Page
+        $this->page = max(1, get_query_var('paged', isset($_REQUEST['page']) && is_numeric($_REQUEST['page']) ? $_REQUEST['page'] : 1));
 
         // Filter Options
         $this->filter_options = $this->apply_current_query(
@@ -237,13 +243,12 @@ class LSD_Skins extends LSD_Base
         $this->query_radius();
 
         // Pagination Options
-        $paged = $this->page;
         $this->limit = isset($this->skin_options['limit']) && trim($this->skin_options['limit'])
             ? sanitize_text_field($this->skin_options['limit'])
             : 300;
 
         $this->args['posts_per_page'] = $this->limit;
-        $this->args['paged'] = $paged;
+        $this->args['paged'] = $this->page;
 
         // Sort Query
         $this->sort();
@@ -589,7 +594,7 @@ class LSD_Skins extends LSD_Base
         $this->limit = $limit;
 
         // Page
-        $args['paged'] = isset($search['page']) ? sanitize_text_field($search['page']) : 1;
+        $args['paged'] = isset($search['page']) ? sanitize_text_field($search['page']) : (get_query_var('paged') ?: 1);
 
         // Search Parameters
         $sf = isset($search['sf']) && is_array($search['sf']) ? $search['sf'] : [];
@@ -695,8 +700,16 @@ class LSD_Skins extends LSD_Base
         // Generate the output
         $output = $this->listings_html();
 
-        $response = ['success' => 1, 'html' => LSD_Kses::full($output), 'next_page' => $this->next_page, 'count' => count($this->listings), 'total' => $this->found_listings, 'seed' => $this->atts['seed'] ?? null];
-        $this->response($response);
+        $this->response([
+            'success' => 1,
+            'html' => LSD_Kses::full($output),
+            'next_page' => $this->next_page,
+            'count' => count($this->listings),
+            'total' => $this->found_listings,
+            'seed' => $this->atts['seed'] ?? null,
+            'pagination' => $this->get_pagination(),
+            'filters' => $this->filters(),
+        ]);
     }
 
     public function setLimit($type = 'listings', $limit = null)
@@ -706,9 +719,11 @@ class LSD_Skins extends LSD_Base
             if ($type === 'map' && isset($this->skin_options['maplimit'])) $skin_limit = $this->skin_options['maplimit'];
             else $skin_limit = $this->skin_options['limit'] ?? 300;
 
-            $this->args['posts_per_page'] = $skin_limit;
+            $limit = $skin_limit;
         }
-        else $this->args['posts_per_page'] = $limit;
+
+        $this->args['posts_per_page'] = $limit;
+        $this->limit = $limit;
     }
 
     public function tpl()
@@ -754,6 +769,8 @@ class LSD_Skins extends LSD_Base
             'carousel' => esc_html__('Carousel', 'listdom'),
             'slider' => esc_html__('Slider', 'listdom'),
             'cover' => esc_html__('Cover View', 'listdom'),
+            'accordion' => esc_html__('Accordion View', 'listdom'),
+            'mosaic' => esc_html__('Mosaic View', 'listdom'),
         ]);
     }
 
@@ -794,6 +811,7 @@ class LSD_Skins extends LSD_Base
 
         if ($this->pagination === 'loadmore') return $this->get_loadmore_button();
         else if ($this->pagination === 'scroll') return $this->get_scroll_pagination();
+        else if ($this->pagination === 'numeric') return $this->get_numeric_pagination();
 
         return '';
     }
@@ -802,6 +820,13 @@ class LSD_Skins extends LSD_Base
     {
         ob_start();
         include lsd_template('paginations/loadmore.php');
+        return ob_get_clean();
+    }
+
+    public function get_numeric_pagination()
+    {
+        ob_start();
+        include lsd_template('paginations/numeric.php');
         return ob_get_clean();
     }
 
@@ -817,6 +842,11 @@ class LSD_Skins extends LSD_Base
         ob_start();
         include lsd_template('elements/switcher.php');
         return ob_get_clean();
+    }
+
+    public function filters(): string
+    {
+        return '';
     }
 
     /**
@@ -856,6 +886,7 @@ class LSD_Skins extends LSD_Base
     {
         return lsd_map($this->search([
             'posts_per_page' => $limit ?: $this->skin_options['maplimit'],
+            'paged' => 1,
         ]), [
             'provider' => $this->map_provider,
             'clustering' => $this->skin_options['clustering'] ?? true,

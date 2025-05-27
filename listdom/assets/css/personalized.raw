@@ -410,6 +410,31 @@
   --listdom-user-profile-bio-text-align: ((user_profile_bio_text_align)); /* Profile Typography */
   --listdom-user-profile-bio-font-size: ((user_profile_bio_font_size)); /* Profile Typography */
   --listdom-user-profile-bio-line-height: ((user_profile_bio_line_height)); /* Profile Typography */
+
+  --listdom-home-breadcrumb-text-color: ((home_breadcrumb_text_color)); /* Home Breadcrumb Title Color */
+  --listdom-home-breadcrumb-icon-gap: ((home_breadcrumb_icon_gap)); /* Home Breadcrumb Title Color */
+  --listdom-home-breadcrumb-icon-color: ((home_breadcrumb_icon_color)); /* Home Breadcrumb Title Color */
+  --listdom-home-breadcrumb-font-family: ((home_breadcrumb_font_family)); /* Home Breadcrumb Typography */
+  --listdom-home-breadcrumb-font-weight: ((home_breadcrumb_font_weight)); /* Home Breadcrumb Typography */
+  --listdom-home-breadcrumb-text-align: ((home_breadcrumb_text_align)); /* Home Breadcrumb Typography */
+  --listdom-home-breadcrumb-font-size: ((home_breadcrumb_font_size)); /* Home Breadcrumb Typography */
+  --listdom-home-breadcrumb-line-height: ((home_breadcrumb_line_height)); /* Home Breadcrumb Typography */
+
+  --listdom-taxonomy-breadcrumb-text-color: ((taxonomy_breadcrumb_text_color)); /* Taxonomy Breadcrumb Title Color */
+  --listdom-taxonomy-breadcrumb-font-family: ((taxonomy_breadcrumb_font_family)); /* Taxonomy Breadcrumb Typography */
+  --listdom-taxonomy-breadcrumb-font-weight: ((taxonomy_breadcrumb_font_weight)); /* Taxonomy Breadcrumb Typography */
+  --listdom-taxonomy-breadcrumb-text-align: ((taxonomy_breadcrumb_text_align)); /* Taxonomy Breadcrumb Typography */
+  --listdom-taxonomy-breadcrumb-font-size: ((taxonomy_breadcrumb_font_size)); /* Taxonomy Breadcrumb Typography */
+  --listdom-taxonomy-breadcrumb-line-height: ((taxonomy_breadcrumb_line_height)); /* Taxonomy Breadcrumb Typography */
+
+  --listdom-current-breadcrumb-text-color: ((current_breadcrumb_text_color)); /* Current Breadcrumb Title Color */
+  --listdom-current-breadcrumb-font-family: ((current_breadcrumb_font_family)); /* Current Breadcrumb Typography */
+  --listdom-current-breadcrumb-font-weight: ((current_breadcrumb_font_weight)); /* Current Breadcrumb Typography */
+  --listdom-current-breadcrumb-text-align: ((current_breadcrumb_text_align)); /* Current Breadcrumb Typography */
+  --listdom-current-breadcrumb-font-size: ((current_breadcrumb_font_size)); /* Current Breadcrumb Typography */
+  --listdom-current-breadcrumb-line-height: ((current_breadcrumb_line_height)); /* Current Breadcrumb Typography */
+
+  --listdom-separator-breadcrumb-text-color: ((separator_breadcrumb_text_color)); /* Separator Breadcrumb Title Color */
 }
 
 .lsd-color-m-txt{color: ((dply_main_color)) !important;}

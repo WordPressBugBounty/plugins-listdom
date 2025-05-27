@@ -21,9 +21,6 @@ class LSD_Entity_Listing extends LSD_Entity
         $category = isset($data['listing_category']) ? sanitize_text_field($data['listing_category']) : '';
         $term = $category ? get_term_by('term_id', $category, LSD_Base::TAX_CATEGORY) : null;
 
-        // Listdom DB
-        $db = new LSD_db();
-
         // Category is valid
         if (trim($category) && !empty($term) && !is_wp_error($term))
         {
@@ -54,15 +51,8 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_latitude', $lat);
         update_post_meta($this->post->ID, 'lsd_longitude', $lng);
 
-        // Listdom Data ID
-        $data_id = $db->select("SELECT `id` FROM `#__lsd_data` WHERE `id`='" . esc_sql($this->post->ID) . "'");
-
-        // Insert Geo Point on Listdom Table
-        if (!$data_id) $db->q("INSERT INTO `#__lsd_data` (`id`, `latitude`, `longitude`) VALUES ('" . esc_sql($this->post->ID) . "', '" . $lat . "', '" . $lng . "')");
-        else $db->q("UPDATE `#__lsd_data` SET `latitude`='" . $lat . "', `longitude`='" . $lng . "' WHERE `id`='" . esc_sql($this->post->ID) . "'");
-
-        // Update Point Field
-        $db->q("UPDATE `#__lsd_data` SET `point`=Point(`latitude`, `longitude`) WHERE `id`='" . esc_sql($this->post->ID) . "'");
+        // Geo-point
+        $data_id = $this->update_geopoint($this->post->ID, $lat, $lng);
 
         // Shape
         update_post_meta($this->post->ID, 'lsd_shape_type', isset($data['shape_type']) ? sanitize_text_field($data['shape_type']) : '');
@@ -144,6 +134,24 @@ class LSD_Entity_Listing extends LSD_Entity
 
         // New Listing Action
         if ($trigger_actions && !$data_id) do_action('lsd_new_listing', $this->post->ID);
+    }
+
+    public function update_geopoint($listing_id, $lat, $lng)
+    {
+        // Listdom DB
+        $db = new LSD_db();
+
+        // Listdom Data ID
+        $data_id = $db->select("SELECT `id` FROM `#__lsd_data` WHERE `id`='" . esc_sql($listing_id) . "'");
+
+        // Insert Geo Point on Listdom Table
+        if (!$data_id) $db->q("INSERT INTO `#__lsd_data` (`id`, `latitude`, `longitude`) VALUES ('" . esc_sql($listing_id) . "', '" . $lat . "', '" . $lng . "')");
+        else $db->q("UPDATE `#__lsd_data` SET `latitude`='" . $lat . "', `longitude`='" . $lng . "' WHERE `id`='" . esc_sql($listing_id) . "'");
+
+        // Update Point Field
+        $db->q("UPDATE `#__lsd_data` SET `point`=Point(`latitude`, `longitude`) WHERE `id`='" . esc_sql($listing_id) . "'");
+
+        return $data_id;
     }
 
     public function id(): int
@@ -267,6 +275,12 @@ class LSD_Entity_Listing extends LSD_Entity
     {
         $element = new LSD_Element_Video();
         return $element->get($this->post->ID);
+    }
+
+    public function get_breadcrumb($icon = true, $taxonomy = LSD_Base::TAX_CATEGORY)
+    {
+        $element = new LSD_Element_Breadcrumb();
+        return $element->get($icon, $taxonomy);
     }
 
     public function get_address($icon = true)

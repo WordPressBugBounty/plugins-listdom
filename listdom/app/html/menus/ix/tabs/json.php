@@ -6,7 +6,7 @@ defined('ABSPATH') || die();
 ?>
 <div class="lsd-ix-wrap">
 
-    <?php if($this->isLite()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('JSON Import / Export', 'listdom')), 'warning'); ?>
+    <?php if ($this->isLite()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('JSON Import / Export', 'listdom')), 'warning'); ?>
     <?php else: ?>
     <h3><?php esc_html_e('Export', 'listdom'); ?></h3>
     <div class="lsd-form-row">

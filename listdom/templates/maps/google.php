@@ -36,12 +36,12 @@ $connected_shortcodes = isset($args['connected_shortcodes']) && is_array($args['
 
 // Map Controls
 $mapcontrols = $args['mapcontrols'] ?? [];
-if(!is_array($mapcontrols) || !count($mapcontrols)) $mapcontrols = LSD_Options::defaults('mapcontrols');
+if (!is_array($mapcontrols) || !count($mapcontrols)) $mapcontrols = LSD_Options::defaults('mapcontrols');
 
 // The Unique ID
 $id = $args['id'] ?? mt_rand(100, 999);
 
-if(isset($args['objects']) && is_array($args['objects']))
+if (isset($args['objects']) && is_array($args['objects']))
 {
     $objects = $args['objects'];
 }
@@ -52,10 +52,10 @@ else
 }
 
 // No Objects to show or only one object with default location
-if(!$force_to_show && (!count($objects) || (count($objects) === 1 && $objects[0]['latitude'] === $latitude && $objects[0]['longitude'] === $longitude))) return;
+if (!$force_to_show && (!count($objects) || (count($objects) === 1 && $objects[0]['latitude'] === $latitude && $objects[0]['longitude'] === $longitude))) return;
 
 // Add Google Maps JS codes to footer
-$assets->footer('<script>
+$assets->footerOrPreview('<script>
 jQuery(document).ready(function()
 {
     listdom_add_googlemaps_callbacks(function()

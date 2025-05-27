@@ -12,6 +12,7 @@ class LSD_Personalize_Single extends LSD_Personalize
     {
         $CSS = LSD_Personalize_Single_Features::make($CSS);
         $CSS = LSD_Personalize_Single_Price::make($CSS);
+        $CSS = LSD_Personalize_Single_Breadcrumb::make($CSS);
         return LSD_Personalize_Single_Reviews::make($CSS);
     }
 }

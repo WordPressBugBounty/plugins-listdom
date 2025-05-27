@@ -1,22 +1,15 @@
 === Listdom – Business Directory and Classified Ads Listings WordPress Plugin ===
 Contributors: webilia
 Donate link: https://listdom.net
-Tags: business directory, listings, classifieds, local business directory, geolocation, Google maps, classified ads, directory plugin
+Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.0.0
 Requires PHP: 7.2
-Tested up to: 6.8.0
-Stable tag: 4.2.0
+Tested up to: 6.8.1
+Stable tag: 4.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Create any WordPress directory or classifieds site in minutes. 80+ responsive skins, search form builder, user profile, front-end dashboard. Compatible with Google Maps and reCAPTCHA.
-
-== Table of Contents ==
-- [Setup Video](#fast-listdom-plugin-review)
-- [Features](#free-wordpress-listing-plugin-features)
-- [Pro Features](#the-premium-version-of-listdom-classified-listing-plugin)
-- [Screenshots](#screenshots)
-- [FAQs](#frequently-asked-questions)
+Build any WordPress directory or classifieds site fast. 80+ skins, search builder, user profiles, frontend dashboard, Google Maps & reCAPTCHA.
 
 == Description ==
 
@@ -112,7 +105,10 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 **👉 Directory Management**
 
 *   Unlimited number of directories
-*   Image gallery module
+*   [Custom fields/attributes](https://webilia.com/docs/listdom/setting-up-listing/attributes?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+fields%2Fattributes)
+*   Filter the listings displayed in each skin by custom fields/attributes
+*   Search and filter by custom fields/attributes
+*   Image gallery element with several styles
 *   Advanced availability time module (Work hours and off days)
 *   Advanced price module
 *   Global and per listing currency manager
@@ -133,10 +129,12 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Page builders compatibility
 *   Listing image
 *   Comment for listings
+*   Numeric, Load more button, and infinite scroll pagination methods
 
 **👉 Search and Filter Options of Listdom WordPress Directory Plugin**
 
 *   Complete search form builder
+*   Responsive settings for each search form
 *   Display search fields in popup 
 *   Fully customizable different filters to show listings
 *   Hidden values and fields
@@ -147,6 +145,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 
 *   Powerful login, register, and forgot password shortcodes
 *   Block access of different user roles to WordPress dashboard
+*   CSV importer
 *   Powerful notifications manager (Admin and user notification emails)
 *   [Custom CSS styles](https://webilia.com/docs/listdom/settings/custom-styles?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+CSS+styles)
 *   [Google reCAPTCHA](https://webilia.com/docs/listdom/settings/general-settings/#recaptcha?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Google+Recaptcha)
@@ -195,15 +194,15 @@ For users seeking additional features and capabilities for a [WordPress director
 
 **👉 Pro Add-on of The Listdom Classified Listing Plugin**
 
+*   Display listings in Side-by-Side view with great responsive view
+*   Display listings in beautiful Mosaic view
+*   Display listings in modern Accordion view
 *   Schema option
 *   Map GPS search
 *   Frontend dashboard menus customization
 *   Guest posting without user registration
 *   Separate shortcode for Add listing form
-*   [Custom fields/attributes](https://webilia.com/docs/listdom/setting-up-listing/attributes?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+fields%2Fattributes)
-*   Filter the listings displayed in each skin by custom fields/attributes
 *   Exclusion filter  for the listings displayed in each skin
-*   Search and filter by custom fields/attributes
 *   Hierarchy Categories
 *   Embed elements in listings
 *   Featured video for each listing
@@ -222,7 +221,6 @@ For users seeking additional features and capabilities for a [WordPress director
 *   Listing slugs with hierarchical categories and locations
 *   Bulk edit the listings styles
 *   JSON importer and exporter
-*   Display listings in Side-by-Side view with great responsive view
 *   API support
 
 Listdom as a classified listing plugin has been developed according to the latest best practices, design patterns, trending design methods, and technologies. We offer all the advanced features that a WordPress directory plugin needs in Listdom.
@@ -282,7 +280,7 @@ Listdom, the robust WordPress directory plugin, offers comprehensive documentati
 
 == The Best WordPress Business Directory Plugin Addons ==
 
-Listdom also offers about 30 add-ons to enhance the functionality of your WordPress directory listing further. These add-ons include features like Claim Feature, Topup Listings, Bookmarks Listings, CSV Importer, Rank Addon, Reviews, Subscriptions, Labelize, and Advanced Map. These addons provide additional layers of interactivity and customization, allowing you to tailor your classified site to your specific needs.
+Listdom also offers about 30 add-ons to enhance the functionality of your WordPress directory listing further. These add-ons include features like Claim Feature, Topup Listings, Bookmarks Listings, Rank Addon, Reviews, Subscriptions, Labelize, and Advanced Map. These addons provide additional layers of interactivity and customization, allowing you to tailor your classified site to your specific needs.
 
 *   Pro Addon
 *   Claim Listings (Claim existing listings with full Woocommerce support)
@@ -290,7 +288,7 @@ Listdom also offers about 30 add-ons to enhance the functionality of your WordPr
 *   Topup Listings
 *   Bookmarks and Favorite Listings
 *   Excel Addon
-*   CSV Importer Addon
+*   CSV Auto Importer Addon
 *   Rank Addon
 *   Reviews Addon (Customizable multi-criteria 5-star rating reviews)
 *   Subscriptions (Charge users for submitting new listings with full WooCommerce support)
@@ -372,7 +370,7 @@ Absolutely! Listdom supports Google Maps! Also, Listdom PRO includes OpenStreetM
 
 = Does Listdom support custom fields? =
 
-Yes, of course! You're able to create your desired custom fields using Attributes in Listdom Pro add-on. You're even able to create category-specific fields!
+Yes, of course! You're able to create your desired custom fields in Listdom. You're even able to create category-specific fields!
 
 = Is it possible to manage single listing page modules? =
 
@@ -414,6 +412,17 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 4.3.0 =
+* [PRO] Added Mosaic and Accordion skins.
+* Added CSV Import/Export functionality to Listdom Lite.
+* Introduced a numeric pagination option.
+* Added a breadcrumb element to single listing templates.
+* Enabled pagination support for the Masonry skin.
+* Added a column width control for the Table skin.
+* Improved custom fields UI, naming conventions, and overall user experience.
+* Fixed issues related to listing and map-based searches.
+* Resolved various UI inconsistencies in both the frontend and backend interfaces.
 
 = 4.2.0 =
 * Moved custom fields feature from Listdom Pro to Listdom Lite.
@@ -528,7 +537,7 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * [PRO] Added a new feature to dynamically add custom menus to the "Frontend Dashboard".
 * [PRO] Introduced the "Exclusion Filter" to exclude listings with specific categories, locations, features, and labels from search results.
 * [PRO] Implemented the "Price Components" feature to enable or disable specific price elements.
-* [PRO] Added the "Attributes Filter" to allow filtering of listings based on attributes (custom fields) at the shortcode level.
+* [PRO] Added the "Custom Fields Filter" to allow filtering of listings based on attributes (custom fields) at the shortcode level.
 * [PRO] Enabled bulk layout changes for specific listings using WordPress quick edit.
 * [PRO] Introduced the ability to reorder "Frontend Dashboard" menus.
 * Added an option to control the description length in applicable skins.

@@ -63,12 +63,12 @@ class LSD_Form extends LSD_Base
         if (!count($args)) return false;
 
         $attributes = '';
-        if (isset($args['attributes']) and is_array($args['attributes']) and count($args['attributes']))
+        if (isset($args['attributes']) && is_array($args['attributes']) && count($args['attributes']))
         {
             foreach ($args['attributes'] as $key => $value) $attributes .= $key . '="' . esc_attr($value) . '" ';
         }
 
-        $required = (isset($args['required']) and $args['required']);
+        $required = isset($args['required']) && $args['required'];
         return '<input type="' . esc_attr($type) . '" name="' . (isset($args['name']) ? esc_attr($args['name']) : '') . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : '') . '" value="' . (isset($args['value']) ? esc_attr($args['value']) : '') . '" placeholder="' . (isset($args['placeholder']) ? esc_attr($args['placeholder']) : '') . '" ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '>';
     }
 

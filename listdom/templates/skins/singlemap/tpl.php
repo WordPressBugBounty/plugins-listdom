@@ -20,7 +20,7 @@ jQuery(document).ready(function()
 </script>');
 ?>
 <div class="lsd-skin-wrapper lsd-singlemap-view-wrapper <?php echo sanitize_html_class($this->get_bar_class()); ?> <?php echo esc_attr($this->html_class); ?>" id="lsd_skin<?php echo esc_attr($this->id); ?>">
-    <?php echo LSD_Kses::form($this->get_left_bar()); ?>
+    <?php echo LSD_Kses::full($this->get_left_bar()); ?>
 
     <div class="lsd-skin-main-bar-wrapper">
         <?php if ($this->sm_shortcode && in_array($this->sm_position, ['top', 'before_listings'])) echo LSD_Kses::form($this->get_search_module()); ?>
@@ -69,5 +69,5 @@ jQuery(document).ready(function()
         <?php if ($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
     </div>
 
-    <?php echo LSD_Kses::form($this->get_right_bar()); ?>
+    <?php echo LSD_Kses::full($this->get_right_bar()); ?>
 </div>

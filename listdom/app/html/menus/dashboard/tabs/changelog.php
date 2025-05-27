@@ -3,6 +3,36 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.3.0 <span>May 27th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("[PRO] Added Mosaic and Accordion skins.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added CSV Import/Export functionality to Listdom Lite.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Introduced a numeric pagination option.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added a breadcrumb element to single listing templates.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Enabled pagination support for the Masonry skin.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e("Added a column width control for the Table skin.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e("Improved custom fields UI, naming conventions, and overall user experience.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("Fixed issues related to listing and map-based searches.", 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e("Resolved various UI inconsistencies in both the frontend and backend interfaces.", 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v4.2.0 <span>May 11th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>
@@ -313,7 +343,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Implemented the "Price Components" feature to enable or disable specific price elements.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added the "Attributes Filter" to allow filtering of listings based on attributes (custom fields) at the shortcode level.', 'listdom'); ?></span>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added the "Custom Fields Filter" to allow filtering of listings based on attributes (custom fields) at the shortcode level.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Enabled bulk layout changes for specific listings using WordPress quick edit.', 'listdom'); ?></span>
@@ -1227,7 +1257,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('Added Listing Labels.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added Attributes.', 'listdom'); ?></span>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added Custom Fields.', 'listdom'); ?></span>
             <ul class="lsd-sub-changelog">
                 <li><?php esc_html_e('Ability to create personalized fields for listing using attributes feature.', 'listdom'); ?></li>
                 <li><?php esc_html_e('Added ability to create attributes per category!', 'listdom'); ?></li>

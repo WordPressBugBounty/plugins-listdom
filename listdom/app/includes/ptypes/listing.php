@@ -153,11 +153,18 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
     public function register_metaboxes()
     {
+        add_meta_box('lsd_metabox_attributes', esc_html__('Custom Fields', 'listdom'), [$this, 'metabox_attributes'], $this->PT, 'normal', 'high');
         add_meta_box('lsd_metabox_address', esc_html__('Location', 'listdom'), [$this, 'metabox_address'], $this->PT, 'normal', 'high');
         add_meta_box('lsd_metabox_details', esc_html__('Details', 'listdom'), [$this, 'metabox_details'], $this->PT, 'normal', 'high');
 
         // Register Metaboxes
         do_action('lsd_register_metaboxes');
+    }
+
+    public function metabox_attributes($post)
+    {
+        // Generate output
+        include $this->include_html_file('metaboxes/listing/attributes.php', ['return_path' => true]);
     }
 
     public function metabox_address($post)

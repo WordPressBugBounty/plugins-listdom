@@ -9,6 +9,16 @@ switch($this->tab)
         $this->include_html_file('menus/ix/tabs/json.php');
         break;
 
+    case 'csv':
+
+        $this->include_html_file('menus/ix/tabs/csv.php');
+        break;
+
+    case 'excel' && !class_exists(\LSDPACEXL\Base::class):
+
+        $this->include_html_file('menus/ix/tabs/excel.php');
+        break;
+
     default:
 
         /**

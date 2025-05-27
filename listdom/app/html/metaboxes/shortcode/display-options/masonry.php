@@ -443,5 +443,20 @@ $optional_addons = [];
         <p class="description"><?php esc_html_e("You can set the animation duration in milliseconds, with a default value of 400. Setting it to 0 will disable the animation.", 'listdom'); ?></p>
     </div>
 </div>
+<div class="lsd-form-row">
+    <div class="lsd-col-2"><?php echo LSD_Form::label([
+        'title' => esc_html__('Pagination Method', 'listdom'),
+        'for' => 'lsd_display_options_skin_masonry_pagination',
+    ]); ?></div>
+    <div class="lsd-col-6">
+        <?php echo LSD_Form::select([
+            'id' => 'lsd_display_options_skin_masonry_pagination',
+            'name' => 'lsd[display][masonry][pagination]',
+            'value' => $masonry['pagination'] ?? 'disabled',
+            'options' => LSD_Base::get_pagination_methods(),
+        ]); ?>
+        <p class="description"><?php esc_html_e('Choose how to load additional listings more than the default limit.', 'listdom'); ?></p>
+    </div>
+</div>
 
 <?php $this->field_listing_link('masonry', $masonry);

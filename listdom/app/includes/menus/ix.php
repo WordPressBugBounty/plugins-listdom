@@ -19,12 +19,15 @@ class LSD_Menus_IX extends LSD_Menus
 
         // General Import
         add_action('lsd_import', [new LSD_IX(), 'import']);
+
+        // CSV
+        (new LSD_Menus_IX_CSV())->init();
     }
 
     public function output()
     {
         // Get the current tab
-        $this->tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'json';
+        $this->tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'csv';
 
         // Generate output
         $this->include_html_file('menus/ix/tpl.php');
@@ -53,6 +56,11 @@ class LSD_Menus_IX extends LSD_Menus
             case 'json':
 
                 $ix->json();
+                break;
+
+            case 'csv':
+
+                $ix->csv();
                 break;
 
             default:

@@ -12,4 +12,13 @@ class LSD_IX_Listdom extends LSD_IX
         echo json_encode($data);
         exit;
     }
+
+    public function csv()
+    {
+        // CSV
+        $ix = new LSD_IX_CSV();
+        $ix->csv();
+
+        exit;
+    }
 }

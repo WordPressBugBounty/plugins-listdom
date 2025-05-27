@@ -79,7 +79,7 @@ $missFeatureMessages = [];
             </div>
             <div class="lsd-form-row">
                 <div class="lsd-col-6"><?php echo LSD_Form::label([
-                    'title' => esc_html__('Attributes', 'listdom'),
+                    'title' => esc_html__('Custom Fields', 'listdom'),
                     'for' => 'lsd_dummy_attributes',
                 ]); ?></div>
                 <div class="lsd-col-6"><?php echo LSD_Form::switcher([

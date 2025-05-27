@@ -20,6 +20,7 @@ $embeds = isset($elements['embed']['enabled']) && $elements['embed']['enabled'] 
 $video = isset($elements['video']['enabled']) && $elements['video']['enabled'] ? $this->featured_video() : '';
 $price = isset($elements['price']['enabled']) && $elements['price']['enabled'] ? $this->price() : '';
 $address = isset($elements['address']['enabled']) && $elements['address']['enabled'] ? $this->address() : '';
+$breadcrumb = isset($elements['breadcrumb']['enabled']) && $elements['breadcrumb']['enabled'] ? $this->breadcrumb() : '';
 $locations = isset($elements['locations']['enabled']) && $elements['locations']['enabled'] ? $this->locations() : '';
 $share = isset($elements['share']['enabled']) && $elements['share']['enabled'] ? $this->share() : '';
 $remark = isset($elements['remark']['enabled']) && $elements['remark']['enabled'] ? $this->remark() : '';
@@ -35,6 +36,11 @@ $minified_availability = $this->entity->get_availability(true);
 $claim = $this->entity->get_claim_button();
 $rate_summary = $this->entity->get_rate_stars('summary');
 ?>
+<div class="lsd-row">
+    <div class="lsd-col-12">
+        <?php if ($breadcrumb) echo LSD_Kses::element($breadcrumb); ?>
+    </div>
+</div>
 <div class="lsd-row listdom-single-top">
     <div class="lsd-col-8">
         <?php if ($categories) echo LSD_Kses::element($categories); ?>

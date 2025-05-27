@@ -213,6 +213,7 @@ class LSD_Options extends LSD_Base
                         'remark' => ['enabled' => 1, 'show_title' => 0],
                         'locations' => ['enabled' => 1, 'show_title' => 0],
                         'address' => ['enabled' => 1, 'show_title' => 0],
+                        'breadcrumb' => ['enabled' => 0, 'show_title' => 0, 'icon' => 1, 'taxonomy' => LSD_Base::TAX_CATEGORY],
                         'map' => ['enabled' => 1, 'show_title' => 0, 'infowindow' => 0],
                         'availability' => ['enabled' => 1, 'show_title' => 1],
                         'owner' => ['enabled' => 1, 'show_title' => 0],

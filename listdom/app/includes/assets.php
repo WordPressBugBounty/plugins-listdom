@@ -42,6 +42,9 @@ class LSD_Assets extends LSD_Base
         add_action('elementor/frontend/after_enqueue_scripts', function ()
         {
             $this->isotope();
+            $this->googlemaps();
+            $this->leaflet();
+
             wp_enqueue_script('lsd-elementor-preview', $this->lsd_asset_url('js/elementor-preview.min.js'), ['jquery', 'lsd-frontend'], LSD_Assets::version(), true);
         });
     }

@@ -71,6 +71,15 @@ jQuery(document).ready(function()
                                 </div>
                             <?php endif; ?>
 
+                            <?php if ($this->is_enabled('attributes')): ?>
+                            <div class="lsd-dashboard-right-box lsd-dashboard-attributes">
+                                <h4><?php esc_html_e('Custom Fields', 'listdom'); ?></h4>
+                                <div>
+                                    <?php do_action('lsd_dashboard_attributes_metabox', $this); ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+
                             <?php if ($this->is_enabled('address')): ?>
 							<div class="lsd-dashboard-right-box lsd-dashboard-address">
 								<h4><?php esc_html_e('Address / Map', 'listdom'); ?></h4>
@@ -86,15 +95,6 @@ jQuery(document).ready(function()
 									<?php $postType->metabox_details($this->post); ?>
 								</div>
 							</div>
-
-							<?php if ($this->is_enabled('attributes')): ?>
-							<div class="lsd-dashboard-right-box lsd-dashboard-attributes">
-								<h4><?php esc_html_e('Attributes', 'listdom'); ?></h4>
-								<div>
-                                    <?php do_action('lsd_dashboard_attributes_metabox', $this); ?>
-								</div>
-							</div>
-							<?php endif; ?>
 
 							<?php do_action('lsd_dashboard_after_attributes', $this->post, $this); ?>
 

@@ -567,11 +567,7 @@ $optional_addons = [];
             'id' => 'lsd_display_options_skin_halfmap_pagination',
             'name' => 'lsd[display][halfmap][pagination]',
             'value' => $halfmap['pagination'] ?? (isset($halfmap['load_more']) && $halfmap['load_more'] == 0 ? 'disabled' : 'loadmore'),
-            'options' => [
-                'loadmore' => esc_html__('Load More Button', 'listdom'),
-                'scroll' => esc_html__('Infinite Scroll', 'listdom'),
-                'disabled' => esc_html__('Disabled', 'listdom'),
-            ],
+            'options' => LSD_Base::get_pagination_methods(),
         ]); ?>
         <p class="description"><?php esc_html_e('Choose how to load additional listings more than the default limit.', 'listdom'); ?></p>
     </div>

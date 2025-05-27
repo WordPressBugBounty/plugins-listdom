@@ -3,7 +3,9 @@
 defined('ABSPATH') || die();
 ?>
 <h2 class="nav-tab-wrapper">
-    <a class="nav-tab <?php echo $this->tab === 'json' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix')); ?>"><?php esc_html_e('JSON', 'listdom'); ?></a>
+    <a class="nav-tab <?php echo $this->tab === 'csv' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=csv')); ?>"><?php esc_html_e('CSV', 'listdom'); ?></a>
+    <a class="nav-tab <?php echo $this->tab === 'json' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=json')); ?>"><?php esc_html_e('JSON', 'listdom'); ?></a>
+    <a class="nav-tab <?php echo $this->tab === 'excel' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=excel')); ?>"><?php esc_html_e('Excel', 'listdom'); ?></a>
 
     <?php
         /**

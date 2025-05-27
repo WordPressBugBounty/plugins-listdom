@@ -379,7 +379,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
 
             $form['attributes'] = [
                 'section' => [
-                    'title' => esc_html__('Attributes', 'listdom'),
+                    'title' => esc_html__('Custom Fields', 'listdom'),
                 ],
                 'fields' => $attributes,
             ];

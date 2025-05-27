@@ -10,6 +10,8 @@ class LSD_Skins_Masonry extends LSD_Skins
 
     public function init()
     {
+        add_action('wp_ajax_lsd_masonry_load_more', [$this, 'filter']);
+        add_action('wp_ajax_nopriv_lsd_masonry_load_more', [$this, 'filter']);
     }
 
     public function after_start()

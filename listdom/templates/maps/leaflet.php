@@ -30,7 +30,7 @@ $force_to_show = isset($args['force_to_show']) && $args['force_to_show'];
 // The Unique ID
 $id = $args['id'] ?? mt_rand(100, 999);
 
-if(isset($args['objects']) && is_array($args['objects']))
+if (isset($args['objects']) && is_array($args['objects']))
 {
     $objects = $args['objects'];
 }
@@ -41,10 +41,10 @@ else
 }
 
 // No Objects to show or only one object with default location
-if(!$force_to_show && (!count($objects) || (count($objects) === 1 && $objects[0]['latitude'] === $latitude && $objects[0]['longitude'] === $longitude))) return;
+if (!$force_to_show && (!count($objects) || (count($objects) === 1 && $objects[0]['latitude'] === $latitude && $objects[0]['longitude'] === $longitude))) return;
     
 // Add Leaflet JS codes to footer
-$assets->footer('<script>
+$assets->footerOrPreview('<script>
 jQuery(document).ready(function()
 {
     const lsdMap = jQuery("#lsd_map'.$id.'").listdomLeaflet(

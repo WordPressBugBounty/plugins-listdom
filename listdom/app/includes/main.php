@@ -305,4 +305,23 @@ class LSD_Main extends LSD_Base
                 return false;
         }
     }
+
+    public static function update_geopoints(int $limit = 100)
+    {
+        $listings = get_posts([
+            'post_type' => LSD_Base::PTYPE_LISTING,
+            'numberposts' => $limit
+        ]);
+
+        // Listing Entity
+        $entity = new LSD_Entity_Listing();
+
+        foreach ($listings as $listing)
+        {
+            $lat = get_post_meta($listing->ID, 'lsd_latitude', true);
+            $lng = get_post_meta($listing->ID, 'lsd_longitude', true);
+
+            $entity->update_geopoint($listing->ID, $lat, $lng);
+        }
+    }
 }

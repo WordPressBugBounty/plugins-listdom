@@ -539,11 +539,7 @@ $optional_addons = [];
             'id' => 'lsd_display_options_skin_list_pagination',
             'name' => 'lsd[display][list][pagination]',
             'value' => $list['pagination'] ?? (isset($list['load_more']) && $list['load_more'] == 0 ? 'disabled' : 'loadmore'),
-            'options' => [
-                'loadmore' => esc_html__('Load More Button', 'listdom'),
-                'scroll' => esc_html__('Infinite Scroll', 'listdom'),
-                'disabled' => esc_html__('Disabled', 'listdom'),
-            ],
+            'options' => LSD_Base::get_pagination_methods(),
         ]); ?>
         <p class="description"><?php esc_html_e('Choose how to load additional listings more than the default limit.', 'listdom'); ?></p>
     </div>

@@ -271,7 +271,7 @@ $walker = new LSD_Walker_Taxonomy();
 
     <div class="lsd-accordion-title">
         <div class="lsd-flex lsd-flex-row lsd-py-2">
-            <h3><?php esc_html_e('Attributes', 'listdom'); ?></h3>
+            <h3><?php esc_html_e('Custom Fields', 'listdom'); ?></h3>
             <div class="lsd-accordion-icons">
                 <i class="lsd-icon fa fa-plus"></i>
                 <i class="lsd-icon fa fa-minus"></i>
@@ -281,21 +281,21 @@ $walker = new LSD_Walker_Taxonomy();
     <div class="lsd-accordion-panel">
         <div class="lsd-row">
             <div class="lsd-col-12">
-                <p class="description lsd-mt-0 lsd-mb-2"><?php esc_html_e("If you want to filter listings based on attributes, fill in the following fields. Otherwise, leave them empty to skip filtering.", 'listdom'); ?></p>
+                <p class="description lsd-mt-0 lsd-mb-4"><?php esc_html_e("If you want to filter listings based on custom fields, fill in the following fields. Otherwise, leave them empty to skip filtering.", 'listdom'); ?></p>
                 <div class="lsd-attributes">
                     <?php if (count($attributes)): ?>
                         <?php foreach ($attributes as $attr): ?>
                             <div class="lsd-form-row">
-                                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                <div class="lsd-col-2 lsd-text-right"><?php echo LSD_Form::label([
                                     'title' => esc_html($attr['name']),
-                                    'for' => 'lsd_sort_options_status',
+                                    'for' => 'lsd_attribute_'.esc_attr($attr['id']),
                                 ]); ?></div>
 
-                                <div  class="lsd-col-6">
+                                <div class="lsd-col-6">
                                     <?php if ($attr['field_type'] === 'dropdown'): ?>
                                         <?php
                                             echo LSD_Form::select([
-                                                'id' => 'lsd_include_' . LSD_Base::TAX_ATTRIBUTE,
+                                                'id' => 'lsd_attribute_'.esc_attr($attr['id']),
                                                 'name' => 'lsd[filter][attributes][' . esc_attr($attr['id']) .'-in][]',
                                                 'value' => $options['attributes'][$attr['id'] . '-in'] ?? [],
                                                 'options' => $attr['values'],
@@ -314,41 +314,42 @@ $walker = new LSD_Walker_Taxonomy();
                                                     'name' => 'lsd[filter]['.LSD_Base::TAX_ATTRIBUTE .'][' . esc_attr($attr['id']) .'-bt-min]',
                                                     'value' => $min,
                                                     'placeholder' => esc_html__('Min number', 'listdom'),
-                                                    'id' => esc_attr($attr['id'])  . '-min',
+                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id'])  . '-min',
                                                 ]);
 
                                                 echo LSD_Form::number([
                                                     'name' => 'lsd[filter]['.LSD_Base::TAX_ATTRIBUTE .'][' . esc_attr($attr['id']) .'-bt-max]',
                                                     'value' => $max,
                                                     'placeholder' => esc_html__('Max number', 'listdom'),
-                                                    'id' => esc_attr($attr['id'])  . '-max',
+                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id'])  . '-max',
                                                 ]);
 
                                                 echo LSD_Form::hidden([
                                                     'name' => 'lsd[filter][attributes][' . esc_attr($attr['id']) .'-bt]',
-                                                    'id' => esc_attr($attr['id']) . '-hidden',
+                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id']) . '-hidden',
                                                     'value' => $min && $max ? $min.':'.$max : '',
                                                 ]);
                                             ?>
                                             <script>
-                                                jQuery(document).ready(function ()
-                                                {
-                                                    const minInput = jQuery('#<?php echo esc_attr($attr['id']); ?>-min');
-                                                    const maxInput = jQuery('#<?php echo esc_attr($attr['id']); ?>-max');
-                                                    const hiddenInput = jQuery('#<?php echo esc_attr($attr['id']); ?>-hidden');
+                                            jQuery(document).ready(function()
+                                            {
+                                                const minInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['id']); ?>-min');
+                                                const maxInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['id']); ?>-max');
+                                                const hiddenInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['id']); ?>-hidden');
 
-                                                    minInput.add(maxInput).on('input', () => {
-                                                        const minValue = minInput.val().trim();
-                                                        const maxValue = maxInput.val().trim();
+                                                minInput.add(maxInput).on('input', () => {
+                                                    const minValue = minInput.val().trim();
+                                                    const maxValue = maxInput.val().trim();
 
-                                                        hiddenInput.val(minValue && maxValue ? `${minValue}:${maxValue}` : '');
-                                                    });
+                                                    hiddenInput.val(minValue && maxValue ? `${minValue}:${maxValue}` : '');
                                                 });
+                                            });
                                             </script>
                                         </div>
                                     <?php else: ?>
                                         <?php
                                             echo LSD_Form::text([
+                                                'id' => 'lsd_attribute_'.esc_attr($attr['id']),
                                                 'name' => 'lsd[filter][attributes][' . esc_attr($attr['id']) .'-lk]',
                                                 'value' => $options['attributes'][$attr['id'] . '-lk'] ?? '',
                                                 'placeholder' => sprintf(esc_html__('Enter %s', 'listdom'), esc_html($attr['name'])),

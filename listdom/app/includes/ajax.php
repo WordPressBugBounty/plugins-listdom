@@ -19,7 +19,7 @@ class LSD_Ajax extends LSD_Base
 
     public function search()
     {
-        $args = isset($_POST['args']) && is_array($_POST['args']) ? $_POST['args'] : [];
+        $args = (isset($_POST['args']) and is_array($_POST['args'])) ? $_POST['args'] : [];
 
         // Get From Request
         if (!count($args)) $args = $_POST;
@@ -27,13 +27,14 @@ class LSD_Ajax extends LSD_Base
         // Sanitization
         array_walk_recursive($args, 'sanitize_text_field');
 
-        $atts = isset($args['atts']) && is_array($args['atts']) ? $args['atts'] : [];
+        $atts = (isset($args['atts']) and is_array($args['atts'])) ? $args['atts'] : [];
 
         // Listdom Shortcode
         $LSD = new LSD_Shortcodes_Listdom();
 
         // Skin
         $skin = (isset($atts['lsd_display']) and isset($atts['lsd_display']['skin'])) ? sanitize_text_field($atts['lsd_display']['skin']) : $LSD->get_default_skin();
+        $limit = $atts['lsd_display'][$skin]['limit'] ?? 300;
 
         // Get Skin Object
         $SKO = $LSD->SKO($skin);
@@ -72,6 +73,8 @@ class LSD_Ajax extends LSD_Base
             'next_page' => $next_page,
             'count' => count($IDs),
             'total' => $total,
+            'limit' => $limit,
+            'pagination' => $SKO->get_pagination()
         ]);
     }
 
@@ -118,7 +121,7 @@ class LSD_Ajax extends LSD_Base
                 $items .= '<li data-value="' . esc_attr($term->term_id) . '">' . esc_html($term->name) . '</li>';
             }
         }
-        else if ($source === LSD_Base::PTYPE_SHORTCODE.'-searchable')
+        else if ($source === LSD_Base::PTYPE_SHORTCODE . '-searchable')
         {
             $posts = get_posts([
                 'post_type' => LSD_Base::PTYPE_SHORTCODE,
@@ -158,7 +161,7 @@ class LSD_Ajax extends LSD_Base
         $this->response([
             'success' => 1,
             'total' => $total,
-            'items' => trim($items) ? '<ul class="lsd-autosuggest-items">'.$items.'</ul>' : '',
+            'items' => trim($items) ? '<ul class="lsd-autosuggest-items">' . $items . '</ul>' : '',
         ]);
     }
 

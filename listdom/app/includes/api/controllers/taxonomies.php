@@ -32,8 +32,8 @@ class LSD_API_Controllers_Taxonomies extends LSD_API_Controller
             ],
             [
                 'key' => LSD_Base::TAX_ATTRIBUTE,
-                'singular' => esc_html__('Attribute', 'listdom'),
-                'plural' => esc_html__('Attributes', 'listdom'),
+                'singular' => esc_html__('Custom Field', 'listdom'),
+                'plural' => esc_html__('Custom Fields', 'listdom'),
             ],
         ];
 

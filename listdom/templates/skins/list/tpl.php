@@ -20,14 +20,14 @@ jQuery(document).ready(function()
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
         next_page: "'.$this->next_page.'",
-        limit: "'.$this->limit.'"
+        limit: "'.$this->limit.'",
     });
 });
 </script>');
 ?>
 <div class="lsd-skin-wrapper lsd-list-view-wrapper <?php echo sanitize_html_class($this->get_bar_class()); ?> <?php echo esc_attr($this->html_class); ?> lsd-style-<?php echo esc_attr($this->style); ?> lsd-font-m" id="lsd_skin<?php echo esc_attr($this->id); ?>" data-next-page="<?php echo esc_attr($this->next_page); ?>">
 
-    <?php echo LSD_Kses::form($this->get_left_bar()); ?>
+    <?php echo LSD_Kses::full($this->get_left_bar()); ?>
 
     <div class="lsd-skin-main-bar-wrapper">
         <?php if ($this->sm_shortcode && $this->sm_position === 'top') echo LSD_Kses::form($this->get_search_module()); ?>
@@ -73,5 +73,5 @@ jQuery(document).ready(function()
         <?php if ($this->sm_shortcode && $this->sm_position === 'bottom') echo LSD_Kses::form($this->get_search_module()); ?>
     </div>
 
-    <?php echo LSD_Kses::form($this->get_right_bar()); ?>
+    <?php echo LSD_Kses::full($this->get_right_bar()); ?>
 </div>

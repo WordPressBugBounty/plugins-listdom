@@ -1,6 +1,7 @@
 <?php
 // no direct access
 defined('ABSPATH') || die();
+
 /** @var LSD_Skins $this */
 ?>
 <div class="lsd-load-more-wrapper">

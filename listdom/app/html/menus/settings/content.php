@@ -9,11 +9,6 @@ switch ($this->tab)
         $this->include_html_file('menus/settings/tabs/single-listing.php');
         break;
 
-    case 'archive-slugs':
-
-        $this->include_html_file('menus/settings/tabs/archive-slugs.php');
-        break;
-
     case 'frontend-dashboard':
 
         $this->include_html_file('menus/settings/tabs/frontend-dashboard.php');

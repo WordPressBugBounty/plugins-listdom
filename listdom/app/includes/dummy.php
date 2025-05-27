@@ -47,13 +47,13 @@ class LSD_Dummy extends LSD_Base
         {
             // Categories
             foreach ([
-                 ['label' => esc_html__('Beauty Salon', 'listdom'), 'color' => '#dd3333', 'icon' => 'fa fa-user'],
-                 ['label' => esc_html__('Cafe', 'listdom'), 'color' => '#81d742', 'icon' => 'fa fa-coffee'],
-                 ['label' => esc_html__('Hospital', 'listdom'), 'color' => '#000000', 'icon' => 'fa fa-heartbeat'],
-                 ['label' => esc_html__('Hotel', 'listdom'), 'color' => '#1d7ed3', 'icon' => 'fa fa-bed'],
-                 ['label' => esc_html__('Restaurant', 'listdom'), 'color' => '#8224e3', 'icon' => 'fas fa-utensil-spoon'],
-                 ['label' => esc_html__('Super Market', 'listdom'), 'color' => '#dd9933', 'icon' => 'fa fa-shopping-basket'],
-             ] as $category)
+                         ['label' => esc_html__('Beauty Salon', 'listdom'), 'color' => '#dd3333', 'icon' => 'fa fa-user'],
+                         ['label' => esc_html__('Cafe', 'listdom'), 'color' => '#81d742', 'icon' => 'fa fa-coffee'],
+                         ['label' => esc_html__('Hospital', 'listdom'), 'color' => '#000000', 'icon' => 'fa fa-heartbeat'],
+                         ['label' => esc_html__('Hotel', 'listdom'), 'color' => '#1d7ed3', 'icon' => 'fa fa-bed'],
+                         ['label' => esc_html__('Restaurant', 'listdom'), 'color' => '#8224e3', 'icon' => 'fas fa-utensil-spoon'],
+                         ['label' => esc_html__('Super Market', 'listdom'), 'color' => '#dd9933', 'icon' => 'fa fa-shopping-basket'],
+                     ] as $category)
             {
                 // Don't add it again if exists
                 if (term_exists($category['label'], LSD_Base::TAX_CATEGORY)) continue;
@@ -76,14 +76,14 @@ class LSD_Dummy extends LSD_Base
         {
             // Locations
             foreach ([
-                 ['label' => esc_html__('Florida', 'listdom')],
-                 ['label' => esc_html__('London', 'listdom')],
-                 ['label' => esc_html__('Los Angeles', 'listdom')],
-                 ['label' => esc_html__('New York', 'listdom')],
-                 ['label' => esc_html__('Paris', 'listdom')],
-                 ['label' => esc_html__('Rome', 'listdom')],
-                 ['label' => esc_html__('Madrid', 'listdom')],
-             ] as $location)
+                         ['label' => esc_html__('Florida', 'listdom')],
+                         ['label' => esc_html__('London', 'listdom')],
+                         ['label' => esc_html__('Los Angeles', 'listdom')],
+                         ['label' => esc_html__('New York', 'listdom')],
+                         ['label' => esc_html__('Paris', 'listdom')],
+                         ['label' => esc_html__('Rome', 'listdom')],
+                         ['label' => esc_html__('Madrid', 'listdom')],
+                     ] as $location)
             {
                 // Don't add it again if exists
                 if (term_exists($location['label'], LSD_Base::TAX_LOCATION)) continue;
@@ -100,11 +100,11 @@ class LSD_Dummy extends LSD_Base
         {
             // Tags
             foreach ([
-                 ['label' => esc_html__('Discount', 'listdom')],
-                 ['label' => esc_html__('Easy Access', 'listdom')],
-                 ['label' => esc_html__('Parking Friendly', 'listdom')],
-                 ['label' => esc_html__('Recommended', 'listdom')],
-             ] as $tag)
+                         ['label' => esc_html__('Discount', 'listdom')],
+                         ['label' => esc_html__('Easy Access', 'listdom')],
+                         ['label' => esc_html__('Parking Friendly', 'listdom')],
+                         ['label' => esc_html__('Recommended', 'listdom')],
+                     ] as $tag)
             {
                 // Don't add it again if exists
                 if (term_exists($tag['label'], LSD_Base::TAX_TAG)) continue;
@@ -121,10 +121,10 @@ class LSD_Dummy extends LSD_Base
         {
             // Features
             foreach ([
-                 ['label' => esc_html__('Free Wifi', 'listdom'), 'icon' => 'fas fa-wifi'],
-                 ['label' => esc_html__('Live Music', 'listdom'), 'icon' => 'fa fa-music'],
-                 ['label' => esc_html__('Valet', 'listdom'), 'icon' => 'fa fa-car'],
-             ] as $feature)
+                         ['label' => esc_html__('Free Wifi', 'listdom'), 'icon' => 'fas fa-wifi'],
+                         ['label' => esc_html__('Live Music', 'listdom'), 'icon' => 'fa fa-music'],
+                         ['label' => esc_html__('Valet', 'listdom'), 'icon' => 'fa fa-car'],
+                     ] as $feature)
             {
                 // Don't add it again if exists
                 if (term_exists($feature['label'], LSD_Base::TAX_FEATURE)) continue;
@@ -144,11 +144,11 @@ class LSD_Dummy extends LSD_Base
         {
             // Labels
             foreach ([
-                 ['label' => esc_html__('Exclusive', 'listdom'), 'color' => '#1d7ed3'],
-                 ['label' => esc_html__('Hot Offer', 'listdom'), 'color' => '#dd3333'],
-                 ['label' => esc_html__('Must See', 'listdom'), 'color' => '#dd9933'],
-                 ['label' => esc_html__('Recommended', 'listdom'), 'color' => '#000000'],
-             ] as $label)
+                         ['label' => esc_html__('Exclusive', 'listdom'), 'color' => '#1d7ed3'],
+                         ['label' => esc_html__('Hot Offer', 'listdom'), 'color' => '#dd3333'],
+                         ['label' => esc_html__('Must See', 'listdom'), 'color' => '#dd9933'],
+                         ['label' => esc_html__('Recommended', 'listdom'), 'color' => '#000000'],
+                     ] as $label)
             {
                 // Don't add it again if exists
                 if (term_exists($label['label'], LSD_Base::TAX_LABEL)) continue;
@@ -168,10 +168,10 @@ class LSD_Dummy extends LSD_Base
         {
             // Attributes
             foreach ([
-                 ['label' => esc_html__('Discount', 'listdom'), 'type' => 'text', 'icon' => 'far fa-money-bill-alt', 'index' => '1.00', 'values' => ''],
-                 ['label' => esc_html__('Pets Allowed', 'listdom'), 'type' => 'dropdown', 'icon' => 'far fa-heart', 'index' => '2.00', 'values' => 'Yes,No,Only Cats,Only Dogs'],
-                 ['label' => esc_html__('Parking Capacity', 'listdom'), 'type' => 'number', 'icon' => 'fa fa-car', 'index' => '3.00', 'values' => ''],
-             ] as $attribute)
+                         ['label' => esc_html__('Discount', 'listdom'), 'type' => 'text', 'icon' => 'far fa-money-bill-alt', 'index' => '1.00', 'values' => ''],
+                         ['label' => esc_html__('Pets Allowed', 'listdom'), 'type' => 'dropdown', 'icon' => 'far fa-heart', 'index' => '2.00', 'values' => 'Yes,No,Only Cats,Only Dogs'],
+                         ['label' => esc_html__('Parking Capacity', 'listdom'), 'type' => 'number', 'icon' => 'fa fa-car', 'index' => '3.00', 'values' => ''],
+                     ] as $attribute)
             {
                 // Don't add it again if exists
                 if (term_exists($attribute['label'], LSD_Base::TAX_ATTRIBUTE)) continue;
@@ -606,6 +606,66 @@ class LSD_Dummy extends LSD_Base
                         'lsd_sorts' => LSD_Options::defaults('sorts'),
                     ],
                 ],
+                [
+                    'title' => 'Accordion',
+                    'meta' => [
+                        'lsd_skin' => 'accordion',
+                        'lsd_display' => [
+                            'skin' => 'accordion',
+                            'accordion' => [
+                                'style' => 'style1',
+                                'map_position' => 'top',
+                                'clustering' => 1,
+                                'clustering_images' => 'img/cluster2/m',
+                                'mapobject_onclick' => 'infowindow',
+                                'mapsearch' => 1,
+                                'maplimit' => 300,
+                                'columns' => 1,
+                                'limit' => 12,
+                                'load_more' => 1,
+                                'display_labels' => 1,
+                                'display_share_buttons' => 1,
+                            ],
+                        ],
+                        'lsd_search' => [
+                            'shortcode' => (string) $first_search_id,
+                            'position' => 'top',
+                        ],
+                        'lsd_filter' => [],
+                        'lsd_mapcontrols' => LSD_Options::defaults('mapcontrols'),
+                        'lsd_sorts' => LSD_Options::defaults('sorts'),
+                    ],
+                ],
+                [
+                    'title' => 'Mosaic',
+                    'meta' => [
+                        'lsd_skin' => 'mosaic',
+                        'lsd_display' => [
+                            'skin' => 'mosaic',
+                            'mosaic' => [
+                                'style' => 'style1',
+                                'map_position' => 'top',
+                                'clustering' => 1,
+                                'clustering_images' => 'img/cluster2/m',
+                                'mapobject_onclick' => 'infowindow',
+                                'mapsearch' => 1,
+                                'maplimit' => 300,
+                                'columns' => 2,
+                                'limit' => 12,
+                                'load_more' => 1,
+                                'display_labels' => 1,
+                                'display_share_buttons' => 1,
+                            ],
+                        ],
+                        'lsd_search' => [
+                            'shortcode' => (string) $first_search_id,
+                            'position' => 'top',
+                        ],
+                        'lsd_filter' => [],
+                        'lsd_mapcontrols' => LSD_Options::defaults('mapcontrols'),
+                        'lsd_sorts' => LSD_Options::defaults('sorts'),
+                    ],
+                ],
             ];
 
             foreach ($shortcodes as $shortcode)
@@ -620,7 +680,6 @@ class LSD_Dummy extends LSD_Base
                 // Get or create page
                 $this->page($page_title, $page_shortcode);
             }
-
         }
 
         // Frontend Dashboard

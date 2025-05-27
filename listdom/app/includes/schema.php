@@ -92,6 +92,11 @@ class LSD_Schema extends LSD_Base
         return $this->prop('url');
     }
 
+    public function breadcrumb(): LSD_Schema
+    {
+        return $this->prop('breadcrumb');
+    }
+
     public function address(): LSD_Schema
     {
         return $this->prop('address');

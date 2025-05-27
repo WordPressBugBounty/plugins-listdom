@@ -100,7 +100,6 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Attributes
-        // Attributes
         $attributes = LSD_Main::get_attributes();
 
         foreach ($attributes as $attribute)
@@ -116,7 +115,7 @@ class LSD_Search_Builder extends LSD_Base
                 'type' => 'attribute',
                 'key' => $key,
                 'title' => $attribute->name,
-                'description' => esc_html__('Attributes', 'listdom'),
+                'description' => esc_html__('Custom Fields', 'listdom'),
                 'methods' => $this->getFieldMethods($type),
             ];
         }

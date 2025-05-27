@@ -9,7 +9,7 @@ class LSD_Element_Attributes extends LSD_Element
     {
         parent::__construct();
 
-        $this->label = esc_html__('Attributes', 'listdom');
+        $this->label = esc_html__('Custom Fields', 'listdom');
     }
 
     public function get($post_id = null, $show_icons = 0, $show_attribute_title = 1)
@@ -45,7 +45,7 @@ class LSD_Element_Attributes extends LSD_Element
             </select>
         </div>
         <div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_show_attribute_title">' . esc_html__('Show Attribute Title', 'listdom') . '</label>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_show_attribute_title">' . esc_html__('Show Custom Field Title', 'listdom') . '</label>
             <select name="lsd[elements][' . esc_attr($this->key) . '][show_attribute_title]" id="lsd_elements_' . esc_attr($this->key) . '_show_attribute_title">
                 <option value="1" ' . (isset($data['show_attribute_title']) && $data['show_attribute_title'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
                 <option value="0" ' . (isset($data['show_attribute_title']) && $data['show_attribute_title'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>

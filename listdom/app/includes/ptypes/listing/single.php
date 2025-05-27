@@ -267,6 +267,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             $rendered = str_replace('{abuse}', LSD_Kses::form($abuse), $rendered);
         }
 
+        // Listing Breadcrumb
+        if (strpos($this->pattern, '{breadcrumb}') !== false)
+        {
+            $breadcrumb = $this->breadcrumb();
+            $rendered = str_replace('{breadcrumb}', LSD_Kses::element($breadcrumb), $rendered);
+        }
+
         // Listing Labels
         if (strpos($this->pattern, '{labels}') !== false)
         {
@@ -488,6 +495,29 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         return preg_replace('/{.*}/', '', apply_filters('lsd_listing_single_content', $rendered, $this));
     }
 
+    public function breadcrumb(): string
+    {
+        $icon = $this->details_page_options['elements']['breadcrumb']['icon'] ?? true;
+        $taxonomy = $this->details_page_options['elements']['breadcrumb']['taxonomy'];
+
+        $breadcrumb = $this->entity->get_breadcrumb($icon, $taxonomy);
+
+        // Schema
+        $schema = lsd_schema()->breadcrumb();
+
+        // Heading
+        $heading = isset($this->details_page_options['elements']['breadcrumb']['custom_title']) && trim($this->details_page_options['elements']['breadcrumb']['custom_title'])
+            ? $this->details_page_options['elements']['breadcrumb']['custom_title']
+            : esc_html__('Breadcrumb', 'listdom');
+
+        $output = '<div class="lsd-single-page-section">';
+        if ($this->details_page_options['elements']['breadcrumb']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-single-page-section-breadcrumb">' . $heading . '</h2>';
+        $output .= '<div class="lsd-single-element lsd-single-breadcrumb" ' . $schema . '>' . $breadcrumb . '</div>';
+        $output .= '</div>';
+
+        return $output;
+    }
+
     public function address(): string
     {
         $address = $this->entity->get_address(false);
@@ -581,7 +611,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Heading
         $heading = isset($this->details_page_options['elements']['attributes']['custom_title']) && trim($this->details_page_options['elements']['attributes']['custom_title'])
             ? $this->details_page_options['elements']['attributes']['custom_title']
-            : esc_html__('Attributes', 'listdom');
+            : esc_html__('Details', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-attributes">';
         if ($this->details_page_options['elements']['attributes']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
@@ -623,7 +653,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $categories = $this->entity->get_categories([
             'show_color' => $show_color,
             'multiple_categories' => $multiple,
-            'color_method' => $color_method
+            'color_method' => $color_method,
         ]);
 
         // Don't show anything when there is no category!
@@ -1011,7 +1041,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             else if ($key === 'image') $content .= LSD_Kses::element($this->image());
             else if ($key === 'gallery') $content .= LSD_Kses::element($this->gallery());
             else if ($key === 'embed') $content .= LSD_Kses::rich($this->embeds());
-            else if ($key === '$video') $content .= LSD_Kses::rich($this->featured_video());
+            else if ($key === 'video') $content .= LSD_Kses::rich($this->featured_video());
             else if ($key === 'labels') $content .= LSD_Kses::element($this->labels());
             else if ($key === 'content') $content .= LSD_Kses::element($this->content($this->filtered_content));
             else if ($key === 'remark') $content .= LSD_Kses::element($this->remark());
@@ -1024,6 +1054,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             else if ($key === 'abuse') $content .= LSD_Kses::form($this->abuse());
             else if ($key === 'availability') $content .= LSD_Kses::element($this->availability());
             else if ($key === 'excerpt') $content .= LSD_Kses::element($this->excerpt());
+            else if ($key === 'breadcrumb') $content .= LSD_Kses::element($this->breadcrumb());
             else $content .= '{' . $key . '}';
         }
 

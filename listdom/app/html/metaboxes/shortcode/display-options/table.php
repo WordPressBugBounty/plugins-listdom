@@ -69,11 +69,7 @@ foreach ($columns as $key => $row) if (!isset($fields_data[$key])) unset($column
             'id' => 'lsd_display_options_skin_table_pagination',
             'name' => 'lsd[display][table][pagination]',
             'value' => $table['pagination'] ?? (isset($table['load_more']) && $table['load_more'] == 0 ? 'disabled' : 'loadmore'),
-            'options' => [
-                'loadmore' => esc_html__('Load More Button', 'listdom'),
-                'scroll' => esc_html__('Infinite Scroll', 'listdom'),
-                'disabled' => esc_html__('Disabled', 'listdom'),
-            ],
+            'options' => LSD_Base::get_pagination_methods(),
         ]); ?>
         <p class="description"><?php esc_html_e('Choose how to load additional listings more than the default limit.', 'listdom'); ?></p>
     </div>
@@ -87,12 +83,14 @@ foreach ($columns as $key => $row) if (!isset($fields_data[$key])) unset($column
         <div class="lsd-col-6">
             <h3 class="lsd-mb-0 lsd-mt-1"><?php echo esc_html__("Rows Display Options", 'listdom'); ?></h3>
             <p class="description lsd-mb-4"><?php echo esc_html__("You can easily customize the table columns and rearrange items by using the drag-and-drop feature.", 'listdom'); ?> </p>
-            <div class="lsd-sortable">
+            <div class="lsd-sortable lsd-display-options-table-columns">
                 <?php foreach ($columns as $key => $column): ?>
                     <?php
-                        $label = $column['label'] ?? $titles[$key];
-                        $enabled = $column['enabled'];
                         if ($key === '') continue;
+
+                        $label = $column['label'] ?? $titles[$key];
+                        $enabled = $column['enabled'] ?? 0;
+                        $width = $column['width'] ?? '';
                     ?>
                     <div class="lsd-form-row lsd-cursor-move">
                         <div class="lsd-col-6 lsd-flex lsd-gap-3 lsd-flex-align-items-center">
@@ -101,15 +99,28 @@ foreach ($columns as $key => $row) if (!isset($fields_data[$key])) unset($column
                                 'id' => 'lsd_display_options_skin_table_' . esc_attr($key),
                                 'name' => 'lsd[display][table][columns][' . esc_attr($key) . '][label]',
                                 'placeholder' => $titles[$key] ?? '',
-                                'value' => esc_html($label),
+                                'value' => esc_attr($label),
                             ]); ?>
                         </div>
-                        <div class="lsd-col-6">
+                        <div class="lsd-col-6 lsd-flex lsd-gap-3 lsd-flex-align-items-center">
                             <?php echo LSD_Form::switcher([
                                 'id' => 'lsd_display_options_skin_table_' . esc_attr($key),
                                 'name' => 'lsd[display][table][columns][' . esc_attr($key) . '][enabled]',
                                 'value' => esc_attr($enabled),
+                                'toggle' => '.lsd-display-options-skin-table-'.esc_attr($key),
                             ]); ?>
+                            <div class="lsd-tooltip lsd-display-options-skin-table-<?php echo esc_attr($key); ?> <?php echo $enabled ? '' : 'lsd-util-hide'; ?>" data-lsd-tooltip="<?php esc_attr_e('Column Width', 'listdom'); ?>">
+                                <?php echo LSD_Form::number([
+                                    'id' => 'lsd_display_options_skin_table_' . esc_attr($key),
+                                    'name' => 'lsd[display][table][columns][' . esc_attr($key) . '][width]',
+                                    'placeholder' => 150,
+                                    'value' => esc_attr($width),
+                                    'attributes' => [
+                                        'min' => 0,
+                                        'step' => 1
+                                    ]
+                                ]); ?>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>

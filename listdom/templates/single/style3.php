@@ -21,6 +21,7 @@ $embeds = isset($elements['embed']['enabled']) && $elements['embed']['enabled'] 
 $video = isset($elements['video']['enabled']) && $elements['video']['enabled'] ? $this->featured_video() : '';
 $price = isset($elements['price']['enabled']) && $elements['price']['enabled'] ? $this->price() : '';
 $address = isset($elements['address']['enabled']) && $elements['address']['enabled'] ? $this->address() : '';
+$breadcrumb = isset($elements['breadcrumb']['enabled']) && $elements['breadcrumb']['enabled'] ? $this->breadcrumb() : '';
 $locations = isset($elements['locations']['enabled']) && $elements['locations']['enabled'] ? $this->locations() : '';
 $share = isset($elements['share']['enabled']) && $elements['share']['enabled'] ? $this->share() : '';
 $remark = isset($elements['remark']['enabled']) && $elements['remark']['enabled'] ? $this->remark() : '';
@@ -38,6 +39,8 @@ $rate_summary = $this->entity->get_rate_stars('summary');
 ?>
 <div class="lsd-row">
     <div class="lsd-col-12">
+        <?php if ($breadcrumb) echo LSD_Kses::element($breadcrumb); ?>
+
         <div class="lsd-full-width-banner-gallery">
             <div class="lsd-single-image-wrapper">
                 <?php if ($gallery) echo LSD_Kses::element($gallery); ?>
