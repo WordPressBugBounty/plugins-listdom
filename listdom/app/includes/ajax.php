@@ -35,6 +35,7 @@ class LSD_Ajax extends LSD_Base
         // Skin
         $skin = (isset($atts['lsd_display']) and isset($atts['lsd_display']['skin'])) ? sanitize_text_field($atts['lsd_display']['skin']) : $LSD->get_default_skin();
         $limit = $atts['lsd_display'][$skin]['limit'] ?? 300;
+        $pagination = $atts['lsd_display'][$skin]['pagination'] ?? 'loadmore';
 
         // Get Skin Object
         $SKO = $LSD->SKO($skin);
@@ -74,7 +75,7 @@ class LSD_Ajax extends LSD_Base
             'count' => count($IDs),
             'total' => $total,
             'limit' => $limit,
-            'pagination' => $SKO->get_pagination()
+            'pagination' => $pagination === 'numeric' ?  $SKO->get_pagination() : ''
         ]);
     }
 

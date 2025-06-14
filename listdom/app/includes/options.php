@@ -16,7 +16,21 @@ class LSD_Options extends LSD_Base
         $current = get_option('lsd_api', []);
 
         // Add if not exists
-        if (!is_array($current) or !isset($current['tokens'])) update_option('lsd_api', $defaults);
+        if (!is_array($current) || !isset($current['tokens'])) update_option('lsd_api', $defaults);
+
+        return self::parse_args(
+            $current,
+            $defaults
+        );
+    }
+
+    public static function ai(): array
+    {
+        $defaults = self::defaults('ai');
+        $current = get_option('lsd_ai', []);
+
+        // Add if not exists
+        if (!is_array($current) || !isset($current['profiles'])) update_option('lsd_ai', $defaults);
 
         return self::parse_args(
             $current,
@@ -304,6 +318,11 @@ class LSD_Options extends LSD_Base
                 ];
                 break;
 
+            case 'ai':
+
+                $defaults = ['profiles' => []];
+                break;
+
             case 'auth':
 
                 $defaults = [
@@ -455,6 +474,7 @@ class LSD_Options extends LSD_Base
                     'block_admin_contributor' => 1,
                     'block_admin_listdom_author' => 1,
                     'block_admin_listdom_publisher' => 1,
+                    'ai_driver' => LSD_AI_Models::OPENAI_GPT_41_NANO,
                 ];
         }
 

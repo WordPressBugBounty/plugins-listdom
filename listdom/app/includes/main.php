@@ -13,7 +13,11 @@ class LSD_Main extends LSD_Base
     public function is_db_update_required(): bool
     {
         $installed_db_ver = $this->get_installed_db_version();
-        return version_compare($installed_db_ver, LSD_Base::DB_VERSION, '<') || !(new LSD_db())->exists('lsd_data');
+        $db = new LSD_db();
+
+        return version_compare($installed_db_ver, LSD_Base::DB_VERSION, '<')
+            || !$db->exists('lsd_data')
+            || !$db->exists('lsd_jobs');
     }
 
     public function geopoint($address): array
@@ -29,7 +33,7 @@ class LSD_Main extends LSD_Base
         // Getting Geo Point
         $JSON = LSD_Main::download($url, [
             'timeout' => 10,
-            'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+            'user-agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'listdom',
             'sslverify' => false,
         ]);
 
@@ -53,7 +57,7 @@ class LSD_Main extends LSD_Base
         // Getting Geo Point
         $JSON = LSD_Main::download($url, [
             'timeout' => 10,
-            'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+            'user-agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'listdom',
             'sslverify' => false,
         ]);
 
@@ -92,7 +96,7 @@ class LSD_Main extends LSD_Base
         foreach ($rest as $label) $labels[] = $label;
         return apply_filters('lsd_weekdays', $labels);
     }
-    
+
     public static function get_first_day_of_week()
     {
         return get_option('start_of_week', 1);
@@ -310,7 +314,7 @@ class LSD_Main extends LSD_Base
     {
         $listings = get_posts([
             'post_type' => LSD_Base::PTYPE_LISTING,
-            'numberposts' => $limit
+            'numberposts' => $limit,
         ]);
 
         // Listing Entity

@@ -32,7 +32,7 @@ foreach ($terms as $term)
     $attributes[$term->term_id] = $term;
 }
 ?>
-<?php $i = 0; foreach ($attributes as $key => $attribute): $att = new LSD_Entity_Attribute($attribute->term_id); if(!isset($post_attributes[$key]) || trim($post_attributes[$key]) === '') continue; ?>
+<?php $i = 0; foreach ($attributes as $key => $attribute): $att = new LSD_Entity_Attribute($attribute->term_id); if(!isset($post_attributes[$key]) || (is_string($post_attributes[$key]) && trim($post_attributes[$key]) === '') || (is_array($post_attributes[$key]) && count(array_filter($post_attributes[$key])) === 0)) continue; ?>
     <?php if ($att->type == 'separator'): ?>
         <?php
             if ($i != 0)

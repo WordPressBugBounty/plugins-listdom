@@ -14,6 +14,9 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
         add_filter('manage_edit-' . LSD_Base::TAX_LOCATION . '_columns', [$this, 'filter_columns']);
         add_filter('manage_' . LSD_Base::TAX_LOCATION . '_custom_column', [$this, 'filter_columns_content'], 10, 3);
         add_filter('manage_edit-' . LSD_Base::TAX_LOCATION . '_sortable_columns', [$this, 'filter_sortable_columns']);
+
+        add_action('wp_ajax_lsd_get_location_terms', [$this, 'ajax_get_location_terms']);
+        add_action('admin_footer', [$this, 'admin_inline_script']);
     }
 
     public function register()
@@ -142,5 +145,86 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
         }
 
         return $content;
+    }
+
+    public function ajax_get_location_terms()
+    {
+        if (!current_user_can('edit_posts')) $this->response(['success' => false, 'content' => 'Unauthorized']);
+
+        $post_id = absint($_POST['post_id'] ?? 0);
+        $new_term_id = absint($_POST['new_term_id'] ?? 0);
+
+        if (!$post_id) $this->response(['success' => false, 'content' => 'Invalid post ID']);
+
+        ob_start();
+        wp_terms_checklist($post_id, [
+            'taxonomy' => LSD_Base::TAX_LOCATION,
+            'checked_ontop' => false,
+            'walker' => null,
+        ]);
+        $html = ob_get_clean();
+
+        $this->response(['success' => true, 'content' => $html, 'new_term_id' => $new_term_id]);
+    }
+
+    public function admin_inline_script()
+    {
+        $screen = get_current_screen();
+        if (!$screen || !isset($screen->post_type) || $screen->post_type !== LSD_Base::PTYPE_LISTING) return;
+
+        $taxonomy = LSD_Base::TAX_LOCATION;
+        $assets = new LSD_Assets();
+        $assets->footer('<script>
+            jQuery(document).ready(function ($)
+            {
+                const taxonomy = "' . esc_js($taxonomy) . '";
+                const $add_button = $("#" + taxonomy + "-add-submit");
+            
+                $add_button.on("click", function ()
+                {
+                    setTimeout(function ()
+                    {
+                        const $new_term_input = $("#new" + taxonomy);
+                        const new_term_name = $new_term_input.val().trim();
+            
+                        const checked_terms = $("#listdom-locationchecklist input[type=\'checkbox\']:checked").map(function () {
+                            return $(this).val();
+                        }).get();
+            
+                        $.post(ajaxurl, {
+                            action: "lsd_get_location_terms",
+                            post_id: $("#post_ID").val(),
+                            new_term_id: 0
+                        }, function (response)
+                        {
+                            if (typeof response === "string") response = JSON.parse(response);
+                            if (!response || !response.success || !response.content) return;
+            
+                            $("#listdom-locationchecklist").html(response.content);
+                            checked_terms.forEach(function (termId) {
+                                $("#listdom-locationchecklist input[type=\'checkbox\'][value=\'" + termId + "\']").prop("checked", true);
+                            });
+            
+                            let $new_checkbox = null;
+                            if (response.new_term_id) $new_checkbox = $("#listdom-locationchecklist input[type=\'checkbox\'][value=\'" + response.new_term_id + "\']");
+                            else
+                            {
+                                $("#listdom-locationchecklist label").each(function () {
+                                    if ($(this).text().trim() === new_term_name) $new_checkbox = $(this).find("input[type=\'checkbox\']");
+                                });
+                            }
+            
+                            if ($new_checkbox && $new_checkbox.length) 
+                            {
+                                $new_checkbox.prop("checked", true);
+                                $new_checkbox.parents("ul.children").each(function () {
+                                    $(this).closest("li").find("> label > input[type=\'checkbox\']").prop("checked", true);
+                                });
+                            }
+                        });
+                    }, 1000);
+                });
+            });
+        </script>');
     }
 }

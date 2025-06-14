@@ -29,3 +29,21 @@ function lsd_schema(): LSD_Schema
 {
     return new LSD_Schema();
 }
+
+function lsd_ads(string $position): string
+{
+    $ads = get_transient('lsd_ads');
+    if (!is_array($ads))
+    {
+        $api = new \Webilia\WP\Ads(1);
+        $ads = $api->getAds([
+            'premium' => LSD_Base::isPro() ? 1 : 0,
+        ]);
+
+        if (!is_array($ads)) $ads = [];
+
+        set_transient('lsd_ads', $ads, DAY_IN_SECONDS);
+    }
+
+    return $ads[$position] ?? '';
+}

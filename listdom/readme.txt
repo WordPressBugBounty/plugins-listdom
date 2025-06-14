@@ -1,30 +1,31 @@
-=== Listdom – Business Directory and Classified Ads Listings WordPress Plugin ===
+=== AI-Powered Business Directory and Classified Ads Listings WordPress Plugin - Listdom ===
 Contributors: webilia
 Donate link: https://listdom.net
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.0.0
 Requires PHP: 7.2
 Tested up to: 6.8.1
-Stable tag: 4.3.0
+Stable tag: 4.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Build any WordPress directory or classifieds site fast. 80+ skins, search builder, user profiles, frontend dashboard, Google Maps & reCAPTCHA.
+Build any WordPress directory or classifieds site with AI. 80+ skins, search builder, user profile, frontend dashboard, Google Maps & reCAPTCHA.
 
 == Description ==
 
-Listdom by Webilia stands out as a powerful free WordPress directory plugin. It establishes a detailed business directory on your WordPress site, transforming it into a central hub of information and interaction. Even if you’re not tech-savvy, this user-friendly WordPress business directory plugin allows you to get started quickly without any need for developer expertise.
+Listdom by Webilia stands out as an AI-powered free WordPress directory plugin. It establishes a detailed business directory on your WordPress site, transforming it into a central hub of information and interaction. Even if you’re not tech-savvy, this user-friendly WordPress business directory plugin allows you to get started quickly without any need for developer expertise.
+
+== Fast Listdom Plugin Review ==
+Here are the key features of Listdom and how to use them:
+
+[youtube https://www.youtube.com/watch?v=du_96cv6BAw]
+
 Listdom has more than 80 different skins and views that are responsive and mobile-friendly. This plugin offers so many features for business directories and classified ads listing sites in one package.
 
 ✅ [Demo](https://demo.webilia.com/listdom/)
 ✅ [Documentation](https://webilia.com/docs/listdom/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 ✅ [Support](https://listdom.net/support/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 ✅ [Live Chat](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
-
-== Fast Listdom Plugin Review ==
-Here are the key features of Listdom and how to use them:
-
-[youtube https://www.youtube.com/watch?v=du_96cv6BAw]
 
 == How to import Demo with Listdomer Theme 👇 ==
 Listdom has a dedicated theme called Listdomer that helps you to import full website demos: 
@@ -33,7 +34,7 @@ Listdom has a dedicated theme called Listdomer that helps you to import full web
 
 == Listdom; The WordPress Directory Plugin by Webilia ==
 
-Listdom is a robust WordPress directory plugin developed by Webilia. This [WordPress classified plugin](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+classified+plugin) enables you to create a fully functional directory and listing site. Designed with user-friendliness in mind, it helps users with varying levels of coding expertise. With Listdom, you can create a WordPress business directory that aligns with your specific needs and preferences.
+Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [WordPress classified plugin](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+classified+plugin) enables you to create a fully functional directory and listing site. Designed with user-friendliness in mind, it helps users with varying levels of coding expertise. With Listdom, you can create a WordPress business directory that aligns with your specific needs and preferences.
 
 == Free WordPress Listing Plugin Features ==
 
@@ -105,7 +106,7 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 **👉 Directory Management**
 
 *   Unlimited number of directories
-*   [Custom fields/attributes](https://webilia.com/docs/listdom/setting-up-listing/attributes?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+fields%2Fattributes)
+*   Custom fields with various field types
 *   Filter the listings displayed in each skin by custom fields/attributes
 *   Search and filter by custom fields/attributes
 *   Image gallery element with several styles
@@ -140,6 +141,11 @@ Listdom is a robust WordPress directory plugin developed by Webilia. This [WordP
 *   Hidden values and fields
 *   Search form shortcode
 *   Fields width settings
+*   Search clear button
+
+**👉 AI Tools**
+
+*   CSV import auto mapping (more are coming)
 
 **👉 Advanced Management Tools**
 
@@ -412,6 +418,17 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 16. Powerful Search or Filter Bars
 
 == Changelog ==
+
+= 4.4.0 =
+* Added AI integration and support for creating multiple AI profiles tailored to different tasks.
+* Introduced AI-powered field mapping for CSV and Excel imports.
+* Redesigned the Listdom admin page for improved usability.
+* Introduced radio and checkbox input types to Listdom custom fields.
+* Added a "Clear All" button and enhanced the logic behind search forms.
+* Added support for slug and parent fields in CSV/Excel import and export.
+* Improved the custom fields editor and various UI elements.
+* Fixed several issues related to pagination controls in skins.
+* Resolved various UI issues.
 
 = 4.3.0 =
 * [PRO] Added Mosaic and Accordion skins.

@@ -130,7 +130,22 @@ class LSD_Search_Helper extends LSD_Base
                 if ($numeric) $order = "CAST(`meta_value` as unsigned)";
 
                 $db = new LSD_db();
-                $results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($id) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
+                $raw_results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($id) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
+
+                $results = [];
+                foreach ($raw_results as $value)
+                {
+                    if (strpos($value, ',') !== false)
+                    {
+                        $parts = array_map('trim', explode(',', $value));
+                        foreach ($parts as $part) if ($part !== '') $results[] = $part;
+                    }
+                    else
+                    {
+                        $value = trim($value);
+                        if ($value !== '') $results[] = $value;
+                    }
+                }
             }
             else
             {
@@ -474,8 +489,8 @@ class LSD_Search_Helper extends LSD_Base
         $current = $args['current'] ?? null;
         $options = $args['options'] ?? [];
 
-        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom-acf') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
-        $output .= '<option value="">' . esc_html__($placeholder, 'listdom-acf') . '</option>';
+        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+        $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
         $output .= $this->acf_dropdown_options($options, $current);
         $output .= '</select>';
 
@@ -524,5 +539,29 @@ class LSD_Search_Helper extends LSD_Base
         }
 
         return $key;
+    }
+
+    public function attribute_checkboxes(array $values, array $args = []): string
+    {
+        $current = $args['current'] ?? [];
+        $name = $args['name'] ?? 'lsd_attribute';
+        $id_prefix = $args['id_prefix'] ?? 'attr_';
+
+        $output = '';
+        foreach ($values as $val)
+        {
+            $val = trim($val);
+            if ($val === '') continue;
+
+            $id = $id_prefix . sanitize_title($val);
+            $checked = isset($current[$val]) && $current[$val] ? 'checked="checked"' : '';
+
+            $output .= '<li>';
+            $output .= '<input type="checkbox" name="' . esc_attr($name) . '[' . esc_attr($val) . ']" id="' . esc_attr($id) . '" value="1" ' . $checked . '>';
+            $output .= '<label for="' . esc_attr($id) . '">' . esc_html($val) . '</label>';
+            $output .= '</li>';
+        }
+
+        return $output;
     }
 }

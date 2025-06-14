@@ -9,7 +9,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '4.3.0';
+    public $version = '4.4.0';
 
     /**
      * The single instance of the class.
@@ -221,6 +221,10 @@ final class Listdom
         // Settings Import / Export
         $ixs = new LSD_IX_Settings();
         $ixs->init();
+
+        // Jobs Manager
+        $jobs = new LSD_Jobs();
+        $jobs->init();
 
         // Listdom Bar
         $bar = LSD_Bar::instance();

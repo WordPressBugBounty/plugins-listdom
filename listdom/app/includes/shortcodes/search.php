@@ -123,8 +123,12 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $filters = isset($args['filters']) && is_array($args['filters']) ? $args['filters'] : [];
 
         $buttons = isset($args['buttons']) && (
-            (is_string($args['buttons']) && $args['buttons']) || (is_array($args['buttons']) && $args['buttons']['status'])
-        );
+                (is_string($args['buttons']) && $args['buttons']) || (is_array($args['buttons']) && $args['buttons']['status'])
+            );
+
+        $clear = isset($args['clear']) && (
+                (is_string($args['clear']) && $args['clear']) || (is_array($args['clear']) && $args['clear']['status'])
+            );
 
         $row = '';
         if ($type === 'row')
@@ -158,7 +162,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             }
 
             // Buttons
-            if ($buttons) $row .= $this->buttons($args);
+            if ($buttons) $row .= $this->buttons('buttons', $args);
+            if ($clear) $row .= $this->buttons('clear', $args);
 
             $row .= '</div></div>';
         }
@@ -180,15 +185,15 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         return $row;
     }
 
-    private function buttons(array $args = []): string
+    private function buttons(string $type = 'buttons', array $args = []): string
     {
         // Alignment & Width
-        $width = $args['buttons']['width'] ?? (int) preg_replace('/\D/', '', $this->col_button);
-        $alignment = $args['buttons']['alignment'] ?? 'left';
+        $width = $args[$type]['width'] ?? (int) preg_replace('/\D/', '', $this->col_button);
+        $alignment = $args[$type]['alignment'] ?? 'left';
 
         // Label
-        $label = isset($args['buttons']['label']) && trim($args['buttons']['label'])
-            ? $args['buttons']['label']
+        $label = isset($args[$type]['label']) && trim($args[$type]['label'])
+            ? $args[$type]['label']
             : __('Search', 'listdom');
 
         $total = 12;
@@ -200,7 +205,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         // Add left spacer if needed
         if (in_array($alignment, ['center', 'right']) && $side > 0) $buttons .= '<div class="lsd-col-span-' . $side . '"></div>';
 
-        $buttons .= '<div class="lsd-search-buttons lsd-col-span-' . esc_attr($width) . '">';
+        $buttons .= '<div class="lsd-search-' . $type . ' lsd-col-span-' . esc_attr($width) . '">';
 
         // Shortcode Input
         if (!empty($this->form['page']) && !empty($this->form['shortcode'])) $buttons .= '<input type="hidden" name="sf-shortcode" value="' . esc_attr($this->form['shortcode']) . '">';
@@ -209,10 +214,13 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         if ($lang = $this->current('lang')) $buttons .= '<input type="hidden" name="lang" value="' . esc_attr($lang) . '">';
 
         // Submit Button
-        $buttons .= '<div class="lsd-search-buttons-submit">';
-        $buttons .= '<button type="submit" class="lsd-search-button lsd-color-m-bg ' . sanitize_html_class(LSD_Main::get_text_class()) . '">';
-        $buttons .= esc_html($label) . '</button></div>';
+        $buttons .= '<div class="lsd-search-' . $type . '-submit">';
+        $buttons .= '<button type="submit" class="lsd-search-button ' .
+            ($type === 'clear' ? 'lsd-search-clear-all' : '') . ' lsd-color-m-bg ' .
+            sanitize_html_class(LSD_Main::get_text_class()) .
+            '">';
 
+        $buttons .= esc_html($label) . '</button></div>';
         $buttons .= '</div>';
 
         // Add right spacer if center-aligned
@@ -302,6 +310,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
                 break;
 
             case 'dropdown':
+            case 'checkbox':
+            case 'radio':
 
                 $output = $this->field_dropdown($filter);
                 break;
@@ -491,7 +501,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             ]);
         }
 
-        return trim($output) ? $label.$output : '';
+        return trim($output) ? $label . $output : '';
     }
 
     public function field_text($filter): string
@@ -575,6 +585,9 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
+        $all_terms = $filter['all_terms'] ?? 1;
+        $predefined_terms = isset($filter['terms']) && is_array($filter['terms']) ? $filter['terms'] : [];
+
         $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
         $name = 'sf-' . $this->helper->standardize_key($key) . '-eq';
 
@@ -590,7 +603,11 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
 
             $terms = $this->helper->get_terms($filter, true);
-            foreach ($terms as $term) $output .= '<option value="' . esc_attr($term) . '" ' . ($current == $term ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
+            foreach ($terms as $key => $term)
+            {
+                if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$key])) continue;
+                $output .= '<option value="' . esc_attr($term) . '" ' . ($current == $term ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
+            }
 
             $output .= '</select>';
         }
@@ -602,7 +619,13 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '<select name="' . esc_attr($name) . '[]" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" multiple data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
 
             $terms = $this->helper->get_terms($filter, true);
-            foreach ($terms as $term) $output .= '<option value="' . esc_attr($term) . '" ' . (in_array($term, $current) ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
+            foreach ($terms as $key => $term)
+            {
+                // Term is not in the predefined terms
+                if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$key])) continue;
+
+                $output .= '<option value="' . esc_attr($term) . '" ' . (in_array($term, $current) ? 'selected="selected"' : '') . '>' . esc_html($term) . '</option>';
+            }
 
             $output .= '</select>';
         }
@@ -616,17 +639,28 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $current = $this->current($name, explode(',', $default));
 
             $terms = $this->helper->get_terms($filter, true);
-            foreach ($terms as $term) $output .= '<label><input type="checkbox" name="' . esc_attr($name) . '[]" value="' . esc_attr($term) . '" ' . (in_array($term, $current) ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
+            foreach ($terms as $key => $term)
+            {
+                // Term is not in the predefined terms
+                if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$key])) continue;
+
+                $output .= '<label class="lsd-search-checkbox-label"><input type="checkbox" name="' . esc_attr($name) . '[]" value="' . esc_attr($term) . '" ' . (in_array($term, $current) ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
+            }
         }
         else if ($method === 'radio')
         {
             $current = $this->current($name, explode(',', $default));
 
             $terms = $this->helper->get_terms($filter, true);
-            foreach ($terms as $term) $output .= '<label><input type="radio" name="' . esc_attr($name) . '" value="' . esc_attr($term) . '" ' . ($term == $current ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
+            foreach ($terms as $key => $term)
+            {
+                // Term is not in the predefined terms
+                if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$key])) continue;
+                $output .= '<label class="lsd-search-checkbox-label"><input type="radio" name="' . esc_attr($name) . '" value="' . esc_attr($term) . '" ' . ($term == $current ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
+            }
         }
 
-        return trim($output) ? $label.$output : '';
+        return trim($output) ? $label . $output : '';
     }
 
     public function field_price($filter): string
@@ -750,7 +784,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '</select>';
         }
 
-        return trim($output) ? $label.$output : '';
+        return trim($output) ? $label . $output : '';
     }
 
     public function field_address($filter): string
@@ -839,7 +873,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $output .= '</div>';
         }
 
-        return trim($output) ? $label.$output : '';
+        return trim($output) ? $label . $output : '';
     }
 
     public function field_period($filter): string
@@ -937,7 +971,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             }
         }
 
-        return trim($output) ? $label.$output : '';
+        return trim($output) ? $label . $output : '';
     }
 
     public function field_acf_hierarchy($name, $current, $choices): string
@@ -1035,7 +1069,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         if ($device === 'desktop' || !isset($this->devices[$device]['inherit']) || $this->devices[$device]['inherit']) $inherit = true;
         ?>
         <div class="lsd-search-devices-<?php echo esc_attr($device); ?>">
-            <form action="<?php echo esc_url($action); ?>" class="lsd-search-form <?php echo !$inherit ? 'lsd-search-not-inherit' : ''; ?>">
+            <form action="<?php echo esc_url($action); ?>"
+                  class="lsd-search-form <?php echo !$inherit ? 'lsd-search-not-inherit' : ''; ?>">
                 <?php
                 $HTML = '';
                 foreach ($filters as $row) $HTML .= $this->row($row);

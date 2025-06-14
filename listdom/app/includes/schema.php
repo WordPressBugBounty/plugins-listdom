@@ -52,7 +52,9 @@ class LSD_Schema extends LSD_Base
             if (!$type)
             {
                 // Category Type
-                $t = isset($category->term_id) ? get_term_meta($category->term_id, 'lsd_schema', true) : '';
+                $t = $category && is_object($category) && isset($category->term_id)
+                    ? get_term_meta($category->term_id, 'lsd_schema', true)
+                    : '';
                 if (!trim($t)) $t = 'https://schema.org/LocalBusiness';
 
                 $type = $t;

@@ -17,12 +17,17 @@ class LSD_Menus_Settings extends LSD_Menus
         add_action('wp_ajax_lsd_save_details_page', [$this, 'save_details_page']);
         add_action('wp_ajax_lsd_save_addons', [$this, 'save_addons']);
         add_action('wp_ajax_lsd_save_advanced', [$this, 'save_advanced']);
+        add_action('wp_ajax_lsd_save_auth', [$this, 'save_auth']);
 
         // API
         add_action('wp_ajax_lsd_api_add_token', [$this, 'token_add']);
         add_action('wp_ajax_lsd_api_remove_token', [$this, 'token_remove']);
         add_action('wp_ajax_lsd_save_api', [$this, 'save_api']);
-        add_action('wp_ajax_lsd_save_auth', [$this, 'save_auth']);
+
+        // AI
+        add_action('wp_ajax_lsd_ai_add_profile', [$this, 'ai_add']);
+        add_action('wp_ajax_lsd_ai_remove_profile', [$this, 'ai_remove']);
+        add_action('wp_ajax_lsd_save_ai', [$this, 'save_ai']);
     }
 
     public function output()
@@ -343,6 +348,71 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Save options
         update_option('lsd_api', $lsd);
+
+        // Print the response
+        $this->response(['success' => 1]);
+    }
+
+    public function ai_add()
+    {
+        // Check Access
+        $this->check_access('lsd_ai_add_profile');
+
+        // Get AI Options
+        $ai = LSD_Options::ai();
+
+        // Add New Profile
+        $ai['profiles'][] = [
+            'id' => LSD_Base::str_random(10),
+            'name' => esc_html__('New Profile', 'listdom'),
+            'model' => LSD_AI_Models::def(),
+            'api_key' => ''
+        ];
+
+        // Save options
+        update_option('lsd_ai', $ai);
+
+        // Print the response
+        $this->response(['success' => 1]);
+    }
+
+    public function ai_remove()
+    {
+        // Check Access
+        $this->check_access('lsd_ai_remove_profile');
+
+        // Index
+        $i = $_POST['i'] ?? '';
+
+        // Invalid Index
+        if (trim($i) === '') $this->response(['success' => 0, 'code' => 'INVALID_INDEX']);
+
+        // Get AI Options
+        $ai = LSD_Options::ai();
+
+        // Remove Profile
+        unset($ai['profiles'][$i]);
+
+        // Save options
+        update_option('lsd_ai', $ai);
+
+        // Print the response
+        $this->response(['success' => 1]);
+    }
+
+    public function save_ai()
+    {
+        // Check Access
+        $this->check_access('lsd_ai_form');
+
+        // Get AI options
+        $lsd = $_POST['lsd'] ?? [];
+
+        // Sanitization
+        array_walk_recursive($lsd, 'sanitize_text_field');
+
+        // Save options
+        update_option('lsd_ai', $lsd);
 
         // Print the response
         $this->response(['success' => 1]);

@@ -15,7 +15,7 @@ $api = LSD_Options::api();
             <h3 class="lsd-my-0"><?php esc_html_e('API Tokens', 'listdom'); ?></h3>
             <div class="lsd-mt-0 lsd-mb-5">
                 <p class="description lsd-mt-0 lsd-mb-0"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
-                <div class="lsd-alert lsd-info"><?php echo sprintf(esc_html__('You can use the %s URL as the API base URL.', 'listdom-network'), '<code>'.get_rest_url().'</code>'); ?></div>
+                <div class="lsd-alert lsd-info"><?php echo sprintf(esc_html__('You can use the %s URL as the API base URL.', 'listdom'), '<code>'.get_rest_url().'</code>'); ?></div>
                 <button type="button" class="button" id="lsd_settings_api_add_token"><?php esc_html_e('Add Token', 'listdom'); ?></button>
             </div>
             <?php foreach($api['tokens'] as $i => $token): ?>
@@ -27,7 +27,7 @@ $api = LSD_Options::api();
                     'placeholder' => esc_html__('Token Name', 'listdom'),
                 ]); ?></div>
                 <div class="lsd-col-4">
-                    <input title="" type="text" name="lsd[tokens][<?php echo esc_attr($i); ?>][key]" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>_key"  value="<?php echo esc_attr($token['key']); ?>" placeholder="<?php esc_attr_e('Token Key', 'listdom'); ?>" readonly>
+                    <input title="" type="text" name="lsd[tokens][<?php echo esc_attr($i); ?>][key]" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>_key" value="<?php echo esc_attr($token['key']); ?>" placeholder="<?php esc_attr_e('Token Key', 'listdom'); ?>" readonly>
                 </div>
                 <div class="lsd-col-1">
                     <div class="lsd-api-remove-token lsd-pt-2 lsd-cursor-pointer" data-i="<?php echo esc_attr($i); ?>" data-confirm="0"><i class="lsd-icon fas fa-trash-alt"></i></div>

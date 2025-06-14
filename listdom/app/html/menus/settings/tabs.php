@@ -21,6 +21,7 @@ $addon = apply_filters('lsd_is_addon_installed', false);
     <a class="nav-tab <?php echo $this->tab === 'auth' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>"><?php esc_html_e('Users', 'listdom'); ?></a>
     <a class="nav-tab <?php echo $this->tab === 'single-listing' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=single-listing')); ?>"><?php esc_html_e('Single Listing', 'listdom'); ?></a>
     <a class="nav-tab <?php echo $this->tab === 'advanced' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=advanced')); ?>"><?php esc_html_e('Advanced', 'listdom'); ?></a>
+    <a class="nav-tab <?php echo $this->tab === 'ai' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=ai')); ?>"><i class="listdom-icon lsdi-stars lsd-m-0"></i><?php esc_html_e('AI', 'listdom'); ?></a>
     <a class="nav-tab <?php echo $this->tab === 'api' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=api')); ?>"><?php esc_html_e('API', 'listdom'); ?></a>
 
     <?php

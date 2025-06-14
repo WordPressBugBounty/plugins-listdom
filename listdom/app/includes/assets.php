@@ -120,7 +120,7 @@ class LSD_Assets extends LSD_Base
             'i18n_description_label' => __('This is the label for your menu item.', 'listdom'),
             'i18n_description_slug' => __('Provide a unique slug for this menu.', 'listdom'),
             'i18n_description_icon' => __('Select the icon.', 'listdom'),
-            'i18n_description_content' => __('Type dashboard content, You can also use shorcodes.', 'listdom'),
+            'i18n_description_content' => __('Type dashboard content, You can also use shortcodes.', 'listdom'),
             'icon_options' => $icon_options,
         ]);
 
@@ -141,6 +141,9 @@ class LSD_Assets extends LSD_Base
 
         // Include Select2
         $this->select2();
+
+        // Listdom Icon
+        $this->lsdi();
 
         // Include Assets
         do_action('lsd_admin_assets');
@@ -266,6 +269,12 @@ class LSD_Assets extends LSD_Base
 
         // Include Date Range Picker CSS file
         wp_enqueue_style('date-range-picker', $this->lsd_asset_url('packages/date-range-picker/drp.min.css'), ['lsd-frontend'], LSD_Assets::version());
+    }
+
+    public function lsdi()
+    {
+        // Include Listdom Icomoon CSS file
+        wp_enqueue_style('lsdi', $this->lsd_asset_url('packages/lsdi/lsdi.css'), [], LSD_Assets::version());
     }
 
     public static function api()
@@ -500,6 +509,7 @@ class LSD_Assets extends LSD_Base
                     'listdom-ix',
                     LSD_Base::WELCOME_SLUG,
                     'listdom-addons',
+                    'listdom-licenses',
                     'toplevel_page_listdom',
                     'widgets',
                     'plugins',

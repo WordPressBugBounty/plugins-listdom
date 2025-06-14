@@ -830,6 +830,9 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             'style' => $style ?: ($this->details_page_options['elements']['gallery']['style'] ?? 'list'),
             'thumbnail_status' => $this->details_page_options['elements']['gallery']['thumbnail_status'] ?? 'image',
             'include_thumbnail' => ($this->details_page_options['elements']['gallery']['thumbnail'] ?? 0),
+            'image_limit' => ($this->details_page_options['elements']['gallery']['image_limit'] ?? 4),
+            'image_height' => ($this->details_page_options['elements']['gallery']['image_height'] ?? '300'),
+            'image_fit' => ($this->details_page_options['elements']['gallery']['image_fit'] ?? 'covers'),
         ]);
 
         // Don't show anything when there is no Gallery!

@@ -5,7 +5,7 @@ class LSD_API_Validation extends LSD_API
     public function APIToken(WP_REST_Request $request, $token = ''): bool
     {
         // Check Token
-        if (trim($token))
+        if (!is_null($token) && trim($token))
         {
             $api = LSD_Options::api();
 
@@ -25,7 +25,7 @@ class LSD_API_Validation extends LSD_API
     public function UserToken(WP_REST_Request $request, $token = ''): bool
     {
         // Check User
-        if (trim($token))
+        if (!is_null($token) && trim($token))
         {
             $user_id = $this->db->select("SELECT `user_id` FROM `#__usermeta` WHERE `meta_key`='lsd_token' AND `meta_value`='" . esc_sql($token) . "'", 'loadResult');
             if (!$user_id) return false;

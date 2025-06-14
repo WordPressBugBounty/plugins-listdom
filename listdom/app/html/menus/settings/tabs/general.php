@@ -200,9 +200,9 @@ $networks = LSD_Options::socials();
             <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
                 <div class="lsd-form-row">
                     <div class="lsd-col-2"><?php echo LSD_Form::label([
-                            'title' => esc_html__('Google Maps API key', 'listdom'),
-                            'for' => 'lsd_settings_googlemaps_api_key',
-                        ]); ?></div>
+                        'title' => esc_html__('Google Maps API key', 'listdom'),
+                        'for' => 'lsd_settings_googlemaps_api_key',
+                    ]); ?></div>
                     <div class="lsd-col-10">
                         <?php echo LSD_Form::text([
                             'id' => 'lsd_settings_googlemaps_api_key',

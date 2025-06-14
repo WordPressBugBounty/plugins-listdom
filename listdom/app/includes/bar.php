@@ -5,7 +5,7 @@ class LSD_Bar extends LSD_Base
     /**
      * The single instance of the class.
      *
-     * @var LSD_id
+     * @var LSD_Bar
      * @since 1.0.0
      */
     protected static $instance = null;

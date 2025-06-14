@@ -8,6 +8,7 @@ class LSD_Menus_IX_CSV extends LSD_Base
         add_action('wp_ajax_lsd_ix_csv_upload', [$this, 'upload']);
         add_action('wp_ajax_lsd_ix_csv_import', [$this, 'import']);
         add_action('wp_ajax_lsd_ix_csv_load_template', [$this, 'template']);
+        add_action('wp_ajax_lsd_ix_csv_ai_mapping', [$this, 'ai_mapping']);
 
         // Remove Mapping Template
         add_action('wp_ajax_lsd_csv_template_remove', [$this, 'remove_template']);
@@ -157,6 +158,42 @@ class LSD_Menus_IX_CSV extends LSD_Base
         $template = $tpl->get($key);
 
         $this->response(['success' => 1, 'template' => $template['fields'] ?? []]);
+    }
+
+    public function ai_mapping()
+    {
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : null;
+
+        // Check if nonce is not set
+        if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
+
+        // Verify that the nonce is valid.
+        if (!wp_verify_nonce($wpnonce, 'lsd_ix_csv_ai_mapping')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
+
+        // Parameters
+        $file = isset($_POST['file']) ? sanitize_text_field($_POST['file']) : '';
+        $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field($_POST['ai_profile']) : '';
+
+        // Feed Path / URL
+        $path = $this->get_upload_path().$file;
+
+        // Mapping Library
+        $mapping = new LSD_IX_Mapping();
+        $f_fields = $mapping->feed_fields($path);
+
+        // AI Mapping
+        $ai = (new LSD_AI())->by_profile($ai_profile);
+
+        // Mapped by AI!
+        $mapping_ai = $ai ? $ai->auto_mapping($mapping->listdom_fields(), $f_fields) : [];
+
+        $this->response([
+            'success' => $ai ? 1 : 0,
+            'template' => $mapping_ai,
+            'message' => $ai
+                ? esc_html__('Mapping by AI was successful!', 'listdom')
+                : esc_html__('The AI model is not configured. You can configure it in Listdom settings.', 'listdom'),
+        ]);
     }
 
     public function mapping_form($file)

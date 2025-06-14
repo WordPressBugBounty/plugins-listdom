@@ -7,6 +7,7 @@ class LSD_Menus extends LSD_Base
     protected $ix;
     protected $addons;
     protected $welcome;
+    protected $licenses;
     public $tab;
 
     public function init()
@@ -17,6 +18,7 @@ class LSD_Menus extends LSD_Base
         $this->ix = new LSD_Menus_IX();
         $this->addons = new LSD_Menus_Addons();
         $this->welcome = new LSD_Menus_Welcome();
+        $this->licenses = new LSD_Activation();
 
         // Register Listdom Menus
         add_action('admin_menu', [$this, 'register_menus'], 1);
@@ -32,16 +34,16 @@ class LSD_Menus extends LSD_Base
         $icon = $this->lsd_asset_url('img/listdom-icon.svg');
 
         $listdom = esc_html__('Listdom', 'listdom');
-        $home = esc_html__('Home', 'listdom');
+        $licenses = esc_html__('Licenses', 'listdom');
 
         if ($b = apply_filters('lsd_backend_main_badge', 0))
         {
-            $listdom .= ' <span class="update-plugins count-' . $b . '"><span class="update-count">' . $b . '</span></span>';
-            $home .= ' <span class="update-plugins count-' . $b . '"><span class="update-count">' . $b . '</span></span>';
+            $listdom .= ' <span class="update-plugins count-' . esc_attr($b) . '"><span class="update-count">' . esc_html($b) . '</span></span>';
+            $licenses .= ' <span class="update-plugins count-' . esc_attr($b) . '"><span class="update-count">' . esc_html($b) . '</span></span>';
         }
 
         add_menu_page(esc_html__('Listdom', 'listdom'), $listdom, 'manage_options', 'listdom', null, $icon, 26);
-        add_submenu_page('listdom', esc_html__('Home', 'listdom'), $home, 'manage_options', 'listdom', [$this->dashboard, 'output'], 1);
+        add_submenu_page('listdom', esc_html__('Home', 'listdom'), esc_html__('Home', 'listdom'), 'manage_options', 'listdom', [$this->dashboard, 'output'], 1);
         add_submenu_page('listdom', esc_html__('Shortcodes', 'listdom'), esc_html__('Shortcodes', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SHORTCODE, null, 2);
         add_submenu_page('listdom', esc_html__('Search Builder', 'listdom'), esc_html__('Search and Filter Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SEARCH, null, 3);
         add_submenu_page('listdom', esc_html__('Notifications', 'listdom'), esc_html__('Notifications', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_NOTIFICATION, null, 4);
@@ -52,6 +54,12 @@ class LSD_Menus extends LSD_Base
 
         add_submenu_page('listdom', esc_html__('Documentation', 'listdom'), esc_html__('Documentation', 'listdom'), 'manage_options', LSD_Base::getListdomDocsURL(), null, 30);
         add_submenu_page('listdom', esc_html__('Support', 'listdom'), esc_html__('Support', 'listdom'), 'manage_options', LSD_Base::getSupportURL(), null, 31);
+
+        // Display Licenses Menu
+        if (apply_filters('lsd_display_activation_tab', true))
+        {
+            add_submenu_page('listdom', esc_html__('Licenses', 'listdom'), $licenses, 'manage_options', 'listdom-licenses', [$this->licenses, 'content'], 32);
+        }
     }
 
     /**
@@ -158,5 +166,15 @@ class LSD_Menus extends LSD_Base
         if (isset($menu[$end + 1])) $menu[$end + 1][4] .= ' menu-top-first';
 
         return true;
+    }
+
+    public static function header($title = null)
+    {
+        $base = new LSD_Base();
+        $base->include_html_file('menus/dashboard/header.php', [
+            'parameters' => [
+                'title' => $title ?? esc_html__('Listdom', 'listdom'),
+            ],
+        ]);
     }
 }

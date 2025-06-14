@@ -4,9 +4,6 @@ class LSD_Activation extends LSD_Base
 {
     public function init()
     {
-        add_action('lsd_admin_dashboard_tabs', [$this, 'tab']);
-        add_action('lsd_admin_dashboard_contents', [$this, 'content']);
-
         // Activate
         add_action('wp_ajax_lsd_activation', [$this, 'activate']);
 
@@ -20,39 +17,15 @@ class LSD_Activation extends LSD_Base
         });
     }
 
-    public function tab($tab)
+    public function content()
     {
         // List of Products
         $products = LSD_Base::products();
 
-        // No products
-        if (!count($products)) return;
-
         // Display Activation Tab?
         if (!apply_filters('lsd_display_activation_tab', true)) return;
 
-        // Tab Title
-        $title = esc_html__('License Activation', 'listdom');
-        if ($b = apply_filters('lsd_backend_main_badge', 0)) $title .= ' <span class="update-plugins count-' . $b . '"><span class="update-count">' . $b . '</span></span>';
-
-        echo '<a class="nav-tab ' . ($tab === 'activation' ? 'nav-tab-active' : '') . '" href="' . esc_url(admin_url('admin.php?page=listdom&tab=activation')) . '">' . $title . '</a>';
-    }
-
-    public function content($tab)
-    {
-        // It's not Activation Tab
-        if ($tab !== 'activation') return;
-
-        // List of Products
-        $products = LSD_Base::products();
-
-        // No products
-        if (!count($products)) return;
-
-        // Display Activation Tab?
-        if (!apply_filters('lsd_display_activation_tab', true)) return;
-
-        $this->include_html_file('menus/dashboard/tabs/activation.php', [
+        $this->include_html_file('menus/activation/tpl.php', [
             'parameters' => [
                 'products' => $products,
             ],

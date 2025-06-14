@@ -3,44 +3,55 @@
 defined('ABSPATH') || die();
 
 /** @var LSD_Menus_IX $this */
+
+// Sub-tab
+$sub = isset($_GET['sub']) && trim($_GET['sub']) ? sanitize_text_field($_GET['sub']) : 'import';
 ?>
 <div class="lsd-ix-wrap">
 
     <?php if ($this->isLite()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('JSON Import / Export', 'listdom')), 'warning'); ?>
     <?php else: ?>
-    <h3><?php esc_html_e('Export', 'listdom'); ?></h3>
-    <div class="lsd-form-row">
-        <div class="lsd-col-12">
-            <ul>
-                <li><a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=listdom-ix&lsd-export=json'), 'lsd_ix_form')); ?>" class="button button-primary"><?php esc_html_e('JSON', 'listdom'); ?></a></li>
-            </ul>
-        </div>
-    </div>
 
-    <h3><?php esc_html_e('Import', 'listdom'); ?></h3>
-    <form id="lsd_ix_listdom_import_form" class="lsd-mt-4" enctype="multipart/form-data">
-        <div class="lsd-form-row">
-            <div class="lsd-col-4">
-                <?php echo LSD_Form::file([
-                    'id' => 'lsd_ix_listdom_import_file_input',
-                ]); ?>
+        <ul class="lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mt-4">
+            <li class="<?php echo $sub === 'import' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=json')); ?>"><?php esc_html_e('Import', 'listdom'); ?></a></li>
+            <li class="<?php echo $sub === 'export' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=json&sub=export')); ?>"><?php esc_html_e('Export', 'listdom'); ?></a></li>
+        </ul>
+
+        <?php if ($sub === 'export'): ?>
+            <div class="lsd-form-row lsd-mt-5">
+                <div class="lsd-col-12">
+                    <p class="description lsd-mb-3"><?php esc_html_e("Please click the button below to download the JSON export of your listings.", 'listdom'); ?></p>
+                    <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=listdom-ix&lsd-export=json'), 'lsd_ix_form')); ?>" class="button button-primary button-hero"><?php esc_html_e('Export', 'listdom'); ?></a>
+                </div>
             </div>
-            <div class="lsd-col-1 lsd-text-left">
-                <?php echo LSD_Form::hidden([
-                    'id' => 'lsd_ix_listdom_import_file',
-                    'name' => 'ix[file]',
-                ]); ?>
-                <?php LSD_Form::nonce('lsd_ix_listdom_import'); ?>
-                <button type="submit" id="lsd_ix_listdom_import_submit" class="button button-primary" disabled><?php esc_html_e('Import', 'listdom'); ?></button>
-            </div>
-        </div>
-        <div class="lsd-form-row">
-            <div class="lsd-col-12">
-                <p id="lsd_ix_listdom_import_message"></p>
-                <?php echo LSD_Base::alert(esc_html__("You should upload only JSON file exported from Listdom!", 'listdom')); ?>
-            </div>
-        </div>
-    </form>
+        <?php else: ?>
+            <h3><?php esc_html_e('Import', 'listdom'); ?></h3>
+            <form id="lsd_ix_listdom_import_form" class="lsd-mt-4" enctype="multipart/form-data">
+                <div class="lsd-form-row">
+                    <div class="lsd-col-6">
+                        <?php echo LSD_Form::file([
+                            'id' => 'lsd_ix_listdom_import_file_input',
+                        ]); ?>
+                    </div>
+                </div>
+                <div class="lsd-form-row lsd-mt-4 lsd-pt-2">
+                    <div class="lsd-col-12">
+                        <?php echo LSD_Form::hidden([
+                            'id' => 'lsd_ix_listdom_import_file',
+                            'name' => 'ix[file]',
+                        ]); ?>
+                        <?php LSD_Form::nonce('lsd_ix_listdom_import'); ?>
+                        <button type="submit" id="lsd_ix_listdom_import_submit" class="button button-primary button-hero" disabled><?php esc_html_e('Import', 'listdom'); ?></button>
+                    </div>
+                </div>
+                <div class="lsd-form-row">
+                    <div class="lsd-col-12 lsd-alert-no-my">
+                        <p id="lsd_ix_listdom_import_message"></p>
+                        <?php echo LSD_Base::alert(esc_html__("You should upload only JSON file exported from Listdom!", 'listdom')); ?>
+                    </div>
+                </div>
+            </form>
+        <?php endif; ?>
     <?php endif; ?>
 
 </div>

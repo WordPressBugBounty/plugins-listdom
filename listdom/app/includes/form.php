@@ -6,7 +6,7 @@ class LSD_Form extends LSD_Base
     {
         if (!count($args)) return false;
 
-        $required = (isset($args['required']) and $args['required']);
+        $required = isset($args['required']) && $args['required'];
         return '<label for="' . (isset($args['for']) ? esc_attr($args['for']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : '') . '">' . esc_html($args['title']) . ($required ? ' ' . LSD_Base::REQ_HTML : '') . '</label>';
     }
 
@@ -750,6 +750,38 @@ class LSD_Form extends LSD_Base
         return self::select($args);
     }
 
+    public static function ai_providers($args = [])
+    {
+        // Get Available AI Providers
+        $args['options'] = LSD_AI_Models::get_models();
+
+        // Dropdown Field
+        return self::select($args);
+    }
+
+    public static function ai_profiles($args = [])
+    {
+        // AI Options
+        $ai = LSD_Options::ai();
+
+        // AI Profiles
+        $profiles = [];
+
+        if (isset($ai['profiles']) && is_array($ai['profiles']))
+        {
+            foreach ($ai['profiles'] as $profile)
+            {
+                $profiles[$profile['id']] = $profile['name'] ?? 'N/A';
+            }
+        }
+
+        // AI Profiles
+        $args['options'] = $profiles;
+
+        // Dropdown Field
+        return self::select($args);
+    }
+
     public static function border(array $args): string
     {
         $id = $args['id'] ?? 'lsd_border';
@@ -760,118 +792,118 @@ class LSD_Form extends LSD_Base
             <div class="lsd-border-width-wrapper lsd-flex-3">
                 <div class="lsd-border-width-top">
                     '.LSD_Form::label([
-                'title' => esc_html__('Border Top', 'listdom'),
-                'for' => $id.'_top'
-            ]).'
+                        'title' => esc_html__('Border Top', 'listdom'),
+                        'for' => $id.'_top'
+                    ]).'
                     '.LSD_Form::number([
-                'id' => $id.'_top',
-                'name' => $name.'[top]',
-                'placeholder' => esc_html__('Top', 'listdom'),
-                'attributes' => [
-                    'min' => 0,
-                    'max' => 10,
-                    'increment' => 1
-                ],
-                'value' => $value['top'] ?? 0
-            ]).'
+                        'id' => $id.'_top',
+                        'name' => $name.'[top]',
+                        'placeholder' => esc_html__('Top', 'listdom'),
+                        'attributes' => [
+                            'min' => 0,
+                            'max' => 10,
+                            'increment' => 1
+                        ],
+                        'value' => $value['top'] ?? 0
+                    ]).'
                 </div>
                 <div class="lsd-border-width-right">
                     '.LSD_Form::label([
-                'title' => esc_html__('Border Right', 'listdom'),
-                'for' => $id.'_right'
-            ]).'
+                        'title' => esc_html__('Border Right', 'listdom'),
+                        'for' => $id.'_right'
+                    ]).'
                     '.LSD_Form::number([
-                'id' => $id.'_right',
-                'name' => $name.'[right]',
-                'placeholder' => esc_html__('Right', 'listdom'),
-                'attributes' => [
-                    'min' => 0,
-                    'max' => 10,
-                    'increment' => 1
-                ],
-                'value' => $value['right'] ?? 0
-            ]).'
+                        'id' => $id.'_right',
+                        'name' => $name.'[right]',
+                        'placeholder' => esc_html__('Right', 'listdom'),
+                        'attributes' => [
+                            'min' => 0,
+                            'max' => 10,
+                            'increment' => 1
+                        ],
+                        'value' => $value['right'] ?? 0
+                    ]).'
                 </div>
                 <div class="lsd-border-width-bottom">
                     '.LSD_Form::label([
-                'title' => esc_html__('Border Bottom', 'listdom'),
-                'for' => $id.'_bottom'
-            ]).'
+                        'title' => esc_html__('Border Bottom', 'listdom'),
+                        'for' => $id.'_bottom'
+                    ]).'
                     '.LSD_Form::number([
-                'id' => $id.'_bottom',
-                'name' => $name.'[bottom]',
-                'placeholder' => esc_html__('Bottom', 'listdom'),
-                'attributes' => [
-                    'min' => 0,
-                    'max' => 10,
-                    'increment' => 1
-                ],
-                'value' => $value['bottom'] ?? 0
-            ]).'
+                        'id' => $id.'_bottom',
+                        'name' => $name.'[bottom]',
+                        'placeholder' => esc_html__('Bottom', 'listdom'),
+                        'attributes' => [
+                            'min' => 0,
+                            'max' => 10,
+                            'increment' => 1
+                        ],
+                        'value' => $value['bottom'] ?? 0
+                    ]).'
                 </div>
                 <div class="lsd-border-width-left">
                     '.LSD_Form::label([
-                'title' => esc_html__('Border Left', 'listdom'),
-                'for' => $id.'_left'
-            ]).'
+                        'title' => esc_html__('Border Left', 'listdom'),
+                        'for' => $id.'_left'
+                    ]).'
                     '.LSD_Form::number([
-                'id' => $id.'_left',
-                'name' => $name.'[left]',
-                'placeholder' => esc_html__('Left', 'listdom'),
-                'attributes' => [
-                    'min' => 0,
-                    'max' => 10,
-                    'increment' => 1
-                ],
-                'value' => $value['left'] ?? 0
-            ]).'
+                        'id' => $id.'_left',
+                        'name' => $name.'[left]',
+                        'placeholder' => esc_html__('Left', 'listdom'),
+                        'attributes' => [
+                            'min' => 0,
+                            'max' => 10,
+                            'increment' => 1
+                        ],
+                        'value' => $value['left'] ?? 0
+                    ]).'
                 </div>
             </div>
             <div class="lsd-border-color-wrapper lsd-flex-1">
                 '.LSD_Form::label([
-                'title' => esc_html__('Border Color', 'listdom'),
-                'for' => $id.'_color'
-            ]).'
+                    'title' => esc_html__('Border Color', 'listdom'),
+                    'for' => $id.'_color'
+                ]).'
                 '.LSD_Form::colorpicker([
-                'id' => $id.'_color',
-                'name' => $name.'[color]',
-                'value' => $value['color'] ?? ''
-            ]).'
+                    'id' => $id.'_color',
+                    'name' => $name.'[color]',
+                    'value' => $value['color'] ?? ''
+                ]).'
             </div>
             <div class="lsd-border-radius-wrapper lsd-flex-1">
                 '.LSD_Form::label([
-                'title' => esc_html__('Border Radius', 'listdom'),
-                'for' => $id.'_radius'
-            ]).'
+                    'title' => esc_html__('Border Radius', 'listdom'),
+                    'for' => $id.'_radius'
+                ]).'
                 '.LSD_Form::number([
-                'id' => $id.'_radius',
-                'name' => $name.'[radius]',
-                'placeholder' => esc_html__('Radius', 'listdom'),
-                'attributes' => [
-                    'min' => 0,
-                    'max' => 50,
-                    'increment' => 1
-                ],
-                'value' => $value['radius'] ?? 0
-            ]).'
+                    'id' => $id.'_radius',
+                    'name' => $name.'[radius]',
+                    'placeholder' => esc_html__('Radius', 'listdom'),
+                    'attributes' => [
+                        'min' => 0,
+                        'max' => 50,
+                        'increment' => 1
+                    ],
+                    'value' => $value['radius'] ?? 0
+                ]).'
             </div>
             <div class="lsd-border-style-wrapper lsd-flex-1">
                 '.LSD_Form::label([
-                'title' => esc_html__('Border Style', 'listdom'),
-                'for' => $id.'_style'
-            ]).'
+                    'title' => esc_html__('Border Style', 'listdom'),
+                    'for' => $id.'_style'
+                ]).'
                 '.LSD_Form::select([
-                'id' => $id.'_style',
-                'name' => $name.'[style]',
-                'options' => [
-                    'none' => esc_html__('None', 'listdom'),
-                    'solid' => esc_html__('Solid', 'listdom'),
-                    'dashed' => esc_html__('Dashed', 'listdom'),
-                    'dotted' => esc_html__('Dotted', 'listdom'),
-                    'double' => esc_html__('Double', 'listdom'),
-                ],
-                'value' => $value['style'] ?? 'none'
-            ]).'
+                    'id' => $id.'_style',
+                    'name' => $name.'[style]',
+                    'options' => [
+                        'none' => esc_html__('None', 'listdom'),
+                        'solid' => esc_html__('Solid', 'listdom'),
+                        'dashed' => esc_html__('Dashed', 'listdom'),
+                        'dotted' => esc_html__('Dotted', 'listdom'),
+                        'double' => esc_html__('Double', 'listdom'),
+                    ],
+                    'value' => $value['style'] ?? 'none'
+                ]).'
             </div>
         </div>';
     }

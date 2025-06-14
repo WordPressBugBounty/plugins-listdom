@@ -200,7 +200,7 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
                 </select>
             </div>
 
-            <?php if ($type === 'taxonomy'): ?>
+            <?php if ($type === 'taxonomy' || $type === 'checkbox' || $type === 'radio'): ?>
             <div class="lsd-search-method-dependant lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-hierarchical lsd-search-method-checkboxes lsd-search-method-radio">
                 <div class="lsd-search-field-param lsd-search-field-all-terms">
                     <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_all_terms"><?php esc_html_e('Terms Method', 'listdom'); ?></label>
@@ -211,6 +211,8 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
                 </div>
                 <div class="lsd-search-field-param lsd-search-field-terms <?php echo ($display_all_terms == 1 ? 'lsd-util-hide' : ''); ?>">
                     <label><?php esc_html_e('Terms', 'listdom'); ?></label>
+
+                    <?php if ($type === 'taxonomy'): ?>
                     <ul>
                         <?php echo $helper->tax_checkboxes([
                             'taxonomy' => $key,
@@ -220,6 +222,22 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
                             'name' => 'lsd['.esc_attr($device_key).']['.esc_attr($i).'][filters]['.esc_attr($key).'][terms]',
                         ]); ?>
                     </ul>
+                    <?php else: ?>
+                        <?php
+                        $term = get_term_by('name', $label, LSD_Base::TAX_ATTRIBUTE);
+                        $values = get_term_meta($term->term_id, 'lsd_values', true);
+                        $values_array = explode(',', $values);
+
+                        echo '<ul>';
+                        echo $helper->attribute_checkboxes($values_array, [
+                            'current' => $terms,  // your current selected terms array
+                            'name' => 'lsd[' . esc_attr($device_key) . '][' . esc_attr($i) . '][filters][' . esc_attr($key) . '][terms]',
+                            'id_prefix' => $key . '_',
+                        ]);
+                        echo '</ul>';
+                        ?>
+                    <?php endif; ?>
+
                 </div>
             </div>
             <?php endif; ?>

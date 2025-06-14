@@ -29,7 +29,7 @@ $options = (new LSD_Customizer())->options();
     <form id="lsd_settings_form">
 
         <?php $c = 0; foreach ($options as $ck => $category): $c++; ?>
-        <div class="lsd-accordion-title <?php echo $c === 1 ? 'lsd-accordion-active' : ''; ?>">
+        <div class="lsd-accordion-title-customizer-<?php echo esc_html(strtolower(str_replace(' ', '-', $category['title'] ?? ''))); ?> lsd-accordion-title <?php echo $c === 1 ? 'lsd-accordion-active' : ''; ?>">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php echo esc_html($category['title'] ?? ''); ?></h3>
                 <div class="lsd-flex lsd-flex-row lsd-gap-4">
@@ -43,7 +43,7 @@ $options = (new LSD_Customizer())->options();
                 </div>
             </div>
         </div>
-        <div class="lsd-accordion-panel <?php echo $c === 1 ? 'lsd-accordion-open' : ''; ?>">
+        <div class="lsd-accordion-panel-customizer-<?php echo esc_html(strtolower(str_replace(' ', '-', $category['title'] ?? ''))); ?> lsd-accordion-panel <?php echo $c === 1 ? 'lsd-accordion-open' : ''; ?>">
             <?php if (isset($category['sections']) && is_array($category['sections']) && (count($category['sections']) > 1 || (isset($category['display_sections_force']) && $category['display_sections_force']))): ?>
                 <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mb-4" data-for=".lsd-customizer-<?php echo esc_attr($ck); ?>-category-tab-switcher-content">
                     <?php $s = 0; foreach ($category['sections'] as $sk => $section): $s++; ?>

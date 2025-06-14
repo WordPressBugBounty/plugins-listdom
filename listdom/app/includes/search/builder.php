@@ -184,6 +184,20 @@ class LSD_Search_Builder extends LSD_Base
                 'checkboxes' => esc_html__('Checkboxes', 'listdom'),
                 'radio' => esc_html__('Radio Buttons', 'listdom'),
             ],
+            'checkbox' => [
+                'dropdown' => esc_html__('Dropdown', 'listdom'),
+                'dropdown-multiple' => esc_html__('Dropdown (Multiple Selection)', 'listdom'),
+                'text-input' => esc_html__('Text Input', 'listdom'),
+                'checkboxes' => esc_html__('Checkboxes', 'listdom'),
+                'radio' => esc_html__('Radio Buttons', 'listdom'),
+            ],
+            'radio' => [
+                'dropdown' => esc_html__('Dropdown', 'listdom'),
+                'dropdown-multiple' => esc_html__('Dropdown (Multiple Selection)', 'listdom'),
+                'text-input' => esc_html__('Text Input', 'listdom'),
+                'checkboxes' => esc_html__('Checkboxes', 'listdom'),
+                'radio' => esc_html__('Radio Buttons', 'listdom'),
+            ],
             'address' => [
                 'text-input' => esc_html__('Text Input', 'listdom'),
             ],

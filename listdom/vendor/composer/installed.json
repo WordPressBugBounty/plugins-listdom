@@ -1626,17 +1626,17 @@
         },
         {
             "name": "webilia/wp",
-            "version": "v1.0.9",
-            "version_normalized": "1.0.9.0",
+            "version": "1.0.12",
+            "version_normalized": "1.0.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webilia/wp.git",
-                "reference": "54b47284a83781a7b84b89e3b29e62574f143011"
+                "reference": "27501c3e81d714891222e4a709642588f2d03313"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webilia/wp/zipball/54b47284a83781a7b84b89e3b29e62574f143011",
-                "reference": "54b47284a83781a7b84b89e3b29e62574f143011",
+                "url": "https://api.github.com/repos/webilia/wp/zipball/27501c3e81d714891222e4a709642588f2d03313",
+                "reference": "27501c3e81d714891222e4a709642588f2d03313",
                 "shasum": ""
             },
             "require": {
@@ -1648,7 +1648,7 @@
                 "squizlabs/php_codesniffer": "*",
                 "szepeviktor/phpstan-wordpress": "^1.1"
             },
-            "time": "2025-03-14T00:08:00+00:00",
+            "time": "2025-06-12T19:46:29+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1673,7 +1673,7 @@
             "description": "A handy set of libraries for WordPress developments.",
             "support": {
                 "issues": "https://github.com/webilia/wp/issues",
-                "source": "https://github.com/webilia/wp/tree/v1.0.9"
+                "source": "https://github.com/webilia/wp/tree/v1.0.12"
             },
             "install-path": "../webilia/wp"
         }

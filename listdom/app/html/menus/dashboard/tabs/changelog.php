@@ -3,6 +3,36 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.4.0 <span>June 13th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added AI integration and support for creating multiple AI profiles tailored to different tasks.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Introduced AI-powered field mapping for CSV and Excel imports.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Redesigned the Listdom admin page for improved usability.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Introduced radio and checkbox input types to Listdom custom fields.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added a "Clear All" button and enhanced the logic behind search forms.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added support for slug and parent fields in CSV/Excel import and export.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved the custom fields editor and various UI elements.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed several issues related to pagination controls in skins.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Resolved various UI issues.', 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v4.3.0 <span>May 27th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>
@@ -1069,7 +1099,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('Added Listdom Restful API.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added embed code feature to submit videos, virtual tours etc. for certain listings!.', 'listdom'); ?></span>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added embed code feature to submit videos, virtual tours etc. for certain listings!', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed category hierarchy issue on attributes menu.', 'listdom'); ?></span>

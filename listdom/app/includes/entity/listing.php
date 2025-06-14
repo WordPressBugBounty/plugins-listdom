@@ -66,7 +66,10 @@ class LSD_Entity_Listing extends LSD_Entity
         // Save attributes one by one
         foreach ($attributes as $key => $attribute)
         {
-            update_post_meta($this->post->ID, 'lsd_attribute_' . $key, sanitize_text_field($attribute));
+            if (is_array($attribute)) $attribute = implode(',', array_map('sanitize_text_field', $attribute));
+            else $attribute = sanitize_text_field($attribute);
+
+            update_post_meta($this->post->ID, 'lsd_attribute_' . $key, $attribute);
         }
 
         // Listing Link
@@ -384,10 +387,17 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function get_marker(): string
     {
-        $category = $this->get_data_category();
-        $icon = isset($category->term_id) ? LSD_Taxonomies::icon($category->term_id) : '';
-        $bgcolor = isset($category->term_id) ? get_term_meta($category->term_id, 'lsd_color', true) : '';
+        $icon = '';
+        $bgcolor = '';
 
+        $category = $this->get_data_category();
+        if ($category && isset($category->term_id))
+        {
+            $icon = LSD_Taxonomies::icon($category->term_id);
+            $bgcolor = get_term_meta($category->term_id, 'lsd_color', true);
+        }
+
+        // Marker
         $marker = '<div class="lsd-marker-container" style="background-color: ' . esc_attr($bgcolor) . '">
             ' . $icon . '
         </div>';
@@ -450,7 +460,9 @@ class LSD_Entity_Listing extends LSD_Entity
     public function get_category_color()
     {
         $category = $this->get_data_category();
-        return get_term_meta($category->term_id, 'lsd_color', true);
+        return $category && isset($category->term_id)
+            ? get_term_meta($category->term_id, 'lsd_color', true)
+            : '';
     }
 
     public function get_contact_info(array $args = [])

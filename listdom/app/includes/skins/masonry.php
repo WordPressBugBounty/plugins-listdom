@@ -5,6 +5,7 @@ class LSD_Skins_Masonry extends LSD_Skins
     public $skin = 'masonry';
     public $default_style = 'style1';
     public $filter_by = LSD_Base::TAX_CATEGORY;
+    public $filter_all_label;
     public $list_view = false;
     public $duration = 400;
 
@@ -24,11 +25,14 @@ class LSD_Skins_Masonry extends LSD_Skins
 
         // Animation Duration
         $this->duration = $this->skin_options['duration'] ?? 400;
+
+        // All Listings Tab Label
+        $this->filter_all_label = $this->skin_options['filter_all_label'] ?? __('All', 'listdom');
     }
 
     public function filters(): string
     {
-        $output = '<div class="lsd-masonry-filters"><a href="#" class="lsd-selected" data-filter="*">' . esc_html__('All', 'listdom') . '<div class="lsd-border lsd-color-m-bg"></div></a>';
+        $output = '<div class="lsd-masonry-filters"><a href="#" class="lsd-selected" data-filter="*">' . esc_html__($this->filter_all_label, 'listdom') . '<div class="lsd-border lsd-color-m-bg"></div></a>';
         $terms = get_terms($this->filter_by, [
             'hide_empty' => true,
             'include' => isset($this->atts[$this->filter_by]) && trim($this->atts[$this->filter_by]) ? $this->atts[$this->filter_by] : '',

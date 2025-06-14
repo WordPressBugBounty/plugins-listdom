@@ -73,6 +73,7 @@ abstract class LSD_IX_Array extends LSD_IX
         $columns = [
             esc_html__('ID', 'listdom'),
             esc_html__('Title', 'listdom'),
+            esc_html__('Slug', 'listdom'),
             esc_html__('Description', 'listdom'),
             esc_html__('Date', 'listdom'),
             esc_html__('Owner', 'listdom'),
@@ -141,6 +142,7 @@ abstract class LSD_IX_Array extends LSD_IX
         $row = [
             $listing['ID'],
             $listing['post_title'],
+            $listing['post_name'],
             $listing['post_content'],
             $listing['post_date'],
             get_the_author_meta('user_email', $listing['post_author']),
@@ -237,6 +239,7 @@ abstract class LSD_IX_Array extends LSD_IX
         $listing = [
             'unique_id' => $mapped['unique_id'] ?? '',
             'post_title' => $title,
+            'post_name' => $mapped['post_name'] ?? sanitize_title($title),
             'post_content' => $mapped['post_content'] ?? '',
             'post_author' => $mapped['post_author'] ?? '',
             'post_date' => $mapped['post_date'] ?? '',

@@ -211,7 +211,8 @@ class LSD_PTypes_Search extends LSD_PTypes
         $builder = new LSD_Search_Builder();
         $html = $builder->row($post_id, $device_key, [
             'type' => $type,
-            'buttons' => 0,
+            'buttons' => ['status' => 1],
+            'clear' => ['status' => 0],
         ], $i);
 
         $this->response(['success' => 1, 'html' => $html]);

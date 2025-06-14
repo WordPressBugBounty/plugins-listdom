@@ -10,7 +10,7 @@ $settings = LSD_Options::settings();
 ?>
 <div class="lsd-auth-wrap">
     <form id="lsd_auth_form">
-        <div class="lsd-accordion-title lsd-accordion-active">
+        <div class="lsd-accordion-title lsd-accordion-active lsd-accordion-title-auth">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php esc_html_e('Authentication', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
@@ -19,7 +19,7 @@ $settings = LSD_Options::settings();
                 </div>
             </div>
         </div>
-        <div class="lsd-auth-form-group lsd-accordion-panel lsd-accordion-open">
+        <div class="lsd-auth-form-group lsd-accordion-panel lsd-accordion-open lsd-accordion-panel-auth">
             <p class="description lsd-mb-4"><?php echo sprintf(esc_html__('In order to use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-auth]</code>'); ?></p>
 
             <div class="lsd-form-row">
@@ -271,7 +271,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div class="lsd-accordion-title">
+        <div class="lsd-accordion-title lsd-accordion-title-auth-login">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php esc_html_e('Login', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
@@ -280,7 +280,7 @@ $settings = LSD_Options::settings();
                 </div>
             </div>
         </div>
-        <div class="lsd-auth-form-group lsd-accordion-panel">
+        <div class="lsd-accordion-panel-auth-login lsd-auth-form-group lsd-accordion-panel">
             <p class="description lsd-mb-4"><?php echo sprintf(esc_html__('In order to use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-login]</code>'); ?></p>
 
             <h3><?php esc_html_e('Labels', 'listdom'); ?></h3>
@@ -386,7 +386,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div class="lsd-accordion-title">
+        <div class="lsd-accordion-title lsd-accordion-title-auth-register">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php esc_html_e('Register', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
@@ -396,7 +396,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div class="lsd-auth-form-group lsd-accordion-panel">
+        <div class="lsd-auth-form-group lsd-accordion-panel lsd-accordion-panel-auth-register">
             <p class="description lsd-mb-4"><?php echo sprintf(esc_html__('In order to use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-register]</code>'); ?></p>
 
             <h3><?php esc_html_e('Labels', 'listdom'); ?></h3>
@@ -625,7 +625,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div class="lsd-accordion-title">
+        <div class="lsd-accordion-title lsd-accordion-title-auth-forgot-password">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php esc_html_e('Forgot Password', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
@@ -635,7 +635,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div class="lsd-auth-form-group lsd-accordion-panel">
+        <div class="lsd-auth-form-group lsd-accordion-panel lsd-accordion-panel-auth-forgot-password">
             <p class="description lsd-mb-4"><?php echo sprintf(esc_html__('In order to use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-forgot-password]</code>'); ?></p>
 
             <h3><?php esc_html_e('Labels', 'listdom'); ?></h3>
@@ -699,7 +699,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div class="lsd-accordion-title">
+        <div class="lsd-accordion-title lsd-accordion-title-auth-profile">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php esc_html_e('Profile & User Directory', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
@@ -709,7 +709,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div class="lsd-auth-form-group lsd-accordion-panel">
+        <div class="lsd-auth-form-group lsd-accordion-panel lsd-accordion-panel-auth-profile">
             <h3 class="lsd-mt-0"><?php esc_html_e('User Profile', 'listdom'); ?></h3>
             <p class="description lsd-mb-4"><?php echo sprintf(esc_html__('In order to use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-profile]</code>'); ?></p>
 
@@ -752,7 +752,7 @@ $settings = LSD_Options::settings();
             </ul>
         </div>
 
-        <div class="lsd-accordion-title">
+        <div class="lsd-accordion-title lsd-accordion-title-auth-logged-in-users">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php esc_html_e('Logged In Users', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
@@ -762,7 +762,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div class="lsd-auth-form-group lsd-accordion-panel">
+        <div class="lsd-auth-form-group lsd-accordion-panel lsd-accordion-panel-auth-logged-in-users">
 
             <div class="lsd-form-row">
                 <div class="lsd-col-2"><?php echo LSD_Form::label([
@@ -796,7 +796,7 @@ $settings = LSD_Options::settings();
             </div>
 
         </div>
-        <div class="lsd-accordion-title">
+        <div class="lsd-accordion-title lsd-accordion-title-auth-block-admin-access">
             <div class="lsd-flex lsd-flex-row lsd-py-2">
                 <h3><?php esc_html_e('Block Admin Access', 'listdom'); ?></h3>
                 <div class="lsd-accordion-icons">
@@ -805,7 +805,7 @@ $settings = LSD_Options::settings();
                 </div>
             </div>
         </div>
-        <div class="lsd-settings-form-group lsd-accordion-panel">
+        <div class="lsd-settings-form-group lsd-accordion-panel lsd-accordion-panel-auth-block-admin-access">
             <div class="lsd-form-row lsd-mt-0">
                 <div class="lsd-col-12">
                     <p class="description lsd-mt-0 lsd-mb-5"><?php esc_html_e('You can block WordPress admin access for the following user roles, if needed. Check to block access, or uncheck to allow it.', 'listdom'); ?></p>

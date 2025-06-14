@@ -19,7 +19,7 @@ $did_taxonomies = [];
 ?>
 <div class="lsd-settings-wrap" id="lsd_settings_advanced_wrapper">
     <div class="lsd-form-row lsd-my-0">
-        <div class="lsd-col-10">
+        <div class="lsd-col-9">
             <form id="lsd_settings_form">
                 <div class="lsd-accordion-title lsd-accordion-active">
                     <div class="lsd-flex lsd-flex-row lsd-py-2">
@@ -228,7 +228,7 @@ $did_taxonomies = [];
                 </div>
             </form>
         </div>
-        <div class="lsd-col-2">
+        <div class="lsd-col-3">
             <div class="lsd-settings-ix-wrapper lsd-flex lsd-flex-col lsd-flex-items-start lsd-flex-items-stretch lsd-gap-3">
                 <div class="lsd-box-white lsd-p-4">
                     <h4 class="lsd-mt-0"><?php esc_html_e('Import', 'listdom'); ?></h4>

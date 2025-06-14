@@ -173,7 +173,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                             'value' => $menu['content'] ?? '',
                                             'data-field' => 'content',
                                         ]); ?>
-                                        <p class="description"><?php esc_html_e('Type dashboard content. You can also use shorcodes.', 'listdom'); ?></p>
+                                        <p class="description"><?php esc_html_e('Type dashboard content. You can also use shortcodes.', 'listdom'); ?></p>
                                     </label>
                                 </div>
                                 <input type="hidden" name="lsd[dashboard_menus][]" class="custom-menu-slug"

@@ -380,6 +380,19 @@ $optional_addons = [];
         ]); ?>
     </div>
 </div>
+    <div class="lsd-form-row">
+        <div class="lsd-col-2"><?php echo LSD_Form::label([
+            'title' => esc_html__('All Listings Tab Label', 'listdom'),
+            'for' => 'lsd_display_options_skin_masonry_filter_all_label',
+        ]); ?></div>
+        <div class="lsd-col-6">
+            <?php echo LSD_Form::text([
+                'id' => 'lsd_display_options_skin_masonry_filter_all_label',
+                'name' => 'lsd[display][masonry][filter_all_label]',
+                'value' => $masonry['filter_all_label'] ??  esc_html__('All', 'listdom')
+            ]); ?>
+        </div>
+    </div>
 <div class="lsd-form-row">
     <div class="lsd-col-2"><?php echo LSD_Form::label([
         'title' => esc_html__('Limit', 'listdom'),

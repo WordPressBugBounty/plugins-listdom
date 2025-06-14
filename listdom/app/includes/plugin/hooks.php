@@ -141,6 +141,23 @@ class LSD_Plugin_Hooks
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
+        $table_name = $wpdb->prefix . 'lsd_jobs';
+        $sql = "CREATE TABLE `$table_name` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `type` varchar(20) NOT NULL,
+            `sub_type` varchar(20) NULL,
+            `data` text NULL,
+            `priority` tinyint(1) NOT NULL DEFAULT '1',
+            `runs` tinyint(3) NOT NULL DEFAULT '0',
+            `run_at` datetime DEFAULT NULL,
+            `created_at` datetime DEFAULT NULL,
+            `updated_at` datetime DEFAULT NULL,
+            PRIMARY KEY (id),
+            KEY `run_at` (`run_at`)
+        ) $charset_collate;";
+
+        dbDelta($sql);
+
         update_option('lsd_db_version', LSD_Base::DB_VERSION);
     }
 
@@ -150,6 +167,9 @@ class LSD_Plugin_Hooks
      */
     public function deactivate(bool $network = false)
     {
+        // Clear Scheduled Hook
+        wp_clear_scheduled_hook('lsd_jobs_run');
+
         /**
          * Refresh WordPress rewrite rules
          * We cannot use LSD_RewriteRules here because plugin is deactivated and it won't run

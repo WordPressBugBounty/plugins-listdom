@@ -102,7 +102,7 @@ class LSD_Duplicate
         else
         {
             // Flash Message
-            LSD_Flash::add(esc_html__("You don't have access to duplicate this post!", 'listdom'), 'success');
+            LSD_Flash::add(esc_html__("You don't have access to duplicate this post!", 'listdom'), 'error');
 
             $url = wp_get_referer();
             if (!$url) $url = admin_url();

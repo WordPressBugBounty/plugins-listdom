@@ -37,7 +37,17 @@ class LSD_Entity_Attribute extends LSD_Base
 
                 return $editor ? wpautop($data) : esc_html($data);
 
+            case 'checkbox':
+                if (is_array($data))
+                {
+                    $escaped = array_map('esc_html', $data);
+                    return implode(', ', $escaped);
+                }
+
+                return esc_html($data);
+
             case 'dropdown':
+            case 'radio':
             default:
 
                 return esc_html($data);

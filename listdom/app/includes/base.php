@@ -16,7 +16,7 @@ class LSD_Base
     const STATUS_HOLD = 'hold';
     const STATUS_OFFLINE = 'offline';
     const EP_LISTING = 701;
-    const DB_VERSION = 1;
+    const DB_VERSION = 2;
     const REQ_HTML = '<span class="lsd-required">*</span>';
     const WELCOME_SLUG = 'listdom-welcome';
 
@@ -470,6 +470,11 @@ class LSD_Base
         return 'https://listdom.net/products/listdom-' . str_replace(' ', '-', strtolower($addon)) . '-addon';
     }
 
+    public static function getAccountURL(): string
+    {
+        return self::addUtmParameters('https://listdom.net/my-account/');
+    }
+
     public static function getUpgradeURL(): string
     {
         return 'https://api.webilia.com/go/buy-listdom-pro';
@@ -488,6 +493,11 @@ class LSD_Base
     public static function getSupportURL(): string
     {
         return self::addUtmParameters('https://listdom.net/support/');
+    }
+
+    public static function getMobileApp(): string
+    {
+        return self::addUtmParameters('https://listdom.net/products/listdom-mobile-app/');
     }
 
     public static function getListdomDocsURL(): string

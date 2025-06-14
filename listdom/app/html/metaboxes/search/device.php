@@ -9,7 +9,7 @@ defined('ABSPATH') || die();
 $device_fields = LSD_Search_Helper::get_search_fields($post->ID, $device);
 
 // Add a default row
-if (!count($device_fields)) $device_fields[] = ['type' => 'row', 'buttons' => 1];
+if (!count($device_fields)) $device_fields[] = ['type' => 'row', 'buttons' => ['status' => 1], 'clear' => ['status' => 0]];
 
 // Devices
 $devices = get_post_meta($post->ID, 'lsd_devices', true);

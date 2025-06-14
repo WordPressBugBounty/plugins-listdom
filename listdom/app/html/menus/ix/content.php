@@ -14,6 +14,11 @@ switch($this->tab)
         $this->include_html_file('menus/ix/tabs/csv.php');
         break;
 
+    case 'dummy-data':
+
+        $this->include_html_file('menus/ix/tabs/dummy-data.php');
+        break;
+
     case 'excel' && !class_exists(\LSDPACEXL\Base::class):
 
         $this->include_html_file('menus/ix/tabs/excel.php');

@@ -4,24 +4,8 @@ class LSD_Dummy extends LSD_Base
 {
     public function init()
     {
-        add_action('lsd_admin_dashboard_tabs', [$this, 'tab']);
-        add_action('lsd_admin_dashboard_contents', [$this, 'content']);
-
-        // Activate
+        // Import the Content
         add_action('wp_ajax_lsd_dummy', [$this, 'dummy']);
-    }
-
-    public function tab($tab)
-    {
-        echo '<a class="nav-tab ' . ($tab == 'dummy-data' ? 'nav-tab-active' : '') . '" href="' . esc_url(admin_url('admin.php?page=listdom&tab=dummy-data')) . '">' . esc_html__('Dummy Data', 'listdom') . '</a>';
-    }
-
-    public function content($tab)
-    {
-        // It's not Activation Tab
-        if ($tab !== 'dummy-data') return;
-
-        $this->include_html_file('menus/dashboard/tabs/dummy-data.php');
     }
 
     public function dummy()
@@ -42,6 +26,12 @@ class LSD_Dummy extends LSD_Base
         $import_shortcodes = isset($dummy['shortcodes']) && $dummy['shortcodes'];
         $import_frontend_dashboard = isset($dummy['frontend_dashboard']) && $dummy['frontend_dashboard'];
         $import_profile = isset($dummy['profile']) && $dummy['profile'];
+
+        // Whether the Pro version is active
+        $listdom_pro = LSD_Base::isPro();
+
+        // Default single listing style to apply
+        $default_single_style = 'style2';
 
         if ($import_categories)
         {
@@ -730,7 +720,7 @@ class LSD_Dummy extends LSD_Base
                         'lsd_website' => 'https://samplebank.com',
                         'lsd_remark' => 'A sample bank listing.',
                         'lsd_displ' => [
-                            'style' => 'style2',
+                            'style' => $default_single_style,
                             'elements_global' => 1,
                             'elements' => [
                                 'labels' => ['enabled' => 1],
@@ -869,7 +859,7 @@ class LSD_Dummy extends LSD_Base
                         'lsd_website' => 'https://samplerestaurant.com',
                         'lsd_remark' => 'A sample restaurant listing.',
                         'lsd_displ' => [
-                            'style' => 'style3',
+                            'style' => $listdom_pro ? 'style3' : $default_single_style,
                             'elements_global' => 1,
                             'elements' => [
                                 'labels' => ['enabled' => 1],
@@ -934,7 +924,7 @@ class LSD_Dummy extends LSD_Base
                         'lsd_website' => 'https://jimrohn.com',
                         'lsd_remark' => 'A renowned speaker with a passion for motivating others.',
                         'lsd_displ' => [
-                            'style' => 'style4',
+                            'style' => $listdom_pro ? 'style4' : $default_single_style,
                             'elements_global' => 1,
                             'elements' => [
                                 'labels' => ['enabled' => 1],
@@ -978,6 +968,14 @@ class LSD_Dummy extends LSD_Base
 
             $ix = new LSD_IX();
             $ix->collection($listings);
+
+            // Single Listing Options
+            $details_page = LSD_Options::details_page();
+
+            $details_page['general']['style'] = $default_single_style;
+            if ($listdom_pro) $details_page['general']['displ'] = 'admin';
+
+            update_option('lsd_details_page', $details_page);
         }
 
         $this->response(['success' => 1]);

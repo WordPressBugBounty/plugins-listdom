@@ -111,6 +111,7 @@ class LSD_IX extends LSD_Base
     {
         $post = [
             'post_title' => $listing['post_title'],
+            'post_name' => isset($listing['post_name']) && trim($listing['post_name']) ? $listing['post_name'] : $listing['post_title'],
             'post_content' => $listing['post_content'] ?? '',
             'post_type' => LSD_Base::PTYPE_LISTING,
             'post_status' => $listing['post_status'] ?? 'publish',

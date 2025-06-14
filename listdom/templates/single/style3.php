@@ -74,17 +74,23 @@ $rate_summary = $this->entity->get_rate_stars('summary');
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($claim) echo LSD_Kses::element($claim); ?>
+                    <div class="listdom-single-top-bottom-inner">
+                        <?php if ($claim) echo LSD_Kses::element($claim); ?>
 
-                    <?php if ($discussion_status): ?>
-                        <div class="listdom-write-a-review-button">
-                            <a href="#lsd-discussion">
-                                <?php esc_html_e('Submit a Review', 'listdom'); ?>
-                            </a>
-                        </div>
-                    <?php endif; ?>
+                        <?php if($claim && $discussion_status) : ?>
+                            <div class="lsd-divider"></div>
+                        <?php endif; ?>
 
-                    <?php if ($rate_summary) echo LSD_Kses::element($rate_summary); ?>
+                        <?php if ($discussion_status): ?>
+                            <div class="listdom-write-a-review-button">
+                                <a href="#lsd-discussion">
+                                    <?php esc_html_e('Submit a Review', 'listdom'); ?>
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($rate_summary) echo LSD_Kses::element($rate_summary); ?>
+                    </div>
                 </div>
             <?php endif; ?>
 
