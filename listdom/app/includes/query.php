@@ -10,7 +10,7 @@ class LSD_Query extends LSD_Base
         else if ($id == 'price') $field = 'lsd_price';
         else if ($id == 'class') $field = 'lsd_price_class';
         else if ($id == 'acf_fields') $field = 'acf_fields';
-        else $field = 'lsd_attribute_' . $id;
+        else $field = 'lsd_attribute_' . LSD_Main::get_attr_slug($id);
 
         $query = [];
         switch ($type)

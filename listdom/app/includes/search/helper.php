@@ -121,7 +121,7 @@ class LSD_Search_Helper extends LSD_Base
         }
         else if (strpos($key, 'att-') !== false)
         {
-            $id = LSD_Main::get_attr_id(substr($key, 4));
+            $slug = substr($key, 4);
             $hide_empty = $filter['hide_empty'] ?? 1;
 
             if ($hide_empty)
@@ -130,7 +130,7 @@ class LSD_Search_Helper extends LSD_Base
                 if ($numeric) $order = "CAST(`meta_value` as unsigned)";
 
                 $db = new LSD_db();
-                $raw_results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($key) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
+                $raw_results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($slug) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
 
                 $results = [];
                 foreach ($raw_results as $value)
@@ -149,6 +149,8 @@ class LSD_Search_Helper extends LSD_Base
             }
             else
             {
+                $id = LSD_Main::get_attr_id($slug);
+
                 $values_str = get_term_meta($id, 'lsd_values', true);
                 $results = explode(',', trim($values_str, ', '));
             }

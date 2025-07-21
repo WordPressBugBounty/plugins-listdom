@@ -4,8 +4,8 @@ Donate link: https://listdom.net
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.0.0
 Requires PHP: 7.2
-Tested up to: 6.8.1
-Stable tag: 4.5.0
+Tested up to: 6.8
+Stable tag: 4.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -422,6 +422,9 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 4.5.1 =
+* Fixed some issues related to the search module.
 
 = 4.5.0 =
 * Added OpenStreetMap integration to Listdom Core.
