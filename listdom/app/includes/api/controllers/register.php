@@ -32,7 +32,7 @@ class LSD_API_Controllers_Register extends LSD_API_Controller
         $response = wp_insert_user([
             'display_name' => $name,
             'user_login' => sanitize_user($email),
-            'user_email ' => sanitize_email($email),
+            'user_email' => sanitize_email($email),
             'user_pass' => $password,
         ]);
 

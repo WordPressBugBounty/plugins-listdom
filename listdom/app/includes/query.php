@@ -4,7 +4,7 @@ class LSD_Query extends LSD_Base
 {
     public static function attribute($key, $value)
     {
-        list($id, $type) = explode('-', $key);
+        [$id, $type] = explode('-', $key);
 
         if ($id == 'address') $field = 'lsd_address';
         else if ($id == 'price') $field = 'lsd_price';

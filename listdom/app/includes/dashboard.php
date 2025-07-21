@@ -5,16 +5,13 @@ class LSD_Dashboard extends LSD_Base
     public function init()
     {
         // Dashboard Shortcode
-        $Dashboard = new LSD_Shortcodes_Dashboard();
-        $Dashboard->init();
+        $dashboard = new LSD_Shortcodes_Dashboard();
+        $dashboard->init();
     }
 
     public function modules()
     {
         $modules = [
-            ['label' => esc_html__('Address / Map', 'listdom'), 'key' => 'address'],
-            ['label' => esc_html__('Price Options', 'listdom'), 'key' => 'price'],
-            ['label' => esc_html__('Work Hours', 'listdom'), 'key' => 'availability'],
             ['label' => esc_html__('Contact Details', 'listdom'), 'key' => 'contact'],
             ['label' => esc_html__('Remark', 'listdom'), 'key' => 'remark'],
             ['label' => esc_html__('Gallery', 'listdom'), 'key' => 'gallery'],
@@ -28,6 +25,18 @@ class LSD_Dashboard extends LSD_Base
             ['label' => esc_html__('Excerpt', 'listdom'), 'key' => 'excerpt'],
         ];
 
+        if (LSD_Components::related())
+            $modules[] = ['label' => esc_html__('Related Listings', 'listdom'), 'key' => 'related'];
+
+        // Map Module
+        if (LSD_Components::map()) $modules[] = ['label' => esc_html__('Address / Map', 'listdom'), 'key' => 'address'];
+
+        // Price Module
+        if (LSD_Components::pricing()) $modules[] = ['label' => esc_html__('Price Options', 'listdom'), 'key' => 'price'];
+
+        // Work Hours Module
+        if (LSD_Components::work_hours()) $modules[] = ['label' => esc_html__('Work Hours', 'listdom'), 'key' => 'availability'];
+
         return apply_filters('lsd_dashboard_modules', $modules);
     }
 
@@ -39,7 +48,6 @@ class LSD_Dashboard extends LSD_Base
             'excerpt' => ['label' => esc_html__('Listing Excerpt', 'listdom')],
             'guest_email' => ['label' => esc_html__('Guest Email', 'listdom'), 'always_enabled' => true, 'guest' => true],
             'guest_password' => ['label' => esc_html__('Guest Password', 'listdom'), 'always_enabled' => true, 'guest' => true],
-            'address' => ['label' => esc_html__('Address', 'listdom'), 'module' => 'address'],
             'remark' => ['label' => esc_html__('Remark', 'listdom'), 'module' => 'remark'],
             'price' => ['label' => esc_html__('Price', 'listdom'), 'module' => 'price'],
             'price_max' => ['label' => esc_html__('Price (Max)', 'listdom'), 'module' => 'price'],
@@ -60,6 +68,11 @@ class LSD_Dashboard extends LSD_Base
             'featured_image' => ['label' => esc_html__('Featured Image', 'listdom'), 'module' => 'image', 'capability' => 'upload_files'],
         ];
 
+        if (LSD_Components::related())
+            $fields['related_listings'] = ['label' => esc_html__('Related Listings', 'listdom'), 'module' => 'related'];
+
+        if (LSD_Components::map()) $fields['address'] = ['label' => esc_html__('Address', 'listdom'), 'module' => 'address'];
+
         $SN = new LSD_Socials();
         $networks = LSD_Options::socials();
 
@@ -72,10 +85,12 @@ class LSD_Dashboard extends LSD_Base
         // Price Components
         $price_components = LSD_Options::price_components();
 
-        // Remove Price Fields
-        if(!$price_components['max']) unset($fields['price_max']);
-        if(!$price_components['after']) unset($fields['price_after']);
-        if(!$price_components['class']) unset($fields['price_class']);
+        // Remove Price Fields if pricing component is disabled
+        if (!LSD_Components::pricing()) unset($fields['price']);
+
+        if (!$price_components['max']) unset($fields['price_max']);
+        if (!$price_components['after']) unset($fields['price_after']);
+        if (!$price_components['class']) unset($fields['price_class']);
 
         return apply_filters('lsd_dashboard_fields', $fields);
     }

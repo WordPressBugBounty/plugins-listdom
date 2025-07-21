@@ -24,6 +24,7 @@ $address = isset($elements['address']['enabled']) && $elements['address']['enabl
 $breadcrumb = isset($elements['breadcrumb']['enabled']) && $elements['breadcrumb']['enabled'] ? $this->breadcrumb() : '';
 $locations = isset($elements['locations']['enabled']) && $elements['locations']['enabled'] ? $this->locations() : '';
 $share = isset($elements['share']['enabled']) && $elements['share']['enabled'] ? $this->share() : '';
+$related = isset($elements['related']['enabled']) && $elements['related']['enabled'] ? $this->related() : '';
 $remark = isset($elements['remark']['enabled']) && $elements['remark']['enabled'] ? $this->remark() : '';
 $tags = isset($elements['tags']['enabled']) && $elements['tags']['enabled'] ? $this->tags() : '';
 $contact_info = isset($elements['contact']['enabled']) && $elements['contact']['enabled'] ? $this->contact_info() : '';
@@ -124,6 +125,7 @@ $rate_summary = $this->entity->get_rate_stars('summary');
 
         <?php if ($tags) echo LSD_Kses::element($tags); ?>
         <?php if ($share) echo LSD_Kses::element($share); ?>
+        <?php if($related) echo LSD_Kses::full($related); ?>
 
         {franchise}
 

@@ -2,6 +2,18 @@
 
 class LSD_Shortcodes_Auth extends LSD_Base
 {
+    /**
+     * Allowed roles for login and register shortcodes
+     *
+     * @var string[]
+     */
+    private static $allowed_roles = [
+        'subscriber',
+        'contributor',
+        'listdom_author',
+        'listdom_publisher',
+    ];
+
     public function init()
     {
         // Shortcodes
@@ -59,6 +71,10 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         $redirect = $atts['redirect'] ?? '';
 
+        // Role Restriction
+        $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
+        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+
         // Get Redirect from Request
         if (isset($_REQUEST['redirect_to']) && trim($_REQUEST['redirect_to']))
         {
@@ -78,6 +94,10 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // User is Already Logged-in
         if (is_user_logged_in()) return $this->user_profile();
+
+        // Role Restriction
+        $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
+        if (!in_array($role, self::$allowed_roles, true)) $role = '';
 
         ob_start();
         include lsd_template('auth/register.php');
@@ -107,6 +127,10 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // User is Already Logged-in
         if (is_user_logged_in()) return $this->user_profile();
 
+        // Role Restriction
+        $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
+        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+
         ob_start();
         include lsd_template('auth/auth.php');
         return ob_get_clean();
@@ -130,6 +154,22 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $redirect_to = isset($_POST['redirect_to']) && $_POST['redirect_to']
             ? sanitize_text_field($_POST['redirect_to'])
             : '';
+
+        // Role Restriction
+        $role = isset($_POST['lsd_role']) ? sanitize_text_field($_POST['lsd_role']) : '';
+        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+
+        if ($role)
+        {
+            $user_data = get_user_by('login', $credentials['user_login']);
+            if (!$user_data) $user_data = get_user_by('email', $credentials['user_login']);
+
+            if (!$user_data) $this->response(['success' => 0, 'message' => esc_html__('User not found!', 'listdom')]);
+            if (!in_array('administrator', $user_data->roles) && !in_array($role, $user_data->roles))
+            {
+                $this->response(['success' => 0, 'message' => esc_html__('User not found!', 'listdom')]);
+            }
+        }
 
         // Attempt to log in
         $user = wp_signon($credentials, false);
@@ -190,8 +230,19 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Check if the username or email already exists
         if (username_exists($username) || email_exists($email)) $this->response(['success' => 0, 'message' => esc_html__('Username and / or email already exist.', 'listdom')]);
 
+        // Role Restriction
+        $role = isset($_POST['lsd_role']) ? sanitize_text_field($_POST['lsd_role']) : '';
+        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+
         // Create the user
-        $user_id = wp_create_user($username, $password, $email);
+        $user_data = [
+            'user_login' => $username,
+            'user_pass'  => $password,
+            'user_email' => $email,
+        ];
+
+        if ($role) $user_data['role'] = $role;
+        $user_id = wp_insert_user($user_data);
 
         // Check for errors
         if (is_wp_error($user_id)) $this->response(['success' => 0, 'message' => esc_html($user_id->get_error_message())]);

@@ -25,75 +25,120 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.lsdi-add-plus:before {
+.lsdi-account:before {
   content: "\e900";
 }
-.lsdi-add-plus-circle:before {
+.lsdi-add-plus:before {
   content: "\e901";
 }
-.lsdi-ai-search:before {
+.lsdi-add-plus-circle:before {
   content: "\e902";
 }
-.lsdi-bank:before {
+.lsdi-advanced:before {
   content: "\e903";
 }
-.lsdi-card-exchange:before {
+.lsdi-ai-search:before {
   content: "\e904";
 }
-.lsdi-file-edit-pencil:before {
+.lsdi-api:before {
   content: "\e905";
 }
-.lsdi-frontend-dashboard:before {
+.lsdi-bank:before {
   content: "\e906";
 }
-.lsdi-label-important:before {
+.lsdi-card-exchange:before {
   content: "\e907";
 }
-.lsdi-list-view:before {
+.lsdi-checkmark-circle:before {
   content: "\e908";
 }
-.lsdi-location:before {
+.lsdi-customizer:before {
   content: "\e909";
 }
-.lsdi-login-method:before {
+.lsdi-dashboard-circle-edit:before {
   content: "\e90a";
 }
-.lsdi-menu-square:before {
+.lsdi-file-edit-pencil:before {
   content: "\e90b";
 }
-.lsdi-payment:before {
+.lsdi-frontend-dashboard:before {
   content: "\e90c";
 }
-.lsdi-paypal:before {
+.lsdi-general:before {
   content: "\e90d";
 }
-.lsdi-pencil-edit:before {
+.lsdi-group-items:before {
   content: "\e90e";
 }
-.lsdi-property-edit:before {
+.lsdi-label-important:before {
   content: "\e90f";
 }
-.lsdi-right-arrow:before {
+.lsdi-layout:before {
   content: "\e910";
 }
-.lsdi-search-area:before {
+.lsdi-list-view:before {
   content: "\e911";
 }
-.lsdi-second-bracket-square:before {
+.lsdi-location:before {
   content: "\e912";
 }
-.lsdi-stars:before {
+.lsdi-login-method:before {
   content: "\e913";
 }
-.lsdi-stripe:before {
+.lsdi-map-pinpoint:before {
   content: "\e914";
 }
-.lsdi-tag:before {
+.lsdi-menu-square:before {
   content: "\e915";
 }
-.lsdi-user-circle:before {
+.lsdi-move-left:before {
   content: "\e916";
 }
-.lsdi-wizard:before {
+.lsdi-payment:before {
   content: "\e917";
+}
+.lsdi-paypal:before {
+  content: "\e918";
+}
+.lsdi-pencil-edit:before {
+  content: "\e919";
+}
+.lsdi-property-edit:before {
+  content: "\e91a";
+}
+.lsdi-reset:before {
+  content: "\e91b";
+}
+.lsdi-right-arrow:before {
+  content: "\e91c";
+}
+.lsdi-search:before {
+  content: "\e91d";
+}
+.lsdi-search-area:before {
+  content: "\e91e";
+}
+.lsdi-second-bracket-square:before {
+  content: "\e91f";
+}
+.lsdi-sort-by-up:before {
+  content: "\e920";
+}
+.lsdi-stars:before {
+  content: "\e921";
+}
+.lsdi-stripe:before {
+  content: "\e922";
+}
+.lsdi-structure-check:before {
+  content: "\e923";
+}
+.lsdi-tag:before {
+  content: "\e924";
+}
+.lsdi-user-circle:before {
+  content: "\e925";
+}
+.lsdi-wizard:before {
+  content: "\e926";
 }

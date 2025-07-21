@@ -47,6 +47,9 @@ $gallery_method = $dashboard ? ($this->settings['submission_gallery_method'] ?? 
 if (!is_user_logged_in()) $gallery_method = 'uploader';
 
 $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_size'] ?? '') : '';
+
+$related = get_post_meta($post->ID, 'lsd_related_listings', true);
+if (!is_array($related)) $related = [];
 ?>
 <div class="lsd-metabox">
 
@@ -77,7 +80,7 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
     </div>
     <?php endif; ?>
 
-    <?php if (!$dashboard || $dashboard->is_enabled('price')): ?>
+    <?php if ((!$dashboard || $dashboard->is_enabled('price')) && LSD_Components::pricing()): ?>
     <div class="lsd-form-group lsd-no-border lsd-mt-0 lsd-mb-0 lsd-form-group-price lsd-listing-module-price">
         <div class="lsd-form-row">
             <div class="lsd-col-2"></div>
@@ -143,11 +146,32 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
     </div>
     <?php endif; ?>
 
-    <?php if (!$dashboard || $dashboard->is_enabled('availability')): ?>
+    <?php if ((!$dashboard || $dashboard->is_enabled('availability')) && LSD_Components::work_hours()): ?>
     <div class="lsd-form-group lsd-no-border lsd-mt-0 lsd-listing-module-availability">
         <div class="lsd-form-row">
             <div class="lsd-col-2"></div>
-            <div class="lsd-col-8"><h3 class="lsd-mt-0"><?php esc_html_e('Work Hours', 'listdom'); ?></h3></div>
+            <div class="lsd-col-8 lsd-flex lsd-flex-row lsd-flex-content-start lsd-flex-items-center lsd-gap-3">
+                <?php if ((new LSD_AI())->has_profile() && get_current_user_id()): ?>
+                <div class="lsd-inline-popup-wrapper lsd-no-button-styles">
+                    <button type="button" class="button lsd-inline-popup-trigger" data-focus="#lsd_ava_ai_text" data-for="#lsd-availability-ai-popup" id="lsd_ava_ai_open"><i class="listdom-icon lsdi-stars"></i></button>
+                    <div id="lsd-availability-ai-popup" class="lsd-inline-popup-content">
+                        <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-3">
+                            <div>
+                                <?php echo LSD_Form::label(['for' => 'lsd_ava_ai_profile', 'title' => esc_html__('AI Profile', 'listdom'), 'class' => 'lsd-d-block lsd-mb-2']); ?>
+                                <?php echo LSD_Form::ai_profiles(['id' => 'lsd_ava_ai_profile']); ?>
+                            </div>
+                            <div>
+                                <textarea class="lsd-d-block" title="" id="lsd_ava_ai_text" rows="5" maxlength="200" placeholder="<?php esc_attr_e('e.g. Mon-Fri 9 AM - 5 PM, Sat off', 'listdom'); ?>"></textarea>
+                            </div>
+                            <div>
+                                <button type="button" class="button button-primary" id="lsd_ava_ai_generate"><i class="listdom-icon lsdi-stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <h3 class="lsd-mt-0 lsd-mb-0"><?php esc_html_e('Work Hours', 'listdom'); ?></h3>
+            </div>
         </div>
         <?php foreach (LSD_Main::get_weekdays() as $weekday): $daycode = $weekday['code']; ?>
         <div class="lsd-form-row" id="lsd-ava-<?php echo esc_attr($daycode); ?>">
@@ -167,6 +191,56 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
         </div>
         <?php endforeach; ?>
     </div>
+    <?php if ((new LSD_AI())->has_profile() && get_current_user_id()): ?>
+        <script>
+        jQuery(document).ready(function($)
+        {
+            const $popup = $('#lsd-availability-ai-modal');
+            $('#lsd_ava_ai_generate').on('click', function()
+            {
+                const ai_profile = $('#lsd_ava_ai_profile').val();
+                const text = $('#lsd_ava_ai_text').val();
+
+                const $btn = $(this);
+                $btn.prop('disabled', true);
+
+                $.ajax({
+                    type: 'POST',
+                    url: ajaxurl,
+                    data: {
+                        action: 'lsd_ai_availability',
+                        ai_profile: ai_profile,
+                        text: text,
+                        _wpnonce: '<?php echo wp_create_nonce('lsd_ai_availability'); ?>'
+                    },
+                    dataType: 'json'
+                }).done(function(response)
+                {
+                    $btn.prop('disabled', false);
+                    if (response.success === 1 && typeof response.availability === 'object')
+                    {
+                        for (const day in response.availability)
+                        {
+                            if (!response.availability.hasOwnProperty(day)) continue;
+
+                            const item = response.availability[day];
+
+                            $('#lsd_ava'+day).val(item.hours || '');
+                            $('#lsd-ava-'+day+' .lsd-ava-off input[type=checkbox]')
+                                .prop('checked', item.off)
+                                .trigger('change');
+                        }
+
+                        $popup.hide();
+                    }
+                }).fail(function()
+                {
+                    $btn.prop('disabled', false);
+                });
+            });
+        });
+        </script>
+    <?php endif; ?>
     <?php endif; ?>
 
     <?php if (!$dashboard || $dashboard->is_enabled('contact')): ?>
@@ -247,7 +321,7 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
                     'textarea_name' => 'lsd[remark]',
                     'textarea_rows' => 6,
                     'quicktags' => false,
-                    'media_buttons' => false,
+                    'media_buttons' => true,
                 ]); ?>
                 <p class="description"><?php esc_html_e("It will show to the visitors in a different style so you can use it as remark or an ad remark!", 'listdom'); ?></p>
             </div>
@@ -344,6 +418,29 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
                     </div>
                 </div>
             </li>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if ((!$dashboard || $dashboard->is_enabled('related')) && LSD_Components::related()): ?>
+    <div class="lsd-form-group lsd-no-border lsd-mt-0">
+        <div class="lsd-form-row">
+            <div class="lsd-col-2"></div>
+            <div class="lsd-col-8">
+                <h3 class="lsd-my-0"><?php esc_html_e('Related Listings', 'listdom'); ?><?php $dashboard && $dashboard->required_html('related_listings'); ?></h3>
+                <p class="description lsd-mb-4 lsd-mt-0"><?php echo esc_html__("Manual related listing selection. By selecting a listing here it will override the related listing settings in the single listing settings.", 'listdom'); ?> </p>
+
+                <?php echo LSD_Form::autosuggest([
+                    'source' => LSD_Base::PTYPE_LISTING,
+                    'name' => 'lsd[related_listings]',
+                    'id' => 'lsd_related_listing_manual_selection',
+                    'input_id' => 'lsd_related_listing_manual_selection_input',
+                    'suggestions' => 'lsd_related_listing_manual_selection_suggestion',
+                    'values' => $related,
+                    'max_items' => 20,
+                    'placeholder' => esc_html__("Enter at least 3 characters of the Listing's title ...", 'listdom'),
+                ]); ?>
+            </div>
         </div>
     </div>
     <?php endif; ?>

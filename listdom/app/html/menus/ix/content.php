@@ -19,7 +19,7 @@ switch($this->tab)
         $this->include_html_file('menus/ix/tabs/dummy-data.php');
         break;
 
-    case 'excel' && !class_exists(\LSDPACEXL\Base::class):
+    case $this->tab === 'excel' && !class_exists(\LSDPACEXL\Base::class):
 
         $this->include_html_file('menus/ix/tabs/excel.php');
         break;

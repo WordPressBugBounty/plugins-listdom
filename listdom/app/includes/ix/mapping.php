@@ -53,7 +53,7 @@ class LSD_IX_Mapping extends LSD_IX
                 'type' => 'text',
                 'mandatory' => false,
                 'description' => esc_html__("A text field should be mapped. Valid values are publish, trash, draft, and pending. The default value is publish.", 'listdom'),
-                'default' => [$default, 'email'],
+                'default' => [$default, 'text'],
             ],
             'lsd_price' => [
                 'label' => esc_html__('Price', 'listdom'),
@@ -230,7 +230,7 @@ class LSD_IX_Mapping extends LSD_IX
 
             $mapping_type = in_array($type, ['number', 'email', 'url']) ? $type : 'text';
 
-            $fields['lsd_attribute_' . $attribute->term_id] = [
+            $fields['lsd_attribute_' . $attribute->slug] = [
                 'label' => $attribute->name,
                 'type' => $mapping_type,
                 'mandatory' => false,

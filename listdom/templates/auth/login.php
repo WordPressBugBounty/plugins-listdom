@@ -3,6 +3,7 @@
 defined('ABSPATH') || die();
 
 /** @var string $redirect */
+/** @var string $role */
 
 // User is Already Logged-in
 if (is_user_logged_in()) return '';
@@ -27,14 +28,15 @@ $assets = new LSD_Assets();
 $assets->footer('<script>
 jQuery(document).ready(function()
 {
-    jQuery("#lsd-login-form").listdomLoginForm({
+    jQuery("#lsd-login").listdomLoginForm(
+    {
         ajax_url: "' . admin_url('admin-ajax.php') . '",
         nonce: "' . wp_create_nonce('lsd_login') . '"
     });
     
     // Adding placeholders via jQuery
-    jQuery("#lsd-login-form #user_login").attr("placeholder", "' . $username_placeholder . '");
-    jQuery("#lsd-login-form #user_pass").attr("placeholder", "' . $password_placeholder . '");
+    jQuery("#lsd-login #user_login").attr("placeholder", "' . esc_js($username_placeholder) . '");
+    jQuery("#lsd-login #user_pass").attr("placeholder", "' . esc_js($password_placeholder) . '");
 });
 </script>');
 ?>
@@ -54,6 +56,11 @@ jQuery(document).ready(function()
                 'placeholder_password' => $password_placeholder
             ]); ?>
             <?php LSD_Form::nonce('lsd_login','lsd_login'); ?>
+            <?php if (trim($role)) echo LSD_Form::hidden([
+                'name' => 'lsd_role',
+                'id' => 'lsd_role',
+                'value' => $role,
+            ]); ?>
         </div>
     </form>
 </div>

@@ -112,6 +112,8 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                         case 'price':
 
+                            if (!LSD_Components::pricing()) continue 2;
+
                             if ($method === 'dropdown-plus') $keys = ['sf-att-' . $f['key'] . '-grq'];
                             else if ($method === 'mm-input' || $method === 'range')
                             {
@@ -124,6 +126,8 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                             break;
 
                         case 'address':
+
+                            if (!LSD_Components::map()) continue 2;
 
                             $keys = ['sf-att-' . $f['key'] . '-lk'];
                             break;

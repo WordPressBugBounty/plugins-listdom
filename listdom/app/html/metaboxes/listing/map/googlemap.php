@@ -35,6 +35,50 @@ jQuery(document).ready(function($)
             zoom: zoomlevel
         });
 
+        // Initialize Google Places Autocomplete if Places library is available
+        if (typeof google.maps.places !== 'undefined')
+        {
+            const input = document.getElementById('lsd_object_type_address');
+            const autocomplete = new google.maps.places.Autocomplete(input);
+
+            autocomplete.addListener('place_changed', function ()
+            {
+                const place = autocomplete.getPlace();
+                if (place.geometry)
+                {
+                    const latitude = $('#lsd_object_type_latitude');
+                    const longitude = $('#lsd_object_type_longitude');
+
+                    latitude.val(place.geometry.location.lat());
+                    longitude.val(place.geometry.location.lng());
+
+                    latitude.trigger('change');
+                }
+            });
+        }
+        // Address Changed Manually
+        else
+        {
+            $('#lsd_object_type_address').on('change', function ()
+            {
+                const geocoder = new google.maps.Geocoder();
+                const address = $('#lsd_object_type_address').val();
+                geocoder.geocode({'address': address}, function (results, status)
+                {
+                    if (status === 'OK')
+                    {
+                        const latitude = $('#lsd_object_type_latitude');
+                        const longitude = $('#lsd_object_type_longitude');
+
+                        latitude.val(results[0].geometry.location.lat());
+                        longitude.val(results[0].geometry.location.lng());
+
+                        latitude.trigger('change');
+                    }
+                });
+            });
+        }
+
         // Define the Marker
         const marker = new google.maps.Marker(
         {
@@ -234,26 +278,6 @@ jQuery(document).ready(function($)
             drawingManager.setMap(null);
             if(typeof overlay !== 'undefined' && typeof overlay.setMap === 'function') overlay.setMap(null);
         }
-
-        // Address Changed Manually
-        $('#lsd_object_type_address').on('change', function ()
-        {
-            const geocoder = new google.maps.Geocoder();
-            const address = $('#lsd_object_type_address').val();
-            geocoder.geocode({'address': address}, function(results, status)
-            {
-                if(status === 'OK')
-                {
-                    const latitude = $('#lsd_object_type_latitude');
-                    const longitude = $('#lsd_object_type_longitude');
-
-                    latitude.val(results[0].geometry.location.lat());
-                    longitude.val(results[0].geometry.location.lng());
-
-                    latitude.trigger('change');
-                }
-            });
-        });
 
         // Latitude and Longitude Changed Manually
         $('#lsd_object_type_latitude, #lsd_object_type_longitude').on('change', function()

@@ -18,32 +18,36 @@ $attributes = LSD_Main::get_attributes_details();
 // Walker
 $walker = new LSD_Walker_Taxonomy();
 ?>
-<div class="lsd-metabox lsd-metabox-filter-options">
-    <p class="description lsd-m-4"><?php esc_html_e('Use the options below to filter the listings you want to display with this shortcode.', 'listdom'); ?></p>
+<h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Filter Options", 'listdom'); ?></h3>
+<p class="description lsd-mb-4 lsd-mt-3"><?php echo esc_html__("Filter which listings appear based on category, location, tags, fields, rank, and more.", 'listdom'); ?> </p>
+<div id="lsd_metabox_filter_options" class="lsd-metabox lsd-metabox-filter-options">
 
     <?php if (!class_exists(LSDADDAPS::class) && !class_exists(\LSDPACAPS\Base::class)): ?>
-    <div class="lsd-m-4"><?php echo LSD_Base::alert(sprintf(esc_html__('Did you know that with the %s add-on, you can customize the matching logic for taxonomies?', 'listdom'), '<strong>'.esc_html__('Advanced Portal Search', 'listdom').'</strong>')); ?></div>
+    <div class="lsd-my-4"><?php echo LSD_Base::alert(sprintf(esc_html__('Did you know that with the %s add-on, you can customize the matching logic for taxonomies?', 'listdom'), '<strong>'.esc_html__('Advanced Portal Search', 'listdom').'</strong>')); ?></div>
     <?php endif; ?>
 
-    <div class="lsd-accordion-title lsd-accordion-active">
-        <div class="lsd-flex lsd-flex-row lsd-py-2">
-            <h3><?php esc_html_e('Categories', 'listdom'); ?></h3>
-            <div class="lsd-accordion-icons">
-                <i class="lsd-icon fa fa-plus"></i>
-                <i class="lsd-icon fa fa-minus"></i>
-            </div>
-        </div>
-    </div>
-    <div class="lsd-accordion-panel lsd-accordion-open">
+    <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex" data-for=".lsd-tab-switcher-content-filter-options">
+        <li data-tab="categories" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Categories', 'listdom'); ?></a></li>
+        <li data-tab="locations"><a href="#"><?php esc_html_e('Locations', 'listdom'); ?></a></li>
+        <li data-tab="tags"><a href="#"><?php esc_html_e('Tags', 'listdom'); ?></a></li>
+        <li data-tab="features"><a href="#"><?php esc_html_e('Features', 'listdom'); ?></a></li>
+        <li data-tab="labels"><a href="#"><?php esc_html_e('Labels', 'listdom'); ?></a></li>
+        <li data-tab="custom-fields"><a href="#"><?php esc_html_e('Custom Fields', 'listdom'); ?></a></li>
+        <li data-tab="authors"><a href="#"><?php esc_html_e('Authors', 'listdom'); ?></a></li>
+
+        <?php do_action('lsd_shortcode_filter_options_tab'); ?>
+    </ul>
+
+    <div class="lsd-tab-switcher-content lsd-tab-switcher-content-filter-options lsd-tab-switcher-content-active" id="lsd-tab-switcher-categories-content">
         <div class="lsd-row">
             <div class="lsd-col-12">
-                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" data-for=".lsd-tab-switcher-content-category">
+                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-level-5-menu" data-for=".lsd-tab-switcher-content-category">
                     <li data-tab="include" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Include', 'listdom'); ?></a></li>
                     <li data-tab="exclude" class=""><a href="#"><?php esc_html_e('Exclude', 'listdom'); ?></a></li>
                 </ul>
 
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-category lsd-tab-switcher-content-active" id="lsd-tab-switcher-include-content">
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you don't want to filter the listings by category, simply leave the options unselected.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you don't want to filter the listings by category, simply leave the options unselected.", 'listdom'); ?></p>
                     <div class="lsd-categories">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_CATEGORY, [
                             'id' => 'lsd_include_' . LSD_Base::TAX_CATEGORY,
@@ -57,7 +61,7 @@ $walker = new LSD_Walker_Taxonomy();
                 </div>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-category lsd-alert-no-mb" id="lsd-tab-switcher-exclude-content">
                     <?php if (LSD_Base::isPro()): ?>
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a category it will be excluded from shortcode results.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you add a category it will be excluded from shortcode results.", 'listdom'); ?></p>
                     <div class="lsd-categories">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_CATEGORY, [
                             'id' => 'lsd_exclude_'.LSD_Base::TAX_CATEGORY,
@@ -74,25 +78,16 @@ $walker = new LSD_Walker_Taxonomy();
             </div>
         </div>
     </div>
-    <div class="lsd-accordion-title">
-        <div class="lsd-flex lsd-flex-row lsd-py-2">
-            <h3><?php esc_html_e('Locations', 'listdom'); ?></h3>
-            <div class="lsd-accordion-icons">
-                <i class="lsd-icon fa fa-plus"></i>
-                <i class="lsd-icon fa fa-minus"></i>
-            </div>
-        </div>
-    </div>
-    <div class="lsd-accordion-panel">
+    <div class="lsd-tab-switcher-content lsd-tab-switcher-content-filter-options" id="lsd-tab-switcher-locations-content">
         <div class="lsd-row">
             <div class="lsd-col-12">
-                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" data-for=".lsd-tab-switcher-content-location">
+                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-level-5-menu" data-for=".lsd-tab-switcher-content-location">
                     <li data-tab="include-locations" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Include', 'listdom'); ?></a></li>
                     <li data-tab="exclude-locations" class=""><a href="#"><?php esc_html_e('Exclude', 'listdom'); ?></a></li>
                 </ul>
 
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-location lsd-tab-switcher-content-active" id="lsd-tab-switcher-include-locations-content">
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a location it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you add a location it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
                     <div class="lsd-locations">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_LOCATION, [
                             'id' => 'lsd_include_'.LSD_Base::TAX_LOCATION,
@@ -106,7 +101,7 @@ $walker = new LSD_Walker_Taxonomy();
                 </div>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-location lsd-alert-no-mb" id="lsd-tab-switcher-exclude-locations-content">
                     <?php if(LSD_Base::isPro()): ?>
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a location it will be excluded from shortcode results.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you add a location it will be excluded from shortcode results.", 'listdom'); ?></p>
                     <div class="lsd-locations">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_LOCATION, [
                             'id' => 'lsd_exclude_'.LSD_Base::TAX_LOCATION,
@@ -123,25 +118,16 @@ $walker = new LSD_Walker_Taxonomy();
             </div>
         </div>
     </div>
-    <div class="lsd-accordion-title">
-        <div class="lsd-flex lsd-flex-row lsd-py-2">
-            <h3><?php esc_html_e('Tags', 'listdom'); ?></h3>
-            <div class="lsd-accordion-icons">
-                <i class="lsd-icon fa fa-plus"></i>
-                <i class="lsd-icon fa fa-minus"></i>
-            </div>
-        </div>
-    </div>
-    <div class="lsd-accordion-panel">
-        <div class="lsd-form-row">
+    <div class="lsd-tab-switcher-content lsd-tab-switcher-content-filter-options" id="lsd-tab-switcher-tags-content">
+        <div class="lsd-form-row lsd-m-0">
             <div class="lsd-col-12">
-                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" data-for=".lsd-tab-switcher-content-tag">
+                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-level-5-menu" data-for=".lsd-tab-switcher-content-tag">
                     <li data-tab="include-tags" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Include', 'listdom'); ?></a></li>
                     <li data-tab="exclude-tags" class=""><a href="#"><?php esc_html_e('Exclude', 'listdom'); ?></a></li>
                 </ul>
 
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-tag lsd-tab-switcher-content-active" id="lsd-tab-switcher-include-tags-content">
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a tag it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you add a tag it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
                     <div class="lsd-tags">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_TAG, [
                             'id' => 'lsd_include_' . LSD_Base::TAX_TAG,
@@ -155,7 +141,7 @@ $walker = new LSD_Walker_Taxonomy();
                 </div>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-tag lsd-alert-no-mb" id="lsd-tab-switcher-exclude-tags-content">
                     <?php if (LSD_Base::isPro()): ?>
-                        <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a tag it will be excluded from shortcode results.", 'listdom'); ?></p>
+                        <p class="description lsd-mb-2"><?php esc_html_e("If you add a tag it will be excluded from shortcode results.", 'listdom'); ?></p>
                         <div class="lsd-tags">
                             <?php echo LSD_Form::taxonomy(LSD_Base::TAX_TAG, [
                                 'id' => 'lsd_exclude_' . LSD_Base::TAX_TAG,
@@ -172,24 +158,15 @@ $walker = new LSD_Walker_Taxonomy();
             </div>
         </div>
     </div>
-    <div class="lsd-accordion-title">
-        <div class="lsd-flex lsd-flex-row lsd-py-2">
-            <h3><?php esc_html_e('Features', 'listdom'); ?></h3>
-            <div class="lsd-accordion-icons">
-                <i class="lsd-icon fa fa-plus"></i>
-                <i class="lsd-icon fa fa-minus"></i>
-            </div>
-        </div>
-    </div>
-    <div class="lsd-accordion-panel">
+    <div class="lsd-tab-switcher-content lsd-tab-switcher-content-filter-options" id="lsd-tab-switcher-features-content">
         <div class="lsd-row">
             <div class="lsd-col-12">
-                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" data-for=".lsd-tab-switcher-content-feature">
+                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-level-5-menu" data-for=".lsd-tab-switcher-content-feature">
                     <li data-tab="include-features" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Include', 'listdom'); ?></a></li>
                     <li data-tab="exclude-features" class=""><a href="#"><?php esc_html_e('Exclude', 'listdom'); ?></a></li>
                 </ul>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-feature lsd-tab-switcher-content-active" id="lsd-tab-switcher-include-features-content">
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a feature it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you add a feature it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
                     <div class="lsd-features">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_FEATURE, [
                             'id' => 'lsd_include_' . LSD_Base::TAX_FEATURE,
@@ -203,7 +180,7 @@ $walker = new LSD_Walker_Taxonomy();
                 </div>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-feature lsd-alert-no-mb" id="lsd-tab-switcher-exclude-features-content">
                 <?php if (LSD_Base::isPro()): ?>
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a feature it will be excluded from shortcode results.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you add a feature it will be excluded from shortcode results.", 'listdom'); ?></p>
                     <div class="lsd-features">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_FEATURE, [
                             'id' => 'lsd_exclude_' . LSD_Base::TAX_FEATURE,
@@ -220,24 +197,15 @@ $walker = new LSD_Walker_Taxonomy();
             </div>
         </div>
     </div>
-    <div class="lsd-accordion-title">
-        <div class="lsd-flex lsd-flex-row lsd-py-2">
-            <h3><?php esc_html_e('Labels', 'listdom'); ?></h3>
-            <div class="lsd-accordion-icons">
-                <i class="lsd-icon fa fa-plus"></i>
-                <i class="lsd-icon fa fa-minus"></i>
-            </div>
-        </div>
-    </div>
-    <div class="lsd-accordion-panel">
+    <div class="lsd-tab-switcher-content lsd-tab-switcher-content-filter-options" id="lsd-tab-switcher-labels-content">
         <div class="lsd-row">
             <div class="lsd-col-12">
-                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" data-for=".lsd-tab-switcher-content-label">
+                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-level-5-menu" data-for=".lsd-tab-switcher-content-label">
                     <li data-tab="include-labels" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Include', 'listdom'); ?></a></li>
                     <li data-tab="exclude-labels" class=""><a href="#"><?php esc_html_e('Exclude', 'listdom'); ?></a></li>
                 </ul>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-label lsd-tab-switcher-content-active" id="lsd-tab-switcher-include-labels-content">
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a label it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you add a label it will be included in the shortcode results. Leave it empty to include all of them.", 'listdom'); ?></p>
                     <div class="lsd-labels">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_LABEL, [
                             'id' => 'lsd_include_' . LSD_Base::TAX_LABEL,
@@ -251,7 +219,7 @@ $walker = new LSD_Walker_Taxonomy();
                 </div>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-label lsd-alert-no-mb" id="lsd-tab-switcher-exclude-labels-content">
                     <?php if (LSD_Base::isPro()): ?>
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add a label it will be excluded from shortcode results.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("If you add a label it will be excluded from shortcode results.", 'listdom'); ?></p>
                     <div class="lsd-locations">
                         <?php echo LSD_Form::taxonomy(LSD_Base::TAX_LABEL, [
                             'id' => 'lsd_exclude_' . LSD_Base::TAX_LABEL,
@@ -268,17 +236,7 @@ $walker = new LSD_Walker_Taxonomy();
             </div>
         </div>
     </div>
-
-    <div class="lsd-accordion-title">
-        <div class="lsd-flex lsd-flex-row lsd-py-2">
-            <h3><?php esc_html_e('Custom Fields', 'listdom'); ?></h3>
-            <div class="lsd-accordion-icons">
-                <i class="lsd-icon fa fa-plus"></i>
-                <i class="lsd-icon fa fa-minus"></i>
-            </div>
-        </div>
-    </div>
-    <div class="lsd-accordion-panel">
+    <div class="lsd-tab-switcher-content lsd-tab-switcher-content-filter-options" id="lsd-tab-switcher-custom-fields-content">
         <div class="lsd-row">
             <div class="lsd-col-12">
                 <p class="description lsd-mt-0 lsd-mb-4"><?php esc_html_e("If you want to filter listings based on custom fields, fill in the following fields. Otherwise, leave them empty to skip filtering.", 'listdom'); ?></p>
@@ -314,14 +272,14 @@ $walker = new LSD_Walker_Taxonomy();
                                                     'name' => 'lsd[filter]['.LSD_Base::TAX_ATTRIBUTE .'][' . esc_attr($attr['id']) .'-bt-min]',
                                                     'value' => $min,
                                                     'placeholder' => esc_html__('Min number', 'listdom'),
-                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id'])  . '-min',
+                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id']),
                                                 ]);
 
                                                 echo LSD_Form::number([
                                                     'name' => 'lsd[filter]['.LSD_Base::TAX_ATTRIBUTE .'][' . esc_attr($attr['id']) .'-bt-max]',
                                                     'value' => $max,
                                                     'placeholder' => esc_html__('Max number', 'listdom'),
-                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id'])  . '-max',
+                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id']) . '-max',
                                                 ]);
 
                                                 echo LSD_Form::hidden([
@@ -364,26 +322,16 @@ $walker = new LSD_Walker_Taxonomy();
             </div>
         </div>
     </div>
-
-    <div class="lsd-accordion-title">
-        <div class="lsd-flex lsd-flex-row lsd-py-2">
-            <h3><?php esc_html_e('Authors', 'listdom'); ?></h3>
-            <div class="lsd-accordion-icons">
-                <i class="lsd-icon fa fa-plus"></i>
-                <i class="lsd-icon fa fa-minus"></i>
-            </div>
-        </div>
-    </div>
-    <div class="lsd-accordion-panel">
+    <div class="lsd-tab-switcher-content lsd-tab-switcher-content-filter-options" id="lsd-tab-switcher-authors-content">
         <div class="lsd-row">
             <div class="lsd-col-12">
-                <ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" data-for=".lsd-tab-switcher-content-authors">
+                <ul class="lsd-tab-switcher lsd-level-5-menu lsd-sub-tabs lsd-flex" data-for=".lsd-tab-switcher-content-authors">
                     <li data-tab="include-authors" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Include', 'listdom'); ?></a></li>
                     <li data-tab="exclude-authors"><a href="#"><?php esc_html_e('Exclude', 'listdom'); ?></a></li>
                 </ul>
 
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-authors lsd-tab-switcher-content-active" id="lsd-tab-switcher-include-authors-content">
-                    <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("Don't select any option if you don't want to filter the listings by authors.", 'listdom'); ?></p>
+                    <p class="description lsd-mb-2"><?php esc_html_e("Don't select any option if you don't want to filter the listings by authors.", 'listdom'); ?></p>
                     <?php echo LSD_Form::autosuggest([
                         'source' => 'users',
                         'name' => 'lsd[filter][authors]',
@@ -399,7 +347,7 @@ $walker = new LSD_Walker_Taxonomy();
 
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-authors lsd-alert-no-mb" id="lsd-tab-switcher-exclude-authors-content">
                     <?php if (LSD_Base::isPro()): ?>
-                        <p class="description lsd-mt-4 lsd-mb-2"><?php esc_html_e("If you add an author, their listings will be excluded from the results.", 'listdom'); ?></p>
+                        <p class="description lsd-mb-2"><?php esc_html_e("If you add an author, their listings will be excluded from the results.", 'listdom'); ?></p>
                         <?php echo LSD_Form::autosuggest([
                             'source' => 'users',
                             'name' => 'lsd[exclude][authors]',

@@ -15,6 +15,7 @@
   --listdom-primary-button-hover-bg: ((primary_button_hover_bg_color)); /* Primary Button Hover Background Color */
   --listdom-primary-button-hover-bg-2: ((primary_button_hover_bg_color_2)); /* Primary Button Hover Background Color */
   --listdom-primary-button-hover-text: ((primary_button_hover_text_color)); /* Primary Button Hover Text Color */
+  --listdom-primary-button-padding: ((primary_button_padding)); /* Primary Button Padding */
   --listdom-primary-button-border: ((primary_button_border)); /* Primary Button Border */
   --listdom-primary-button-border-style: ((primary_button_border_style)); /* Primary Button Border Style */
   --listdom-primary-button-border-color: ((primary_button_border_color)); /* Primary Button Border Color */
@@ -36,6 +37,7 @@
   --listdom-search-button-hover-bg: ((search_button_hover_bg_color)); /* Search Button Hover Background Color */
   --listdom-search-button-hover-bg-2: ((search_button_hover_bg_color_2)); /* Search Button Hover Background Color */
   --listdom-search-button-hover-text: ((search_button_hover_text_color)); /* Search Button Hover Text Color */
+  --listdom-search-button-padding: ((search_button_padding)); /* Search Button Padding */
   --listdom-search-button-border: ((search_button_border)); /* Search Button Border */
   --listdom-search-button-border-style: ((search_button_border_style)); /* Search Button Border Style */
   --listdom-search-button-border-color: ((search_button_border_color)); /* Search Button Border Color */
@@ -57,6 +59,7 @@
   --listdom-pagination-button-hover-bg: ((pagination_button_hover_bg_color)); /* Pagination Button Hover Background Color */
   --listdom-pagination-button-hover-bg-2: ((pagination_button_hover_bg_color_2)); /* Pagination Button Hover Background Color */
   --listdom-pagination-button-hover-text: ((pagination_button_hover_text_color)); /* Pagination Button Hover Text Color */
+  --listdom-pagination-button-padding: ((pagination_button_padding)); /* Pagination Button Padding */
   --listdom-pagination-button-border: ((pagination_button_border)); /* Pagination Button Border */
   --listdom-pagination-button-border-style: ((pagination_button_border_style)); /* Pagination Button Border Style */
   --listdom-pagination-button-border-color: ((pagination_button_border_color)); /* Pagination Button Border Color */
@@ -78,6 +81,7 @@
   --listdom-secondary-button-hover-bg: ((secondary_button_hover_bg_color)); /* secondary Button Hover Background Color */
   --listdom-secondary-button-hover-bg-2: ((secondary_button_hover_bg_color_2)); /* secondary Button Hover Background Color */
   --listdom-secondary-button-hover-text: ((secondary_button_hover_text_color)); /* secondary Button Hover Text Color */
+  --listdom-secondary-button-padding: ((secondary_button_padding)); /* Secondary Button Padding */
   --listdom-secondary-button-border: ((secondary_button_border)); /* secondary Button Border */
   --listdom-secondary-button-border-style: ((secondary_button_border_style)); /* secondary Button Border Style */
   --listdom-secondary-button-border-color: ((secondary_button_border_color)); /* secondary Button Border Color */
@@ -99,6 +103,7 @@
   --listdom-solid-button-hover-bg: ((solid_button_hover_bg_color)); /* Solid Button Hover Background Color */
   --listdom-solid-button-hover-bg-2: ((solid_button_hover_bg_color_2)); /* Solid Button Hover Background Color */
   --listdom-solid-button-hover-text: ((solid_button_hover_text_color)); /* Solid Button Hover Text Color */
+  --listdom-solid-button-padding: ((solid_button_padding)); /* Solid Button Padding */
   --listdom-solid-button-border: ((solid_button_border)); /* Solid Button Border */
   --listdom-solid-button-border-style: ((solid_button_border_style)); /* Solid Button Border Style */
   --listdom-solid-button-border-color: ((solid_button_border_color)); /* Solid Button Border Color */

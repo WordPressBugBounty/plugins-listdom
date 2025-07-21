@@ -1,0 +1,56 @@
+<?php
+// no direct access
+defined('ABSPATH') || die();
+
+/** @var LSD_PTypes_Shortcode $this */
+/** @var array $options */
+
+$mosaic = $options['mosaic'] ?? [];
+?>
+<h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Layout", 'listdom'); ?></h3>
+<p class="description lsd-mb-4 lsd-mt-3"><?php echo esc_html__("Control listing limit, pagination, and how single listing pages open from the results.", 'listdom'); ?> </p>
+<div class="lsd-form-row">
+    <div class="lsd-col-2"><?php echo LSD_Form::label([
+        'title' => esc_html__('Listings Per Row', 'listdom'),
+        'for' => 'lsd_display_options_skin_mosaic_columns',
+    ]); ?></div>
+    <div class="lsd-col-6">
+        <?php echo LSD_Form::select([
+            'id' => 'lsd_display_options_skin_mosaic_columns',
+            'name' => 'lsd[display][mosaic][columns]',
+            'options' => ['2'=>2],
+            'value' => $mosaic['columns'] ?? '2'
+        ]); ?>
+    </div>
+</div>
+<div class="lsd-form-row">
+    <div class="lsd-col-2"><?php echo LSD_Form::label([
+        'title' => esc_html__('Limit', 'listdom'),
+        'for' => 'lsd_display_options_skin_mosaic_limit',
+    ]); ?></div>
+    <div class="lsd-col-6">
+        <?php echo LSD_Form::text([
+            'id' => 'lsd_display_options_skin_mosaic_limit',
+            'name' => 'lsd[display][mosaic][limit]',
+            'value' => $mosaic['limit'] ?? '12'
+        ]); ?>
+        <p class="description"><?php echo sprintf(esc_html__("The Limit should be an even number. For example, 2, 4, 6, 8, etc.", 'listdom'), '<strong>'.esc_html__('Listings Per Row', 'listdom').'</strong>', '<strong>'.esc_html__('Listings Per Row', 'listdom').'</strong>'); ?></p>
+    </div>
+</div>
+<div class="lsd-form-row">
+    <div class="lsd-col-2"><?php echo LSD_Form::label([
+        'title' => esc_html__('Pagination Method', 'listdom'),
+        'for' => 'lsd_display_options_skin_mosaic_pagination',
+    ]); ?></div>
+    <div class="lsd-col-6">
+        <?php echo LSD_Form::select([
+            'id' => 'lsd_display_options_skin_mosaic_pagination',
+            'name' => 'lsd[display][mosaic][pagination]',
+            'value' => $mosaic['pagination'] ?? (isset($mosaic['load_more']) && $mosaic['load_more'] == 0 ? 'disabled' : 'loadmore'),
+            'options' => LSD_Base::get_pagination_methods(),
+        ]); ?>
+        <p class="description"><?php esc_html_e('Choose how to load additional listings more than the default limit.', 'listdom'); ?></p>
+    </div>
+</div>
+
+<?php $this->field_listing_link('mosaic', $mosaic);

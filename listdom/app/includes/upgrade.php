@@ -37,6 +37,7 @@ class LSD_Upgrade extends LSD_Base
         if (version_compare($version, '3.5.0', '<')) $this->v350();
         if (version_compare($version, '3.8.0', '<')) $this->v380();
         if (version_compare($version, '4.1.0', '<')) $this->v410();
+        if (version_compare($version, '4.5.0', '<')) $this->v450();
     }
 
     private function socials()
@@ -683,5 +684,43 @@ class LSD_Upgrade extends LSD_Base
         
         Regards,
         #site_name#');
+    }
+
+    private function v450()
+    {
+        // Database
+        $db = new LSD_db();
+
+        $metas = $db->select(
+            "SELECT `meta_id`, `post_id`, `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attributes' AND `meta_value`!='a:0:{}' ORDER BY `meta_id` DESC LIMIT 1000",
+            'loadAssocList'
+        );
+
+        $terms = get_terms([
+            'taxonomy' => LSD_Base::TAX_ATTRIBUTE,
+            'hide_empty' => false,
+        ]);
+
+        // Map Term ID to Slug
+        $attr_map = [];
+        foreach ($terms as $term) $attr_map[$term->term_id] = $term->slug;
+
+        foreach ($metas as $meta)
+        {
+            $values = maybe_unserialize($meta['meta_value']);
+            if (!is_array($values)) continue;
+
+            foreach ($values as $id => $val)
+            {
+                if (!is_numeric($id) || !isset($attr_map[$id])) continue;
+
+                $slug = $attr_map[$id];
+                if ($slug && !array_key_exists($slug, $values)) $values[$slug] = $val;
+
+                update_post_meta($meta['post_id'], 'lsd_attribute_'.$slug, $val);
+            }
+
+            update_post_meta($meta['post_id'], 'lsd_attributes', $values);
+        }
     }
 }

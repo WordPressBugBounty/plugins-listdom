@@ -54,6 +54,12 @@ class LSD_Entity_Attribute extends LSD_Base
         }
     }
 
+    public function slug(): string
+    {
+        $term = get_term($this->term_id);
+        return $term && isset($term->slug) ? $term->slug : '';
+    }
+
     public function icon()
     {
         return LSD_Taxonomies::icon($this->term_id);

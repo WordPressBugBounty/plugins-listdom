@@ -12,10 +12,10 @@ class LSD_API_Resources_Attribute extends LSD_API_Resource
         if (!is_array($values)) $values = [];
 
         $attributes = [];
-        foreach ($values as $attribute_id => $value)
+        foreach ($values as $slug => $value)
         {
             // Term
-            $term = get_term($attribute_id);
+            $term = get_term_by('slug', $slug);
 
             // Invalid Term
             if (!$term || !isset($term->term_id)) continue;
@@ -36,7 +36,7 @@ class LSD_API_Resources_Attribute extends LSD_API_Resource
             if (!$all_categories && (count($categories) && !isset($categories[$category->term_id]))) continue;
 
             $attributes[] = [
-                'id' => $attribute_id,
+                'id' => $term->term_id,
                 'name' => $term->name,
                 'value' => $value,
                 'type' => $type,

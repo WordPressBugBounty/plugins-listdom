@@ -24,6 +24,8 @@ class LSD_File extends LSD_Base
 
     public static function delete($path): bool
     {
+        if (!file_exists($path)) return true;
+
         return unlink($path);
     }
 

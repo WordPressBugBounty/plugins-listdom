@@ -19,6 +19,8 @@ class LSD_Element_Share extends LSD_Element
 
     public function get($post_id = null)
     {
+        if (!LSD_Components::socials()) return '';
+
         if (is_null($post_id))
         {
             global $post;

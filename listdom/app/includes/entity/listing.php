@@ -72,6 +72,9 @@ class LSD_Entity_Listing extends LSD_Entity
             update_post_meta($this->post->ID, 'lsd_attribute_' . $key, $attribute);
         }
 
+        // Related Listings
+        update_post_meta($this->post->ID, 'lsd_related_listings', isset($data['related_listings']) && is_array($data['related_listings']) ? $data['related_listings'] : []);
+
         // Listing Link
         update_post_meta($this->post->ID, 'lsd_link', isset($data['link']) && filter_var($data['link'], FILTER_VALIDATE_URL) ? esc_url_raw($data['link']) : '');
 
@@ -180,10 +183,10 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID);
     }
 
-    public function get_excerpt($limit = 15, $read_more = false)
+    public function get_excerpt($limit = 15, $read_more = false, $full = false)
     {
         $element = new LSD_Element_Excerpt();
-        return $element->get($this->post->ID, $limit, $read_more);
+        return $element->get($this->post->ID, $limit, $read_more, $full);
     }
 
     public function get_features($method = 'list', $show_icons = true, $enable_link = true, $list_style = 'per-row')
@@ -196,8 +199,8 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function get_tags($enable_link = true)
     {
-        $element = new LSD_Element_Tags();
-        return $element->get($this->post->ID, $enable_link);
+        $element = new LSD_Element_Tags($enable_link);
+        return $element->get($this->post->ID);
     }
 
     public function get_categories($args = true, $multiple_categories = false, $color_method = 'bg', $enable_link = true)
@@ -292,20 +295,24 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID, $icon);
     }
 
-    public function get_locations()
+    public function get_locations($args = [])
     {
-        $element = new LSD_Element_Locations();
+        $element = new LSD_Element_Locations($args);
         return $element->get($this->post->ID);
     }
 
     public function get_price($minimized = false)
     {
+        if (!LSD_Components::pricing()) return '';
+
         $element = new LSD_Element_Price();
         return $element->get($this->post->ID, $minimized);
     }
 
     public function get_price_class(): string
     {
+        if (!LSD_Components::pricing()) return '';
+
         $class = (int) get_post_meta($this->post->ID, 'lsd_price_class', true);
         if (!trim($class)) $class = 2;
 
@@ -341,6 +348,8 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function get_availability($oneday = false, $day = null)
     {
+        if (!LSD_Components::work_hours()) return '';
+
         $element = new LSD_Element_Availability($oneday, $day);
         return $element->get($this->post->ID);
     }
@@ -381,7 +390,17 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function get_share_buttons($layout = 'archive', $args = [])
     {
+        if (!LSD_Components::socials()) return '';
+
         $element = new LSD_Element_Share($layout, $args);
+        return $element->get($this->post->ID);
+    }
+
+    public function get_related_listings($args = [])
+    {
+        if (!LSD_Components::related()) return '';
+
+        $element = new LSD_Element_Related($args);
         return $element->get($this->post->ID);
     }
 
@@ -603,7 +622,7 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function get_children($limit = -1): array
     {
-        // Get Childs
+        // Get Children
         return get_posts([
             'post_type' => LSD_Base::PTYPE_LISTING,
             'posts_per_page' => $limit,

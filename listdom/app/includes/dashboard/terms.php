@@ -85,7 +85,7 @@ class LSD_Dashboard_Terms extends LSD_Base
         $terms = self::terms($a);
 
         $prefix = str_repeat($pre, $args['level']);
-        $output = '<ul ' . ($args['level'] > 0 ? 'class="lsd-children"' : '') . '>';
+        $output = '<ul class="' . ($args['level'] > 0 ? 'lsd-children ' : '') . ' lsd-fd-taxonomies-checkboxes">';
         foreach ($terms as $term)
         {
             $output .= '<li>';
@@ -122,7 +122,7 @@ class LSD_Dashboard_Terms extends LSD_Base
         $none_label = $args['none_label'] ?? '-----';
         $required = $args['required'] ?? false;
 
-        $output = '<select name="' . esc_attr($name) . ($multiple ? '[]' : '') . '" id="' . esc_attr($id) . '" class="' . esc_attr($class) . '" ' . ($multiple ? 'multiple' : '') . ' ' . ($required ? 'required' : '') . '>';
+        $output = '<select name="' . esc_attr($name) . ($multiple ? '[]' : '') . '" id="' . esc_attr($id) . '" class="lsd-fd-taxonomies-dropdown ' . esc_attr($class) . '" ' . ($multiple ? 'multiple' : '') . ' ' . ($required ? 'required' : '') . '>';
         if ($none) $output .= '<option class="level-0" value="">' . $none_label . '</option>';
 
         $output .= self::options($a, 0, $selected);

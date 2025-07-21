@@ -416,8 +416,15 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Listing Excerpt
         if (strpos($this->pattern, '{excerpt}') !== false)
         {
-            $contact_info = $this->excerpt();
-            $rendered = str_replace('{excerpt}', LSD_Kses::element($contact_info), $rendered);
+            $excerpt = $this->excerpt();
+            $rendered = str_replace('{excerpt}', LSD_Kses::element($excerpt), $rendered);
+        }
+
+        // Listing Related
+        if (strpos($this->pattern, '{related}') !== false)
+        {
+            $related = $this->related();
+            $rendered = str_replace('{related}', LSD_Kses::full($related), $rendered);
         }
 
         // Wrap the content
@@ -545,7 +552,9 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
     public function locations(): string
     {
-        $locations = $this->entity->get_locations();
+        $locations = $this->entity->get_locations([
+            'enable_link' => $this->details_page_options['elements']['locations']['enable_link'] ?? 1
+        ]);
 
         // Don't show anything when there is no locations!
         if (!trim($locations)) return '';
@@ -624,6 +633,8 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
     public function availability(): string
     {
+        if (!LSD_Components::work_hours()) return '';
+
         $availability = $this->entity->get_availability();
 
         // Don't show anything if nothing found
@@ -654,6 +665,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             'show_color' => $show_color,
             'multiple_categories' => $multiple,
             'color_method' => $color_method,
+            'enable_link' => $this->details_page_options['elements']['categories']['enable_link'] ?? 1,
         ]);
 
         // Don't show anything when there is no category!
@@ -741,7 +753,12 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $show_icons = $this->details_page_options['elements']['features']['show_icons'] ?? 0;
         $list_style = $this->details_page_options['elements']['features']['list_style'] ?? 'per-row';
 
-        $features = $this->entity->get_features('list', $show_icons, true, $list_style);
+        $features = $this->entity->get_features(
+            'list',
+            $show_icons,
+            $this->details_page_options['elements']['features']['enable_link'] ?? 1,
+            $list_style
+        );
 
         // Don't show anything when there is no features!
         if (!trim($features)) return '';
@@ -764,6 +781,8 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
     public function map(): string
     {
+        if (!LSD_Components::map()) return '';
+
         $map = $this->entity->get_map([
             'provider' => $this->details_page_options['elements']['map']['map_provider'] ?? LSD_Map_Provider::def(),
             'style' => $this->details_page_options['elements']['map']['style'] ?? null,
@@ -883,7 +902,10 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
     public function labels(): string
     {
-        $labels = $this->entity->get_labels();
+        $labels = $this->entity->get_labels(
+            'tags',
+            $this->details_page_options['elements']['labels']['enable_link'] ?? 1
+        );
 
         // Don't show anything when nothing found!
         if (!trim($labels)) return '';
@@ -905,6 +927,9 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
     public function price(): string
     {
+        // Pricing
+        if (!LSD_Components::pricing()) return '';
+
         $price = $this->entity->get_price();
 
         // Don't show anything when nothing found!
@@ -929,6 +954,8 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
     public function share(): string
     {
+        if (!LSD_Components::socials()) return '';
+
         $share = $this->entity->get_share_buttons('single');
 
         // Don't show anything when nothing found!
@@ -947,9 +974,33 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         return $output;
     }
 
+    public function related(): string
+    {
+        if (!LSD_Components::related()) return '';
+
+        $related = $this->entity->get_related_listings($this->details_page_options['elements']['related']);
+
+        // Don't show anything when nothing found!
+        if (!trim($related)) return '';
+
+        // Heading
+        $heading = isset($this->details_page_options['elements']['related']['custom_title']) && trim($this->details_page_options['elements']['related']['custom_title'])
+            ? $this->details_page_options['elements']['related']['custom_title']
+            : esc_html__('Related', 'listdom');
+
+        $output = '<div class="lsd-single-page-section lsd-single-page-section-related">';
+        if ($this->details_page_options['elements']['related']['show_title']) $output .= '<h2 class="lsd-single-page-section-title">' . $heading . '</h2>';
+        $output .= '<div class="lsd-single-related-box lsd-single-element lsd-single-related">' . $related . '</div>';
+        $output .= '</div>';
+
+        return $output;
+    }
+
     public function tags(): string
     {
-        $tags = $this->entity->get_tags();
+        $tags = $this->entity->get_tags(
+            $this->details_page_options['elements']['tags']['enable_link'] ?? 1
+        );
 
         // Don't show anything when there is no tag!
         if (!trim($tags)) return '';

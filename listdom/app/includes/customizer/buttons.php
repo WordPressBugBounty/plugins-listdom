@@ -11,7 +11,14 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                 'sub_title' => esc_html__("Define the button's appearance in normal state.", 'listdom'),
                 'divisions' => [
                     '_' => [
-                        'fields' => self::fields(),
+                        'fields' => self::fields([
+                            'padding' => [
+                                'top' => 6,
+                                'right' => 20,
+                                'bottom' => 6,
+                                'left' => 20,
+                            ],
+                        ]),
                     ],
                 ],
             ],
@@ -20,7 +27,7 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                 'sub_title' => esc_html__("Define the button's appearance in hover state, where 'hover' applies styling when the user moves the cursor over it.", 'listdom'),
                 'divisions' => [
                     '_' => [
-                        'fields' => self::fields(['bg1' => '#306be6'] , ['bg1', 'bg2', 'border', 'text']),
+                        'fields' => self::fields(['bg1' => '#306be6'], ['bg1', 'bg2', 'border', 'text']),
                     ],
                 ],
             ],
@@ -39,9 +46,35 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                         'inherit' => [
                             'key' => 'buttons.primary_button',
                             'text' => esc_html__('Inherit from General Button.', 'listdom'),
-                            'enabled' => 1,
+                            'enabled' => 0,
                         ],
-                        'groups' => $button_groups,
+                        'groups' => [
+                            'normal' => [
+                                'title' => esc_html__('Normal', 'listdom'),
+                                'sub_title' => esc_html__("Define the button's appearance in normal state.", 'listdom'),
+                                'divisions' => [
+                                    '_' => [
+                                        'fields' => self::fields([
+                                            'padding' => [
+                                                'top' => 9,
+                                                'right' => 20,
+                                                'bottom' => 9,
+                                                'left' => 20,
+                                            ],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                            'hover' => [
+                                'title' => esc_html__('Hover', 'listdom'),
+                                'sub_title' => esc_html__("Define the button's appearance in hover state, where 'hover' applies styling when the user moves the cursor over it.", 'listdom'),
+                                'divisions' => [
+                                    '_' => [
+                                        'fields' => self::fields(['bg1' => '#306be6'], ['bg1', 'bg2', 'border', 'text']),
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                     'pagination_button' => [
                         'title' => esc_html__('Pagination', 'listdom'),
@@ -49,9 +82,58 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                         'inherit' => [
                             'key' => 'buttons.primary_button',
                             'text' => esc_html__('Inherit from General Button.', 'listdom'),
-                            'enabled' => 1,
+                            'enabled' => 0,
                         ],
-                        'groups' => $button_groups,
+                        'groups' => [
+                            'normal' => [
+                                'title' => esc_html__('Normal', 'listdom'),
+                                'divisions' => [
+                                    '_' => [
+                                        'fields' => self::fields([
+                                            'bg1' => '#e6f7ff',
+                                            'bg2' => '#e6f7ff',
+                                            'text' => '#0ab0fe',
+                                            'border' => [
+                                                'style' => 'solid',
+                                                'color' => '#bceaff',
+                                                'top' => 1,
+                                                'left' => 1,
+                                                'right' => 1,
+                                                'bottom' => 1,
+                                                'radius' => 4,
+                                            ],
+                                            'padding' => [
+                                                'top' => 6,
+                                                'right' => 20,
+                                                'bottom' => 6,
+                                                'left' => 20,
+                                            ],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                            'hover' => [
+                                'title' => esc_html__('Hover', 'listdom'),
+                                'divisions' => [
+                                    '_' => [
+                                        'fields' => self::fields([
+                                            'bg1' => '#306be6',
+                                            'bg2' => '#306be6',
+                                            'text' => '#fff',
+                                            'border' => [
+                                                'style' => 'solid',
+                                                'color' => '#bceaff',
+                                                'top' => 1,
+                                                'left' => 1,
+                                                'right' => 1,
+                                                'bottom' => 1,
+                                                'radius' => 4,
+                                            ],
+                                        ], ['bg1', 'bg2', 'border', 'text']),
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                     'secondary_button' => [
                         'title' => esc_html__('Light', 'listdom'),
@@ -78,6 +160,12 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                                                 'bottom' => 1,
                                                 'radius' => 4,
                                             ],
+                                            'padding' => [
+                                                'top' => 6,
+                                                'right' => 20,
+                                                'bottom' => 6,
+                                                'left' => 20,
+                                            ],
                                         ]),
                                     ],
                                 ],
@@ -99,7 +187,7 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                                                 'bottom' => 1,
                                                 'radius' => 4,
                                             ],
-                                        ],['bg1', 'bg2', 'border', 'text']),
+                                        ], ['bg1', 'bg2', 'border', 'text']),
                                     ],
                                 ],
                             ],
@@ -130,6 +218,12 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                                                 'bottom' => 0,
                                                 'radius' => 4,
                                             ],
+                                            'padding' => [
+                                                'top' => 6,
+                                                'right' => 20,
+                                                'bottom' => 6,
+                                                'left' => 20,
+                                            ],
                                         ]),
                                     ],
                                 ],
@@ -151,7 +245,7 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                                                 'bottom' => 0,
                                                 'radius' => 4,
                                             ],
-                                        ],['bg1', 'bg2', 'border', 'text']),
+                                        ], ['bg1', 'bg2', 'border', 'text']),
                                     ],
                                 ],
                             ],
@@ -202,6 +296,16 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                     'align' => $defaults['typography']['align'] ?? 'center',
                     'size' => $defaults['typography']['size'] ?? 15,
                     'line_height' => $defaults['typography']['line_height'] ?? 32,
+                ],
+            ],
+            'padding' => [
+                'type' => 'padding',
+                'title' => esc_html__('Padding', 'listdom'),
+                'default' => [
+                    'top' => $defaults['padding']['top'] ?? 0,
+                    'right' => $defaults['padding']['right'] ?? 0,
+                    'bottom' => $defaults['padding']['bottom'] ?? 0,
+                    'left' => $defaults['padding']['left'] ?? 0,
                 ],
             ],
         ];

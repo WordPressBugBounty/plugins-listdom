@@ -5,8 +5,8 @@ function lsd_map($listings = [], $args = [])
     // Map Provider
     $provider = LSD_Map_Provider::get($args['provider'] ?? null);
 
-    if($provider === LSD_MP_GOOGLE) return lsd_googlemap($listings, $args);
-    elseif($provider === LSD_MP_LEAFLET) return lsd_leaflet($listings, $args);
+    if ($provider === LSD_MP_GOOGLE) return lsd_googlemap($listings, $args);
+    else if ($provider === LSD_MP_LEAFLET) return lsd_leaflet($listings, $args);
 
     return null;
 }

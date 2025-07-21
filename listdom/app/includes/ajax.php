@@ -15,6 +15,12 @@ class LSD_Ajax extends LSD_Base
         // Hierarchical Dropdowns
         add_action('wp_ajax_lsd_hierarchical_terms', [$this, 'terms']);
         add_action('wp_ajax_nopriv_lsd_hierarchical_terms', [$this, 'terms']);
+
+        // Availability by AI
+        add_action('wp_ajax_lsd_ai_availability', [$this, 'availability_ai']);
+
+        // Editor Content by AI
+        add_action('wp_ajax_lsd_ai_content', [$this, 'content_ai']);
     }
 
     public function search()
@@ -201,6 +207,46 @@ class LSD_Ajax extends LSD_Base
             'success' => 1,
             'found' => count($terms) ? 1 : 0,
             'items' => $items,
+        ]);
+    }
+
+    public function availability_ai()
+    {
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : '';
+
+        if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
+        if (!wp_verify_nonce($wpnonce, 'lsd_ai_availability')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
+
+        $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field($_POST['ai_profile']) : '';
+        $text = isset($_POST['text']) ? sanitize_text_field($_POST['text']) : '';
+
+        $ai = (new LSD_AI())->by_profile($ai_profile);
+        $availability = $ai ? $ai->availability($text) : [];
+
+        $this->response([
+            'success' => $ai ? 1 : 0,
+            'availability' => $availability,
+            'message' => $ai ? esc_html__('Availability generated successfully!', 'listdom') : esc_html__('The AI model is not configured. You can configure it in Listdom settings.', 'listdom'),
+        ]);
+    }
+
+    public function content_ai()
+    {
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : '';
+
+        if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
+        if (!wp_verify_nonce($wpnonce, 'lsd_ai_content')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
+
+        $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field($_POST['ai_profile']) : '';
+        $text = isset($_POST['text']) ? sanitize_text_field($_POST['text']) : '';
+
+        $ai = (new LSD_AI())->by_profile($ai_profile);
+        $content = $ai ? $ai->content($text) : '';
+
+        $this->response([
+            'success' => $ai ? 1 : 0,
+            'content' => $content,
+            'message' => $ai ? esc_html__('Content generated successfully!', 'listdom') : esc_html__('The AI model is not configured. You can configure it in Listdom settings.', 'listdom'),
         ]);
     }
 }

@@ -14,6 +14,8 @@ class LSD_Socials extends LSD_Base
 
     public function init()
     {
+        if (!LSD_Components::socials()) return;
+
         // Profile
         add_action('lsd_social_networks_profile_form', [$this, 'profile_form']);
         add_action('lsd_social_networks_profile_save', [$this, 'profile_save']);
@@ -84,6 +86,8 @@ class LSD_Socials extends LSD_Base
 
     public function profile_form($user)
     {
+        if (!LSD_Components::socials()) return;
+
         $networks = LSD_Options::socials();
         foreach ($networks as $network => $values)
         {
@@ -101,6 +105,8 @@ class LSD_Socials extends LSD_Base
 
     public function profile_save($user_id)
     {
+        if (!LSD_Components::socials()) return;
+
         $networks = LSD_Options::socials();
         foreach ($networks as $network => $values)
         {
@@ -120,6 +126,8 @@ class LSD_Socials extends LSD_Base
      */
     public function listing_form($listing, LSD_Shortcodes_Dashboard $dashboard = null)
     {
+        if (!LSD_Components::socials()) return;
+
         $networks = LSD_Options::socials();
         foreach ($networks as $network => $values)
         {
@@ -148,6 +156,8 @@ class LSD_Socials extends LSD_Base
      */
     public function listing_save(WP_Post $listing, array $data)
     {
+        if (!LSD_Components::socials()) return;
+
         // Social Data
         $data = isset($data['sc']) && is_array($data['sc']) ? $data['sc'] : [];
 
@@ -169,6 +179,8 @@ class LSD_Socials extends LSD_Base
 
     public function list(int $id, string $method = 'profile'): string
     {
+        if (!LSD_Components::socials()) return '';
+
         // Social Options
         $networks = LSD_Options::socials();
 
@@ -195,6 +207,8 @@ class LSD_Socials extends LSD_Base
 
     public function values(int $id, string $method = 'profile'): array
     {
+        if (!LSD_Components::socials()) return [];
+
         // Social Options
         $networks = LSD_Options::socials();
 

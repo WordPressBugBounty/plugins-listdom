@@ -76,9 +76,24 @@ class LSD_Element_Categories extends LSD_Element
 
     public function display(WP_Term $category): string
     {
-        $link = $this->enable_link ? esc_url(get_term_link($category->term_id)) : '#';
         $icon = $this->display_icon ? LSD_Taxonomies::icon($category->term_id) : '';
 
-        return '<span><a href="' . $link . '" ' . ($this->show_color ? LSD_Element_Categories::styles($category->term_id, $this->color_method) : '') . ' ' . lsd_schema()->category() . '>' . $icon . ($this->display_name ? esc_html($category->name) : '') . '</a></span>';
+        if ($this->enable_link) $inner = '<a href="' . esc_url(get_term_link($category->term_id)) . '" ' . ($this->show_color ? LSD_Element_Categories::styles($category->term_id, $this->color_method) : '') . ' ' . lsd_schema()->category() . '>' . $icon . ($this->display_name ? esc_html($category->name) : '') . '</a>';
+        else $inner = '<span class="lsd-single-term" ' . ($this->show_color ? LSD_Element_Categories::styles($category->term_id, $this->color_method) : '') . ' ' . lsd_schema()->category() . '>' . $icon . ($this->display_name ? esc_html($category->name) : '') . '</span>';
+
+        return '<span>' . $inner . '</span>';
+    }
+
+    protected function general_settings(array $data): string
+    {
+        $enable_link = isset($data['enable_link']) ? (int) $data['enable_link'] : 1;
+
+        return '<div>
+            <label for="lsd_elements_' . esc_attr($this->key) . '_enable_link">' . esc_html__('Enable Link To Archive', 'listdom') . '</label>
+            <select name="lsd[elements][' . esc_attr($this->key) . '][enable_link]" id="lsd_elements_' . esc_attr($this->key) . '_enable_link">
+                <option value="1" ' . ($enable_link === 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
+                <option value="0" ' . ($enable_link === 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
+            </select>
+        </div>';
     }
 }

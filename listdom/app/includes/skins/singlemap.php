@@ -26,4 +26,12 @@ class LSD_Skins_Singlemap extends LSD_Skins
             ? $this->skin_options['sidebar_default_state']
             : 'open_optional';
     }
+
+    public function output()
+    {
+        // No Map Component
+        if (!LSD_Components::map()) return '';
+
+        return parent::output();
+    }
 }

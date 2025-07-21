@@ -72,6 +72,14 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         // All Categories
         $all_categories = LSD_Taxonomies_Category::get_terms();
 
+        // Default Category Selection
+        $uncategorized_id = LSD_Main::get_uncategorized_category_id();
+        $selected = $category && isset($category->term_id)
+            ? $category->term_id
+            : (is_array($all_categories) && count($all_categories) === 1
+                ? $all_categories[0]->term_id
+                : ($uncategorized_id ?: null));
+
         // Security Nonce
         LSD_Form::nonce('lsd_listing_cpt', '_lsdnonce');
 
@@ -83,9 +91,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
             'id' => 'lsd_listing_category',
             'taxonomy' => LSD_Base::TAX_CATEGORY,
             'show_option_none' => '-----',
-            'selected' => $category && isset($category->term_id)
-                ? $category->term_id
-                : (is_array($all_categories) && count($all_categories) === 1 ? $all_categories[0]->term_id : null),
+            'selected' => $selected,
             'class' => 'widefat',
             'hierarchical' => 1,
             'orderby' => 'name',
@@ -101,7 +107,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
     public function add_form()
     {
         ?>
-        <div class="form-field">
+        <div class="form-field" id="lsd_icon_field">
             <label for="lsd_icon"><?php esc_html_e('Icon', 'listdom'); ?></label>
             <?php echo LSD_Form::iconpicker([
                 'name' => 'lsd_icon',
@@ -109,6 +115,16 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
                 'value' => '',
             ]); ?>
             <p class="description"><?php esc_html_e("The icon is needed for listings' markers and some other sections.", 'listdom'); ?></p>
+        </div>
+        <div class="form-field">
+            <label for="lsd_disabled_icon"><?php esc_html_e('Disable Icon', 'listdom'); ?></label>
+            <?php echo LSD_Form::switcher([
+                'name' => 'lsd_disabled_icon',
+                'id' => 'lsd_disabled_icon',
+                'value' => 0,
+                'toggle' => '#lsd_icon_field'
+            ]); ?>
+            <p class="description"><?php esc_html_e('Check to hide icon for this category.', 'listdom'); ?></p>
         </div>
         <div class="form-field">
             <label for="lsd_color"><?php esc_html_e('Color', 'listdom'); ?></label>
@@ -150,9 +166,10 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         $icon = get_term_meta($term->term_id, 'lsd_icon', true);
         $color = get_term_meta($term->term_id, 'lsd_color', true);
         $image = get_term_meta($term->term_id, 'lsd_image', true);
+        $disable = get_term_meta($term->term_id, 'lsd_disabled_icon', true);
         $schema = get_term_meta($term->term_id, 'lsd_schema', true);
         ?>
-        <tr class="form-field">
+        <tr class="form-field <?php echo $disable ? 'lsd-util-hide' : ''; ?>" id="lsd_icon_field">
             <th scope="row">
                 <label for="lsd_icon"><?php esc_html_e('Icon', 'listdom'); ?></label>
             </th>
@@ -163,6 +180,20 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
                     'value' => $icon,
                 ]); ?>
                 <p class="description"><?php esc_html_e("The icon is needed for listings' markers and some other sections.", 'listdom'); ?></p>
+            </td>
+        </tr>
+        <tr class="form-field">
+            <th scope="row">
+                <label for="lsd_disabled_icon"><?php esc_html_e('Disable Icon', 'listdom'); ?></label>
+            </th>
+            <td>
+                <?php echo LSD_Form::switcher([
+                    'name' => 'lsd_disabled_icon',
+                    'id' => 'lsd_disabled_icon',
+                    'value' => $disable,
+                    'toggle' => '#lsd_icon_field'
+                ]); ?>
+                <p class="description"><?php esc_html_e('Check to hide icon for this category.', 'listdom'); ?></p>
             </td>
         </tr>
         <tr class="form-field">
@@ -218,11 +249,13 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         $icon = sanitize_text_field($_POST['lsd_icon']);
         $color = isset($_POST['lsd_color']) ? sanitize_text_field($_POST['lsd_color']) : '';
         $image = isset($_POST['lsd_image']) ? sanitize_text_field($_POST['lsd_image']) : '';
+        $disable = isset($_POST['lsd_disabled_icon']) ? (int) sanitize_text_field($_POST['lsd_disabled_icon']) : 0;
         $schema = isset($_POST['lsd_schema']) && trim($_POST['lsd_schema']) ? sanitize_text_field($_POST['lsd_schema']) : 'https://schema.org/LocalBusiness';
 
         update_term_meta($term_id, 'lsd_icon', $icon);
         update_term_meta($term_id, 'lsd_color', $color);
         update_term_meta($term_id, 'lsd_image', $image);
+        update_term_meta($term_id, 'lsd_disabled_icon', $disable);
         update_term_meta($term_id, 'lsd_schema', $schema);
 
         return true;
@@ -267,7 +300,8 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
 
             case 'icon':
 
-                $content = '<div class="lsd-preview-color" style="background-color: ' . get_term_meta($term_id, 'lsd_color', true) . '"><div class="lsd-icon-wrapper">' . LSD_Taxonomies::icon($term_id, 'fa-lg') . '</div></div>';
+                $disabled_icon = (int) get_term_meta($term_id, 'lsd_disabled_icon', true);
+                $content = $disabled_icon ? '' : '<div class="lsd-preview-color" style="background-color: ' . get_term_meta($term_id, 'lsd_color', true) . '"><div class="lsd-icon-wrapper">' . LSD_Taxonomies::icon($term_id, 'fa-lg') . '</div></div>';
                 break;
 
             default:

@@ -59,6 +59,7 @@ class LSD_Element_Features extends LSD_Element
     protected function general_settings(array $data): string
     {
         $list_style = isset($data['list_style']) && trim($data['list_style']) ? $data['list_style'] : 'per-row';
+        $enable_link = isset($data['enable_link']) ? (int) $data['enable_link'] : 1;
 
         return '<div>
             <label for="lsd_elements_' . esc_attr($this->key) . '_show_icons">' . esc_html__('Show Icons', 'listdom') . '</label>
@@ -70,8 +71,8 @@ class LSD_Element_Features extends LSD_Element
         <div>
             <label for="lsd_elements_' . esc_attr($this->key) . '_enable_link">' . esc_html__('Enable Link To Archive', 'listdom') . '</label>
             <select name="lsd[elements][' . esc_attr($this->key) . '][enable_link]" id="lsd_elements_' . esc_attr($this->key) . '_enable_link">
-                <option value="0" ' . (isset($data['enable_link']) && $data['enable_link'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
-                <option value="1" ' . (isset($data['enable_link']) && $data['enable_link'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
+                <option value="1" ' . ($enable_link === 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
+                <option value="0" ' . ($enable_link === 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
             </select>
         </div>
         <div>

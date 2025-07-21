@@ -2,6 +2,9 @@
 // no direct access
 defined('ABSPATH') || die();
 
+/** @var string $redirect */
+/** @var string $role */
+
 // User is Already Logged-in
 if (is_user_logged_in()) return '';
 
@@ -97,6 +100,15 @@ jQuery(document).ready(function()
                 'name' => 'lsd_redirect',
                 'id' => 'lsd_redirect',
                 'value' => $redirect,
+            ]);
+        }
+
+        if (trim($role))
+        {
+            echo LSD_Form::hidden([
+                'name' => 'lsd_role',
+                'id' => 'lsd_role',
+                'value' => $role,
             ]);
         }
         ?>

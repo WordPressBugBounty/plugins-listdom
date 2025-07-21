@@ -5,6 +5,7 @@ defined('ABSPATH') || die();
 /** @var LSD_Menus_Settings $this */
 
 $details_page = LSD_Options::details_page();
+
 $styles = LSD_Styles::details();
 $detail_types = LSD_Styles::detail_types();
 
@@ -101,7 +102,7 @@ if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::clas
     <form id="lsd_settings_form">
         <div class="lsd-form-row">
             <div class="lsd-col-4 lsd-pr-4 lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-flex-content-start lsd-gap-3 lsd-alert-no-my">
-                <h3 class="lsd-mb-0"><?php esc_html_e('General', 'listdom'); ?></h3>
+                <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('General', 'listdom'); ?></h3>
                 <div class="lsd-row">
                     <div class="lsd-col-6"><?php echo LSD_Form::label([
                         'title' => esc_html__('Style Category', 'listdom'),
@@ -274,12 +275,12 @@ if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::clas
                 <?php endif; ?>
             </div>
             <div class="lsd-col-8">
-                <ul class="lsd-tab-switcher <?php echo $current_style === 'dynamic' ? '' : 'lsd-util-hide'; ?> lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mt-4" id="lsd_dynamic_switcher" data-for=".lsd-tab-switcher-content-details">
+                <ul class="lsd-tab-switcher <?php echo $current_style === 'dynamic' ? '' : 'lsd-util-hide'; ?> lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mb-4" id="lsd_dynamic_switcher" data-for=".lsd-tab-switcher-content-details">
                     <li data-tab="config" class="<?php echo $current_style !== 'dynamic' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="#"><?php esc_html_e('Configuration', 'listdom'); ?></a></li>
                     <li data-tab="builder" class="<?php echo $current_style === 'dynamic' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="#"><?php esc_html_e('Design Builder', 'listdom'); ?></a></li>
                 </ul>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-details <?php echo $current_style !== 'dynamic' ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-config-content">
-                    <h3><?php esc_html_e('Elements', 'listdom'); ?></h3>
+                    <h3 class="lsd-mt-0"><?php esc_html_e('Elements', 'listdom'); ?></h3>
                     <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch">
                         <ul class="lsd-elements lsd-sortable lsd-m-0 lsd-flex-o-2">
                             <?php foreach($details_page['elements'] as $key => $element): ?>
@@ -306,7 +307,7 @@ if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::clas
                     </div>
                 </div>
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-details <?php echo $current_style === 'dynamic' ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-builder-content">
-                    <h3><?php esc_html_e('Design Builder', 'listdom'); ?></h3>
+                    <h3 class="lsd-mt-0"><?php esc_html_e('Design Builder', 'listdom'); ?></h3>
                     <div class="lsd-form-row lsd-mt-4">
                         <div class="lsd-col-2 lsd-flex lsd-flex-content-end lsd-flex-align-items-center">
                             <label for="lsd-dynamic-box-method"><?php echo esc_html__('Box Method', 'listdom'); ?></label>
@@ -358,14 +359,13 @@ if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::clas
             </div>
         </div>
         <div class="lsd-spacer-10"></div>
-        <div class="lsd-form-row">
-			<div class="lsd-col-12 lsd-flex lsd-gap-3">
+        <div class="lsd-form-row lsd-settings-submit-wrapper">
+			<div class="lsd-col-12 lsd-flex lsd-gap-3 lsd-flex-content-end">
 				<?php LSD_Form::nonce('lsd_settings_form'); ?>
-				<?php echo LSD_Form::submit([
-					'label' => esc_html__('Save', 'listdom'),
-					'id' => 'lsd_settings_save_button',
-                    'class' => 'button button-hero button-primary'
-				]); ?>
+                <button type="submit" id="lsd_settings_save_button" class="lsd-primary-button">
+                    <?php esc_html_e('Save The Changes', 'listdom'); ?>
+                    <i class='lsdi lsdi-checkmark-circle'></i>
+                </button>
                 <div>
                     <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
                     <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
@@ -405,7 +405,7 @@ jQuery('#lsd_settings_form').on('submit', function(e)
             $tab.attr('data-saved', 'true');
 
             // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
+            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save The Changes', 'listdom')); ?><i class='lsdi lsdi-checkmark-circle'></i>");
 
             // Unloading
             loading.stop($success, 2000);
@@ -415,7 +415,7 @@ jQuery('#lsd_settings_form').on('submit', function(e)
             $tab.attr('data-saved', 'false');
 
             // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
+            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save The Changes', 'listdom')); ?><i class='lsdi lsdi-checkmark-circle'></i>");
 
             // Unloading
             loading.stop($error, 2000);

@@ -11,8 +11,10 @@ $search = get_post_meta($post->ID, 'lsd_search', true);
 // Searchable
 $searchable = $search['searchable'] ?? 1;
 ?>
-<div class="lsd-metabox lsd-metabox-search lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-3 lsd-pt-2">
-    <div class="lsd-flex lsd-flex-row">
+<h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Search", 'listdom'); ?></h3>
+<p class="description lsd-mb-4 lsd-mt-3"><?php echo esc_html__("Add a search form and define its position and behavior.", 'listdom'); ?> </p>
+<div id="lsd_metabox_search" class="lsd-metabox lsd-metabox-search lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-3 lsd-pt-2">
+    <div class="lsd-flex lsd-flex-row lsd-searchable">
         <?php echo LSD_Form::label([
             'title' => esc_html__('Searchable', 'listdom'),
             'for' => 'lsd_search_searchable',

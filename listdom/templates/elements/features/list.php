@@ -13,7 +13,7 @@ if (!count($terms)) return '';
         <?php
             $icon = LSD_Taxonomies::icon($term->term_id);
             $itemprop = get_term_meta($term->term_id, 'lsd_itemprop', true);
-            $link = $this->enable_link ? '<a href="' . esc_url(get_term_link($term->term_id)) . '">' . esc_html($term->name) . '</a>' : esc_html($term->name);
+            $link = $this->enable_link ? '<a href="' . esc_url(get_term_link($term->term_id)) . '">' . esc_html($term->name) . '</a>' : '<span class="lsd-single-term">'.esc_html($term->name).'</span>';
         ?>
         <li <?php echo $itemprop ? lsd_schema()->prop($itemprop) : ''; ?>><?php echo $this->show_icons && trim($icon) ? $icon . ' ' : ''; ?><?php echo $link; ?></li>
     <?php endforeach; ?>

@@ -27,8 +27,11 @@ $listings = get_posts([
 $current_user = wp_get_current_user();
 $current_id = $current_user->ID;
 
+// General Settings
+$settings = LSD_Options::settings();
+
 $user_object = get_userdata($user['ID']);
-$user_roles = (array) $user_object->roles;
+$user_roles = $user_object->roles;
 
 // Check if user has allowed role
 $allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
@@ -124,6 +127,15 @@ $allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
                                         required
                                     ></textarea>
                                 </div>
+
+                                <?php if (isset($settings['mailchimp_status']) && $settings['mailchimp_status']): ?>
+                                <div class="lsd-profile-contact-form-row">
+                                    <label>
+                                        <input type="checkbox" name="lsd_subscribe" value="1" <?php echo isset($settings['mailchimp_checked']) && $settings['mailchimp_checked'] ? 'checked' : ''; ?>>
+                                        <?php echo esc_html($settings['mailchimp_message'] ?: __('Subscribe to our newsletter.', 'listdom')); ?>
+                                    </label>
+                                </div>
+                                <?php endif; ?>
 
                                 <div class="lsd-profile-contact-form-row lsd-profile-contact-form-third-row">
                                     <?php echo LSD_Main::grecaptcha_field('transform-95'); ?>

@@ -6,12 +6,21 @@ defined('ABSPATH') || die();
 
 // Entity
 $entity = new LSD_Entity_Listing($this->post->ID);
+$taxonomies = new LSD_Dashboard_Taxonomies_Terms();
 
 // Category
 $category = $entity->get_data_category();
 
 // All Categories
 $all_categories = LSD_Taxonomies_Category::get_terms();
+
+// Default Category Selection
+$uncategorized_id = LSD_Main::get_uncategorized_category_id();
+$selected_category_id = $category && isset($category->term_id)
+    ? $category->term_id
+    : (is_array($all_categories) && count($all_categories) === 1
+        ? $all_categories[0]->term_id
+        : ($uncategorized_id ?: null));
 
 // Objects
 $postType = new LSD_PTypes_Listing();
@@ -47,7 +56,7 @@ jQuery(document).ready(function()
                     <div class="lsd-col-8">
 						<div class="lsd-dashboard-form-left-col-wrapper">
 							<div class="lsd-dashboard-title">
-								<input type="text" name="lsd[title]" required value="<?php echo isset($this->post->post_title) ? esc_attr($this->post->post_title) : ''; ?>" placeholder="<?php esc_attr_e('Title', 'listdom'); ?>">
+								<input type="text" name="lsd[title]" required value="<?php echo isset($this->post->post_title) ? esc_attr($this->post->post_title) : ''; ?>" placeholder="<?php esc_attr_e('Title', 'listdom'); ?>" title="<?php esc_attr_e('Title', 'listdom'); ?>">
 							</div>
 
                             <div class="lsd-dashboard-editor">
@@ -80,7 +89,7 @@ jQuery(document).ready(function()
                             </div>
                             <?php endif; ?>
 
-                            <?php if ($this->is_enabled('address')): ?>
+                            <?php if ($this->is_enabled('address') && LSD_Components::map()): ?>
 							<div class="lsd-dashboard-right-box lsd-dashboard-address">
 								<h4><?php esc_html_e('Address / Map', 'listdom'); ?></h4>
 								<div>
@@ -166,6 +175,7 @@ jQuery(document).ready(function()
 
                         <div class="lsd-dashboard-box lsd-dashboard-category">
                             <h4><?php echo esc_html__('Category', 'listdom').' '.LSD_Base::REQ_HTML; ?></h4>
+                            <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_CATEGORY])); ?>
                             <div>
                                 <?php
                                     echo LSD_Dashboard_Terms::category([
@@ -173,9 +183,7 @@ jQuery(document).ready(function()
                                         'hide_empty' => 0,
                                         'orderby' => 'name',
                                         'order' => 'ASC',
-                                        'selected' => $category && isset($category->term_id)
-                                            ? $category->term_id
-                                            : (is_array($all_categories) && count($all_categories) === 1 ? $all_categories[0]->term_id : null),
+                                        'selected' => $selected_category_id,
                                         'hierarchical' => 0,
                                         'id' => 'lsd_listing_category',
                                         'name' => 'lsd[listing_category]',
@@ -191,6 +199,7 @@ jQuery(document).ready(function()
                         <?php if ($this->is_enabled('locations')): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-locations">
                             <h4><?php esc_html_e('Locations', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_LOCATION); ?></h4>
+                            <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_LOCATION])); ?>
                             <?php
                                 echo LSD_Dashboard_Terms::locations([
                                     'taxonomy' => LSD_Base::TAX_LOCATION,
@@ -209,6 +218,7 @@ jQuery(document).ready(function()
                         <?php if ($this->is_enabled('tags')): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-tags">
                             <h4><?php esc_html_e('Tags', 'listdom'); ?><?php $this->required_html('tags'); ?></h4>
+                            <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_TAG])); ?>
                             <?php
                                 $terms = wp_get_post_terms($this->post->ID, LSD_Base::TAX_TAG);
 
@@ -235,6 +245,7 @@ jQuery(document).ready(function()
                         <?php if ($this->is_enabled('features')): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-features">
                             <h4><?php esc_html_e('Features', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_FEATURE); ?></h4>
+                            <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_FEATURE])); ?>
                             <?php
                                 echo LSD_Dashboard_Terms::features([
                                     'taxonomy' => LSD_Base::TAX_FEATURE,
@@ -253,6 +264,7 @@ jQuery(document).ready(function()
                         <?php if ($this->is_enabled('labels')): ?>
                         <div class="lsd-dashboard-box lsd-dashboard-labels" id="lsd-dashboard-labels">
                             <h4><?php esc_html_e('Labels', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_LABEL); ?></h4>
+                            <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_LABEL])); ?>
                             <?php
                                 echo LSD_Dashboard_Terms::labels([
                                     'taxonomy' => LSD_Base::TAX_LABEL,

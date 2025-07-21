@@ -10,7 +10,7 @@ $display_avatar = !isset($this->args['display_avatar']) || $this->args['display_
 $display_name = !isset($this->args['display_name']) || $this->args['display_name'];
 $display_job_title = !isset($this->args['display_job_title']) || $this->args['display_job_title'];
 $display_bio = !isset($this->args['display_bio']) || $this->args['display_bio'];
-$display_socials = !isset($this->args['display_socials']) || $this->args['display_socials'];
+$display_socials = LSD_Components::socials() && (!isset($this->args['display_socials']) || $this->args['display_socials']);
 $display_tel = !isset($this->args['display_tel']) || $this->args['display_tel'];
 $display_email = !isset($this->args['display_email']) || $this->args['display_email'];
 $display_mobile = !isset($this->args['display_mobile']) || $this->args['display_mobile'];
@@ -175,6 +175,15 @@ $current_id = get_current_user_id();
 				required
 			></textarea>
 		</div>
+
+		<?php if (isset($this->settings['mailchimp_status']) && $this->settings['mailchimp_status']): ?>
+		<div class="lsd-owner-contact-form-row">
+			<label>
+				<input type="checkbox" name="lsd_subscribe" value="1" <?php echo isset($this->settings['mailchimp_checked']) && $this->settings['mailchimp_checked'] ? 'checked' : ''; ?>>
+				<?php echo esc_html($this->settings['mailchimp_message'] ?: __('Subscribe to our newsletter.', 'listdom')); ?>
+			</label>
+		</div>
+		<?php endif; ?>
 
 		<div class="lsd-owner-contact-form-row lsd-owner-contact-form-third-row">
 			<?php echo LSD_Main::grecaptcha_field('transform-95'); ?>

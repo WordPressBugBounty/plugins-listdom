@@ -17,11 +17,20 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
         $max_price = $metas['lsd_price_max'] ?? null;
         $text_price = $metas['lsd_price_after'] ?? null;
         $currency = $metas['lsd_currency'] ?? null;
-        $price_class = $metas['lsd_price_class'] ?? 2;
 
-        $price = $resource->render_price($min_price, $currency);
-        if ($max_price) $price .= ' - ' . $resource->render_price($max_price, $currency);
-        if ($text_price) $price .= ' / ' . $text_price;
+        $price_class = $metas['lsd_price_class'] ?? 2;
+        $price = '';
+
+        // Pricing
+        $pricing = LSD_Components::pricing();
+
+        if ($pricing)
+        {
+            $price = $resource->render_price($min_price, $currency);
+
+            if ($max_price) $price .= ' - ' . $resource->render_price($max_price, $currency);
+            if ($text_price) $price .= ' / ' . $text_price;
+        }
 
         // Media
         $thumbnail_id = get_post_thumbnail_id($listing);
@@ -43,8 +52,8 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
                     'label' => $status->label,
                 ],
                 'address' => $metas['lsd_address'] ?? null,
-                'price' => strip_tags($price),
-                'price_class' => $price_class,
+                'price' => $pricing ? strip_tags($price) : null,
+                'price_class' => $pricing ? $price_class : null,
                 'latitude' => $metas['lsd_latitude'] ?? null,
                 'longitude' => $metas['lsd_longitude'] ?? null,
                 'zoomlevel' => $metas['lsd_zoomlevel'] ?? null,
@@ -64,10 +73,10 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
             ],
             'raw' => [
                 'content' => strip_tags(apply_filters('the_content', $listing->post_content)),
-                'price' => $min_price,
-                'price_max' => $max_price,
-                'price_after' => $text_price,
-                'currency' => $currency,
+                'price' => $pricing ? $min_price : null,
+                'price_max' => $pricing ? $max_price : null,
+                'price_after' => $pricing ? $text_price : null,
+                'currency' => $pricing ? $currency : null,
                 'featured_image' => $thumbnail_id,
                 'gallery' => $gallery,
             ],

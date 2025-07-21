@@ -1,0 +1,170 @@
+<?php
+// no direct access
+defined('ABSPATH') || die();
+
+/** @var LSD_PTypes_Shortcode $this */
+/** @var array $options */
+
+$list = $options['list'] ?? [];
+?>
+<h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Map", 'listdom'); ?></h3>
+<p class="description lsd-mb-4 lsd-mt-3"><?php echo esc_html__("Configure map provider, controls, display behavior, marker actions, and map-based filters.", 'listdom'); ?> </p>
+<?php if (LSD_Components::map()): ?>
+<div class="lsd-form-row">
+    <div class="lsd-col-2"><?php echo LSD_Form::label([
+        'title' => esc_html__('Map Provider', 'listdom'),
+        'for' => 'lsd_display_options_skin_list_map_provider',
+    ]); ?></div>
+    <div class="lsd-col-6">
+        <?php echo LSD_Form::providers([
+            'id' => 'lsd_display_options_skin_list_map_provider',
+            'name' => 'lsd[display][list][map_provider]',
+            'value' => $list['map_provider'] ?? LSD_Map_Provider::def(),
+            'disabled' => true,
+            'class' => 'lsd-map-provider-toggle',
+            'attributes' => [
+                'data-parent' => '#lsd_skin_display_options_map_list'
+            ]
+        ]); ?>
+    </div>
+</div>
+<div class="lsd-form-group lsd-form-row-map-needed lsd-p-0 lsd-m-0 <?php echo isset($list['map_provider']) && $list['map_provider'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_list_map_options">
+    <div class="lsd-form-row">
+        <div class="lsd-col-2"><?php echo LSD_Form::label([
+            'title' => esc_html__('Position', 'listdom'),
+            'for' => 'lsd_display_options_skin_list_map_position',
+        ]); ?></div>
+        <div class="lsd-col-6">
+            <?php echo LSD_Form::select([
+                'id' => 'lsd_display_options_skin_list_map_position',
+                'name' => 'lsd[display][list][map_position]',
+                'options' => [
+                    'top' => esc_html__('Show before the List view', 'listdom'),
+                    'bottom' => esc_html__('Show after the List view', 'listdom'),
+                    'left' => esc_html__('Show on left', 'listdom'),
+                    'right' => esc_html__('Show on right', 'listdom')
+                ],
+                'value' => $list['map_position'] ?? 'top'
+            ]); ?>
+        </div>
+    </div>
+    <div class="lsd-form-row lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
+        <div class="lsd-col-2"><?php echo LSD_Form::label([
+            'title' => esc_html__('Map Style', 'listdom'),
+            'for' => 'lsd_display_options_skin_list_mapstyle',
+        ]); ?></div>
+        <div class="lsd-col-6">
+            <?php echo LSD_Form::mapstyle([
+                'id' => 'lsd_display_options_skin_list_mapstyle',
+                'name' => 'lsd[display][list][mapstyle]',
+                'value' => $list['mapstyle'] ?? ''
+            ]); ?>
+        </div>
+    </div>
+    <div class="lsd-form-row">
+        <div class="lsd-col-2"><?php echo LSD_Form::label([
+            'title' => esc_html__('Clustering', 'listdom'),
+            'for' => 'lsd_display_options_skin_list_clustering',
+        ]); ?></div>
+        <div class="lsd-col-6">
+            <?php echo LSD_Form::switcher([
+                'id' => 'lsd_display_options_skin_list_clustering',
+                'toggle' => '#lsd_display_options_skin_list_clustering_options',
+                'name' => 'lsd[display][list][clustering]',
+                'value' => $list['clustering'] ?? '1'
+            ]); ?>
+        </div>
+    </div>
+    <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
+        <div id="lsd_display_options_skin_list_clustering_options" <?php echo ((!isset($list['clustering']) || $list['clustering']) ? '' : 'style="display: none;"'); ?>>
+            <div class="lsd-form-row">
+                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                    'title' => esc_html__('Bubbles', 'listdom'),
+                    'for' => 'lsd_display_options_skin_list_clustering_images',
+                ]); ?></div>
+                <div class="lsd-col-6">
+                    <?php echo LSD_Form::select([
+                        'id' => 'lsd_display_options_skin_list_clustering_images',
+                        'name' => 'lsd[display][list][clustering_images]',
+                        'options' => LSD_Base::get_clustering_icons(),
+                        'value' => $list['clustering_images'] ?? 'img/cluster1/m'
+                    ]); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="lsd-form-row">
+        <div class="lsd-col-2"><?php echo LSD_Form::label([
+            'title' => esc_html__('Marker/Shape On Click', 'listdom'),
+            'for' => 'lsd_display_options_skin_list_mapobject_onclick',
+        ]); ?></div>
+        <div class="lsd-col-6">
+            <?php echo LSD_Form::select([
+                'id' => 'lsd_display_options_skin_list_mapobject_onclick',
+                'name' => 'lsd[display][list][mapobject_onclick]',
+                'options' => [
+                    'infowindow' => esc_html__('Open Infowindow', 'listdom'),
+                    'redirect' => esc_html__('Redirect to Single Listing Page', 'listdom'),
+                    'lightbox' => esc_html__('Open Single Listing in a Lightbox', 'listdom'),
+                    'none' => esc_html__('None', 'listdom')
+                ],
+                'value' => $list['mapobject_onclick'] ?? 'infowindow'
+            ]); ?>
+            <p class="description"><?php esc_html_e("You can choose to display an info window when someone clicks on a marker or shape on the map, open the single listing page directly, or show the details in a lightbox without reloading the page.", 'listdom'); ?></p>
+        </div>
+    </div>
+    <div class="lsd-form-row lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
+        <div class="lsd-col-2"><?php echo LSD_Form::label([
+            'title' => esc_html__('Map Search', 'listdom'),
+            'for' => 'lsd_display_options_skin_list_mapsearch',
+        ]); ?></div>
+        <div class="lsd-col-6">
+            <?php if ($this->isPro()): ?>
+                <?php echo LSD_Form::switcher([
+                    'id' => 'lsd_display_options_skin_list_mapsearch',
+                    'name' => 'lsd[display][list][mapsearch]',
+                    'value' => $list['mapsearch'] ?? '1',
+                ]); ?>
+                <p class="description"><?php esc_html_e("Provide ability to filter listings based on current map position.", 'listdom'); ?></p>
+            <?php else: ?>
+                <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Map Search', 'listdom')); ?></p>
+            <?php endif; ?>
+        </div>
+    </div>
+    <div class="lsd-form-row">
+        <div class="lsd-col-2"><?php echo LSD_Form::label([
+            'title' => esc_html__('Map Limit', 'listdom'),
+            'for' => 'lsd_display_options_skin_list_maplimit',
+        ]); ?></div>
+        <div class="lsd-col-6">
+            <?php echo LSD_Form::text([
+                'id' => 'lsd_display_options_skin_list_maplimit',
+                'name' => 'lsd[display][list][maplimit]',
+                'value' => $list['maplimit'] ?? '300'
+            ]); ?>
+            <p class="description"><?php esc_html_e("This option controls the number of items displayed on the map. Increasing the limit beyond 300 may significantly slow down the page loading time. We recommend using filter options to include only the listings you want in this shortcode.", 'listdom'); ?></p>
+        </div>
+    </div>
+
+    <div class="lsd-form-row">
+        <div class="lsd-col-2"><?php echo LSD_Form::label([
+            'title' => esc_html__('Map Height', 'listdom'),
+            'for' => 'lsd_display_options_skin_list_map_height',
+        ]); ?></div>
+        <div class="lsd-col-6">
+            <?php echo LSD_Form::text([
+                'id' => 'lsd_display_options_skin_list_map_height',
+                'name' => 'lsd[display][list][map_height]',
+                'value' => $list['map_height'] ?? ''
+            ]); ?>
+            <p class="description"><?php esc_html_e("Use this option to set the map height. Enter a value with units, such as 500px or 100vh. If you're unsure, leave it blank.", 'listdom'); ?></p>
+        </div>
+    </div>
+
+    <?php
+        // Action for Third Party Plugins
+        do_action('lsd_shortcode_map_options', 'list', $options);
+    ?>
+
+</div>
+<?php endif;

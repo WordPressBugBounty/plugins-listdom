@@ -31,8 +31,8 @@ class LSD_Base
         // Apply Filter
         $path = apply_filters('lsd_include_html_file', $path, $file, $args);
 
-        // File is not exists
-        if (!file_exists($path)) return esc_html__('HTML file is not exists! Check the file path please.', 'listdom');
+        // File does not exist
+        if (!file_exists($path)) return esc_html__('HTML file does not exist! Check the file path.', 'listdom');
 
         // Return the File Path
         if (isset($args['return_path']) && $args['return_path']) return $path;
@@ -50,7 +50,7 @@ class LSD_Base
         // Get Buffer
         $output = ob_get_clean();
 
-        // Return the File OutPut
+        // Return the file output
         if (isset($args['return_output']) && $args['return_output']) return $output;
 
         // Print the output
@@ -201,6 +201,8 @@ class LSD_Base
                 'order' => 'DESC',
             ],
         ];
+
+        if (!LSD_Components::pricing()) unset($options['lsd_price']);
 
         return apply_filters('lsd_sort_options', $options);
     }
@@ -388,9 +390,9 @@ class LSD_Base
         }
         else
         {
-            if ($type === 'short') return sprintf(esc_html__("Upgrade to the %s first!", 'listdom'), '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
-            else if ($type === 'tiny') return sprintf(esc_html__("%s needed!", 'listdom'), '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Upgrade', 'listdom') . '</strong></a>');
-            else return sprintf(esc_html__("You're using %s of listdom. You should upgrade to the %s to enjoy all features of listdom!", 'listdom'), '<strong>' . esc_html__('Basic Version', 'listdom') . '</strong>', '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
+            if ($type === 'short') return sprintf(esc_html__("Upgrade to the %s first!", 'listdom'), '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
+            else if ($type === 'tiny') return sprintf(esc_html__("%s needed!", 'listdom'), '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Upgrade', 'listdom') . '</strong></a>');
+            else return sprintf(esc_html__("You're using %s of listdom. You should upgrade to the %s to enjoy all features of listdom!", 'listdom'), '<strong>' . esc_html__('Basic Version', 'listdom') . '</strong>', '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
         }
     }
 
@@ -412,8 +414,8 @@ class LSD_Base
         }
         else
         {
-            if ($multiple) return sprintf(esc_html__('%s are included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
-            else return sprintf(esc_html__('%s is included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getUpgradeURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
+            if ($multiple) return sprintf(esc_html__('%s are included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
+            else return sprintf(esc_html__('%s is included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
         }
     }
 
@@ -477,7 +479,7 @@ class LSD_Base
 
     public static function getUpgradeURL(): string
     {
-        return 'https://api.webilia.com/go/buy-listdom-pro';
+        return LSD_Base::getWebiliaShopURL();
     }
 
     public static function getWebiliaShopURL(): string

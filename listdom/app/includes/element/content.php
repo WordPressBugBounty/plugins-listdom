@@ -17,13 +17,13 @@ class LSD_Element_Content extends LSD_Element
         return apply_filters('lsd_content_element_get_content', $content);
     }
 
-    public function excerpt($post_id, $limit = 15, $read_more = false)
+    public function excerpt($post_id, $limit = 15, $read_more = false, $full = false)
     {
         // Post Excerpt
         $excerpt = get_the_excerpt($post_id);
 
         // Post Content
-        if (trim($excerpt) === '' && $limit > 0) $excerpt = strip_shortcodes(get_post_field('post_content', $post_id));
+        if ((trim($excerpt) === '' && $limit > 0) || $full) $excerpt = strip_shortcodes(get_post_field('post_content', $post_id));
 
         $has_more = false;
         if ($limit > 0)

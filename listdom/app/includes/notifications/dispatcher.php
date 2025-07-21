@@ -42,6 +42,7 @@ class LSD_Notifications_Dispatcher extends LSD_Notifications
         $email = isset($_POST['lsd_email']) ? sanitize_email($_POST['lsd_email']) : '';
         $phone = isset($_POST['lsd_phone']) ? sanitize_text_field($_POST['lsd_phone']) : '';
         $message = isset($_POST['lsd_message']) ? strip_tags($_POST['lsd_message']) : '';
+        $subscribe = isset($_POST['lsd_subscribe']) ? sanitize_text_field($_POST['lsd_subscribe']) : '';
         $user_id = isset($_POST['lsd_user_id']) ? sanitize_text_field($_POST['lsd_user_id']) : '';
 
         // User ID is not set
@@ -64,6 +65,7 @@ class LSD_Notifications_Dispatcher extends LSD_Notifications
             'email' => $email,
             'phone' => $phone,
             'message' => $message,
+            'subscribe' => $subscribe,
             'user_id' => $user_id,
         ]);
 
@@ -76,6 +78,7 @@ class LSD_Notifications_Dispatcher extends LSD_Notifications
         $email = isset($_POST['lsd_email']) ? sanitize_email($_POST['lsd_email']) : '';
         $phone = isset($_POST['lsd_phone']) ? sanitize_text_field($_POST['lsd_phone']) : '';
         $message = isset($_POST['lsd_message']) ? strip_tags($_POST['lsd_message']) : '';
+        $subscribe = isset($_POST['lsd_subscribe']) ? sanitize_text_field($_POST['lsd_subscribe']) : '';
         $post_id = isset($_POST['lsd_post_id']) ? sanitize_text_field($_POST['lsd_post_id']) : '';
 
         // Post ID is not set
@@ -98,6 +101,7 @@ class LSD_Notifications_Dispatcher extends LSD_Notifications
             'email' => $email,
             'phone' => $phone,
             'message' => $message,
+            'subscribe' => $subscribe,
             'post_id' => $post_id,
         ]);
     }

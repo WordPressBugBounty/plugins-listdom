@@ -56,16 +56,16 @@ if (!is_array($raw)) $raw = [];
                     if ($type === 'dropdown') echo LSD_Form::select([
                         'id' => 'lsd_listing_attributes' . $attribute->term_id,
                         'options' => $options,
-                        'name' => 'lsd[attributes][' . $attribute->term_id . ']',
+                        'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'required' => $required,
-                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->term_id, true),
+                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true),
                         'attributes' => [
                             'data-required' => $data_required,
                         ],
                     ]);
                     else if ($type === 'radio' && count($options))
                     {
-                        $saved_value = trim((string) get_post_meta($post->ID, 'lsd_attribute_' . $attribute->term_id, true));
+                        $saved_value = trim((string) get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true));
 
                         echo '<div class="lsd-attribute-radio">';
 
@@ -83,7 +83,7 @@ if (!is_array($raw)) $raw = [];
                             echo '<div>';
                             echo LSD_Form::input([
                                 'id' => 'lsd_listing_attributes_' . $attribute->term_id . $r,
-                                'name' => 'lsd[attributes][' . $attribute->term_id . ']',
+                                'name' => 'lsd[attributes][' . $attribute->slug . ']',
                                 'value' => $opt,
                                 'required' => $required,
                                 'attributes' => $attributes,
@@ -98,7 +98,7 @@ if (!is_array($raw)) $raw = [];
                     }
                     else if ($type === 'checkbox' && count($options))
                     {
-                        $saved_values = get_post_meta($post->ID, 'lsd_attribute_' . $attribute->term_id, true) ?? [];
+                        $saved_values = get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true) ?? [];
                         if (!is_array($saved_values)) $saved_values = array_map('trim', explode(',', $saved_values));
 
                         echo '<div class="lsd-attribute-checkbox" data-required-message="' . esc_attr__('Please select at least one option.', 'listdom') . '" data-required="' . esc_attr($required) . '">';
@@ -114,7 +114,7 @@ if (!is_array($raw)) $raw = [];
                             echo '<div>';
                             echo LSD_Form::checkbox([
                                 'id' => 'lsd_listing_attributes_' . $attribute->term_id . $c,
-                                'name' => 'lsd[attributes][' . $attribute->term_id . '][]',
+                                'name' => 'lsd[attributes][' . $attribute->slug . '][]',
                                 'value' => $opt,
                                 'attributes' => $attributes,
                             ]);
@@ -128,18 +128,18 @@ if (!is_array($raw)) $raw = [];
                     }
                     else if ($type === 'textarea' && !$editor) echo LSD_Form::textarea([
                         'id' => 'lsd_listing_attributes' . $attribute->term_id,
-                        'name' => 'lsd[attributes][' . $attribute->term_id . ']',
+                        'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'required' => $required,
                         'rows' => 8,
-                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->term_id, true),
+                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true),
                         'attributes' => [
                             'data-required' => $data_required,
                         ],
                     ]);
                     else if ($type === 'textarea' && $editor) echo LSD_Form::editor([
                         'id' => 'lsd_listing_attributes' . $attribute->term_id,
-                        'name' => 'lsd[attributes][' . $attribute->term_id . ']',
-                        'value' => $raw[$attribute->term_id] ?? '',
+                        'name' => 'lsd[attributes][' . $attribute->slug . ']',
+                        'value' => $raw[$attribute->slug] ?? '',
                     ]);
                     else if ($type === 'separator')
                     {
@@ -147,9 +147,9 @@ if (!is_array($raw)) $raw = [];
                     }
                     else echo LSD_Form::input([
                         'id' => 'lsd_listing_attributes' . $attribute->term_id,
-                        'name' => 'lsd[attributes][' . $attribute->term_id . ']',
+                        'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'required' => $required,
-                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->term_id, true),
+                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true),
                         'attributes' => [
                             'data-required' => $data_required,
                         ],

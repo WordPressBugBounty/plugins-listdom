@@ -8,14 +8,13 @@ defined('ABSPATH') || die();
         <?php do_action('lsd_addon_form'); ?>
 
         <div class="lsd-spacer-10"></div>
-        <div class="lsd-form-row">
-			<div class="lsd-col-12 lsd-flex lsd-gap-3">
+        <div class="lsd-form-row lsd-settings-submit-wrapper">
+			<div class="lsd-col-12 lsd-flex lsd-gap-3 lsd-flex-content-end">
 				<?php LSD_Form::nonce('lsd_addons_form'); ?>
-				<?php echo LSD_Form::submit([
-					'label' => esc_html__('Save', 'listdom'),
-					'id' => 'lsd_addons_save_button',
-                    'class' => 'button button-hero button-primary',
-				]); ?>
+                <button type="submit" id="lsd_addons_save_button" class="lsd-primary-button">
+                    <?php esc_html_e('Save The Changes', 'listdom'); ?>
+                    <i class='lsdi lsdi-checkmark-circle'></i>
+                </button>
                 <div>
                     <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
                     <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
@@ -57,7 +56,7 @@ jQuery('#lsd_addons_form').on('submit', function(e)
             $tab.attr('data-saved', 'true');
 
             // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
+            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save The Changes', 'listdom')); ?><i class='lsdi lsdi-checkmark-circle'></i>");
             $success.removeClass('lsd-util-hide');
 
             // Unloading
@@ -68,7 +67,7 @@ jQuery('#lsd_addons_form').on('submit', function(e)
             $tab.attr('data-saved', 'false');
 
             // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save', 'listdom')); ?>");
+            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save The Changes', 'listdom')); ?><i class='lsdi lsdi-checkmark-circle'></i>");
             $error.removeClass('lsd-util-hide');
 
             // Unloading

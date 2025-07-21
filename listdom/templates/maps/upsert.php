@@ -2,6 +2,8 @@
 // no direct access
 defined('ABSPATH') || die();
 
+if (!LSD_Components::map()) return;
+
 $object_type = get_post_meta($this->id, 'lsd_object_type', true);
 if(!trim($object_type)) $object_type = 'marker';
 

@@ -33,6 +33,9 @@ class LSD_PTypes_Listing extends LSD_PTypes
         add_action('save_post', [$this, 'save'], 10, 2);
         add_filter('post_type_link', [$this, 'filter_link'], 10, 2);
 
+        // AI Editor Button
+        add_action('media_buttons', [$this, 'editor_ai_button']);
+
         // Delete
         add_action('delete_post', [$this, 'delete']);
 
@@ -154,7 +157,10 @@ class LSD_PTypes_Listing extends LSD_PTypes
     public function register_metaboxes()
     {
         add_meta_box('lsd_metabox_attributes', esc_html__('Listing Information', 'listdom'), [$this, 'metabox_attributes'], $this->PT, 'normal', 'high');
-        add_meta_box('lsd_metabox_address', esc_html__('Location', 'listdom'), [$this, 'metabox_address'], $this->PT, 'normal', 'high');
+
+        // Map Component
+        if (LSD_Components::map()) add_meta_box('lsd_metabox_address', esc_html__('Location', 'listdom'), [$this, 'metabox_address'], $this->PT, 'normal', 'high');
+
         add_meta_box('lsd_metabox_details', esc_html__('Details', 'listdom'), [$this, 'metabox_details'], $this->PT, 'normal', 'high');
 
         // Register Metaboxes
@@ -426,6 +432,31 @@ class LSD_PTypes_Listing extends LSD_PTypes
         }
 
         return $comments_open;
+    }
+
+    public function editor_ai_button($editor_id)
+    {
+        if (is_admin())
+        {
+            $screen = get_current_screen();
+            if (!$screen || $screen->post_type !== $this->PT) return;
+        }
+        else
+        {
+            if (!LSD_Payload::get('dashboard') && !LSD_Payload::get('add_listing')) return;
+        }
+
+        // No AI Profile
+        if (!(new LSD_AI())->has_profile() || !get_current_user_id()) return;
+
+        // Editor ID
+        $uid = esc_attr($editor_id);
+
+        $this->include_html_file('metaboxes/listing/editor-ai.php', [
+            'parameters' => [
+                'uid' => $uid,
+            ],
+        ]);
     }
 }
 

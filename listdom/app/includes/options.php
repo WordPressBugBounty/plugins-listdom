@@ -56,10 +56,50 @@ class LSD_Options extends LSD_Base
 
     public static function details_page(): array
     {
-        return self::parse_args(
+        $options = self::parse_args(
             get_option('lsd_details_page', []),
             self::defaults('details_page')
         );
+
+        if (!LSD_Components::work_hours())
+        {
+            unset($options['elements']['availability']);
+            foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $sec)
+                if (isset($options['builder'][$sec]['elements']['availability'])) unset($options['builder'][$sec]['elements']['availability']);
+        }
+
+        if (!LSD_Components::pricing())
+        {
+            unset($options['elements']['price']);
+            foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $sec)
+                if (isset($options['builder'][$sec]['elements']['price'])) unset($options['builder'][$sec]['elements']['price']);
+        }
+
+        if (!LSD_Components::map())
+        {
+            unset($options['elements']['map'], $options['elements']['address']);
+            foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $sec)
+            {
+                unset($options['builder'][$sec]['elements']['map']);
+                unset($options['builder'][$sec]['elements']['address']);
+            }
+        }
+
+        if (!LSD_Components::related())
+        {
+            unset($options['elements']['related']);
+            foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $sec)
+                if (isset($options['builder'][$sec]['elements']['related'])) unset($options['builder'][$sec]['elements']['related']);
+        }
+
+        if (!LSD_Components::socials())
+        {
+            unset($options['elements']['share']);
+            foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $sec)
+                if (isset($options['builder'][$sec]['elements']['share'])) unset($options['builder'][$sec]['elements']['share']);
+        }
+
+        return $options;
     }
 
     public static function dummy(): array
@@ -82,6 +122,8 @@ class LSD_Options extends LSD_Base
 
     public static function socials()
     {
+        if (!LSD_Components::socials()) return [];
+
         $socials = get_option('lsd_socials', []);
         if (count($socials)) return $socials;
 
@@ -232,6 +274,7 @@ class LSD_Options extends LSD_Base
                         'availability' => ['enabled' => 1, 'show_title' => 1],
                         'owner' => ['enabled' => 1, 'show_title' => 0],
                         'share' => ['enabled' => 1, 'show_title' => 0],
+                        'related' => ['enabled' => 0, 'show_title' => 0],
                         'abuse' => ['enabled' => 0, 'show_title' => 0],
                         'excerpt' => ['enabled' => 0, 'show_title' => 0],
                     ],
@@ -414,7 +457,7 @@ class LSD_Options extends LSD_Base
                     'timepicker_format' => 24,
                     'listing_link_status' => 1,
                     'address_placeholder' => '123 Main St, Unit X, City, State, Zipcode',
-                    'map_provider' => 'googlemap',
+                    'map_provider' => 'leaflet',
                     'map_gps_zl' => 13,
                     'map_gps_zl_current' => 7,
                     'map_backend_zl' => 6,
@@ -440,6 +483,11 @@ class LSD_Options extends LSD_Base
                     'grecaptcha_status' => 0,
                     'grecaptcha_sitekey' => '',
                     'grecaptcha_secretkey' => '',
+                    'mailchimp_status' => 0,
+                    'mailchimp_api_key' => '',
+                    'mailchimp_list_id' => '',
+                    'mailchimp_checked' => 0,
+                    'mailchimp_message' => '',
                     'location_archive' => '',
                     'category_archive' => '',
                     'tag_archive' => '',
@@ -452,6 +500,11 @@ class LSD_Options extends LSD_Base
                     'submission_tax_listdom-location_method' => 'checkboxes',
                     'submission_tax_listdom-feature_method' => 'checkboxes',
                     'submission_tax_listdom-tag_method' => 'textarea',
+                    'submission_term_builder_'.LSD_Base::TAX_CATEGORY => 'disabled',
+                    'submission_term_builder_'.LSD_Base::TAX_LOCATION => 'disabled',
+                    'submission_term_builder_'.LSD_Base::TAX_LABEL => 'disabled',
+                    'submission_term_builder_'.LSD_Base::TAX_TAG => 'disabled',
+                    'submission_term_builder_'.LSD_Base::TAX_FEATURE => 'disabled',
                     'submission_module' => [
                         'address' => 1,
                         'price' => 1,
@@ -466,9 +519,18 @@ class LSD_Options extends LSD_Base
                         'labels' => 1,
                         'image' => 1,
                         'embed' => 1,
+                        'related' => 0,
                     ],
                     'assets' => [
                         'load' => 1,
+                    ],
+                    'components' => [
+                        'map' => 1,
+                        'pricing' => 1,
+                        'work_hours' => 1,
+                        'visibility' => 1,
+                        'related' => 1,
+                        'socials' => 1,
                     ],
                     'block_admin_subscriber' => 1,
                     'block_admin_contributor' => 1,
@@ -553,11 +615,21 @@ class LSD_Options extends LSD_Base
         $settings = LSD_Options::settings();
         $pro = LSD_Base::isPro();
 
+        $pricing = LSD_Components::pricing();
+
         return [
-            'currency' => isset($settings['price_component_currency']) && $pro ? (int) $settings['price_component_currency'] : 1,
-            'max' => isset($settings['price_component_max']) && $pro ? (int) $settings['price_component_max'] : 1,
-            'after' => isset($settings['price_component_after']) && $pro ? (int) $settings['price_component_after'] : 1,
-            'class' => isset($settings['price_component_class']) && $pro ? (int) $settings['price_component_class'] : 1,
+            'currency' => !$pricing ? 0 : (
+                isset($settings['price_component_currency']) && $pro ? (int) $settings['price_component_currency'] : 1
+            ),
+            'max' => !$pricing ? 0 : (
+                isset($settings['price_component_max']) && $pro ? (int) $settings['price_component_max'] : 1
+            ),
+            'after' => !$pricing ? 0 : (
+                isset($settings['price_component_after']) && $pro ? (int) $settings['price_component_after'] : 1
+            ),
+            'class' => !$pricing ? 0 : (
+                isset($settings['price_component_class']) && $pro ? (int) $settings['price_component_class'] : 1
+            ),
         ];
     }
 

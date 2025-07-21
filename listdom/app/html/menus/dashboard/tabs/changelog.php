@@ -3,6 +3,45 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.5.0 <span>July 19th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added OpenStreetMap integration to Listdom Core.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Introduced listing visibility control to Listdom Core.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Enabled creating new categories, locations, etc., directly from the frontend dashboard.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Introduced the Related Listings feature.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added Google and OpenStreetMap address autocomplete support.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added an advanced components system to disable unused Listdom Core features.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Integrated Mailchimp subscription support.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Improved AI tools with automatic content and business hours generation.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added an option to create categories without icons.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Completely rebuilt the settings menu and shortcode builder in the Listdom backend.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Added padding controls and made various UI refinements.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed several issues with search fields.', 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v4.4.0 <span>June 13th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>

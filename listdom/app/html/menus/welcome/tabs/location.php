@@ -120,12 +120,7 @@ jQuery(document).ready(function ($)
             $('#lsd_settings_map_provider').val(mapProvider).trigger('change');
         };
 
-        <?php if (LSD_Base::isPro()) : ?>
-            selectMap();
-        <?php else: ?>
-            if (isGooglemap) selectMap();
-            else $alert.html(listdom_alertify('<?php echo esc_js(__('The Open Street Map is available in pro addon only.', 'listdom')); ?>', 'lsd-warning'));
-        <?php endif; ?>
+        selectMap();
     });
 });
 

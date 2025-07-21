@@ -74,7 +74,7 @@ $ids = $this->listings;
 
         <?php if ($this->display_description): ?>
             <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
-                <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length)); ?>
+                <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length, false, $this->content_type === 'description')); ?>
             </p>
         <?php endif; ?>
 

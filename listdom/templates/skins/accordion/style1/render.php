@@ -83,7 +83,7 @@ $ids = $this->listings;
 
                             <?php if ($this->display_description): ?>
                                 <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
-                                    <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length)); ?>
+                                    <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length, false, $this->content_type === 'description')); ?>
                                 </p>
                             <?php endif; ?>
 
@@ -127,28 +127,3 @@ $ids = $this->listings;
         </div>
     </div>
 <?php endforeach; ?>
-
-<script>
-    jQuery(document).ready(function($) {
-        // Initially hide all bodies
-        $('.lsd-accordion-body').hide();
-
-        // On header click
-        $('.lsd-accordion-header').on('click', function() {
-            const $header = $(this);
-            const $body = $header.next('.lsd-accordion-body');
-
-            // Slide up other open bodies
-            $('.lsd-accordion-body').not($body).slideUp();
-            // Remove 'active' class from other arrows
-            $('.lsd-accordion-header').not($header).find('.accordion-arrow').removeClass('rotated');
-
-            // Toggle current body
-            $body.stop(true, true).slideToggle();
-
-            // Toggle icon rotation
-            $header.find('.accordion-arrow').toggleClass('rotated');
-        });
-    });
-</script>
-

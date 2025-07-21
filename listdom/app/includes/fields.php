@@ -42,6 +42,10 @@ class LSD_Fields extends LSD_Base
             'map' => ['label' => esc_html__('Map', 'listdom'), 'enabled' => 0],
         ];
 
+        if (!LSD_Components::pricing()) unset($fields['price'], $fields['price_class']);
+        if (!LSD_Components::work_hours()) unset($fields['availability']);
+        if (!LSD_Components::map()) unset($fields['address'], $fields['map']);
+
         // Conditionally include or exclude fields based on specific class existence
         if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)) $fields['review_stars'] = ['label' => esc_html__('Review Rates', 'listdom'), 'enabled' => 0];
         if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)) $fields['compare'] = ['label' => esc_html__('Compare', 'listdom'), 'enabled' => 0];
@@ -125,7 +129,7 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'price':
-                $output = LSD_Kses::element($listing->get_price());
+                if (LSD_Components::pricing()) $output = LSD_Kses::element($listing->get_price());
                 break;
 
             case 'email':
@@ -137,7 +141,7 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'price_class':
-                $output = LSD_Kses::element($listing->get_price_class());
+                if (LSD_Components::pricing()) $output = LSD_Kses::element($listing->get_price_class());
                 break;
 
             case 'image':
@@ -149,7 +153,7 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'availability':
-                $output = LSD_Kses::element($listing->get_availability(true));
+                if (LSD_Components::work_hours()) $output = LSD_Kses::element($listing->get_availability(true));
                 break;
 
             case 'locations':
@@ -201,7 +205,7 @@ class LSD_Fields extends LSD_Base
                 if (!is_array($attributes)) $attributes = [];
 
                 $att = new LSD_Entity_Attribute($key);
-                $output = LSD_Kses::element($att->render($attributes[$key] ?? ''));
+                $output = LSD_Kses::element($att->render($attributes[$att->slug()] ?? ''));
                 break;
 
             case substr($key, 0, 3) === 'sn_':
@@ -243,6 +247,7 @@ class LSD_Fields extends LSD_Base
 
     public function schema($key)
     {
+        $output = '';
         switch ($key)
         {
             case 'title':
@@ -254,7 +259,7 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'price':
-                $output = lsd_schema()->priceRange();
+                if (LSD_Components::pricing()) $output = lsd_schema()->priceRange();
                 break;
 
             case 'phone':

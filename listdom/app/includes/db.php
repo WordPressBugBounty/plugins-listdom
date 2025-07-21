@@ -145,7 +145,7 @@ class LSD_db extends LSD_Base
     }
 
     /**
-     * Returns WordPres DB Object
+     * Returns WordPress DB Object
      * @return wpdb
      * @global wpdb $wpdb
      */

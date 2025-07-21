@@ -14,9 +14,10 @@ if (!is_array($mapcontrols) || !count($mapcontrols)) $mapcontrols = LSD_Options:
 // Positions Array
 $positions = $this->get_map_control_positions();
 ?>
-<div class="lsd-metabox lsd-metabox-map-controls lsd-collapsible lsd-collapsible-close">
-    <div class="lsd-collapsible-content">
-        <p class="description"><?php esc_html_e('You can manage the map controls / buttons.', 'listdom'); ?></p>
+<div class="lsd-tab-switcher-content lsd-tab-switcher-content-map" id="lsd-tab-switcher-map-controls-content">
+    <div id="lsd_metabox_map_controls" class="lsd-metabox lsd-metabox-map-controls">
+         <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Map Controls", 'listdom'); ?></h3>
+         <p class="description lsd-mt-3"><?php esc_html_e('You can manage the map controls / buttons.', 'listdom'); ?></p>
         <ul>
             <li>
                 <label for="lsd_map_control_zoom"><?php esc_html_e('Zoom Control', 'listdom'); ?></label>
@@ -102,5 +103,4 @@ $positions = $this->get_map_control_positions();
             </li>
         </ul>
     </div>
-    <div class="lsd-collapsible-trigger"><?php esc_html_e('View Options', 'listdom'); ?></div>
 </div>

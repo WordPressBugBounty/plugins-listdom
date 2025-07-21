@@ -56,22 +56,22 @@ class LSD_Element extends LSD_Base
                 ' . $this->label . '
             </div>
             <div class="lsd-col-2 lsd-actions lsd-details-page-element-toggle-status" id="lsd_actions_' . esc_attr($this->key) . '" data-key="' . esc_attr($this->key) . '">
-                '.($has_options ? '<span class="lsd-toggle lsd-mr-2" data-for="#lsd_options_' . esc_attr($this->key) . '" data-all=".lsd-element-options">
+                ' . ($has_options ? '<span class="lsd-toggle lsd-mr-2" data-for="#lsd_options_' . esc_attr($this->key) . '" data-all=".lsd-element-options">
                     <i class="lsd-icon fa fa-cog fa-lg"></i>
-                </span>' : '').'
+                </span>' : '') . '
                 <strong class="lsd-enabled ' . ($data['enabled'] ? '' : 'lsd-util-hide') . '"><i class="lsd-icon fa fa-check"></i></strong>
                 <strong class="lsd-disabled ' . ($data['enabled'] ? 'lsd-util-hide' : '') . '"><i class="lsd-icon fa fa-minus-circle"></i></strong>
             </div>
         </div>
         <div class="lsd-element-options lsd-util-hide" id="lsd_options_' . esc_attr($this->key) . '">
             ' . ($has_general_options ? '<ul class="lsd-tab-switcher lsd-sub-tabs lsd-flex lsd-gap-3" id="lsd_element_option_switcher_' . esc_attr($this->key) . '" data-for=".lsd-tab-switcher-element-' . esc_attr($this->key) . '-content">
-                <li data-tab="title-' . esc_attr($this->key) . '" class="lsd-sub-tabs-active"><a href="#">' . esc_html__('Title', 'listdom') . '</a></li>
-                <li data-tab="options-' . esc_attr($this->key) . '"><a href="#">' . esc_html__('Options', 'listdom') . '</a></li>
+                ' . (trim($title) ? '<li data-tab="title-' . esc_attr($this->key) . '" class="lsd-sub-tabs-active"><a href="#">' . esc_html__('Title', 'listdom') . '</a></li>' : '') . '
+                <li data-tab="options-' . esc_attr($this->key) . '" ' . (trim($title) ? '' : 'class="lsd-sub-tabs-active"') . '><a href="#">' . esc_html__('Options', 'listdom') . '</a></li>
             </ul>' : '') . '
-            <div class="lsd-element-option-wrapper '.($has_general_options ? 'lsd-tab-switcher-content lsd-tab-switcher-element-' . esc_attr($this->key) . '-content lsd-tab-switcher-content-active' : '').'" id="lsd-tab-switcher-title-' . esc_attr($this->key) . '-content">
+            ' . (trim($title) ? '<div class="lsd-element-option-wrapper ' . ($has_general_options ? 'lsd-tab-switcher-content lsd-tab-switcher-element-' . esc_attr($this->key) . '-content lsd-tab-switcher-content-active' : '') . '" id="lsd-tab-switcher-title-' . esc_attr($this->key) . '-content">
                 <div>' . $title . '</div>
-            </div>
-            ' . ($has_general_options ? '<div class="lsd-element-option-wrapper lsd-tab-switcher-content lsd-tab-switcher-element-' . esc_attr($this->key) . '-content" id="lsd-tab-switcher-options-' . esc_attr($this->key) . '-content">
+            </div>' : '') . '
+            ' . ($has_general_options ? '<div class="lsd-element-option-wrapper lsd-tab-switcher-content lsd-tab-switcher-element-' . esc_attr($this->key) . '-content ' . (trim($title) ? '' : 'lsd-tab-switcher-content-active') . '" id="lsd-tab-switcher-options-' . esc_attr($this->key) . '-content">
                 <div>
                     ' . $general . '
                     ' . $additional . '
@@ -93,7 +93,7 @@ class LSD_Element extends LSD_Base
 
         if (!$this->inline_title)
         {
-            $title_alignment .= '<div class="lsd-title-dependent-' . esc_attr($this->key) . '-option '.($show_title ? '' : 'lsd-util-hide').'">
+            $title_alignment .= '<div class="lsd-title-dependent-' . esc_attr($this->key) . '-option ' . ($show_title ? '' : 'lsd-util-hide') . '">
                 <label for="lsd_elements_' . esc_attr($this->key) . '_title_align">' . esc_html__('Title Alignment', 'listdom') . '</label>
                 <select name="lsd[elements][' . esc_attr($this->key) . '][title_align]" id="lsd_elements_' . esc_attr($this->key) . '_title_align">
                     <option value="">' . esc_html__('Default', 'listdom') . '</option>
@@ -112,10 +112,10 @@ class LSD_Element extends LSD_Base
             </select>
         </div>
         ' . $title_alignment . '
-        <div class="lsd-title-dependent-' . esc_attr($this->key) . '-option '.($show_title ? '' : 'lsd-util-hide').'">
+        <div class="lsd-title-dependent-' . esc_attr($this->key) . '-option ' . ($show_title ? '' : 'lsd-util-hide') . '">
             <label for="lsd_elements_' . esc_attr($this->key) . '_custom_title">' . esc_html__('Custom Title', 'listdom') . '</label>
-            <input type="text" name="lsd[elements][' . esc_attr($this->key) . '][custom_title]" id="lsd_elements_' . esc_attr($this->key) . '_custom_title" value="'.(isset($data['custom_title']) && trim($data['custom_title']) ? esc_attr($data['custom_title']) : '').'" placeholder="' . esc_attr__('Custom Title', 'listdom') . '">
-            <p class="description lsd-mb-0">'.esc_html__('If a custom title is provided, it will replace the default title.', 'listdom').'</p>
+            <input type="text" name="lsd[elements][' . esc_attr($this->key) . '][custom_title]" id="lsd_elements_' . esc_attr($this->key) . '_custom_title" value="' . (isset($data['custom_title']) && trim($data['custom_title']) ? esc_attr($data['custom_title']) : '') . '" placeholder="' . esc_attr__('Custom Title', 'listdom') . '">
+            <p class="description lsd-mb-0">' . esc_html__('If a custom title is provided, it will replace the default title.', 'listdom') . '</p>
         </div>';
     }
 

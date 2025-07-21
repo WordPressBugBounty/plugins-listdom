@@ -40,6 +40,7 @@ class LSD_Personalize_Buttons extends LSD_Personalize
             'hover_bg_color' => sanitize_text_field($hover['bg1']),
             'hover_bg_color_2' => sanitize_text_field($hover['bg2']),
             'hover_text_color' => sanitize_text_field($hover['text']),
+            'padding' => $normal['padding'] ?? [],
             'border' => $normal['border'] ?? [],
             'border_hover' => $hover['border'] ?? [],
             'hover_border_radius' => sanitize_text_field($hover['border']['radius']) . 'px',
@@ -80,6 +81,7 @@ class LSD_Personalize_Buttons extends LSD_Personalize
             $CSS = str_replace("(({$button_type}_button_border_hover_style))", $settings['border_hover']['style'], $CSS);
             $CSS = str_replace("(({$button_type}_button_border_hover_color))", $settings['border_hover']['color'] ?: 'none', $CSS);
             $CSS = str_replace("(({$button_type}_button_hover_border_radius))", $settings['hover_border_radius'], $CSS);
+            $CSS = str_replace("(({$button_type}_button_padding))", self::paddings($settings['padding']), $CSS);
 
             // Typography
             $CSS = str_replace("(({$button_type}_button_font_family))", self::font_family($settings['family'] ?? ''), $CSS);

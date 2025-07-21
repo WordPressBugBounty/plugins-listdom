@@ -66,6 +66,56 @@ class LSD_AI_Models_GPT extends LSD_AI_Models_Base
         return $this->response($response);
     }
 
+    public function availability(string $text): array
+    {
+        // General Settings
+        $settings = LSD_Options::settings();
+
+        // Hour Format
+        $hour_format = $settings['timepicker_format'] ?? '24';
+
+        // Prompt
+        $prompt = sprintf('Convert the following text that describes weekly working hours into a JSON object.
+        
+        Days are represented by numbers 1 (Monday) to 7 (Sunday).
+        Each day should include "hours" and "off" (1 for closed, 0 otherwise).
+        Times should be based on %s format.
+        Example: {"1":{"hours":"9am-5pm","off":0},"2":{"off":1}}
+        Return only the JSON object without any explanation.', $hour_format);
+
+        $response = $this->request([
+            'model' => $this->key(),
+            'messages' => [
+                ['role' => 'user', 'content' => $prompt . "\n\n" . mb_substr($text, 0, 200)],
+            ],
+            'temperature' => 0.2,
+        ]);
+
+        if (isset($response['error']) && is_array($response['error']) && count($response['error'])) return [];
+
+        return $this->response($response);
+    }
+
+    public function content(string $text): string
+    {
+        $response = $this->request([
+            'model' => $this->key(),
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'You are an assistant that writes listing descriptions from a short explanation. '
+                        . 'Return only the generated text with no formatting or commentary.',
+                ],
+                ['role' => 'user', 'content' => mb_substr($text, 0, 200)],
+            ],
+            'temperature' => 0.7,
+        ]);
+
+        if (isset($response['error']) && is_array($response['error']) && count($response['error'])) return '';
+
+        return trim($response['choices'][0]['message']['content'] ?? '');
+    }
+
     private function request(array $request): array
     {
         // Perform the HTTP POST request

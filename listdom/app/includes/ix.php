@@ -336,9 +336,12 @@ class LSD_IX extends LSD_Base
         $values = get_post_meta($post_id, 'lsd_attributes', true);
         if (!is_array($values)) $values = [];
 
-        foreach ($values as $id => $value)
+        foreach ($values as $slug => $value)
         {
-            $term = (array) get_term($id);
+            $term = (array) get_term_by('slug', $slug);
+
+            // Term ID
+            $term_id = $term['term_id'];
 
             // Remove Useless Keys
             foreach ([
@@ -347,7 +350,7 @@ class LSD_IX extends LSD_Base
              ] as $key) unset($term[$key]);
 
             // Meta Values
-            $term['meta'] = $this->get_term_meta($id);
+            $term['meta'] = $this->get_term_meta($term_id);
 
             $attr = [
                 'value' => $value,

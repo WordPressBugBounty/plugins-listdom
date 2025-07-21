@@ -23,5 +23,9 @@ class LSD_Integrations extends LSD_Base
         // KC Integration
         $kc = new LSD_Integrations_KC();
         $kc->init();
+
+        // Mailchimp Integration
+        $mailchimp = new LSD_Integrations_Mailchimp();
+        $mailchimp->init();
     }
 }

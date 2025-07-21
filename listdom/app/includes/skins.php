@@ -49,6 +49,7 @@ class LSD_Skins extends LSD_Base
     public $display_slider_arrows = true;
     public $display_read_more_button = true;
     public $description_length = 12;
+    public $content_type = 'excerpt';
 
     public $image_method = 'cover';
     public $image_fit = 'cover';
@@ -68,6 +69,7 @@ class LSD_Skins extends LSD_Base
     public $price_components = [];
     public $connected_shortcodes = [];
     public $map_position;
+    public $map_component = true;
 
     public function __construct()
     {
@@ -76,6 +78,9 @@ class LSD_Skins extends LSD_Base
 
         // Price Components
         $this->price_components = LSD_Options::price_components();
+
+        // Map Component
+        $this->map_component = LSD_Components::map();
     }
 
     public function init()
@@ -144,26 +149,27 @@ class LSD_Skins extends LSD_Base
         $this->display_location = !isset($this->skin_options['display_location']) || $this->skin_options['display_location'];
 
         // Price Class
-        $this->display_price_class = !isset($this->skin_options['display_price_class']) || $this->skin_options['display_price_class'];
+        $this->display_price_class = (!isset($this->skin_options['display_price_class']) || $this->skin_options['display_price_class']) && LSD_Components::pricing();
 
         // Price class is disabled globally
         if (isset($this->price_components['class']) && !$this->price_components['class']) $this->display_price_class = false;
 
         $this->display_description = !isset($this->skin_options['display_description']) || $this->skin_options['display_description'];
-        $this->display_address = !isset($this->skin_options['display_address']) || $this->skin_options['display_address'];
-        $this->display_availability = !isset($this->skin_options['display_availability']) || $this->skin_options['display_availability'];
+        $this->display_address = (!isset($this->skin_options['display_address']) || $this->skin_options['display_address']) && LSD_Components::map();
+        $this->display_availability = (!isset($this->skin_options['display_availability']) || $this->skin_options['display_availability']) && LSD_Components::work_hours();
         $this->display_categories = !isset($this->skin_options['display_categories']) || $this->skin_options['display_categories'];
-        $this->display_price = !isset($this->skin_options['display_price']) || $this->skin_options['display_price'];
+        $this->display_price = (!isset($this->skin_options['display_price']) || $this->skin_options['display_price']) && LSD_Components::pricing();
         $this->display_favorite_icon = !isset($this->skin_options['display_favorite_icon']) || $this->skin_options['display_favorite_icon'];
         $this->display_compare_icon = !isset($this->skin_options['display_compare_icon']) || $this->skin_options['display_compare_icon'];
         $this->display_review_stars = !isset($this->skin_options['display_review_stars']) || $this->skin_options['display_review_stars'];
         $this->display_labels = !isset($this->skin_options['display_labels']) || $this->skin_options['display_labels'];
         $this->display_title = !isset($this->skin_options['display_title']) || $this->skin_options['display_title'];
         $this->display_is_claimed = !isset($this->skin_options['display_is_claimed']) || $this->skin_options['display_is_claimed'];
-        $this->display_share_buttons = !isset($this->skin_options['display_share_buttons']) || $this->skin_options['display_share_buttons'];
+        $this->display_share_buttons = (!isset($this->skin_options['display_share_buttons']) || $this->skin_options['display_share_buttons']) && LSD_Components::socials();
         $this->display_slider_arrows = !isset($this->skin_options['display_slider_arrows']) || $this->skin_options['display_slider_arrows'];
         $this->default_view = isset($this->skin_options['default_view']) ? sanitize_text_field($this->skin_options['default_view']) : 'grid';
         $this->description_length = isset($this->skin_options['description_length']) && is_numeric($this->skin_options['description_length']) ? $this->skin_options['description_length'] : 12;
+        $this->content_type = $this->skin_options['content_type'] ?? 'excerpt';
 
         $this->columns = isset($this->skin_options['columns']) && $this->skin_options['columns'] ? sanitize_text_field($this->skin_options['columns']) : 3;
 
@@ -423,7 +429,8 @@ class LSD_Skins extends LSD_Base
         if (isset($this->filter_options['circle']['center']) && isset($this->filter_options['circle']['radius']) && is_array($this->filter_options['circle']) && count($this->filter_options['circle']))
         {
             $main = new LSD_Main();
-            $geopoint = $main->geopoint($this->filter_options['circle']['center']);
+            if(is_array($this->filter_options['circle']['center'])) $geopoint = $this->filter_options['circle']['center'];
+            else $geopoint = $main->geopoint($this->filter_options['circle']['center']);
 
             if (isset($geopoint[0]) && $geopoint[0] && isset($geopoint[1]) && $geopoint[1])
             {
@@ -757,11 +764,10 @@ class LSD_Skins extends LSD_Base
 
     public static function get_skins()
     {
-        return apply_filters('lsd_skins', [
+        $skins = apply_filters('lsd_skins', [
             'singlemap' => esc_html__('Single Map', 'listdom'),
             'list' => esc_html__('List View', 'listdom'),
             'grid' => esc_html__('Grid View', 'listdom'),
-            'side' => esc_html__('Side by Side View', 'listdom'),
             'listgrid' => esc_html__('List + Grid View', 'listdom'),
             'halfmap' => esc_html__('Half Map / Split View', 'listdom'),
             'table' => esc_html__('Table View', 'listdom'),
@@ -769,14 +775,19 @@ class LSD_Skins extends LSD_Base
             'carousel' => esc_html__('Carousel', 'listdom'),
             'slider' => esc_html__('Slider', 'listdom'),
             'cover' => esc_html__('Cover View', 'listdom'),
+            'side' => esc_html__('Side by Side View', 'listdom'),
             'accordion' => esc_html__('Accordion View', 'listdom'),
             'mosaic' => esc_html__('Mosaic View', 'listdom'),
         ]);
+
+        if (!LSD_Components::map()) unset($skins['singlemap'], $skins['halfmap']);
+
+        return $skins;
     }
 
     public static function get_searchable_skins()
     {
-        return apply_filters('lsd_searchable_skins', [
+        $skins = apply_filters('lsd_searchable_skins', [
             'singlemap' => esc_html__('Single Map', 'listdom'),
             'list' => esc_html__('List View', 'listdom'),
             'grid' => esc_html__('Grid View', 'listdom'),
@@ -786,6 +797,10 @@ class LSD_Skins extends LSD_Base
             'table' => esc_html__('Table View', 'listdom'),
             'masonry' => esc_html__('Masonry View', 'listdom'),
         ]);
+
+        if (!LSD_Components::map()) unset($skins['singlemap'], $skins['halfmap']);
+
+        return $skins;
     }
 
     public function get_search_module(string $style = ''): string
@@ -884,6 +899,8 @@ class LSD_Skins extends LSD_Base
 
     public function get_map(bool $force_to_show = false, $limit = null)
     {
+        if (!$this->map_component) return '';
+
         return lsd_map($this->search([
             'posts_per_page' => $limit ?: $this->skin_options['maplimit'],
             'paged' => 1,
@@ -910,7 +927,7 @@ class LSD_Skins extends LSD_Base
         $content = '';
 
         // Map
-        if ($map && $this->map_provider && $this->map_position === 'left')
+        if ($map && $this->map_provider && $this->map_position === 'left' && $this->map_component)
         {
             $content .= '<div class="lsd-map-left-wrapper">';
             $content .= $this->get_map(true);
@@ -928,7 +945,7 @@ class LSD_Skins extends LSD_Base
         $content = '';
 
         // Map
-        if ($map && $this->map_provider && $this->map_position === 'right')
+        if ($map && $this->map_provider && $this->map_position === 'right' && $this->map_component)
         {
             $content .= '<div class="lsd-map-right-wrapper">';
             $content .= $this->get_map(true);
@@ -948,13 +965,13 @@ class LSD_Skins extends LSD_Base
 
         // Left Bar
         if (
-            ($map && $this->map_provider && $this->map_position === 'left')
+            ($map && $this->map_provider && $this->map_position === 'left' && $this->map_component)
             || ($search && $this->sm_shortcode && $this->sm_position === 'left')
         ) $left = true;
 
         // right Bar
         if (
-            ($map && $this->map_provider && $this->map_position === 'right')
+            ($map && $this->map_provider && $this->map_position === 'right' && $this->map_component)
             || ($search && $this->sm_shortcode && $this->sm_position === 'right')
         ) $right = true;
 

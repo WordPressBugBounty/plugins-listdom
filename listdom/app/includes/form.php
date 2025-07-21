@@ -285,7 +285,7 @@ class LSD_Form extends LSD_Base
             $query['meta_query'] = [
                 [
                     'key' => 'lsd_skin',
-                    'value' => ['list', 'grid', 'halfmap', 'listgrid', 'masonry', 'singlemap', 'table', 'side'],
+                    'value' => ['list', 'grid', 'halfmap', 'listgrid', 'masonry', 'singlemap', 'table', 'side', 'mosaic', 'accordion'],
                     'compare' => 'IN',
                 ],
             ];
@@ -623,7 +623,7 @@ class LSD_Form extends LSD_Base
         $output .= '</select></div>';
 
         // Minute
-        $output .= '<div class="lsd-col-6"><select name="' . esc_attr($args['name']) . '[minute]" title="' . esc_attr__('Minute', 'listdom') . '" class="lsd-col-6">';
+        $output .= '<div class="lsd-col-6"><select name="' . esc_attr($args['name']) . '[minute]" title="' . esc_attr__('Minute', 'listdom') . '">';
 
         for ($m = 0; $m <= 11; $m++)
         {

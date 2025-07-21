@@ -194,7 +194,7 @@ abstract class LSD_IX_Array extends LSD_IX
             $categories = get_term_meta($attribute->term_id, 'lsd_categories', true);
             if ($all_categories) $categories = [];
 
-            if ($all_categories || ($category_id && is_array($categories) && count($categories) && isset($categories[$category_id]) && $categories[$category_id])) $row[] = $metas['lsd_attribute_' . $attribute->term_id] ?? '';
+            if ($all_categories || ($category_id && is_array($categories) && count($categories) && isset($categories[$category_id]) && $categories[$category_id])) $row[] = $metas['lsd_attribute_' . $attribute->slug] ?? '';
             else $row[] = '';
         }
 
@@ -243,13 +243,19 @@ abstract class LSD_IX_Array extends LSD_IX
             'post_content' => $mapped['post_content'] ?? '',
             'post_author' => $mapped['post_author'] ?? '',
             'post_date' => $mapped['post_date'] ?? '',
-            'post_status' => $mapped['post_status'] ?? 'publish',
+            'post_status' => isset($mapped['post_status']) ? strtolower($mapped['post_status']) : 'publish',
             'image' => $mapped['lsd_image'] ?? '',
             'gallery' => isset($mapped['lsd_gallery']) ? explode(',', $mapped['lsd_gallery']) : '',
             'taxonomies' => [],
             'attributes' => [],
             'meta' => [],
         ];
+
+        // Validate post status
+        if (!in_array($listing['post_status'], LSD_Main::allowed_statuses(), true))
+        {
+            $listing['post_status'] = 'publish';
+        }
 
         foreach ($mapped as $key => $value)
         {
@@ -271,10 +277,10 @@ abstract class LSD_IX_Array extends LSD_IX
             {
                 $ex = explode('_', $key);
 
-                $id = $ex[2] ?? 0;
-                if (!$id) continue;
+                $slug = $ex[2] ?? 0;
+                if (!$slug) continue;
 
-                $term = get_term($id, LSD_Base::TAX_ATTRIBUTE);
+                $term = get_term_by('slug', $slug, LSD_Base::TAX_ATTRIBUTE);
                 if (is_wp_error($term)) continue;
 
                 // Add to Attributes

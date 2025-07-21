@@ -4,9 +4,6 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
 {
     public static function grab()
     {
-        // Resource
-        $resource = new LSD_API_Resource();
-
         // Taxonomy API Controller
         $taxonomies = new LSD_API_Controllers_Taxonomies();
 
@@ -145,7 +142,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         }
 
         // Address & Map
-        if (self::is_enabled('address'))
+        if (self::is_enabled('address') && LSD_Components::map())
         {
             $form['address'] = [
                 'section' => [
@@ -173,7 +170,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         }
 
         // Price
-        if (self::is_enabled('price'))
+        if (self::is_enabled('price') && LSD_Components::pricing())
         {
             $currencies = [];
             foreach (LSD_Base::get_currencies() as $symbol => $currency) $currencies[$currency] = $symbol;
@@ -213,7 +210,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         }
 
         // Availability
-        if (self::is_enabled('availability'))
+        if (self::is_enabled('availability') && LSD_Components::work_hours())
         {
             $ava_fields = [];
             foreach (LSD_Main::get_weekdays() as $weekday)

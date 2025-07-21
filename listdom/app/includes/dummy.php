@@ -702,7 +702,7 @@ class LSD_Dummy extends LSD_Base
                     'post_author' => 1,
                     'post_date' => '2023-01-01',
                     'taxonomies' => [
-                        'listing_category' => [
+                        LSD_Base::TAX_CATEGORY => [
                             ['name' => 'Bank'],
                         ],
                     ],
@@ -766,7 +766,7 @@ class LSD_Dummy extends LSD_Base
                     'post_content' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
                     'post_author' => 1,
                     'taxonomies' => [
-                        'listing_category' => [
+                        LSD_Base::TAX_CATEGORY => [
                             ['name' => 'Business'],
                             ['name' => 'Casino'],
                             ['name' => 'Clinic'],
@@ -841,7 +841,7 @@ class LSD_Dummy extends LSD_Base
                     'post_content' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
                     'post_author' => 1,
                     'taxonomies' => [
-                        'listing_category' => [
+                        LSD_Base::TAX_CATEGORY => [
                             ['name' => 'Restaurant'],
                         ],
                     ],
@@ -906,7 +906,7 @@ class LSD_Dummy extends LSD_Base
                     'post_author' => 1,
                     'post_date' => '2023-06-01',
                     'taxonomies' => [
-                        'listing_category' => [
+                        LSD_Base::TAX_CATEGORY => [
                             ['name' => 'Motivational Speaker'],
                         ],
                     ],

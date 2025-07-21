@@ -26,7 +26,8 @@ $display_label = isset($args['display_label']) && $args['display_label'];
 
 // Social Networks
 $socials = '';
-if (!isset($args['show_socials']) || $args['show_socials']) $socials = (new LSD_Socials())->list($post_id, 'listing');
+if (LSD_Components::socials() && (!isset($args['show_socials']) || $args['show_socials']))
+    $socials = (new LSD_Socials())->list($post_id, 'listing');
 
 // No data
 if (!$email && !$phone && !$website && !$contact_address && !$socials) return '';

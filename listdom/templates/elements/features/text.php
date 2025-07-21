@@ -11,7 +11,7 @@ $text = '';
 foreach ($terms as $term)
 {
     $itemprop = get_term_meta($term->term_id, 'lsd_itemprop', true);
-    $text .= '<span' . ($itemprop ? ' ' . lsd_schema()->prop($itemprop) : '') . '>' . esc_html($term->name) . '</span> ' . esc_html($this->separator) . ' ';
+    $text .= '<span class="lsd-single-term" ' . ($itemprop ? ' ' . lsd_schema()->prop($itemprop) : '') . '>' . esc_html($term->name) . '</span> ' . esc_html($this->separator) . ' ';
 }
 ?>
 <div><?php echo trim($text, ' ' . $this->separator); ?></div>

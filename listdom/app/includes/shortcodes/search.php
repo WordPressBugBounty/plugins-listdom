@@ -519,7 +519,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $name = 'sf-acf-' . $this->helper->standardize_key($key) . '-atx';
         }
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
         $title = $filter['title'] ?? '';
         $current = $this->current($name, $default);
 
@@ -560,7 +560,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $max_default = $filter['max_default_value'] ?? '';
         $max_current = $this->current($max_name, $max_default);
 
-        $id = 'lsd_search_' . $this->id . '_' . $key;
+        $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $key;
         $title = $filter['title'] ?? '';
 
         return $this->helper->number($filter, [

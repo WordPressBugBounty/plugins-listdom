@@ -130,7 +130,7 @@ class LSD_Search_Helper extends LSD_Base
                 if ($numeric) $order = "CAST(`meta_value` as unsigned)";
 
                 $db = new LSD_db();
-                $raw_results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($id) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
+                $raw_results = $db->select("SELECT `meta_value` FROM `#__postmeta` WHERE `meta_key`='lsd_attribute_" . esc_sql($key) . "' AND `meta_value`!='' GROUP BY `meta_value` ORDER BY " . $order . " ASC", 'loadColumn');
 
                 $results = [];
                 foreach ($raw_results as $value)

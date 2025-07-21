@@ -9,26 +9,15 @@ class LSD_Map_Provider extends LSD_Base
 
         // Return Default Provider
         $settings = LSD_Options::settings();
-        return $settings['map_provider'] ?? LSD_MP_GOOGLE;
+        return $settings['map_provider'] ?? LSD_MP_LEAFLET;
     }
 
     public static function get_providers(): array
     {
-        // Map Providers of Lite Version
-        if (LSD_Base::isLite())
-        {
-            return [
-                LSD_MP_GOOGLE => esc_html__('Google Maps', 'listdom'),
-            ];
-        }
-        // Map Providers of Full Version
-        else
-        {
-            return [
-                LSD_MP_LEAFLET => esc_html__('Leaflet (OpenStreetMap)', 'listdom'),
-                LSD_MP_GOOGLE => esc_html__('Google Maps', 'listdom'),
-            ];
-        }
+        return [
+            LSD_MP_LEAFLET => esc_html__('Leaflet (OpenStreetMap)', 'listdom'),
+            LSD_MP_GOOGLE => esc_html__('Google Maps', 'listdom'),
+        ];
     }
 
     public function form($shape)

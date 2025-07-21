@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitf6e77e8c0bee0423904b9b259f238605
+class ComposerStaticInit704949f0858aaaa05005c0223924d274
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -38,6 +38,10 @@ class ComposerStaticInitf6e77e8c0bee0423904b9b259f238605
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Container\\' => 14,
             'Psr\\Clock\\' => 10,
+        ),
+        'L' => 
+        array (
+            'LSDPACVIS\\' => 10,
         ),
         'J' => 
         array (
@@ -105,6 +109,10 @@ class ComposerStaticInitf6e77e8c0bee0423904b9b259f238605
         'Psr\\Clock\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/clock/src',
+        ),
+        'LSDPACVIS\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webilia/listdom-p-visibility/app',
         ),
         'Jenssegers\\Blade\\' => 
         array (
@@ -573,6 +581,12 @@ class ComposerStaticInitf6e77e8c0bee0423904b9b259f238605
         'Illuminate\\View\\ViewName' => __DIR__ . '/..' . '/illuminate/view/ViewName.php',
         'Illuminate\\View\\ViewServiceProvider' => __DIR__ . '/..' . '/illuminate/view/ViewServiceProvider.php',
         'Jenssegers\\Blade\\Blade' => __DIR__ . '/..' . '/jenssegers/blade/src/Blade.php',
+        'LSDPACVIS\\API' => __DIR__ . '/..' . '/webilia/listdom-p-visibility/app/API.php',
+        'LSDPACVIS\\Addon' => __DIR__ . '/..' . '/webilia/listdom-p-visibility/app/Addon.php',
+        'LSDPACVIS\\Base' => __DIR__ . '/..' . '/webilia/listdom-p-visibility/app/Base.php',
+        'LSDPACVIS\\Boot' => __DIR__ . '/..' . '/webilia/listdom-p-visibility/app/Boot.php',
+        'LSDPACVIS\\IX' => __DIR__ . '/..' . '/webilia/listdom-p-visibility/app/IX.php',
+        'LSDPACVIS\\Module' => __DIR__ . '/..' . '/webilia/listdom-p-visibility/app/Module.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'Psr\\Clock\\ClockInterface' => __DIR__ . '/..' . '/psr/clock/src/ClockInterface.php',
         'Psr\\Container\\ContainerExceptionInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerExceptionInterface.php',
@@ -749,6 +763,7 @@ class ComposerStaticInitf6e77e8c0bee0423904b9b259f238605
         'Webilia\\WP\\Metadata\\User' => __DIR__ . '/..' . '/webilia/wp/src/Metadata/User.php',
         'Webilia\\WP\\Option' => __DIR__ . '/..' . '/webilia/wp/src/Option.php',
         'Webilia\\WP\\Payload' => __DIR__ . '/..' . '/webilia/wp/src/Payload.php',
+        'Webilia\\WP\\Plugin\\Feedback' => __DIR__ . '/..' . '/webilia/wp/src/Plugin/Feedback.php',
         'Webilia\\WP\\Plugin\\Licensing' => __DIR__ . '/..' . '/webilia/wp/src/Plugin/Licensing.php',
         'Webilia\\WP\\Plugin\\Update' => __DIR__ . '/..' . '/webilia/wp/src/Plugin/Update.php',
         'Webilia\\WP\\PostType' => __DIR__ . '/..' . '/webilia/wp/src/PostType.php',
@@ -765,9 +780,9 @@ class ComposerStaticInitf6e77e8c0bee0423904b9b259f238605
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitf6e77e8c0bee0423904b9b259f238605::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitf6e77e8c0bee0423904b9b259f238605::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitf6e77e8c0bee0423904b9b259f238605::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit704949f0858aaaa05005c0223924d274::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit704949f0858aaaa05005c0223924d274::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit704949f0858aaaa05005c0223924d274::$classMap;
 
         }, null, ClassLoader::class);
     }

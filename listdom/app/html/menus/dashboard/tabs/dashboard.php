@@ -115,7 +115,7 @@ defined('ABSPATH') || die();
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth&accordion=profile')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth&subtab=profile')); ?>" class="lsd-neutral-button">
                         <i class="listdom-icon lsdi-user-circle"></i>
                         <?php esc_html_e('Author Profile', 'listdom'); ?>
                     </a>
@@ -132,19 +132,19 @@ defined('ABSPATH') || die();
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&accordion=single-listing')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=single-listing')); ?>" class="lsd-neutral-button">
                         <i class="listdom-icon lsdi-file-edit-pencil"></i>
                         <?php esc_html_e('Single Listing Customizer', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&accordion=forms')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=forms')); ?>" class="lsd-neutral-button">
                         <i class="listdom-icon lsdi-ai-search"></i>
                         <?php esc_html_e('Search Forms Customizer', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&accordion=skins')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=skins')); ?>" class="lsd-neutral-button">
                         <i class="listdom-icon lsdi-property-edit"></i>
                         <?php esc_html_e('Skins Customizer', 'listdom'); ?>
                     </a>
@@ -209,7 +209,7 @@ defined('ABSPATH') || die();
                 <img class="lsd-icon" src="<?php echo esc_url_raw($this->lsd_asset_url('img/dashboard/vertex.png')); ?>" alt="">
                 <div>
                     <span class="lsd-admin-title"><?php esc_html_e('Working with Elementor?', 'listdom'); ?></span>
-                    <p class="lsd-m-0"><?php esc_html_e('Try using the Vertex addons for Elementor. A new plugin developed be Webilia.', 'listdom'); ?></p>
+                    <p class="lsd-m-0"><?php esc_html_e('Try using the Vertex addons for Elementor. A new plugin developed by Webilia.', 'listdom'); ?></p>
                 </div>
             </div>
 

@@ -293,6 +293,27 @@ class LSD_Main extends LSD_Base
         return $slug;
     }
 
+    public static function get_uncategorized_category_id(): int
+    {
+        $term = get_term_by('slug', 'uncategorized', LSD_Base::TAX_CATEGORY);
+        return $term instanceof WP_Term ? (int) $term->term_id : 0;
+    }
+
+    public static function allowed_statuses(): array
+    {
+        $default = [
+            'publish',
+            'trash',
+            'pending',
+            'draft',
+            'future',
+        ];
+
+        $custom = array_keys((new LSD_Statuses())->statuses());
+
+        return array_merge($default, $custom);
+    }
+
     public function is_request(string $type): bool
     {
         switch ($type)

@@ -73,14 +73,14 @@ class LSD_Element_Owner extends LSD_Element
                 'value' => $data['display_bio'] ?? 1,
             ]) . '
         </div>
-        <div>
+        ' . (LSD_Components::socials() ? '<div>
             <label for="lsd_elements_' . esc_attr($this->key) . '_display_socials">' . esc_html__('Socials', 'listdom') . '</label>
             ' . LSD_Form::switcher([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_socials',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_socials]',
                 'value' => $data['display_socials'] ?? 1,
             ]) . '
-        </div>
+        </div>' : '') . '
         <div>
             <label for="lsd_elements_' . esc_attr($this->key) . '_display_tel">' . esc_html__('Tel', 'listdom') . '</label>
             ' . LSD_Form::switcher([

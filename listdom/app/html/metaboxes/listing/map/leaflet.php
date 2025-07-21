@@ -47,6 +47,32 @@ jQuery(document).ready(function($)
         }).addTo(map);
     }
 
+    // OSM Autocomplete
+    $('#lsd_object_type_address').autocomplete(
+    {
+        source: function (request, response)
+        {
+            $.getJSON('https://nominatim.openstreetmap.org/search', {format: 'json', limit: 5, q: request.term}, function (data)
+            {
+                response($.map(data, function (item)
+                {
+                    return {
+                        label: item.display_name,
+                        value: item.display_name,
+                        lat: item.lat,
+                        lon: item.lon
+                    };
+                }));
+            });
+        },
+        minLength: 3,
+        select: function (event, ui)
+        {
+            $('#lsd_object_type_latitude').val(ui.item.lat);
+            $('#lsd_object_type_longitude').val(ui.item.lon).trigger('change');
+        }
+    });
+
     // Draw Toolbar
     const drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
@@ -167,26 +193,6 @@ jQuery(document).ready(function($)
     {
         $('#lsd_object_type_latitude').val(marker.getLatLng().lat);
         $('#lsd_object_type_longitude').val(marker.getLatLng().lng).trigger('change');
-    });
-
-    // Address Changed Manually
-    $('#lsd_object_type_address').on('change', function()
-    {
-        const address = $('#lsd_object_type_address').val();
-
-        $.get(location.protocol + '//nominatim.openstreetmap.org/search?format=json&q='+address, function(data)
-        {
-            if(data.length > 0)
-            {
-                const latitude = $('#lsd_object_type_latitude');
-                const longitude = $('#lsd_object_type_longitude');
-
-                latitude.val(data[0].lat);
-                longitude.val(data[0].lon);
-
-                latitude.trigger('change');
-            }
-        });
     });
 
     // Latitude and Longitude Changed Manually

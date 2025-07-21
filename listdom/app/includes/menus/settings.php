@@ -39,6 +39,32 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->include_html_file('menus/settings/tpl.php');
     }
 
+
+    public function addons_tab(): string
+    {
+        $addons = LSD_Base::addons();
+
+        uasort($addons, function($a, $b) {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        $output = '';
+
+        foreach ($addons as $key => $addon)
+        {
+            if($key === 'csv' || $key === 'excel') continue;
+            $name = ucwords(strtolower($addon['name']));
+
+            $active_class = ($key === array_key_first($addons)) ? 'nav-tab-active' : '';
+
+            $output .= '<li class="lsd-nav-tab ' . esc_attr($active_class) . '" data-key="' . esc_attr($key) . '">';
+            $output .= esc_html__($name, 'listdom-'. $key);
+            $output .= '</li>';
+        }
+
+        return $output;
+    }
+
     public function check_access(string $action = 'lsd_settings_form', string $capability = 'manage_options')
     {
         $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : '';

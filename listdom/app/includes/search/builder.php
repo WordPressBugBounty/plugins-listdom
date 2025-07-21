@@ -76,7 +76,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Price
-        if (!in_array('price', $existings)) $fields[] = [
+        if (!in_array('price', $existings) && LSD_Components::pricing()) $fields[] = [
             'type' => 'price',
             'key' => 'price',
             'title' => esc_html__('Price', 'listdom'),
@@ -84,7 +84,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Price Class
-        if (!in_array('class', $existings)) $fields[] = [
+        if (!in_array('class', $existings) && LSD_Components::pricing()) $fields[] = [
             'type' => 'class',
             'key' => 'class',
             'title' => esc_html__('Price Class', 'listdom'),
@@ -92,7 +92,7 @@ class LSD_Search_Builder extends LSD_Base
         ];
 
         // Address
-        if (!in_array('address', $existings)) $fields[] = [
+        if (!in_array('address', $existings) && LSD_Components::map()) $fields[] = [
             'type' => 'address',
             'key' => 'address',
             'title' => esc_html__('Address', 'listdom'),

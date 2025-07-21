@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.0.0
 Requires PHP: 7.2
 Tested up to: 6.8.1
-Stable tag: 4.4.0
+Stable tag: 4.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,11 +82,13 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 
 **👉 Map Module with Plenty of Features**
 
+*   Google Maps
+*   OpenStreetMap (Leaflet)
 *   Display listings on the map with various styles
 *   Add a map to each directory list
 *   Position the map on top, bottom, right, or left of the directories
-*   Display listings in Half Map / Split views (See the demo)
-*   Show listings on [Google Maps](https://demo.webilia.com/listdom/half-map-split-view/style-2-half-map-right-map/) based on their location with full map module options
+*   Display listings in Half Map / Split views
+*   Show listings on [maps](https://demo.webilia.com/listdom/half-map-split-view/style-2-half-map-right-map/) based on their location with full map module options
 *   Advanced marker clustering
 *   Show single listing as a modal box on the map
 *   [Stunning map styles](https://demo.webilia.com/listdom/single-map/) (Apple, Facebook, Ultralight, Dark and many more map styles)
@@ -131,6 +133,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 *   Listing image
 *   Comment for listings
 *   Numeric, Load more button, and infinite scroll pagination methods
+*   Advanced component menu to simplify the directory management
 
 **👉 Search and Filter Options of Listdom WordPress Directory Plugin**
 
@@ -145,7 +148,9 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 
 **👉 AI Tools**
 
-*   CSV import auto mapping (more are coming)
+*   CSV import auto mapping
+*   Text generation
+*   Work hours generation
 
 **👉 Advanced Management Tools**
 
@@ -158,6 +163,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 *   Multi-Site compatibility
 *   Advanced configuration options
 *   Disable Font Awesome package
+*   Mailchimp Integration
 *   Visual Composer support
 *   King Composer support
 *   Compatible with Membership plugins
@@ -288,6 +294,7 @@ Listdom, the robust WordPress directory plugin, offers comprehensive documentati
 
 Listdom also offers about 30 add-ons to enhance the functionality of your WordPress directory listing further. These add-ons include features like Claim Feature, Topup Listings, Bookmarks Listings, Rank Addon, Reviews, Subscriptions, Labelize, and Advanced Map. These addons provide additional layers of interactivity and customization, allowing you to tailor your classified site to your specific needs.
 
+*   Bridge Addon (For a fast migration)
 *   Pro Addon
 *   Claim Listings (Claim existing listings with full Woocommerce support)
 *   Connect Addon (Manage contact requests)
@@ -338,7 +345,6 @@ While Listdom and Listdomer both offer free versions, they also provide enhanced
 == Upcoming Features! ==
 
 *   Gateways Direct Support
-*   Mailchimp Integration
 *   Chat Module
 *   And many more ...
 
@@ -372,7 +378,7 @@ Follow these steps to install **Listdom** on your WordPress website:
 
 = Does Listdom have a feature to show listings on a map? =
 
-Absolutely! Listdom supports Google Maps! Also, Listdom PRO includes OpenStreetMap too, so you can use your desired map provider.
+Absolutely! Listdom supports both Google Maps and OpenStreetMap, so you can use your desired map provider.
 
 = Does Listdom support custom fields? =
 
@@ -384,7 +390,7 @@ Yes, using our advanced configuration options you're able to disable/enable the 
 
 = Do I have to use Google Maps? it's a little expensive! =
 
-Listdom Pro add-on supports free OpenStreetMap! Also, it's possible to use both of them at once! For example in the single listing page you can use Google Maps but in List, Grid and other skins you can use OpenStreetMap.
+Listdom supports free OpenStreetMap! It's possible to use both of them at once. For example, on the single listing page you can use Google Maps but in List, Grid and other skins you can use OpenStreetMap.
 
 = I like to use OpenStreetMap but with more beautiful tiles! What can I do? =
 
@@ -400,24 +406,36 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 
 == Screenshots ==
 
-1. Listdom Carousel View
-2. Listdom Grid View
-3. Listdom List View
-4. Single Listing (Style 2)
-5. Single Listing (Style 1)
-6. Listdom Slider View
-7. Listdom Half map View
-8. Listdom Table View
-9. Listdom Masonry View
-10. Listdom Cover View
-11. Listdom Frontend dashboard
-12. Add / Edit Listing Page
-13. Powerful Shortcode Builder
-14. Advanced Configuration Options
-15. OpenStreetMap (Completely Free)
-16. Powerful Search or Filter Bars
+1. Several Single Listing Styles
+2. User Profile
+3. Listings Half Map View
+4. Listings Grid View
+5. Listings List View
+6. Listings Table View
+7. Listings Masonry View
+8. Listings Cover View
+9. Listdom Frontend Dashboard
+10. Add New Listing
+11. Powerful Shortcode Builder
+12. Detailed Settings
+13. OpenStreetMap (Completely Free)
+14. Powerful Search Bars
 
 == Changelog ==
+
+= 4.5.0 =
+* Added OpenStreetMap integration to Listdom Core.
+* Introduced listing visibility control to Listdom Core.
+* Enabled creating new categories, locations, etc., directly from the frontend dashboard.
+* Introduced the Related Listings feature.
+* Added Google and OpenStreetMap address autocomplete support.
+* Added an advanced components system to disable unused Listdom Core features.
+* Integrated Mailchimp subscription support.
+* Improved AI tools with automatic content and business hour generation.
+* Added an option to create categories without icons.
+* Completely rebuilt the settings menu and shortcode builder in the Listdom backend.
+* Added padding controls and made various UI refinements.
+* Fixed several issues with search fields.
 
 = 4.4.0 =
 * Added AI integration and support for creating multiple AI profiles tailored to different tasks.

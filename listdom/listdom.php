@@ -3,7 +3,7 @@
  * Plugin Name: Listdom
  * Plugin URI: https://listdom.net
  * Description: Listdom is a powerful yet easy-to-use tool for listing anything on your website. It offers modern, responsive skins such as List, Grid, Map, and Masonry to showcase your content beautifully.
- * Version: 4.4.0
+ * Version: 4.5.0
  * Author: Webilia
  * Author URI: https://webilia.com/
  * Requires at least: 4.0.0
@@ -23,7 +23,7 @@ $init = true;
 if (version_compare(phpversion(), '7.2', '<'))
 {
     $init = false;
-    add_action('user_admin_notices', function ()
+    add_action('admin_notices', function ()
     {
         ?>
         <div class="notice notice-error is-dismissible">
@@ -38,7 +38,7 @@ global $wp_version;
 if (version_compare($wp_version, '4.0.0', '<'))
 {
     $init = false;
-    add_action('user_admin_notices', function () use ($wp_version)
+    add_action('admin_notices', function () use ($wp_version)
     {
         ?>
         <div class="notice notice-error is-dismissible">

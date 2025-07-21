@@ -55,7 +55,7 @@ class LSD_Assets extends LSD_Base
         if (!$this->should_include()) return;
 
         // Include Listdom frontend script file
-        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider'], $this->version(), true);
+        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'], $this->version(), true);
 
         // Localize Vars
         wp_localize_script('lsd-frontend', 'lsd', [
@@ -79,6 +79,9 @@ class LSD_Assets extends LSD_Base
         // Include OWL
         $this->owl(['lsd-frontend']);
 
+        // Include Color Picker
+        $this->colorpicker();
+
         // Include Lightbox
         $this->lightbox();
 
@@ -90,6 +93,9 @@ class LSD_Assets extends LSD_Base
 
         // Include no-ui-slider
         $this->nouislider();
+
+        // Listdom Icon
+        $this->lsdi();
     }
 
     public function admin()
@@ -101,7 +107,7 @@ class LSD_Assets extends LSD_Base
         if (!$this->should_include('backend')) return;
 
         // Include Listdom backend script file
-        wp_enqueue_script('lsd-backend', $this->lsd_asset_url('js/backend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable'], $this->version(), true);
+        wp_enqueue_script('lsd-backend', $this->lsd_asset_url('js/backend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-autocomplete'], $this->version(), true);
 
         $icon_options = [];
         $fonts = LSD_Base::get_font_icons();
@@ -293,6 +299,9 @@ class LSD_Assets extends LSD_Base
 
     public static function map($draw = false)
     {
+        // Map Component
+        if (!LSD_Components::map()) return;
+
         // Map Provider
         $provider = LSD_Map_Provider::get();
 
@@ -303,7 +312,7 @@ class LSD_Assets extends LSD_Base
     public static function leaflet($draw = false): bool
     {
         // Include Leaflet Javascript API
-        $leaflet_include = apply_filters('lsd_leaflet_include', true);
+        $leaflet_include = apply_filters('lsd_leaflet_include', LSD_Components::map());
         if (!$leaflet_include) return false;
 
         $base = new LSD_Base();
@@ -346,12 +355,12 @@ class LSD_Assets extends LSD_Base
 
     public static function googlemaps(): bool
     {
+        // Include Google Maps Javascript API
+        $gm_include = apply_filters('lsd_gm_include', LSD_Components::map());
+        if (!$gm_include) return false;
+
         // Listdom Settings
         $settings = LSD_Options::settings();
-
-        // Include Google Maps Javascript API
-        $gm_include = apply_filters('lsd_gm_include', true);
-        if (!$gm_include) return false;
 
         // Dependencies
         $dependencies = [];

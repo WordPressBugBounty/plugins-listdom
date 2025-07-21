@@ -198,6 +198,8 @@ class LSD_User extends LSD_Base
             $user = get_userdata($user_id);
         }
 
+        if (!$user || !($user instanceof WP_User)) return [];
+
         $meta_keys = [
             'lsd_profile_image' => 'profile_image',
             'lsd_hero_image' => 'hero_image',

@@ -127,12 +127,8 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
     public function register_metaboxes()
     {
         add_meta_box('lsd_metabox_shortcode', esc_html__('Shortcode', 'listdom'), [$this, 'metabox_shortcode'], $this->PT, 'side');
-        add_meta_box('lsd_metabox_search', esc_html__('Search', 'listdom'), [$this, 'metabox_search'], $this->PT, 'side');
-        add_meta_box('lsd_metabox_default_sort', esc_html__('Default Sort', 'listdom'), [$this, 'metabox_default_sort'], $this->PT, 'side');
-        add_meta_box('lsd_metabox_sort_options', esc_html__('Sort Options', 'listdom'), [$this, 'metabox_sort_options'], $this->PT, 'side');
-        add_meta_box('lsd_metabox_map_controls', esc_html__('Map Controls', 'listdom'), [$this, 'metabox_map_controls'], $this->PT, 'side');
-        add_meta_box('lsd_metabox_display_options', esc_html__('Display Options', 'listdom'), [$this, 'metabox_display_options'], $this->PT, 'normal');
-        add_meta_box('lsd_metabox_filter_options', esc_html__('Filter Options', 'listdom'), [$this, 'metabox_filter_options'], $this->PT, 'normal');
+
+        add_meta_box('lsd_metabox_display_options', esc_html__('Shortcode Settings', 'listdom'), [$this, 'metabox_display_options'], $this->PT, 'normal');
     }
 
     public function metabox_shortcode($post)
@@ -141,40 +137,10 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         include $this->include_html_file('metaboxes/shortcode/shortcode.php', ['return_path' => true]);
     }
 
-    public function metabox_search($post)
-    {
-        // Generate output
-        include $this->include_html_file('metaboxes/shortcode/search.php', ['return_path' => true]);
-    }
-
-    public function metabox_map_controls($post)
-    {
-        // Generate output
-        include $this->include_html_file('metaboxes/shortcode/map-controls.php', ['return_path' => true]);
-    }
-
-    public function metabox_default_sort($post)
-    {
-        // Generate output
-        include $this->include_html_file('metaboxes/shortcode/default-sort.php', ['return_path' => true]);
-    }
-
-    public function metabox_sort_options($post)
-    {
-        // Generate output
-        include $this->include_html_file('metaboxes/shortcode/sort-options.php', ['return_path' => true]);
-    }
-
     public function metabox_display_options($post)
     {
         // Generate output
         include $this->include_html_file('metaboxes/shortcode/display-options.php', ['return_path' => true]);
-    }
-
-    public function metabox_filter_options($post)
-    {
-        // Generate output
-        include $this->include_html_file('metaboxes/shortcode/filter-options.php', ['return_path' => true]);
     }
 
     public function save($post_id, $post)

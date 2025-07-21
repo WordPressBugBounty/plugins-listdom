@@ -159,6 +159,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         $email = $args['email'] ?? '';
         $phone = isset($args['phone']) && trim($args['phone']) ? $args['phone'] : 'N/A';
         $message = $args['message'] ?? '';
+        $subscribe = $args['subscribe'] ?? '';
         $profile_link = LSD_User::profile_link($owner_id);
 
         // Results
@@ -211,6 +212,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
                 'email' => $email,
                 'phone' => $phone,
                 'message' => $message,
+                'subscribe' => $subscribe,
             ], $notification->ID, $listing_id);
         }
 

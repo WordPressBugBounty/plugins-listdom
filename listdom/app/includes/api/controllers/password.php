@@ -9,13 +9,13 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
 
         // Password is Too Short
         if (strlen($password) < 6) return $this->response([
-            'data' => new WP_Error('400', esc_html__("Password is too short! It should be at-least 6 characters.", 'listdom')),
+            'data' => new WP_Error('400', esc_html__("Password is too short! It should be at least 6 characters.", 'listdom')),
             'status' => 400,
         ]);
 
         // Password does not Match
         if ($password !== $password_confirmation) return $this->response([
-            'data' => new WP_Error('400', esc_html__("Password do not match with its confirmation.", 'listdom')),
+            'data' => new WP_Error('400', esc_html__("Password does not match its confirmation.", 'listdom')),
             'status' => 400,
         ]);
 

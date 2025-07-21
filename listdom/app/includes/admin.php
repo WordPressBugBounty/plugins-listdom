@@ -30,6 +30,9 @@ class LSD_Admin extends LSD_Base
         // Block Admin Access
         add_action('admin_init', [$this, 'block_admin']);
         add_filter('show_admin_bar', [$this, 'show_admin_bar']);
+
+        // WordPress Dashboard Widget
+        add_action('wp_dashboard_setup', [$this, 'dashboard_widget']);
     }
 
     public function post_activate()
@@ -72,7 +75,7 @@ class LSD_Admin extends LSD_Base
 
     private function is_admin_blocked(): bool
     {
-        if (!is_user_logged_in()) return false;
+        if (!is_user_logged_in() || is_super_admin()) return false;
 
         $roles = wp_get_current_user()->roles;
         foreach ($roles as $role)
@@ -81,5 +84,39 @@ class LSD_Admin extends LSD_Base
         }
 
         return true;
+    }
+
+    public function dashboard_widget(): void
+    {
+        wp_add_dashboard_widget(
+            'lsd_news_updates',
+            esc_html__('Listdom', 'listdom'),
+            [$this, 'dashboard_widget_content']
+        );
+    }
+
+    public function dashboard_widget_content(): void
+    {
+        if (!function_exists('fetch_feed')) include_once ABSPATH . WPINC . '/feed.php';
+
+        $rss = fetch_feed('https://listdom.net/blog/feed/');
+        $items = [];
+        $error = null;
+
+        if (is_wp_error($rss)) $error = esc_html__('Unable to retrieve news.', 'listdom');
+        else
+        {
+            $max = $rss->get_item_quantity(5);
+            $items = $rss->get_items(0, $max);
+
+            if (!$items) $error = esc_html__('No news items found.', 'listdom');
+        }
+
+        $this->include_html_file('menus/plugins/dashboard-widget.php', [
+            'parameters' => [
+                'items' => $items,
+                'error' => $error,
+            ],
+        ]);
     }
 }

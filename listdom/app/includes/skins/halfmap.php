@@ -23,4 +23,12 @@ class LSD_Skins_Halfmap extends LSD_Skins
         // Current View
         $this->default_view = isset($_POST['view']) ? sanitize_text_field($_POST['view']) : $this->default_view;
     }
+
+    public function output()
+    {
+        // No Map Component
+        if (!LSD_Components::map()) return '';
+
+        return parent::output();
+    }
 }

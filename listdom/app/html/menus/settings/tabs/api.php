@@ -7,47 +7,54 @@ defined('ABSPATH') || die();
 $api = LSD_Options::api();
 ?>
 <div class="lsd-settings-wrap">
-    <?php if($this->isLite()): ?>
-    <div class="lsd-mt-4"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('API', 'listdom')), 'warning'); ?></div>
-    <?php else: ?>
     <form id="lsd_api_form">
-        <div class="lsd-settings-form-group lsd-box-white lsd-rounded lsd-mt-4 lsd-p-5">
-            <h3 class="lsd-my-0"><?php esc_html_e('API Tokens', 'listdom'); ?></h3>
-            <div class="lsd-mt-0 lsd-mb-5">
-                <p class="description lsd-mt-0 lsd-mb-0"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
-                <div class="lsd-alert lsd-info"><?php echo sprintf(esc_html__('You can use the %s URL as the API base URL.', 'listdom'), '<code>'.get_rest_url().'</code>'); ?></div>
-                <button type="button" class="button" id="lsd_settings_api_add_token"><?php esc_html_e('Add Token', 'listdom'); ?></button>
-            </div>
-            <?php foreach($api['tokens'] as $i => $token): ?>
-            <div class="lsd-form-row" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>">
-                <div class="lsd-col-2"><?php echo LSD_Form::text([
-                    'id' => 'lsd_settings_api_tokens_'.esc_attr($i).'_name',
-                    'name' => 'lsd[tokens]['.esc_attr($i).'][name]',
-                    'value' => $token['name'],
-                    'placeholder' => esc_html__('Token Name', 'listdom'),
-                ]); ?></div>
-                <div class="lsd-col-4">
-                    <input title="" type="text" name="lsd[tokens][<?php echo esc_attr($i); ?>][key]" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>_key" value="<?php echo esc_attr($token['key']); ?>" placeholder="<?php esc_attr_e('Token Key', 'listdom'); ?>" readonly>
+        <div class="lsd-tab-content-active lsd-tab-content">
+            <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('API Tokens', 'listdom'); ?></h3>
+            <?php if ($this->isLite()): ?>
+                <div class="lsd-m-4"><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('API', 'listdom')), 'warning'); ?></div>
+            <?php else: ?>
+                <div class="lsd-settings-form-group lsd-box-white lsd-rounded">
+                    <div class="lsd-settings-group-wrapper">
+                        <div class="lsd-settings-fields-wrapper">
+                            <div class="lsd-mt-0 lsd-mb-5">
+                                <p class="description lsd-mt-0 lsd-mb-0"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
+                                <div class="lsd-alert lsd-info"><?php echo sprintf(esc_html__('You can use the %s URL as the API base URL.', 'listdom'), '<code>'.get_rest_url().'</code>'); ?></div>
+                                <button type="button" class="button" id="lsd_settings_api_add_token"><?php esc_html_e('Add Token', 'listdom'); ?></button>
+                            </div>
+                            <?php foreach($api['tokens'] as $i => $token): ?>
+                            <div class="lsd-form-row" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>">
+                                <div class="lsd-col-2"><?php echo LSD_Form::text([
+                                    'id' => 'lsd_settings_api_tokens_'.esc_attr($i).'_name',
+                                    'name' => 'lsd[tokens]['.esc_attr($i).'][name]',
+                                    'value' => $token['name'],
+                                    'placeholder' => esc_html__('Token Name', 'listdom'),
+                                ]); ?></div>
+                                <div class="lsd-col-4">
+                                    <input title="" type="text" name="lsd[tokens][<?php echo esc_attr($i); ?>][key]" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>_key" value="<?php echo esc_attr($token['key']); ?>" placeholder="<?php esc_attr_e('Token Key', 'listdom'); ?>" readonly>
+                                </div>
+                                <div class="lsd-col-1">
+                                    <div class="lsd-api-remove-token lsd-pt-2 lsd-cursor-pointer" data-i="<?php echo esc_attr($i); ?>" data-confirm="0"><i class="lsd-icon fas fa-trash-alt"></i></div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="lsd-col-1">
-                    <div class="lsd-api-remove-token lsd-pt-2 lsd-cursor-pointer" data-i="<?php echo esc_attr($i); ?>" data-confirm="0"><i class="lsd-icon fas fa-trash-alt"></i></div>
-                </div>
-            </div>
-            <?php endforeach; ?>
+            <?php endif; ?>
         </div>
+        <?php if ($this->isPro()): ?>
         <div class="lsd-spacer-10"></div>
-        <div class="lsd-form-row">
-			<div class="lsd-col-12">
+        <div class="lsd-form-row lsd-settings-submit-wrapper">
+			<div class="lsd-col-12 lsd-flex lsd-flex-content-end">
 				<?php LSD_Form::nonce('lsd_api_form'); ?>
-				<?php echo LSD_Form::submit([
-					'label' => esc_html__('Save', 'listdom'),
-					'id' => 'lsd_api_save_button',
-					'class' => 'button button-hero button-primary',
-				]); ?>
+                <button type="submit" id="lsd_api_save_button" class="lsd-primary-button">
+                    <?php esc_html_e('Save The Changes', 'listdom'); ?>
+                    <i class='lsdi lsdi-checkmark-circle'></i>
+                </button>
 			</div>
         </div>
+        <?php endif; ?>
     </form>
-    <?php endif; ?>
 </div>
 <script>
 // Add Token

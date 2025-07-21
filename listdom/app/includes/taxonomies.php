@@ -204,6 +204,9 @@ class LSD_Taxonomies extends LSD_Base
 
     public static function icon($term_id, $class = 'fa-fw')
     {
+        $disabled = get_term_meta($term_id, 'lsd_disabled_icon', true);
+        if ($disabled) return apply_filters('lsd_term_icon', '', $term_id, $class);
+
         $icon = get_term_meta($term_id, 'lsd_icon', true);
         $HTML = trim($icon) ? '<i class="lsd-icon ' . esc_attr($icon) . ' ' . esc_attr($class) . '" aria-hidden="true"></i>' : '';
 

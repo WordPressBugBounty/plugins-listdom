@@ -14,7 +14,9 @@ if(!is_array($sorts) || !count($sorts)) $sorts = LSD_Options::defaults('sorts');
 // Available Options
 $options = $this->get_available_sort_options();
 ?>
-<div class="lsd-metabox lsd-metabox-sort-options">
+<h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Default Sort", 'listdom'); ?></h3>
+<p class="description lsd-mb-4 lsd-mt-3"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
+<div id="lsd_metabox_default_sort" class="lsd-metabox lsd-metabox-sort-options">
     <div class="lsd-metabox-sort-options-default">
         <div class="lsd-metabox-sort-options-default-order lsd-mb-3 lsd-mt-3">
             <label for="lsd_sort_options_orderby"><?php esc_html_e('Order By', 'listdom'); ?></label>

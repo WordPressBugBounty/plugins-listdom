@@ -9,7 +9,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '4.4.0';
+    public $version = '4.5.0';
 
     /**
      * The single instance of the class.
@@ -215,8 +215,10 @@ final class Listdom
         $review->init();
 
         // Deactivation Feedback
-        $df = new LSD_Plugin_Feedback();
-        $df->init();
+        new LSD_Plugin_Feedback([
+            'plugin' => 'listdom',
+            'basename' => LSD_BASENAME,
+        ]);
 
         // Settings Import / Export
         $ixs = new LSD_IX_Settings();
@@ -229,6 +231,9 @@ final class Listdom
         // Listdom Bar
         $bar = LSD_Bar::instance();
         $bar->init();
+
+        // Listing Visibility
+        (new LSD_Visibility())->init();
 
         // Initialize Lite Features
         if ($main->isLite())
