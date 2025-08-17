@@ -38,8 +38,8 @@ $ids = $this->listings;
             <div class="lsd-listing-detail-bottom">
                 <div class="lsd-row">
                     <div class="lsd-col-9">
-                        <?php if ($this->display_location): ?>
-                            <div class="lsd-listing-locations">
+                        <?php if ($this->display_address): ?>
+                            <div class="lsd-listing-address">
                                 <?php echo LSD_Kses::element($listing->get_address()); ?>
                             </div>
                         <?php endif; ?>

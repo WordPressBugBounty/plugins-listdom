@@ -80,7 +80,7 @@ class LSD_Assets extends LSD_Base
         $this->owl(['lsd-frontend']);
 
         // Include Color Picker
-        $this->colorpicker();
+        $this->pickr();
 
         // Include Lightbox
         $this->lightbox();
@@ -208,6 +208,12 @@ class LSD_Assets extends LSD_Base
 
         // Include WordPress color picker CSS file
         wp_enqueue_style('wp-color-picker');
+    }
+
+    public function pickr()
+    {
+        wp_enqueue_script('pickr', $this->lsd_asset_url('packages/pickr/pickr.min.js'), [], LSD_Assets::version());
+        wp_enqueue_style('pickr', $this->lsd_asset_url('packages/pickr/pickr.min.css'), [], LSD_Assets::version());
     }
 
     public static function lightslider()

@@ -40,6 +40,7 @@ class LSD_API_Resources_Taxonomy extends LSD_API_Resource
         if (isset($metas['lsd_schema'])) $data['schema'] = $metas['lsd_schema'];
 
         if (isset($metas['lsd_field_type'])) $data['field_type'] = $metas['lsd_field_type'];
+        if (isset($metas['lsd_link_label'])) $data['link_label'] = $metas['lsd_link_label'];
         if (isset($metas['lsd_index'])) $data['index'] = $metas['lsd_index'];
         if (isset($metas['lsd_all_categories'])) $data['all_categories'] = $metas['lsd_all_categories'];
         if (isset($metas['lsd_categories'])) $data['categories'] = $metas['lsd_categories'];
@@ -108,6 +109,7 @@ class LSD_API_Resources_Taxonomy extends LSD_API_Resource
         if (isset($metas['lsd_required'])) $data['required'] = $metas['lsd_required'];
         if (isset($metas['lsd_editor'])) $data['editor'] = $metas['lsd_editor'];
         if (isset($metas['lsd_icon'])) $data['icon'] = $metas['lsd_icon'];
+        if (isset($metas['lsd_link_label'])) $data['link_label'] = $metas['lsd_link_label'];
         if (isset($metas['lsd_symbol'])) $data['symbol'] = LSD_API_Resources_Image::get($metas['lsd_symbol']);
         if (isset($metas['lsd_image'])) $data['image'] = LSD_API_Resources_Image::get($metas['lsd_image']);
 

@@ -249,6 +249,7 @@ class LSD_Main extends LSD_Base
             $icon = get_term_meta($term->term_id, 'lsd_icon', true);
             $required = get_term_meta($term->term_id, 'lsd_required', true);
             $editor = get_term_meta($term->term_id, 'lsd_editor', true);
+            $link_label = get_term_meta($term->term_id, 'lsd_link_label', true);
 
             $values_array = is_string($values_raw)
                 ? explode(',', $values_raw)
@@ -265,6 +266,7 @@ class LSD_Main extends LSD_Base
                 'icon' => $icon,
                 'required' => $required,
                 'editor' => $editor,
+                'link_label' => $link_label,
             ];
         }
 

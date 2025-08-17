@@ -232,7 +232,8 @@ class LSD_IX extends LSD_Base
                 $term = $attribute['term'] ?? [];
                 if (!is_array($term) || !count($term)) continue;
 
-                $exists = term_exists($term['name'], LSD_Base::TAX_ATTRIBUTE);
+                $slug = $term['slug'] ?? '';
+                $exists = $slug ? term_exists($slug, LSD_Base::TAX_ATTRIBUTE) : term_exists($term['name'], LSD_Base::TAX_ATTRIBUTE);
 
                 if (is_array($exists) && isset($exists['term_id'])) $term_id = (int) $exists['term_id'];
                 else
@@ -241,7 +242,7 @@ class LSD_IX extends LSD_Base
                     $wpt = wp_insert_term($term['name'], LSD_Base::TAX_ATTRIBUTE, [
                         'description' => $term['description'] ?? '',
                         'parent' => $term['parent'] ?? 0,
-                        'slug' => $term['slug'] ?? '',
+                        'slug' => $slug,
                     ]);
 
                     // An Error Occurred
@@ -257,10 +258,13 @@ class LSD_IX extends LSD_Base
                     }
                 }
 
+                $term_obj = get_term($term_id, LSD_Base::TAX_ATTRIBUTE);
+                if (!$term_obj || is_wp_error($term_obj)) continue;
+
                 $value = $attribute['value'] ?? '';
 
                 // Add to Attributes
-                $attributes[$term_id] = $value;
+                $attributes[$term_obj->slug] = $value;
             }
         }
 

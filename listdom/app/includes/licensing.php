@@ -5,12 +5,28 @@ use Webilia\WP\Plugin\Licensing;
 class LSD_Licensing extends LSD_Base
 {
     /**
+     * Runtime cache to avoid multiple checks in a single request
+     *
+     * @var array<string,mixed>
+     */
+    private static $runtime = [];
+
+    /**
      * @param string $basename
      * @return string
      */
     private static function getProductKey(string $basename): string
     {
         return 'lsd_product_validation_' . str_replace(['/', '-'], '_', $basename);
+    }
+
+    /**
+     * @param string $basename
+     * @return string
+     */
+    private static function getOptionKey(string $basename): string
+    {
+        return self::getProductKey($basename) . '_opt';
     }
 
     /**
@@ -23,14 +39,34 @@ class LSD_Licensing extends LSD_Base
         // Product Key
         $key = self::getProductKey($basename);
 
+        // Already checked in this request
+        if (isset(self::$runtime[$key])) return self::$runtime[$key];
+
+        $option_key = self::getOptionKey($basename);
+
         $license_key_option = $prefix . '_purchase_code';
         $activation_id_option = $prefix . '_activation_id';
 
         // Validation Status
         $valid = 0;
 
-        // Cached Status
+        // Cached Status (transient)
         $cached = get_transient($key);
+
+        // Fallback to options when transients are disabled
+        if (!is_numeric($cached))
+        {
+            $opt_cache = get_option($option_key, []);
+
+            if (
+                is_array($opt_cache) &&
+                isset($opt_cache['value'], $opt_cache['expires']) &&
+                $opt_cache['expires'] > current_time('timestamp')
+            )
+            {
+                $cached = $opt_cache['value'];
+            }
+        }
 
         // Already Checked
         if (is_numeric($cached)) $valid = (int) $cached;
@@ -67,7 +103,7 @@ class LSD_Licensing extends LSD_Base
             // Invalid
             else
             {
-                $expiry = HOUR_IN_SECONDS;
+                $expiry = DAY_IN_SECONDS;
 
                 // Start Grace Period
                 $grace_started = add_option($prefix . '_invalidated_at', current_time('timestamp'));
@@ -76,12 +112,89 @@ class LSD_Licensing extends LSD_Base
                 if ($grace_started) $valid = 3;
             }
 
-            // Set to Transient
+            // Persist cache in transients and options
             set_transient($key, $valid, $expiry);
+            update_option(
+                $option_key,
+                ['value' => $valid, 'expires' => current_time('timestamp') + $expiry],
+                false
+            );
         }
+
+        // Store in runtime cache
+        self::$runtime[$key] = $valid;
 
         // Filter Validation
         return (int) apply_filters('lsd_licensing_validation', $valid, $basename, $prefix);
+    }
+
+    /**
+     * Validate the license and return detailed result
+     *
+     * @param string $basename
+     * @param string $prefix
+     * @return array
+     */
+    public static function validate(string $basename, string $prefix): array
+    {
+        // Product Key for validation details
+        $key = self::getProductKey($basename) . '_data';
+
+        // Already checked in this request
+        if (isset(self::$runtime[$key])) return self::$runtime[$key];
+
+        // Option Key
+        $option_key = $key . '_opt';
+
+        $license_key_option = $prefix . '_purchase_code';
+        $activation_id_option = $prefix . '_activation_id';
+
+        // Cached Response (transient)
+        $data = get_transient($key);
+
+        // Fallback to options when transients are disabled
+        if (!is_array($data))
+        {
+            $opt_cache = get_option($option_key, []);
+
+            if (
+                is_array($opt_cache) &&
+                isset($opt_cache['value'], $opt_cache['expires']) &&
+                $opt_cache['expires'] > current_time('timestamp')
+            )
+            {
+                $data = $opt_cache['value'];
+            }
+        }
+
+        // Already Checked
+        if (!is_array($data))
+        {
+            // Webilia Licensing Server
+            $licensing = new Licensing(
+                $license_key_option,
+                $activation_id_option,
+                $basename,
+                LSD_LICENSING_SERVER
+            );
+
+            // Validate License and get response
+            $data = $licensing->validate();
+
+            // Persist cache in transients and options
+            set_transient($key, $data, WEEK_IN_SECONDS);
+            update_option(
+                $option_key,
+                ['value' => $data, 'expires' => current_time('timestamp') + WEEK_IN_SECONDS],
+                false
+            );
+        }
+
+        // Store in runtime cache
+        self::$runtime[$key] = $data;
+
+        // Filter Validation Response
+        return (array) apply_filters('lsd_licensing_validation_data', $data, $basename, $prefix);
     }
 
     /**
@@ -217,9 +330,18 @@ class LSD_Licensing extends LSD_Base
      */
     public static function reset(string $basename)
     {
-        // Product Key
+        // Base Key
         $key = self::getProductKey($basename);
 
+        // Transient Cache
         delete_transient($key);
+        delete_transient($key . '_data');
+
+        // Option Cache
+        delete_option(self::getOptionKey($basename));
+        delete_option($key . '_data_opt');
+
+        // Runtime Cache
+        unset(self::$runtime[$key], self::$runtime[$key . '_data']);
     }
 }

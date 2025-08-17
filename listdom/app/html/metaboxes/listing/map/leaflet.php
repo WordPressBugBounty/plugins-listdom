@@ -26,7 +26,9 @@ jQuery(document).ready(function($)
     let latlngs = [];
 
     // Init map
-    const map = L.map(document.getElementById('lsd_address_map')).setView(center, zoomlevel);
+    const map = L.map(document.getElementById('lsd_address_map'), {
+        scrollWheelZoom: false,
+    }).setView(center, zoomlevel);
 
     if(mapbox_token)
     {

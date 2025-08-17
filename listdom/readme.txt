@@ -2,10 +2,10 @@
 Contributors: webilia
 Donate link: https://listdom.net
 Tags: business directory, listings, classifieds, local business directory, directory plugin
-Requires at least: 4.0.0
+Requires at least: 4.2
 Requires PHP: 7.2
 Tested up to: 6.8
-Stable tag: 4.5.1
+Stable tag: 4.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -342,6 +342,10 @@ While Listdom and Listdomer both offer free versions, they also provide enhanced
 👉 Official X Account: [Follow on X](https://twitter.com/Webilia_Inc)
 👉 Official LinkedIn: [Follow on LinkedIn](https://www.linkedin.com/company/webilia)
 
+== Commercial ==
+
+This plugin is free but offers additional paid commercial upgrades and support. [Learn more](https://listdom.net)
+
 == Upcoming Features! ==
 
 *   Gateways Direct Support
@@ -422,6 +426,18 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 4.6.0 =
+* Added image field type for custom fields.
+* Added telephone field type for custom fields.
+* Added GPT-5 AI models.
+* Added role-based redirection pages for the authentication feature.
+* Added a frontend dashboard search widget.
+* Added link labels for URL, telephone, and email custom fields.
+* Improved the Listdom frontend bar and backend header.
+* Enhanced the look and feel of Listdom skins.
+* Disabled scroll wheel zoom on Leaflet maps.
+* Fixed various issues in the frontend dashboard.
 
 = 4.5.1 =
 * Fixed some issues related to the search module.

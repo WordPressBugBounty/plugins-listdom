@@ -421,7 +421,7 @@ class LSD_Base
 
     public static function missAddonMessage($addon = '', $feature = ''): string
     {
-        return sprintf(esc_html__('Activate the %s add-on to use the %s feature.', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '" target="_blank"><strong>' . esc_html__($addon, 'listdom') . '</strong></a>'), '<strong>'.$feature.'</strong>');
+        return sprintf(esc_html__('Activate the %s add-on to use the %s feature.', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '" target="_blank"><strong>' . esc_html__($addon, 'listdom') . '</strong></a>'), '<strong>' . $feature . '</strong>');
     }
 
     public static function optionalAddonsMessage(array $addon_features = []): string
@@ -709,6 +709,9 @@ class LSD_Base
 
     public static function stars($stars): string
     {
+        // Ensure numeric
+        $stars = is_numeric($stars) ? (float) $stars : 0;
+
         // Rounded Stars
         $rounded = round($stars);
 

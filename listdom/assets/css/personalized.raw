@@ -289,6 +289,8 @@
   --listdom-masonry-tabs-border-radius: ((masonry_tabs_border_radius)); /* Masonry Tabs Border Radius */
   --listdom-masonry-tabs-hover-border-radius: ((masonry_tabs_hover_border_radius)); /* Masonry Tabs Border Radius */
 
+  --listdom-slider-arrows-icon-color: ((slider_arrows_icon_color)); /* Slider Icons Color */
+
   --listdom-reviews-tabs-bg: ((reviews_tabs_bg_color)); /* Reviews Tabs Background Color */
   --listdom-reviews-tabs-text: ((reviews_tabs_text_color)); /* Reviews Tabs Text Color */
   --listdom-reviews-tabs-hover-bg: ((reviews_tabs_hover_bg_color)); /* Reviews Tabs Hover Background Color */

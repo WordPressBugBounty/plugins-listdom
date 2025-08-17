@@ -459,4 +459,3 @@ class LSD_PTypes_Listing extends LSD_PTypes
         ]);
     }
 }
-

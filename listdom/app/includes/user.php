@@ -290,4 +290,19 @@ class LSD_User extends LSD_Base
 
         return get_author_posts_url($id);
     }
+
+    public static function roles(bool $only_keys = false): array
+    {
+        $roles = apply_filters('lsd_user_supported_roles', [
+            'subscriber' => esc_html__('Subscriber', 'listdom'),
+            'contributor' => esc_html__('Contributor', 'listdom'),
+            'listdom_author' => esc_html__('Listdom Author', 'listdom'),
+            'listdom_publisher' => esc_html__('Listdom Publisher', 'listdom'),
+        ]);
+
+        // Only Keys
+        if ($only_keys) return array_keys($roles);
+
+        return $roles;
+    }
 }

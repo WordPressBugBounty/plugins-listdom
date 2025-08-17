@@ -18,16 +18,16 @@ $networks = LSD_Options::socials();
 ?>
 <div class="lsd-settings-wrap">
     <form id="lsd_settings_form">
-        <div id="lsd_panel_general_general" class="lsd-settings-form-group lsd-tab-content-active lsd-tab-content">
+        <div id="lsd_panel_general_general" class="lsd-settings-form-group lsd-tab-content<?php echo ($this->subtab === 'general' || !$this->subtab) ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('General', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
                     <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Date & Time', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Date Picker Format', 'listdom'),
-                                'for' => 'lsd_settings_datepicker_format',
-                            ]); ?></div>
+                            'title' => esc_html__('Date Picker Format', 'listdom'),
+                            'for' => 'lsd_settings_datepicker_format',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::select([
                                 'id' => 'lsd_settings_datepicker_format',
@@ -46,9 +46,9 @@ $networks = LSD_Options::socials();
                     </div>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Time Picker Format', 'listdom'),
-                                'for' => 'lsd_settings_timepicker_format',
-                            ]); ?></div>
+                            'title' => esc_html__('Time Picker Format', 'listdom'),
+                            'for' => 'lsd_settings_timepicker_format',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::select([
                                 'id' => 'lsd_settings_timepicker_format',
@@ -66,9 +66,9 @@ $networks = LSD_Options::socials();
                     <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Currency', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Currency Position', 'listdom'),
-                                'for' => 'lsd_settings_currency_position',
-                            ]); ?></div>
+                            'title' => esc_html__('Currency Position', 'listdom'),
+                            'for' => 'lsd_settings_currency_position',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::select([
                                 'id' => 'lsd_settings_currency_position',
@@ -85,9 +85,9 @@ $networks = LSD_Options::socials();
                     </div>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Default Currency', 'listdom'),
-                                'for' => 'lsd_settings_default_currency',
-                            ]); ?></div>
+                            'title' => esc_html__('Default Currency', 'listdom'),
+                            'for' => 'lsd_settings_default_currency',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::currency([
                                 'id' => 'lsd_settings_default_currency',
@@ -102,9 +102,9 @@ $networks = LSD_Options::socials();
                     <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Listing', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Listing Custom Link', 'listdom'),
-                                'for' => 'lsd_settings_listing_link_status',
-                            ]); ?></div>
+                            'title' => esc_html__('Listing Custom Link', 'listdom'),
+                            'for' => 'lsd_settings_listing_link_status',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::switcher([
                                 'id' => 'lsd_settings_listing_link_status',
@@ -116,9 +116,9 @@ $networks = LSD_Options::socials();
                     </div>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Include Featured Image in Gallery', 'listdom'),
-                                'for' => 'lsd_settings_gallery_featured_image',
-                            ]); ?></div>
+                            'title' => esc_html__('Include Featured Image in Gallery', 'listdom'),
+                            'for' => 'lsd_settings_gallery_featured_image',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::select([
                                 'id' => 'lsd_settings_gallery_featured_image',
@@ -135,9 +135,9 @@ $networks = LSD_Options::socials();
                     </div>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Address Placeholder', 'listdom'),
-                                'for' => 'lsd_settings_address_placeholder',
-                            ]); ?></div>
+                            'title' => esc_html__('Address Placeholder', 'listdom'),
+                            'for' => 'lsd_settings_address_placeholder',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::text([
                                 'id' => 'lsd_settings_address_placeholder',
@@ -149,9 +149,9 @@ $networks = LSD_Options::socials();
                     </div>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('No Listing Message', 'listdom'),
-                                'for' => 'lsd_settings_no_listings_message',
-                            ]); ?></div>
+                            'title' => esc_html__('No Listing Message', 'listdom'),
+                            'for' => 'lsd_settings_no_listings_message',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::textarea([
                                 'id' => 'lsd_settings_no_listings_message',
@@ -168,7 +168,7 @@ $networks = LSD_Options::socials();
         </div>
 
         <?php if (LSD_Components::map()): ?>
-        <div id="lsd_panel_general_map-module" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_general_map-module" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'map-module' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Map Module', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -207,7 +207,7 @@ $networks = LSD_Options::socials();
                                         '<strong>'.esc_html__('Maps Javascript API', 'listdom').'</strong>',
                                         '<strong>'.esc_html__('Places API', 'listdom').'</strong>',
                                         '<strong>'.esc_html__('Geocoding API', 'listdom').'</strong>',
-                                        '<strong>'.esc_html__('Directions API', 'listdom').'</strong>',
+                                        '<strong>'.esc_html__('Directions API', 'listdom').'</strong>'
                                     ); ?>
                                 </div>
                             </div>
@@ -391,7 +391,7 @@ $networks = LSD_Options::socials();
         <?php endif; ?>
 
         <?php if (LSD_Components::pricing()): ?>
-        <div id="lsd_panel_general_price-components" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_general_price-components" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'price-components' ? ' lsd-tab-content-active' : ''; ?>">
             <?php if ($this->isLite()): ?>
                 <div class="lsd-alert lsd-warning lsd-mt-0 lsd-mb-4">
                     <?php echo LSD_Base::missFeatureMessage(
@@ -431,7 +431,7 @@ $networks = LSD_Options::socials();
         <?php endif; ?>
 
         <?php if (LSD_Components::socials()): ?>
-        <div id="lsd_panel_general_socials" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_general_socials" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'socials' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Social Networks', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -490,7 +490,7 @@ $networks = LSD_Options::socials();
         </div>
         <?php endif; ?>
 
-        <div id="lsd_panel_general_archive-pages" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_general_archive-pages" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'archive-pages' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Archive Pages', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -583,7 +583,7 @@ $networks = LSD_Options::socials();
             </div>
         </div>
 
-        <div id="lsd_panel_general_slugs" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_general_slugs" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'slugs' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Slugs', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -598,7 +598,7 @@ $networks = LSD_Options::socials();
                                 <?php echo LSD_Form::text([
                                     'id' => 'lsd_settings_listings_slug',
                                     'name' => 'lsd[listings_slug]',
-                                    'value' => $settings['listings_slug'] ?? ''
+                                    'value' => isset($settings['listings_slug']) && trim($settings['listings_slug']) ? $settings['listings_slug'] : LSD_Options::slug()
                                 ]); ?>
                                 <p class="description"><?php echo sprintf(esc_html__("This option modifies the listing page URL. For example, if you set it to markers, the listings' addresses will be %s", 'listdom'), sprintf('https://yourwebsite.com/%s/listing-name/', '<strong>markers</strong>')); ?></p>
                             </div>
@@ -726,7 +726,7 @@ $networks = LSD_Options::socials();
             </div>
         </div>
 
-        <div id="lsd_panel_general_Google-reCAPTCHA" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_general_Google-reCAPTCHA" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'Google-reCAPTCHA' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Google-reCAPTCHA', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -777,7 +777,7 @@ $networks = LSD_Options::socials();
             </div>
         </div>
 
-        <div id="lsd_panel_general_integrations" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_general_integrations" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'integrations' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Integrations', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">

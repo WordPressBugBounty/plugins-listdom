@@ -40,7 +40,7 @@ $optional_addons = [];
     <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Elements", 'listdom'); ?></h3>
     <p class="description lsd-mb-4"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
     <div class="lsd-flex lsd-gap-2">
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3">
             <div class="lsd-form-row lsd-display-options-builder-option">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Location', 'listdom'),
@@ -57,7 +57,7 @@ $optional_addons = [];
         </div>
 
         <?php if (LSD_Components::map()): ?>
-        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2">
+        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style4">
             <div class="lsd-form-row">
                 <div class="lsd-col-5"><?php echo LSD_Form::label([
                     'title' => esc_html__('Address', 'listdom'),

@@ -168,12 +168,26 @@ class LSD_Menus extends LSD_Base
         return true;
     }
 
-    public static function header($title = null)
+    public static function header($title = null, $url = null, $menus = [])
     {
         $base = new LSD_Base();
-        $base->include_html_file('menus/dashboard/header.php', [
+
+        // Current menu slug without extra parameters
+        $page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : '';
+
+        // Set default title
+        if (LSD_Base::isPro()) $default = esc_html__('Listdom Pro', 'listdom');
+        else $default = esc_html__('Listdom', 'listdom');
+
+        // Show Listdom version on the home page
+        if ($page === 'listdom' && defined('LSD_VERSION')) $default .= ' <span class="lsd-dashboard-version">(' . esc_html(LSD_VERSION) . ')</span>';
+
+        $base->include_html_file('plugin/header.php', [
             'parameters' => [
-                'title' => $title ?? esc_html__('Listdom', 'listdom'),
+                'title' => $title ?? $default,
+                'page' => $page,
+                'url' => $url,
+                'menus' => $menus,
             ],
         ]);
     }

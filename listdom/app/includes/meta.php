@@ -433,7 +433,7 @@ class LSD_Meta extends LSD_Base
             $key = 'lsd_attribute_' . $attribute->term_id;
             $metas[$key] = [
                 'key' => $key,
-                'type' => in_array($type, [LSD_Meta::NUMBER, LSD_Meta::EMAIL, LSD_Meta::URL])
+                'type' => in_array($type, [LSD_Meta::NUMBER, LSD_Meta::EMAIL, LSD_Meta::URL, LSD_Meta::TEL, LSD_Meta::IMAGE])
                     ? $type
                     : LSD_Meta::TEXT,
                 'name' => $attribute->name,

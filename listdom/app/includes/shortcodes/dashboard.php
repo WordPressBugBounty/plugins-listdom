@@ -14,6 +14,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     public $post;
     public $limit;
     public $form_type;
+    public $search;
+    public $category;
 
     /**
      * @var WP_Query
@@ -100,8 +102,28 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Mode
         $this->mode = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : 'manage';
 
+        // Listdom Bar
+        $bar = LSD_Bar::instance();
+
+        if ($this->mode === 'form')
+        {
+            $id = isset($_GET['id']) ? (int) sanitize_text_field($_GET['id']) : 0;
+
+            if ($id > 0) $bar->add($id);
+            else $bar->menu(
+                admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_LISTING),
+                __('Add Listing', 'listdom')
+            );
+        }
+
         // Payload
         LSD_Payload::set('dashboard', $this);
+
+        // Dashboard Settings in Listdom Bar
+        $bar->menu(
+            admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard'),
+            __('Dashboard Settings', 'listdom')
+        );
 
         // Dashboard
         if ($this->mode === 'manage') return $this->manage();
@@ -129,6 +151,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Status
         $status = $_GET['status'] ?? '';
 
+        // Search
+        $this->search = isset($_GET['lsd_s']) ? sanitize_text_field($_GET['lsd_s']) : '';
+        $this->category = isset($_GET['lsd_category']) ? (int) sanitize_text_field($_GET['lsd_category']) : 0;
+
         // Get Listings
         $query = [
             'post_type' => LSD_Base::PTYPE_LISTING,
@@ -136,6 +162,18 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             'post_status' => $status ?: ['publish', 'pending', 'draft', 'trash', LSD_Base::STATUS_HOLD, LSD_Base::STATUS_EXPIRED],
             'paged' => $paged,
         ];
+
+        if ($this->search) $query['s'] = $this->search;
+        if ($this->category)
+        {
+            $query['tax_query'] = [
+                [
+                    'taxonomy' => LSD_Base::TAX_CATEGORY,
+                    'field' => 'term_id',
+                    'terms' => $this->category,
+                ],
+            ];
+        }
 
         // Filter by Author
         if (!current_user_can('edit_others_posts')) $query['author'] = get_current_user_id();
@@ -440,9 +478,32 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             else if (isset($tax[$f])) $value = $tax[$f];
             else if (isset($social[$f])) $value = $social[$f];
             else if (isset($_POST[$f])) $value = $_POST[$f];
+            if ($f === 'ava')
+            {
+                $valid = true;
+                if (!is_array($value)) $valid = false;
+                else
+                {
+                    foreach (LSD_Main::get_weekdays() as $weekday)
+                    {
+                        $daycode = $weekday['code'];
+                        $day = $value[$daycode] ?? [];
+                        $hours = isset($day['hours']) ? trim((string) $day['hours']) : '';
+                        $off = isset($day['off']) ? (bool) $day['off'] : false;
+                        if ($hours === '' && !$off)
+                        {
+                            $valid = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$valid) $errors[] = esc_html__('Please set work hours or mark off for all days!', 'listdom');
+                continue;
+            }
 
             if (is_array($value) && !count($value)) $errors[] = sprintf(esc_html__('At-least one value for %s field is required!', 'listdom'), strtolower($field['label']));
-            else if (!is_array($value) && trim($value) === '') $errors[] = sprintf(esc_html__('%s field is required!', 'listdom'), $field['label']);
+            else if (!is_array($value) && trim((string) $value) === '') $errors[] = sprintf(esc_html__('%s field is required!', 'listdom'), $field['label']);
         }
 
         // Restrictions
@@ -903,5 +964,22 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         ob_start();
         include lsd_template('dashboard/auth.php');
         return ob_get_clean();
+    }
+
+    public function listing_counts(): array
+    {
+        global $wp_post_statuses;
+        $counts = wp_count_posts(LSD_Base::PTYPE_LISTING, 'readable');
+
+        $valid = [];
+        foreach ($counts as $s => $count)
+        {
+            if (!$count || !isset($wp_post_statuses[$s])) continue;
+            if (!isset($wp_post_statuses[$s]->show_in_admin_status_list) || !$wp_post_statuses[$s]->show_in_admin_status_list) continue;
+
+            $valid[$s] = $count;
+        }
+
+        return $valid;
     }
 }

@@ -74,7 +74,9 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                     <option value="checkbox"><?php esc_html_e('Checkbox', 'listdom'); ?></option>
                     <option value="number"><?php esc_html_e('Number Input', 'listdom'); ?></option>
                     <option value="email"><?php esc_html_e('Email Input', 'listdom'); ?></option>
+                    <option value="tel"><?php esc_html_e('Tel Input', 'listdom'); ?></option>
                     <option value="url"><?php esc_html_e('URL Input', 'listdom'); ?></option>
+                    <option value="image"><?php esc_html_e('Image', 'listdom'); ?></option>
                     <option value="dropdown"><?php esc_html_e('Dropdown', 'listdom'); ?></option>
                     <option value="textarea"><?php esc_html_e('Textarea', 'listdom'); ?></option>
                     <option value="separator"><?php esc_html_e('Separator', 'listdom'); ?></option>
@@ -112,7 +114,7 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                 </div>
             </div>
             <div
-                class="form-field lsd-field-type-dependent lsd-field-type-text lsd-field-type-number lsd-field-type-email lsd-field-type-url lsd-field-type-dropdown lsd-field-type-textarea lsd-field-type-radio lsd-field-type-checkbox">
+                class="form-field lsd-field-type-dependent lsd-field-type-text lsd-field-type-number lsd-field-type-email lsd-field-type-tel lsd-field-type-url lsd-field-type-dropdown lsd-field-type-textarea lsd-field-type-radio lsd-field-type-checkbox lsd-field-type-image">
                 <label for="lsd_required"><?php esc_html_e('Required', 'listdom'); ?></label>
                 <?php echo LSD_Form::switcher([
                     'name' => 'lsd_required',
@@ -128,6 +130,15 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                     'value' => 0,
                 ]); ?>
                 <p class="description"><?php esc_html_e('Rich or HTML editor cannot be required!', 'listdom'); ?></p>
+            </div>
+            <div class="form-field lsd-field-type-dependent lsd-field-type-url lsd-field-type-email lsd-field-type-tel">
+                <label for="lsd_link_label"><?php esc_html_e('Link Label', 'listdom'); ?></label>
+                <?php echo LSD_Form::text([
+                    'name' => 'lsd_link_label',
+                    'id' => 'lsd_link_label',
+                    'value' => '',
+                ]); ?>
+                <p class="description"><?php esc_html_e('Text to display instead of the raw value.', 'listdom'); ?></p>
             </div>
             <div class="form-field">
                 <label for="lsd_index"><?php esc_html_e('Index', 'listdom'); ?></label>
@@ -171,6 +182,7 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
         $itemprop = get_term_meta($term->term_id, 'lsd_itemprop', true);
         $required = get_term_meta($term->term_id, 'lsd_required', true);
         $editor = get_term_meta($term->term_id, 'lsd_editor', true);
+        $link_label = get_term_meta($term->term_id, 'lsd_link_label', true);
         ?>
         <tr class="form-field form-field-attribute-row">
             <td></td>
@@ -179,12 +191,14 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                     <div class="form-field">
                         <label for="lsd_field_type"><?php esc_html_e('Field Type', 'listdom'); ?></label>
                         <select name="lsd_field_type" id="lsd_field_type" class="width-95-percent">
-                            <option value="text" <?php echo $field_type === 'text' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Text Input', 'listdom'); ?></option>'
+                            <option value="text" <?php echo $field_type === 'text' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Text Input', 'listdom'); ?></option>
                             <option value="radio" <?php echo $field_type === 'radio' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Radio', 'listdom'); ?></option>
                             <option value="checkbox" <?php echo $field_type === 'checkbox' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Checkbox', 'listdom'); ?></option>
                             <option value="number" <?php echo $field_type === 'number' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Number Input', 'listdom'); ?></option>
                             <option value="email" <?php echo $field_type === 'email' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Email Input', 'listdom'); ?></option>
+                            <option value="tel" <?php echo $field_type === 'tel' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Tel Input', 'listdom'); ?></option>
                             <option value="url" <?php echo $field_type === 'url' ? 'selected="selected"' : ''; ?>><?php esc_html_e('URL Input', 'listdom'); ?></option>
+                            <option value="image" <?php echo $field_type === 'image' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Image', 'listdom'); ?></option>
                             <option value="dropdown" <?php echo $field_type === 'dropdown' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Dropdown', 'listdom'); ?></option>
                             <option value="textarea" <?php echo $field_type === 'textarea' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Textarea', 'listdom'); ?></option>
                             <option value="separator" <?php echo $field_type === 'separator' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Separator', 'listdom'); ?></option>
@@ -220,7 +234,7 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                         </div>
                         <p class="description"><?php esc_html_e('You can create category specific attributes.', 'listdom'); ?></p>
                     </div>
-                    <div class="form-field lsd-field-type-dependent lsd-field-type-text lsd-field-type-number lsd-field-type-email lsd-field-type-url lsd-field-type-dropdown lsd-field-type-textarea lsd-field-type-radio lsd-field-type-checkbox">
+                    <div class="form-field lsd-field-type-dependent lsd-field-type-text lsd-field-type-number lsd-field-type-email lsd-field-type-tel lsd-field-type-url lsd-field-type-dropdown lsd-field-type-textarea lsd-field-type-radio lsd-field-type-checkbox lsd-field-type-image">
                         <label for="lsd_required"><?php esc_html_e('Required', 'listdom'); ?></label>
                         <?php echo LSD_Form::switcher([
                             'name' => 'lsd_required',
@@ -236,6 +250,15 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                             'value' => $editor,
                         ]); ?>
                         <p class="description"><?php esc_html_e('Rich or HTML editor cannot be required!', 'listdom'); ?></p>
+                    </div>
+                    <div class="form-field lsd-field-type-dependent lsd-field-type-url lsd-field-type-email lsd-field-type-tel">
+                        <label for="lsd_link_label"><?php esc_html_e('Link Label', 'listdom'); ?></label>
+                        <?php echo LSD_Form::text([
+                            'name' => 'lsd_link_label',
+                            'id' => 'lsd_link_label',
+                            'value' => $link_label,
+                        ]); ?>
+                        <p class="description"><?php esc_html_e('Text to display instead of the raw value.', 'listdom'); ?></p>
                     </div>
                     <div class="form-field">
                         <label for="lsd_index"><?php esc_html_e('Index', 'listdom'); ?></label>
@@ -300,10 +323,14 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
         $editor = isset($_POST['lsd_editor']) ? (int) sanitize_text_field($_POST['lsd_editor']) : 0;
         if ($editor) $required = 0;
 
+        $link_label = isset($_POST['lsd_link_label']) ? sanitize_text_field($_POST['lsd_link_label']) : '';
+        if (!in_array($field_type, ['url', 'email', 'tel'])) $link_label = '';
+
         update_term_meta($term_id, 'lsd_icon', $icon);
         update_term_meta($term_id, 'lsd_itemprop', $itemprop);
         update_term_meta($term_id, 'lsd_required', $required);
         update_term_meta($term_id, 'lsd_editor', $editor);
+        update_term_meta($term_id, 'lsd_link_label', $link_label);
 
         return true;
     }

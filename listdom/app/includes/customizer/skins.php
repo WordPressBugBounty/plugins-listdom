@@ -32,6 +32,25 @@ class LSD_Customizer_Skins extends LSD_Customizer
                             ],
                         ],
                     ],
+                    'slider' => [
+                        'title' => esc_html__('Slider', 'listdom'),
+                        'groups' => [
+                            'arrows' => [
+                                'title' => esc_html__('Arrows', 'listdom'),
+                                'divisions' => [
+                                    '_' => [
+                                        'fields' => [
+                                            'icon_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Icon Color', 'listdom'),
+                                                'default' => '#33c6ff',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ];

@@ -287,6 +287,7 @@ abstract class LSD_IX_Array extends LSD_IX
                 $listing['attributes'][] = [
                     'term' => [
                         'name' => $term->name,
+                        'slug' => $term->slug,
                     ],
                     'value' => $value ? trim($value) : '',
                 ];

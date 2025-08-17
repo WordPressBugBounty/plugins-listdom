@@ -553,7 +553,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
     public function locations(): string
     {
         $locations = $this->entity->get_locations([
-            'enable_link' => $this->details_page_options['elements']['locations']['enable_link'] ?? 1
+            'enable_link' => $this->details_page_options['elements']['locations']['enable_link'] ?? 1,
         ]);
 
         // Don't show anything when there is no locations!
@@ -742,7 +742,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-remark" ' . $schema . '>';
         if ($this->details_page_options['elements']['remark']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
-        $output .= '<div class="lsd-single-content-wrapper lsd-single-element lsd-single-remark">' . $remark . '</div>';
+        $output .= '<div class="lsd-single-content-wrapper lsd-single-element lsd-single-remark">' . wpautop($remark) . '</div>';
         $output .= '</div>';
 
         return $output;

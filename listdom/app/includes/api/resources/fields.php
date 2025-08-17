@@ -349,7 +349,8 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
             foreach ($terms as $term)
             {
                 $type = get_term_meta($term->term_id, 'lsd_field_type', true);
-                if (in_array($type, ['text', 'number', 'email', 'url'])) $type = $type . '-input';
+                if (in_array($type, ['text', 'number', 'email', 'url', 'tel'])) $type = $type . '-input';
+                else if ($type === 'image') $type = 'file';
 
                 // Get all category status
                 $all_categories = get_term_meta($term->term_id, 'lsd_all_categories', true);

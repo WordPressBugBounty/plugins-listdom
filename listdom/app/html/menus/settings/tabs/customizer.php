@@ -37,7 +37,7 @@ $options = (new LSD_Customizer())->options();
 
     <form id="lsd_settings_form">
         <?php $c = 0; foreach ($options as $ck => $category): $c++; ?>
-        <div id="lsd_panel_customizer_<?php echo esc_html(strtolower(str_replace(' ', '-', $category['title'] ?? ''))); ?>" data-category="<?php echo esc_attr($ck); ?>" data-title="<?php echo esc_html__($category['title'], 'listdom'); ?>" class="lsd-settings-form-group lsd-tab-content <?php echo $c === 1 ? 'lsd-tab-content-active': ''; ?>">
+        <div id="lsd_panel_customizer_<?php echo esc_html(strtolower(str_replace(' ', '-', $category['title'] ?? ''))); ?>" data-category="<?php echo esc_attr($ck); ?>" data-title="<?php echo esc_html__($category['title'], 'listdom'); ?>" class="lsd-settings-form-group lsd-tab-content <?php echo ($this->subtab ? $this->subtab === $ck : $c === 1) ? 'lsd-tab-content-active' : ''; ?>">
             <?php if (isset($category['sections']) && is_array($category['sections']) && (count($category['sections']) > 1 || (isset($category['display_sections_force']) && $category['display_sections_force']))): ?>
                 <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex lsd-mb-4" data-for=".lsd-customizer-<?php echo esc_attr($ck); ?>-category-tab-switcher-content">
                     <?php $s = 0; foreach ($category['sections'] as $sk => $section): $s++; ?>
@@ -308,7 +308,7 @@ jQuery('#lsd_settings_reset').on('submit', function (e)
         success: function ()
         {
             // Loading Styles
-            $button.removeClass('loading').html("<i class='lsdi lsdi-advanced'></i><?php echo esc_js(esc_attr__('Reset display options', 'listdom')); ?>");
+            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Reset display options', 'listdom')); ?>");
 
             // Reload
             window.location.reload();
@@ -316,7 +316,7 @@ jQuery('#lsd_settings_reset').on('submit', function (e)
         error: function ()
         {
             // Loading Styles
-            $button.removeClass('loading').html("<i class='lsdi lsdi-advanced'></i><?php echo esc_js(esc_attr__('Reset display options', 'listdom')); ?>");
+            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Reset display options', 'listdom')); ?>");
         }
     });
 });

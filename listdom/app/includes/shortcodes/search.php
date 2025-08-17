@@ -14,6 +14,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
     public $col_filter;
     public $col_button;
     public $is_more_options;
+    public $is_boxed;
     public $settings;
     public $ajax;
     public $connected_shortcodes = [];
@@ -41,6 +42,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         if (trim($pre)) return $pre;
 
         $this->is_more_options = false;
+        $this->is_boxed = true;
 
         // Shortcode ID
         $this->id = $atts['id'] ?? 0;
@@ -143,7 +145,10 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             [$this->col_filter, $this->col_button] = $this->helper->column(count($visible_filters), $buttons);
 
             // Row container
-            $row .= '<div class="lsd-search-row ' . ($this->is_more_options ? 'lsd-search-included-in-more ' : '') . '"><div class="lsd-row lsd-grid-container">';
+            $row .= '<div class="lsd-search-row '
+                . ($this->is_more_options ? 'lsd-search-included-in-more ' : '')
+                . ($this->is_boxed ? '' : 'lsd-box-less-search ')
+                . '"><div class="lsd-row lsd-grid-container">';
 
             // Filters
             foreach ($filters as $filter)
@@ -177,7 +182,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             $mo_type = $more_options['type'] ?? 'normal';
             $mo_width = isset($more_options['type']) && $more_options['type'] === 'popup' ? (int) $more_options['width'] : 60;
 
-            $row .= '<div class="lsd-search-row-more-options" data-for=".lsd-search-devices-' . esc_attr($this->device_key) . '" data-width="' . esc_attr($mo_width) . '" data-type="' . esc_attr($mo_type) . '">';
+            $row .= '<div class="lsd-search-row-more-options '. ($this->is_boxed ? '': 'lsd-m-0 lsd-rounded-10') .'" data-for=".lsd-search-devices-' . esc_attr($this->device_key) . '" data-width="' . esc_attr($mo_width) . '" data-type="' . esc_attr($mo_type) . '">';
             $row .= '<span class="lsd-search-more-options"> ' . esc_html($mo_button) . '<i class="lsd-icon fa fa-plus"></i></span>';
             $row .= '</div>';
         }
@@ -298,6 +303,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
                 break;
 
             case 'text':
+            case 'tel':
             case 'textarea':
 
                 $output = $this->field_text($filter);
@@ -1067,6 +1073,10 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         $inherit = false;
         if ($device === 'desktop' || !isset($this->devices[$device]['inherit']) || $this->devices[$device]['inherit']) $inherit = true;
+
+        $box = $this->devices[$device]['box'] ?? 1;
+        if ($device !== 'desktop' && $inherit) $box = $this->devices['desktop']['box'] ?? 1;
+        $this->is_boxed = (bool) $box;
         ?>
         <div class="lsd-search-devices-<?php echo esc_attr($device); ?>">
             <form action="<?php echo esc_url($action); ?>"

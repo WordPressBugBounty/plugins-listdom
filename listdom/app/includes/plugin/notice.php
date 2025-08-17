@@ -5,13 +5,13 @@ class LSD_Plugin_Notice extends LSD_Base
     // Define notices
     protected $notices = [
         'review' => [
-            'template' => 'menus/notices/review.php',
+            'template' => 'notices/review.php',
             'option_key' => 'lsd_review_display_time',
             'default_delay' => WEEK_IN_SECONDS * 2, // Two weeks after installation
             'actions' => ['later', 'done'],
         ],
         'listdomer' => [
-            'template' => 'menus/notices/listdomer.php',
+            'template' => 'notices/listdomer.php',
             'option_key' => 'lsd_listdomer_display_time',
             'default_delay' => WEEK_IN_SECONDS, // One week
             'actions' => ['later', 'dismiss'],

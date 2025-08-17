@@ -2,18 +2,6 @@
 
 class LSD_Shortcodes_Auth extends LSD_Base
 {
-    /**
-     * Allowed roles for login and register shortcodes
-     *
-     * @var string[]
-     */
-    private static $allowed_roles = [
-        'subscriber',
-        'contributor',
-        'listdom_author',
-        'listdom_publisher',
-    ];
-
     public function init()
     {
         // Shortcodes
@@ -73,7 +61,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Role Restriction
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
-        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
 
         // Get Redirect from Request
         if (isset($_REQUEST['redirect_to']) && trim($_REQUEST['redirect_to']))
@@ -97,7 +85,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Role Restriction
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
-        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
 
         ob_start();
         include lsd_template('auth/register.php');
@@ -129,7 +117,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Role Restriction
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
-        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
 
         ob_start();
         include lsd_template('auth/auth.php');
@@ -157,7 +145,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Role Restriction
         $role = isset($_POST['lsd_role']) ? sanitize_text_field($_POST['lsd_role']) : '';
-        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
 
         if ($role)
         {
@@ -177,11 +165,13 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Invalid Login
         if (is_wp_error($user)) $this->response(['success' => 0, 'message' => esc_html__('Invalid username or password.', 'listdom')]);
 
+        $redirect_url = $this->role_based_redirect('login', $user, $redirect_to);
+
         // Valid Login
         $this->response([
             'success' => 1,
             'message' => esc_html__('Login Successful.', 'listdom'),
-            'redirect' => $this->validate_redirect($redirect_to),
+            'redirect' => $redirect_url,
         ]);
     }
 
@@ -232,7 +222,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Role Restriction
         $role = isset($_POST['lsd_role']) ? sanitize_text_field($_POST['lsd_role']) : '';
-        if (!in_array($role, self::$allowed_roles, true)) $role = '';
+        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
 
         // Create the user
         $user_data = [
@@ -254,10 +244,18 @@ class LSD_Shortcodes_Auth extends LSD_Base
         }
 
         // Send success message with redirect
+        $redirect_url = '';
+        if ($auth['register']['login_after_register'] == 1)
+        {
+            $user = get_user_by('id', $user_id);
+            $redirect_url = $this->role_based_redirect('register', $user, $_POST['lsd_redirect'] ?? '');
+        }
+
+        // Send success message with redirect
         $this->response([
             'success' => 1,
             'message' => esc_html__('Registration successful.', 'listdom'),
-            'redirect' => $auth['register']['login_after_register'] == 1 ? $this->validate_redirect($_POST['lsd_redirect'] ?? '') : '',
+            'redirect' => $redirect_url,
         ]);
     }
 
@@ -433,6 +431,39 @@ class LSD_Shortcodes_Auth extends LSD_Base
             wp_redirect($this->get_forgot_url($_GET['redirect_to'] ?? ''));
             exit;
         }
+    }
+
+    private function role_based_redirect(string $section, $user, string $current): string
+    {
+        $auth = LSD_Options::auth();
+
+        $redirect_url = $current;
+
+        if (isset($auth[$section]))
+        {
+            $page_id = $auth[$section]['redirect'] ?? 0;
+
+            if ($user instanceof WP_User)
+            {
+                foreach ((array) $user->roles as $role)
+                {
+                    $role_key = 'redirect_' . $role;
+                    if ($auth[$section][$role_key] == 1)
+                    {
+                        $page_id = $auth[$section][$role]['redirect'] ?? $page_id;
+                        break;
+                    }
+                }
+            }
+
+            if ($page_id)
+            {
+                $page = get_post($page_id);
+                if ($page && $page->post_status === 'publish') $redirect_url = get_permalink($page_id);
+            }
+        }
+
+        return $this->validate_redirect($redirect_url);
     }
 
     public function validate_redirect(string $url)

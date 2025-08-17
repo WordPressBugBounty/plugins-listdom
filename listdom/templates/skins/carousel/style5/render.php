@@ -12,7 +12,7 @@ $ids = $this->listings;
 		<div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
 
 			<?php if ($this->display_image): ?>
-				<?php echo LSD_Kses::element($listing->get_cover_image([390, 260], $this->get_listing_link_method())); ?>
+                <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
 			<?php endif; ?>
 
 			<?php if ($this->display_labels): ?>

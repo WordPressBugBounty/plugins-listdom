@@ -273,6 +273,7 @@ $optional_addons = [];
                                 'name' => 'lsd[display][accordion][image_method]',
                                 'options' => [
                                     'accordion' => esc_html__('Cover', 'listdom'),
+                                    'slider' => esc_html__('Slider', 'listdom'),
                                 ],
                                 'value' => $accordion['image_method'] ?? 'accordion'
                             ]); ?>

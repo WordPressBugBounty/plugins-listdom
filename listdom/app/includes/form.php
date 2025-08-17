@@ -16,6 +16,12 @@ class LSD_Form extends LSD_Base
         return self::input($args);
     }
 
+    public static function search($args = [])
+    {
+        if (!count($args)) return false;
+        return self::input($args, 'search');
+    }
+
     public static function number($args = [])
     {
         if (!count($args)) return false;
@@ -217,11 +223,22 @@ class LSD_Form extends LSD_Base
         $image_id = $args['value'] ?? '';
         $image = $image_id ? wp_get_attachment_image($image_id, ['400', '266']) : '';
 
+        $attributes = '';
+        if (isset($args['attributes']) && is_array($args['attributes']))
+        {
+            foreach ($args['attributes'] as $key => $value)
+            {
+                $attributes .= ' ' . esc_attr($key) . '="' . esc_attr($value) . '"';
+            }
+        }
+
+        $required = isset($args['required']) && $args['required'];
+
         return '<div>
             <div id="' . esc_attr($args['id']) . '_img" class="lsd-imagepicker-image-placeholder lsd-mb-2">' . (trim($image) ? $image : '') . '</div>
-            <input type="hidden" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" value="' . esc_attr($image_id) . '">
-            <button type="button" class="lsd-select-image-button button ' . ($image_id ? 'lsd-util-hide' : '') . '" id="' . esc_attr($args['id']) . '_button" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Upload/Select image', 'listdom') . '</button>
-            <button type="button" class="lsd-remove-image-button button ' . ($image_id ? '' : 'lsd-util-hide') . '" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Remove image', 'listdom') . '</button>
+            <input type="hidden" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" value="' . esc_attr($image_id) . '"' . $attributes . ($required ? ' required' : '') . '>
+            <button type="button" class="lsd-choose-file lsd-select-image-button button ' . ($image_id ? 'lsd-util-hide' : '') . '" id="' . esc_attr($args['id']) . '_button" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Upload/Select image', 'listdom') . '</button>
+            <button type="button" class="lsd-choose-file lsd-remove-image-button button ' . ($image_id ? '' : 'lsd-util-hide') . '" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Remove image', 'listdom') . '</button>
         </div>';
     }
 

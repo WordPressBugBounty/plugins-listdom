@@ -170,7 +170,7 @@ if (!is_array($related)) $related = [];
                     </div>
                 </div>
                 <?php endif; ?>
-                <h3 class="lsd-mt-0 lsd-mb-0"><?php esc_html_e('Work Hours', 'listdom'); ?></h3>
+                <h3 class="lsd-mt-0 lsd-mb-0"><?php esc_html_e('Work Hours', 'listdom'); ?><?php $dashboard && $dashboard->required_html('ava'); ?></h3>
             </div>
         </div>
         <?php foreach (LSD_Main::get_weekdays() as $weekday): $daycode = $weekday['code']; ?>

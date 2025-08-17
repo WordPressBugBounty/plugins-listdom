@@ -23,13 +23,13 @@ $api = LSD_Options::api();
                             </div>
                             <?php foreach($api['tokens'] as $i => $token): ?>
                             <div class="lsd-form-row" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>">
-                                <div class="lsd-col-2"><?php echo LSD_Form::text([
+                                <div class="lsd-col-3"><?php echo LSD_Form::text([
                                     'id' => 'lsd_settings_api_tokens_'.esc_attr($i).'_name',
                                     'name' => 'lsd[tokens]['.esc_attr($i).'][name]',
                                     'value' => $token['name'],
                                     'placeholder' => esc_html__('Token Name', 'listdom'),
                                 ]); ?></div>
-                                <div class="lsd-col-4">
+                                <div class="lsd-col-6">
                                     <input title="" type="text" name="lsd[tokens][<?php echo esc_attr($i); ?>][key]" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>_key" value="<?php echo esc_attr($token['key']); ?>" placeholder="<?php esc_attr_e('Token Key', 'listdom'); ?>" readonly>
                                 </div>
                                 <div class="lsd-col-1">

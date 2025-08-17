@@ -2,6 +2,7 @@
 
 class LSD_Menus_Settings extends LSD_Menus
 {
+    public $subtab;
     public function __construct()
     {
         // Initialize the Menu
@@ -34,6 +35,7 @@ class LSD_Menus_Settings extends LSD_Menus
     {
         // Get the current tab
         $this->tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : '';
+        $this->subtab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : '';
 
         // Generate output
         $this->include_html_file('menus/settings/tpl.php');
@@ -55,7 +57,8 @@ class LSD_Menus_Settings extends LSD_Menus
             if($key === 'csv' || $key === 'excel') continue;
             $name = ucwords(strtolower($addon['name']));
 
-            $active_class = ($key === array_key_first($addons)) ? 'nav-tab-active' : '';
+            $default = array_key_first($addons);
+            $active_class = ($key === ($this->subtab ?: $default)) ? 'lsd-nav-tab-active' : '';
 
             $output .= '<li class="lsd-nav-tab ' . esc_attr($active_class) . '" data-key="' . esc_attr($key) . '">';
             $output .= esc_html__($name, 'listdom-'. $key);

@@ -12,7 +12,7 @@ class LSD_Bar extends LSD_Base
 
     /**
      * All Listdom stuff that are loaded
-     * @var array
+     * @var array<int|string>
      */
     protected static $list = [];
 
@@ -29,13 +29,6 @@ class LSD_Bar extends LSD_Base
 
         // Return the instance
         return self::$instance;
-    }
-
-    /**
-     * Listdom Constructor.
-     */
-    protected function __construct()
-    {
     }
 
     public function init()
@@ -61,8 +54,15 @@ class LSD_Bar extends LSD_Base
         $list = array_unique(self::$list);
 
         $items = '';
-        foreach ($list as $id)
+        foreach ($list as $item)
         {
+            if (is_string($item))
+            {
+                $items .= $item;
+                continue;
+            }
+
+            $id = (int) $item;
             $post = get_post($id);
             if (!($post instanceof WP_Post)) continue;
 
@@ -90,21 +90,28 @@ class LSD_Bar extends LSD_Base
                 else $type = esc_html__('Single Listing', 'listdom');
             }
 
-            // Search
-            if ($post->post_type === LSD_Base::PTYPE_SEARCH) $type = esc_html__('Search', 'listdom');
+            // Listing, Search or Package
+            if ($post->post_type === LSD_Base::PTYPE_LISTING) $type = esc_html__('Listing', 'listdom');
+            else if ($post->post_type === LSD_Base::PTYPE_SEARCH) $type = esc_html__('Search', 'listdom');
+            else if (class_exists(LSDPACSUB\Base::class) && $post->post_type === LSDPACSUB\Base::PTYPE_PACKAGE) $type = esc_html__('Package', 'listdom');
 
-            $items .= '<li class="lsd-bar-'.esc_attr($post->post_type).'" id="lsd-bar-'.esc_attr($id).'"><a class="ab-item" href="'.esc_url_raw($url).'"><span class="lsd-bar-title">'.esc_html($post->post_title).'</span><span class="lsd-bar-type">'.esc_html($type).'</span></a></li>';
+            $items .= '<li class="lsd-bar-' . esc_attr($post->post_type) . '" id="lsd-bar-' . esc_attr($id) . '"><a class="ab-item" href="' . esc_url($url) . '"><span class="lsd-bar-title">' . esc_html($post->post_title) . '</span><span class="lsd-bar-type">' . esc_html($type) . '</span></a></li>';
         }
 
         // Listdom Bar Menu
-        $menu = '<li id="wp-admin-bar-listdom" class="menupop"><a aria-haspopup="true" class="ab-item" href="'.admin_url('admin.php?page=listdom').'"><span class="lsd-bar-link-title"><img src="'.$main->lsd_asset_url('img/listdom-icon.svg').'" alt=""><span>Listdom</span></span></a><div class="ab-sub-wrapper"><ul class="ab-submenu" id="wp-admin-bar-listdom-default">'.$items.'</ul></div></li>';
+        $menu = '<li id="wp-admin-bar-listdom" class="menupop"><a aria-haspopup="true" class="ab-item" href="' . admin_url('admin.php?page=listdom') . '"><span class="lsd-bar-link-title"><img src="' . $main->lsd_asset_url('img/listdom-icon.svg') . '" alt=""><span>Listdom</span></span></a><div class="ab-sub-wrapper"><ul class="ab-submenu" id="wp-admin-bar-listdom-default">' . $items . '</ul></div></li>';
 
         // Add to WP Bar
-        echo "<script>jQuery('#wp-admin-bar-root-default').append('".$menu."')</script>";
+        echo "<script>jQuery('#wp-admin-bar-root-default').append('" . $menu . "')</script>";
     }
 
     public function add(int $id)
     {
         self::$list[] = $id;
+    }
+
+    public function menu(string $url, string $title, string $unique = ''): void
+    {
+        self::$list[] = '<li><a class="ab-item" href="' . esc_url($url) . '" ' . ($unique !== '' ? ' id="lsd-bar-' . esc_attr($unique) . '"' : '') . '><span class="lsd-bar-title">' . esc_html($title) . '</span></a></li>';
     }
 }

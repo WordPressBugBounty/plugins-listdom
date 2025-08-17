@@ -6,7 +6,7 @@ class Base
     public function include_html_file($file = '', $args = [])
     {
         // File is empty
-        if (!trim($file)) return esc_html__('HTML file path is empty!', 'listdom-visibility');
+        if (!trim($file)) return esc_html__('HTML file path is empty.', 'listdom-visibility');
 
         // Core File
         $path = dirname(__FILE__) . '/../html/' . ltrim($file, '/');

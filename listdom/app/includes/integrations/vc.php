@@ -18,7 +18,7 @@ class LSD_Integrations_VC extends LSD_Integrations
             'meta_query' => [
                 [
                     'key' => 'lsd_skin',
-                    'value' => ['list', 'grid', 'halfmap', 'listgrid', 'masonry', 'singlemap', 'table', 'side'],
+                    'value' => ['list', 'grid', 'halfmap', 'listgrid', 'masonry', 'singlemap', 'table', 'side', 'accordion', 'mosaic'],
                     'compare' => 'IN',
                 ],
             ],

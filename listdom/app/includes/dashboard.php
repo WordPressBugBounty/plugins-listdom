@@ -73,6 +73,8 @@ class LSD_Dashboard extends LSD_Base
 
         if (LSD_Components::map()) $fields['address'] = ['label' => esc_html__('Address', 'listdom'), 'module' => 'address'];
 
+        if (LSD_Components::work_hours()) $fields['ava'] = ['label' => esc_html__('Work Hours', 'listdom'), 'module' => 'availability'];
+
         $SN = new LSD_Socials();
         $networks = LSD_Options::socials();
 

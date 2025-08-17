@@ -4,12 +4,16 @@ class LSD_AI_Models extends LSD_Base
 {
     const OPENAI_GPT_41_NANO = 'gpt-4.1-nano';
     const OPENAI_GPT_4O_MINI = 'gpt-4o-mini';
+    const OPENAI_GPT_5_MINI = 'gpt-5-mini';
+    const OPENAI_GPT_5_NANO = 'gpt-5-nano';
 
     public static function get_models(): array
     {
         return [
             self::OPENAI_GPT_41_NANO => esc_html__('OpenAI GPT 4.1 Nano', 'listdom'),
             self::OPENAI_GPT_4O_MINI => esc_html__('OpenAI GPT 4o Mini', 'listdom'),
+            self::OPENAI_GPT_5_MINI => esc_html__('OpenAI GPT 5 Mini', 'listdom'),
+            self::OPENAI_GPT_5_NANO => esc_html__('OpenAI GPT 5 Nano', 'listdom'),
         ];
     }
 

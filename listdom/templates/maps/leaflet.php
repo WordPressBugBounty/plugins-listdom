@@ -9,6 +9,9 @@ defined('ABSPATH') || die();
 $assets = new LSD_Assets();
 $assets->leaflet();
 
+// Listdom
+$main = new LSD_Main();
+
 // Listdom Settings
 $settings = LSD_Options::settings();
 
@@ -21,7 +24,7 @@ $gps_zl_current = $settings['map_gps_zl_current'] ?? 7;
 $map_height = $args['map_height'] ?? null;
 $atts = isset($args['atts']) && is_array($args['atts']) ? $args['atts'] : [];
 $mapsearch = isset($args['mapsearch']) && $args['mapsearch'];
-$gplaces = isset($args['gplaces']) && $args['gplaces'];
+$autoGPS = isset($args['autoGPS']) && $args['autoGPS'];
 $infowindow = !isset($args['infowindow']) || $args['infowindow'];
 $max_bounds = isset($args['max_bounds']) && is_array($args['max_bounds']) ? $args['max_bounds'] : [];
 $access_token = LSD_Options::mapbox_token();
@@ -69,7 +72,8 @@ jQuery(document).ready(function()
         stroke_weight: '.$settings['map_shape_stroke_weight'].',
         atts: "'.http_build_query(['atts'=>$atts], '', '&').'",
         mapsearch: '.($mapsearch ? 'true' : 'false').',
-        gplaces: false,
+        autoGPS: '.($autoGPS ? 'true' : 'false').',
+        geo_request: '.($main->is_geo_request() ? 'true' : 'false').',
         display_infowindow: '.($infowindow ? 'true' : 'false').',
         max_bounds: '.json_encode($max_bounds, JSON_NUMERIC_CHECK).',
         gps_zoom: {

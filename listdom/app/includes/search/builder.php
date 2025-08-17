@@ -107,8 +107,8 @@ class LSD_Search_Builder extends LSD_Base
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
             $key = 'att-' . $attribute->slug;
 
-            // Skip URL, Email and Separator Fields
-            if (in_array($type, ['url', 'email', 'separator'])) continue;
+            // Skip URL, Email, Image and Separator Fields
+            if (in_array($type, ['url', 'email', 'separator', 'image'])) continue;
             if (in_array($key, $existings)) continue;
 
             $fields[] = [
@@ -164,6 +164,9 @@ class LSD_Search_Builder extends LSD_Base
                 'text-input' => esc_html__('Text Input', 'listdom'),
             ],
             'text' => [
+                'text-input' => esc_html__('Text Input', 'listdom'),
+            ],
+            'tel' => [
                 'text-input' => esc_html__('Text Input', 'listdom'),
             ],
             'textarea' => [

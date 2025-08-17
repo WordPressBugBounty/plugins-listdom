@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Listdom\n"
-"POT-Creation-Date: 2025-07-19 17:29-0700\n"
-"PO-Revision-Date: 2025-07-19 17:29-0700\n"
+"POT-Creation-Date: 2025-08-16 15:36-0700\n"
+"PO-Revision-Date: 2025-08-16 15:36-0700\n"
 "Last-Translator: Totalery <info@totalery.com>\n"
 "Language-Team: Webilia <info@webilia.com>\n"
 "Language: en_US\n"
@@ -116,1821 +116,1820 @@ msgstr ""
 msgid "Deactivate"
 msgstr ""
 
-#: app/html/menus/addons/tpl.php:9
+#: app/html/menus/addons/tpl.php:11
 msgid "Listdom Addons"
 msgstr ""
 
-#: app/html/menus/addons/tpl.php:15
+#: app/html/menus/addons/tpl.php:17
 msgid ""
 "Listdom has one of the most complete addons designed for listing directory "
 "industry. You can freely use these addons to achieve what you want."
 msgstr ""
 
-#: app/html/menus/addons/tpl.php:19
+#: app/html/menus/addons/tpl.php:21
 #, php-format
 msgid ""
 "It seems there is a problem to get list of addons from Webilia server. "
 "Please try again later or check our website at %s"
 msgstr ""
 
-#: app/html/menus/addons/tpl.php:46
-msgid "Download"
+#: app/html/menus/addons/tpl.php:25
+msgid "Installed Addons"
 msgstr ""
 
-#: app/html/menus/addons/tpl.php:48
+#: app/html/menus/addons/tpl.php:33
 #: app/html/menus/dashboard/tabs/dashboard.php:177
 #: app/html/menus/dashboard/tabs/dashboard.php:180
-#: app/html/menus/plugins/dashboard-widget.php:30 app/includes/hooks.php:25
+#: app/html/plugin/dashboard-widget.php:30 app/includes/hooks.php:25
 #: app/includes/menus.php:55
 msgid "Documentation"
 msgstr ""
 
-#: app/html/menus/addons/tpl.php:54
+#: app/html/menus/addons/tpl.php:41
+msgid "Available Addons"
+msgstr ""
+
+#: app/html/menus/addons/tpl.php:60
+msgid "Download"
+msgstr ""
+
+#: app/html/menus/addons/tpl.php:67
 #, php-format
 msgid ""
 "Not sure which addon is suitable for your need? You can always send us an "
 "email at %s"
 msgstr ""
 
-#: app/html/menus/dashboard/header.php:10
-msgid "logo"
-msgstr ""
-
-#: app/html/menus/dashboard/header.php:17 app/html/menus/settings/tabs.php:121
-#: app/includes/menus.php:53
-msgid "Addons"
-msgstr ""
-
-#: app/html/menus/dashboard/header.php:22
-msgid "My Listdom Account"
-msgstr ""
-
 #: app/html/menus/dashboard/tabs.php:6
-#: app/includes/shortcodes/dashboard.php:316
+#: app/includes/shortcodes/dashboard.php:354
 msgid "Dashboard"
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:9
-msgid "Added OpenStreetMap integration to Listdom Core."
-msgstr ""
-
-#: app/html/menus/dashboard/tabs/changelog.php:12
-msgid "Introduced listing visibility control to Listdom Core."
+msgid "Fixed some issues related to the search module."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:15
+msgid "Added OpenStreetMap integration to Listdom Core."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:18
+msgid "Introduced listing visibility control to Listdom Core."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:21
 msgid ""
 "Enabled creating new categories, locations, etc., directly from the frontend "
 "dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:18
+#: app/html/menus/dashboard/tabs/changelog.php:24
 msgid "Introduced the Related Listings feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:21
+#: app/html/menus/dashboard/tabs/changelog.php:27
 msgid "Added Google and OpenStreetMap address autocomplete support."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:24
+#: app/html/menus/dashboard/tabs/changelog.php:30
 msgid ""
 "Added an advanced components system to disable unused Listdom Core features."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:27
+#: app/html/menus/dashboard/tabs/changelog.php:33
 msgid "Integrated Mailchimp subscription support."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:30
+#: app/html/menus/dashboard/tabs/changelog.php:36
 msgid "Improved AI tools with automatic content and business hours generation."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:33
+#: app/html/menus/dashboard/tabs/changelog.php:39
 msgid "Added an option to create categories without icons."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:36
+#: app/html/menus/dashboard/tabs/changelog.php:42
 msgid ""
 "Completely rebuilt the settings menu and shortcode builder in the Listdom "
 "backend."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:39
+#: app/html/menus/dashboard/tabs/changelog.php:45
 msgid "Added padding controls and made various UI refinements."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:42
+#: app/html/menus/dashboard/tabs/changelog.php:48
 msgid "Fixed several issues with search fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:48
+#: app/html/menus/dashboard/tabs/changelog.php:54
 msgid ""
 "Added AI integration and support for creating multiple AI profiles tailored "
 "to different tasks."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:51
+#: app/html/menus/dashboard/tabs/changelog.php:57
 msgid "Introduced AI-powered field mapping for CSV and Excel imports."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:54
+#: app/html/menus/dashboard/tabs/changelog.php:60
 msgid "Redesigned the Listdom admin page for improved usability."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:57
+#: app/html/menus/dashboard/tabs/changelog.php:63
 msgid "Introduced radio and checkbox input types to Listdom custom fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:60
+#: app/html/menus/dashboard/tabs/changelog.php:66
 msgid ""
 "Added a \"Clear All\" button and enhanced the logic behind search forms."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:63
+#: app/html/menus/dashboard/tabs/changelog.php:69
 msgid ""
 "Added support for slug and parent fields in CSV/Excel import and export."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:66
+#: app/html/menus/dashboard/tabs/changelog.php:72
 msgid "Improved the custom fields editor and various UI elements."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:69
+#: app/html/menus/dashboard/tabs/changelog.php:75
 msgid "Fixed several issues related to pagination controls in skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:72
+#: app/html/menus/dashboard/tabs/changelog.php:78
 msgid "Resolved various UI issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:78
+#: app/html/menus/dashboard/tabs/changelog.php:84
 msgid "[PRO] Added Mosaic and Accordion skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:81
+#: app/html/menus/dashboard/tabs/changelog.php:87
 msgid "Added CSV Import/Export functionality to Listdom Lite."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:84
+#: app/html/menus/dashboard/tabs/changelog.php:90
 msgid "Introduced a numeric pagination option."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:87
+#: app/html/menus/dashboard/tabs/changelog.php:93
 msgid "Added a breadcrumb element to single listing templates."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:90
+#: app/html/menus/dashboard/tabs/changelog.php:96
 msgid "Enabled pagination support for the Masonry skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:93
+#: app/html/menus/dashboard/tabs/changelog.php:99
 msgid "Added a column width control for the Table skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:96
+#: app/html/menus/dashboard/tabs/changelog.php:102
 msgid ""
 "Improved custom fields UI, naming conventions, and overall user experience."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:99
+#: app/html/menus/dashboard/tabs/changelog.php:105
 msgid "Fixed issues related to listing and map-based searches."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:102
+#: app/html/menus/dashboard/tabs/changelog.php:108
 msgid ""
 "Resolved various UI inconsistencies in both the frontend and backend "
 "interfaces."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:108
+#: app/html/menus/dashboard/tabs/changelog.php:114
 msgid "Moved custom fields feature from Listdom Pro to Listdom Lite."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:111
+#: app/html/menus/dashboard/tabs/changelog.php:117
 msgid ""
 "Introduced responsive search builder to create different search forms per "
 "device type."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:114
+#: app/html/menus/dashboard/tabs/changelog.php:120
 msgid "Added new UI Customizer options for price fields and user profiles."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:117
+#: app/html/menus/dashboard/tabs/changelog.php:123
 msgid "Added an option to exclude the featured image from the listing gallery."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:120
+#: app/html/menus/dashboard/tabs/changelog.php:126
 msgid "Added camera control options to the map widget."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:123
+#: app/html/menus/dashboard/tabs/changelog.php:129
 msgid ""
 "Added dropdown and checkbox field types for tags in the frontend dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:126
+#: app/html/menus/dashboard/tabs/changelog.php:132
 msgid "Added linear layout option for the listing gallery element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:129
+#: app/html/menus/dashboard/tabs/changelog.php:135
 msgid "Added an option to customize the search button label."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:132
+#: app/html/menus/dashboard/tabs/changelog.php:138
 msgid ""
 "Improved responsiveness of search forms and range slider fields on the "
 "frontend."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:135
+#: app/html/menus/dashboard/tabs/changelog.php:141
 msgid "Enhanced dropdown field usability in the frontend dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:138
+#: app/html/menus/dashboard/tabs/changelog.php:144
 msgid "Fixed various UI issues in the table skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:144
+#: app/html/menus/dashboard/tabs/changelog.php:150
 msgid "Enhanced the settings importer / exporter."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:150
+#: app/html/menus/dashboard/tabs/changelog.php:156
 msgid "Fixed a couple of minor issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:156
+#: app/html/menus/dashboard/tabs/changelog.php:162
 msgid "Added public profile functionality."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:159
+#: app/html/menus/dashboard/tabs/changelog.php:165
 msgid "Added user profile settings to the frontend dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:162
+#: app/html/menus/dashboard/tabs/changelog.php:168
 msgid "Introduced new user directory shortcode."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:165
+#: app/html/menus/dashboard/tabs/changelog.php:171
 msgid "Added support to open additional search options in a popup."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:168
+#: app/html/menus/dashboard/tabs/changelog.php:174
 msgid ""
 "Added a setting to customize the \"More Options\" label in the search widget."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:171
+#: app/html/menus/dashboard/tabs/changelog.php:177
 msgid "Added new customization options in the UI Customizer."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:174
+#: app/html/menus/dashboard/tabs/changelog.php:180
 msgid ""
 "[PRO] Added the ability to exclude listings from shortcodes by tags or "
 "authors."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:177
+#: app/html/menus/dashboard/tabs/changelog.php:183
 msgid ""
 "Added an option to display checkbox and radio fields in multiple columns in "
 "the search widget."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:180
+#: app/html/menus/dashboard/tabs/changelog.php:186
 msgid "Enhanced the performance of sliders and carousels."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:183
+#: app/html/menus/dashboard/tabs/changelog.php:189
 msgid "Improved the Map Bar responsiveness on smaller screens."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:186
+#: app/html/menus/dashboard/tabs/changelog.php:192
 msgid "Resolved search widget positioning issues in specific skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:189
+#: app/html/menus/dashboard/tabs/changelog.php:195
 msgid "Fixed a conflict with advanced asset loading feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:192
+#: app/html/menus/dashboard/tabs/changelog.php:198
 msgid ""
 "Fixed an issue where listing status could not be updated from the frontend "
 "dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:198
+#: app/html/menus/dashboard/tabs/changelog.php:204
 msgid "Added a comprehensive Game-Changer UI Customizer to Listdom Core."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:201
+#: app/html/menus/dashboard/tabs/changelog.php:207
 msgid ""
 "[PRO] Introduced a new option to set a custom Single Listing Style for the "
 "Side by Side skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:204
+#: app/html/menus/dashboard/tabs/changelog.php:210
 msgid ""
 "[PRO] Added a new option to customize the Single Listing Style for the "
 "Lightbox feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:207
+#: app/html/menus/dashboard/tabs/changelog.php:213
 msgid ""
 "[PRO] Enabled an option to display the Single Listing Page in right, left, "
 "or bottom panels."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:210
+#: app/html/menus/dashboard/tabs/changelog.php:216
 msgid "Added a built-in Authentication Form to the Frontend Dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:213
+#: app/html/menus/dashboard/tabs/changelog.php:219
 msgid "Introduced an option to make a shortcode non-searchable."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:216
+#: app/html/menus/dashboard/tabs/changelog.php:222
 msgid "Added a Zoom Level option for the Single Map element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:219
+#: app/html/menus/dashboard/tabs/changelog.php:225
 msgid "Added a Title Visibility option for search fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:222
+#: app/html/menus/dashboard/tabs/changelog.php:228
 msgid ""
 "Introduced the Listdom Bar to help web designers easily access Listdom "
 "features from the frontend."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:225
+#: app/html/menus/dashboard/tabs/changelog.php:231
 msgid "Enabled the ability to update Listing Status in the Frontend Dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:228
+#: app/html/menus/dashboard/tabs/changelog.php:234
 msgid "Added a Listing Status Filter to the Frontend Dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:231
+#: app/html/menus/dashboard/tabs/changelog.php:237
 msgid "Introduced an option to set Custom Listing Cards in the Half Map skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:234
+#: app/html/menus/dashboard/tabs/changelog.php:240
 msgid "Improved the Table Skin for better usability."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:237
+#: app/html/menus/dashboard/tabs/changelog.php:243
 msgid "[PRO] Enhanced the Side by Side skin with additional refinements."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:240
+#: app/html/menus/dashboard/tabs/changelog.php:246
 msgid ""
 "Applied various UI and responsiveness improvements across Listdom views."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:243
+#: app/html/menus/dashboard/tabs/changelog.php:249
 msgid "[PRO] Fixed issues related to Hierarchical Dropdowns."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:246
+#: app/html/menus/dashboard/tabs/changelog.php:252
 msgid "Fixed compatibility issues with PHP 7.4 and lower."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:252
+#: app/html/menus/dashboard/tabs/changelog.php:258
 msgid ""
 "Added a Connected Shortcodes feature in the search builder, allowing "
 "multiple shortcodes to update dynamically with a single search widget."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:255
+#: app/html/menus/dashboard/tabs/changelog.php:261
 msgid "Introduced a new style for List, Grid, Masonry, and List + Grid skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:258
+#: app/html/menus/dashboard/tabs/changelog.php:264
 msgid "Enabled embedding via URL for the Embed and Featured Video elements."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:261
+#: app/html/menus/dashboard/tabs/changelog.php:267
 msgid "Introduced a new option to control the visibility of search fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:264
+#: app/html/menus/dashboard/tabs/changelog.php:270
 msgid ""
 "Added the ability to restrict certain user roles from accessing the "
 "WordPress backend."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:267
+#: app/html/menus/dashboard/tabs/changelog.php:273
 msgid "Added an Image Fit option to applicable skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:270
+#: app/html/menus/dashboard/tabs/changelog.php:276
 msgid "Added an option to adjust the map height across different shortcodes."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:273
+#: app/html/menus/dashboard/tabs/changelog.php:279
 msgid ""
 "Added listing excerpts to Listdom fields and frontend dashboard modules."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:276
+#: app/html/menus/dashboard/tabs/changelog.php:282
 msgid "Added a Thumbnail Status feature to the gallery element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:279
+#: app/html/menus/dashboard/tabs/changelog.php:285
 msgid "Moved the entire Listdom Pro authentication feature to Listdom core."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:282
+#: app/html/menus/dashboard/tabs/changelog.php:288
 msgid "Improved the appearance and usability of search widgets."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:285
+#: app/html/menus/dashboard/tabs/changelog.php:291
 msgid "Enhanced the Listdom settings menu for better navigation."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:288
+#: app/html/menus/dashboard/tabs/changelog.php:294
 msgid "Improved the user interface and responsiveness of various elements."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:291
+#: app/html/menus/dashboard/tabs/changelog.php:297
 msgid "Fixed search-related issues on archive pages."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:294
+#: app/html/menus/dashboard/tabs/changelog.php:300
 msgid ""
 "Fixed an issue where multiple search widgets with More Options caused "
 "conflicts on the same page."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:297
+#: app/html/menus/dashboard/tabs/changelog.php:303
 msgid "Resolved various AJAX search issues in Table and Masonry skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:303
+#: app/html/menus/dashboard/tabs/changelog.php:309
 msgid "Fixed an issue with settings import functionality."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:306
+#: app/html/menus/dashboard/tabs/changelog.php:312
 msgid "Resolved a problem with the Frontend Dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:312
+#: app/html/menus/dashboard/tabs/changelog.php:318
 msgid ""
 "[PRO] Added an option to use Listdom authentication pages instead of "
 "WordPress default pages."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:315
+#: app/html/menus/dashboard/tabs/changelog.php:321
 msgid ""
 "[PRO] Introduced an advanced permalink system to include categories and "
 "locations in listing URLs."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:318
+#: app/html/menus/dashboard/tabs/changelog.php:324
 msgid ""
 "[PRO] Added the ability to connect different shortcodes to the Singlemap "
 "skin, allowing search results to update dynamically based on the map's "
 "position."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:321
+#: app/html/menus/dashboard/tabs/changelog.php:327
 msgid ""
 "Introduced the 'Optimize Assets Loading' feature to suppress Listdom CSS/JS "
 "file loading on specific WordPress pages."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:324
+#: app/html/menus/dashboard/tabs/changelog.php:330
 msgid ""
 "Moved the Frontend Dashboard feature from the Pro add-on to the Listdom core."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:327
+#: app/html/menus/dashboard/tabs/changelog.php:333
 msgid ""
 "Added an option to set custom titles for elements on the single listing page."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:330
+#: app/html/menus/dashboard/tabs/changelog.php:336
 msgid "Added left and right map display positions for applicable skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:333
+#: app/html/menus/dashboard/tabs/changelog.php:339
 msgid ""
 "Introduced the settings export to create JSON backups of Listdom options."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:336
+#: app/html/menus/dashboard/tabs/changelog.php:342
 msgid "Added settings import to restore Listdom settings."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:339
+#: app/html/menus/dashboard/tabs/changelog.php:345
 msgid ""
 "Added the ability to customize the placeholder for the address field in both "
 "the backend and frontend."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:342
+#: app/html/menus/dashboard/tabs/changelog.php:348
 msgid ""
 "Introduced a control option for the phone and name fields in the listing "
 "contact and report abuse forms."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:345
+#: app/html/menus/dashboard/tabs/changelog.php:351
 msgid ""
 "Added an option to disable the map info-window on the single listing page."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:348
+#: app/html/menus/dashboard/tabs/changelog.php:354
 msgid "Enhanced accessibility across Listdom."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:351
+#: app/html/menus/dashboard/tabs/changelog.php:357
 msgid "Improved backend management for listings and notifications."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:354
+#: app/html/menus/dashboard/tabs/changelog.php:360
 msgid ""
 "Refined the structure and organization of the settings menu and setting tabs."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:357
+#: app/html/menus/dashboard/tabs/changelog.php:363
 msgid "Improved the user interface of the search builder."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:360
+#: app/html/menus/dashboard/tabs/changelog.php:366
 msgid "Resolved several responsive UI issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:363
+#: app/html/menus/dashboard/tabs/changelog.php:369
 msgid "Fixed an issue with clearing selections in the search widget."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:366
+#: app/html/menus/dashboard/tabs/changelog.php:372
 msgid "Addressed a problem with WordPress Multisite integration."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:369
+#: app/html/menus/dashboard/tabs/changelog.php:375
 msgid "Fixed some icon display issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:376
-msgid "Enhanced the performance of the Cover skin for better speed."
-msgstr ""
-
-#: app/html/menus/dashboard/tabs/changelog.php:379
-msgid ""
-"Refined the Welcome Wizard and updated button styles for improved usability."
-msgstr ""
-
 #: app/html/menus/dashboard/tabs/changelog.php:382
-msgid "Resolved one click handler issue to ensure smoother interactions."
+msgid "Enhanced the performance of the Cover skin for better speed."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:385
 msgid ""
-"Fixed an issue with the include/exclude filter options for better usability."
+"Refined the Welcome Wizard and updated button styles for improved usability."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:388
+msgid "Resolved one click handler issue to ensure smoother interactions."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:391
+msgid ""
+"Fixed an issue with the include/exclude filter options for better usability."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:394
 msgid ""
 "[PRO] Corrected a problem with price components when the price class was "
 "globally disabled."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:391
+#: app/html/menus/dashboard/tabs/changelog.php:397
 msgid "[PRO] Fixed some issues in dashboard menus for improved customization."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:397
+#: app/html/menus/dashboard/tabs/changelog.php:403
 msgid ""
 "Refined the user interface of the settings panel for a more intuitive "
 "experience."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:400
+#: app/html/menus/dashboard/tabs/changelog.php:406
 msgid "Enhanced the security measures for the search widget."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:406
+#: app/html/menus/dashboard/tabs/changelog.php:412
 msgid ""
 "[PRO] Added a new feature to dynamically add custom menus to the \"Frontend "
 "Dashboard.\""
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:409
+#: app/html/menus/dashboard/tabs/changelog.php:415
 msgid ""
 "[PRO] Introduced the \"Exclusion Filter\" to exclude listings with specific "
 "categories, locations, features, and labels from search results."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:412
+#: app/html/menus/dashboard/tabs/changelog.php:418
 msgid ""
 "[PRO] Implemented the \"Price Components\" feature to enable or disable "
 "specific price elements."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:415
+#: app/html/menus/dashboard/tabs/changelog.php:421
 msgid ""
 "[PRO] Added the \"Custom Fields Filter\" to allow filtering of listings "
 "based on attributes (custom fields) at the shortcode level."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:418
+#: app/html/menus/dashboard/tabs/changelog.php:424
 msgid ""
 "[PRO] Enabled bulk layout changes for specific listings using WordPress "
 "quick edit."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:421
+#: app/html/menus/dashboard/tabs/changelog.php:427
 msgid "[PRO] Introduced the ability to reorder \"Frontend Dashboard\" menus."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:424
+#: app/html/menus/dashboard/tabs/changelog.php:430
 msgid "Added an option to control the description length in applicable skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:427
+#: app/html/menus/dashboard/tabs/changelog.php:433
 msgid "Introduced a new element to display listing excerpts."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:430
-msgid "Added an option to customize the dropdown style of search fields."
-msgstr ""
-
-#: app/html/menus/dashboard/tabs/changelog.php:433
-msgid ""
-"Introduced a revamped interface for selecting different skins in shortcodes."
-msgstr ""
-
 #: app/html/menus/dashboard/tabs/changelog.php:436
-msgid "Improved the overall design and usability of the frontend dashboard."
+msgid "Added an option to customize the dropdown style of search fields."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:439
 msgid ""
-"Enhanced the structure and visual appeal of the settings menu in the backend."
+"Introduced a revamped interface for selecting different skins in shortcodes."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:442
-msgid "Improved the responsiveness of the \"Side by Side\" skin."
+msgid "Improved the overall design and usability of the frontend dashboard."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:445
 msgid ""
-"Enhanced the Listdom welcome wizard by adding a theme installation step."
+"Enhanced the structure and visual appeal of the settings menu in the backend."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:448
+msgid "Improved the responsiveness of the \"Side by Side\" skin."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:451
+msgid ""
+"Enhanced the Listdom welcome wizard by adding a theme installation step."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:454
 msgid ""
 "Resolved an issue with customizing display options in WordPress Multisite "
 "environments."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:451
+#: app/html/menus/dashboard/tabs/changelog.php:457
 msgid ""
 "Fixed a display issue where the map appeared incorrectly when set to the "
 "bottom position in list and grid skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:457
+#: app/html/menus/dashboard/tabs/changelog.php:463
 msgid "[PRO] Added a shortcode for an independent \"Add Listing\" form."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:460
+#: app/html/menus/dashboard/tabs/changelog.php:466
 msgid "[PRO] Added responsive view support for the \"Side by Side\" skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:463
+#: app/html/menus/dashboard/tabs/changelog.php:469
 msgid "Introduced support for listing excerpts."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:466
+#: app/html/menus/dashboard/tabs/changelog.php:472
 msgid "Enabled featured image display in style 3 of single listing."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:469
+#: app/html/menus/dashboard/tabs/changelog.php:475
 msgid "Improved the listing contact element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:472
+#: app/html/menus/dashboard/tabs/changelog.php:478
 msgid "Refined the settings loader style in the Listdom backend."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:475
+#: app/html/menus/dashboard/tabs/changelog.php:481
 msgid ""
 "Enhanced the structure of \"Masonry\" and \"Halfmap\" skins for better "
 "performance and usability."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:478
+#: app/html/menus/dashboard/tabs/changelog.php:484
 msgid "[PRO] Resolved an issue in the Frontend Dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:481
+#: app/html/menus/dashboard/tabs/changelog.php:487
 msgid "[PRO] Fixed several issues related to listing schema."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:484
+#: app/html/menus/dashboard/tabs/changelog.php:490
 msgid "Corrected various issues within the search module."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:487
+#: app/html/menus/dashboard/tabs/changelog.php:493
 msgid "Addressed UI and responsiveness issues across different views."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:490
+#: app/html/menus/dashboard/tabs/changelog.php:496
 msgid "Fixed certain issues with required attributes in listings editors."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:496
+#: app/html/menus/dashboard/tabs/changelog.php:502
 msgid ""
 "[PRO] Introduced authentication features including login, registration, and "
 "password recovery."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:499
+#: app/html/menus/dashboard/tabs/changelog.php:505
 msgid ""
 "[PRO] Added the option to customize the single listing layout per category."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:502
+#: app/html/menus/dashboard/tabs/changelog.php:508
 msgid ""
 "[PRO] Implemented the ability to restrict image size in the frontend "
 "dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:505
+#: app/html/menus/dashboard/tabs/changelog.php:511
 msgid "Introduced a table builder feature for the table skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:508
+#: app/html/menus/dashboard/tabs/changelog.php:514
 msgid "Added numerous configurable display options across different skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:511
+#: app/html/menus/dashboard/tabs/changelog.php:517
 msgid "Introduced a welcome setup wizard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:514
+#: app/html/menus/dashboard/tabs/changelog.php:520
 msgid ""
 "Added a new \"Listdom Publisher\" user role with the capability to publish "
 "listings."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:517
+#: app/html/menus/dashboard/tabs/changelog.php:523
 msgid "Introduced an option to add the featured image to the gallery element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:520
+#: app/html/menus/dashboard/tabs/changelog.php:526
 msgid ""
 "[PRO] Added the option to hide attribute titles within the attributes "
 "element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:523
+#: app/html/menus/dashboard/tabs/changelog.php:529
 msgid "Introduced a layout option for the features element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:526
+#: app/html/menus/dashboard/tabs/changelog.php:532
 msgid "Added a new option to customize the sort bar layout."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:529
+#: app/html/menus/dashboard/tabs/changelog.php:535
 msgid "[PRO] Enhanced per-listing display options."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:532
+#: app/html/menus/dashboard/tabs/changelog.php:538
 msgid "Streamlined the licensing and activation process."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:535
+#: app/html/menus/dashboard/tabs/changelog.php:541
 msgid "Improved the search and filter form builder."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:538
+#: app/html/menus/dashboard/tabs/changelog.php:544
 msgid "Optimized the dummy data importer."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:541
+#: app/html/menus/dashboard/tabs/changelog.php:547
 msgid "Resolved display option issues in WP Multisite."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:544
+#: app/html/menus/dashboard/tabs/changelog.php:550
 msgid "Addressed issues with pre-made layouts in single listing."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:547
+#: app/html/menus/dashboard/tabs/changelog.php:553
 msgid "Fixed various UI and responsiveness issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:553
-#: app/html/menus/dashboard/tabs/changelog.php:742
-#: app/html/menus/dashboard/tabs/changelog.php:745
-#: app/html/menus/dashboard/tabs/changelog.php:817
-#: app/html/menus/dashboard/tabs/changelog.php:820
-#: app/html/menus/dashboard/tabs/changelog.php:880
-#: app/html/menus/dashboard/tabs/changelog.php:883
+#: app/html/menus/dashboard/tabs/changelog.php:559
+#: app/html/menus/dashboard/tabs/changelog.php:748
+#: app/html/menus/dashboard/tabs/changelog.php:751
+#: app/html/menus/dashboard/tabs/changelog.php:823
+#: app/html/menus/dashboard/tabs/changelog.php:826
 #: app/html/menus/dashboard/tabs/changelog.php:886
 #: app/html/menus/dashboard/tabs/changelog.php:889
-#: app/html/menus/dashboard/tabs/changelog.php:914
-#: app/html/menus/dashboard/tabs/changelog.php:917
+#: app/html/menus/dashboard/tabs/changelog.php:892
+#: app/html/menus/dashboard/tabs/changelog.php:895
 #: app/html/menus/dashboard/tabs/changelog.php:920
 #: app/html/menus/dashboard/tabs/changelog.php:923
-#: app/html/menus/dashboard/tabs/changelog.php:960
-#: app/html/menus/dashboard/tabs/changelog.php:963
+#: app/html/menus/dashboard/tabs/changelog.php:926
+#: app/html/menus/dashboard/tabs/changelog.php:929
 #: app/html/menus/dashboard/tabs/changelog.php:966
 #: app/html/menus/dashboard/tabs/changelog.php:969
-#: app/html/menus/dashboard/tabs/changelog.php:1009
-#: app/html/menus/dashboard/tabs/changelog.php:1032
-#: app/html/menus/dashboard/tabs/changelog.php:1063
-#: app/html/menus/dashboard/tabs/changelog.php:1066
+#: app/html/menus/dashboard/tabs/changelog.php:972
+#: app/html/menus/dashboard/tabs/changelog.php:975
+#: app/html/menus/dashboard/tabs/changelog.php:1015
+#: app/html/menus/dashboard/tabs/changelog.php:1038
 #: app/html/menus/dashboard/tabs/changelog.php:1069
-#: app/html/menus/dashboard/tabs/changelog.php:1091
-#: app/html/menus/dashboard/tabs/changelog.php:1094
-#: app/html/menus/dashboard/tabs/changelog.php:1110
-#: app/html/menus/dashboard/tabs/changelog.php:1113
-#: app/html/menus/dashboard/tabs/changelog.php:1135
-#: app/html/menus/dashboard/tabs/changelog.php:1157
-#: app/html/menus/dashboard/tabs/changelog.php:1176
+#: app/html/menus/dashboard/tabs/changelog.php:1072
+#: app/html/menus/dashboard/tabs/changelog.php:1075
+#: app/html/menus/dashboard/tabs/changelog.php:1097
+#: app/html/menus/dashboard/tabs/changelog.php:1100
+#: app/html/menus/dashboard/tabs/changelog.php:1116
+#: app/html/menus/dashboard/tabs/changelog.php:1119
+#: app/html/menus/dashboard/tabs/changelog.php:1141
+#: app/html/menus/dashboard/tabs/changelog.php:1163
+#: app/html/menus/dashboard/tabs/changelog.php:1182
 #, php-format
 msgid "[ADDON] Released %s addon!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:553
+#: app/html/menus/dashboard/tabs/changelog.php:559
 msgid "Connect"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:556
+#: app/html/menus/dashboard/tabs/changelog.php:562
 msgid ""
 "Added a design builder for creating flexible and visually appealing single "
 "listing pages."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:559
+#: app/html/menus/dashboard/tabs/changelog.php:565
 msgid "Added Style 3 and Style 4 for single listing pages."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:562
+#: app/html/menus/dashboard/tabs/changelog.php:568
 msgid "Added a slider type for the gallery element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:565
+#: app/html/menus/dashboard/tabs/changelog.php:571
 msgid "Added a new sort option based on listing visits."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:568
+#: app/html/menus/dashboard/tabs/changelog.php:574
 msgid ""
 "Added duplicate listing, duplicate shortcode, duplicate notification, and "
 "duplicate search features."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:571
+#: app/html/menus/dashboard/tabs/changelog.php:577
 msgid "Added a dedicated key for the Google Geocoding API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:574
+#: app/html/menus/dashboard/tabs/changelog.php:580
 msgid "[PRO] Added listing featured video element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:577
+#: app/html/menus/dashboard/tabs/changelog.php:583
 msgid "[PRO] Improved frontend dashboard configurations."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:580
+#: app/html/menus/dashboard/tabs/changelog.php:586
 msgid ""
 "Improved the responsive view of skins, lightbox, and the frontend dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:583
+#: app/html/menus/dashboard/tabs/changelog.php:589
 msgid "Improved search widget styles."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:586
+#: app/html/menus/dashboard/tabs/changelog.php:592
 msgid "Enhanced the dummy data importer."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:589
+#: app/html/menus/dashboard/tabs/changelog.php:595
 msgid "Fixed various UI issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:592
+#: app/html/menus/dashboard/tabs/changelog.php:598
 msgid "Resolved some issues in search and filter widgets."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:598
+#: app/html/menus/dashboard/tabs/changelog.php:604
 msgid "Fixed some visual issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:604
-#: app/html/menus/dashboard/tabs/changelog.php:706
-#: app/html/menus/dashboard/tabs/changelog.php:907
-#: app/html/menus/dashboard/tabs/changelog.php:1018
-#: app/html/menus/dashboard/tabs/changelog.php:1084
-#: app/html/menus/dashboard/tabs/changelog.php:1128
-#: app/html/menus/dashboard/tabs/changelog.php:1269
+#: app/html/menus/dashboard/tabs/changelog.php:610
+#: app/html/menus/dashboard/tabs/changelog.php:712
+#: app/html/menus/dashboard/tabs/changelog.php:913
+#: app/html/menus/dashboard/tabs/changelog.php:1024
+#: app/html/menus/dashboard/tabs/changelog.php:1090
+#: app/html/menus/dashboard/tabs/changelog.php:1134
+#: app/html/menus/dashboard/tabs/changelog.php:1275
 msgid "Fixed some issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:610
+#: app/html/menus/dashboard/tabs/changelog.php:616
 msgid ""
 "Added listing author role for ease of user management in frontend submission."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:613
+#: app/html/menus/dashboard/tabs/changelog.php:619
 msgid "[PRO] Added lightbox option to listing link methods."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:616
+#: app/html/menus/dashboard/tabs/changelog.php:622
 msgid "[PRO] Added maximum gallery images to the frontend listing submission."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:619
+#: app/html/menus/dashboard/tabs/changelog.php:625
 msgid ""
 "[PRO] Added maximum description length to the frontend listing submission."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:622
+#: app/html/menus/dashboard/tabs/changelog.php:628
 msgid "[PRO] Added maximum number of tags to the frontend listing submission."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:625
+#: app/html/menus/dashboard/tabs/changelog.php:631
 msgid "Improved listdom interfaces in backend and frontend."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:628
+#: app/html/menus/dashboard/tabs/changelog.php:634
 msgid "Improved loading of Google Maps API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:631
+#: app/html/menus/dashboard/tabs/changelog.php:637
 msgid "Improved listdom settings menu."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:634
+#: app/html/menus/dashboard/tabs/changelog.php:640
 msgid "Fixed some issues in trial and license activation."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:637
+#: app/html/menus/dashboard/tabs/changelog.php:643
 msgid "Fixed an scroll issue in sortbar."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:640
+#: app/html/menus/dashboard/tabs/changelog.php:646
 msgid ""
 "Fixed issue of not displaying the success and error messages in listdom "
 "dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:643
+#: app/html/menus/dashboard/tabs/changelog.php:649
 msgid "Fixed an issue when latitude and / or longitude are wrong."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:649
+#: app/html/menus/dashboard/tabs/changelog.php:655
 msgid "Added an option to disable contact form of owner element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:652
+#: app/html/menus/dashboard/tabs/changelog.php:658
 msgid "Improved listdom interfaces in WordPress backend."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:655
+#: app/html/menus/dashboard/tabs/changelog.php:661
 msgid "Improved the license activation section."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:658
+#: app/html/menus/dashboard/tabs/changelog.php:664
 msgid "Fixed an issue in single map skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:664
+#: app/html/menus/dashboard/tabs/changelog.php:670
 msgid "[PRO] Added side by side skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:667
+#: app/html/menus/dashboard/tabs/changelog.php:673
 msgid "Added sort by price option."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:670
+#: app/html/menus/dashboard/tabs/changelog.php:676
 msgid "Added new icons for listdom and listings menus."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:673
+#: app/html/menus/dashboard/tabs/changelog.php:679
 msgid "Improved listdom dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:676
+#: app/html/menus/dashboard/tabs/changelog.php:682
 msgid "Improved the block editor integration."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:679
+#: app/html/menus/dashboard/tabs/changelog.php:685
 msgid "Fixed some issues in single listing page."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:682
+#: app/html/menus/dashboard/tabs/changelog.php:688
 msgid "Fixed an issue in assigning guest user to listing."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:685
+#: app/html/menus/dashboard/tabs/changelog.php:691
 msgid "Fixed some issues in image slider mode of listing image."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:691
+#: app/html/menus/dashboard/tabs/changelog.php:697
 msgid "Improved the server requirements."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:697
+#: app/html/menus/dashboard/tabs/changelog.php:703
 msgid "Fixed some PHP issues in certain conditions."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:703
+#: app/html/menus/dashboard/tabs/changelog.php:709
 msgid "Improved the image gallery slider."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:712
+#: app/html/menus/dashboard/tabs/changelog.php:718
 msgid "Fixed some UI issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:718
+#: app/html/menus/dashboard/tabs/changelog.php:724
 msgid "Rebranded to Webilia."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:721
+#: app/html/menus/dashboard/tabs/changelog.php:727
 msgid "Fixed some PHP issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:727
+#: app/html/menus/dashboard/tabs/changelog.php:733
 msgid "Added telegram to the social options."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:730
+#: app/html/menus/dashboard/tabs/changelog.php:736
 msgid ""
 "Added left, right, and bottom positions for the search in the shortcode."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:733
+#: app/html/menus/dashboard/tabs/changelog.php:739
 msgid ""
 "Added Hierarchy structure to the checkbox field of the search form builder."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:736
+#: app/html/menus/dashboard/tabs/changelog.php:742
 msgid "Fixed an issue related to the empty values."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:742
+#: app/html/menus/dashboard/tabs/changelog.php:748
 msgid "Network"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:745
+#: app/html/menus/dashboard/tabs/changelog.php:751
 msgid "Ads"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:748
+#: app/html/menus/dashboard/tabs/changelog.php:754
 msgid ""
 "[PRO] Added ability to display image slider in archive shortcodes instead of "
 "featured image."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:751
+#: app/html/menus/dashboard/tabs/changelog.php:757
 msgid "Improved the listing translations."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:754
+#: app/html/menus/dashboard/tabs/changelog.php:760
 msgid ""
 "Improved the compatibility with some third party plugins including page "
 "builder plugins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:757
+#: app/html/menus/dashboard/tabs/changelog.php:763
 msgid "Fixed some issues in multilingual websites."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:763
+#: app/html/menus/dashboard/tabs/changelog.php:769
 msgid ""
 "[PRO] Added an ability to manage required fields for frontend submission."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:766
+#: app/html/menus/dashboard/tabs/changelog.php:772
 msgid "[PRO] Added an ability to display radius field in search form."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:769
+#: app/html/menus/dashboard/tabs/changelog.php:775
 msgid "[PRO] Added radius-dropdown method to radius search."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:772
+#: app/html/menus/dashboard/tabs/changelog.php:778
 msgid "Added WhatsApp, tiktok, and youtube to the social networks."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:775
+#: app/html/menus/dashboard/tabs/changelog.php:781
 msgid ""
 "Added infinite scroll pagination method to list, grid, listgrid, halfmap and "
 "table skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:778
+#: app/html/menus/dashboard/tabs/changelog.php:784
 msgid "Disabled auto GPS when a geo request is made by user."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:781
+#: app/html/menus/dashboard/tabs/changelog.php:787
 msgid "Improved the interface of filter options in shortcode builder."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:784
+#: app/html/menus/dashboard/tabs/changelog.php:790
 msgid "Fixed some multilingual issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:787
+#: app/html/menus/dashboard/tabs/changelog.php:793
 msgid "Fixed a compatibility issue with Avada theme."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:793
+#: app/html/menus/dashboard/tabs/changelog.php:799
 msgid "Added new map routes to the API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:796
+#: app/html/menus/dashboard/tabs/changelog.php:802
 msgid "Added an ability to disable marker click on maps."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:799
+#: app/html/menus/dashboard/tabs/changelog.php:805
 msgid "Improved the map render time."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:802
+#: app/html/menus/dashboard/tabs/changelog.php:808
 msgid "Disabled one finger drag in leaflet map for mobile devices."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:805
+#: app/html/menus/dashboard/tabs/changelog.php:811
 msgid "Fixed an issue in search widget in some multilingual websites."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:808
+#: app/html/menus/dashboard/tabs/changelog.php:814
 msgid "Fixed an issue in primary category."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:811
+#: app/html/menus/dashboard/tabs/changelog.php:817
 msgid "Fixed an issue in marker lightbox."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:817
+#: app/html/menus/dashboard/tabs/changelog.php:823
 msgid "Elementor Compatibility"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:820
+#: app/html/menus/dashboard/tabs/changelog.php:826
 msgid "Divi Builder Compatibility"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:823
+#: app/html/menus/dashboard/tabs/changelog.php:829
 msgid "Added webp image support."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:826
+#: app/html/menus/dashboard/tabs/changelog.php:832
 msgid "[PRO] Added pagination to frontend dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:829
+#: app/html/menus/dashboard/tabs/changelog.php:835
 msgid "[PRO] Fixed some issues in hierarchical dropdown."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:832
+#: app/html/menus/dashboard/tabs/changelog.php:838
 msgid "Fixed an issue regarding style 1 of single listing page."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:838
+#: app/html/menus/dashboard/tabs/changelog.php:844
 msgid "Added Instagram to social network options."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:841
+#: app/html/menus/dashboard/tabs/changelog.php:847
 msgid "[PRO] Improved guest user listing submission."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:844
+#: app/html/menus/dashboard/tabs/changelog.php:850
 msgid "Improved the social network options."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:847
-#: app/html/menus/dashboard/tabs/changelog.php:1150
-#: app/html/menus/dashboard/tabs/changelog.php:1169
+#: app/html/menus/dashboard/tabs/changelog.php:853
+#: app/html/menus/dashboard/tabs/changelog.php:1156
+#: app/html/menus/dashboard/tabs/changelog.php:1175
 msgid "Fixed some PHP notices."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:850
+#: app/html/menus/dashboard/tabs/changelog.php:856
 msgid "Fixed an issue in status change notification."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:856
+#: app/html/menus/dashboard/tabs/changelog.php:862
 msgid "Added an option to change date format of date picker fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:859
+#: app/html/menus/dashboard/tabs/changelog.php:865
 msgid "Added an option to disable \"Listing Link\" field."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:862
+#: app/html/menus/dashboard/tabs/changelog.php:868
 msgid "Added HTML editor to the remark field."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:865
+#: app/html/menus/dashboard/tabs/changelog.php:871
 msgid "Added an ability to switch languages in REST API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:868
+#: app/html/menus/dashboard/tabs/changelog.php:874
 msgid "Added some new endpoints to the REST API for multilingual websites."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:871
+#: app/html/menus/dashboard/tabs/changelog.php:877
 msgid "Fixed an issue regarding halfmap skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:874
+#: app/html/menus/dashboard/tabs/changelog.php:880
 msgid "Fixed an issue in search module."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:880
+#: app/html/menus/dashboard/tabs/changelog.php:886
 msgid "Franchise"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:883 app/includes/fields.php:51
+#: app/html/menus/dashboard/tabs/changelog.php:889 app/includes/fields.php:51
 msgid "Compare"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:886
+#: app/html/menus/dashboard/tabs/changelog.php:892
 msgid "APS"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:889
+#: app/html/menus/dashboard/tabs/changelog.php:895
 msgid "Stats"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:892
+#: app/html/menus/dashboard/tabs/changelog.php:898
 msgid "[PRO] Added an ability to disable image display per short-code."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:895
+#: app/html/menus/dashboard/tabs/changelog.php:901
 msgid ""
 "[PRO] Added a feature to change the listing link method with normal, blank, "
 "and disabled options."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:898
+#: app/html/menus/dashboard/tabs/changelog.php:904
 msgid "Added new notification for listing status update."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:901
+#: app/html/menus/dashboard/tabs/changelog.php:907
 msgid "Added report abuse element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:904
+#: app/html/menus/dashboard/tabs/changelog.php:910
 msgid "Fixed some issues regarding schema feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:914
+#: app/html/menus/dashboard/tabs/changelog.php:920
 msgid "ACF Integration"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:917
+#: app/html/menus/dashboard/tabs/changelog.php:923
 msgid "Auction"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:920
+#: app/html/menus/dashboard/tabs/changelog.php:926
 msgid "BuddyPress Integration"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:923
+#: app/html/menus/dashboard/tabs/changelog.php:929
 msgid "KML"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:926
+#: app/html/menus/dashboard/tabs/changelog.php:932
 msgid "Added price class feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:929
+#: app/html/menus/dashboard/tabs/changelog.php:935
 msgid ""
 "Added an option to display human readable criteria to the search module."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:932
+#: app/html/menus/dashboard/tabs/changelog.php:938
 msgid "Added an option to change the currency position."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:935
+#: app/html/menus/dashboard/tabs/changelog.php:941
 msgid "Added style 3 to list, grid, listgrid, and halfmap skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:938
+#: app/html/menus/dashboard/tabs/changelog.php:944
 msgid "Added style 5 to carousel skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:941
+#: app/html/menus/dashboard/tabs/changelog.php:947
 msgid "Added style 4 to cover skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:944
+#: app/html/menus/dashboard/tabs/changelog.php:950
 msgid "Added style 3 to masonry skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:947
+#: app/html/menus/dashboard/tabs/changelog.php:953
 msgid "Added style 3 to table skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:950
+#: app/html/menus/dashboard/tabs/changelog.php:956
 msgid "Added website field to contact details of listing and owner."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:953
+#: app/html/menus/dashboard/tabs/changelog.php:959
 msgid "Disabled scroll wheel on leaflet map."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:960
+#: app/html/menus/dashboard/tabs/changelog.php:966
 msgid "Booking"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:963
+#: app/html/menus/dashboard/tabs/changelog.php:969
 msgid "Multiple Categories"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:966
+#: app/html/menus/dashboard/tabs/changelog.php:972
 msgid "Advanced Icon"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:969
+#: app/html/menus/dashboard/tabs/changelog.php:975
 msgid "Listing Visibility"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:972
+#: app/html/menus/dashboard/tabs/changelog.php:978
 msgid ""
 "[PRO] Added an option to load locations and features in multiple dropdown "
 "instead of checkboxes in frontend dashboard."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:975
+#: app/html/menus/dashboard/tabs/changelog.php:981
 msgid "[PRO] Added required option for the attribute fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:978
+#: app/html/menus/dashboard/tabs/changelog.php:984
 msgid ""
 "Added a new feature to select some predefined terms in taxonomy fields of "
 "search builder."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:981
+#: app/html/menus/dashboard/tabs/changelog.php:987
 msgid "Added list / grid switcher in the half map skin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:984
+#: app/html/menus/dashboard/tabs/changelog.php:990
 msgid "Added random sort option."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:987
+#: app/html/menus/dashboard/tabs/changelog.php:993
 msgid "Added an option to manage zoom levels of GPS feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:990
+#: app/html/menus/dashboard/tabs/changelog.php:996
 msgid "Added no listing message."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:993
+#: app/html/menus/dashboard/tabs/changelog.php:999
 msgid "Improved the settings menu."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:996
+#: app/html/menus/dashboard/tabs/changelog.php:1002
 msgid "Fixed an issue of not having HTML codes in Notifications."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:999
+#: app/html/menus/dashboard/tabs/changelog.php:1005
 msgid "Fixed an issue in modal content."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1002
+#: app/html/menus/dashboard/tabs/changelog.php:1008
 msgid "Fixed an issue in featured image uploading for guest users."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1009
+#: app/html/menus/dashboard/tabs/changelog.php:1015
 msgid "Team"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1012
+#: app/html/menus/dashboard/tabs/changelog.php:1018
 msgid ""
 "Added an option to load single listing page into light-box on click of "
 "marker."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1015
+#: app/html/menus/dashboard/tabs/changelog.php:1021
 msgid "Improved the listdom icons."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1025
+#: app/html/menus/dashboard/tabs/changelog.php:1031
 msgid "Fixed some UI issues related to icons."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1032
+#: app/html/menus/dashboard/tabs/changelog.php:1038
 msgid "Rate & Review"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1035
+#: app/html/menus/dashboard/tabs/changelog.php:1041
 msgid "[PRO] Added radius search in search module."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1038
+#: app/html/menus/dashboard/tabs/changelog.php:1044
 msgid "Added compatibility with WP 2020 theme."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1041
+#: app/html/menus/dashboard/tabs/changelog.php:1047
 msgid "Applied many improvements."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1043
+#: app/html/menus/dashboard/tabs/changelog.php:1049
 msgid "Escaped all the translate-able strings based on their context."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1044
+#: app/html/menus/dashboard/tabs/changelog.php:1050
 msgid "Improved security by sanitizing inputs."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1045
+#: app/html/menus/dashboard/tabs/changelog.php:1051
 msgid "Escaped dynamic HTML tags."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1046
+#: app/html/menus/dashboard/tabs/changelog.php:1052
 msgid "Improved security of Embed feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1047
+#: app/html/menus/dashboard/tabs/changelog.php:1053
 msgid "Fixed some issues in loading CSS and JS assets."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1048
+#: app/html/menus/dashboard/tabs/changelog.php:1054
 msgid "Removed inline CSS and JS codes."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1049
+#: app/html/menus/dashboard/tabs/changelog.php:1055
 msgid "Improved the structure of listdom API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1053
+#: app/html/menus/dashboard/tabs/changelog.php:1059
 msgid "Fixed an issue in assigning listing to user after approving by admin."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1056
+#: app/html/menus/dashboard/tabs/changelog.php:1062
 msgid "Fixed an issue in showing map element in style 1."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1063
+#: app/html/menus/dashboard/tabs/changelog.php:1069
 msgid "Labelize"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1066
+#: app/html/menus/dashboard/tabs/changelog.php:1072
 msgid "Subscriptions"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1069
+#: app/html/menus/dashboard/tabs/changelog.php:1075
 msgid "Paid Member Subscriptions Integration"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1072
+#: app/html/menus/dashboard/tabs/changelog.php:1078
 msgid ""
 "[PRO] Added hierarchical dropdown method for taxonomies in search builder."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1075
+#: app/html/menus/dashboard/tabs/changelog.php:1081
 msgid "Added some new endpoints to the API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1078
+#: app/html/menus/dashboard/tabs/changelog.php:1084
 msgid "Improved security of listdom and addons."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1081
+#: app/html/menus/dashboard/tabs/changelog.php:1087
 msgid "Fixed an issue in search builder regarding default values."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1091 app/includes/fields.php:53
+#: app/html/menus/dashboard/tabs/changelog.php:1097 app/includes/fields.php:53
 msgid "Claim"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1094
+#: app/html/menus/dashboard/tabs/changelog.php:1100
 msgid "Topup"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1097
+#: app/html/menus/dashboard/tabs/changelog.php:1103
 msgid ""
 "Added an ability to show all values of a certain attribute in the search "
 "builder."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1100
+#: app/html/menus/dashboard/tabs/changelog.php:1106
 msgid "Improved security of listdom."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1103
+#: app/html/menus/dashboard/tabs/changelog.php:1109
 msgid "Fixed an issue regarding showing all attributes in API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1110
+#: app/html/menus/dashboard/tabs/changelog.php:1116
 msgid "Favorites"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1113
+#: app/html/menus/dashboard/tabs/changelog.php:1119
 msgid "Rank"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1116
+#: app/html/menus/dashboard/tabs/changelog.php:1122
 msgid "[PRO] Added schema (Structured Data) feature to boost SEO."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1119
+#: app/html/menus/dashboard/tabs/changelog.php:1125
 msgid "Improved Listdom Restful API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1122
+#: app/html/menus/dashboard/tabs/changelog.php:1128
 msgid "Fixed some issues in permission of Restful API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1125
+#: app/html/menus/dashboard/tabs/changelog.php:1131
 msgid "Fixed an issue in search of text fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1135
+#: app/html/menus/dashboard/tabs/changelog.php:1141
 msgid "Mobile Application"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1138
+#: app/html/menus/dashboard/tabs/changelog.php:1144
 msgid "Added Listdom Restful API."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1141
+#: app/html/menus/dashboard/tabs/changelog.php:1147
 msgid ""
 "[PRO] Added embed code feature to submit videos, virtual tours etc. for "
 "certain listings!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1144
+#: app/html/menus/dashboard/tabs/changelog.php:1150
 msgid "Fixed category hierarchy issue on attributes menu."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1147
+#: app/html/menus/dashboard/tabs/changelog.php:1153
 msgid "Fixed a conflict between Listdom and Elementor."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1157
+#: app/html/menus/dashboard/tabs/changelog.php:1163
 #: app/html/menus/ix/tabs.php:6
 msgid "CSV"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1160
+#: app/html/menus/dashboard/tabs/changelog.php:1166
 msgid ""
 "[PRO] Added dashboard module controls so the modules can be disabled / "
 "enabled."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1163
+#: app/html/menus/dashboard/tabs/changelog.php:1169
 msgid "[PRO] Added ability to export and import listing gallery."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1166
+#: app/html/menus/dashboard/tabs/changelog.php:1172
 msgid ""
 "Fixed an issue in target page of search form when the shortcode loads in "
 "archive instead of singular page."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1176
+#: app/html/menus/dashboard/tabs/changelog.php:1182
 msgid "Advanced Map"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1179
+#: app/html/menus/dashboard/tabs/changelog.php:1185
 msgid "[PRO] Added advanced import and export system."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1182
+#: app/html/menus/dashboard/tabs/changelog.php:1188
 msgid "Fixed an issue in map search feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1189
+#: app/html/menus/dashboard/tabs/changelog.php:1195
 msgid "[PRO] Added hierarchical support for category taxonomy."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1192
+#: app/html/menus/dashboard/tabs/changelog.php:1198
 msgid "Added an dashboard notification system to manage the system emails."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1195
+#: app/html/menus/dashboard/tabs/changelog.php:1201
 msgid "Added HTML marker to leaflet."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1198
+#: app/html/menus/dashboard/tabs/changelog.php:1204
 msgid "Improved leaflet clustering for polygon, rectangle and poly-lines."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1201
+#: app/html/menus/dashboard/tabs/changelog.php:1207
 msgid "Fixed an issue in leaflet clustering."
-msgstr ""
-
-#: app/html/menus/dashboard/tabs/changelog.php:1208
-msgid ""
-"[PRO] Added dashboard shortcode to add and manage listings from frontend."
-msgstr ""
-
-#: app/html/menus/dashboard/tabs/changelog.php:1211
-msgid "[PRO] Added clustering feature for leaflet map."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:1214
 msgid ""
-"Added search functionality to the shortcode builder for different skins."
+"[PRO] Added dashboard shortcode to add and manage listings from frontend."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:1217
-msgid "Fixed some issues on search builder."
+msgid "[PRO] Added clustering feature for leaflet map."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:1220
-msgid "Fixed an issue in availability form."
+msgid ""
+"Added search functionality to the shortcode builder for different skins."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:1223
-msgid "Fixed an issue in warning of Google Maps API Key."
+msgid "Fixed some issues on search builder."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:1226
-msgid "Fixed an issue in saving the attributes."
+msgid "Fixed an issue in availability form."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/changelog.php:1229
+msgid "Fixed an issue in warning of Google Maps API Key."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:1232
+msgid "Fixed an issue in saving the attributes."
+msgstr ""
+
+#: app/html/menus/dashboard/tabs/changelog.php:1235
 msgid "Fixed a query issue on skins."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1236
+#: app/html/menus/dashboard/tabs/changelog.php:1242
 msgid "Added multiple dropdown search methods."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1239
+#: app/html/menus/dashboard/tabs/changelog.php:1245
 msgid "Improved dummy data importer to import a default search form too."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1242
+#: app/html/menus/dashboard/tabs/changelog.php:1248
 msgid "Fixed some issues on settings page."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1249
+#: app/html/menus/dashboard/tabs/changelog.php:1255
 msgid "Added Advanced Search Builder"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1251
+#: app/html/menus/dashboard/tabs/changelog.php:1257
 msgid ""
 "Ability to create different search forms with different rows, styles and "
 "fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1252
+#: app/html/menus/dashboard/tabs/changelog.php:1258
 msgid "Added price field with options."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1253
+#: app/html/menus/dashboard/tabs/changelog.php:1259
 msgid "Added address field."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1254
+#: app/html/menus/dashboard/tabs/changelog.php:1260
 msgid "Added dropdown search method."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1255
+#: app/html/menus/dashboard/tabs/changelog.php:1261
 msgid "Added radio input search method."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1256
+#: app/html/menus/dashboard/tabs/changelog.php:1262
 msgid "Added checkboxes search method."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1257
+#: app/html/menus/dashboard/tabs/changelog.php:1263
 msgid "Added text input search method."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1258
+#: app/html/menus/dashboard/tabs/changelog.php:1264
 msgid "Added dropdown+ search method."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1259
+#: app/html/menus/dashboard/tabs/changelog.php:1265
 msgid "Added Min/Max input search method."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1263
+#: app/html/menus/dashboard/tabs/changelog.php:1269
 msgid "Added ability to hide email, fax, mobile, etc. in owner element."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1266
+#: app/html/menus/dashboard/tabs/changelog.php:1272
 msgid "Improved search widget to work with search builder!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1276
+#: app/html/menus/dashboard/tabs/changelog.php:1282
 msgid "[PRO] Improved design of GPS icon in map module."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1279
+#: app/html/menus/dashboard/tabs/changelog.php:1285
 msgid "Fixed some tiny issues."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1286
+#: app/html/menus/dashboard/tabs/changelog.php:1292
 msgid "[PRO] Improved activation and update process!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1293
+#: app/html/menus/dashboard/tabs/changelog.php:1299
 msgid "Added Shortcode Generator."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1295
+#: app/html/menus/dashboard/tabs/changelog.php:1301
 msgid ""
 "Ability to select shortcode skin from 10 different skins and many styles."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1296
+#: app/html/menus/dashboard/tabs/changelog.php:1302
 msgid ""
 "Ability to filter listings using category, tag, label, location, feature and "
 "author filter options!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1297
+#: app/html/menus/dashboard/tabs/changelog.php:1303
 msgid "Ability to select default order options."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1298
+#: app/html/menus/dashboard/tabs/changelog.php:1304
 msgid "Ability to disable / enable sort bar and its options!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1299
+#: app/html/menus/dashboard/tabs/changelog.php:1305
 msgid "Ability to select map provider per shortcode!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1300
+#: app/html/menus/dashboard/tabs/changelog.php:1306
 msgid "Added many configuration options to achieve your desired look and feel!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1304
+#: app/html/menus/dashboard/tabs/changelog.php:1310
 msgid "Added Listing Category."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1306
+#: app/html/menus/dashboard/tabs/changelog.php:1312
 msgid ""
 "Ability to select an icon for each category. The icon will show in category "
 "shortcodes and map markers."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1307
+#: app/html/menus/dashboard/tabs/changelog.php:1313
 msgid "Ability to select a color for each category. It use in markers."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1308
+#: app/html/menus/dashboard/tabs/changelog.php:1314
 msgid ""
 "Ability to select an image for each category. The image will show in "
 "category shortcodes."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1309
+#: app/html/menus/dashboard/tabs/changelog.php:1315
 msgid ""
 "Added ability to filter listings by one or multiple categories in the "
 "shortcode generator."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1313
+#: app/html/menus/dashboard/tabs/changelog.php:1319
 msgid "Added Hierarchical Listing Location."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1315
+#: app/html/menus/dashboard/tabs/changelog.php:1321
 msgid ""
 "Ability to select an image for each location. The image will show in "
 "location shortcodes."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1316
+#: app/html/menus/dashboard/tabs/changelog.php:1322
 msgid ""
 "Added ability to filter listings by one or multiple locations in the "
 "shortcode generator."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1320
+#: app/html/menus/dashboard/tabs/changelog.php:1326
 msgid "Added Listing Tags."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1323
+#: app/html/menus/dashboard/tabs/changelog.php:1329
 msgid "Added Listing Features."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1326
+#: app/html/menus/dashboard/tabs/changelog.php:1332
 msgid "Added Listing Labels."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1329
+#: app/html/menus/dashboard/tabs/changelog.php:1335
 msgid "[PRO] Added Custom Fields."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1331
+#: app/html/menus/dashboard/tabs/changelog.php:1337
 msgid ""
 "Ability to create personalized fields for listing using attributes feature."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1332
+#: app/html/menus/dashboard/tabs/changelog.php:1338
 msgid "Added ability to create attributes per category!"
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1336
+#: app/html/menus/dashboard/tabs/changelog.php:1342
 msgid "Fixed an issue in listing link."
 msgstr ""
 
-#: app/html/menus/dashboard/tabs/changelog.php:1339
+#: app/html/menus/dashboard/tabs/changelog.php:1345
 msgid "Improved clustering feature of Google Maps."
 msgstr ""
 
@@ -2037,8 +2036,8 @@ msgid "Authentication Page"
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/dashboard.php:114
-#: app/html/menus/ix/tabs/dummy-data.php:92 app/html/menus/settings/tabs.php:41
-#: app/html/menus/settings/tabs.php:48
+#: app/html/menus/ix/tabs/dummy-data.php:92 app/html/menus/settings/tabs.php:43
+#: app/html/menus/settings/tabs.php:50
 #: app/html/menus/welcome/tabs/dummy-data.php:97
 #: app/includes/customizer/dashboard.php:9
 msgid "Frontend Dashboard"
@@ -2098,7 +2097,7 @@ msgid "Visit our support center for help with Listdom."
 msgstr ""
 
 #: app/html/menus/dashboard/tabs/dashboard.php:191
-#: app/html/menus/plugins/dashboard-widget.php:34 app/includes/hooks.php:26
+#: app/html/plugin/dashboard-widget.php:34 app/includes/hooks.php:26
 #: app/includes/menus.php:56
 msgid "Support"
 msgstr ""
@@ -2357,7 +2356,7 @@ msgstr ""
 
 #: app/html/menus/ix/tabs/csv/mapping.php:90
 #: app/html/metaboxes/search/row.php:17
-#: app/includes/taxonomies/attribute.php:322
+#: app/includes/taxonomies/attribute.php:349
 msgid "Type"
 msgstr ""
 
@@ -2435,7 +2434,7 @@ msgstr ""
 #: app/includes/taxonomies/location.php:25
 #: app/includes/taxonomies/location.php:27
 #: app/includes/widgets/taxonomycloud.php:41 app/includes/widgets/terms.php:41
-#: templates/dashboard/form.php:201
+#: templates/dashboard/form.php:200
 msgid "Locations"
 msgstr ""
 
@@ -2452,7 +2451,7 @@ msgstr ""
 #: app/includes/ptypes/listing/single.php:1011
 #: app/includes/search/builder.php:58 app/includes/taxonomies/tag.php:13
 #: app/includes/taxonomies/tag.php:15 app/includes/widgets/taxonomycloud.php:39
-#: app/includes/widgets/terms.php:39 templates/dashboard/form.php:220
+#: app/includes/widgets/terms.php:39 templates/dashboard/form.php:219
 msgid "Tags"
 msgstr ""
 
@@ -2472,15 +2471,15 @@ msgstr ""
 #: app/includes/search/builder.php:66 app/includes/taxonomies/feature.php:22
 #: app/includes/taxonomies/feature.php:24
 #: app/includes/widgets/taxonomycloud.php:42 app/includes/widgets/terms.php:42
-#: templates/dashboard/form.php:247
+#: templates/dashboard/form.php:246
 msgid "Features"
 msgstr ""
 
 #: app/html/menus/ix/tabs/dummy-data.php:70
 #: app/html/menus/settings/tabs/auth.php:24
 #: app/html/menus/settings/tabs/auth.php:288
-#: app/html/menus/settings/tabs/auth.php:405
-#: app/html/menus/settings/tabs/auth.php:641
+#: app/html/menus/settings/tabs/auth.php:437
+#: app/html/menus/settings/tabs/auth.php:705
 #: app/html/menus/settings/tabs/frontend-dashboard.php:321
 #: app/html/menus/welcome/tabs/dummy-data.php:75
 #: app/html/metaboxes/shortcode/display-options/elements/accordion.php:186
@@ -2506,7 +2505,7 @@ msgstr ""
 #: app/includes/search/builder.php:74 app/includes/taxonomies/label.php:18
 #: app/includes/taxonomies/label.php:20
 #: app/includes/widgets/taxonomycloud.php:43 app/includes/widgets/terms.php:43
-#: templates/dashboard/form.php:266
+#: templates/dashboard/form.php:265
 msgid "Labels"
 msgstr ""
 
@@ -2514,7 +2513,7 @@ msgstr ""
 #: app/html/menus/welcome/tabs/dummy-data.php:86
 #: app/html/metaboxes/shortcode/filter-options.php:35
 #: app/includes/api/controllers/taxonomies.php:36
-#: app/includes/api/resources/fields.php:379 app/includes/dashboard.php:18
+#: app/includes/api/resources/fields.php:380 app/includes/dashboard.php:18
 #: app/includes/element/attributes.php:12 app/includes/search/builder.php:118
 #: app/includes/taxonomies/attribute.php:22
 #: app/includes/taxonomies/attribute.php:24 templates/dashboard/form.php:85
@@ -2526,7 +2525,7 @@ msgid "Shortcodes & Pages"
 msgstr ""
 
 #: app/html/menus/ix/tabs/dummy-data.php:115
-#: app/html/menus/settings/tabs.php:42
+#: app/html/menus/settings/tabs.php:44
 #: app/html/menus/welcome/tabs/dummy-data.php:119
 #: app/includes/customizer/profile.php:9 app/includes/customizer/profile.php:13
 #: templates/profile/users.php:62
@@ -2560,7 +2559,8 @@ msgstr ""
 msgid "You should upload only JSON file exported from Listdom!"
 msgstr ""
 
-#: app/html/menus/ix/tpl.php:8 app/includes/menus.php:51
+#: app/html/menus/ix/tpl.php:8 app/html/menus/settings/tabs.php:97
+#: app/includes/menus.php:51
 msgid "Import / Export"
 msgstr ""
 
@@ -2568,65 +2568,8 @@ msgstr ""
 msgid "Easily import and export listings in your preferred format!"
 msgstr ""
 
-#: app/html/menus/notices/listdomer.php:13
-#: app/html/menus/welcome/tabs/listdomer.php:7
-msgid "Enjoy the Listdom more with Listdomer theme"
-msgstr ""
-
-#: app/html/menus/notices/listdomer.php:14
-#: app/html/menus/welcome/tabs/listdomer.php:10
-msgid ""
-"Enhance your website's styling with the Listdomer theme! In addition to "
-"Listdom's impressive features, the Listdomer theme gives you greater control "
-"over your site's design and customization. Install and activate it to "
-"customize your directory site more."
-msgstr ""
-
-#: app/html/menus/notices/listdomer.php:17
-#: app/html/menus/welcome/tabs/listdomer.php:23
-msgid "YES, Install Listdomer Theme"
-msgstr ""
-
-#: app/html/menus/notices/listdomer.php:20
-msgid "Maybe, Later"
-msgstr ""
-
-#: app/html/menus/notices/listdomer.php:21
-msgid "No, Thanks"
-msgstr ""
-
-#: app/html/menus/notices/review.php:13
-msgid "Looks like you've been using Listdom for a while."
-msgstr ""
-
-#: app/html/menus/notices/review.php:14
-msgid ""
-"Could you give a 5-star rating on the WordPress repository? It helps the "
-"Listdom team know their efforts are useful to you."
-msgstr ""
-
-#: app/html/menus/notices/review.php:17
-msgid "Sure, you deserve it"
-msgstr ""
-
-#: app/html/menus/notices/review.php:20
-msgid "Maybe later"
-msgstr ""
-
-#: app/html/menus/notices/review.php:21
-msgid "Already done :)"
-msgstr ""
-
-#: app/html/menus/plugins/dashboard-widget.php:12
-msgid "News & Updates"
-msgstr ""
-
-#: app/html/menus/plugins/dashboard-widget.php:40
-msgid "Go Pro"
-msgstr ""
-
 #: app/html/menus/settings/tabs.php:14 app/html/menus/settings/tabs.php:17
-#: app/html/menus/settings/tabs.php:35
+#: app/html/menus/settings/tabs.php:37
 #: app/html/menus/settings/tabs/general.php:22
 #: app/html/menus/settings/tabs/single-listing.php:105
 #: app/includes/api/resources/fields.php:13
@@ -2640,50 +2583,50 @@ msgstr ""
 msgid "Map Module"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:19
+#: app/html/menus/settings/tabs.php:20
 #: app/html/menus/settings/tabs/general.php:398
 #: app/html/menus/settings/tabs/general.php:405
 msgid "Price Components"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:21 app/includes/element/owner.php:77
+#: app/html/menus/settings/tabs.php:23 app/includes/element/owner.php:77
 msgid "Socials"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:23
+#: app/html/menus/settings/tabs.php:25
 #: app/html/menus/settings/tabs/general.php:494
 msgid "Archive Pages"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:24
+#: app/html/menus/settings/tabs.php:26
 #: app/html/menus/settings/tabs/general.php:587
 msgid "Slugs"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:25
+#: app/html/menus/settings/tabs.php:27
 msgid "Google reCAPTCHA"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:26
+#: app/html/menus/settings/tabs.php:28
 #: app/html/menus/settings/tabs/general.php:781
 msgid "Integrations"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:32
+#: app/html/menus/settings/tabs.php:34
 msgid "Customizer"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:36 app/includes/customizer/buttons.php:38
+#: app/html/menus/settings/tabs.php:38 app/includes/customizer/buttons.php:38
 msgid "Buttons"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:37
+#: app/html/menus/settings/tabs.php:39
 #: app/html/menus/settings/tabs/auth.php:114
 #: app/includes/customizer/forms.php:9
 msgid "Forms"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:38 app/html/menus/settings/tabs.php:83
+#: app/html/menus/settings/tabs.php:40 app/html/menus/settings/tabs.php:85
 #: app/html/menus/settings/tabs/general.php:443
 #: app/html/metaboxes/shortcode/display-options/elements/side.php:32
 #: app/includes/bar.php:80 app/includes/bar.php:90
@@ -2691,141 +2634,140 @@ msgstr ""
 msgid "Single Listing"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:39 app/includes/customizer/skins.php:9
+#: app/html/menus/settings/tabs.php:41 app/includes/customizer/skins.php:9
 msgid "Skins"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:40
+#: app/html/menus/settings/tabs.php:42
 #: app/html/menus/settings/tabs/general.php:654
 #: app/includes/customizer/taxonomies.php:9 app/includes/element/related.php:49
 msgid "Taxonomies"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:51
+#: app/html/menus/settings/tabs.php:53
 #: app/html/menus/settings/tabs/frontend-dashboard.php:30
 msgid "Pages"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:52
+#: app/html/menus/settings/tabs.php:54
 #: app/html/menus/settings/tabs/frontend-dashboard.php:92
 #: app/html/menus/settings/tabs/frontend-dashboard.php:98
 msgid "Dashboard Menus"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:53
+#: app/html/menus/settings/tabs.php:55
 #: app/html/menus/settings/tabs/frontend-dashboard.php:189
 #: app/html/menus/settings/tabs/frontend-dashboard.php:195
 msgid "Guest Submission"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:54
+#: app/html/menus/settings/tabs.php:56
 #: app/html/menus/settings/tabs/frontend-dashboard.php:256
 #: app/includes/ptypes/search.php:97
 msgid "Fields"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:55
+#: app/html/menus/settings/tabs.php:57
 #: app/html/menus/settings/tabs/frontend-dashboard.php:368
 msgid "Restrictions"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:68 app/includes/customizer/profile.php:17
+#: app/html/menus/settings/tabs.php:70 app/includes/customizer/profile.php:17
 msgid "Users"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:71 app/html/menus/settings/tabs/auth.php:14
+#: app/html/menus/settings/tabs.php:73 app/html/menus/settings/tabs/auth.php:14
 #: app/includes/customizer/forms.php:20
 msgid "Authentication"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:72
+#: app/html/menus/settings/tabs.php:74
 #: app/html/menus/settings/tabs/auth.php:185
 #: app/html/menus/settings/tabs/auth.php:279 app/includes/options.php:379
 msgid "Login"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:73
+#: app/html/menus/settings/tabs.php:75
 #: app/html/menus/settings/tabs/auth.php:216
-#: app/html/menus/settings/tabs/auth.php:396 app/includes/options.php:377
-#: app/includes/options.php:398
+#: app/html/menus/settings/tabs/auth.php:428 app/includes/options.php:377
+#: app/includes/options.php:402
 msgid "Register"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:74
+#: app/html/menus/settings/tabs.php:76
 #: app/html/menus/settings/tabs/auth.php:247
-#: app/html/menus/settings/tabs/auth.php:636 app/includes/options.php:381
+#: app/html/menus/settings/tabs/auth.php:700 app/includes/options.php:381
 msgid "Forgot Password"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:75
-#: app/html/menus/settings/tabs/auth.php:707
+#: app/html/menus/settings/tabs.php:77
+#: app/html/menus/settings/tabs/auth.php:754
 msgid "Profile & User Directory"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:76
-#: app/html/menus/settings/tabs/auth.php:756
+#: app/html/menus/settings/tabs.php:78
+#: app/html/menus/settings/tabs/auth.php:803
 msgid "Logged In Users"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:77
-#: app/html/menus/settings/tabs/auth.php:794
+#: app/html/menus/settings/tabs.php:79
+#: app/html/menus/settings/tabs/auth.php:841
 msgid "Block Admin Access"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:89
+#: app/html/menus/settings/tabs.php:91
 msgid "Advanced"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:92
-#: app/html/menus/settings/tabs/advanced.php:25
-msgid "Optimize Assets Loading"
+#: app/html/menus/settings/tabs.php:94
+msgid "Assets Loading"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:93
+#: app/html/menus/settings/tabs.php:95
 #: app/html/menus/settings/tabs/advanced.php:179
 msgid "Custom Styles"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:94
+#: app/html/menus/settings/tabs.php:96
 #: app/html/menus/settings/tabs/advanced.php:197
 msgid "Components"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:95
-#: app/html/menus/settings/tabs/advanced.php:310
-msgid "Import/Export"
-msgstr ""
-
-#: app/html/menus/settings/tabs.php:101
+#: app/html/menus/settings/tabs.php:103
 msgid "AI"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:107 app/html/menus/settings/tabs/api.php:14
+#: app/html/menus/settings/tabs.php:109 app/html/menus/settings/tabs/api.php:14
 msgid "API"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:137
+#: app/html/menus/settings/tabs.php:123 app/html/plugin/header.php:24
+#: app/includes/menus.php:53
+msgid "Addons"
+msgstr ""
+
+#: app/html/menus/settings/tabs.php:139
 #, php-format
 msgid "Have Problems? %s"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:137
+#: app/html/menus/settings/tabs.php:139
 msgid "Contact Support"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:143
+#: app/html/menus/settings/tabs.php:145
 msgid "You have unsaved changes."
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:144
+#: app/html/menus/settings/tabs.php:146
 msgid "Do you want to leave without saving? "
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:147
+#: app/html/menus/settings/tabs.php:149
 msgid "Leave Now"
 msgstr ""
 
-#: app/html/menus/settings/tabs.php:148
+#: app/html/menus/settings/tabs.php:150
 msgid "Save & Leave"
 msgstr ""
 
@@ -2837,9 +2779,9 @@ msgstr ""
 #: app/html/menus/settings/tabs/advanced.php:391
 #: app/html/menus/settings/tabs/ai.php:84
 #: app/html/menus/settings/tabs/api.php:51
-#: app/html/menus/settings/tabs/auth.php:832
 #: app/html/menus/settings/tabs/auth.php:874
-#: app/html/menus/settings/tabs/auth.php:884
+#: app/html/menus/settings/tabs/auth.php:916
+#: app/html/menus/settings/tabs/auth.php:926
 #: app/html/menus/settings/tabs/customizer.php:176
 #: app/html/menus/settings/tabs/customizer.php:221
 #: app/html/menus/settings/tabs/customizer.php:231
@@ -2858,7 +2800,7 @@ msgstr ""
 #: app/html/menus/settings/tabs/addons.php:19
 #: app/html/menus/settings/tabs/advanced.php:302
 #: app/html/menus/settings/tabs/ai.php:88
-#: app/html/menus/settings/tabs/auth.php:836
+#: app/html/menus/settings/tabs/auth.php:878
 #: app/html/menus/settings/tabs/customizer.php:180
 #: app/html/menus/settings/tabs/frontend-dashboard.php:477
 #: app/html/menus/settings/tabs/general.php:910
@@ -2869,12 +2811,16 @@ msgstr ""
 #: app/html/menus/settings/tabs/addons.php:20
 #: app/html/menus/settings/tabs/advanced.php:303
 #: app/html/menus/settings/tabs/ai.php:89
-#: app/html/menus/settings/tabs/auth.php:837
+#: app/html/menus/settings/tabs/auth.php:879
 #: app/html/menus/settings/tabs/customizer.php:181
 #: app/html/menus/settings/tabs/frontend-dashboard.php:478
 #: app/html/menus/settings/tabs/general.php:911
 #: app/html/menus/settings/tabs/single-listing.php:371
 msgid "Error: Unable to save options."
+msgstr ""
+
+#: app/html/menus/settings/tabs/advanced.php:25
+msgid "Optimize Assets Loading"
 msgstr ""
 
 #: app/html/menus/settings/tabs/advanced.php:28
@@ -2967,7 +2913,8 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/elements/listgrid.php:103
 #: app/html/metaboxes/shortcode/display-options/elements/masonry.php:120
 #: app/includes/api/resources/fields.php:238 app/includes/dashboard.php:38
-#: app/includes/dummy.php:495 app/includes/fields.php:28
+#: app/includes/dashboard.php:76 app/includes/dummy.php:495
+#: app/includes/fields.php:28
 msgid "Work Hours"
 msgstr ""
 
@@ -2984,6 +2931,10 @@ msgstr ""
 #: app/html/menus/settings/tabs/advanced.php:280
 #: app/html/menus/settings/tabs/general.php:435
 msgid "Social Networks"
+msgstr ""
+
+#: app/html/menus/settings/tabs/advanced.php:310
+msgid "Import/Export"
 msgstr ""
 
 #: app/html/menus/settings/tabs/advanced.php:318
@@ -3086,9 +3037,9 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/auth.php:17
 #: app/html/menus/settings/tabs/auth.php:282
-#: app/html/menus/settings/tabs/auth.php:399
-#: app/html/menus/settings/tabs/auth.php:639
-#: app/html/menus/settings/tabs/auth.php:710
+#: app/html/menus/settings/tabs/auth.php:431
+#: app/html/menus/settings/tabs/auth.php:703
+#: app/html/menus/settings/tabs/auth.php:757
 #, php-format
 msgid "To use this options you can put %s shortcode into any page."
 msgstr ""
@@ -3184,18 +3135,18 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/auth.php:291
 #: app/html/menus/settings/tabs/auth.php:349
-#: app/html/menus/settings/tabs/auth.php:408
-#: app/html/menus/settings/tabs/auth.php:466 app/includes/options.php:392
-#: app/includes/options.php:409
+#: app/html/menus/settings/tabs/auth.php:440
+#: app/html/menus/settings/tabs/auth.php:498 app/includes/options.php:396
+#: app/includes/options.php:417
 msgid "Username"
 msgstr ""
 
 #: app/html/menus/settings/tabs/auth.php:305
 #: app/html/menus/settings/tabs/auth.php:363
-#: app/html/menus/settings/tabs/auth.php:422
-#: app/html/menus/settings/tabs/auth.php:480
-#: app/includes/api/resources/fields.php:427 app/includes/options.php:394
-#: app/includes/options.php:410 templates/dashboard/form.php:126
+#: app/html/menus/settings/tabs/auth.php:454
+#: app/html/menus/settings/tabs/auth.php:512
+#: app/includes/api/resources/fields.php:428 app/includes/options.php:398
+#: app/includes/options.php:418 templates/dashboard/form.php:125
 #: templates/dashboard/profile.php:267
 msgid "Password"
 msgstr ""
@@ -3205,19 +3156,18 @@ msgid "Remember me"
 msgstr ""
 
 #: app/html/menus/settings/tabs/auth.php:333
-#: app/html/menus/settings/tabs/auth.php:450
+#: app/html/menus/settings/tabs/auth.php:482
 msgid "Button"
 msgstr ""
 
 #: app/html/menus/settings/tabs/auth.php:346
-#: app/html/menus/settings/tabs/auth.php:463
-#: app/html/menus/settings/tabs/auth.php:671
+#: app/html/menus/settings/tabs/auth.php:495
+#: app/html/menus/settings/tabs/auth.php:735
 #: app/includes/ptypes/notification.php:94
 msgid "Placeholders"
 msgstr ""
 
 #: app/html/menus/settings/tabs/auth.php:376
-#: app/html/menus/settings/tabs/auth.php:687
 msgid "Redirect"
 msgstr ""
 
@@ -3229,106 +3179,121 @@ msgstr ""
 msgid "After the user logs in, they will be redirected to the designated page."
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:401
+#: app/html/menus/settings/tabs/auth.php:392
+msgid "Redirection Per User Role"
+msgstr ""
+
+#: app/html/menus/settings/tabs/auth.php:409
+#: app/html/menus/settings/tabs/auth.php:587
+msgid "Redirect Page"
+msgstr ""
+
+#: app/html/menus/settings/tabs/auth.php:418
+#, php-format
+msgid ""
+"After logging in, the %s user will be redirected to the designated page."
+msgstr ""
+
+#: app/html/menus/settings/tabs/auth.php:433
 msgid ""
 "You can restrict the register form to a specific role using the role "
 "parameter (subscriber, contributor, listdom_author or listdom_publisher). "
 "Example:"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:436
-#: app/html/menus/settings/tabs/auth.php:494
-#: app/html/menus/settings/tabs/auth.php:644
-#: app/html/menus/settings/tabs/auth.php:674
+#: app/html/menus/settings/tabs/auth.php:468
+#: app/html/menus/settings/tabs/auth.php:526
+#: app/html/menus/settings/tabs/auth.php:708
+#: app/html/menus/settings/tabs/auth.php:738
 #: app/html/metaboxes/listing/details.php:72
 #: app/html/metaboxes/listing/details.php:254
 #: app/html/metaboxes/listing/details.php:257
 #: app/includes/api/resources/fields.php:255
 #: app/includes/api/resources/fields.php:256
-#: app/includes/api/resources/fields.php:398 app/includes/dashboard.php:56
+#: app/includes/api/resources/fields.php:399 app/includes/dashboard.php:56
 #: app/includes/element/owner.php:93 app/includes/fields.php:30
 #: app/includes/ix/array.php:89 app/includes/meta.php:327
-#: app/includes/options.php:396 app/includes/options.php:418
-#: templates/dashboard/form.php:115 templates/dashboard/profile.php:139
+#: app/includes/options.php:400 app/includes/options.php:426
+#: templates/dashboard/form.php:114 templates/dashboard/profile.php:139
 #: templates/elements/contact-info.php:58 templates/elements/owner.php:90
 #: templates/profile/profile.php:177 templates/profile/users.php:51
 msgid "Email"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:507
-#: app/html/menus/settings/tabs/auth.php:510
+#: app/html/menus/settings/tabs/auth.php:539
+#: app/html/menus/settings/tabs/auth.php:542
 msgid "Auto Login"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:525
+#: app/html/menus/settings/tabs/auth.php:557
 msgid "After Register Redirect Page"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:534
+#: app/html/menus/settings/tabs/auth.php:566
 msgid ""
 "After the user registers, they will be redirected to the designated page."
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:539
+#: app/html/menus/settings/tabs/auth.php:570
+msgid "Auto Login Per User Role"
+msgstr ""
+
+#: app/html/menus/settings/tabs/auth.php:596
+#, php-format
+msgid ""
+"After registering, the %s user will be redirected to the designated page."
+msgstr ""
+
+#: app/html/menus/settings/tabs/auth.php:603
 msgid "Password Policy"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:542
+#: app/html/menus/settings/tabs/auth.php:606
 msgid "Strong Password"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:558
+#: app/html/menus/settings/tabs/auth.php:622
 msgid "Password Length"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:577
+#: app/html/menus/settings/tabs/auth.php:641
 msgid "Contain Uppercase"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:591
+#: app/html/menus/settings/tabs/auth.php:655
 msgid "Contain Lowercase"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:605
+#: app/html/menus/settings/tabs/auth.php:669
 msgid "Contain Numbers"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:619
+#: app/html/menus/settings/tabs/auth.php:683
 msgid "Contain Special Characters"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:658
+#: app/html/menus/settings/tabs/auth.php:722
 #: app/html/metaboxes/search/row.php:111 app/html/metaboxes/search/row.php:164
 msgid "Button Label"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:690
-msgid "Page"
-msgstr ""
-
-#: app/html/menus/settings/tabs/auth.php:699
-msgid ""
-"After the user receives the password recovery email, they will be redirected "
-"to the designated page."
-msgstr ""
-
-#: app/html/menus/settings/tabs/auth.php:712
+#: app/html/menus/settings/tabs/auth.php:759
 msgid "User Profile"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:715
+#: app/html/menus/settings/tabs/auth.php:762
 msgid "Profile Page"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:730
+#: app/html/menus/settings/tabs/auth.php:777
 msgid "Author Listings Shortcode"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:745
+#: app/html/menus/settings/tabs/auth.php:792
 msgid "User Directory"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:746
+#: app/html/menus/settings/tabs/auth.php:793
 #, php-format
 msgid ""
 "To use the user directory, you can place the %s shortcode on any page. The "
@@ -3336,45 +3301,29 @@ msgid ""
 "following shortcodes:"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:761
+#: app/html/menus/settings/tabs/auth.php:808
 msgid "Redirect After Logout Page"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:771
+#: app/html/menus/settings/tabs/auth.php:818
 msgid ""
 "After the user logs out, they will be redirected to the designated page."
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:777
+#: app/html/menus/settings/tabs/auth.php:824
 msgid "Account URL"
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:786
+#: app/html/menus/settings/tabs/auth.php:833
 msgid ""
 "If the user is logged in and clicks on the account button, they will be "
 "redirected to the designated page."
 msgstr ""
 
-#: app/html/menus/settings/tabs/auth.php:799
+#: app/html/menus/settings/tabs/auth.php:846
 msgid ""
 "You can block WordPress admin access for the following user roles, if "
 "needed. Check to block access, or uncheck to allow it."
-msgstr ""
-
-#: app/html/menus/settings/tabs/auth.php:802
-msgid "Subscriber"
-msgstr ""
-
-#: app/html/menus/settings/tabs/auth.php:803
-msgid "Contributor"
-msgstr ""
-
-#: app/html/menus/settings/tabs/auth.php:804 app/includes/upgrade.php:64
-msgid "Listdom Author"
-msgstr ""
-
-#: app/html/menus/settings/tabs/auth.php:805 app/includes/upgrade.php:77
-msgid "Listdom Publisher"
 msgstr ""
 
 #: app/html/menus/settings/tabs/customizer.php:18
@@ -3488,16 +3437,15 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/frontend-dashboard.php:149
 #: app/includes/customizer/forms.php:61
-#: app/includes/taxonomies/attribute.php:140
-#: app/includes/taxonomies/attribute.php:248
-#: app/includes/taxonomies/attribute.php:320
+#: app/includes/taxonomies/attribute.php:151
+#: app/includes/taxonomies/attribute.php:271
+#: app/includes/taxonomies/attribute.php:347
 #: app/includes/taxonomies/category.php:111
 #: app/includes/taxonomies/category.php:174
 #: app/includes/taxonomies/category.php:284
 #: app/includes/taxonomies/feature.php:64
 #: app/includes/taxonomies/feature.php:94
 #: app/includes/taxonomies/feature.php:147
-#: templates/dashboard/taxonomies/terms.php:106
 msgid "Icon"
 msgstr ""
 
@@ -3552,12 +3500,12 @@ msgstr ""
 #: app/html/metaboxes/shortcode/map-controls.php:67
 #: app/html/metaboxes/shortcode/map-controls.php:83
 #: app/html/metaboxes/shortcode/map-controls.php:91
-#: app/html/metaboxes/shortcode/map-controls.php:99 app/includes/base.php:1904
-#: app/includes/base.php:1917 app/includes/element/gallery.php:66
+#: app/html/metaboxes/shortcode/map-controls.php:99 app/includes/base.php:1907
+#: app/includes/base.php:1920 app/includes/element/gallery.php:66
 #: app/includes/element/gallery.php:98 app/includes/element/map.php:54
 #: app/includes/element/map.php:73 app/includes/element/map.php:99
 #: app/includes/element/map.php:135 app/includes/element/map.php:144
-#: app/includes/element/map.php:153 app/includes/form.php:349
+#: app/includes/element/map.php:153 app/includes/form.php:366
 #: app/includes/widgets/alllistings.php:97
 msgid "Disabled"
 msgstr ""
@@ -3578,29 +3526,30 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/frontend-dashboard.php:270
 #: app/html/menus/settings/tabs/frontend-dashboard.php:289
-#: app/includes/search/builder.php:159 app/includes/search/builder.php:184
-#: app/includes/search/builder.php:191 app/includes/search/builder.php:198
-#: app/includes/search/builder.php:218
+#: app/includes/search/builder.php:159 app/includes/search/builder.php:187
+#: app/includes/search/builder.php:194 app/includes/search/builder.php:201
+#: app/includes/search/builder.php:221
 msgid "Checkboxes"
 msgstr ""
 
 #: app/html/menus/settings/tabs/frontend-dashboard.php:271
 #: app/html/menus/settings/tabs/frontend-dashboard.php:290
-#: app/includes/search/builder.php:157 app/includes/search/builder.php:174
-#: app/includes/search/builder.php:181 app/includes/search/builder.php:188
-#: app/includes/search/builder.php:195 app/includes/search/builder.php:209
-#: app/includes/search/builder.php:215 app/includes/taxonomies/attribute.php:78
-#: app/includes/taxonomies/attribute.php:188
+#: app/includes/search/builder.php:157 app/includes/search/builder.php:177
+#: app/includes/search/builder.php:184 app/includes/search/builder.php:191
+#: app/includes/search/builder.php:198 app/includes/search/builder.php:212
+#: app/includes/search/builder.php:218 app/includes/taxonomies/attribute.php:80
+#: app/includes/taxonomies/attribute.php:202
 msgid "Dropdown"
 msgstr ""
 
 #: app/html/menus/settings/tabs/frontend-dashboard.php:288
 #: app/includes/search/builder.php:161 app/includes/search/builder.php:164
 #: app/includes/search/builder.php:167 app/includes/search/builder.php:170
-#: app/includes/search/builder.php:183 app/includes/search/builder.php:190
-#: app/includes/search/builder.php:197 app/includes/search/builder.php:202
-#: app/includes/search/builder.php:217 app/includes/taxonomies/attribute.php:72
-#: app/includes/taxonomies/attribute.php:182
+#: app/includes/search/builder.php:173 app/includes/search/builder.php:186
+#: app/includes/search/builder.php:193 app/includes/search/builder.php:200
+#: app/includes/search/builder.php:205 app/includes/search/builder.php:220
+#: app/includes/taxonomies/attribute.php:72
+#: app/includes/taxonomies/attribute.php:194
 msgid "Text Input"
 msgstr ""
 
@@ -3797,7 +3746,8 @@ msgstr ""
 
 #: app/html/menus/settings/tabs/general.php:102
 #: app/html/metaboxes/shortcode/display-options/layout/cover.php:23
-#: app/includes/ptypes/listing.php:83 templates/profile/profile.php:63
+#: app/includes/bar.php:94 app/includes/ptypes/listing.php:83
+#: templates/profile/profile.php:63
 msgid "Listing"
 msgstr ""
 
@@ -3954,7 +3904,7 @@ msgstr ""
 msgid "Fill Opacity"
 msgstr ""
 
-#: app/html/menus/settings/tabs/general.php:332 app/includes/form.php:864
+#: app/html/menus/settings/tabs/general.php:332 app/includes/form.php:881
 msgid "Border Color"
 msgstr ""
 
@@ -4069,7 +4019,7 @@ msgstr ""
 #: app/includes/element/breadcrumb.php:47 app/includes/element/related.php:42
 #: app/includes/fields.php:38 app/includes/ix/array.php:96
 #: app/includes/ptypes/listing.php:122 app/includes/taxonomies/category.php:26
-#: app/includes/taxonomies/category.php:64 templates/dashboard/form.php:177
+#: app/includes/taxonomies/category.php:64 templates/dashboard/form.php:176
 msgid "Category"
 msgstr ""
 
@@ -4529,6 +4479,25 @@ msgstr ""
 msgid "Return To WordPress Dashboard"
 msgstr ""
 
+#: app/html/menus/welcome/tabs/listdomer.php:7
+#: app/html/notices/listdomer.php:13
+msgid "Enjoy the Listdom more with Listdomer theme"
+msgstr ""
+
+#: app/html/menus/welcome/tabs/listdomer.php:10
+#: app/html/notices/listdomer.php:14
+msgid ""
+"Enhance your website's styling with the Listdomer theme! In addition to "
+"Listdom's impressive features, the Listdomer theme gives you greater control "
+"over your site's design and customization. Install and activate it to "
+"customize your directory site more."
+msgstr ""
+
+#: app/html/menus/welcome/tabs/listdomer.php:23
+#: app/html/notices/listdomer.php:17
+msgid "YES, Install Listdomer Theme"
+msgstr ""
+
 #: app/html/menus/welcome/tabs/listdomer.php:62
 #: app/html/menus/welcome/tabs/listdomer.php:91
 msgid "Next"
@@ -4762,6 +4731,10 @@ msgstr ""
 msgid "Please select at least one option."
 msgstr ""
 
+#: app/html/metaboxes/listing/attributes.php:146
+msgid "Please select an image."
+msgstr ""
+
 #: app/html/metaboxes/listing/details.php:60
 msgid "Submitter Request"
 msgstr ""
@@ -4773,7 +4746,7 @@ msgid "Name"
 msgstr ""
 
 #: app/html/metaboxes/listing/details.php:76
-#: app/includes/api/resources/fields.php:405 templates/dashboard/form.php:133
+#: app/includes/api/resources/fields.php:406 templates/dashboard/form.php:132
 msgid "Message"
 msgstr ""
 
@@ -4919,7 +4892,7 @@ msgstr ""
 msgid "Embed"
 msgstr ""
 
-#: app/html/metaboxes/listing/details.php:374 templates/dashboard/manage.php:59
+#: app/html/metaboxes/listing/details.php:374 templates/dashboard/manage.php:75
 msgid "Add"
 msgstr ""
 
@@ -5037,22 +5010,26 @@ msgstr ""
 msgid "BCC Recipients"
 msgstr ""
 
-#: app/html/metaboxes/search/device.php:39
+#: app/html/metaboxes/search/device.php:40
 msgid "Inherit from Desktop."
 msgstr ""
 
-#: app/html/metaboxes/search/device.php:47
+#: app/html/metaboxes/search/device.php:51
+msgid "Enable Background Box."
+msgstr ""
+
+#: app/html/metaboxes/search/device.php:56
 msgid "Add the “More Options” fields in the row below."
 msgstr ""
 
-#: app/html/metaboxes/search/device.php:51
+#: app/html/metaboxes/search/device.php:60
 #: app/html/metaboxes/search/params.php:83 app/includes/assets.php:121
-#: app/includes/form.php:553 app/includes/form.php:558
-#: app/includes/form.php:563 templates/dashboard/item.php:48
+#: app/includes/form.php:570 app/includes/form.php:575
+#: app/includes/form.php:580 templates/dashboard/item.php:48
 msgid "Click twice to delete"
 msgstr ""
 
-#: app/html/metaboxes/search/device.php:68
+#: app/html/metaboxes/search/device.php:78
 msgid "Available Fields"
 msgstr ""
 
@@ -5075,7 +5052,7 @@ msgstr ""
 
 #: app/html/metaboxes/search/fields.php:31
 #: app/html/metaboxes/search/fields.php:41 app/html/metaboxes/search/row.php:58
-#: app/includes/shortcodes/search.php:176
+#: app/includes/shortcodes/search.php:181
 msgid "More Options"
 msgstr ""
 
@@ -5083,7 +5060,7 @@ msgstr ""
 msgid "Add row"
 msgstr ""
 
-#: app/html/metaboxes/search/form.php:22 app/includes/base.php:1868
+#: app/html/metaboxes/search/form.php:22 app/includes/base.php:1871
 #: app/includes/element.php:99
 msgid "Default"
 msgstr ""
@@ -5290,8 +5267,8 @@ msgid "Radius Display Unit"
 msgstr ""
 
 #: app/html/metaboxes/search/params.php:166
-#: app/includes/shortcodes/search.php:824
-#: app/includes/shortcodes/search.php:850
+#: app/includes/shortcodes/search.php:830
+#: app/includes/shortcodes/search.php:856
 msgid "Meters"
 msgstr ""
 
@@ -5300,7 +5277,7 @@ msgid "Kilo Meters (KM)"
 msgstr ""
 
 #: app/html/metaboxes/search/params.php:168
-#: app/includes/shortcodes/search.php:866
+#: app/includes/shortcodes/search.php:872
 msgid "Miles"
 msgstr ""
 
@@ -5490,28 +5467,28 @@ msgstr ""
 
 #: app/html/metaboxes/search/row.php:104 app/html/metaboxes/search/row.php:157
 #: app/html/metaboxes/shortcode/display-options/map/halfmap.php:138
-#: app/includes/element.php:100 app/includes/form.php:852
-#: app/includes/form.php:975 app/includes/form.php:1040
+#: app/includes/element.php:100 app/includes/form.php:869
+#: app/includes/form.php:992 app/includes/form.php:1057
 msgid "Left"
 msgstr ""
 
 #: app/html/metaboxes/search/row.php:105 app/html/metaboxes/search/row.php:158
-#: app/includes/element.php:101 app/includes/form.php:1042
+#: app/includes/element.php:101 app/includes/form.php:1059
 msgid "Center"
 msgstr ""
 
 #: app/html/metaboxes/search/row.php:106 app/html/metaboxes/search/row.php:159
 #: app/html/metaboxes/shortcode/display-options/map/halfmap.php:139
-#: app/includes/element.php:102 app/includes/form.php:818
-#: app/includes/form.php:943 app/includes/form.php:1041
+#: app/includes/element.php:102 app/includes/form.php:835
+#: app/includes/form.php:960 app/includes/form.php:1058
 msgid "Right"
 msgstr ""
 
 #: app/html/metaboxes/search/row.php:115
 #: app/html/metaboxes/shortcode/search.php:14
-#: app/html/metaboxes/shortcode/tabs.php:32 app/includes/bar.php:94
+#: app/html/metaboxes/shortcode/tabs.php:32 app/includes/bar.php:95
 #: app/includes/customizer/buttons.php:45 app/includes/customizer/forms.php:16
-#: app/includes/shortcodes/search.php:197
+#: app/includes/shortcodes/search.php:202 templates/dashboard/manage.php:44
 msgid "Search"
 msgstr ""
 
@@ -5769,7 +5746,9 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/elements/masonry.php:286
 #: app/html/metaboxes/shortcode/display-options/elements/mosaic.php:214
 #: app/html/metaboxes/shortcode/display-options/elements/side.php:148
-#: app/includes/ix/array.php:94 app/includes/taxonomies/category.php:140
+#: app/includes/ix/array.php:94 app/includes/taxonomies/attribute.php:79
+#: app/includes/taxonomies/attribute.php:201
+#: app/includes/taxonomies/category.php:140
 #: app/includes/taxonomies/category.php:215
 #: app/includes/taxonomies/category.php:283
 #: app/includes/taxonomies/location.php:67
@@ -5809,7 +5788,21 @@ msgstr ""
 msgid "Cover"
 msgstr ""
 
-#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:279
+#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:276
+#: app/html/metaboxes/shortcode/display-options/elements/carousel.php:313
+#: app/html/metaboxes/shortcode/display-options/elements/grid.php:308
+#: app/html/metaboxes/shortcode/display-options/elements/halfmap.php:307
+#: app/html/metaboxes/shortcode/display-options/elements/list.php:310
+#: app/html/metaboxes/shortcode/display-options/elements/listgrid.php:310
+#: app/html/metaboxes/shortcode/display-options/elements/masonry.php:310
+#: app/html/metaboxes/shortcode/display-options/elements/mosaic.php:238
+#: app/html/metaboxes/shortcode/display-options/skin/slider.php:5
+#: app/includes/customizer/skins.php:36 app/includes/element/gallery.php:79
+#: app/includes/skins.php:776
+msgid "Slider"
+msgstr ""
+
+#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:280
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:317
 #: app/html/metaboxes/shortcode/display-options/elements/grid.php:312
 #: app/html/metaboxes/shortcode/display-options/elements/halfmap.php:311
@@ -5820,7 +5813,7 @@ msgstr ""
 msgid "Cover shows only featured image but slider shows all gallery images."
 msgstr ""
 
-#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:283
+#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:284
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:289
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:341
 #: app/html/metaboxes/shortcode/display-options/elements/grid.php:336
@@ -5833,7 +5826,7 @@ msgstr ""
 msgid "Display Image"
 msgstr ""
 
-#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:289
+#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:290
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:346
 #: app/html/metaboxes/shortcode/display-options/elements/grid.php:341
 #: app/html/metaboxes/shortcode/display-options/elements/halfmap.php:340
@@ -5843,7 +5836,7 @@ msgstr ""
 msgid "Content Length"
 msgstr ""
 
-#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:298
+#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:299
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:355
 #: app/html/metaboxes/shortcode/display-options/elements/grid.php:350
 #: app/html/metaboxes/shortcode/display-options/elements/halfmap.php:349
@@ -5853,7 +5846,7 @@ msgstr ""
 msgid "Content length is measured in words, so 10 means a 10-word limit."
 msgstr ""
 
-#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:306
+#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:307
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:363
 #: app/html/metaboxes/shortcode/display-options/elements/grid.php:357
 #: app/html/metaboxes/shortcode/display-options/elements/halfmap.php:356
@@ -5863,7 +5856,7 @@ msgstr ""
 msgid "Content Type"
 msgstr ""
 
-#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:315
+#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:316
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:372
 #: app/html/metaboxes/shortcode/display-options/elements/grid.php:366
 #: app/html/metaboxes/shortcode/display-options/elements/halfmap.php:365
@@ -5872,12 +5865,12 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/elements/masonry.php:368
 #: app/includes/api/resources/fields.php:25 app/includes/ix/array.php:77
 #: app/includes/ptypes/listing/single.php:689 templates/dashboard/form.php:64
-#: templates/dashboard/taxonomies/terms.php:77
-#: templates/dashboard/taxonomies/terms.php:83
+#: templates/dashboard/taxonomies/terms.php:138
+#: templates/dashboard/taxonomies/terms.php:144
 msgid "Description"
 msgstr ""
 
-#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:316
+#: app/html/metaboxes/shortcode/display-options/elements/accordion.php:317
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:373
 #: app/html/metaboxes/shortcode/display-options/elements/grid.php:367
 #: app/html/metaboxes/shortcode/display-options/elements/halfmap.php:366
@@ -5887,18 +5880,6 @@ msgstr ""
 #: app/includes/dashboard.php:25 app/includes/ptypes/listing/single.php:714
 #: templates/dashboard/form.php:74
 msgid "Excerpt"
-msgstr ""
-
-#: app/html/metaboxes/shortcode/display-options/elements/carousel.php:313
-#: app/html/metaboxes/shortcode/display-options/elements/grid.php:308
-#: app/html/metaboxes/shortcode/display-options/elements/halfmap.php:307
-#: app/html/metaboxes/shortcode/display-options/elements/list.php:310
-#: app/html/metaboxes/shortcode/display-options/elements/listgrid.php:310
-#: app/html/metaboxes/shortcode/display-options/elements/masonry.php:310
-#: app/html/metaboxes/shortcode/display-options/elements/mosaic.php:238
-#: app/html/metaboxes/shortcode/display-options/skin/slider.php:5
-#: app/includes/element/gallery.php:79 app/includes/skins.php:776
-msgid "Slider"
 msgstr ""
 
 #: app/html/metaboxes/shortcode/display-options/elements/carousel.php:324
@@ -6141,7 +6122,7 @@ msgid "All Listings Tab Label"
 msgstr ""
 
 #: app/html/metaboxes/shortcode/display-options/layout/masonry.php:40
-#: app/includes/skins/masonry.php:30 templates/dashboard/manage.php:35
+#: app/includes/skins/masonry.php:30 templates/dashboard/manage.php:50
 msgid "All"
 msgstr ""
 
@@ -6360,7 +6341,7 @@ msgstr ""
 #: app/html/metaboxes/shortcode/display-options/map/listgrid.php:109
 #: app/html/metaboxes/shortcode/display-options/map/mosaic.php:109
 #: app/html/metaboxes/shortcode/display-options/map/singlemap.php:88
-#: app/includes/element/gallery.php:132 app/includes/form.php:899
+#: app/includes/element/gallery.php:132 app/includes/form.php:916
 msgid "None"
 msgstr ""
 
@@ -6930,52 +6911,155 @@ msgstr ""
 msgid "Skin"
 msgstr ""
 
-#: app/includes/admin.php:93 app/includes/integrations/be.php:45
+#: app/html/notices/listdomer.php:20
+msgid "Maybe, Later"
+msgstr ""
+
+#: app/html/notices/listdomer.php:21
+msgid "No, Thanks"
+msgstr ""
+
+#: app/html/notices/review.php:13
+msgid "Looks like you've been using Listdom for a while."
+msgstr ""
+
+#: app/html/notices/review.php:14
+msgid ""
+"Could you give a 5-star rating on the WordPress repository? It helps the "
+"Listdom team know their efforts are useful to you."
+msgstr ""
+
+#: app/html/notices/review.php:17
+msgid "Sure, you deserve it"
+msgstr ""
+
+#: app/html/notices/review.php:20
+msgid "Maybe later"
+msgstr ""
+
+#: app/html/notices/review.php:21
+msgid "Already done :)"
+msgstr ""
+
+#: app/html/plugin/dashboard-widget.php:12
+msgid "News & Updates"
+msgstr ""
+
+#: app/html/plugin/dashboard-widget.php:40
+msgid "Go Pro"
+msgstr ""
+
+#: app/html/plugin/header.php:14
+msgid "logo"
+msgstr ""
+
+#: app/html/plugin/header.php:29
+msgid "My Listdom Account"
+msgstr ""
+
+#: app/includes/admin.php:102 app/includes/integrations/be.php:45
 #: app/includes/integrations/kc.php:32 app/includes/integrations/vc.php:31
 #: app/includes/menus.php:36 app/includes/menus.php:45
-#: app/includes/menus.php:176
+#: app/includes/menus.php:180
 msgid "Listdom"
 msgstr ""
 
-#: app/includes/admin.php:106
+#: app/includes/admin.php:115
 msgid "Unable to retrieve news."
 msgstr ""
 
-#: app/includes/admin.php:112
+#: app/includes/admin.php:121
 msgid "No news items found."
 msgstr ""
 
-#: app/includes/ai/models.php:11
+#: app/includes/admin.php:264
+msgid "Listdom Dashboard Page"
+msgstr ""
+
+#: app/includes/admin.php:265
+msgid "Listdom Add Listing Page"
+msgstr ""
+
+#: app/includes/admin.php:266
+msgid "Listdom Login Page"
+msgstr ""
+
+#: app/includes/admin.php:267
+msgid "Listdom Register Page"
+msgstr ""
+
+#: app/includes/admin.php:268
+msgid "Listdom Forgot Password Page"
+msgstr ""
+
+#: app/includes/admin.php:269
+msgid "Listdom Profile Page"
+msgstr ""
+
+#: app/includes/admin.php:270
+msgid "Listdom Login Redirect Page"
+msgstr ""
+
+#: app/includes/admin.php:271
+msgid "Listdom Register Redirect Page"
+msgstr ""
+
+#: app/includes/admin.php:272
+msgid "Listdom Forgot Password Redirect Page"
+msgstr ""
+
+#: app/includes/admin.php:273
+msgid "Listdom Logout Redirect Page"
+msgstr ""
+
+#: app/includes/admin.php:274
+msgid "Listdom Account Redirect Page"
+msgstr ""
+
+#: app/includes/admin.php:290
+#, php-format
+msgid "Search Results (%s)"
+msgstr ""
+
+#: app/includes/ai/models.php:13
 msgid "OpenAI GPT 4.1 Nano"
 msgstr ""
 
-#: app/includes/ai/models.php:12
+#: app/includes/ai/models.php:14
 msgid "OpenAI GPT 4o Mini"
 msgstr ""
 
-#: app/includes/ajax.php:91 app/includes/ajax.php:178
+#: app/includes/ai/models.php:15
+msgid "OpenAI GPT 5 Mini"
+msgstr ""
+
+#: app/includes/ai/models.php:16
+msgid "OpenAI GPT 5 Nano"
+msgstr ""
+
+#: app/includes/ajax.php:97 app/includes/ajax.php:184
 #: app/includes/notifications/dispatcher.php:52
 #: app/includes/notifications/dispatcher.php:88
 msgid "Security nonce is required."
 msgstr ""
 
-#: app/includes/ajax.php:94 app/includes/ajax.php:181
+#: app/includes/ajax.php:100 app/includes/ajax.php:187
 #: app/includes/notifications/dispatcher.php:55
 #: app/includes/notifications/dispatcher.php:91
 msgid "Security nonce is invalid."
 msgstr ""
 
-#: app/includes/ajax.php:229
+#: app/includes/ajax.php:235
 msgid "Availability generated successfully!"
 msgstr ""
 
-#: app/includes/ajax.php:229 app/includes/ajax.php:249
+#: app/includes/ajax.php:235 app/includes/ajax.php:255
 #: app/includes/menus/ix/csv.php:195
 msgid ""
 "The AI model is not configured. You can configure it in Listdom settings."
 msgstr ""
 
-#: app/includes/ajax.php:249
+#: app/includes/ajax.php:255
 msgid "Content generated successfully!"
 msgstr ""
 
@@ -7055,8 +7139,8 @@ msgid "Name, Email, Phone and Message fields are required!"
 msgstr ""
 
 #: app/includes/api/controllers/login.php:69
-#: app/includes/shortcodes/auth.php:167 app/includes/shortcodes/auth.php:170
-#: app/includes/shortcodes/dashboard.php:610 templates/profile/profile.php:12
+#: app/includes/shortcodes/auth.php:155 app/includes/shortcodes/auth.php:158
+#: app/includes/shortcodes/dashboard.php:671 templates/profile/profile.php:12
 msgid "User not found!"
 msgstr ""
 
@@ -7121,7 +7205,7 @@ msgstr ""
 msgid "Custom Field"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:77 templates/dashboard/form.php:238
+#: app/includes/api/resources/fields.php:77 templates/dashboard/form.php:237
 msgid "Tag1,Tag2,Tag3"
 msgstr ""
 
@@ -7129,7 +7213,7 @@ msgstr ""
 #: app/includes/api/resources/fields.php:136 app/includes/dashboard.php:23
 #: app/includes/dashboard.php:68 app/includes/element/image.php:12
 #: app/includes/fields.php:33 app/includes/ix/mapping.php:150
-#: templates/dashboard/form.php:285
+#: templates/dashboard/form.php:284
 msgid "Featured Image"
 msgstr ""
 
@@ -7171,30 +7255,30 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:399 templates/dashboard/form.php:116
+#: app/includes/api/resources/fields.php:400 templates/dashboard/form.php:115
 #: templates/elements/abuse.php:41 templates/elements/abuse.php:42
 #: templates/elements/owner.php:145 templates/elements/owner.php:146
 #: templates/profile/profile.php:99 templates/profile/profile.php:100
 msgid "Your Email"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:406 templates/dashboard/form.php:134
+#: app/includes/api/resources/fields.php:407 templates/dashboard/form.php:133
 msgid "Message to Reviewer"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:416 templates/dashboard/form.php:121
+#: app/includes/api/resources/fields.php:417 templates/dashboard/form.php:120
 msgid "Full Name"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:417 templates/dashboard/form.php:122
+#: app/includes/api/resources/fields.php:418 templates/dashboard/form.php:121
 msgid "Please insert your full name"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:428 templates/dashboard/form.php:127
+#: app/includes/api/resources/fields.php:429 templates/dashboard/form.php:126
 msgid "Should be at-least 8 characters"
 msgstr ""
 
-#: app/includes/api/resources/fields.php:435 templates/dashboard/form.php:112
+#: app/includes/api/resources/fields.php:436 templates/dashboard/form.php:111
 msgid "To Reviewer"
 msgstr ""
 
@@ -7229,6 +7313,10 @@ msgstr ""
 #: app/includes/bar.php:79 app/includes/bar.php:89
 #: app/includes/element/infowindow.php:12 app/includes/element/map.php:69
 msgid "Infowindow"
+msgstr ""
+
+#: app/includes/bar.php:96
+msgid "Package"
 msgstr ""
 
 #: app/includes/base.php:26
@@ -7325,6 +7413,7 @@ msgstr ""
 
 #: app/includes/base.php:387 app/includes/base.php:389
 #: app/includes/base.php:412 app/includes/base.php:413
+#: app/includes/menus.php:179
 msgid "Listdom Pro"
 msgstr ""
 
@@ -7420,129 +7509,129 @@ msgstr ""
 msgid "To use the %s feature, you need to install %s add-on."
 msgstr ""
 
-#: app/includes/base.php:715
+#: app/includes/base.php:718
 #, php-format
 msgid "%s from 5"
 msgstr ""
 
-#: app/includes/base.php:818
+#: app/includes/base.php:821
 msgid "Uncategorized"
 msgstr ""
 
-#: app/includes/base.php:837
+#: app/includes/base.php:840
 msgid "Free"
 msgstr ""
 
-#: app/includes/base.php:1869
+#: app/includes/base.php:1872
 msgid "Apple Maps Esque"
 msgstr ""
 
-#: app/includes/base.php:1870
+#: app/includes/base.php:1873
 msgid "Blue Essence"
 msgstr ""
 
-#: app/includes/base.php:1871
+#: app/includes/base.php:1874
 msgid "Blue Water"
 msgstr ""
 
-#: app/includes/base.php:1872
+#: app/includes/base.php:1875
 msgid "CDO"
 msgstr ""
 
-#: app/includes/base.php:1873 app/includes/socials/facebook.php:10
+#: app/includes/base.php:1876 app/includes/socials/facebook.php:10
 #: templates/dashboard/profile.php:191
 msgid "Facebook"
 msgstr ""
 
-#: app/includes/base.php:1874
+#: app/includes/base.php:1877
 msgid "Intown Map"
 msgstr ""
 
-#: app/includes/base.php:1875
+#: app/includes/base.php:1878
 msgid "Light Dream"
 msgstr ""
 
-#: app/includes/base.php:1876
+#: app/includes/base.php:1879
 msgid "Midnight"
 msgstr ""
 
-#: app/includes/base.php:1877
+#: app/includes/base.php:1880
 msgid "Pale Down"
 msgstr ""
 
-#: app/includes/base.php:1878
+#: app/includes/base.php:1881
 msgid "Shades of Grey"
 msgstr ""
 
-#: app/includes/base.php:1879
+#: app/includes/base.php:1882
 msgid "Subtle Grayscale"
 msgstr ""
 
-#: app/includes/base.php:1880
+#: app/includes/base.php:1883
 msgid "Ultra Light"
 msgstr ""
 
-#: app/includes/base.php:1890
+#: app/includes/base.php:1893
 msgid "Classic Bubbles"
 msgstr ""
 
-#: app/includes/base.php:1891
+#: app/includes/base.php:1894
 msgid "Modern Bubbles"
 msgstr ""
 
-#: app/includes/base.php:1901
+#: app/includes/base.php:1904
 msgid "Load More Button"
 msgstr ""
 
-#: app/includes/base.php:1902
+#: app/includes/base.php:1905
 msgid "Infinite Scroll"
 msgstr ""
 
-#: app/includes/base.php:1903
+#: app/includes/base.php:1906
 msgid "Numeric"
 msgstr ""
 
-#: app/includes/base.php:1911
+#: app/includes/base.php:1914
 msgid "Same Window"
 msgstr ""
 
-#: app/includes/base.php:1912
+#: app/includes/base.php:1915
 msgid "New Window"
 msgstr ""
 
-#: app/includes/base.php:1913
+#: app/includes/base.php:1916
 msgid "Open in Lightbox"
 msgstr ""
 
-#: app/includes/base.php:1914
+#: app/includes/base.php:1917
 msgid "Right Panel"
 msgstr ""
 
-#: app/includes/base.php:1915
+#: app/includes/base.php:1918
 msgid "Left Panel"
 msgstr ""
 
-#: app/includes/base.php:1916
+#: app/includes/base.php:1919
 msgid "Bottom Panel"
 msgstr ""
 
-#: app/includes/base.php:1925
+#: app/includes/base.php:1928
 msgid "Lato"
 msgstr ""
 
-#: app/includes/base.php:1930
+#: app/includes/base.php:1933
 msgid "Roboto"
 msgstr ""
 
-#: app/includes/base.php:1935
+#: app/includes/base.php:1938
 msgid "Raleway"
 msgstr ""
 
-#: app/includes/base.php:1940
+#: app/includes/base.php:1943
 msgid "Open Sans"
 msgstr ""
 
-#: app/includes/base.php:1945
+#: app/includes/base.php:1948
 msgid "Poppins"
 msgstr ""
 
@@ -7593,7 +7682,7 @@ msgstr ""
 msgid "Light"
 msgstr ""
 
-#: app/includes/customizer/buttons.php:197 app/includes/form.php:900
+#: app/includes/customizer/buttons.php:197 app/includes/form.php:917
 msgid "Solid"
 msgstr ""
 
@@ -7687,7 +7776,7 @@ msgstr ""
 #: app/includes/customizer/dashboard.php:75
 #: app/includes/customizer/forms.php:227
 #: app/includes/customizer/profile.php:224
-#: app/includes/customizer/single.php:187
+#: app/includes/customizer/single.php:187 app/includes/customizer/skins.php:45
 msgid "Icon Color"
 msgstr ""
 
@@ -7867,13 +7956,17 @@ msgid "Current"
 msgstr ""
 
 #: app/includes/customizer/single.php:247
-#: app/includes/taxonomies/attribute.php:80
-#: app/includes/taxonomies/attribute.php:190
+#: app/includes/taxonomies/attribute.php:82
+#: app/includes/taxonomies/attribute.php:204
 msgid "Separator"
 msgstr ""
 
 #: app/includes/customizer/skins.php:24
 msgid "Tabs Hover / Active"
+msgstr ""
+
+#: app/includes/customizer/skins.php:39
+msgid "Arrows"
 msgstr ""
 
 #: app/includes/customizer/tabs.php:15
@@ -8262,197 +8355,197 @@ msgstr ""
 msgid "Favorite"
 msgstr ""
 
-#: app/includes/form.php:209
+#: app/includes/form.php:215
 msgid "Transparent"
 msgstr ""
 
-#: app/includes/form.php:223
+#: app/includes/form.php:240
 msgid "Upload/Select image"
 msgstr ""
 
-#: app/includes/form.php:224
+#: app/includes/form.php:241
 msgid "Remove image"
 msgstr ""
 
-#: app/includes/form.php:237
+#: app/includes/form.php:254
 msgid "Upload/Select file"
 msgstr ""
 
-#: app/includes/form.php:238
+#: app/includes/form.php:255
 msgid "Remove file"
 msgstr ""
 
-#: app/includes/form.php:265 app/includes/form.php:1016
-#: app/includes/form.php:1039
+#: app/includes/form.php:282 app/includes/form.php:1033
+#: app/includes/form.php:1056
 msgid "Inherit"
 msgstr ""
 
-#: app/includes/form.php:607
+#: app/includes/form.php:624
 msgid "Hour"
 msgstr ""
 
-#: app/includes/form.php:614 app/includes/form.php:615
+#: app/includes/form.php:631 app/includes/form.php:632
 #, php-format
 msgid "%d AM"
 msgstr ""
 
-#: app/includes/form.php:616 app/includes/form.php:617
+#: app/includes/form.php:633 app/includes/form.php:634
 #, php-format
 msgid "%d PM"
 msgstr ""
 
-#: app/includes/form.php:626
+#: app/includes/form.php:643
 msgid "Minute"
 msgstr ""
 
-#: app/includes/form.php:795
+#: app/includes/form.php:812
 msgid "Border Top"
 msgstr ""
 
-#: app/includes/form.php:801 app/includes/form.php:927
+#: app/includes/form.php:818 app/includes/form.php:944
 msgid "Top"
 msgstr ""
 
-#: app/includes/form.php:812
+#: app/includes/form.php:829
 msgid "Border Right"
 msgstr ""
 
-#: app/includes/form.php:829
+#: app/includes/form.php:846
 msgid "Border Bottom"
 msgstr ""
 
-#: app/includes/form.php:835 app/includes/form.php:959
+#: app/includes/form.php:852 app/includes/form.php:976
 msgid "Bottom"
 msgstr ""
 
-#: app/includes/form.php:846
+#: app/includes/form.php:863
 msgid "Border Left"
 msgstr ""
 
-#: app/includes/form.php:875
+#: app/includes/form.php:892
 msgid "Border Radius"
 msgstr ""
 
-#: app/includes/form.php:881
+#: app/includes/form.php:898
 msgid "Radius"
 msgstr ""
 
-#: app/includes/form.php:892
+#: app/includes/form.php:909
 msgid "Border Style"
 msgstr ""
 
-#: app/includes/form.php:901
+#: app/includes/form.php:918
 msgid "Dashed"
 msgstr ""
 
-#: app/includes/form.php:902
+#: app/includes/form.php:919
 msgid "Dotted"
 msgstr ""
 
-#: app/includes/form.php:903
+#: app/includes/form.php:920
 msgid "Double"
 msgstr ""
 
-#: app/includes/form.php:921
+#: app/includes/form.php:938
 msgid "Padding Top"
 msgstr ""
 
-#: app/includes/form.php:937
+#: app/includes/form.php:954
 msgid "Padding Right"
 msgstr ""
 
-#: app/includes/form.php:953
+#: app/includes/form.php:970
 msgid "Padding Bottom"
 msgstr ""
 
-#: app/includes/form.php:969
+#: app/includes/form.php:986
 msgid "Padding Left"
 msgstr ""
 
-#: app/includes/form.php:997
+#: app/includes/form.php:1014
 msgid "Font Family"
 msgstr ""
 
-#: app/includes/form.php:1009
+#: app/includes/form.php:1026
 msgid "Font Weight"
 msgstr ""
 
-#: app/includes/form.php:1017
+#: app/includes/form.php:1034
 msgid "100 (Thin)"
 msgstr ""
 
-#: app/includes/form.php:1018
+#: app/includes/form.php:1035
 msgid "200 (Extra Light)"
 msgstr ""
 
-#: app/includes/form.php:1019
+#: app/includes/form.php:1036
 msgid "300 (Light)"
 msgstr ""
 
-#: app/includes/form.php:1020
+#: app/includes/form.php:1037
 msgid "400 (Regular)"
 msgstr ""
 
-#: app/includes/form.php:1021
+#: app/includes/form.php:1038
 msgid "500 (Medium)"
 msgstr ""
 
-#: app/includes/form.php:1022
+#: app/includes/form.php:1039
 msgid "600 (Semi-Bold)"
 msgstr ""
 
-#: app/includes/form.php:1023
+#: app/includes/form.php:1040
 msgid "700 (Bold)"
 msgstr ""
 
-#: app/includes/form.php:1024
+#: app/includes/form.php:1041
 msgid "800 (Extra Bold)"
 msgstr ""
 
-#: app/includes/form.php:1025
+#: app/includes/form.php:1042
 msgid "900 (Black)"
 msgstr ""
 
-#: app/includes/form.php:1032
+#: app/includes/form.php:1049
 msgid "Text Align"
 msgstr ""
 
-#: app/includes/form.php:1043
+#: app/includes/form.php:1060
 msgid "Justify"
 msgstr ""
 
-#: app/includes/form.php:1044
+#: app/includes/form.php:1061
 msgid "Initial"
 msgstr ""
 
-#: app/includes/form.php:1051 app/includes/form.php:1057
+#: app/includes/form.php:1068 app/includes/form.php:1074
 msgid "Size"
 msgstr ""
 
-#: app/includes/form.php:1068 app/includes/form.php:1074
+#: app/includes/form.php:1085 app/includes/form.php:1091
 msgid "Line Height"
 msgstr ""
 
-#: app/includes/hooks.php:172 app/includes/shortcodes/dashboard.php:701
-#: app/includes/shortcodes/dashboard.php:803
+#: app/includes/hooks.php:172 app/includes/shortcodes/dashboard.php:762
+#: app/includes/shortcodes/dashboard.php:864
 msgid "You are not allowed to upload files!"
 msgstr ""
 
-#: app/includes/hooks.php:175 app/includes/shortcodes/auth.php:142
-#: app/includes/shortcodes/auth.php:191
-#: app/includes/shortcodes/dashboard.php:373
-#: app/includes/shortcodes/dashboard.php:604
-#: app/includes/shortcodes/dashboard.php:704
-#: app/includes/shortcodes/dashboard.php:779
-#: app/includes/shortcodes/dashboard.php:806
+#: app/includes/hooks.php:175 app/includes/shortcodes/auth.php:130
+#: app/includes/shortcodes/auth.php:181
+#: app/includes/shortcodes/dashboard.php:411
+#: app/includes/shortcodes/dashboard.php:665
+#: app/includes/shortcodes/dashboard.php:765
+#: app/includes/shortcodes/dashboard.php:840
+#: app/includes/shortcodes/dashboard.php:867
 msgid "Security nonce is missing!"
 msgstr ""
 
-#: app/includes/hooks.php:181 app/includes/shortcodes/dashboard.php:376
-#: app/includes/shortcodes/dashboard.php:607
-#: app/includes/shortcodes/dashboard.php:710
-#: app/includes/shortcodes/dashboard.php:782
-#: app/includes/shortcodes/dashboard.php:809
+#: app/includes/hooks.php:181 app/includes/shortcodes/dashboard.php:414
+#: app/includes/shortcodes/dashboard.php:668
+#: app/includes/shortcodes/dashboard.php:771
+#: app/includes/shortcodes/dashboard.php:843
+#: app/includes/shortcodes/dashboard.php:870
 msgid "Security nonce is not valid!"
 msgstr ""
 
@@ -8806,11 +8899,11 @@ msgstr ""
 msgid "Mapping by AI was successful!"
 msgstr ""
 
-#: app/includes/menus/settings.php:331
+#: app/includes/menus/settings.php:334
 msgid "New Token"
 msgstr ""
 
-#: app/includes/menus/settings.php:393
+#: app/includes/menus/settings.php:396
 msgid "New Profile"
 msgstr ""
 
@@ -9067,7 +9160,7 @@ msgstr ""
 
 #: app/includes/notifications/dispatcher.php:61
 #: app/includes/notifications/dispatcher.php:97
-#: app/includes/shortcodes/dashboard.php:379
+#: app/includes/shortcodes/dashboard.php:417
 msgid "Google recaptcha is invalid."
 msgstr ""
 
@@ -9087,31 +9180,31 @@ msgstr ""
 msgid "Forgot your password?"
 msgstr ""
 
-#: app/includes/options.php:393 app/includes/options.php:411
+#: app/includes/options.php:397 app/includes/options.php:419
 msgid "Enter your username"
 msgstr ""
 
-#: app/includes/options.php:395 app/includes/options.php:412
+#: app/includes/options.php:399 app/includes/options.php:420
 msgid "Enter your password"
 msgstr ""
 
-#: app/includes/options.php:397
+#: app/includes/options.php:401
 msgid "Enter your email address"
 msgstr ""
 
-#: app/includes/options.php:413
+#: app/includes/options.php:421
 msgid "Remember Me"
 msgstr ""
 
-#: app/includes/options.php:414
+#: app/includes/options.php:422
 msgid "Log In"
 msgstr ""
 
-#: app/includes/options.php:419
+#: app/includes/options.php:427
 msgid "Enter your Email Address"
 msgstr ""
 
-#: app/includes/options.php:420
+#: app/includes/options.php:428
 msgid "Reset Password"
 msgstr ""
 
@@ -9209,7 +9302,8 @@ msgid "Create your first notification"
 msgstr ""
 
 #: app/includes/ptypes/listing.php:84 app/includes/shortcodes/addlisting.php:25
-#: app/includes/shortcodes/dashboard.php:320
+#: app/includes/shortcodes/dashboard.php:115
+#: app/includes/shortcodes/dashboard.php:358
 msgid "Add Listing"
 msgstr ""
 
@@ -9221,7 +9315,7 @@ msgstr ""
 msgid "Edit Listing"
 msgstr ""
 
-#: app/includes/ptypes/listing.php:88 app/includes/shortcodes/dashboard.php:591
+#: app/includes/ptypes/listing.php:88 app/includes/shortcodes/dashboard.php:652
 msgid "View Listing"
 msgstr ""
 
@@ -9254,7 +9348,7 @@ msgid "Listing Information"
 msgstr ""
 
 #: app/includes/ptypes/listing.php:164
-#: app/includes/ptypes/listing/single.php:623 templates/dashboard/form.php:102
+#: app/includes/ptypes/listing/single.php:623
 msgid "Details"
 msgstr ""
 
@@ -9450,60 +9544,60 @@ msgstr ""
 msgid "Text Search"
 msgstr ""
 
-#: app/includes/search/builder.php:158 app/includes/search/builder.php:182
-#: app/includes/search/builder.php:189 app/includes/search/builder.php:196
-#: app/includes/search/builder.php:216
+#: app/includes/search/builder.php:158 app/includes/search/builder.php:185
+#: app/includes/search/builder.php:192 app/includes/search/builder.php:199
+#: app/includes/search/builder.php:219
 msgid "Dropdown (Multiple Selection)"
 msgstr ""
 
-#: app/includes/search/builder.php:160 app/includes/search/builder.php:185
-#: app/includes/search/builder.php:192 app/includes/search/builder.php:199
-#: app/includes/search/builder.php:219
+#: app/includes/search/builder.php:160 app/includes/search/builder.php:188
+#: app/includes/search/builder.php:195 app/includes/search/builder.php:202
+#: app/includes/search/builder.php:222
 msgid "Radio Buttons"
 msgstr ""
 
-#: app/includes/search/builder.php:173 app/includes/search/builder.php:178
+#: app/includes/search/builder.php:176 app/includes/search/builder.php:181
 #: app/includes/taxonomies/attribute.php:75
-#: app/includes/taxonomies/attribute.php:185
+#: app/includes/taxonomies/attribute.php:197
 msgid "Number Input"
 msgstr ""
 
-#: app/includes/search/builder.php:175 app/includes/search/builder.php:205
+#: app/includes/search/builder.php:178 app/includes/search/builder.php:208
 msgid "Dropdown+"
 msgstr ""
 
-#: app/includes/search/builder.php:206
+#: app/includes/search/builder.php:209
 msgid "Min/Max Input"
 msgstr ""
 
-#: app/includes/search/builder.php:212
+#: app/includes/search/builder.php:215
 msgid "Date Range Picker"
 msgstr ""
 
-#: app/includes/search/builder.php:222 app/includes/search/builder.php:237
-#: app/includes/search/builder.php:238
+#: app/includes/search/builder.php:225 app/includes/search/builder.php:240
+#: app/includes/search/builder.php:241
 msgid "Range Slider"
 msgstr ""
 
-#: app/includes/search/builder.php:225 app/includes/taxonomies/attribute.php:74
-#: app/includes/taxonomies/attribute.php:184
+#: app/includes/search/builder.php:228 app/includes/taxonomies/attribute.php:74
+#: app/includes/taxonomies/attribute.php:196
 msgid "Checkbox"
 msgstr ""
 
-#: app/includes/search/builder.php:233
+#: app/includes/search/builder.php:236
 msgid "Hierarchical Dropdowns"
 msgstr ""
 
-#: app/includes/search/builder.php:235
+#: app/includes/search/builder.php:238
 msgid "Radius Search"
 msgstr ""
 
-#: app/includes/search/builder.php:236
+#: app/includes/search/builder.php:239
 msgid "Radius Search (Dropdown)"
 msgstr ""
 
 #: app/includes/shortcodes/addlisting.php:57
-#: app/includes/shortcodes/dashboard.php:113
+#: app/includes/shortcodes/dashboard.php:135
 msgid "Not found!"
 msgstr ""
 
@@ -9518,190 +9612,198 @@ msgid "login"
 msgstr ""
 
 #: app/includes/shortcodes/addlisting.php:68
-#: app/includes/shortcodes/dashboard.php:183
+#: app/includes/shortcodes/dashboard.php:221
 msgid "Unfortunately you don't have permission to create or edit listings."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:145
+#: app/includes/shortcodes/auth.php:133
 msgid "Username or password is empty."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:178
+#: app/includes/shortcodes/auth.php:166
 msgid "Invalid username or password."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:183
+#: app/includes/shortcodes/auth.php:173
 msgid "Login Successful."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:194
+#: app/includes/shortcodes/auth.php:184
 msgid "All fields are required."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:215
+#: app/includes/shortcodes/auth.php:205
 #, php-format
 msgid "Password must be at-least %s characters long."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:218
+#: app/includes/shortcodes/auth.php:208
 msgid "Password must contain at-least one lowercase letter."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:221
+#: app/includes/shortcodes/auth.php:211
 msgid "Password must contain at-least one uppercase letter."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:224
+#: app/includes/shortcodes/auth.php:214
 msgid "Password must contain at-least one number."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:227
+#: app/includes/shortcodes/auth.php:217
 msgid "Password must contain at-least one special character."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:231
+#: app/includes/shortcodes/auth.php:221
 msgid "Username and / or email already exist."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:259
+#: app/includes/shortcodes/auth.php:257
 msgid "Registration successful."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:267
+#: app/includes/shortcodes/auth.php:265
 msgid "Security nonce is missing or invalid!"
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:270
+#: app/includes/shortcodes/auth.php:268
 msgid "Email is required."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:276
+#: app/includes/shortcodes/auth.php:274
 msgid "Email does not exist."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:285
+#: app/includes/shortcodes/auth.php:283
 msgid "Please check your email for the reset link."
 msgstr ""
 
-#: app/includes/shortcodes/auth.php:291
+#: app/includes/shortcodes/auth.php:289
 msgid "Forgot password email could not be sent."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:191
+#: app/includes/shortcodes/dashboard.php:125
+msgid "Dashboard Settings"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:229
 msgid "Sorry! Selected post is not a listing."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:197
+#: app/includes/shortcodes/dashboard.php:235
 msgid "Sorry! You don't have access to modify this listing."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:323
+#: app/includes/shortcodes/dashboard.php:361
 msgid "Profile Setting"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:326 templates/auth/profile.php:29
+#: app/includes/shortcodes/dashboard.php:364 templates/auth/profile.php:29
 msgid "Logout"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:397
+#: app/includes/shortcodes/dashboard.php:435
 msgid "Please fill listing title field!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:400
+#: app/includes/shortcodes/dashboard.php:438
 msgid "Please insert your email!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:404
+#: app/includes/shortcodes/dashboard.php:442
 msgid "Please insert your password! It should be at-least 8 characters."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:444
+#: app/includes/shortcodes/dashboard.php:501
+msgid "Please set work hours or mark off for all days!"
+msgstr ""
+
+#: app/includes/shortcodes/dashboard.php:505
 #, php-format
 msgid "At-least one value for %s field is required!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:445
+#: app/includes/shortcodes/dashboard.php:506
 #, php-format
 msgid "%s field is required!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:454
+#: app/includes/shortcodes/dashboard.php:515
 #, php-format
 msgid "You can only upload a maximum of %s gallery images. You've uploaded %s."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:478
-#: app/includes/shortcodes/dashboard.php:848
+#: app/includes/shortcodes/dashboard.php:539
+#: app/includes/shortcodes/dashboard.php:909
 #, php-format
 msgid ""
 "The image '%s' exceeds the maximum allowed size of %s KB. The image size is "
 "%s KB."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:491
+#: app/includes/shortcodes/dashboard.php:552
 #, php-format
 msgid ""
 "The maximum length for listing content is %s characters. You've written %s "
 "characters."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:497
+#: app/includes/shortcodes/dashboard.php:558
 #, php-format
 msgid "The maximum allowed tags is %s tags. You've added %s tags."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:591
+#: app/includes/shortcodes/dashboard.php:652
 #, php-format
 msgid "The listing has been published. %s"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:592
+#: app/includes/shortcodes/dashboard.php:653
 msgid ""
 "The listing has been submitted. It will be reviewed as soon as possible."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:662
+#: app/includes/shortcodes/dashboard.php:723
 msgid "Password must be at least 6 characters long!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:667
+#: app/includes/shortcodes/dashboard.php:728
 msgid "Passwords do not match!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:674
+#: app/includes/shortcodes/dashboard.php:735
 msgid "Password updated successfully! Please log in again."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:685
+#: app/includes/shortcodes/dashboard.php:746
 msgid "The Profile has been updated."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:718
-#: app/includes/shortcodes/dashboard.php:817
+#: app/includes/shortcodes/dashboard.php:779
+#: app/includes/shortcodes/dashboard.php:878
 msgid "Please upload an image!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:726
+#: app/includes/shortcodes/dashboard.php:787
 msgid "Only JPG, PNG, and WebP images are allowed!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:737 templates/dashboard/form.php:298
+#: app/includes/shortcodes/dashboard.php:798 templates/dashboard/form.php:297
 #, php-format
 msgid "The uploaded image exceeds the maximum allowed size of %s KB."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:749
+#: app/includes/shortcodes/dashboard.php:810
 msgid "The image is uploaded!"
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:863
+#: app/includes/shortcodes/dashboard.php:924
 #, php-format
 msgid ""
 "The image '%s' has an invalid extension. Only JPG, PNG, and WebP files are "
 "allowed."
 msgstr ""
 
-#: app/includes/shortcodes/dashboard.php:894
+#: app/includes/shortcodes/dashboard.php:955
 msgid "The images are uploaded!"
 msgstr ""
 
@@ -9709,32 +9811,32 @@ msgstr ""
 msgid "Profile Image"
 msgstr ""
 
-#: app/includes/shortcodes/search.php:268
+#: app/includes/shortcodes/search.php:273
 #, php-format
 msgid "Results %s %s"
 msgstr ""
 
-#: app/includes/shortcodes/search.php:778
+#: app/includes/shortcodes/search.php:784
 msgid "Any"
 msgstr ""
 
-#: app/includes/shortcodes/search.php:779
+#: app/includes/shortcodes/search.php:785
 msgid "$"
 msgstr ""
 
-#: app/includes/shortcodes/search.php:780
+#: app/includes/shortcodes/search.php:786
 msgid "$$"
 msgstr ""
 
-#: app/includes/shortcodes/search.php:781
+#: app/includes/shortcodes/search.php:787
 msgid "$$$"
 msgstr ""
 
-#: app/includes/shortcodes/search.php:782
+#: app/includes/shortcodes/search.php:788
 msgid "$$$$"
 msgstr ""
 
-#: app/includes/shortcodes/search.php:861
+#: app/includes/shortcodes/search.php:867
 msgid "KM"
 msgstr ""
 
@@ -9969,115 +10071,130 @@ msgid "No Custom Fields"
 msgstr ""
 
 #: app/includes/taxonomies/attribute.php:70
-#: app/includes/taxonomies/attribute.php:180
+#: app/includes/taxonomies/attribute.php:192
 msgid "Field Type"
 msgstr ""
 
 #: app/includes/taxonomies/attribute.php:73
-#: app/includes/taxonomies/attribute.php:183
+#: app/includes/taxonomies/attribute.php:195
 msgid "Radio"
 msgstr ""
 
 #: app/includes/taxonomies/attribute.php:76
-#: app/includes/taxonomies/attribute.php:186
+#: app/includes/taxonomies/attribute.php:198
 msgid "Email Input"
 msgstr ""
 
 #: app/includes/taxonomies/attribute.php:77
-#: app/includes/taxonomies/attribute.php:187
+#: app/includes/taxonomies/attribute.php:199
+msgid "Tel Input"
+msgstr ""
+
+#: app/includes/taxonomies/attribute.php:78
+#: app/includes/taxonomies/attribute.php:200
 msgid "URL Input"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:79
-#: app/includes/taxonomies/attribute.php:189
+#: app/includes/taxonomies/attribute.php:81
+#: app/includes/taxonomies/attribute.php:203
 msgid "Textarea"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:84
-#: app/includes/taxonomies/attribute.php:194
-#: app/includes/taxonomies/attribute.php:323
+#: app/includes/taxonomies/attribute.php:86
+#: app/includes/taxonomies/attribute.php:208
+#: app/includes/taxonomies/attribute.php:350
 msgid "Values"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:86
-#: app/includes/taxonomies/attribute.php:196
+#: app/includes/taxonomies/attribute.php:88
+#: app/includes/taxonomies/attribute.php:210
 msgid "Active,Sold,Waiting"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:87
-#: app/includes/taxonomies/attribute.php:198
+#: app/includes/taxonomies/attribute.php:89
+#: app/includes/taxonomies/attribute.php:212
 msgid "Comma Separated values for dropdown type."
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:90
-#: app/includes/taxonomies/attribute.php:201
+#: app/includes/taxonomies/attribute.php:92
+#: app/includes/taxonomies/attribute.php:215
 msgid "Related Categories"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:96
-#: app/includes/taxonomies/attribute.php:206
+#: app/includes/taxonomies/attribute.php:98
+#: app/includes/taxonomies/attribute.php:220
 #: app/includes/taxonomies/category.php:27
 msgid "All Categories"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:100
-#: app/includes/taxonomies/attribute.php:210
+#: app/includes/taxonomies/attribute.php:102
+#: app/includes/taxonomies/attribute.php:224
 #, php-format
 msgid "There is no category. You can define some categories %s"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:100
-#: app/includes/taxonomies/attribute.php:210
+#: app/includes/taxonomies/attribute.php:102
+#: app/includes/taxonomies/attribute.php:224
 msgid "here"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:111
-#: app/includes/taxonomies/attribute.php:221
+#: app/includes/taxonomies/attribute.php:113
+#: app/includes/taxonomies/attribute.php:235
 msgid "You can create category specific attributes."
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:116
-#: app/includes/taxonomies/attribute.php:224
+#: app/includes/taxonomies/attribute.php:118
+#: app/includes/taxonomies/attribute.php:238
 msgid "Required"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:124
-#: app/includes/taxonomies/attribute.php:232
+#: app/includes/taxonomies/attribute.php:126
+#: app/includes/taxonomies/attribute.php:246
 msgid "Rich Editor"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:130
-#: app/includes/taxonomies/attribute.php:238
+#: app/includes/taxonomies/attribute.php:132
+#: app/includes/taxonomies/attribute.php:252
 msgid "Rich or HTML editor cannot be required!"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:133
-#: app/includes/taxonomies/attribute.php:241
-#: app/includes/taxonomies/attribute.php:324
+#: app/includes/taxonomies/attribute.php:135
+#: app/includes/taxonomies/attribute.php:255
+msgid "Link Label"
+msgstr ""
+
+#: app/includes/taxonomies/attribute.php:141
+#: app/includes/taxonomies/attribute.php:261
+msgid "Text to display instead of the raw value."
+msgstr ""
+
+#: app/includes/taxonomies/attribute.php:144
+#: app/includes/taxonomies/attribute.php:264
+#: app/includes/taxonomies/attribute.php:351
 msgid "Index"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:135
-#: app/includes/taxonomies/attribute.php:243
+#: app/includes/taxonomies/attribute.php:146
+#: app/includes/taxonomies/attribute.php:266
 msgid "1.00 or 2 or 5.50 etc."
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:137
-#: app/includes/taxonomies/attribute.php:245
+#: app/includes/taxonomies/attribute.php:148
+#: app/includes/taxonomies/attribute.php:268
 msgid ""
 "An arbitrary number to determine the field order relative to the others e.g. "
 "\"1\" to be at the top of other fields."
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:148
-#: app/includes/taxonomies/attribute.php:256
+#: app/includes/taxonomies/attribute.php:159
+#: app/includes/taxonomies/attribute.php:279
 #: app/includes/taxonomies/feature.php:75
 #: app/includes/taxonomies/feature.php:108
 msgid "Schema Property"
 msgstr ""
 
-#: app/includes/taxonomies/attribute.php:154
-#: app/includes/taxonomies/attribute.php:263
+#: app/includes/taxonomies/attribute.php:165
+#: app/includes/taxonomies/attribute.php:286
 #: app/includes/taxonomies/feature.php:81
 #: app/includes/taxonomies/feature.php:117
 msgid "Schema Item Property (https://schema.org/)"
@@ -10164,7 +10281,6 @@ msgstr ""
 
 #: app/includes/taxonomies/category.php:130
 #: app/includes/taxonomies/label.php:60 app/includes/taxonomies/label.php:77
-#: templates/dashboard/taxonomies/terms.php:123
 msgid "Color"
 msgstr ""
 
@@ -10458,6 +10574,14 @@ msgstr ""
 msgid "No Tags"
 msgstr ""
 
+#: app/includes/upgrade.php:64 app/includes/user.php:299
+msgid "Listdom Author"
+msgstr ""
+
+#: app/includes/upgrade.php:77 app/includes/user.php:300
+msgid "Listdom Publisher"
+msgstr ""
+
 #: app/includes/user.php:39
 msgid "<strong>Error</strong>: Please enter a username."
 msgstr ""
@@ -10501,6 +10625,14 @@ msgstr ""
 
 #: app/includes/user.php:255
 msgid "Password Reset Request"
+msgstr ""
+
+#: app/includes/user.php:297
+msgid "Subscriber"
+msgstr ""
+
+#: app/includes/user.php:298
+msgid "Contributor"
 msgstr ""
 
 #: app/includes/widgets/alllistings.php:9
@@ -10655,27 +10787,27 @@ msgstr ""
 msgid "Content Not Found."
 msgstr ""
 
-#: templates/dashboard/form.php:156
+#: templates/dashboard/form.php:155
 msgid "Published"
 msgstr ""
 
-#: templates/dashboard/form.php:157
+#: templates/dashboard/form.php:156
 msgid "Pending Review"
 msgstr ""
 
-#: templates/dashboard/form.php:158
+#: templates/dashboard/form.php:157
 msgid "Draft"
 msgstr ""
 
-#: templates/dashboard/form.php:170 templates/dashboard/profile.php:299
+#: templates/dashboard/form.php:169 templates/dashboard/profile.php:299
 msgid "Save"
 msgstr ""
 
-#: templates/dashboard/form.php:297
+#: templates/dashboard/form.php:296
 msgid "Choose Image"
 msgstr ""
 
-#: templates/dashboard/form.php:302
+#: templates/dashboard/form.php:301
 msgid "Remove Image"
 msgstr ""
 
@@ -10687,7 +10819,15 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: templates/dashboard/manage.php:59
+#: templates/dashboard/manage.php:40
+msgid "View All"
+msgstr ""
+
+#: templates/dashboard/manage.php:43
+msgid "Search…"
+msgstr ""
+
+#: templates/dashboard/manage.php:75
 #, php-format
 msgid "No listing found! %s your first listing now."
 msgstr ""
@@ -10760,26 +10900,44 @@ msgstr ""
 msgid "Repeat New Password"
 msgstr ""
 
-#: templates/dashboard/taxonomies/terms.php:36
-msgid "Add New"
+#: templates/dashboard/taxonomies/terms.php:39
+#, php-format
+msgid "Select the %s or %s"
 msgstr ""
 
-#: templates/dashboard/taxonomies/terms.php:42
-#: templates/dashboard/taxonomies/terms.php:49
-#: templates/dashboard/taxonomies/terms.php:65
-#: templates/dashboard/taxonomies/terms.php:72
+#: templates/dashboard/taxonomies/terms.php:41
+msgid "Add a new one"
+msgstr ""
+
+#: templates/dashboard/taxonomies/terms.php:47
+#, php-format
+msgid "New %s"
+msgstr ""
+
+#: templates/dashboard/taxonomies/terms.php:52
+#: templates/dashboard/taxonomies/terms.php:59
+#: templates/dashboard/taxonomies/terms.php:75
+#: templates/dashboard/taxonomies/terms.php:82
 #, php-format
 msgid "%s Name"
 msgstr ""
 
-#: templates/dashboard/taxonomies/terms.php:56
-#: templates/dashboard/taxonomies/terms.php:138
+#: templates/dashboard/taxonomies/terms.php:66
+#: templates/dashboard/taxonomies/terms.php:153
 #, php-format
 msgid "Add %s"
 msgstr ""
 
-#: templates/dashboard/taxonomies/terms.php:92
+#: templates/dashboard/taxonomies/terms.php:88
 msgid "Parent"
+msgstr ""
+
+#: templates/dashboard/taxonomies/terms.php:103
+msgid "Pick the color"
+msgstr ""
+
+#: templates/dashboard/taxonomies/terms.php:120
+msgid "Select the icon"
 msgstr ""
 
 #: templates/elements/abuse.php:27 templates/elements/abuse.php:28
@@ -10893,7 +11051,8 @@ msgstr ""
 msgid "Submit a Review"
 msgstr ""
 
-#: templates/skins/accordion/style1/render.php:42
+#: templates/skins/accordion/builder/render.php:35
+#: templates/skins/accordion/style1/render.php:35
 msgid "Toggle details"
 msgstr ""
 

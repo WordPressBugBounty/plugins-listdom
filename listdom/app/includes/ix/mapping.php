@@ -228,7 +228,7 @@ class LSD_IX_Mapping extends LSD_IX
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
             if ($type === 'separator') continue;
 
-            $mapping_type = in_array($type, ['number', 'email', 'url']) ? $type : 'text';
+            $mapping_type = in_array($type, ['number', 'email', 'url', 'tel']) ? $type : 'text';
 
             $fields['lsd_attribute_' . $attribute->slug] = [
                 'label' => $attribute->name,

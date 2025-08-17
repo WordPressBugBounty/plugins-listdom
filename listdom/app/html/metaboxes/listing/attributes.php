@@ -40,7 +40,7 @@ if (!is_array($raw)) $raw = [];
             $editor = get_term_meta($attribute->term_id, 'lsd_editor', true);
             if (trim($editor) === '') $editor = 0;
             ?>
-            <div class="lsd-form-row lsd-category-specific <?php echo esc_attr(trim($categories_class)); ?>" id="lsd_attribute_<?php echo esc_attr($attribute->term_id); ?>">
+            <div class="lsd-form-row lsd-category-specific lsd-attribute-type-<?php echo esc_attr($type); ?>  <?php echo esc_attr(trim($categories_class)); ?>" id="lsd_attribute_<?php echo esc_attr($attribute->term_id); ?>">
                 <div class="lsd-col-2 lsd-label-col">
                     <?php if ($type !== 'separator'): ?>
                         <?php echo LSD_Form::label([
@@ -141,6 +141,17 @@ if (!is_array($raw)) $raw = [];
                         'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'value' => $raw[$attribute->slug] ?? '',
                     ]);
+                    else if ($type === 'image')
+                    {
+                        echo '<div class="lsd-attribute-image" data-required-message="' . esc_attr__('Please select an image.', 'listdom') . '" data-required="' . esc_attr($required) . '">';
+                        echo LSD_Form::imagepicker([
+                            'id' => 'lsd_listing_attributes' . $attribute->term_id,
+                            'name' => 'lsd[attributes][' . $attribute->slug . ']',
+                            'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true),
+                            'required' => $required,
+                        ]);
+                        echo '</div>';
+                    }
                     else if ($type === 'separator')
                     {
                         echo '<h3>' . esc_html($attribute->name) . '</h3>';

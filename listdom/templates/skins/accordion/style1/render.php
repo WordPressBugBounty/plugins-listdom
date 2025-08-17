@@ -4,13 +4,6 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Skins_Accordion $this */
 
-// Featured Image Sizes
-$sizes = [
-    2 => [560, 430],
-    3 => [325, 250],
-    4 => [280, 215],
-];
-
 $ids = $this->listings;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
@@ -56,7 +49,7 @@ $ids = $this->listings;
                         <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
                             <?php if ($this->display_image): ?>
                                 <div class="lsd-image">
-                                    <?php echo LSD_Kses::element($listing->get_image_module($this, $sizes[$this->columns])); ?>
+                                    <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -94,9 +87,9 @@ $ids = $this->listings;
                                     </div>
                                 <?php endif; ?>
 
-                                <?php if ($this->display_availability): ?>
+                                <?php if ($this->display_availability && $availability = $listing->get_availability(true)): ?>
                                     <div class="lsd-listing-availability">
-                                        <?php echo LSD_Kses::element($listing->get_availability(true)); ?>
+                                        <?php echo LSD_Kses::element($availability); ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -126,4 +119,4 @@ $ids = $this->listings;
             </div>
         </div>
     </div>
-<?php endforeach; ?>
+<?php endforeach;

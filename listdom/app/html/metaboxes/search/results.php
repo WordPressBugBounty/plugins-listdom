@@ -27,7 +27,7 @@ $connected_shortcodes = $form['connected_shortcodes'] ?? [];
                 'id' => 'lsd_search_form_results_page',
                 'name' => 'lsd[form][page]',
                 'value' => $page,
-                'class' => 'widefat',
+                'class' => 'widefat lsd-searchable-select',
                 'show_empty' => true,
                 'empty_label' => '('.esc_html__('Current Page', 'listdom').')',
             ]); ?>
@@ -44,7 +44,7 @@ $connected_shortcodes = $form['connected_shortcodes'] ?? [];
                 'id' => 'lsd_search_form_shortcode',
                 'name' => 'lsd[form][shortcode]',
                 'value' => isset($form['shortcode']) && $form['shortcode'] ? $form['shortcode'] : '',
-                'class' => 'widefat',
+                'class' => 'widefat lsd-searchable-select',
                 'only_archive_skins' => true,
                 'show_empty' => true,
             ]); ?>

@@ -61,7 +61,13 @@ class LSD_Ajax extends LSD_Base
 
         // Get Map Objects
         $archive = new LSD_PTypes_Listing_Archive();
-        $objects = $archive->render_map_objects($SKO->search(), ['sidebar' => class_exists(LSDPACAM\Base::class)]);
+        $objects = $archive->render_map_objects(
+            $SKO->search(),
+            [
+                'sidebar' => class_exists(LSDPACAM\Base::class),
+                'onclick' => $args['onclick'] ?? 'infowindow',
+            ]
+        );
 
         // Change the limit
         $SKO->setLimit();

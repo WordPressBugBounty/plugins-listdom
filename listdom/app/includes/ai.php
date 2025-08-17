@@ -24,6 +24,12 @@ class LSD_AI extends LSD_Base
         // AI Model
         $model = $profile['model'] ?? LSD_AI_Models::def();
 
+        // GPT 5 Mini
+        if ($model === LSD_AI_Models::OPENAI_GPT_5_MINI) return new LSD_AI_Models_GPT5Mini($key);
+
+        // GPT 5 Nano
+        if ($model === LSD_AI_Models::OPENAI_GPT_5_NANO) return new LSD_AI_Models_GPT5Nano($key);
+
         // 4o Mini
         if ($model === LSD_AI_Models::OPENAI_GPT_4O_MINI) return new LSD_AI_Models_GPT4oMini($key);
 

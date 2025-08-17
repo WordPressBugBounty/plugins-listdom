@@ -21,7 +21,7 @@ $did_taxonomies = [];
     <div class="lsd-form-row lsd-my-0">
         <div class="lsd-col-12 lsd-flex-o-2">
             <form id="lsd_settings_form">
-                <div id="lsd_panel_advanced_assets-loading" class="lsd-settings-form-group lsd-tab-content-active lsd-tab-content">
+                <div id="lsd_panel_advanced_assets-loading" class="lsd-settings-form-group lsd-tab-content<?php echo ($this->subtab === 'assets-loading' || !$this->subtab) ? ' lsd-tab-content-active' : ''; ?>">
                     <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Optimize Assets Loading', 'listdom'); ?></h3>
                     <div class="lsd-settings-group-wrapper">
                         <div class="lsd-settings-fields-wrapper">
@@ -175,7 +175,7 @@ $did_taxonomies = [];
                         </div>
                     </div>
                 </div>
-                <div id="lsd_panel_advanced_custom-styles" class="lsd-settings-form-group lsd-tab-content">
+                <div id="lsd_panel_advanced_custom-styles" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'custom-styles' ? ' lsd-tab-content-active' : ''; ?>">
                     <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Custom Styles', 'listdom'); ?></h3>
                     <div class="lsd-settings-group-wrapper">
                         <div class="lsd-settings-fields-wrapper">
@@ -193,7 +193,7 @@ $did_taxonomies = [];
                     </div>
                 </div>
 
-                <div id="lsd_panel_advanced_components" class="lsd-settings-form-group lsd-tab-content">
+                <div id="lsd_panel_advanced_components" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'components' ? ' lsd-tab-content-active' : ''; ?>">
                     <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Components', 'listdom'); ?></h3>
 
                     <div class="lsd-settings-group-wrapper">
@@ -306,7 +306,7 @@ $did_taxonomies = [];
                 </div>
             </form>
         </div>
-        <div id="lsd_panel_advanced_import-export" class="lsd-settings-form-group lsd-tab-content lsd-w-full lsd-flex-o-1">
+        <div id="lsd_panel_advanced_import-export" class="lsd-settings-form-group lsd-tab-content lsd-w-full lsd-flex-o-1<?php echo $this->subtab === 'import-export' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Import/Export', 'listdom'); ?></h3>
 
             <div class="lsd-col-12">

@@ -46,22 +46,22 @@ $current_id = get_current_user_id();
 				<i class="lsd-icon fa fa-envelope"></i>
 			</div>
 
-			<?php if ($field_name): ?>
-			<div class="lsd-report-abuse-form-row lsd-report-abuse-form-row-phone">
-				<input
-					class="lsd-form-control-input"
-					type="tel"
-					name="lsd_phone"
-					placeholder="<?php esc_attr_e('Your Phone', 'listdom') ?>"
-					title="<?php esc_attr_e('Your Phone', 'listdom') ?>"
-					value="<?php echo $current_id ? esc_attr(get_user_meta($current_id, 'lsd_phone', true)) : ''; ?>"
-					required
-				>
-				<i class="lsd-icon fas fa-phone-alt"></i>
-			</div>
-			<?php endif; ?>
-		</div>
-		
+            <?php if ($field_phone): ?>
+            <div class="lsd-report-abuse-form-row lsd-report-abuse-form-row-phone">
+                <input
+                    class="lsd-form-control-input"
+                    type="tel"
+                    name="lsd_phone"
+                    placeholder="<?php esc_attr_e('Your Phone', 'listdom') ?>"
+                    title="<?php esc_attr_e('Your Phone', 'listdom') ?>"
+                    value="<?php echo $current_id ? esc_attr(get_user_meta($current_id, 'lsd_phone', true)) : ''; ?>"
+                    required
+                >
+                <i class="lsd-icon fas fa-phone-alt"></i>
+            </div>
+            <?php endif; ?>
+        </div>
+
 		<div class="lsd-report-abuse-form-row">
 			<textarea
 				class="lsd-form-control-textarea"
@@ -76,7 +76,7 @@ $current_id = get_current_user_id();
 			<?php echo LSD_Main::grecaptcha_field('transform-95'); ?>
 			<button type="submit" class="lsd-form-submit lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>"><?php esc_html_e('Send', 'listdom'); ?></button>
 
-			<?php wp_nonce_field('lsd_abuse_'.$post_id); ?>
+			<?php wp_nonce_field('lsd_abuse_' . $post_id); ?>
 			<input type="hidden" name="lsd_post_id" value="<?php echo esc_attr($post_id); ?>">
 			<input type="hidden" name="action" value="lsd_report_abuse">
 		</div>

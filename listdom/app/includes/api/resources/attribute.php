@@ -31,6 +31,7 @@ class LSD_API_Resources_Attribute extends LSD_API_Resource
             // Attribute Data
             $type = get_term_meta($term->term_id, 'lsd_field_type', true);
             $values = get_term_meta($term->term_id, 'lsd_values', true);
+            $link_label = get_term_meta($term->term_id, 'lsd_link_label', true);
 
             // This attribute is not specified for listing category
             if (!$all_categories && (count($categories) && !isset($categories[$category->term_id]))) continue;
@@ -41,6 +42,7 @@ class LSD_API_Resources_Attribute extends LSD_API_Resource
                 'value' => $value,
                 'type' => $type,
                 'values' => $values,
+                'link_label' => $link_label,
             ];
         }
 

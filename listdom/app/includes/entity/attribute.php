@@ -21,11 +21,35 @@ class LSD_Entity_Attribute extends LSD_Base
 
             case 'email':
 
-                return '<a href="mailto:' . esc_attr($data) . '">' . esc_html($data) . '</a>';
+                $label = get_term_meta($this->term_id, 'lsd_link_label', true);
+                $text = trim($label) === '' ? $data : $label;
+
+                return '<a href="mailto:' . esc_attr($data) . '">' . esc_html($text) . '</a>';
+
+            case 'tel':
+
+                $label = get_term_meta($this->term_id, 'lsd_link_label', true);
+                $text = trim($label) === '' ? $data : $label;
+
+                return '<a href="tel:' . esc_attr($data) . '">' . esc_html($text) . '</a>';
 
             case 'url':
 
-                return '<a href="' . esc_attr($data) . '">' . esc_html($data) . '</a>';
+                $label = get_term_meta($this->term_id, 'lsd_link_label', true);
+                $text = trim($label) === '' ? $data : $label;
+
+                return '<a href="' . esc_attr($data) . '">' . esc_html($text) . '</a>';
+
+            case 'image':
+
+                if (is_numeric($data))
+                {
+                    $image = wp_get_attachment_image($data, 'medium');
+                    return $image ?: '';
+                }
+
+                $data = trim($data);
+                return $data ? '<img src="' . esc_url($data) . '" alt="">' : '';
 
             case 'separator':
 
@@ -38,6 +62,7 @@ class LSD_Entity_Attribute extends LSD_Base
                 return $editor ? wpautop($data) : esc_html($data);
 
             case 'checkbox':
+
                 if (is_array($data))
                 {
                     $escaped = array_map('esc_html', $data);

@@ -389,6 +389,10 @@ class LSD_Options extends LSD_Base
                     ],
                     'register' => [
                         'redirect' => get_option('page_on_front') ?? 0,
+                        'redirect_subscriber' => 0,
+                        'redirect_contributor' => 0,
+                        'redirect_listdom_author' => 0,
+                        'redirect_listdom_publisher' => 0,
                         'username_label' => __('Username', 'listdom'),
                         'username_placeholder' => __('Enter your username', 'listdom'),
                         'password_label' => __('Password', 'listdom'),
@@ -406,6 +410,10 @@ class LSD_Options extends LSD_Base
                     ],
                     'login' => [
                         'redirect' => get_option('page_on_front') ?? 0,
+                        'redirect_subscriber' => 0,
+                        'redirect_contributor' => 0,
+                        'redirect_listdom_author' => 0,
+                        'redirect_listdom_publisher' => 0,
                         'username_label' => __('Username', 'listdom'),
                         'password_label' => __('Password', 'listdom'),
                         'username_placeholder' => __('Enter your username', 'listdom'),

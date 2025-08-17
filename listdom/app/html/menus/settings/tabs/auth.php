@@ -10,7 +10,7 @@ $settings = LSD_Options::settings();
 ?>
 <div class="lsd-auth-wrap">
     <form id="lsd_auth_form">
-        <div id="lsd_panel_auth_authentication" class="lsd-auth-form-group lsd-tab-content-active lsd-tab-content">
+        <div id="lsd_panel_auth_authentication" class="lsd-auth-form-group lsd-tab-content<?php echo ($this->subtab === 'authentication' || !$this->subtab) ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Authentication', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
@@ -275,7 +275,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div id="lsd_panel_auth_login" class="lsd-auth-form-group lsd-tab-content">
+        <div id="lsd_panel_auth_login" class="lsd-auth-form-group lsd-tab-content<?php echo $this->subtab === 'login' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Login', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
@@ -388,11 +388,43 @@ $settings = LSD_Options::settings();
                             <p class="description lsd-mb-0"><?php esc_html_e("After the user logs in, they will be redirected to the designated page.", 'listdom'); ?></p>
                         </div>
                     </div>
+
+                    <h3 class="lsd-admin-title"><?php esc_html_e('Redirection Per User Role', 'listdom'); ?></h3>
+                    <?php foreach (LSD_User::roles() as $role => $label): ?>
+                    <div class="lsd-mt-4">
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                'for' => 'lsd_auth_login_redirect_role_'. $role,
+                                'title' => $label
+                            ]); ?></div>
+                            <div class="lsd-col-4"><?php echo LSD_Form::switcher([
+                                'id' => 'lsd_auth_login_redirect_role_'. $role,
+                                'name' => 'lsd[login][redirect_'. $role.']',
+                                'value' => $auth['login']['redirect_'. $role],
+                                'toggle' => '#lsd-auth-login-redirect-page-' . esc_attr($role) . '-content',
+                            ]); ?></div>
+                        </div>
+                        <div class="lsd-form-row <?php echo ($auth['login']['redirect_'. $role]) == 0 ? 'lsd-util-hide' : ''; ?>" id="<?php echo esc_attr('lsd-auth-login-redirect-page-' . esc_attr($role) . '-content'); ?>" >
+                            <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                'title' => esc_html__('Redirect Page', 'listdom'),
+                                'for' => 'lsd_auth_login_redirect_' . $role,
+                            ]); ?></div>
+                            <div class="lsd-col-4">
+                                <?php echo LSD_Form::pages([
+                                    'id' => 'lsd_auth_login_redirect_' . $role,
+                                    'name' => 'lsd[login]['. $role .'][redirect]',
+                                    'value' => $auth['login'][$role]['redirect'] ?? $auth['login']['redirect'],
+                                ]); ?>
+                                <p class="description lsd-mb-0"><?php echo sprintf(esc_html__("After logging in, the %s user will be redirected to the designated page.", 'listdom'), '<strong>'.$label.'</strong>'); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
 
-        <div id="lsd_panel_auth_register" class="lsd-auth-form-group lsd-tab-content">
+        <div id="lsd_panel_auth_register" class="lsd-auth-form-group lsd-tab-content<?php echo $this->subtab === 'register' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Register', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
@@ -534,6 +566,38 @@ $settings = LSD_Options::settings();
                             <p class="description lsd-mb-0"><?php esc_html_e("After the user registers, they will be redirected to the designated page.", 'listdom'); ?></p>
                         </div>
                     </div>
+
+                    <h3 class="lsd-admin-title"><?php esc_html_e('Auto Login Per User Role', 'listdom'); ?></h3>
+                    <?php foreach (LSD_User::roles() as $role => $label): ?>
+                        <div class="lsd-mt-4">
+                            <div class="lsd-form-row">
+                                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                    'for' => 'lsd_auth_register_redirect_role_'. $role,
+                                    'title' => $label
+                                ]); ?></div>
+                                <div class="lsd-col-10"><?php echo LSD_Form::switcher([
+                                    'id' => 'lsd_auth_register_redirect_role_' . $role,
+                                    'name' => 'lsd[register][redirect_'. $role.']',
+                                    'value' => $auth['register']['redirect_'. $role],
+                                    'toggle' => '#lsd-auth-register-redirect-page-' . esc_attr($role) . '-content',
+                                ]); ?></div>
+                            </div>
+                            <div class="lsd-form-row <?php echo ($auth['register']['redirect_'. $role]) == 0 ? 'lsd-util-hide' : ''; ?>" id="<?php echo esc_attr('lsd-auth-register-redirect-page-' . esc_attr($role) . '-content'); ?>" >
+                                <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                    'title' => esc_html__('Redirect Page', 'listdom'),
+                                    'for' => 'lsd_auth_register_redirect_' . $role,
+                                ]); ?></div>
+                                <div class="lsd-col-4">
+                                    <?php echo LSD_Form::pages([
+                                        'id' => 'lsd_auth_register_redirect_' . $role,
+                                        'name' => 'lsd[register]['. $role .'][redirect]',
+                                        'value' => $auth['register'][$role]['redirect'] ?? $auth['register']['redirect'],
+                                    ]); ?>
+                                    <p class="description lsd-mb-0"><?php echo sprintf(esc_html__("After registering, the %s user will be redirected to the designated page.", 'listdom'), '<strong>'.$label.'</strong>'); ?></p>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
                     <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Password Policy', 'listdom'); ?></h3>
@@ -632,7 +696,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div id="lsd_panel_auth_forgot-password" class="lsd-auth-form-group lsd-tab-content">
+        <div id="lsd_panel_auth_forgot-password" class="lsd-auth-form-group lsd-tab-content<?php echo $this->subtab === 'forgot-password' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Forgot Password', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
@@ -683,27 +747,10 @@ $settings = LSD_Options::settings();
                         </div>
                     </div>
                 </div>
-                <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Redirect', 'listdom'); ?></h3>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-2"><?php echo LSD_Form::label([
-                            'title' => esc_html__('Page', 'listdom'),
-                            'for' => 'lsd_auth_forgot_password_redirect',
-                        ]); ?></div>
-                        <div class="lsd-col-4">
-                            <?php echo LSD_Form::pages([
-                                'id' => 'lsd_auth_forgot_password_redirect',
-                                'name' => 'lsd[forgot_password][redirect]',
-                                'value' => $auth['forgot_password']['redirect']
-                            ]); ?>
-                            <p class="description lsd-mb-0"><?php esc_html_e("After the user receives the password recovery email, they will be redirected to the designated page.", 'listdom'); ?></p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <div id="lsd_panel_auth_profile-user-directory" class="lsd-auth-form-group lsd-tab-content">
+        <div id="lsd_panel_auth_profile-user-directory" class="lsd-auth-form-group lsd-tab-content<?php echo $this->subtab === 'profile-user-directory' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Profile & User Directory', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
@@ -752,7 +799,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div id="lsd_panel_auth_logged-in-users" class="lsd-auth-form-group lsd-tab-content">
+        <div id="lsd_panel_auth_logged-in-users" class="lsd-auth-form-group lsd-tab-content<?php echo $this->subtab === 'logged-in-users' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Logged In Users', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -790,7 +837,7 @@ $settings = LSD_Options::settings();
             </div>
         </div>
 
-        <div id="lsd_panel_auth_block-admin-access" class="lsd-auth-form-group lsd-tab-content">
+        <div id="lsd_panel_auth_block-admin-access" class="lsd-auth-form-group lsd-tab-content<?php echo $this->subtab === 'block-admin-access' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Block Admin Access', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -798,21 +845,16 @@ $settings = LSD_Options::settings();
                 <div class="lsd-col-12">
                     <p class="description lsd-mt-0 lsd-mb-5"><?php esc_html_e('You can block WordPress admin access for the following user roles, if needed. Check to block access, or uncheck to allow it.', 'listdom'); ?></p>
 
-                    <?php foreach ([
-                        'subscriber' => esc_html__('Subscriber', 'listdom'),
-                        'contributor' => esc_html__('Contributor', 'listdom'),
-                        'listdom_author' => esc_html__('Listdom Author', 'listdom'),
-                        'listdom_publisher' => esc_html__('Listdom Publisher', 'listdom'),
-                    ] as $role => $label): ?>
+                    <?php foreach (LSD_User::roles() as $role => $label): ?>
                         <div class="lsd-form-row">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'for' => 'lsd_block_admin_role_'.$role,
+                                'for' => 'lsd_block_admin_role_'. $role,
                                 'title' => $label
                             ]); ?></div>
                             <div class="lsd-col-10"><?php echo LSD_Form::switcher([
-                                'id' => 'lsd_block_admin_role_'.$role,
-                                'name' => 'settings[block_admin_'.$role.']',
-                                'value' => $settings['block_admin_'.$role] ?? 1
+                                'id' => 'lsd_block_admin_role_'. $role,
+                                'name' => 'settings[block_admin_'. $role.']',
+                                'value' => $settings['block_admin_'. $role] ?? 1
                             ]); ?></div>
                         </div>
                     <?php endforeach; ?>

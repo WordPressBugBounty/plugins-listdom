@@ -26,7 +26,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
 ?>
 <div class="lsd-settings-wrap" id="lsd_settings_frontend_dashboard">
     <form id="lsd_settings_form">
-        <div id="lsd_panel_frontend-dashboard_pages" class="lsd-settings-form-group lsd-tab-content-active lsd-tab-content">
+        <div id="lsd_panel_frontend-dashboard_pages" class="lsd-settings-form-group lsd-tab-content<?php echo ($this->subtab === 'pages' || !$this->subtab) ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Pages', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -88,7 +88,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
             </div>
         </div>
 
-        <div id="lsd_panel_frontend-dashboard_dashboard-menus" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_frontend-dashboard_dashboard-menus" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'dashboard-menus' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Dashboard Menus', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
@@ -185,7 +185,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
             </div>
         </div>
 
-        <div id="lsd_panel_frontend-dashboard_guest-submission" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_frontend-dashboard_guest-submission" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'guest-submission' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Guest Submission', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -252,7 +252,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
             </div>
         </div>
 
-        <div id="lsd_panel_frontend-dashboard_fields" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_frontend-dashboard_fields" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'fields' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Fields', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -364,7 +364,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
             </div>
         </div>
 
-        <div id="lsd_panel_frontend-dashboard_restrictions" class="lsd-settings-form-group lsd-tab-content">
+        <div id="lsd_panel_frontend-dashboard_restrictions" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'restrictions' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Restrictions', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
