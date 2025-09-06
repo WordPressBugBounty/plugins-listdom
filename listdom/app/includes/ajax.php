@@ -223,6 +223,9 @@ class LSD_Ajax extends LSD_Base
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
         if (!wp_verify_nonce($wpnonce, 'lsd_ai_availability')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
 
+        // No Access
+        if (!(new LSD_AI())->has_access(LSD_AI::TASK_AVAILABILITY)) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
+
         $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field($_POST['ai_profile']) : '';
         $text = isset($_POST['text']) ? sanitize_text_field($_POST['text']) : '';
 
@@ -242,6 +245,9 @@ class LSD_Ajax extends LSD_Base
 
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
         if (!wp_verify_nonce($wpnonce, 'lsd_ai_content')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
+
+        // No Access
+        if (!(new LSD_AI())->has_access(LSD_AI::TASK_CONTENT)) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
 
         $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field($_POST['ai_profile']) : '';
         $text = isset($_POST['text']) ? sanitize_text_field($_POST['text']) : '';

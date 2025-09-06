@@ -110,7 +110,7 @@ class LSD_Assets extends LSD_Base
         wp_enqueue_script('lsd-backend', $this->lsd_asset_url('js/backend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-autocomplete'], $this->version(), true);
 
         $icon_options = [];
-        $fonts = LSD_Base::get_font_icons();
+        $fonts = LSD_Icons::get();
         foreach ($fonts as $font => $code) $icon_options[] = ['value' => $font, 'label' => $font];
 
         // Localize Vars

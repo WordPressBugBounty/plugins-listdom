@@ -19,31 +19,33 @@ $price_components = LSD_Options::price_components();
     <?php $this->include_html_file('metaboxes/shortcode/tabs.php'); ?>
 
     <div class="lsd-metabox-display-options-content">
-
         <div id="lsd_tab_content_skin" class="lsd-tab-content lsd-tab-content-active">
-            <div class="lsd-form-group lsd-skins-form-group lsd-mt-0 lsd-p-0">
-                    <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Select the Skin", 'listdom'); ?></h3>
-                    <p class="description lsd-mb-4 lsd-mt-3"><?php echo esc_html__("Choose how listings are displayed: grid, list, carousel, map, or other visual layouts.", 'listdom'); ?> </p>
-
+            <div class="lsd-settings-group-wrapper lsd-form-group lsd-skins-form-group lsd-m-0 lsd-p-0">
+                <div class="lsd-settings-fields-wrapper">
+                    <div class="lsd-admin-section-heading">
+                        <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Select the Skin", 'listdom'); ?></h3>
+                        <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("Choose how listings are displayed: grid, list, carousel, map, or other visual layouts.", 'listdom'); ?> </p>
+                    </div>
                     <div class="lsd-form-row lsd-m-0">
-                        <div class="lsd-col-12">
-                            <div class="lsd-skin-style-options">
-                                <?php foreach ($skins->get_skins() as $skin_key => $skin_label): ?>
-                                    <div class="lsd-skin-style-option <?php echo $selected_skin === $skin_key ? 'selected' : ''; ?>" data-skin="<?php echo esc_attr($skin_key); ?>">
-                                        <img width="120" src="<?php echo esc_url($this->lsd_asset_url('img/skins/'.$skin_key.'.svg')); ?>" alt="<?php echo esc_attr($skin_label); ?>">
-                                        <h4 class="lsd-mt-2 lsd-mb-3"><?php echo esc_html($skin_label); ?></h4>
-                                    </div>
-                                <?php endforeach; ?>
-                                <input type="hidden" name="lsd[display][skin]" id="lsd_display_options_skin" value="<?php echo esc_attr($options['skin'] ?? ''); ?>">
-                            </div>
+                    <div class="lsd-col-12">
+                        <div class="lsd-skin-style-options">
+                            <?php foreach ($skins->get_skins() as $skin_key => $skin_label): ?>
+                                <div class="lsd-skin-style-option <?php echo $selected_skin === $skin_key ? 'selected' : ''; ?>" data-skin="<?php echo esc_attr($skin_key); ?>">
+                                    <img width="120" src="<?php echo esc_url($this->lsd_asset_url('img/skins/'.$skin_key.'.svg')); ?>" alt="<?php echo esc_attr($skin_label); ?>">
+                                    <h4 class="lsd-mt-2 lsd-mb-3"><?php echo esc_html($skin_label); ?></h4>
+                                </div>
+                            <?php endforeach; ?>
+                            <input type="hidden" name="lsd[display][skin]" id="lsd_display_options_skin" value="<?php echo esc_attr($options['skin'] ?? ''); ?>">
                         </div>
                     </div>
-            </div>
-            <?php foreach ($skins->get_skins() as $skin => $label): ?>
-                <div class="lsd-form-row lsd-skin-content <?php echo $selected_skin === $skin ? '':'lsd-util-hide'; ?>" data-skin="<?php echo esc_attr($skin); ?>">
-                    <?php $this->include_html_file('metaboxes/shortcode/display-options/skin/'.$skin.'.php'); ?>
                 </div>
-            <?php endforeach; ?>
+                      <?php foreach ($skins->get_skins() as $skin => $label): ?>
+                          <div class="lsd-form-row lsd-skin-content lsd-m-0 <?php echo $selected_skin === $skin ? '':'lsd-util-hide'; ?>" data-skin="<?php echo esc_attr($skin); ?>">
+                              <?php $this->include_html_file('metaboxes/shortcode/display-options/skin/'.$skin.'.php'); ?>
+                          </div>
+                      <?php endforeach; ?>
+                </div>
+            </div>
         </div>
         <div id="lsd_tab_content_elements" class="lsd-tab-content">
             <div id="lsd_skin_display_options_container">
@@ -52,13 +54,10 @@ $price_components = LSD_Options::price_components();
                     <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/'.$skin.'.php', [
                         'parameters' => [
                             'options' => $options,
+                            'skin' => $skin,
                             'price_components' => $price_components,
                         ]
                     ]); ?>
-                    <?php
-                        // Action for Third Party Plugins
-                        do_action('lsd_shortcode_display_options', $skin, $options);
-                    ?>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -68,8 +67,8 @@ $price_components = LSD_Options::price_components();
         </div>
         <div id="lsd_tab_content_map" class="lsd-tab-content">
             <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex" data-for=".lsd-tab-switcher-content-map">
-                <li data-tab="map" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Map', 'listdom'); ?></a></li>
-                <li data-tab="map-controls" class="lsd-metabox-map-controls-tab"><a href="#"><?php esc_html_e('Map Controls', 'listdom'); ?></a></li>
+                <li data-tab="map" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Settings', 'listdom'); ?></a></li>
+                <li data-tab="map-controls" class="lsd-metabox-map-controls-tab"><a href="#"><?php esc_html_e('Google Maps Controls', 'listdom'); ?></a></li>
             </ul>
             <div class="lsd-tab-content-map-controls">
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-map lsd-tab-switcher-content-active" id="lsd-tab-switcher-map-content">

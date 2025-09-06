@@ -22,7 +22,7 @@ class LSD_Color extends LSD_Base
         $b = hexdec(substr($bg_color, 4, 2));
 
         $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-        return ($yiq >= 130) ? '#000000' : '#ffffff';
+        return $yiq >= 130 ? '#000000' : '#ffffff';
     }
 
     public static function text_class($color = 'main'): string
@@ -45,7 +45,7 @@ class LSD_Color extends LSD_Base
 
         $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
 
-        return ($yiq >= 130) ? 'lsd-color-black-txt' : 'lsd-color-white-txt';
+        return $yiq >= 130 ? 'lsd-color-black-txt' : 'lsd-color-white-txt';
     }
 
     public static function brightness($hex, $percent): string
@@ -58,7 +58,7 @@ class LSD_Color extends LSD_Base
         $hex = array_map('hexdec', str_split($hex, 2));
         foreach ($hex as &$color)
         {
-            $adjustableLimit = ($percent < 0) ? $color : 255 - $color;
+            $adjustableLimit = $percent < 0 ? $color : 255 - $color;
             $adjustAmount = ceil($adjustableLimit * $percent);
 
             $color = str_pad(dechex($color + $adjustAmount), 2, '0', STR_PAD_LEFT);

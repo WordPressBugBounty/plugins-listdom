@@ -50,6 +50,9 @@ $gallery_max_size = $dashboard ? ($this->settings['submission_max_image_upload_s
 
 $related = get_post_meta($post->ID, 'lsd_related_listings', true);
 if (!is_array($related)) $related = [];
+
+// AI
+$ai = new LSD_AI();
 ?>
 <div class="lsd-metabox">
 
@@ -105,7 +108,7 @@ if (!is_array($related)) $related = [];
                 <label for="lsd_price"><?php esc_html_e('Price', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input type="text" name="lsd[price]" id="lsd_price" placeholder="<?php esc_attr_e('Price', 'listdom'); ?>" value="<?php echo esc_attr($price); ?>" />
+                <input type="text" name="lsd[price]" id="lsd_price" placeholder="<?php esc_attr_e('Price', 'listdom'); ?>" value="<?php echo esc_attr($price); ?>">
             </div>
         </div>
         <?php if ($price_components['max']): ?>
@@ -114,7 +117,7 @@ if (!is_array($related)) $related = [];
                 <label for="lsd_price_max"><?php esc_html_e('Price (Max)', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_max'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input type="text" name="lsd[price_max]" id="lsd_price_max" placeholder="<?php esc_attr_e('Price (Max)', 'listdom'); ?>" value="<?php echo esc_attr($price_max); ?>" />
+                <input type="text" name="lsd[price_max]" id="lsd_price_max" placeholder="<?php esc_attr_e('Price (Max)', 'listdom'); ?>" value="<?php echo esc_attr($price_max); ?>">
             </div>
         </div>
         <?php endif; ?>
@@ -124,7 +127,7 @@ if (!is_array($related)) $related = [];
                 <label for="lsd_price_after"><?php esc_html_e('Price Description', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_after'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input type="text" name="lsd[price_after]" id="lsd_price_after" placeholder="<?php esc_attr_e('Per night, Per cup, ...', 'listdom'); ?>" value="<?php echo esc_attr($price_after); ?>" />
+                <input type="text" name="lsd[price_after]" id="lsd_price_after" placeholder="<?php esc_attr_e('Per night, Per cup, ...', 'listdom'); ?>" value="<?php echo esc_attr($price_after); ?>">
             </div>
         </div>
         <?php endif; ?>
@@ -151,7 +154,7 @@ if (!is_array($related)) $related = [];
         <div class="lsd-form-row">
             <div class="lsd-col-2"></div>
             <div class="lsd-col-8 lsd-flex lsd-flex-row lsd-flex-content-start lsd-flex-items-center lsd-gap-3">
-                <?php if ((new LSD_AI())->has_profile() && get_current_user_id()): ?>
+                <?php if ($ai->has_access(LSD_AI::TASK_AVAILABILITY)): ?>
                 <div class="lsd-inline-popup-wrapper lsd-no-button-styles">
                     <button type="button" class="button lsd-inline-popup-trigger" data-focus="#lsd_ava_ai_text" data-for="#lsd-availability-ai-popup" id="lsd_ava_ai_open"><i class="listdom-icon lsdi-stars"></i></button>
                     <div id="lsd-availability-ai-popup" class="lsd-inline-popup-content">
@@ -179,7 +182,7 @@ if (!is_array($related)) $related = [];
                 <label for="lsd_ava<?php echo esc_attr($daycode); ?>"><?php esc_html_e($weekday['day'], 'listdom'); ?></label>
             </div>
             <div class="lsd-col-7 lsd-ava-hours">
-                <input type="text" name="lsd[ava][<?php echo esc_attr($daycode); ?>][hours]" id="lsd_ava<?php echo esc_attr($daycode); ?>" placeholder="<?php esc_attr_e('9 - 18, 9 AM to 9 PM', 'listdom'); ?>" value="<?php echo isset($ava[$daycode]['hours']) ? esc_attr($ava[$daycode]['hours']) : ''; ?>" />
+                <input type="text" name="lsd[ava][<?php echo esc_attr($daycode); ?>][hours]" id="lsd_ava<?php echo esc_attr($daycode); ?>" placeholder="<?php esc_attr_e('9 - 18, 9 AM to 9 PM', 'listdom'); ?>" value="<?php echo isset($ava[$daycode]['hours']) ? esc_attr($ava[$daycode]['hours']) : ''; ?>">
             </div>
             <div class="lsd-col-1 lsd-ava-off">
                 <label>
@@ -191,7 +194,7 @@ if (!is_array($related)) $related = [];
         </div>
         <?php endforeach; ?>
     </div>
-    <?php if ((new LSD_AI())->has_profile() && get_current_user_id()): ?>
+    <?php if ($ai->has_access(LSD_AI::TASK_AVAILABILITY)): ?>
         <script>
         jQuery(document).ready(function($)
         {
@@ -254,7 +257,7 @@ if (!is_array($related)) $related = [];
                 <label for="lsd_email"><?php esc_html_e('Email', 'listdom'); ?><?php $dashboard && $dashboard->required_html('email'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input type="email" name="lsd[email]" id="lsd_email" placeholder="<?php esc_attr_e('Email', 'listdom'); ?>" value="<?php echo esc_attr($email); ?>" />
+                <input type="email" name="lsd[email]" id="lsd_email" placeholder="<?php esc_attr_e('Email', 'listdom'); ?>" value="<?php echo esc_attr($email); ?>">
             </div>
         </div>
         <div class="lsd-form-row">
@@ -262,7 +265,7 @@ if (!is_array($related)) $related = [];
                 <label for="lsd_phone"><?php esc_html_e('Phone', 'listdom'); ?><?php $dashboard && $dashboard->required_html('phone'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input type="tel" name="lsd[phone]" id="lsd_phone" placeholder="<?php esc_attr_e('Phone', 'listdom'); ?>" value="<?php echo esc_attr($phone); ?>" />
+                <input type="tel" name="lsd[phone]" id="lsd_phone" placeholder="<?php esc_attr_e('Phone', 'listdom'); ?>" value="<?php echo esc_attr($phone); ?>">
             </div>
         </div>
         <div class="lsd-form-row">
@@ -270,7 +273,7 @@ if (!is_array($related)) $related = [];
                 <label for="lsd_website"><?php esc_html_e('Website', 'listdom'); ?><?php $dashboard && $dashboard->required_html('website'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input type="url" name="lsd[website]" id="lsd_website" placeholder="<?php esc_attr_e('https://yourwebsite.com', 'listdom'); ?>" value="<?php echo esc_url($website); ?>" />
+                <input type="url" name="lsd[website]" id="lsd_website" placeholder="<?php esc_attr_e('https://yourwebsite.com', 'listdom'); ?>" value="<?php echo esc_url($website); ?>">
             </div>
         </div>
         <div class="lsd-form-row">
@@ -278,7 +281,7 @@ if (!is_array($related)) $related = [];
                 <label for="lsd_contact_address"><?php esc_html_e('Contact Address', 'listdom'); ?><?php $dashboard && $dashboard->required_html('contact_address'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input type="text" name="lsd[contact_address]" id="lsd_contact_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($contact_address); ?>" />
+                <input type="text" name="lsd[contact_address]" id="lsd_contact_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($contact_address); ?>">
             </div>
         </div>
 
@@ -291,7 +294,7 @@ if (!is_array($related)) $related = [];
             <label for="lsd_link"><?php esc_html_e('Listing Custom Link', 'listdom'); ?><?php $dashboard && $dashboard->required_html('link'); ?></label>
         </div>
         <div class="lsd-col-8">
-            <input type="url" name="lsd[link]" id="lsd_link" placeholder="<?php esc_attr_e('https://anothersite.com/listing-page/', 'listdom'); ?>" value="<?php echo esc_attr($link); ?>" />
+            <input type="url" name="lsd[link]" id="lsd_link" placeholder="<?php esc_attr_e('https://anothersite.com/listing-page/', 'listdom'); ?>" value="<?php echo esc_attr($link); ?>">
         </div>
     </div>
     <div class="lsd-form-row">
@@ -301,7 +304,7 @@ if (!is_array($related)) $related = [];
         </div>
     </div>
     <?php else: ?>
-    <input type="hidden" name="lsd[link]" value="" />
+    <input type="hidden" name="lsd[link]" value="">
     <?php endif; ?>
 
     <?php endif; ?>

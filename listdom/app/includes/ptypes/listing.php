@@ -441,13 +441,10 @@ class LSD_PTypes_Listing extends LSD_PTypes
             $screen = get_current_screen();
             if (!$screen || $screen->post_type !== $this->PT) return;
         }
-        else
-        {
-            if (!LSD_Payload::get('dashboard') && !LSD_Payload::get('add_listing')) return;
-        }
+        else if (!LSD_Payload::get('dashboard') && !LSD_Payload::get('add_listing')) return;
 
-        // No AI Profile
-        if (!(new LSD_AI())->has_profile() || !get_current_user_id()) return;
+        // No AI Profile or Access
+        if (!(new LSD_AI())->has_access(LSD_AI::TASK_CONTENT)) return;
 
         // Editor ID
         $uid = esc_attr($editor_id);

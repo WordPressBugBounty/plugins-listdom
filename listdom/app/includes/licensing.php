@@ -324,6 +324,86 @@ class LSD_Licensing extends LSD_Base
         return (int) ceil($diff / DAY_IN_SECONDS);
     }
 
+    public static function remainingDays(int $expiry, int $installed): array
+    {
+        $now = current_time('timestamp');
+        $total = max(0, $expiry - $installed);
+        $remaining = $expiry - $now;
+
+        // Progress %
+        $progress = $total > 0 ? max(0, min(100, round(($remaining / $total) * 100))) : 0;
+
+        // Remaining days
+        $days_remaining = max(0, (int) ceil($remaining / DAY_IN_SECONDS));
+
+        // Flags
+        $expired = $days_remaining === 0;
+        $expiring = !$expired && $days_remaining <= 30;
+
+        return [
+            'progress' => $progress,
+            'days_remaining' => $days_remaining,
+            'expired' => $expired,
+            'expiring' => $expiring,
+        ];
+    }
+
+    public static function getStatus(string $basename, string $prefix): array
+    {
+        $valid = self::isValid($basename, $prefix);
+        $trial = $valid === 2;
+        $grace = $valid === 3;
+
+        $validation_status = self::validate($basename, $prefix);
+        $installed_at = (int) get_option($prefix . '_installed_at', 0);
+        $installed_date = $installed_at ? date('M j, Y', $installed_at) : '';
+
+        $expiry_time = 0;
+        if (isset($validation_status['expiry_timestamp'])) $expiry_time = (int) $validation_status['expiry_timestamp'];
+        else if (isset($validation_status['expiry'])) $expiry_time = strtotime($validation_status['expiry']);
+
+        $remaining = $expiry_time && $installed_at ? self::remainingDays($expiry_time, $installed_at) : [];
+
+        $expired = $remaining['expired'] ?? false;
+        $expiring = $remaining['expiring'] ?? false;
+        $progress = $remaining['progress'] ?? 100;
+        $days_remaining = $remaining['days_remaining'] ?? 0;
+
+        if ($grace) $progress = 0;
+
+        $valid_license = $valid === 1 && !$expiring && !$expired;
+
+        $badge = self::getBadge($valid_license, $expiring, $expired, $grace);
+        $progress_class = $valid_license ? 'lsd-success' : ($expiring || $grace ? 'lsd-warning' : 'lsd-error');
+
+        return [
+            'valid' => $valid,
+            'trial' => $trial,
+            'grace' => $grace,
+            'validation_status' => $validation_status,
+            'installed_at' => $installed_at,
+            'installed_date' => $installed_date,
+            'expiry_time' => $expiry_time,
+            'expired' => $expired,
+            'expiring' => $expiring,
+            'progress' => $progress,
+            'days_remaining' => $days_remaining,
+            'valid_license' => $valid_license,
+            'badge' => $badge,
+            'progress_class' => $progress_class,
+        ];
+    }
+
+    public static function getBadge(bool $license, bool $expiring, bool $expired, bool $grace): array
+    {
+        if ($license) return ['class' => 'lsd-success', 'icon' => 'lsdi-checkmark-circle', 'text' => esc_html__('Active', 'listdom')];
+        if ($expiring) return ['class' => 'lsd-warning', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expiring', 'listdom')];
+        if ($expired) return ['class' => 'lsd-error', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expired', 'listdom')];
+        if ($grace) return ['class' => 'lsd-warning', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expiring', 'listdom')];
+
+        return ['class' => '', 'icon' => 'lsdi-key', 'text' => esc_html__('Inactive', 'listdom')];
+    }
+
     /**
      * @param string $basename
      * @return void

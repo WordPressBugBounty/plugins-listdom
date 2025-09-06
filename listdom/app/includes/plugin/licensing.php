@@ -35,11 +35,22 @@ class LSD_Plugin_Licensing
     }
 
     /**
-     * @return mixed
+     * @param bool $mask
+     * @return string
      */
-    public function getLicenseKey()
+    public function getLicenseKey(bool $mask = false): string
     {
-        return $this->handler->getLicenseKey();
+        $license_key = (string) $this->handler->getLicenseKey();
+
+        if ($mask && trim($license_key))
+        {
+            $length = strlen($license_key);
+
+            if ($length > 8) $license_key = substr($license_key, 0, 4) . str_repeat('*', min(10, $length - 8)) . substr($license_key, -4);
+            else $license_key = str_repeat('*', $length);
+        }
+
+        return $license_key;
     }
 
     /**

@@ -25,6 +25,10 @@ class LSD_Shortcodes_Auth extends LSD_Base
         add_action('wp_ajax_lsd_forgot_password', [$this, 'forgot_password_request']);
         add_action('wp_ajax_nopriv_lsd_forgot_password', [$this, 'forgot_password_request']);
 
+        // Reset Password
+        add_action('wp_ajax_lsd_reset_password', [$this, 'reset_password_request']);
+        add_action('wp_ajax_nopriv_lsd_reset_password', [$this, 'reset_password_request']);
+
         // Redirect After Logout
         add_action('wp_logout', [$this, 'logout_redirect']);
 
@@ -160,7 +164,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         }
 
         // Attempt to log in
-        $user = wp_signon($credentials, false);
+        $user = wp_signon($credentials, is_ssl());
 
         // Invalid Login
         if (is_wp_error($user)) $this->response(['success' => 0, 'message' => esc_html__('Invalid username or password.', 'listdom')]);
@@ -196,7 +200,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Sanitize form values
         $username = sanitize_text_field($_POST['lsd_username']);
         $email = sanitize_email($_POST['lsd_email']);
-        $password = sanitize_text_field($_POST['lsd_password']);
+        $password = $_POST['lsd_password'];
 
         // Ensure Password Policy is Met
         if (isset($auth['register']['strong_password']) && $auth['register']['strong_password'])
@@ -287,6 +291,46 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $this->response([
             'success' => 0,
             'message' => esc_html__('Forgot password email could not be sent.', 'listdom'),
+        ]);
+    }
+
+    public function reset_password_request()
+    {
+        // Check for nonce security
+        if (!isset($_POST['lsd_reset_password_nonce']) || !wp_verify_nonce($_POST['lsd_reset_password_nonce'], 'lsd_reset_password_nonce')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
+
+        // Required fields
+        if (!isset($_POST['password']) || !isset($_POST['password_confirmation']) || !trim($_POST['password']) || !trim($_POST['password_confirmation'])) $this->response(['success' => 0, 'message' => esc_html__('Password is required.', 'listdom')]);
+
+        $password = $_POST['password'];
+        $password_confirmation = $_POST['password_confirmation'];
+
+        // Password length
+        if (strlen($password) < 6) $this->response(['success' => 0, 'message' => esc_html__("Password is too short! It should be at least 6 characters.", 'listdom')]);
+
+        // Password confirmation
+        if ($password !== $password_confirmation) $this->response(['success' => 0, 'message' => esc_html__("Password does not match its confirmation.", 'listdom')]);
+
+        $login = isset($_POST['user_login']) ? sanitize_user($_POST['user_login']) : '';
+        $key = isset($_POST['reset_key']) ? sanitize_text_field($_POST['reset_key']) : '';
+
+        // Validate reset key
+        $user = check_password_reset_key($key, $login);
+        if ($user instanceof WP_Error) $this->response(['success' => 0, 'message' => esc_html__('This password reset link is invalid or has expired.', 'listdom')]);
+
+        // Reset password
+        reset_password($user, $password);
+
+        // Trigger Action
+        do_action('lsd_user_password_reset', $user->ID);
+
+        // Redirect URL
+        $redirect_url = $this->get_login_url();
+
+        $this->response([
+            'success' => 1,
+            'message' => esc_html__('Your password has been reset.', 'listdom'),
+            'redirect' => $redirect_url,
         ]);
     }
 
@@ -428,8 +472,30 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Forgot Password Page Redirect
         if ($this->option('forgot_password_form') && !$this->option('hide_forgot_password_form') && isset($_GET['action']) && $_GET['action'] === 'lostpassword')
         {
-            wp_redirect($this->get_forgot_url($_GET['redirect_to'] ?? ''));
-            exit;
+            $url = $this->get_forgot_url($_GET['redirect_to'] ?? '');
+            if (trim($url))
+            {
+                wp_redirect($url);
+                exit;
+            }
+        }
+
+        // Reset Password Page Redirect
+        if ($this->option('forgot_password_form') && !$this->option('hide_forgot_password_form') && isset($_GET['action']) && in_array($_GET['action'], ['rp', 'resetpass'], true))
+        {
+            $url = $this->get_forgot_url($_GET['redirect_to'] ?? '');
+
+            if (trim($url))
+            {
+                $url = add_query_arg([
+                    'action' => sanitize_text_field($_GET['action']),
+                    'key' => sanitize_text_field($_GET['key'] ?? ''),
+                    'login' => sanitize_user($_GET['login'] ?? ''),
+                ], $url);
+
+                wp_redirect($url);
+                exit;
+            }
         }
     }
 
@@ -448,7 +514,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
                 foreach ((array) $user->roles as $role)
                 {
                     $role_key = 'redirect_' . $role;
-                    if ($auth[$section][$role_key] == 1)
+                    if (($auth[$section][$role_key] ?? 0) == 1)
                     {
                         $page_id = $auth[$section][$role]['redirect'] ?? $page_id;
                         break;

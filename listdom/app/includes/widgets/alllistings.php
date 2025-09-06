@@ -64,7 +64,7 @@ class LSD_Widgets_Alllistings extends WP_Widget
 
         echo '<p class="lsd-widget-row">
             <label for="' . $this->get_field_id('title') . '">' . esc_html__('Title', 'listdom') . '</label>
-            <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '" />
+            <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '">
         </p>';
 
         echo '<p class="lsd-widget-row">
@@ -100,7 +100,7 @@ class LSD_Widgets_Alllistings extends WP_Widget
 
         echo '<p class="lsd-widget-row">
             <label for="' . $this->get_field_id('limit') . '">' . esc_html__('Limit', 'listdom') . '</label>
-            <input class="widefat" type="number" id="' . $this->get_field_id('limit') . '" name="' . $this->get_field_name('limit') . '" value="' . (isset($instance['limit']) ? esc_attr($instance['limit']) : '') . '" />
+            <input class="widefat" type="number" id="' . $this->get_field_id('limit') . '" name="' . $this->get_field_name('limit') . '" value="' . (isset($instance['limit']) ? esc_attr($instance['limit']) : '') . '">
         </p>';
 
         echo '</div>';
@@ -113,7 +113,7 @@ class LSD_Widgets_Alllistings extends WP_Widget
         $instance['map_provider'] = isset($new_instance['map_provider']) ? sanitize_text_field($new_instance['map_provider']) : 'leaflet';
         $instance['style'] = isset($new_instance['style']) ? sanitize_text_field($new_instance['style']) : '';
         $instance['clustering'] = isset($new_instance['clustering']) ? (int) $new_instance['clustering'] : 1;
-        $instance['limit'] = (isset($new_instance['limit']) and is_numeric($new_instance['limit']) and $new_instance['limit'] > 0) ? $new_instance['limit'] : 300;
+        $instance['limit'] = isset($new_instance['limit']) && is_numeric($new_instance['limit']) && $new_instance['limit'] > 0 ? $new_instance['limit'] : 300;
 
         return $instance;
     }

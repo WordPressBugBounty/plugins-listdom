@@ -10,9 +10,10 @@ class Addon extends Base
         $this->options = \LSD_Options::addons('visibility');
     }
 
-    public function form()
+    public function form($default)
     {
-        $this->include_html_file('form.php');
+        $subtab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : $default;
+        $this->include_html_file('form.php', ['parameters' => compact('subtab')]);
     }
 
     public function cron()

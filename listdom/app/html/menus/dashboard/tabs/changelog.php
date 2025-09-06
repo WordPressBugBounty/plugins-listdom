@@ -3,6 +3,39 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.7.0 <span>September 5th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[Pro] Added a Gallery skin.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added Gemini 2.5 Flash and Gemini 2.5 Flash Lite to the Listdom AI models.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added Anthropic Claude Sonnet 4 and Anthropic Claude Haiku 3.5 to the Listdom AI models.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Introduced AI module configuration options.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added new icons to the Listdom icon picker field.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Rebuilt the Import/Export, Add-ons, and Licenses menus in the Listdom backend.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved the Listdom settings, shortcode builder, and other backend interfaces.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Enhanced the Listdom customizer by adding new controls and a unit selector.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed a login issue in the Listdom login shortcode.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed several minor UI display issues throughout the plugin.', 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v4.6.0 <span>August 16th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>

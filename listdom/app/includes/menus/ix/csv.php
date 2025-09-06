@@ -96,19 +96,31 @@ class LSD_Menus_IX_CSV extends LSD_Base
         // Unlimited Time Needed!
         set_time_limit(0);
 
-        // Save as Template
-        if (isset($ix['template']) && trim($ix['template']))
+        // Offset & Limit
+        $offset = $ix['offset'] ?? 0;
+        $limit = $ix['size'] ?? 20;
+
+        $templates = '';
+        $dropdown = '';
+
+        if (isset($ix['template']) && trim($ix['template']) && $offset == 0)
         {
             $template = new LSD_IX_Templates_CSV();
             $template->upsert([
                 'name' => $ix['template'],
                 'fields' => $ix['mapping'],
             ]);
-        }
 
-        // Offset & Limit
-        $offset = $ix['offset'] ?? 0;
-        $limit = $ix['size'] ?? 20;
+            // Updated templates list
+            $templates = $template->manage('lsd_csv_template_remove');
+
+            // Updated dropdown
+            $dropdown = $template->dropdown([
+                'id' => 'lsd_ix_csv_auto_import_mapping',
+                'name' => 'ix[mapping]',
+                'show_empty' => true,
+            ]);
+        }
 
         $csv = new LSD_IX_CSV();
         [$count] = $csv->import_by_mapping($path, $ix['mapping'], $offset, $limit);
@@ -137,6 +149,8 @@ class LSD_Menus_IX_CSV extends LSD_Base
             'success' => 1,
             'done' => $done,
             'message' => $message,
+            'templates' => $templates,
+            'dropdown' => $dropdown,
         ]);
     }
 
@@ -222,8 +236,26 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
         // Template Library
         $tpl = new LSD_IX_Templates_CSV();
+
+        // Jobs Library
+        $job = new LSD_IX_Jobs_CSV();
+        $jobs = $job->all();
+        $removed_jobs = [];
+
+        foreach ($jobs as $job_key => $job_item)
+        {
+            $mapping = $job_item['mapping'] ?? [];
+            if (!is_array($mapping)) $mapping = [$mapping];
+
+            if (in_array($key, $mapping))
+            {
+                $job->remove($job_key);
+                $removed_jobs[] = $job_key;
+            }
+        }
+
         $tpl->remove($key);
 
-        $this->response(['success' => 1]);
+        $this->response(['success' => 1, 'jobs' => $removed_jobs]);
     }
 }

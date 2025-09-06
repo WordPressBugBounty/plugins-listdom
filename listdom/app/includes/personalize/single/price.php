@@ -48,8 +48,8 @@ class LSD_Personalize_Single_Price extends LSD_Personalize_Single
             'family' => sanitize_text_field($normal['typography']['family']),
             'weight' => sanitize_text_field($normal['typography']['weight']),
             'align' => sanitize_text_field($normal['typography']['align']),
-            'size' => sanitize_text_field($normal['typography']['size']) . 'px',
-            'line_height' => sanitize_text_field($normal['typography']['line_height']) . 'px',
+            'size' => self::unit_number($normal['typography']['size']),
+            'line_height' => self::unit_number($normal['typography']['line_height']),
         ];
     }
 

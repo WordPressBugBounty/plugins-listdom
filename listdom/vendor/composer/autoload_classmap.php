@@ -568,6 +568,7 @@ return array(
     'Webilia\\WP\\Date' => $vendorDir . '/webilia/wp/src/Date.php',
     'Webilia\\WP\\DateTime' => $vendorDir . '/webilia/wp/src/DateTime.php',
     'Webilia\\WP\\Db' => $vendorDir . '/webilia/wp/src/Db.php',
+    'Webilia\\WP\\EmailSubscription' => $vendorDir . '/webilia/wp/src/EmailSubscription.php',
     'Webilia\\WP\\Entities\\Post' => $vendorDir . '/webilia/wp/src/Entities/Post.php',
     'Webilia\\WP\\Entities\\Term' => $vendorDir . '/webilia/wp/src/Entities/Term.php',
     'Webilia\\WP\\Entities\\User' => $vendorDir . '/webilia/wp/src/Entities/User.php',

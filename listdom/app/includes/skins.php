@@ -102,6 +102,7 @@ class LSD_Skins extends LSD_Base
         (new LSD_Skins_Masonry())->init();
         (new LSD_Skins_Accordion())->init();
         (new LSD_Skins_Mosaic())->init();
+        (new LSD_Skins_Gallery())->init();
     }
 
     public function start($atts)
@@ -778,6 +779,7 @@ class LSD_Skins extends LSD_Base
             'side' => esc_html__('Side by Side View', 'listdom'),
             'accordion' => esc_html__('Accordion View', 'listdom'),
             'mosaic' => esc_html__('Mosaic View', 'listdom'),
+            'gallery' => esc_html__('Gallery View', 'listdom'),
         ]);
 
         if (!LSD_Components::map()) unset($skins['singlemap'], $skins['halfmap']);
@@ -902,7 +904,7 @@ class LSD_Skins extends LSD_Base
         if (!$this->map_component) return '';
 
         return lsd_map($this->search([
-            'posts_per_page' => $limit ?: $this->skin_options['maplimit'],
+            'posts_per_page' => $limit ?? ($this->skin_options['maplimit'] ?? -1),
             'paged' => 1,
         ]), [
             'provider' => $this->map_provider,

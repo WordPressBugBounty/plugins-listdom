@@ -36,7 +36,7 @@ class LSD_Walker_Taxonomy extends Walker_Category_Checklist
             $output .= "\n<li id='{$taxonomy}-{$category->term_id}'$class>" .
                 '<label class="selectit"><input value="' . esc_attr($category->term_id) . '" type="checkbox" name="' . esc_attr($name) . '[]" id="in-' . esc_attr($taxonomy . '-' . $category->term_id) . '"' .
                 checked(in_array($category->term_id, $args['selected_cats']), true, false) .
-                disabled(empty($args['disabled']), false, false) . ' /> ' .
+                disabled(empty($args['disabled']), false, false) . '> ' .
                 esc_html(apply_filters('the_category', $category->name)) . '</label>';
         }
     }

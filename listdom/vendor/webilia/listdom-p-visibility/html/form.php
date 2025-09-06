@@ -1,10 +1,11 @@
 <?php
 // no direct access
 defined('ABSPATH') || die();
+/** @var string $subtab */
 
 $visibility = LSD_Options::addons('visibility');
 ?>
-<div id="lsd_panel_addons_visibility" class="lsd-tab-content">
+<div id="lsd_panel_addons_visibility" class="lsd-tab-content<?php echo $subtab === 'visibility' ? ' lsd-tab-content-active' : ''; ?>"<?php echo $subtab === 'visibility' ? '' : ' hidden'; ?>>
     <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Listing Visibility', 'listdom-visibility'); ?></h3>
     <div class="lsd-settings-group-wrapper">
         <div class="lsd-settings-fields-wrapper">

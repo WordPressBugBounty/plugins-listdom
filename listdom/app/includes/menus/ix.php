@@ -2,6 +2,8 @@
 
 class LSD_Menus_IX extends LSD_Menus
 {
+    public $subtab;
+
     public function __construct()
     {
         // Initialize the menu
@@ -28,6 +30,7 @@ class LSD_Menus_IX extends LSD_Menus
     {
         // Get the current tab
         $this->tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'csv';
+        $this->subtab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : 'import';
 
         // Generate output
         $this->include_html_file('menus/ix/tpl.php');

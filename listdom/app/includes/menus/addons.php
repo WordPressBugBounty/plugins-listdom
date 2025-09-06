@@ -50,4 +50,54 @@ class LSD_Menus_Addons extends LSD_Menus
 
         return [$installed, $others];
     }
+
+    public function get_type_descriptions(): array
+    {
+        return [
+            'addon' => esc_html__('Listdom has the most complete set of addons for listing directory industry. Use these addons to achieve what you want.', 'listdom'),
+            'toolkit' => esc_html__('Toolkits are used to use Listdom demos without activating several addons.', 'listdom'),
+            'app' => esc_html__('Apps are advanced directory solutions designated for those who aim for big targets.', 'listdom'),
+        ];
+    }
+
+    public function get_type_label(string $type): string
+    {
+        if ($type === 'toolkit') return esc_html__('Toolkits', 'listdom');
+        if ($type === 'app') return esc_html__('Apps', 'listdom');
+
+        return esc_html__('Addons', 'listdom');
+    }
+
+    public function get_download_labels(): array
+    {
+        return [
+            'addon' => esc_html__('Get This Addon', 'listdom'),
+            'toolkit' => esc_html__('Get This Toolkit', 'listdom'),
+            'app' => esc_html__('Get This App', 'listdom'),
+        ];
+    }
+
+    public function get_badge(string $status): array
+    {
+        return $status === 'installed'
+            ? ['class' => 'lsd-success', 'icon' => 'lsdi-checkmark-circle', 'text' => esc_html__('Installed', 'listdom')]
+            : ['class' => '', 'icon' => 'lsdi-alert', 'text' => esc_html__('Not Installed', 'listdom')];
+    }
+
+    public function get_grouped_addons(): array
+    {
+        [$installed, $others] = $this->get();
+
+        $grouped = [];
+        foreach (['installed' => $installed ?? [], 'available' => $others ?? []] as $status => $addons)
+        {
+            foreach ($addons as $addon)
+            {
+                $addon->status = $status;
+                $grouped[$addon->type][] = $addon;
+            }
+        }
+
+        return $grouped;
+    }
 }

@@ -363,7 +363,14 @@ class LSD_Options extends LSD_Base
 
             case 'ai':
 
-                $defaults = ['profiles' => []];
+                $defaults = [
+                    'profiles' => [],
+                    'modules' => [
+                        'working_hours' => ['access' => ['administrator']],
+                        'content_generation' => ['access' => ['administrator']],
+                        'auto_mapping' => ['access' => ['administrator']],
+                    ],
+                ];
                 break;
 
             case 'auth':
@@ -464,6 +471,7 @@ class LSD_Options extends LSD_Base
                     'currency_position' => 'before',
                     'timepicker_format' => 24,
                     'listing_link_status' => 1,
+                    'help_improve_listdom' => 0,
                     'address_placeholder' => '123 Main St, Unit X, City, State, Zipcode',
                     'map_provider' => 'leaflet',
                     'map_gps_zl' => 13,

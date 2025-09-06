@@ -83,6 +83,29 @@ class LSD_Personalize extends LSD_Base
         );
     }
 
+    protected static function unit_number($data, string $fallback = 'px', string $empty = ''): string
+    {
+        if (is_array($data))
+        {
+            $value = $data['value'] ?? '';
+            $unit = $data['unit'] ?? $fallback;
+        }
+        else
+        {
+            $value = $data;
+            $unit = $fallback;
+        }
+
+        $value = trim(sanitize_text_field($value));
+        if ($value === '') return $empty;
+
+        $unit = sanitize_text_field($unit);
+        $allowed = ['px', 'em', 'rem', '%'];
+        if (!in_array($unit, $allowed)) $unit = $fallback;
+
+        return $value . $unit;
+    }
+
     protected static function font_family(string $family = ''): string
     {
         return trim($family) && $family !== 'inherit' ? '"' . ucfirst($family) . '", Arial, monospace' : 'inherit';

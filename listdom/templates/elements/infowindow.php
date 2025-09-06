@@ -8,7 +8,7 @@ defined('ABSPATH') || die();
 $availability = $this->listing->get_availability(true);
 ?>
 <div class="lsd-infowindow-wrapper lsd-infowindow-style1">
-    <div class="lsd-infowindow-container lsd-font-m lsd-color-m-brd <?php echo ($this->listing->is_shape() ? 'lsd-shape' : ''); ?>">
+    <div class="lsd-infowindow-container lsd-font-m lsd-color-m-brd <?php echo $this->listing->is_shape() ? 'lsd-shape' : ''; ?>">
         
 		<div class="lsd-listing-image">
             <?php echo LSD_Kses::element($this->listing->get_cover_image([300, 160])); ?>

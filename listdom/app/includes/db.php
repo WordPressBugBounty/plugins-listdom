@@ -140,7 +140,10 @@ class LSD_db extends LSD_Base
         // Get WordPress DB object
         $wpdb = $this->get_DBO();
 
+        $query = str_replace('#__users', $wpdb->base_prefix . 'users', $query);
+        $query = str_replace('#__usermeta', $wpdb->base_prefix . 'usermeta', $query);
         $query = str_replace('#__blogs', $wpdb->base_prefix . 'blogs', $query);
+
         return str_replace('#__', $wpdb->prefix, $query);
     }
 

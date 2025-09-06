@@ -55,7 +55,7 @@ $ids = $this->listings;
                     <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
                         <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
                         <?php if ($this->display_is_claimed): ?>
-                            <?php echo ($listing->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="'.esc_attr__('Verified', 'listdom').'"></i>' : ''); ?>
+                            <?php echo $listing->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="'.esc_attr__('Verified', 'listdom').'"></i>' : ''; ?>
                         <?php endif; ?>
                     </h3>
                 <?php endif; ?>

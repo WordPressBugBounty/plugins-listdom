@@ -67,7 +67,7 @@ if (!is_array($raw)) $raw = [];
                     {
                         $saved_value = trim((string) get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true));
 
-                        echo '<div class="lsd-attribute-radio">';
+                        echo '<div class="lsd-attribute-radio" data-required-message="' . esc_attr__('Please select at least one option.', 'listdom') . '" data-required="' . esc_attr($required) . '">';
 
                         $r = 0;
                         foreach ($options as $opt => $option)
@@ -75,9 +75,7 @@ if (!is_array($raw)) $raw = [];
                             $r++;
 
                             $is_checked = $saved_value === trim((string) $opt);
-                            $attributes = [
-                                'data-required' => $required,
-                            ];
+                            $attributes = [];
                             if ($saved_value === trim((string) $opt)) $attributes['checked'] = true;
 
                             echo '<div>';

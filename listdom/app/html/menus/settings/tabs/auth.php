@@ -10,7 +10,7 @@ $settings = LSD_Options::settings();
 ?>
 <div class="lsd-auth-wrap">
     <form id="lsd_auth_form">
-        <div id="lsd_panel_auth_authentication" class="lsd-auth-form-group lsd-tab-content<?php echo ($this->subtab === 'authentication' || !$this->subtab) ? ' lsd-tab-content-active' : ''; ?>">
+        <div id="lsd_panel_auth_authentication" class="lsd-auth-form-group lsd-tab-content<?php echo $this->subtab === 'authentication' || !$this->subtab ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Authentication', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
@@ -21,7 +21,7 @@ $settings = LSD_Options::settings();
                 </div>
 
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Labels', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Labels', 'listdom'); ?></h3>
                     <div id="lsd-tabs-labels">
                         <div class="lsd-form-row">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
@@ -67,56 +67,57 @@ $settings = LSD_Options::settings();
                     </div>
 
                     <div id="lsd-links-labels">
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-2"><?php echo LSD_Form::label([
-                            'title' => esc_html__('Login Link', 'listdom'),
-                            'for' => 'lsd_auth_login_link_label',
-                        ]); ?></div>
-                        <div class="lsd-col-4">
-                            <?php echo LSD_Form::text([
-                                'id' => 'lsd_auth_login_link_label',
-                                'name' => 'lsd[auth][login_link_label]',
-                                'value' => $auth['auth']['login_link_label'],
-                            ]); ?>
-                        </div>
-                    </div>
-
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-2"><?php echo LSD_Form::label([
-                            'title' => esc_html__('Register Link', 'listdom'),
-                            'for' => 'lsd_auth_register_link_label',
-                        ]); ?></div>
-                        <div class="lsd-col-4">
-                            <?php echo LSD_Form::text([
-                                'id' => 'lsd_auth_register_link_label',
-                                'name' => 'lsd[auth][register_link_label]',
-                                'value' => $auth['auth']['register_link_label'],
-                            ]); ?>
-                        </div>
-                    </div>
-
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-2"><?php echo LSD_Form::label([
-                            'title' => esc_html__('Forgot Password Link', 'listdom'),
-                            'for' => 'lsd_auth_forgot_password_link_label',
-                        ]); ?></div>
-                        <div class="lsd-col-4">
-                            <?php echo LSD_Form::text([
-                                'id' => 'lsd_auth_forgot_password_link_label',
-                                'name' => 'lsd[auth][forgot_password_link_label]',
-                                'value' => $auth['auth']['forgot_password_link_label']
-                            ]); ?>
-                        </div>
-                    </div>
-                </div>
-                </div>
-                <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Forms', 'listdom'); ?></h3>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-2"><?php echo LSD_Form::label([
-                                'title' => esc_html__('Form Switcher', 'listdom'),
-                                'for' => 'lsd_auth_switch_style',
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                'title' => esc_html__('Login Link', 'listdom'),
+                                'for' => 'lsd_auth_login_link_label',
                             ]); ?></div>
+                            <div class="lsd-col-4">
+                                <?php echo LSD_Form::text([
+                                    'id' => 'lsd_auth_login_link_label',
+                                    'name' => 'lsd[auth][login_link_label]',
+                                    'value' => $auth['auth']['login_link_label'],
+                                ]); ?>
+                            </div>
+                        </div>
+
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                'title' => esc_html__('Register Link', 'listdom'),
+                                'for' => 'lsd_auth_register_link_label',
+                            ]); ?></div>
+                            <div class="lsd-col-4">
+                                <?php echo LSD_Form::text([
+                                    'id' => 'lsd_auth_register_link_label',
+                                    'name' => 'lsd[auth][register_link_label]',
+                                    'value' => $auth['auth']['register_link_label'],
+                                ]); ?>
+                            </div>
+                        </div>
+
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-2"><?php echo LSD_Form::label([
+                                'title' => esc_html__('Forgot Password Link', 'listdom'),
+                                'for' => 'lsd_auth_forgot_password_link_label',
+                            ]); ?></div>
+                            <div class="lsd-col-4">
+                                <?php echo LSD_Form::text([
+                                    'id' => 'lsd_auth_forgot_password_link_label',
+                                    'name' => 'lsd[auth][forgot_password_link_label]',
+                                    'value' => $auth['auth']['forgot_password_link_label']
+                                ]); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lsd-settings-fields-wrapper">
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Forms', 'listdom'); ?></h3>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-2"><?php echo LSD_Form::label([
+                            'title' => esc_html__('Form Switcher', 'listdom'),
+                            'for' => 'lsd_auth_switch_style',
+                        ]); ?></div>
                         <div class="lsd-col-4">
                             <?php echo LSD_Form::select([
                                 'id' => 'lsd_auth_switch_style',
@@ -176,8 +177,10 @@ $settings = LSD_Options::settings();
                 </div>
                 <div class="lsd-settings-fields-wrapper">
 
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Change Default Pages', 'listdom'); ?></h3>
-                    <p class="description lsd-mb-4"><?php echo esc_html__('Select the desired login, registration, and forgot password pages. These changes will apply site-wide.', 'listdom'); ?></p>
+                    <div>
+                        <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Change Default Pages', 'listdom'); ?></h3>
+                        <p class="description lsd-my-0"><?php echo esc_html__('Select the desired login, registration, and forgot password pages. These changes will apply site-wide.', 'listdom'); ?></p>
+                    </div>
 
                     <div class="lsd-default-forms <?php echo $auth['auth']['hide_login_form'] ? 'lsd-util-hide' : ''; ?>" id="lsd-login-default-form">
                         <div class="lsd-form-row">
@@ -194,7 +197,7 @@ $settings = LSD_Options::settings();
                                 ]); ?>
                             </div>
                         </div>
-                        <div id="lsd_login_page_select" class="lsd-form-row lsd-mb-4 <?php echo $auth['auth']['login_form'] ? '' : 'lsd-util-hide'; ?>">
+                        <div id="lsd_login_page_select" class="lsd-form-row <?php echo $auth['auth']['login_form'] ? '' : 'lsd-util-hide'; ?>">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
                                 'title' => esc_html__('Login Page', 'listdom'),
                                 'for' => 'lsd_auth_login_page',
@@ -225,7 +228,7 @@ $settings = LSD_Options::settings();
                                 ]); ?>
                             </div>
                         </div>
-                        <div id="lsd_register_page_select" class="lsd-form-row lsd-mb-4 <?php echo $auth['auth']['register_form'] ? '' : 'lsd-util-hide'; ?>">
+                        <div id="lsd_register_page_select" class="lsd-form-row <?php echo $auth['auth']['register_form'] ? '' : 'lsd-util-hide'; ?>">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
                                 'title' => esc_html__('Register Page', 'listdom'),
                                 'for' => 'lsd_auth_register_page',
@@ -285,7 +288,7 @@ $settings = LSD_Options::settings();
                     <strong>[listdom-login role="listdom_author"]</strong>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Labels', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Labels', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Username', 'listdom'),
@@ -343,7 +346,7 @@ $settings = LSD_Options::settings();
                     </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Placeholders', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Placeholders', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Username', 'listdom'),
@@ -373,7 +376,7 @@ $settings = LSD_Options::settings();
                     </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Redirect', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Redirect', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('After Login Redirect Page', 'listdom'),
@@ -389,9 +392,9 @@ $settings = LSD_Options::settings();
                         </div>
                     </div>
 
-                    <h3 class="lsd-admin-title"><?php esc_html_e('Redirection Per User Role', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Redirection Per User Role', 'listdom'); ?></h3>
                     <?php foreach (LSD_User::roles() as $role => $label): ?>
-                    <div class="lsd-mt-4">
+                    <div class="lsd-mt-0">
                         <div class="lsd-form-row">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
                                 'for' => 'lsd_auth_login_redirect_role_'. $role,
@@ -434,7 +437,7 @@ $settings = LSD_Options::settings();
                     <strong>[listdom-register role="listdom_author"]</strong>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Labels', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Labels', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Username', 'listdom'),
@@ -492,7 +495,7 @@ $settings = LSD_Options::settings();
                     </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Placeholders', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Placeholders', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Username', 'listdom'),
@@ -536,7 +539,7 @@ $settings = LSD_Options::settings();
                     </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Auto Login', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Auto Login', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Auto Login', 'listdom'),
@@ -567,9 +570,9 @@ $settings = LSD_Options::settings();
                         </div>
                     </div>
 
-                    <h3 class="lsd-admin-title"><?php esc_html_e('Auto Login Per User Role', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Auto Login Per User Role', 'listdom'); ?></h3>
                     <?php foreach (LSD_User::roles() as $role => $label): ?>
-                        <div class="lsd-mt-4">
+                        <div class="lsd-mt-0">
                             <div class="lsd-form-row">
                                 <div class="lsd-col-2"><?php echo LSD_Form::label([
                                     'for' => 'lsd_auth_register_redirect_role_'. $role,
@@ -600,7 +603,7 @@ $settings = LSD_Options::settings();
                     <?php endforeach; ?>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Password Policy', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Password Policy', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Strong Password', 'listdom'),
@@ -700,9 +703,9 @@ $settings = LSD_Options::settings();
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Forgot Password', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
-                <p class="description lsd-mb-4"><?php echo sprintf(esc_html__('To use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-forgot-password]</code>'); ?></p>
+                <p class="description lsd-mb-3"><?php echo sprintf(esc_html__('To use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-forgot-password]</code>'); ?></p>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Labels', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Labels', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Email', 'listdom'),
@@ -732,7 +735,7 @@ $settings = LSD_Options::settings();
                     </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Placeholders', 'listdom'); ?></h3>
+                    <h3 class="lsd-admin-title lsd-my-0"><?php esc_html_e('Placeholders', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Email', 'listdom'),
@@ -754,9 +757,9 @@ $settings = LSD_Options::settings();
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Profile & User Directory', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
-                <p class="description lsd-mb-4"><?php echo sprintf(esc_html__('To use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-profile]</code>'); ?></p>
+                <p class="description lsd-mb-3"><?php echo sprintf(esc_html__('To use this options you can put %s shortcode into any page.', 'listdom'), '<code>[listdom-profile]</code>'); ?></p>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('User Profile', 'listdom'); ?></h3>
+                    <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('User Profile', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Profile Page', 'listdom'),
@@ -789,10 +792,12 @@ $settings = LSD_Options::settings();
                     </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('User Directory', 'listdom'); ?></h3>
-                    <p class="description lsd-mb-4"><?php echo sprintf(esc_html__("To use the user directory, you can place the %s shortcode on any page. The shortcode supports both List and Grid styles. Feel free to use one of the following shortcodes:", 'listdom'), '<code>[listdom-users]</code>'); ?></p>
+                    <div>
+                        <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('User Directory', 'listdom'); ?></h3>
+                        <p class="description lsd-mt-1 lsd-mb-0"><?php echo sprintf(esc_html__("To use the user directory, you can place the %s shortcode on any page. The shortcode supports both List and Grid styles. Feel free to use one of the following shortcodes:", 'listdom'), '<code>[listdom-users]</code>'); ?></p>
+                    </div>
                     <ul>
-                        <li class="lsd-mb-2">[listdom-users style="list" limit="24"]</li>
+                        <li>[listdom-users style="list" limit="24"]</li>
                         <li>[listdom-users style="grid" limit="12" columns="3"]</li>
                     </ul>
                 </div>
@@ -815,7 +820,7 @@ $settings = LSD_Options::settings();
                                 'show_empty' => true,
                                 'value' => $auth['logout']['redirect']
                             ]); ?>
-                            <p class="description"><?php esc_html_e("After the user logs out, they will be redirected to the designated page.", 'listdom'); ?></p>
+                            <p class="description lsd-mb-0"><?php esc_html_e("After the user logs out, they will be redirected to the designated page.", 'listdom'); ?></p>
                         </div>
                     </div>
 
@@ -841,12 +846,10 @@ $settings = LSD_Options::settings();
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Block Admin Access', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
-                    <div class="lsd-form-row lsd-mt-0">
-                <div class="lsd-col-12">
-                    <p class="description lsd-mt-0 lsd-mb-5"><?php esc_html_e('You can block WordPress admin access for the following user roles, if needed. Check to block access, or uncheck to allow it.', 'listdom'); ?></p>
+                    <p class="description lsd-my-0"><?php esc_html_e('You can block WordPress admin access for the following user roles, if needed. Check to block access, or uncheck to allow it.', 'listdom'); ?></p>
 
                     <?php foreach (LSD_User::roles() as $role => $label): ?>
-                        <div class="lsd-form-row">
+                        <div class="lsd-form-row lsd-my-0">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
                                 'for' => 'lsd_block_admin_role_'. $role,
                                 'title' => $label
@@ -860,13 +863,11 @@ $settings = LSD_Options::settings();
                     <?php endforeach; ?>
                 </div>
             </div>
-                </div>
-            </div>
         </div>
 
         <?php do_action('lsd_auth_form_general', $auth); ?>
 
-        <div class="lsd-spacer-10"></div>
+        <div class="lsd-spacer-30"></div>
         <div class="lsd-form-row lsd-settings-submit-wrapper">
             <div class="lsd-col-12 lsd-flex lsd-gap-3 lsd-flex-content-end">
                 <?php LSD_Form::nonce('lsd_auth_form'); ?>

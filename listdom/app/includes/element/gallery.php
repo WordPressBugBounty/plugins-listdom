@@ -112,13 +112,13 @@ class LSD_Element_Gallery extends LSD_Element
         <div class="lsd-gallery-element">
             <div class="lsd-gallery-element-style-dependency lsd-gallery-element-style-dependency-linear">
                 <label for="lsd_elements_' . esc_attr($this->key) . '_image_height">' . esc_html__('Image Height (px)', 'listdom') . '</label>
-                <input type="number" id="lsd_elements_' . esc_attr($this->key) . '_image_height" name="lsd[elements][' . esc_attr($this->key) . '][image_height]" value="' . esc_attr($data['image_height'] ?? '300') . '" min="0" step="1" required />
+                <input type="number" id="lsd_elements_' . esc_attr($this->key) . '_image_height" name="lsd[elements][' . esc_attr($this->key) . '][image_height]" value="' . esc_attr($data['image_height'] ?? '300') . '" min="0" step="1" required>
             </div>
         </div>
         <div class="lsd-gallery-element">
             <div class="lsd-gallery-element-style-dependency lsd-gallery-element-style-dependency-linear">
                 <label for="lsd_elements_' . esc_attr($this->key) . '_image_limit">' . esc_html__('Number of Images', 'listdom') . '</label>
-                <input type="number" id="lsd_elements_' . esc_attr($this->key) . '_image_limit" name="lsd[elements][' . esc_attr($this->key) . '][image_limit]" value="' . esc_attr($data['image_limit'] ?? '4') . '" min="1" step="1" />
+                <input type="number" id="lsd_elements_' . esc_attr($this->key) . '_image_limit" name="lsd[elements][' . esc_attr($this->key) . '][image_limit]" value="' . esc_attr($data['image_limit'] ?? '4') . '" min="1" step="1">
             </div>
         </div>
          <div class="lsd-gallery-element">

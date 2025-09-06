@@ -179,7 +179,7 @@ class LSD_Form extends LSD_Base
         $assets->iconpicker();
 
         $options = '';
-        $fonts = LSD_Base::get_font_icons();
+        $fonts = LSD_Icons::get();
 
         foreach ($fonts as $font => $code) $options .= '<option value="' . esc_attr($font) . '" ' . ((isset($args['value']) and $args['value'] == $font) ? 'selected="selected"' : '') . '>' . esc_html($font) . '</option>';
 
@@ -585,7 +585,7 @@ class LSD_Form extends LSD_Base
         $output = '<div class="lsd-autosuggest-wrapper" data-toggle="' . esc_attr($toggle) . '">';
 
         // Input
-        $output .= '<input type="text" id="' . esc_attr($input_id) . '" class="lsd-autosuggest" data-source="' . esc_attr($source) . '" data-name="' . esc_attr($name) . '" data-append="#' . esc_attr($id) . '" data-suggestions="#' . esc_attr($suggestions) . '" data-min-characters="' . esc_attr($min) . '" data-max-items="' . esc_attr($max_items) . '" data-nonce="' . esc_attr($nonce) . '" placeholder="' . esc_attr($placeholder) . '" autocomplete="off">';
+        $output .= '<input type="text" id="' . esc_attr($input_id) . '" class="lsd-autosuggest lsd-admin-input" data-source="' . esc_attr($source) . '" data-name="' . esc_attr($name) . '" data-append="#' . esc_attr($id) . '" data-suggestions="#' . esc_attr($suggestions) . '" data-min-characters="' . esc_attr($min) . '" data-max-items="' . esc_attr($max_items) . '" data-nonce="' . esc_attr($nonce) . '" placeholder="' . esc_attr($placeholder) . '" autocomplete="off">';
 
         // Suggestions Placeholder
         $output .= '<div class="lsd-autosuggest-suggestions" id="' . esc_attr($suggestions) . '"></div>';
@@ -594,7 +594,7 @@ class LSD_Form extends LSD_Base
         $output .= '<div class="lsd-autosuggest-current" id="' . esc_attr($id) . '">' . $current . '</div>';
 
         // Show Help
-        if (trim($description)) $output .= '<p class="description '.$description_class.'">' . esc_html($description) . '</p>';
+        if (trim($description)) $output .= '<p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2 '.$description_class.'">' . esc_html($description) . '</p>';
 
         // Close Wrapper
         $output .= '</div>';
@@ -1008,8 +1008,8 @@ class LSD_Form extends LSD_Base
         $include = isset($args['include']) && is_array($args['include']) ? $args['include'] : [];
         $value = isset($args['value']) && is_array($args['value']) ? $args['value'] : [];
 
-        return '<div class="lsd-typography-wrapper">
-            '.(!$include || in_array('family', $include) ? '<div class="lsd-typography-family-wrapper lsd-flex-2">
+        $row1 = ''
+            . (!$include || in_array('family', $include) ? '<div class="lsd-typography-family-wrapper lsd-flex-2">
                 '.LSD_Form::label([
                     'title' => esc_html__('Font Family', 'listdom'),
                     'for' => $id.'_family'
@@ -1020,8 +1020,8 @@ class LSD_Form extends LSD_Base
                     'value' => $value['family'] ?? 'inherit',
                     'show_inherit' => true,
                 ]).'
-            </div>' : '' ).'
-            '.(!$include || in_array('weight', $include) ? '<div class="lsd-typography-weight-wrapper lsd-flex-2">
+            </div>' : '' )
+            . (!$include || in_array('weight', $include) ? '<div class="lsd-typography-weight-wrapper lsd-flex-2">
                 '.LSD_Form::label([
                     'title' => esc_html__('Font Weight', 'listdom'),
                     'for' => $id.'_weight'
@@ -1043,8 +1043,8 @@ class LSD_Form extends LSD_Base
                     ],
                     'value' => $value['weight'] ?? 'inherit'
                 ]).'
-            </div>' : '' ).'
-            '.(!$include || in_array('align', $include) ? '<div class="lsd-typography-align-wrapper lsd-flex-1">
+            </div>' : '' )
+            . (!$include || in_array('align', $include) ? '<div class="lsd-typography-align-wrapper lsd-flex-1">
                 '.LSD_Form::label([
                     'title' => esc_html__('Text Align', 'listdom'),
                     'for' => $id.'_align'
@@ -1062,42 +1062,73 @@ class LSD_Form extends LSD_Base
                     ],
                     'value' => $value['align'] ?? 'inherit'
                 ]).'
-            </div>' : '' ).'
-            '.(!$include || in_array('size', $include) ? '<div class="lsd-typography-size-wrapper lsd-flex-1">
-                '.LSD_Form::label([
+            </div>' : '' );
+
+        $row2 = ''
+            . (!$include || in_array('size', $include) ? '<div class="lsd-typography-size-wrapper lsd-flex-1">'.
+                LSD_Form::label([
                     'title' => esc_html__('Size', 'listdom'),
-                    'for' => $id.'_size'
+                    'for' => $id.'_size_value'
                 ]).'
-                '.LSD_Form::number([
+                '.LSD_Form::unit_number([
                     'id' => $id.'_size',
                     'name' => $name.'[size]',
-                    'placeholder' => esc_html__('Size', 'listdom'),
-                    'attributes' => [
-                        'min' => 0,
-                        'max' => 80,
-                        'increment' => 1
-                    ],
-                    'value' => $value['size'] ?? ''
+                    'value' => $value['size'] ?? '',
+                    'units' => $args['size_units'] ?? ['px', 'em', 'rem', '%'],
                 ]).'
-            </div>' : '' ).'
-            '.(!$include || in_array('line_height', $include) ? '<div class="lsd-typography-line-height-wrapper lsd-flex-1">
-                '.LSD_Form::label([
+            </div>' : '' )
+            . (!$include || in_array('line_height', $include) ? '<div class="lsd-typography-line-height-wrapper lsd-flex-1">'.
+                LSD_Form::label([
                     'title' => esc_html__('Line Height', 'listdom'),
-                    'for' => $id.'_line_height'
+                    'for' => $id.'_line_height_value'
                 ]).'
-                '.LSD_Form::number([
+                '.LSD_Form::unit_number([
                     'id' => $id.'_line_height',
                     'name' => $name.'[line_height]',
-                    'placeholder' => esc_html__('Line Height', 'listdom'),
-                    'attributes' => [
-                        'min' => 0,
-                        'max' => 120,
-                        'increment' => 1
-                    ],
-                    'value' => $value['line_height'] ?? ''
+                    'value' => $value['line_height'] ?? '',
+                    'units' => $args['line_height_units'] ?? ['px', 'em', 'rem', '%'],
                 ]).'
-            </div>' : '' ).'
-        </div>';
+            </div>' : '' );
+
+        return '<div class="lsd-typography-wrapper">'
+            . ($row1 ? '<div class="lsd-typography-row">' . $row1 . '</div>' : '')
+            . ($row2 ? '<div class="lsd-typography-row">' . $row2 . '</div>' : '')
+            . '</div>';
+    }
+
+    public static function unit_number(array $args)
+    {
+        if (!count($args)) return false;
+
+        $value = $args['value'] ?? [];
+        $number = is_array($value) ? ($value['value'] ?? '') : $value;
+        $unit = is_array($value) && isset($value['unit']) && $value['unit'] ? $value['unit'] : ($args['unit'] ?? 'px');
+        $units = $args['units'] ?? ['px', 'em', 'rem', '%'];
+
+        $id = $args['id'] ?? 'lsd_unit_number';
+        $name = $args['name'] ?? 'unit_number';
+
+        $number_field = self::number([
+            'id' => $id . '_value',
+            'name' => $name . '[value]',
+            'value' => $number,
+            'attributes' => array_merge(
+                ['step' => 'any'],
+                $args['attributes']['number'] ?? []
+            ),
+        ]);
+
+        $unit_field = self::select([
+            'id' => $id . '_unit',
+            'name' => $name . '[unit]',
+            'options' => array_combine($units, $units),
+            'value' => $unit,
+        ]);
+
+        return '<div class="lsd-unit-number-wrapper">'
+            . '<div class="lsd-unit-number-value">' . $number_field . '</div>'
+            . '<div class="lsd-unit-number-unit">' . $unit_field . '</div>'
+            . '</div>';
     }
 
     public static function submit($args = []): string

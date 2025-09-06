@@ -38,9 +38,9 @@ class LSD_Personalize_Forms extends LSD_Personalize
         $CSS = str_replace("((general_form_input_font_family))", self::font_family($normal['typography']['family'] ?? ''), $CSS);
         $CSS = str_replace("((general_form_input_font_weight))", sanitize_text_field($normal['typography']['weight']), $CSS);
         $CSS = str_replace("((general_form_input_text_align))", sanitize_text_field($normal['typography']['align']), $CSS);
-        $CSS = str_replace("((general_form_input_font_size))", sanitize_text_field($normal['typography']['size']) . 'px', $CSS);
+        $CSS = str_replace("((general_form_input_font_size))", self::unit_number($normal['typography']['size']), $CSS);
 
-        return str_replace("((general_form_input_line_height))", sanitize_text_field($normal['typography']['line_height']) . 'px', $CSS);
+        return str_replace("((general_form_input_line_height))", self::unit_number($normal['typography']['line_height']), $CSS);
     }
 
     private static function search(string $CSS): string
@@ -76,9 +76,9 @@ class LSD_Personalize_Forms extends LSD_Personalize
         $CSS = str_replace("((search_form_input_font_family))", self::font_family($normal['typography']['family'] ?? ''), $CSS);
         $CSS = str_replace("((search_form_input_font_weight))", sanitize_text_field($normal['typography']['weight']), $CSS);
         $CSS = str_replace("((search_form_input_text_align))", sanitize_text_field($normal['typography']['align']), $CSS);
-        $CSS = str_replace("((search_form_input_font_size))", sanitize_text_field($normal['typography']['size']) . 'px', $CSS);
+        $CSS = str_replace("((search_form_input_font_size))", self::unit_number($normal['typography']['size']), $CSS);
 
-        return str_replace("((search_form_input_line_height))", sanitize_text_field($normal['typography']['line_height']) . 'px', $CSS);
+        return str_replace("((search_form_input_line_height))", self::unit_number($normal['typography']['line_height']), $CSS);
     }
 
     private static function auth(string $CSS): string
@@ -112,8 +112,8 @@ class LSD_Personalize_Forms extends LSD_Personalize
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_family))', self::font_family($tab['typography']['family'] ?? ''), $CSS);
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_weight))', sanitize_text_field($tab['typography']['weight'] ?: 'inherit'), $CSS);
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_text_align))', sanitize_text_field($tab['typography']['align'] ?: 'inherit'), $CSS);
-            $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_size))', sanitize_text_field($tab['typography']['size'] ? $tab['typography']['size'] . 'px' : 'inherit'), $CSS);
-            $CSS = str_replace('((auth_forms_tabs_' . $state . '_line_height))', sanitize_text_field($tab['typography']['line_height'] ? $tab['typography']['line_height'] . 'px' : 'inherit'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_size))', self::unit_number($tab['typography']['size'] ?? '', 'px', 'inherit'), $CSS);
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_line_height))', self::unit_number($tab['typography']['line_height'] ?? '', 'px', 'inherit'), $CSS);
         }
 
         // Labels
@@ -121,8 +121,8 @@ class LSD_Personalize_Forms extends LSD_Personalize
         $CSS = str_replace('((auth_forms_labels_font_family))', self::font_family($labels['typography']['family'] ?? ''), $CSS);
         $CSS = str_replace('((auth_forms_labels_font_weight))', sanitize_text_field($labels['typography']['weight'] ?: 'inherit'), $CSS);
         $CSS = str_replace('((auth_forms_labels_text_align))', sanitize_text_field($labels['typography']['align'] ?: 'inherit'), $CSS);
-        $CSS = str_replace('((auth_forms_labels_font_size))', sanitize_text_field($labels['typography']['size'] ? $labels['typography']['size'] . 'px' : 'inherit'), $CSS);
+        $CSS = str_replace('((auth_forms_labels_font_size))', self::unit_number($labels['typography']['size'] ?? '', 'px', 'inherit'), $CSS);
 
-        return str_replace('((auth_forms_labels_line_height))', sanitize_text_field($labels['typography']['line_height'] ? $labels['typography']['line_height'] . 'px' : 'inherit'), $CSS);
+        return str_replace('((auth_forms_labels_line_height))', self::unit_number($labels['typography']['line_height'] ?? '', 'px', 'inherit'), $CSS);
     }
 }

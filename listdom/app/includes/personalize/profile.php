@@ -66,8 +66,8 @@ class LSD_Personalize_Profile extends LSD_Personalize
         $CSS = str_replace("(($prefix" . "_font_family))", self::font_family($typography['family'] ?? ''), $CSS);
         $CSS = str_replace("(($prefix" . "_font_weight))", sanitize_text_field($typography['weight'] ?? ''), $CSS);
         $CSS = str_replace("(($prefix" . "_text_align))", sanitize_text_field($typography['align'] ?? ''), $CSS);
-        $CSS = str_replace("(($prefix" . "_font_size))", isset($typography['size']) ? sanitize_text_field($typography['size']) . 'px' : '', $CSS);
-        $CSS = str_replace("(($prefix" . "_line_height))", isset($typography['line_height']) ? sanitize_text_field($typography['line_height']) . 'px' : '', $CSS);
+        $CSS = str_replace("(($prefix" . "_font_size))", isset($typography['size']) ? self::unit_number($typography['size']) : '', $CSS);
+        $CSS = str_replace("(($prefix" . "_line_height))", isset($typography['line_height']) ? self::unit_number($typography['line_height']) : '', $CSS);
 
         if (isset($data['icon_color']))
         {

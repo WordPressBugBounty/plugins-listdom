@@ -18,10 +18,11 @@ class LSD_LifeCycle extends LSD_Base
             self::setBodyStarted(true);
         });
 
-        if (function_exists('wp_is_block_theme') && wp_is_block_theme())
+        add_action('after_setup_theme', function ()
         {
-            self::setBodyStarted(true);
-        }
+            if (function_exists('wp_is_block_theme') && wp_is_block_theme())
+                self::setBodyStarted(true);
+        });
     }
 
     public static function setBodyStarted(bool $status)

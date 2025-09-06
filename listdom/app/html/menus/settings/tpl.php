@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Menus_Settings $this */
 ?>
-<div class="wrap about-wrap lsd-wrap lsd-settings-wrap">
+<div class="wrap lsd-wrap lsd-settings-wrap">
     <?php LSD_Menus::header(esc_html__('Settings', 'listdom')); ?>
 
     <div class="lsd-admin-main-wrapper">

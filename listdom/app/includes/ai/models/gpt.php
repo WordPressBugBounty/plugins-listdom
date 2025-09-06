@@ -1,123 +1,33 @@
 <?php
 
-class LSD_AI_Models_GPT extends LSD_AI_Models_Base
+abstract class LSD_AI_Models_GPT extends LSD_AI_Models_Base
 {
+    use LSD_AI_Tasks_Mapping;
+    use LSD_AI_Tasks_Availability;
+    use LSD_AI_Tasks_Content;
+
     private $url = 'https://api.openai.com/v1/chat/completions';
 
-    public function key(): string
+    private function request(string $prompt, float $temperature = 0.2, string $system = ''): array
     {
-        return '';
-    }
-
-    public function auto_mapping(array $listdom_fields, array $source_fields): array
-    {
-        $listdom_fields_compact = [];
-        foreach ($listdom_fields as $field_key => $listdom_field)
-        {
-            $listdom_fields_compact[$field_key] = [
-                'label' => $listdom_field['label'] ?? '',
-                'type' => $listdom_field['type'] ?? 'text',
-            ];
-        }
-
-        $listdom_fields_json = json_encode($listdom_fields_compact, JSON_PRETTY_PRINT);
-        $source_fields_json = json_encode($source_fields, JSON_PRETTY_PRINT);
-
-        $prompt = 'You are an intelligent field-mapping assistant. Your task is to map Listdom fields to the most appropriate column indices from a provided CSV or Excel file.
-
-        Instructions:
-        - Read both the Listdom fields and the CSV/Excel column titles. Evaluate each column individually, regardless of its position in the file. Do not skip valid columns based on their order.
-        - Always prioritize **exact or very close name matches** (e.g., "name" → "post_title", "city" → "locations").
-        - Ignore any CSV/Excel columns that are empty or unnamed. 
-          In the JSON input, such columns may appear as an empty string (""), null, or whitespace-only. 
-          Do not map these columns to any Listdom field.
-        - Map each Listdom field to the most relevant CSV column index.
-        - Use semantic similarity to guide mappings. For example: 
-          - "name" or "listing name" → "post_title"
-          - "places" or "city" → "locations"
-        - If a clear match cannot be found, exclude that field from the mapping.
-        
-        Inputs:
-        Listdom Fields (JSON):
-        ' . $listdom_fields_json . '
-        
-        CSV/Excel Columns (first row as JSON):
-        ' . $source_fields_json . '
-        
-        Output:
-        Generate a clean JSON object where the key is the Listdom field name and the value is the corresponding CSV column index.
-        Only include fields that have a valid match and are not based on empty or unnamed columns.
-        
-        Example format:
-        {"unique_id":0,"post_title":3,"post_name":5}
-        
-        Return only the JSON object without any explanation or extra text.';
-
-        $response = $this->request([
-            'model' => $this->key(),
-            'messages' => [
-                ['role' => 'user', 'content' => $prompt],
-            ],
-            'temperature' => 0.2,
-        ]);
-
-        if (isset($response['error']) && is_array($response['error']) && count($response['error'])) return [];
-
-        return $this->response($response);
-    }
-
-    public function availability(string $text): array
-    {
-        // General Settings
-        $settings = LSD_Options::settings();
-
-        // Hour Format
-        $hour_format = $settings['timepicker_format'] ?? '24';
-
         // Prompt
-        $prompt = sprintf('Convert the following text that describes weekly working hours into a JSON object.
-        
-        Days are represented by numbers 1 (Monday) to 7 (Sunday).
-        Each day should include "hours" and "off" (1 for closed, 0 otherwise).
-        Times should be based on %s format.
-        Example: {"1":{"hours":"9am-5pm","off":0},"2":{"off":1}}
-        Return only the JSON object without any explanation.', $hour_format);
+        $messages = [
+            ['role' => 'user', 'content' => $prompt]
+        ];
 
-        $response = $this->request([
+        // System Prompt
+        if ($system) $messages[] = [
+            'role' => 'system',
+            'content' => $system,
+        ];
+
+        // Request Body
+        $body = [
             'model' => $this->key(),
-            'messages' => [
-                ['role' => 'user', 'content' => $prompt . "\n\n" . mb_substr($text, 0, 200)],
-            ],
-            'temperature' => 0.2,
-        ]);
+            'temperature' => $temperature,
+            'messages' => $messages,
+        ];
 
-        if (isset($response['error']) && is_array($response['error']) && count($response['error'])) return [];
-
-        return $this->response($response);
-    }
-
-    public function content(string $text): string
-    {
-        $response = $this->request([
-            'model' => $this->key(),
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are an assistant that writes listing descriptions from a short explanation. '
-                        . 'Return only the generated text with no formatting or commentary.',
-                ],
-                ['role' => 'user', 'content' => mb_substr($text, 0, 200)],
-            ],
-            'temperature' => 0.7,
-        ]);
-
-        if (isset($response['error']) && is_array($response['error']) && count($response['error'])) return '';
-
-        return trim($response['choices'][0]['message']['content'] ?? '');
-    }
-
-    private function request(array $request): array
-    {
         // Perform the HTTP POST request
         $response = wp_remote_post($this->url, [
             'method' => 'POST',
@@ -126,7 +36,7 @@ class LSD_AI_Models_GPT extends LSD_AI_Models_Base
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . $this->api_key(),
             ],
-            'body' => json_encode($request),
+            'body' => json_encode($body),
             'data_format' => 'body', // Important: tells WP to send body as raw data
         ]);
 
@@ -157,10 +67,8 @@ class LSD_AI_Models_GPT extends LSD_AI_Models_Base
         return $decoded_response;
     }
 
-    private function response(array $response): ?array
+    protected function string(array $response): string
     {
-        $content = $response['choices'][0]['message']['content'] ?? '';
-
-        return $this->json_extract($content);
+        return $response['choices'][0]['message']['content'] ?? '';
     }
 }

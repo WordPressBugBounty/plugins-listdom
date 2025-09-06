@@ -44,8 +44,8 @@ class LSD_Personalize_Dashboard extends LSD_Personalize
         $CSS = str_replace("((dashboard_font_family))", self::font_family($normal['typography']['family'] ?? ''), $CSS);
         $CSS = str_replace("((dashboard_font_weight))", sanitize_text_field($normal['typography']['weight']), $CSS);
         $CSS = str_replace("((dashboard_text_align))", sanitize_text_field($normal['typography']['align']), $CSS);
-        $CSS = str_replace("((dashboard_font_size))", sanitize_text_field($normal['typography']['size']) . 'px', $CSS);
+        $CSS = str_replace("((dashboard_font_size))", self::unit_number($normal['typography']['size']), $CSS);
 
-        return str_replace("((dashboard_line_height))", sanitize_text_field($normal['typography']['line_height']) . 'px', $CSS);
+        return str_replace("((dashboard_line_height))", self::unit_number($normal['typography']['line_height']), $CSS);
     }
 }

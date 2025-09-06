@@ -1,6 +1,6 @@
 <?php
 
-class LSD_AI_Models_Base
+abstract class LSD_AI_Models_Base
 {
     private $api_key;
 
@@ -14,7 +14,7 @@ class LSD_AI_Models_Base
         return $this->api_key;
     }
 
-    public function json_extract(string $text): ?array
+    public function json_extract(string $text): array
     {
         // Try to find the start of a JSON object or array
         $start_json_object = strpos($text, '{');
@@ -56,5 +56,12 @@ class LSD_AI_Models_Base
         }
 
         return []; // No valid JSON found
+    }
+
+    protected function response(array $response): array
+    {
+        return $this->json_extract(
+            $this->string($response)
+        );
     }
 }

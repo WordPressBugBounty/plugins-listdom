@@ -358,7 +358,7 @@ if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::clas
                 </div>
             </div>
         </div>
-        <div class="lsd-spacer-10"></div>
+        <div class="lsd-spacer-30"></div>
         <div class="lsd-form-row lsd-settings-submit-wrapper">
 			<div class="lsd-col-12 lsd-flex lsd-gap-3 lsd-flex-content-end">
 				<?php LSD_Form::nonce('lsd_settings_form'); ?>

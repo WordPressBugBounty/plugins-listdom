@@ -26,7 +26,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
 ?>
 <div class="lsd-settings-wrap" id="lsd_settings_frontend_dashboard">
     <form id="lsd_settings_form">
-        <div id="lsd_panel_frontend-dashboard_pages" class="lsd-settings-form-group lsd-tab-content<?php echo ($this->subtab === 'pages' || !$this->subtab) ? ' lsd-tab-content-active' : ''; ?>">
+        <div id="lsd_panel_frontend-dashboard_pages" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'pages' || !$this->subtab ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Pages', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
@@ -42,7 +42,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                 'name' => 'lsd[submission_page]',
                                 'show_empty' => true,
                             ]); ?>
-                            <p class="description"><?php echo sprintf(esc_html__("Put %s shortcode into the page.", 'listdom'), '<code>[listdom-dashboard]</code>'); ?></p>
+                            <p class="description lsd-mb-0"><?php echo sprintf(esc_html__("Put %s shortcode into the page.", 'listdom'), '<code>[listdom-dashboard]</code>'); ?></p>
                         </div>
                     </div>
                     <div class="lsd-form-row">
@@ -109,7 +109,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                     $icon = $menu['icon'] ?? 'fas fa-tachometer-alt';
                                     $id = $menu['id'] ?? 'lsd_dashboard_menus_' . $key;
 
-                                    echo '<li id="' . esc_attr($id) . '"><p><i class="lsd-icon ' . esc_attr($icon) . '"></i><span>' . esc_html($menu['label']) . '</span></p><input type="hidden" name="lsd[dashboard_menus][]" value="' . esc_attr($id) . '"/></li>';
+                                    echo '<li id="' . esc_attr($id) . '"><p><i class="lsd-icon ' . esc_attr($icon) . '"></i><span>' . esc_html($menu['label']) . '</span></p><input type="hidden" name="lsd[dashboard_menus][]" value="' . esc_attr($id) . '"></li>';
                                 }
 
                                 foreach ($custom_menus as $menu):
@@ -191,7 +191,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                 <div class="lsd-settings-fields-wrapper">
 
                     <?php if ($this->isLite()): ?>
-                        <div class="lsd-alert lsd-warning lsd-mt-0 lsd-mb-4">
+                        <div class="lsd-alert lsd-warning lsd-my-0">
                             <?php echo LSD_Base::missFeatureMessage(esc_html__('Guest Submission', 'listdom')); ?>
                         </div>
                     <?php endif; ?>
@@ -209,11 +209,11 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                 'toggle' => '#lsd_settings_submission_guest_options',
                                 'toggle2' => '#lsd_settings_submission_non_guest_options',
                             ]); ?>
-                            <p class="description lsd-mb-2"><?php esc_html_e("Enable listing submission for guest users!", 'listdom'); ?></p>
+                            <p class="description lsd-mb-0"><?php esc_html_e("Enable listing submission for guest users!", 'listdom'); ?></p>
                         </div>
                     </div>
-                    <div id="lsd_settings_submission_guest_options" class="lsd-mt-3 <?php echo isset($settings['submission_guest']) && $settings['submission_guest'] ? '' : 'lsd-util-hide'; ?>">
-                        <div class="lsd-form-row">
+                    <div id="lsd_settings_submission_guest_options" class="<?php echo isset($settings['submission_guest']) && $settings['submission_guest'] ? '' : 'lsd-util-hide'; ?>">
+                        <div class="lsd-form-row lsd-my-0">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
                                 'title' => esc_html__('User Registration', 'listdom'),
                                 'for' => 'lsd_settings_submission_guest_registration',
@@ -232,8 +232,8 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                             </div>
                         </div>
                     </div>
-                    <div id="lsd_settings_submission_non_guest_options" class="lsd-mt-3 <?php echo !isset($settings['submission_guest']) || !$settings['submission_guest'] ? '' : 'lsd-util-hide'; ?>">
-                        <div class="lsd-form-row">
+                    <div id="lsd_settings_submission_non_guest_options" class="<?php echo !isset($settings['submission_guest']) || !$settings['submission_guest'] ? '' : 'lsd-util-hide'; ?>">
+                        <div class="lsd-form-row lsd-my-0">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
                                 'title' => esc_html__('Redirect to Login', 'listdom'),
                                 'for' => 'lsd_settings_submission_guest_redirect',
@@ -256,9 +256,9 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Fields', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Field Method', 'listdom'); ?></h3>
+                    <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Field Method', 'listdom'); ?></h3>
                     <?php foreach ([LSD_Base::TAX_LOCATION => esc_html__('Locations'), LSD_Base::TAX_FEATURE => esc_html__('Features')] as $tax => $label): ?>
-                        <div class="lsd-form-row">
+                        <div class="lsd-form-row lsd-my-0">
                             <div class="lsd-col-2"><?php echo LSD_Form::label([
                                 'title' => esc_html__($label, 'listdom'),
                                 'for' => 'lsd_settings_tax_' . $tax . '_method',
@@ -276,7 +276,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                             </div>
                         </div>
                     <?php endforeach; ?>
-                    <div class="lsd-form-row">
+                    <div class="lsd-form-row lsd-my-0">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Tags', 'listdom'),
                             'for' => 'lsd_settings_tax_' . LSD_Base::TAX_TAG . '_method',
@@ -294,7 +294,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                             ]); ?>
                         </div>
                     </div>
-                    <div class="lsd-form-row">
+                    <div class="lsd-form-row lsd-my-0">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__('Gallery Method', 'listdom'),
                             'for' => 'lsd_settings_submission_gallery_method',
@@ -313,8 +313,11 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                     </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Terms Builder', 'listdom'); ?></h3>
-                    <p class="description"><?php esc_html_e('Use the options below to allow users to create Categories, Locations, Labels, Tags, and Features directly from the frontend listing form.', 'listdom'); ?></p>
+                    <div>
+                        <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Terms Builder', 'listdom'); ?></h3>
+                        <p class="description lsd-my-0"><?php esc_html_e('Use the options below to allow users to create Categories, Locations, Labels, Tags, and Features directly from the frontend listing form.', 'listdom'); ?></p>
+                    </div>
+
                     <?php foreach ([
                         LSD_Base::TAX_CATEGORY => esc_html__('Categories'),
                         LSD_Base::TAX_LOCATION => esc_html__('Locations'),
@@ -322,7 +325,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                         LSD_Base::TAX_TAG => esc_html__('Tags'),
                         LSD_Base::TAX_FEATURE => esc_html__('Features')]
                     as $tax => $label): ?>
-                    <div class="lsd-form-row">
+                    <div class="lsd-form-row lsd-my-0">
                         <div class="lsd-col-2"><?php echo LSD_Form::label([
                             'title' => esc_html__($label, 'listdom'),
                             'for' => 'lsd_settings_submission_term_builder_'. $tax,
@@ -343,16 +346,16 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                     <?php endforeach; ?>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Required Fields', 'listdom'); ?></h3>
+                    <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Required Fields', 'listdom'); ?></h3>
                     <div class="lsd-form-row">
                         <div class="lsd-col-12">
-                            <ul class="lsd-boxed-list lsd-mb-0">
+                            <ul class="lsd-boxed-list lsd-my-0">
                                 <?php foreach ($dashboard->fields() as $f => $field): ?>
                                     <li class="lsd-d-inline-block">
                                         <label
                                             class="<?php echo isset($field['always_enabled']) && $field['always_enabled'] ? 'lsd-always-enabled' : ''; ?>">
                                             <input type="hidden" name="lsd[submission_fields][<?php echo esc_attr($f); ?>][required]" value="0">
-                                            <input type="checkbox" name="lsd[submission_fields][<?php echo esc_attr($f); ?>][required]" value="1" <?php echo (isset($settings['submission_fields'][$f]) && $settings['submission_fields'][$f]['required'] == 1) || (isset($field['always_enabled']) && $field['always_enabled']) ? 'checked' : ''; ?> <?php echo isset($field['always_enabled']) && $field['always_enabled'] ? 'disabled' : ''; ?>>
+                                            <input type="checkbox" name="lsd[submission_fields][<?php echo esc_attr($f); ?>][required]" value="1" <?php echo (isset($settings['submission_fields'][$f]) && $settings['submission_fields'][$f]['required'] == 1) || isset($field['always_enabled']) && $field['always_enabled'] ? 'checked' : ''; ?> <?php echo isset($field['always_enabled']) && $field['always_enabled'] ? 'disabled' : ''; ?>>
                                             <?php echo esc_html($field['label']); ?>
                                         </label>
                                     </li>
@@ -369,8 +372,8 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
 
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
-                    <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Listing Content Restrictions', 'listdom'); ?></h3>
-                    <div class="lsd-form-row">
+                    <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Listing Content Restrictions', 'listdom'); ?></h3>
+                    <div class="lsd-form-row lsd-my-0">
                         <div class="lsd-col-4"><?php echo LSD_Form::label([
                             'title' => esc_html__('Maximum Gallery Images', 'listdom'),
                             'for' => 'lsd_settings_submission_max_gallery_images',
@@ -385,10 +388,10 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                     'step' => 1,
                                 ],
                             ]); ?>
-                            <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited number of images", 'listdom'); ?></p>
+                            <p class="description lsd-mb-0"><?php esc_html_e("Leave it empty for unlimited number of images", 'listdom'); ?></p>
                         </div>
                     </div>
-                    <div class="lsd-form-row">
+                    <div class="lsd-form-row lsd-my-0">
                         <div class="lsd-col-4"><?php echo LSD_Form::label([
                             'title' => esc_html__('Maximum Image Size Allowed', 'listdom'),
                             'for' => 'lsd_settings_submission_max_image_upload_size',
@@ -403,10 +406,10 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                     'step' => 10,
                                 ],
                             ]); ?>
-                            <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited size of images. The size is in KB", 'listdom'); ?></p>
+                            <p class="description lsd-mb-0"><?php esc_html_e("Leave it empty for unlimited size of images. The size is in KB", 'listdom'); ?></p>
                         </div>
                     </div>
-                    <div class="lsd-form-row">
+                    <div class="lsd-form-row lsd-my-0">
                         <div class="lsd-col-4"><?php echo LSD_Form::label([
                             'title' => esc_html__('Maximum Description Length', 'listdom'),
                             'for' => 'lsd_settings_submission_max_description_length',
@@ -421,10 +424,10 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                     'step' => 10,
                                 ],
                             ]); ?>
-                            <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited length", 'listdom'); ?></p>
+                            <p class="description lsd-mb-0"><?php esc_html_e("Leave it empty for unlimited length", 'listdom'); ?></p>
                         </div>
                     </div>
-                    <div class="lsd-form-row">
+                    <div class="lsd-form-row lsd-my-0">
                         <div class="lsd-col-4"><?php echo LSD_Form::label([
                             'title' => esc_html__('Maximum Number of Tags', 'listdom'),
                             'for' => 'lsd_settings_submission_max_tags_count',
@@ -439,19 +442,19 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                                     'step' => 1,
                                 ],
                             ]); ?>
-                            <p class="description lsd-mb-2"><?php esc_html_e("Leave it empty for unlimited number of tags", 'listdom'); ?></p>
+                            <p class="description lsd-mb-0"><?php esc_html_e("Leave it empty for unlimited number of tags", 'listdom'); ?></p>
                         </div>
                     </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
                     <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Modules', 'listdom'); ?></h3>
                     <?php foreach ($dashboard->modules() as $module): ?>
-                        <div class="lsd-form-row">
+                        <div class="lsd-form-row lsd-my-0">
                             <div class="lsd-col-4"><?php echo LSD_Form::label([
                                 'title' => $module['label'],
                             ]); ?></div>
                             <div class="lsd-col-6">
-                                <div class="lsd-radio-toggle lsd-mb-1">
+                                <div class="lsd-radio-toggle lsd-mb-0">
                                     <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="1" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_1" <?php echo isset($settings['submission_module'][$module['key']]) && $settings['submission_module'][$module['key']] == 1 ? 'checked="checked"' : ''; ?>>
                                     <label for="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_1"><?php esc_html_e('Enabled', 'listdom'); ?></label>
                                     <input type="radio" name="lsd[submission_module][<?php echo esc_attr($module['key']); ?>]" value="2" id="lsd_settings_submission_module_<?php echo esc_attr($module['key']); ?>_2" <?php echo isset($settings['submission_module'][$module['key']]) && $settings['submission_module'][$module['key']] == 2 ? 'checked="checked"' : ''; ?>>
@@ -465,7 +468,7 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
                 </div>
             </div>
         </div>
-        <div class="lsd-spacer-10"></div>
+        <div class="lsd-spacer-30"></div>
         <div class="lsd-form-row lsd-settings-submit-wrapper">
             <div class="lsd-col-12 lsd-flex lsd-gap-3 lsd-flex-content-end">
                 <?php LSD_Form::nonce('lsd_settings_form'); ?>

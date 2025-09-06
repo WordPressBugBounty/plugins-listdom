@@ -297,6 +297,8 @@ class LSD_Customizer_Buttons extends LSD_Customizer
                     'size' => $defaults['typography']['size'] ?? 15,
                     'line_height' => $defaults['typography']['line_height'] ?? 32,
                 ],
+                'size_units' => ['px', 'em', 'rem', '%'],
+                'line_height_units' => ['px', 'em', 'rem', '%'],
             ],
             'padding' => [
                 'type' => 'padding',

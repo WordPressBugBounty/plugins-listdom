@@ -218,6 +218,8 @@ class LSD_Customizer_Forms extends LSD_Customizer
                     'size' => 'inherit',
                     'line_height' => 'inherit',
                 ], $defaults['typography'] ?? []),
+                'size_units' => ['px', 'em', 'rem', '%'],
+                'line_height_units' => ['px', 'em', 'rem', '%'],
             ],
             'form_bg_color' => $this->fields->color(
                 esc_html__('Background Color', 'listdom'),
@@ -283,6 +285,8 @@ class LSD_Customizer_Forms extends LSD_Customizer
                     'size' => $defaults['typography']['size'] ?? 14,
                     'line_height' => $defaults['typography']['line_height'] ?? 38,
                 ],
+                'size_units' => ['px', 'em', 'rem', '%'],
+                'line_height_units' => ['px', 'em', 'rem', '%'],
             ],
         ];
     }

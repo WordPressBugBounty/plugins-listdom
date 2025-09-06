@@ -68,8 +68,8 @@ $shape = LSD_Shape::get([
                 </div>
             </div>
             <div class="lsd-metabox-contents">
-                <div class="lsd-tab-content <?php echo ($object_type == 'marker' ? 'lsd-tab-content-active' : ''); ?>" id="lsd_tab_content_marker" data-key="marker"></div>
-                <div class="lsd-tab-content <?php echo ($object_type == 'shape' ? 'lsd-tab-content-active' : ''); ?>" id="lsd_tab_content_shape" data-key="shape"></div>
+                <div class="lsd-tab-content <?php echo $object_type == 'marker' ? 'lsd-tab-content-active' : ''; ?>" id="lsd_tab_content_marker" data-key="marker"></div>
+                <div class="lsd-tab-content <?php echo $object_type == 'shape' ? 'lsd-tab-content-active' : ''; ?>" id="lsd_tab_content_shape" data-key="shape"></div>
             </div>
 
             <input type="hidden" class="lsd-update-listener" id="lsd_object_type" value="<?php echo esc_attr($object_type); ?>">

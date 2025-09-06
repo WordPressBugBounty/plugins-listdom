@@ -345,7 +345,7 @@ class LSD_IX extends LSD_Base
             $term = (array) get_term_by('slug', $slug);
 
             // Term ID
-            $term_id = $term['term_id'];
+            $term_id = $term['term_id'] ?? '';
 
             // Remove Useless Keys
             foreach ([

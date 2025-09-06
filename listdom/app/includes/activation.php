@@ -64,8 +64,23 @@ class LSD_Activation extends LSD_Base
         // Reset Transient
         LSD_Licensing::reset($basename);
 
+        $products = LSD_Base::products();
+        $product = $products[$key] ?? null;
+
+        $content = '';
+        if ($product)
+        {
+            $content = $this->include_html_file('menus/activation/addon.php', [
+                'parameters' => [
+                    'key' => $key,
+                    'product' => $product,
+                ],
+                'return_output' => true,
+            ]);
+        }
+
         // Print the response
-        $this->response(['success' => $status, 'message' => $message]);
+        $this->response(['success' => $status, 'message' => $message, 'content' => $content]);
     }
 
     /**
@@ -100,8 +115,23 @@ class LSD_Activation extends LSD_Base
         // Reset Transient
         LSD_Licensing::reset($basename);
 
+        $products = LSD_Base::products();
+        $product = $products[$key] ?? null;
+
+        $content = '';
+        if ($product)
+        {
+            $content = $this->include_html_file('menus/activation/addon.php', [
+                'parameters' => [
+                    'key' => $key,
+                    'product' => $product,
+                ],
+                'return_output' => true,
+            ]);
+        }
+
         // Print the response
-        $this->response(['success' => $status, 'message' => $message]);
+        $this->response(['success' => $status, 'message' => $message, 'content' => $content]);
     }
 
     public static function getLicenseActivationRequiredCount(): int

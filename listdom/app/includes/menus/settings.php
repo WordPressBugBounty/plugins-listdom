@@ -3,6 +3,7 @@
 class LSD_Menus_Settings extends LSD_Menus
 {
     public $subtab;
+
     public function __construct()
     {
         // Initialize the Menu
@@ -34,38 +35,53 @@ class LSD_Menus_Settings extends LSD_Menus
     public function output()
     {
         // Get the current tab
-        $this->tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : '';
-        $this->subtab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : '';
+        $this->tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
+        $this->subtab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : $this->get_default_subtab();
 
         // Generate output
         $this->include_html_file('menus/settings/tpl.php');
     }
 
+    public function get_default_subtab(): string
+    {
+        if ($this->tab === 'frontend-dashboard') return 'pages';
+        if ($this->tab === 'auth') return 'authentication';
+        if ($this->tab === 'advanced') return 'assets-loading';
+
+        return 'general';
+    }
+
 
     public function addons_tab(): string
     {
-        $addons = LSD_Base::addons();
-
-        uasort($addons, function($a, $b) {
-            return strcasecmp($a['name'], $b['name']);
-        });
+        [$addons, $default] = $this->get_addons_default();
+        $subtab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : $default;
 
         $output = '';
-
         foreach ($addons as $key => $addon)
         {
-            if($key === 'csv' || $key === 'excel') continue;
+            // No Settings for Addon
+            if (!apply_filters('lsd_addons_has_settings_'.$key, true)) continue;
+
             $name = ucwords(strtolower($addon['name']));
 
-            $default = array_key_first($addons);
-            $active_class = ($key === ($this->subtab ?: $default)) ? 'lsd-nav-tab-active' : '';
-
-            $output .= '<li class="lsd-nav-tab ' . esc_attr($active_class) . '" data-key="' . esc_attr($key) . '">';
+            $output .= '<li class="lsd-nav-tab ' . esc_attr($key === $subtab ? 'lsd-nav-tab-active' : '') . '" data-key="' . esc_attr($key) . '">';
             $output .= esc_html__($name, 'listdom-'. $key);
             $output .= '</li>';
         }
 
         return $output;
+    }
+
+    public function get_addons_default(): array
+    {
+        $addons = LSD_Base::addons();
+        uasort($addons, function($a, $b)
+        {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        return [$addons, array_key_first($addons)];
     }
 
     public function check_access(string $action = 'lsd_settings_form', string $capability = 'manage_options')

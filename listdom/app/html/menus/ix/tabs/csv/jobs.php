@@ -12,82 +12,111 @@ $template = new LSD_IX_Templates_CSV();
 
 // Date Time Format
 $datetime_format = LSD_Base::datetime_format();
-?>
-<div class="lsd-ix-auto-import-jobs">
-    <?php foreach($jobs as $key => $j): ?>
-        <div class="lsd-flex lsd-flex-row lsd-flex-items-start lsd-gap-5 lsd-mb-4 lsd-border lsd-border-radius lsd-p-4">
-            <div>
-                <h4 class="lsd-mb-2 lsd-mt-0"><a href="<?php echo esc_url_raw($j['url']); ?>" target="_blank"><?php echo $j['url']; ?></a></h4>
 
-                <div class="lsd-flex lsd-flex-row lsd-flex-items-start lsd-gap-5">
-                    <ul class="lsd-mb-0">
-                        <li><?php echo sprintf(esc_html__('Created at: %s', 'listdom'), '<strong>'.wp_date($datetime_format, $key).'</strong>'); ?></li>
-                        <li><?php echo sprintf(esc_html__('Field Mapping: %s', 'listdom'), '<strong>'.$template->get($j['mapping'])['name'].'</strong>'); ?></li>
-                        <li><?php echo sprintf(esc_html__('Import Size: %s', 'listdom'), '<strong>'.$j['size'].'</strong>'); ?></li>
-                        <li class="lsd-mb-0"><?php echo sprintf(esc_html__('Interval: %s', 'listdom'), '<strong>'.ucfirst($j['interval']).'</strong>'); ?></li>
-                    </ul>
-                    <?php if(isset($j['imported_at']) && isset($j['last_import_count'])): ?>
-                    <div>
-                        <ul>
-                            <li><?php echo sprintf(esc_html__('Last Import at: %s', 'listdom'), '<strong>'.wp_date($datetime_format, $j['imported_at']).'</strong>'); ?></li>
-                            <li class="lsd-mb-0"><?php echo sprintf(esc_html__('Last Import Count: %s', 'listdom'), '<strong>'.$j['last_import_count'].'</strong>'); ?></li>
-                        </ul>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <button
-                class="button button-primary lsd-csv-job-remove"
-                data-key="<?php echo esc_attr($key); ?>"
-            ><?php esc_html_e('Remove', 'listdom'); ?></button>
-        </div>
-    <?php endforeach; ?>
-</div>
-<script>
-// Remove Job
-jQuery('.lsd-csv-job-remove').on('click', function()
+// Check if any job has these fields (for table headers)
+$has_imported_at = false;
+$has_last_import_count = false;
+
+foreach ($jobs as $job)
 {
-    // Remove Button
-    const $button = jQuery(this);
+    if (isset($job['imported_at'])) $has_imported_at = true;
+    if (isset($job['last_import_count'])) $has_last_import_count = true;
+}
+?>
+<div class="lsd-settings-fields-wrapper lsd-ix-auto-import-existing-jobs-wrapper">
+    <div class="lsd-ix-auto-import-existing-jobs">
+        <div class="lsd-admin-section-heading">
+            <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Existing Jobs', 'listdom'); ?></h3>
+            <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Here are the running jobs used for auto importing.', 'listdom'); ?></p>
+        </div>
+        <div class="lsd-ix-auto-import-jobs lsd-mt-4">
+            <table class="lsd-admin-table">
+                <thead>
+                <tr>
+                    <th style="width:30%"><?php esc_html_e('URL', 'listdom'); ?></th>
+                    <th><?php esc_html_e('Created at', 'listdom'); ?></th>
+                    <th><?php esc_html_e('Mapping Template', 'listdom'); ?></th>
+                    <th><?php esc_html_e('Size', 'listdom'); ?></th>
+                    <th><?php esc_html_e('Interval', 'listdom'); ?></th>
+                    <?php if ($has_imported_at): ?><th><?php esc_html_e('Last import at', 'listdom'); ?></th><?php endif; ?>
+                    <?php if ($has_last_import_count): ?><th><?php esc_html_e('Last import count', 'listdom'); ?></th><?php endif; ?>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($jobs as $key => $j): ?>
+                    <tr>
+                        <td><a href="<?php echo esc_url_raw($j['url']); ?>" target="_blank"><?php echo esc_html($j['url']); ?></a></td>
+                        <td><?php echo wp_date($datetime_format, $key); ?></td>
+                        <td><?php echo esc_html($template->get($j['mapping'])['name'] ?? ''); ?></td>
+                        <td><?php echo esc_html($j['size']); ?></td>
+                        <td><?php echo ucfirst($j['interval']); ?></td>
+                        <?php if ($has_imported_at): ?>
+                            <td><?php echo isset($j['imported_at']) ? wp_date($datetime_format, $j['imported_at']) : ''; ?></td>
+                        <?php endif; ?>
+                        <?php if ($has_last_import_count): ?>
+                            <td><?php echo isset($j['last_import_count']) ? esc_html($j['last_import_count']) : ''; ?></td>
+                        <?php endif; ?>
+                        <td>
+                            <button class="lsd-text-button lsd-csv-job-remove"
+                                    data-name="<?php echo esc_attr($template->get($j['mapping'])['name'] ?? ''); ?>"
+                                    data-key="<?php echo esc_attr($key ?? ''); ?>">
+                                <i class="listdom-icon fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    // Job
-    const $job = $button.parent();
-
-    // Mapping Key
-    const key = $button.data('key');
-
-    // Add loading Class to the button
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>').attr('disabled', 'disabled');
-
-    jQuery.ajax(
-    {
-        type: "POST",
-        url: ajaxurl,
-        data: "action=lsdaddcsv_remove_job&_wpnonce=<?php echo wp_create_nonce('lsdaddcsv_remove_job'); ?>&key="+key,
-        dataType: 'json',
-        success: function(response)
+    <script>
+        jQuery('.lsd-csv-job-remove').on('click', function()
         {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Remove', 'listdom')); ?>").removeAttr('disabled');
+            const $button = jQuery(this);
+            const $row = $button.closest('tr');
+            const key = $button.data('key');
+            const name = $button.data('name');
 
-            if(response.success === 1)
-            {
-                // Hide Elements
-                $button.hide();
-                $job.remove();
+            // Loading Wrapper
+            const loading = (new ListdomButtonLoader($button));
+            loading.start("");
 
-                // Remove Parent
-                if (!jQuery('.lsd-ix-auto-import-jobs > div').length)
-                {
-                    jQuery('.lsd-ix-auto-import-existing-jobs').addClass('lsd-util-hide');
+            listdom_toastify("<?php echo esc_js(__("Are you sure you want to delete this?", 'listdom')); ?>", "lsd-confirm", {
+                position: "lsd-center-center",
+                confirm: {
+                    confirmText: "<?php echo esc_js(__('Confirm', 'listdom')); ?>",
+                    cancelText:  "<?php echo esc_js(__('Cancel', 'listdom')); ?>",
+                    onConfirm: function(toast) {
+                        jQuery.ajax({
+                            type: "POST",
+                            url: ajaxurl,
+                            data: "action=lsdaddcsv_remove_job&_wpnonce=<?php echo wp_create_nonce('lsdaddcsv_remove_job'); ?>&key=" + key,
+                            dataType: 'json',
+                            success: function(response) {
+
+                                loading.stop();
+
+                                if (response.success === 1) {
+                                    $row.remove();
+
+                                    if (!jQuery('.lsd-ix-auto-import-jobs tbody tr').length) {
+                                        jQuery('.lsd-ix-auto-import-existing-jobs').addClass('lsd-util-hide');
+                                    }
+                                    listdom_toastify(name + ' ' + "<?php echo esc_js(__('Removed', 'listdom')); ?>", 'lsd-success');
+                                }
+                            },
+                            error: function() {
+                                loading.stop();
+                            }
+                        });
+                    },
+                    onCancel: function(toast) {
+                        loading.stop();
+                    }
                 }
-            }
-        },
-        error: function()
-        {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Remove', 'listdom')); ?>").removeAttr('disabled');
-        }
-    });
-});
-</script>
+            });
+        });
+    </script>
+</div>

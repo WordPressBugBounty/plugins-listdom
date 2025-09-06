@@ -3,57 +3,61 @@
 defined('ABSPATH') || die();
 
 /** @var LSD_Menus_IX $this */
-
-// Sub-tab
-$sub = isset($_GET['sub']) && trim($_GET['sub']) ? sanitize_text_field($_GET['sub']) : 'import';
 ?>
 <div class="lsd-ix-wrap">
 
-    <?php if ($this->isLite()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('JSON Import / Export', 'listdom')), 'warning'); ?>
+    <?php if ($this->isLite()): ?>
+    <div class="lsd-settings-group-wrapper lsd-px-4">
+        <div class="lsd-settings-fields-wrapper">
+            <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('JSON Import / Export', 'listdom')), 'warning'); ?>
+        </div>
+    </div>
     <?php else: ?>
+    <div id="lsd_panel_json_import" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'import' || !$this->subtab ? ' lsd-tab-content-active' : ''; ?>">
+        <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Import', 'listdom'); ?></h3>
+        <form id="lsd_ix_listdom_import_form" class="lsd-mt-4" enctype="multipart/form-data">
+            <div class="lsd-settings-group-wrapper">
+                <div class="lsd-settings-fields-wrapper">
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-8 lsd-admin-input-file">
+                            <?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__("Select the JSON file exported from listdom", 'listdom'),
+                                'for' => 'lsd_ix_json_import_file_input',
+                            ]) ?>
+                            <?php echo LSD_Form::file([
+                                'id' => 'lsd_ix_listdom_import_file_input',
+                                'class' => 'lsd-util-hide',
+                            ]); ?>
+                            <?php echo LSD_Form::hidden([
+                                'id' => 'lsd_ix_listdom_import_file',
+                                'name' => 'ix[file]',
+                            ]); ?>
+                            <label for="lsd_ix_listdom_import_file_input" class="lsd-neutral-button lsd-json-import-choose-file lsd-w-max"><?php echo esc_html__('Choose File', 'listdom-jobs'); ?></label>
+                        </div>
+                    </div>
+                    <p class="lsd-util-hide lsd-m-0" id="lsd_ix_listdom_import_message"></p>
 
-        <ul class="lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mt-4">
-            <li class="<?php echo $sub === 'import' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=json')); ?>"><?php esc_html_e('Import', 'listdom'); ?></a></li>
-            <li class="<?php echo $sub === 'export' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=json&sub=export')); ?>"><?php esc_html_e('Export', 'listdom'); ?></a></li>
-        </ul>
+                    <?php LSD_Form::nonce('lsd_ix_listdom_import'); ?>
+                    <button type="submit" id="lsd_ix_listdom_import_submit" class="lsd-primary-button lsd-util-hide">
+                        <?php esc_html_e('Import', 'listdom'); ?>
+                        <i class="listdom-icon lsdi-checkmark-circle"></i>
+                    </button>
 
-        <?php if ($sub === 'export'): ?>
-            <div class="lsd-form-row lsd-mt-5">
-                <div class="lsd-col-12">
-                    <p class="description lsd-mb-3"><?php esc_html_e("Please click the button below to download the JSON export of your listings.", 'listdom'); ?></p>
-                    <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=listdom-ix&lsd-export=json'), 'lsd_ix_form')); ?>" class="button button-primary button-hero"><?php esc_html_e('Export', 'listdom'); ?></a>
                 </div>
             </div>
-        <?php else: ?>
-            <h3><?php esc_html_e('Import', 'listdom'); ?></h3>
-            <form id="lsd_ix_listdom_import_form" class="lsd-mt-4" enctype="multipart/form-data">
-                <div class="lsd-form-row">
-                    <div class="lsd-col-6">
-                        <?php echo LSD_Form::file([
-                            'id' => 'lsd_ix_listdom_import_file_input',
-                        ]); ?>
-                    </div>
-                </div>
-                <div class="lsd-form-row lsd-mt-4 lsd-pt-2">
-                    <div class="lsd-col-12">
-                        <?php echo LSD_Form::hidden([
-                            'id' => 'lsd_ix_listdom_import_file',
-                            'name' => 'ix[file]',
-                        ]); ?>
-                        <?php LSD_Form::nonce('lsd_ix_listdom_import'); ?>
-                        <button type="submit" id="lsd_ix_listdom_import_submit" class="button button-primary button-hero" disabled><?php esc_html_e('Import', 'listdom'); ?></button>
-                    </div>
-                </div>
-                <div class="lsd-form-row">
-                    <div class="lsd-col-12 lsd-alert-no-my">
-                        <p id="lsd_ix_listdom_import_message"></p>
-                        <?php echo LSD_Base::alert(esc_html__("You should upload only JSON file exported from Listdom!", 'listdom')); ?>
-                    </div>
-                </div>
-            </form>
-        <?php endif; ?>
-    <?php endif; ?>
-
+        </form>
+    </div>
+    <div id="lsd_panel_json_export" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'export' ? ' lsd-tab-content-active' : ''; ?>">
+        <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Export', 'listdom'); ?></h3>
+        <div class="lsd-settings-group-wrapper">
+            <div class="lsd-settings-fields-wrapper">
+                <p class="lsd-admin-description lsd-mb-1 lsd-mt-0"><?php esc_html_e("Please click the button below to download the JSON export of your listings.", 'listdom'); ?></p>
+                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=listdom-ix&lsd-export=json'), 'lsd_ix_form')); ?>" class="lsd-primary-button"><?php esc_html_e('Export', 'listdom'); ?></a>
+            </div>
+        </div>
+    </div>
+    <?php endif;?>
 </div>
 <script>
 // File Upload
@@ -66,12 +70,18 @@ jQuery('#lsd_ix_listdom_import_file_input').on('change', function()
 
     const $alert = jQuery("#lsd_ix_listdom_import_message");
     const $submit = jQuery("#lsd_ix_listdom_import_submit");
+    const $file = jQuery('#lsd_ix_listdom_import_file_input');
 
     // Remove Alert
     $alert.html('');
+    $alert.removeClass('lsd-util-hide');
 
-    // Disable Button
-    $submit.attr('disabled', 'disabled');
+    // Loading Wrapper
+    const loading = (new ListdomButtonLoader(jQuery('.lsd-json-import-choose-file')));
+    $file.attr('disabled', 'disabled');
+
+    // Loading
+    loading.start("<?php echo esc_js( __('Uploading', 'listdom') ); ?>");
 
     jQuery.ajax(
     {
@@ -87,17 +97,24 @@ jQuery('#lsd_ix_listdom_import_file_input').on('change', function()
         if(response.success === 1)
         {
             jQuery("#lsd_ix_listdom_import_file").val(response.data.file);
-            $submit.removeAttr('disabled');
+            $submit.removeClass('lsd-util-hide');
+
+            loading.stop();
+            $file.removeAttr('disabled');
 
             // Show Alert
-            $alert.html(listdom_alertify(response.message, 'lsd-success'));
+            $alert.html(listdom_alertify(response.message, 'lsd-success lsd-m-0'));
         }
         else
         {
             jQuery("#lsd_ix_listdom_import_input").val('');
 
+            loading.stop();
+            $file.removeAttr('disabled');
+            $submit.addClass('lsd-util-hide');
+
             // Show Alert
-            $alert.html(listdom_alertify(response.message, 'lsd-error'));
+            listdom_toastify(response.message, 'lsd-error');
         }
     });
 });
@@ -109,15 +126,14 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
 
     // Button
     const $button = jQuery("#lsd_ix_listdom_import_submit");
+    $button.removeClass('lsd-util-hide');
 
-    // Add loading Class to the button
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>').attr('disabled', 'disabled');
+    // Loading Wrapper
+    const loading = (new ListdomButtonLoader($button));
+    loading.start("<?php echo esc_js( __('Importing', 'listdom') ); ?>");
 
-    // Alert
-    const $alert = jQuery("#lsd_ix_listdom_import_message");
-
-    // Show Alert
-    $alert.html(listdom_alertify("<?php echo esc_js(esc_attr__('Please wait ...', 'listdom')); ?>", 'lsd-info'));
+    listdom_toastify("<?php echo esc_js(esc_attr__('Please wait ...', 'listdom')); ?>", 'lsd-in-progress');
+    jQuery("#lsd_ix_listdom_import_message").addClass('lsd-util-hide');
 
     const data = jQuery(this).serialize();
     jQuery.ajax(
@@ -128,27 +144,30 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
         dataType: 'json',
         success: function(response)
         {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Import', 'listdom')); ?>").removeAttr('disabled');
+            loading.stop();
 
             if(response.success === 1)
             {
-                // Show Alert
-                $alert.html(listdom_alertify(response.message, 'lsd-success'));
+                listdom_toastify(response.message, 'lsd-success');
+                $button.addClass('lsd-util-hide');
+
+                jQuery('.lsd-in-progress').remove();
+                window.currentToast = null;
+
+                // hidden value
+                jQuery('#lsd_ix_listdom_import_file_input').val('');
+                jQuery("#lsd_ix_listdom_import_file").val('');
             }
             else
             {
-                // Show Alert
-                $alert.html(listdom_alertify(response.message, 'lsd-error'));
+                listdom_toastify(response.message, 'lsd-error');
             }
         },
         error: function()
         {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Import', 'listdom')); ?>").removeAttr('disabled');
-
-            // Show Alert
-            $alert.html(listdom_alertify("<?php echo esc_js(esc_attr__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error'));
+            loading.stop();
+            $button.addClass('lsd-util-hide');
+            listdom_toastify("<?php echo esc_js(esc_attr__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
         }
     });
 });

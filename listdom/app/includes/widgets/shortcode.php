@@ -53,7 +53,7 @@ class LSD_Widgets_Shortcode extends WP_Widget
         {
             echo '<p class="lsd-widget-row">
                 <label for="' . $this->get_field_id('title') . '">' . esc_html__('Title', 'listdom') . '</label>
-                <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '" />
+                <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '">
             </p>';
 
             echo '<p class="lsd-widget-row">

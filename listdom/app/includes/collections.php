@@ -111,4 +111,16 @@ abstract class LSD_Collections
         $args['options'] = $options;
         return LSD_Form::select($args);
     }
+
+    public static function is_template_used($template_key, array $jobs): bool
+    {
+        foreach ($jobs as $job_item)
+        {
+            $mapping = $job_item['mapping'] ?? [];
+            if (!is_array($mapping)) $mapping = [$mapping];
+            if (in_array($template_key, $mapping)) return true;
+        }
+
+        return false;
+    }
 }

@@ -44,7 +44,7 @@ jQuery(document).ready(function($)
     </div>
     <div class="lsd-dashboard-new-term-form lsd-modal" id="lsd_dashboard_new_term_<?php echo esc_attr($taxonomy); ?>">
         <div class="lsd-modal-content">
-            <h3 class="lsd-tax-title lsd-fd-title"><?php echo sprintf(esc_html__('New %s', 'listdom') , $tax_name); ?></h3>
+            <h3 class="lsd-tax-title lsd-fe-title"><?php echo sprintf(esc_html__('New %s', 'listdom') , $tax_name); ?></h3>
             <?php if ($mode === 'express'): ?>
                 <div class="lsd-add-term-express">
                     <div class="lsd-new-tax-inputs">

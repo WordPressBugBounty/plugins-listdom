@@ -45,7 +45,7 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
 
         echo '<p class="lsd-widget-row">
             <label for="' . $this->get_field_id('title') . '">' . esc_html__('Title', 'listdom') . '</label>
-            <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '" />
+            <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '">
         </p>';
 
         echo '<p class="lsd-widget-row">
@@ -81,7 +81,7 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
 
         echo '<p class="lsd-widget-row">
             <label for="' . $this->get_field_id('limit') . '">' . esc_html__('Limit', 'listdom') . '</label>
-            <input class="widefat" type="number" id="' . $this->get_field_id('limit') . '" name="' . $this->get_field_name('limit') . '" value="' . (isset($instance['limit']) ? esc_attr($instance['limit']) : 24) . '" />
+            <input class="widefat" type="number" id="' . $this->get_field_id('limit') . '" name="' . $this->get_field_name('limit') . '" value="' . (isset($instance['limit']) ? esc_attr($instance['limit']) : 24) . '">
         </p>';
     }
 

@@ -4,9 +4,6 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Menus_IX $this */
 
-// Sub-tab
-$sub = isset($_GET['sub']) && trim($_GET['sub']) ? sanitize_text_field($_GET['sub']) : 'import';
-
 // Templates Library
 $template = new LSD_IX_Templates_CSV();
 
@@ -14,146 +11,187 @@ $template = new LSD_IX_Templates_CSV();
 $jobs = new LSD_IX_Jobs_CSV();
 ?>
 <div class="lsd-ix-wrap">
-
-    <ul class="lsd-sub-tabs lsd-flex lsd-gap-3 lsd-mt-4">
-        <li class="<?php echo $sub === 'import' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=csv')); ?>"><?php esc_html_e('Import', 'listdom'); ?></a></li>
-        <li class="<?php echo $sub === 'templates' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=csv&sub=templates')); ?>"><?php esc_html_e('Mapping Templates', 'listdom'); ?></a></li>
-        <li class="<?php echo $sub === 'auto' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=csv&sub=auto')); ?>"><?php esc_html_e('Auto Import', 'listdom'); ?></a></li>
-        <li class="<?php echo $sub === 'export' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=csv&sub=export')); ?>"><?php esc_html_e('Export', 'listdom'); ?></a></li>
-    </ul>
-
-    <?php if ($sub === 'export'): ?>
-        <div class="lsd-form-row lsd-mt-5">
-            <div class="lsd-col-12">
-                <p class="description lsd-mb-3"><?php esc_html_e("Please click the button below to download the CSV export of your listings.", 'listdom'); ?></p>
-                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=listdom-ix&lsd-export=csv'), 'lsd_ix_form')); ?>" class="button button-primary button-hero"><?php esc_html_e('Export', 'listdom'); ?></a>
-            </div>
-        </div>
-    <?php elseif ($sub === 'auto'): ?>
-        <div>
-            <?php if (!class_exists(LSDPACCSV\Base::class)): echo LSD_Base::alert($this->missAddonMessage('CSV Importer', esc_html__('Auto Import', 'listdom')), 'warning'); ?>
-            <?php else: ?>
-                <h3><?php esc_html_e('Auto Import', 'listdom'); ?></h3>
-                <form id="lsd_ix_csv_auto_import_form" class="lsd-mt-4">
+    <div id="lsd_panel_csv_import" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'import' || !$this->subtab ? ' lsd-tab-content-active' : ''; ?>">
+        <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Import', 'listdom'); ?></h3>
+        <form id="lsd_ix_csv_import_form" class="lsd-mt-4" enctype="multipart/form-data">
+            <div class="lsd-settings-group-wrapper">
+                <div class="lsd-settings-fields-wrapper">
                     <div class="lsd-form-row">
-                        <div class="lsd-col-1">
-                            <label for="lsd_ix_csv_auto_import_url">
-                                <?php esc_html_e('Feed URL', 'listdom'); ?>
-                            </label>
-                        </div>
-                        <div class="lsd-col-6">
-                            <input
-                                type="url"
-                                name="ix[url]"
-                                id="lsd_ix_csv_auto_import_url"
-                                placeholder="https://docs.google.com/spreadsheets/d/document-id/export?format=csv"
-                            >
-                            <p class="description"><?php esc_html_e("This field should contain the URL leading to the CSV file you wish to import.", 'listdom'); ?></p>
+                        <div class="lsd-col-8 lsd-admin-input-file">
+                            <?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Select the CSV file to import', 'listdom'),
+                                'for' => 'lsd_ix_csv_import_file_input',
+                            ]); ?>
+                            <?php echo LSD_Form::file([
+                                'id' => 'lsd_ix_csv_import_file_input',
+                                'class' => 'lsd-util-hide'
+                            ]); ?>
+                            <?php echo LSD_Form::hidden([
+                                'id' => 'lsd_ix_csv_import_file',
+                                'name' => 'ix[file]',
+                            ]); ?>
+                            <label for="lsd_ix_csv_import_file_input" class="lsd-neutral-button lsd-csv-import-choose-file lsd-w-max"><?php echo esc_html__('Choose File', 'listdom-jobs'); ?></label>
                         </div>
                     </div>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-1">
-                            <label for="lsd_ix_csv_auto_import_mapping">
-                                <?php esc_html_e('Field Mapping', 'listdom'); ?>
-                            </label>
-                        </div>
+                </div>
+
+                <div class="lsd-form-row">
+                    <div class="lsd-col-12">
+                        <p id="lsd_ix_csv_import_message"></p>
+                        <div id="lsd_ix_csv_import_mapping"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="lsd-form-row lsd-settings-submit-wrapper lsd-util-hide" id="lsd_ix_csv_import_button_wrap">
+                <div class="lsd-csv-import-button">
+                    <div class="lsd-flex lsd-flex-align-items-center lsd-flex-content-end lsd-gap-3">
                         <div class="lsd-col-6">
-                            <?php echo $template->dropdown([
-                                'id' => 'lsd_ix_csv_auto_import_mapping',
-                                'name' => 'ix[mapping]',
-                                'show_empty' => true,
+                            <?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Save as a new Template', 'listdom'),
+                            ]); ?>
+                        </div>
+                        <div class="lsd-col-2">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_csv_template_name_toggle',
+                                'name' => 'ix[template_new_toggle]',
+                                'toggle' => '#lsd_csv_template_name',
+                                'value' => 1,
                             ]); ?>
                         </div>
                     </div>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-1">
-                            <label for="lsd_ix_csv_auto_import_interval">
-                                <?php esc_html_e('Interval', 'listdom'); ?>
-                            </label>
-                        </div>
-                        <div class="lsd-col-6">
-                            <select name="ix[interval]" id="lsd_ix_csv_auto_import_interval">
-                                <option value="weekly"><?php esc_html_e('Weekly', 'listdom'); ?></option>
-                                <option value="daily"><?php esc_html_e('Daily', 'listdom'); ?></option>
-                                <option value="twicedaily"><?php esc_html_e('Twice a Day', 'listdom'); ?></option>
-                                <option value="hourly"><?php esc_html_e('Hourly', 'listdom'); ?></option>
-                            </select>
-                        </div>
+                    <div id="lsd_csv_template_name">
+                        <?php echo LSD_Form::text([
+                            'name' => 'ix[template]',
+                            'class' => 'lsd-admin-input',
+                            'id' => 'ix_template_new',
+                            'value' => sprintf(esc_html__('CSV (%s)', 'listdom'), date('Y-m-d-H-i')),
+                        ]); ?>
                     </div>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-1">
-                            <label for="lsd_ix_csv_auto_import_size">
-                                <?php esc_html_e('Import Size', 'listdom'); ?>
-                            </label>
-                        </div>
-                        <div class="lsd-col-6">
-                            <input type="number" name="ix[size]" id="lsd_ix_csv_auto_import_size" min="10" max="300" step="1" value="100">
-                            <p class="description"><?php esc_html_e("It determines the maximum number of listings imported in each run of the import job.", 'listdom'); ?></p>
-                        </div>
+                    <div>
+                        <?php LSD_Form::nonce('lsd_ix_csv_import'); ?>
+                        <?php echo LSD_Form::hidden([
+                            'id' => 'lsd_ix_csv_import_size',
+                            'name' => 'ix[size]',
+                            'value' => '20',
+                        ]); ?>
+                        <?php echo LSD_Form::hidden([
+                            'id' => 'lsd_ix_csv_import_offset',
+                            'name' => 'ix[offset]',
+                            'value' => '0',
+                        ]); ?>
+                        <button type="submit" id="lsd_ix_csv_import_submit" class="lsd-primary-button">
+                            <?php esc_html_e('Import', 'listdom'); ?>
+                            <i class="listdom-icon lsdi-checkmark-circle"></i>
+                        </button>
                     </div>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-12">
-                            <p id="lsd_ix_csv_auto_import_message"></p>
-                        </div>
-                    </div>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-12">
-                            <?php LSD_Form::nonce('lsdaddcsv_auto_add'); ?>
-                            <button class="button button-primary button-hero" type="submit"><?php esc_html_e('Add Import Job', 'listdom'); ?></button>
-                        </div>
-                    </div>
-                </form>
-                <?php if (count($jobs->all())): ?>
-                    <div class="lsd-ix-auto-import-existing-jobs">
-                        <hr>
-                        <h3 class="lsd-mt-5"><?php esc_html_e('Existing Jobs', 'listdom'); ?></h3>
-                        <?php echo $jobs->manage(); ?>
-                    </div>
-                <?php endif; ?>
-            <?php endif; ?>
-        </div>
-    <?php elseif ($sub === 'templates'): ?>
-        <h3 class="lsd-mb-5"><?php esc_html_e('Field Mapping Templates', 'listdom'); ?></h3>
-        <?php echo $template->manage('lsd_csv_template_remove'); ?>
-    <?php else: ?>
-        <h3><?php esc_html_e('Import', 'listdom'); ?></h3>
-        <form id="lsd_ix_csv_import_form" class="lsd-mt-4" enctype="multipart/form-data">
-            <div class="lsd-form-row">
-                <div class="lsd-col-6">
-                    <?php echo LSD_Form::file([
-                        'id' => 'lsd_ix_csv_import_file_input',
-                    ]); ?>
-                    <?php echo LSD_Form::hidden([
-                        'id' => 'lsd_ix_csv_import_file',
-                        'name' => 'ix[file]',
-                    ]); ?>
-                </div>
-            </div>
-            <div class="lsd-form-row">
-                <div class="lsd-col-12">
-                    <p id="lsd_ix_csv_import_message"></p>
-                    <div id="lsd_ix_csv_import_mapping"></div>
-                </div>
-            </div>
-            <div class="lsd-form-row" id="lsd_ix_csv_import_button_wrap">
-                <div class="lsd-col-12">
-                    <?php LSD_Form::nonce('lsd_ix_csv_import'); ?>
-                    <?php echo LSD_Form::hidden([
-                        'id' => 'lsd_ix_csv_import_size',
-                        'name' => 'ix[size]',
-                        'value' => '20',
-                    ]); ?>
-                    <?php echo LSD_Form::hidden([
-                        'id' => 'lsd_ix_csv_import_offset',
-                        'name' => 'ix[offset]',
-                        'value' => '0',
-                    ]); ?>
-                    <button type="submit" id="lsd_ix_csv_import_submit" class="button button-primary button-hero" disabled><?php esc_html_e('Import', 'listdom'); ?></button>
                 </div>
             </div>
         </form>
-    <?php endif; ?>
-
+    </div>
+    <div id="lsd_panel_csv_auto-import" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'auto-import' ? ' lsd-tab-content-active' : ''; ?>">
+        <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Auto Import', 'listdom'); ?></h3>
+        <div class="lsd-settings-group-wrapper">
+            <div class="lsd-settings-fields-wrapper">
+                <div>
+                    <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Add a New Job', 'listdom'); ?></h3>
+                    <?php if (!class_exists(LSDPACCSV\Base::class)): echo LSD_Base::alert($this->missAddonMessage('CSV Importer', esc_html__('Auto Import', 'listdom')), 'warning'); ?>
+                    <?php else: ?>
+                        <form id="lsd_ix_csv_auto_import_form">
+                            <div class="lsd-form-row">
+                                <div class="lsd-col-2">
+                                    <label for="lsd_ix_csv_auto_import_url" class="lsd-fields-label">
+                                        <?php esc_html_e('Feed URL', 'listdom'); ?>
+                                    </label>
+                                </div>
+                                <div class="lsd-col-6">
+                                    <input
+                                        type="url"
+                                        name="ix[url]"
+                                        class="lsd-admin-input"
+                                        id="lsd_ix_csv_auto_import_url"
+                                        placeholder="https://docs.google.com/spreadsheets/d/document-id/export?format=csv"
+                                    >
+                                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("This field should contain the URL leading to the CSV file you wish to import.", 'listdom'); ?></p>
+                                </div>
+                            </div>
+                            <div class="lsd-form-row">
+                                <div class="lsd-col-2">
+                                    <label for="lsd_ix_csv_auto_import_mapping" class="lsd-fields-label">
+                                        <?php esc_html_e('Field Mapping', 'listdom'); ?>
+                                    </label>
+                                </div>
+                                <div class="lsd-col-6">
+                                    <?php echo $template->dropdown([
+                                        'class' => 'lsd-admin-input',
+                                        'id' => 'lsd_ix_csv_auto_import_mapping',
+                                        'name' => 'ix[mapping]',
+                                        'show_empty' => true,
+                                    ]); ?>
+                                </div>
+                            </div>
+                            <div class="lsd-form-row">
+                                <div class="lsd-col-2">
+                                    <label for="lsd_ix_csv_auto_import_interval" class="lsd-fields-label">
+                                        <?php esc_html_e('Interval', 'listdom'); ?>
+                                    </label>
+                                </div>
+                                <div class="lsd-col-6">
+                                    <select name="ix[interval]" id="lsd_ix_csv_auto_import_interval" class="lsd-admin-input">
+                                        <option value="weekly"><?php esc_html_e('Weekly', 'listdom'); ?></option>
+                                        <option value="daily"><?php esc_html_e('Daily', 'listdom'); ?></option>
+                                        <option value="twicedaily"><?php esc_html_e('Twice a Day', 'listdom'); ?></option>
+                                        <option value="hourly"><?php esc_html_e('Hourly', 'listdom'); ?></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="lsd-form-row">
+                                <div class="lsd-col-2">
+                                    <label for="lsd_ix_csv_auto_import_size" class="lsd-fields-label">
+                                        <?php esc_html_e('Import Size', 'listdom'); ?>
+                                    </label>
+                                </div>
+                                <div class="lsd-col-6">
+                                    <input class="lsd-admin-input" type="number" name="ix[size]" id="lsd_ix_csv_auto_import_size" min="10" max="300" step="1" value="100">
+                                    <p class="lsd-admin-description-tiny lsd-mt-2"><?php esc_html_e("It determines the maximum number of listings imported in each run of the import job.", 'listdom'); ?></p>
+                                </div>
+                            </div>
+                            <div class="lsd-form-row lsd-settings-submit-wrapper">
+                                <div class="lsd-col-12">
+                                    <?php LSD_Form::nonce('lsdaddcsv_auto_add'); ?>
+                                    <button class="lsd-primary-button" type="submit">
+                                        <?php esc_html_e('Add Import Job', 'listdom'); ?>
+                                        <i class="listdom-icon lsdi-checkmark-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php if (count($jobs->all())): ?>
+                <?php echo $jobs->manage(); ?>
+            <?php endif; ?>
+        </div>
+    </div>
+    <div id="lsd_panel_csv_mapping-templates" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'mapping-templates' ? ' lsd-tab-content-active' : ''; ?>">
+        <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Field Mapping Templates', 'listdom'); ?></h3>
+        <div class="lsd-settings-group-wrapper">
+            <div class="lsd-settings-fields-wrapper">
+                <?php echo $template->manage('lsd_csv_template_remove'); ?>
+            </div>
+        </div>
+    </div>
+    <div id="lsd_panel_csv_export" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'export' ? ' lsd-tab-content-active' : ''; ?>">
+        <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Export', 'listdom'); ?></h3>
+        <div class="lsd-settings-group-wrapper">
+            <div class="lsd-settings-fields-wrapper">
+                <p class="lsd-admin-description lsd-mb-1 lsd-mt-0"><?php esc_html_e("Please click the button below to download the CSV export of your listings.", 'listdom'); ?></p>
+                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=listdom-ix&lsd-export=csv'), 'lsd_ix_form')); ?>" class="lsd-primary-button"><?php esc_html_e('Export', 'listdom'); ?></a>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
 // Manual File Upload
@@ -165,20 +203,16 @@ jQuery('#lsd_ix_csv_import_file_input').on('change', function()
     fd.append('_wpnonce', '<?php echo wp_create_nonce('lsd_ix_csv_upload'); ?>');
     fd.append('file', jQuery(this).prop('files')[0]);
 
-    const $alert = jQuery("#lsd_ix_csv_import_message");
     const $mapping = jQuery("#lsd_ix_csv_import_mapping");
-    const $submit_wrap = jQuery("#lsd_ix_csv_import_button_wrap");
-    const $submit = jQuery("#lsd_ix_csv_import_submit");
-
-    // Remove Alert
-    $alert.html('');
+    const $file = jQuery('#lsd_ix_csv_import_file_input');
 
     // Mapping Form
     $mapping.html('');
 
-    // Disable Button
-    $submit.attr('disabled', 'disabled');
-    $submit_wrap.removeClass('lsd-text-right');
+    // Loading Wrapper
+    const loading = (new ListdomButtonLoader(jQuery('.lsd-csv-import-choose-file')));
+    $file.attr('disabled', 'disabled');
+    loading.start("<?php echo esc_js( __('Uploading', 'listdom') ); ?>");
 
     jQuery.ajax(
     {
@@ -194,23 +228,112 @@ jQuery('#lsd_ix_csv_import_file_input').on('change', function()
         if(response.success === 1)
         {
             jQuery("#lsd_ix_csv_import_file").val(response.data.file);
+            jQuery(".lsd-settings-submit-wrapper").removeClass('lsd-util-hide');
 
-            // Enable Button
-            $submit.removeAttr('disabled');
-            $submit_wrap.addClass('lsd-text-right');
+            loading.stop();
+            $file.removeAttr('disabled');
 
-            // Mapping Form
-            $mapping.html(response.output);
+            // Render Mapping Form
+            $mapping.show().html(response.output);
+            listdom_trigger_toggle();
+
+            // Template Name Handler
+            const $toggle = jQuery('#lsd_csv_template_name_toggle');
+            const $templateInput = jQuery('#ix_template_new');
+            const $templateSelect = jQuery('#lsd_ix_template');
+            const defaultName = $templateInput.val();
+
+            const lsdTemplateName = function()
+            {
+                if ($toggle.is(':checked'))
+                {
+                    // Restore default/new name
+                    if(!$templateInput.val()) $templateInput.val(defaultName);
+                }
+                else
+                {
+                    // Use selected template name
+                    const name = $templateSelect.find('option:selected').text();
+                    $templateInput.val(name !== '-----' ? name : '');
+                }
+            };
+
+            $toggle.on('change', lsdTemplateName);
+            $templateSelect.on('change', function(){
+                if(!$toggle.is(':checked')) lsdTemplateName();
+            });
+            lsdTemplateName();
 
             // Show Alert
-            $alert.html(listdom_alertify(response.message, 'lsd-success'));
+            listdom_toastify(response.message, 'lsd-success');
         }
         else
         {
             jQuery("#lsd_ix_csv_import_input").val('');
 
+            loading.stop();
+            $file.removeAttr('disabled');
+
             // Show Alert
-            $alert.html(listdom_alertify(response.message, 'lsd-error'));
+            listdom_toastify(response.message, 'lsd-error');
+        }
+    });
+});
+
+// Auto Import Add
+jQuery('#lsd_ix_csv_auto_import_form').on('submit', function(e)
+{
+    e.preventDefault();
+
+    const $form = jQuery(this);
+    const $button = $form.find(jQuery('button'));
+
+    // Loading Wrapper
+    const loading = (new ListdomButtonLoader($button));
+    loading.start("<?php echo esc_js( __('Adding Import Job', 'listdom') ); ?>");
+
+    const data = $form.serialize();
+    jQuery.ajax(
+    {
+        type: "POST",
+        url: ajaxurl,
+        data: "action=lsdaddcsv_auto_add&" + data,
+        dataType: 'json',
+        success: function(response)
+        {
+            loading.stop();
+
+            // Show Alert
+            listdom_toastify(response.message, response.success === 1 ? 'lsd-success' : 'lsd-error');
+
+            // Update Jobs Section
+            if (response.success === 1 && response.content)
+            {
+                $form.trigger("reset");
+
+                const $existing = jQuery('.lsd-ix-auto-import-existing-jobs-wrapper');
+                if ($existing.length)
+                {
+                    $existing.replaceWith(response.content);
+                }
+                else
+                {
+                    jQuery('#lsd_panel_csv_auto-import .lsd-settings-group-wrapper').append('<div class="lsd-settings-fields-wrapper">' + response.content + '</div>');
+                }
+
+                // Update templates section
+                if (response.templates)
+                {
+                    jQuery('#lsd_panel_csv_mapping-templates .lsd-settings-fields-wrapper').html(response.templates);
+                }
+            }
+        },
+        error: function()
+        {
+            loading.stop();
+
+            // Show Alert
+            listdom_toastify("<?php echo esc_js(esc_attr__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
         }
     });
 });
@@ -220,22 +343,24 @@ jQuery('#lsd_ix_csv_import_form').on('submit', function(e)
 {
     e.preventDefault();
 
-    const $button = jQuery("#lsd_ix_csv_import_submit");
+    const $button = jQuery('#lsd_ix_csv_import_submit');
     const $alert = jQuery("#lsd_ix_csv_import_message");
     const $mapping = jQuery("#lsd_ix_csv_import_mapping");
     const $input = jQuery("#lsd_ix_csv_import_file_input");
     const $offset = jQuery("#lsd_ix_csv_import_offset");
     const $size = jQuery("#lsd_ix_csv_import_size");
+    const $form = jQuery(this);
 
     // Hide Elements
     $mapping.hide();
     $input.hide();
 
-    // Add loading Class to the button
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>').attr('disabled', 'disabled');
+    // Loading Wrapper
+    const loading = (new ListdomButtonLoader($button));
+    loading.start("<?php echo esc_js( __('Importing', 'listdom') ); ?>");
 
-    // Show Alert
-    $alert.html(listdom_alertify("<?php echo esc_js(esc_attr__('Please wait ...', 'listdom')); ?>", 'lsd-info'));
+    $alert.html('');
+    $alert.removeClass('lsd-util-hide');
 
     // Start the Import
     lsd_csv_chunk_import();
@@ -243,7 +368,7 @@ jQuery('#lsd_ix_csv_import_form').on('submit', function(e)
     // Import Function
     function lsd_csv_chunk_import()
     {
-        const data = jQuery("#lsd_ix_csv_import_form").serialize();
+        const data = $form.serialize();
         jQuery.ajax(
         {
             type: "POST",
@@ -254,13 +379,28 @@ jQuery('#lsd_ix_csv_import_form').on('submit', function(e)
             {
                 if(response.success === 1)
                 {
+                    if(response.templates) jQuery('#lsd_panel_csv_mapping-templates .lsd-settings-fields-wrapper').html(response.templates);
+                    if(response.dropdown) jQuery('#lsd_ix_csv_auto_import_mapping').replaceWith(response.dropdown);
+
                     if(response.done)
                     {
                         // Show Alert
-                        $alert.html(listdom_alertify(response.message, 'lsd-success'));
+                        listdom_toastify(response.message, 'lsd-success');
+                        $alert.addClass('lsd-util-hide');
 
-                        // Hide Button
-                        $button.removeClass('loading').hide()
+                        listdom_trigger_toggle();
+
+                        loading.stop();
+                        $form.find(".lsd-settings-submit-wrapper").addClass('lsd-util-hide');
+
+                        // Reset file input and hidden value
+                        $input.val('');
+                        jQuery("#lsd_ix_csv_import_file").val('');
+                        $offset.val('0');
+
+                        // Show form elements for next import
+                        $input.show();
+                        $mapping.html('').show();
                     }
                     else
                     {
@@ -269,6 +409,9 @@ jQuery('#lsd_ix_csv_import_form').on('submit', function(e)
 
                         // New Offset
                         $offset.val(parseInt($offset.val()) + parseInt($size.val()));
+
+                        loading.stop();
+                        $form.find(".lsd-settings-submit-wrapper").addClass('lsd-util-hide');
 
                         // Run the import again
                         setTimeout(function()
@@ -280,30 +423,24 @@ jQuery('#lsd_ix_csv_import_form').on('submit', function(e)
                 else
                 {
                     // Show Alert
-                    $alert.html(listdom_alertify(response.message, 'lsd-error'));
+                    listdom_toastify(response.message, 'lsd-error');
+
+                    loading.stop();
 
                     // Show Mapping Form
                     setTimeout(function()
                     {
                         $input.show();
                         $mapping.show();
-
-                        // Remove loading Class from the button
-                        $button.removeClass('loading')
-                            .html("<?php echo esc_js(esc_attr__('Import', 'listdom')); ?>")
-                            .removeAttr('disabled');
                     }, 3000);
                 }
             },
             error: function()
             {
-                // Remove loading Class from the button
-                $button.removeClass('loading')
-                    .html("<?php echo esc_js(esc_attr__('Import', 'listdom')); ?>")
-                    .removeAttr('disabled');
-
                 // Show Alert
-                $alert.html(listdom_alertify("<?php echo esc_js(esc_attr__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error'));
+                listdom_toastify("<?php echo esc_js(esc_attr__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
+
+                loading.stop();
 
                 // Show Mapping Form
                 setTimeout(function()
@@ -313,46 +450,5 @@ jQuery('#lsd_ix_csv_import_form').on('submit', function(e)
             }
         });
     }
-});
-
-// Auto Import Add
-jQuery('#lsd_ix_csv_auto_import_form').on('submit', function(e)
-{
-    e.preventDefault();
-
-    const $form = jQuery(this);
-    const $button = $form.find(jQuery('button'));
-    const $alert = jQuery("#lsd_ix_csv_auto_import_message");
-
-    // Add loading Class to the button
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>').attr('disabled', 'disabled');
-
-    // Show Alert
-    $alert.html(listdom_alertify("<?php echo esc_js(esc_attr__('Please wait ...', 'listdom')); ?>", 'lsd-info'));
-
-    const data = $form.serialize();
-    jQuery.ajax(
-    {
-        type: "POST",
-        url: ajaxurl,
-        data: "action=lsdaddcsv_auto_add&" + data,
-        dataType: 'json',
-        success: function(response)
-        {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Add Import Job', 'listdom')); ?>").removeAttr('disabled');
-
-            // Show Alert
-            $alert.html(listdom_alertify(response.message, response.success === 1 ? 'lsd-success' : 'lsd-error'));
-        },
-        error: function()
-        {
-            // Remove loading Class from the button
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Add Import Job', 'listdom')); ?>").removeAttr('disabled');
-
-            // Show Alert
-            $alert.html(listdom_alertify("<?php echo esc_js(esc_attr__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error'));
-        }
-    });
 });
 </script>

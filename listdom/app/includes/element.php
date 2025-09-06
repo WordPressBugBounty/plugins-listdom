@@ -26,8 +26,8 @@ class LSD_Element extends LSD_Base
         // Disabled in Lite
         if ($this->isLite() && $this->pro()) return '<div class="lsd-form-row">
             <div class="lsd-col-12 lsd-handler">
-                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . ']" />
-                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . '][enabled]" value="0" />
+                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . ']">
+                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . '][enabled]" value="0">
                 ' . $this->missFeatureMessage(esc_html__($this->label, 'listdom')) . '
             </div>
         </div>';
@@ -51,8 +51,8 @@ class LSD_Element extends LSD_Base
 
         return '<div class="lsd-form-row">
             <div class="lsd-col-10 lsd-handler">
-                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . ']" />
-                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . '][enabled]" value="' . esc_attr($data['enabled']) . '" />
+                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . ']">
+                <input type="hidden" name="lsd[elements][' . esc_attr($this->key) . '][enabled]" value="' . esc_attr($data['enabled']) . '">
                 ' . $this->label . '
             </div>
             <div class="lsd-col-2 lsd-actions lsd-details-page-element-toggle-status" id="lsd_actions_' . esc_attr($this->key) . '" data-key="' . esc_attr($this->key) . '">

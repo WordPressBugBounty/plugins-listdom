@@ -16,7 +16,7 @@ $api = LSD_Options::api();
                 <div class="lsd-settings-form-group lsd-box-white lsd-rounded">
                     <div class="lsd-settings-group-wrapper">
                         <div class="lsd-settings-fields-wrapper">
-                            <div class="lsd-mt-0 lsd-mb-5">
+                            <div class="lsd-my-0">
                                 <p class="description lsd-mt-0 lsd-mb-0"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
                                 <div class="lsd-alert lsd-info"><?php echo sprintf(esc_html__('You can use the %s URL as the API base URL.', 'listdom'), '<code>'.get_rest_url().'</code>'); ?></div>
                                 <button type="button" class="button" id="lsd_settings_api_add_token"><?php esc_html_e('Add Token', 'listdom'); ?></button>
@@ -43,7 +43,7 @@ $api = LSD_Options::api();
             <?php endif; ?>
         </div>
         <?php if ($this->isPro()): ?>
-        <div class="lsd-spacer-10"></div>
+        <div class="lsd-spacer-30"></div>
         <div class="lsd-form-row lsd-settings-submit-wrapper">
 			<div class="lsd-col-12 lsd-flex lsd-flex-content-end">
 				<?php LSD_Form::nonce('lsd_api_form'); ?>

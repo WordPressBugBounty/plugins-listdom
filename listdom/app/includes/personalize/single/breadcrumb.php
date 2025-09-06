@@ -37,22 +37,22 @@ class LSD_Personalize_Single_Breadcrumb extends LSD_Personalize_Single
             'home_family' => sanitize_text_field($home['typography']['family']),
             'home_weight' => sanitize_text_field($home['typography']['weight']),
             'home_align' => sanitize_text_field($home['typography']['align']),
-            'home_size' => sanitize_text_field($home['typography']['size']) . 'px',
-            'home_line_height' => sanitize_text_field($home['typography']['line_height']) . 'px',
+            'home_size' => self::unit_number($home['typography']['size']),
+            'home_line_height' => self::unit_number($home['typography']['line_height']),
 
             'taxonomy_text_color' => sanitize_text_field($taxonomy['text_color']),
             'taxonomy_family' => sanitize_text_field($taxonomy['typography']['family']),
             'taxonomy_weight' => sanitize_text_field($taxonomy['typography']['weight']),
             'taxonomy_align' => sanitize_text_field($taxonomy['typography']['align']),
-            'taxonomy_size' => sanitize_text_field($taxonomy['typography']['size']) . 'px',
-            'taxonomy_line_height' => sanitize_text_field($taxonomy['typography']['line_height']) . 'px',
+            'taxonomy_size' => self::unit_number($taxonomy['typography']['size']),
+            'taxonomy_line_height' => self::unit_number($taxonomy['typography']['line_height']),
 
             'current_text_color' => sanitize_text_field($current['text_color']),
             'current_family' => sanitize_text_field($current['typography']['family']),
             'current_weight' => sanitize_text_field($current['typography']['weight']),
             'current_align' => sanitize_text_field($current['typography']['align']),
-            'current_size' => sanitize_text_field($current['typography']['size']) . 'px',
-            'current_line_height' => sanitize_text_field($current['typography']['line_height']) . 'px',
+            'current_size' => self::unit_number($current['typography']['size']),
+            'current_line_height' => self::unit_number($current['typography']['line_height']),
 
             'separator_text_color' => sanitize_text_field($separator['text_color']),
         ];

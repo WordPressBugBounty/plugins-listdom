@@ -205,28 +205,31 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         <div class="lsd-display-options-builder-option">
             <?php if ($this->isPro()): ?>
                 <div class="lsd-form-row">
-                    <div class="lsd-col-2"><?php echo LSD_Form::label([
+                    <div class="lsd-col-3"><?php echo LSD_Form::label([
+                        'class' => 'lsd-fields-label',
                         'title' => esc_html__('Listing Link', 'listdom'),
                         'for' => 'lsd_display_options_skin_' . $skin . '_listing_link',
                     ]); ?></div>
-                    <div class="lsd-col-6">
+                    <div class="lsd-col-7">
                         <?php echo LSD_Form::select([
                             'id' => 'lsd_display_options_skin_' . $skin . '_listing_link',
                             'name' => 'lsd[display][' . $skin . '][listing_link]',
                             'value' => $method,
                             'options' => LSD_Base::get_listing_link_methods(),
-                            'class' => 'lsd-do-listing-link',
+                            'class' => 'lsd-do-listing-link lsd-admin-input',
                         ]); ?>
-                        <p class="description"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
+                        <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
                     </div>
                 </div>
                 <div class="lsd-form-row <?php echo in_array($method, ['lightbox', 'right-panel', 'left-panel', 'bottom-panel']) ? '' : 'lsd-util-hide'; ?> lsd-do-listing-link-dependent lsd-do-listing-link-dependent-lightbox lsd-do-listing-link-dependent-right-panel lsd-do-listing-link-dependent-left-panel lsd-do-listing-link-dependent-bottom-panel">
-                    <div class="lsd-col-2"><?php echo LSD_Form::label([
-                        'title' => esc_html__('Single Listing', 'listdom'),
+                    <div class="lsd-col-3"><?php echo LSD_Form::label([
+                        'class' => 'lsd-fields-label',
+                        'title' => esc_html__('Listing style in the lightbox', 'listdom'),
                         'for' => 'lsd_display_options_skin_' . $skin . '_single_style',
                     ]); ?></div>
-                    <div class="lsd-col-6">
+                    <div class="lsd-col-7">
                         <?php echo LSD_Form::select([
+                            'class' => 'lsd-admin-input',
                             'id' => 'lsd_display_options_skin_' . $skin . '_single_style',
                             'name' => 'lsd[display][' . $skin . '][single_style]',
                             'options' => $single_styles,

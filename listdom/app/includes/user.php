@@ -198,7 +198,7 @@ class LSD_User extends LSD_Base
             $user = get_userdata($user_id);
         }
 
-        if (!$user || !($user instanceof WP_User)) return [];
+        if (!($user instanceof WP_User)) return [];
 
         $meta_keys = [
             'lsd_profile_image' => 'profile_image',
@@ -289,6 +289,14 @@ class LSD_User extends LSD_Base
         }
 
         return get_author_posts_url($id);
+    }
+
+    public static function all_roles(): array
+    {
+        $roles = [];
+        foreach (wp_roles()->roles as $key => $details) $roles[$key] = translate_user_role($details['name']);
+
+        return $roles;
     }
 
     public static function roles(bool $only_keys = false): array

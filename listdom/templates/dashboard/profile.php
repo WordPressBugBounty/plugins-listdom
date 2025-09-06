@@ -92,7 +92,7 @@ jQuery(document).ready(function()
                                     </div>
 
                                     <div class="lsd-col-12">
-                                        <span id="lsd_dashboard_profile_image_preview"><?php echo trim($profile_image) ? '<img src="'.esc_url($profile_image).'" />' : ''; ?></span>
+                                        <span id="lsd_dashboard_profile_image_preview"><?php echo trim($profile_image) ? '<img src="'.esc_url($profile_image).'">' : ''; ?></span>
                                     </div>
                                 </div>
 
@@ -122,7 +122,7 @@ jQuery(document).ready(function()
 
                                 </div>
                                 <div class="lsd-col-12">
-                                    <span id="lsd_dashboard_hero_image_preview"><?php echo trim($hero_image) ? '<img src="'.esc_url($hero_image).'" />' : ''; ?></span>
+                                    <span id="lsd_dashboard_hero_image_preview"><?php echo trim($hero_image) ? '<img src="'.esc_url($hero_image).'">' : ''; ?></span>
                                 </div>
                             </div>
                             </div>

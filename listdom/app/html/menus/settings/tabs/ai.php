@@ -6,15 +6,19 @@ defined('ABSPATH') || die();
 
 // AI Settings
 $ai = LSD_Options::ai();
+
+// AI Modules
+$modules = (new LSD_AI())->modules();
 ?>
 <div class="lsd-settings-wrap">
     <form id="lsd_ai_form">
         <div class="lsd-tab-content-active lsd-tab-content">
-            <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('AI Profiles', 'listdom'); ?></h3>
+            <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('AI', 'listdom'); ?></h3>
             <div class="lsd-settings-form-group lsd-box-white lsd-rounded">
                 <div class="lsd-settings-group-wrapper">
                     <div class="lsd-settings-fields-wrapper">
-                        <div class="lsd-mt-0 lsd-mb-4">
+                        <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Profiles', 'listdom'); ?></h3>
+                        <div class="lsd-mt-0">
                             <p class="description lsd-mt-0"><?php esc_html_e("You can create and manage multiple AI profiles, each configured with a specific model and settings. This allows you to choose the best AI for different tasks, such as low-cost models for auto-mapping or powerful models for content and image generation.", 'listdom'); ?></p>
                             <button type="button" class="button" id="lsd_settings_ai_add_profile"><?php esc_html_e('Add New Profile', 'listdom'); ?></button>
                         </div>
@@ -73,10 +77,37 @@ $ai = LSD_Options::ai();
                             </div>
                         <?php endif; ?>
                     </div>
+                    <div class="lsd-settings-fields-wrapper">
+                        <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Modules', 'listdom'); ?></h3>
+                        <div class="lsd-ai-modules-wrapper">
+                            <?php foreach ($modules as $key => $label): ?>
+                                <div>
+                                    <h3 class="lsd-my-0"><?php esc_html_e($label, 'listdom'); ?></h3>
+                                    <div class="lsd-form-row">
+                                        <div class="lsd-col-3">
+                                            <?php echo LSD_Form::label([
+                                                'title' => esc_html__('Access', 'listdom'),
+                                            ]); ?>
+                                        </div>
+                                        <div class="lsd-col-4">
+                                            <?php
+                                            echo LSD_Form::checkboxes([
+                                                'class' => 'lsd-mt-0',
+                                                'name' => 'lsd[modules]['.esc_attr($key).'][access][]',
+                                                'value' => $ai['modules'][$key]['access'] ?? ['administrator'],
+                                                'options' => LSD_User::all_roles(),
+                                            ]);
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="lsd-spacer-10"></div>
+        <div class="lsd-spacer-30"></div>
         <div class="lsd-form-row lsd-settings-submit-wrapper">
 			<div class="lsd-col-12 lsd-flex lsd-flex-content-end">
 				<?php LSD_Form::nonce('lsd_ai_form'); ?>

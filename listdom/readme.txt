@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.2
 Requires PHP: 7.2
 Tested up to: 6.8
-Stable tag: 4.6.0
+Stable tag: 4.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,7 +23,7 @@ Here are the key features of Listdom and how to use them:
 Listdom has more than 80 different skins and views that are responsive and mobile-friendly. This plugin offers so many features for business directories and classified ads listing sites in one package.
 
 ✅ [Demo](https://demo.webilia.com/listdom/)
-✅ [Documentation](https://webilia.com/docs/listdom/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
+✅ [Documentation](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 ✅ [Support](https://listdom.net/support/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 ✅ [Live Chat](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 
@@ -61,8 +61,8 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 *   Helpful dummy data to boost the start
 *   Override archive page design
 *   Font Awesome icons
-*   [Define colors for the skins as you wish](https://webilia.com/docs/listdom/settings/general-settings?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Define+colors+for+the+skins+as+you+wish)
-*   [Use predefined colors](https://webilia.com/docs/listdom/settings/general-settings?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Use+predefined+colors)
+*   [Define colors for the skins as you wish](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Define+colors+for+the+skins+as+you+wish)
+*   [Use predefined colors](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Use+predefined+colors)
 *   Font manager
 *   Several [skins and views](https://demo.webilia.com/listdom/skins/multiple-shortcodes/) on one page
 *   4 Different pre-made styles for single listing page
@@ -158,8 +158,8 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 *   Block access of different user roles to WordPress dashboard
 *   CSV importer
 *   Powerful notifications manager (Admin and user notification emails)
-*   [Custom CSS styles](https://webilia.com/docs/listdom/settings/custom-styles?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+CSS+styles)
-*   [Google reCAPTCHA](https://webilia.com/docs/listdom/settings/general-settings/#recaptcha?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Google+Recaptcha)
+*   [Custom CSS styles](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+CSS+styles)
+*   [Google reCAPTCHA](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Google+Recaptcha)
 *   Multi-Site compatibility
 *   Advanced configuration options
 *   Disable Font Awesome package
@@ -171,7 +171,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 *   Settings backup
 
 **👉 Seo Ready**
-*   [Friendly slug manager](https://webilia.com/docs/listdom/settings/slugs?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Friendly+slug+manager) (Change the slug of listings, categories, features, tags, attributes, labels, locations)
+*   [Friendly slug manager](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Friendly+slug+manager) (Change the slug of listings, categories, features, tags, attributes, labels, locations)
 *   Compatible with popular SEO plugins e.g. Yoast SEO, RankMath, AIOSEO
 
 **👉 Functionality**
@@ -426,6 +426,18 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 4.7.0 =
+* [Pro] Added a new Gallery skin.
+* Added Gemini 2.5 Flash and Gemini 2.5 Flash Lite to the Listdom AI models.
+* Added Anthropic Claude Sonnet 4 and Anthropic Claude Haiku 3.5 to the Listdom AI models.
+* Introduced AI module configuration options.
+* Added new icons to the Listdom icon picker field.
+* Rebuilt the Import/Export, Add-ons, and Licenses menus in the Listdom backend.
+* Improved the Listdom settings, shortcode builder, and other backend interfaces.
+* Enhanced the Listdom customizer by adding new controls and a unit selector.
+* Fixed a login issue in the Listdom login shortcode.
+* Fixed several minor UI display issues throughout the plugin.
 
 = 4.6.0 =
 * Added image field type for custom fields.

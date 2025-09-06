@@ -98,6 +98,8 @@ class LSD_Customizer_Dashboard extends LSD_Customizer
                     'size' => $defaults['typography']['size'] ?? 'inherit',
                     'line_height' => $defaults['typography']['line_height'] ?? 'inherit',
                 ],
+                'size_units' => ['px', 'em', 'rem', '%'],
+                'line_height_units' => ['px', 'em', 'rem', '%'],
             ],
         ];
 

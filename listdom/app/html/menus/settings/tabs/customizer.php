@@ -13,7 +13,7 @@ $options = (new LSD_Customizer())->options();
 <div class="lsd-settings-wrap lsd-settings-customizer" id="lsd_settings_display_options">
 
     <?php if (class_exists(\LSDPACELM\Base::class) || class_exists(\LSDPACDIV\Base::class)): ?>
-    <div class="lsd-mt-4">
+    <div class="lsd-m-0">
         <div class="lsd-alert lsd-warning">
             <strong><?php esc_html_e('Heads Up!', 'listdom'); ?></strong>
             <?php echo sprintf(esc_html__("If you're using a page builder like %s, %s or %s, we recommend managing your styles (colors, typography, spacing, etc.) directly through the page builder’s controls. Changes made in this Customizer may not affect elements created with a page builder but can still apply to parts of the site not built with one.", 'listdom'), '<strong>'.esc_html__('Elementor', 'listdom').'</strong>', '<strong>'.esc_html__('Bricks', 'listdom').'</strong>', '<strong>'.esc_html__('Divi', 'listdom').'</strong>'); ?>
@@ -54,7 +54,7 @@ $options = (new LSD_Customizer())->options();
                                 <p class="description lsd-my-0"><?php echo esc_html($section['description']); ?></p>
                             <?php endif; ?>
 
-                            <?php if (isset($section['inherit']) && is_array($section['inherit'])): $inherit = $values[$ck][$sk]['inherit'] ?? (int) ($section['inherit']['enabled'] ?? 0) ?>
+                            <?php if (isset($section['inherit']) && is_array($section['inherit'])): $inherit = $values[$ck][$sk]['inherit'] ?? (int) $section['inherit']['enabled'] ?? 0 ?>
                                 <div class="lsd-flex lsd-flex-row lsd-flex-content-start lsd-gap-4">
                                     <div><?php echo LSD_Form::switcher([
                                         'id' => 'lsd-customizer-'.$ck.'-'.$sk.'-inherit',
@@ -135,6 +135,7 @@ $options = (new LSD_Customizer())->options();
                                                                             else if ($type === 'text') $f = LSD_Form::text(array_merge($field, $args));
                                                                             // Number
                                                                             else if ($type === 'number') $f = LSD_Form::number(array_merge($field, $args));
+                                                                            else if ($type === 'unit_number') $f = LSD_Form::unit_number(array_merge($field, $args));
                                                                             // Image
                                                                             else if ($type === 'image') $f = LSD_Form::imagepicker(array_merge($field, $args));
                                                                             // Icon
@@ -168,7 +169,7 @@ $options = (new LSD_Customizer())->options();
         </div>
         <?php endforeach; ?>
 
-        <div class="lsd-spacer-10"></div>
+        <div class="lsd-spacer-30"></div>
         <div class="lsd-form-row lsd-settings-submit-wrapper">
             <div class="lsd-col-12 lsd-flex lsd-gap-3 lsd-flex-content-end">
                 <?php LSD_Form::nonce('lsd_settings_form'); ?>

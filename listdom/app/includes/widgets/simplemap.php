@@ -44,12 +44,12 @@ class LSD_Widgets_SimpleMap extends WP_Widget
 
         echo '<p class="lsd-widget-row">
             <label for="' . $this->get_field_id('title') . '">' . esc_html__('Title', 'listdom') . '</label>
-            <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '" />
+            <input class="widefat" type="text" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" value="' . (isset($instance['title']) ? esc_attr($instance['title']) : '') . '">
         </p>';
 
         echo '<p class="lsd-widget-row">
             <label for="' . $this->get_field_id('address') . '">' . esc_html__('Address', 'listdom') . '</label>
-            <input class="widefat" type="text" id="' . $this->get_field_id('address') . '" name="' . $this->get_field_name('address') . '" value="' . (isset($instance['address']) ? esc_attr($instance['address']) : '') . '" />
+            <input class="widefat" type="text" id="' . $this->get_field_id('address') . '" name="' . $this->get_field_name('address') . '" value="' . (isset($instance['address']) ? esc_attr($instance['address']) : '') . '">
             <p class="description">' . esc_html__('The address that you want to show on the map!', 'listdom') . '</p>
         </p>';
 
@@ -78,7 +78,7 @@ class LSD_Widgets_SimpleMap extends WP_Widget
 
         echo '<p class="lsd-widget-row">
             <label for="' . $this->get_field_id('name') . '">' . esc_html__('Location Name', 'listdom') . '</label>
-            <input class="widefat" type="text" id="' . $this->get_field_id('name') . '" name="' . $this->get_field_name('name') . '" value="' . (isset($instance['name']) ? esc_attr($instance['name']) : '') . '" placeholder="' . esc_attr__("Our Office", 'listdom') . '" />
+            <input class="widefat" type="text" id="' . $this->get_field_id('name') . '" name="' . $this->get_field_name('name') . '" value="' . (isset($instance['name']) ? esc_attr($instance['name']) : '') . '" placeholder="' . esc_attr__("Our Office", 'listdom') . '">
         </p>';
 
         echo '<p class="lsd-widget-row">

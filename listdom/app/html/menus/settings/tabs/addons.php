@@ -1,13 +1,16 @@
 <?php
 // no direct access
 defined('ABSPATH') || die();
+
+/** @var LSD_Menus_Settings $this */
+[, $default] = $this->get_addons_default();
 ?>
 <div class="lsd-settings-wrap">
     <form id="lsd_addons_form">
 
-        <?php do_action('lsd_addon_form'); ?>
+        <?php do_action('lsd_addon_form', $default); ?>
 
-        <div class="lsd-spacer-10"></div>
+        <div class="lsd-spacer-30"></div>
         <div class="lsd-form-row lsd-settings-submit-wrapper">
 			<div class="lsd-col-12 lsd-flex lsd-gap-3 lsd-flex-content-end">
 				<?php LSD_Form::nonce('lsd_addons_form'); ?>
