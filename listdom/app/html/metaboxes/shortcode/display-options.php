@@ -32,7 +32,7 @@ $price_components = LSD_Options::price_components();
                             <?php foreach ($skins->get_skins() as $skin_key => $skin_label): ?>
                                 <div class="lsd-skin-style-option <?php echo $selected_skin === $skin_key ? 'selected' : ''; ?>" data-skin="<?php echo esc_attr($skin_key); ?>">
                                     <img width="120" src="<?php echo esc_url($this->lsd_asset_url('img/skins/'.$skin_key.'.svg')); ?>" alt="<?php echo esc_attr($skin_label); ?>">
-                                    <h4 class="lsd-mt-2 lsd-mb-3"><?php echo esc_html($skin_label); ?></h4>
+                                    <h4 class="lsd-mt-2 lsd-mb-0"><?php echo esc_html($skin_label); ?></h4>
                                 </div>
                             <?php endforeach; ?>
                             <input type="hidden" name="lsd[display][skin]" id="lsd_display_options_skin" value="<?php echo esc_attr($options['skin'] ?? ''); ?>">

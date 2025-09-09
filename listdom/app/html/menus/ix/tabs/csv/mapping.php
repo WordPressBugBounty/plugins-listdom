@@ -117,14 +117,12 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                     <?php foreach ($mapping->listdom_fields() as $key => $l_field): ?>
                     <tr class="lsd-ix-mapping-field" id="lsd_ix_mapping_field_<?php echo esc_attr($key); ?>">
                         <td class="lsd-ix-mapping-field-name-col">
-                            <div class="lsd-ix-mapping-field-name">
-                                <strong>
-                                    <?php echo $l_field['label'] ?? 'N/A'; ?> <?php echo isset($l_field['mandatory']) && $l_field['mandatory'] ? '<span class="required">*</span>' : ''; ?>
-                                </strong>
+                            <div class="lsd-ix-mapping-field-name lsd-admin-table-body-title">
+                                <?php echo $l_field['label'] ?? 'N/A'; ?> <?php echo isset($l_field['mandatory']) && $l_field['mandatory'] ? '<span class="required">*</span>' : ''; ?>
                             </div>
-                            <?php echo isset($l_field['description']) ? '<p class="description">'.$l_field['description'].'</p>' : ''; ?>
+                            <?php echo isset($l_field['description']) ? '<p class="lsd-admin-table-body">'.$l_field['description'].'</p>' : ''; ?>
                         </td>
-                        <td class="lsd-ix-mapping-field-type-col"><?php echo isset($l_field['type']) ? ucfirst($l_field['type']) : ''; ?></td>
+                        <td class="lsd-ix-mapping-field-type-col lsd-admin-table-body"><?php echo isset($l_field['type']) ? ucfirst($l_field['type']) : ''; ?></td>
                         <td class="lsd-ix-mapping-field-map-col">
                             <select class="lsd-admin-input" id="lsd_ix_mapping_field_<?php echo esc_attr($key); ?>_map" name="ix[mapping][<?php echo esc_attr($key); ?>][map]" title="<?php esc_attr_e('Map', 'listdom'); ?>">
                                 <option value="">-----</option>

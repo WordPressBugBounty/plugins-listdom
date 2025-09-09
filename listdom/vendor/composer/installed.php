@@ -3,7 +3,7 @@
         'name' => 'webilia/listdom',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '00ea1b36366ef92de8efedcd478a4c1224517a60',
+        'reference' => 'a5bbcfc0b6df7ce63ca542aef9c9600e2455b9b8',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -247,7 +247,7 @@
         'webilia/listdom' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '00ea1b36366ef92de8efedcd478a4c1224517a60',
+            'reference' => 'a5bbcfc0b6df7ce63ca542aef9c9600e2455b9b8',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

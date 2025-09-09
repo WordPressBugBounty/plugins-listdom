@@ -84,9 +84,11 @@ $ids = $this->listings;
             <?php do_action('lsd_skins_after_content', $this, $listing); ?>
 
             <div class="lsd-listing-bottom-bar">
+                <div class="lsd-listing-rate-wrapper">
                 <?php if ($this->display_review_stars): ?>
                     <?php echo LSD_Kses::element($listing->get_rate_stars('summary')); ?>
                 <?php endif; ?>
+                </div>
 
                 <?php if ($this->display_address): ?>
                     <?php if ($address = $listing->get_address()): ?>
