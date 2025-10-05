@@ -38,15 +38,15 @@ class LSD_Element_Attributes extends LSD_Element
     protected function general_settings(array $data): string
     {
         return '<div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_show_icons">' . esc_html__('Show Icons', 'listdom') . '</label>
-            <select name="lsd[elements][' . esc_attr($this->key) . '][show_icons]" id="lsd_elements_' . esc_attr($this->key) . '_show_icons">
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_show_icons">' . esc_html__('Show Icons', 'listdom') . '</label>
+            <select class="lsd-admin-input" name="lsd[elements][' . esc_attr($this->key) . '][show_icons]" id="lsd_elements_' . esc_attr($this->key) . '_show_icons">
                 <option value="0" ' . (isset($data['show_icons']) && $data['show_icons'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
                 <option value="1" ' . (isset($data['show_icons']) && $data['show_icons'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
             </select>
         </div>
         <div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_show_attribute_title">' . esc_html__('Show Custom Field Title', 'listdom') . '</label>
-            <select name="lsd[elements][' . esc_attr($this->key) . '][show_attribute_title]" id="lsd_elements_' . esc_attr($this->key) . '_show_attribute_title">
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_show_attribute_title">' . esc_html__('Show Custom Field Title', 'listdom') . '</label>
+            <select class="lsd-admin-input" name="lsd[elements][' . esc_attr($this->key) . '][show_attribute_title]" id="lsd_elements_' . esc_attr($this->key) . '_show_attribute_title">
                 <option value="1" ' . (isset($data['show_attribute_title']) && $data['show_attribute_title'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
                 <option value="0" ' . (isset($data['show_attribute_title']) && $data['show_attribute_title'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
             </select>

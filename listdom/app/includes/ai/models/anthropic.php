@@ -36,7 +36,7 @@ abstract class LSD_AI_Models_Anthropic extends LSD_AI_Models_Base
                 'x-api-key' => $this->api_key(),
                 'anthropic-version' => '2023-06-01',
             ],
-            'body' => json_encode($body),
+            'body' => wp_json_encode($body),
             'data_format' => 'body',
         ]);
 

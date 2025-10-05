@@ -5,7 +5,7 @@ class LSD_Personalize extends LSD_Base
     public static function generate()
     {
         $main = new LSD_Main();
-        $raw = LSD_File::read($main->get_listdom_path() . '/assets/css/personalized.raw');
+        $raw = LSD_File::read($main->get_listdom_path() . '/assets/css/personalized.txt');
 
         $CSS = LSD_Personalize_General::make($raw);
         $CSS = LSD_Personalize_Buttons::make($CSS);

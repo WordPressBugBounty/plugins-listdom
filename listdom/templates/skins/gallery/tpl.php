@@ -22,6 +22,7 @@ jQuery(document).ready(function()
         atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
         next_page: "'.$this->next_page.'",
         limit: "'.$this->limit.'",
+        nonce: "' . esc_js(wp_create_nonce('lsd_search_form')) . '",
         masonry: "'.(in_array($this->style, ['style3']) ? '1' : '0').'",
         rtl: '.(is_rtl() ? 'true' : 'false').',
         duration: 400,

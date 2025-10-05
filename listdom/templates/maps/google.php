@@ -39,7 +39,7 @@ $mapcontrols = $args['mapcontrols'] ?? [];
 if (!is_array($mapcontrols) || !count($mapcontrols)) $mapcontrols = LSD_Options::defaults('mapcontrols');
 
 // The Unique ID
-$id = $args['id'] ?? mt_rand(100, 999);
+$id = $args['id'] ?? wp_rand(100, 999);
 
 if (isset($args['objects']) && is_array($args['objects']))
 {
@@ -67,14 +67,14 @@ jQuery(document).ready(function()
             id: '.$id.',
             ajax_url: "'.admin_url('admin-ajax.php', null).'",
             zoom: '.$zoomlevel.',
-            objects: '.json_encode($objects, JSON_NUMERIC_CHECK).',
+            objects: '.wp_json_encode($objects, JSON_NUMERIC_CHECK).',
             args: "'.http_build_query(['args'=>$args], '', '&').'",
             richmarker: "'.$assets->lsd_asset_url('packages/richmarker/richmarker.min.js').'",
             infobox: "'.$assets->lsd_asset_url('packages/infobox/infobox.min.js').'",
             clustering: '.(isset($args['clustering']) && $args['clustering'] ? '"'.$assets->lsd_asset_url('packages/clusterer/markerclusterer.min.js').'"' : 'false').',
             clustering_images: "'.$assets->lsd_asset_url(isset($args['clustering_images']) && trim($args['clustering_images']) ? $args['clustering_images'] : 'img/cluster1/m').'",
             styles: '.(trim($style) != '' ? $assets->get_googlemap_style($style) : "''").',
-            mapcontrols: '.json_encode($mapcontrols, JSON_NUMERIC_CHECK).',
+            mapcontrols: '.wp_json_encode($mapcontrols, JSON_NUMERIC_CHECK).',
             fill_color: "'.$settings['map_shape_fill_color'].'",
             fill_opacity: '.$settings['map_shape_fill_opacity'].',
             stroke_color: "'.$settings['map_shape_stroke_color'].'",
@@ -84,15 +84,15 @@ jQuery(document).ready(function()
             mapsearch: '.($mapsearch ? 'true' : 'false').',
             autoGPS: '.($autoGPS ? 'true' : 'false').',
             display_infowindow: '.($infowindow ? 'true' : 'false').',
-            connected_shortcodes: '.json_encode($connected_shortcodes, JSON_NUMERIC_CHECK).',
+            connected_shortcodes: '.wp_json_encode($connected_shortcodes, JSON_NUMERIC_CHECK).',
             geo_request: '.($main->is_geo_request() ? 'true' : 'false').',
             gps_zoom: {
                 zl: '.$gps_zl.',
                 current: '.$gps_zl_current.'
             },
-            max_bounds: '.json_encode($max_bounds, JSON_NUMERIC_CHECK).',
+            max_bounds: '.wp_json_encode($max_bounds, JSON_NUMERIC_CHECK).',
             gplaces: '.($gplaces ? 'true' : 'false').',
-            layers: '.json_encode(apply_filters('lsd_map_layers', [], LSD_MP_GOOGLE), JSON_NUMERIC_CHECK).',
+            layers: '.wp_json_encode(apply_filters('lsd_map_layers', [], LSD_MP_GOOGLE), JSON_NUMERIC_CHECK).',
             direction: {
                 status: '.($direction ? 'true' : 'false').',
                 destination:

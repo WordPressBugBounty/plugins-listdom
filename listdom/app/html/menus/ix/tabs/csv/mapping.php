@@ -35,7 +35,11 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
     <div class="lsd-ix-mapping-wrap">
         <div class="lsd-admin-section-heading">
             <h3 class="lsd-admin-title lsd-m-0"><?php esc_html_e('Mapping', 'listdom'); ?></h3>
-            <p class="lsd-m-0 lsd-admin-description"><?php echo sprintf(esc_html__("You're importing %s file. If you have already saved some mapping templates, you can apply them by selecting from the list or use th smart mapping.", 'listdom'), '<a href="'.$url.'" target="_blank"><strong>'.$file.'</strong></a>'); ?></p>
+            <p class="lsd-m-0 lsd-admin-description"><?php echo sprintf(
+                /* translators: %s: Link to the imported file name. */
+                esc_html__("You're importing %s file. If you have already saved some mapping templates, you can apply them by selecting from the list or use th smart mapping.", 'listdom'),
+                '<a href="'.$url.'" target="_blank"><strong>'.$file.'</strong></a>'
+            ); ?></p>
         </div>
         <div class="lsd-radio-toggle">
             <input class="lsd-toggle" data-for="#lsd_addons_csv_load-template" data-all=".lsd-addons-csv-method-wrapper" type="radio" name="addons[csv][method]" value="load-template" id="lsd_addons_csv_method_load-template" <?php echo $method === 'load-template' ? 'checked="checked"' : ''; ?>>
@@ -98,7 +102,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                         <th>
                             <div class="lsd-th-icon-wrapper">
                                 <?php esc_html_e('Mapping', 'listdom'); ?>
-                                <span class="lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Map as many CSV fields as possible, but only map correct ones to avoid corrupted data after import.', 'listdom-excel'); ?>">
+                                <span class="lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Map as many CSV fields as possible, but only map correct ones to avoid corrupted data after import.', 'listdom'); ?>">
                                     <i class="far fa-question-circle listdom-icon"></i>
                                 </span>
                             </div>
@@ -106,7 +110,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                         <th>
                             <div class="lsd-th-icon-wrapper">
                                 <?php esc_html_e('Default Value', 'listdom'); ?>
-                                <span class="lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('If your CSV feed lacks certain fields, you can assign default values (e.g., set currency to USD if not provided).', 'listdom-excel'); ?>">
+                                <span class="lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('If your CSV feed lacks certain fields, you can assign default values (e.g., set currency to USD if not provided).', 'listdom'); ?>">
                                     <i class="far fa-question-circle listdom-icon"></i>
                                 </span>
                             </div>
@@ -158,8 +162,8 @@ jQuery('#lsd_ix_csv_load_template_map').on('click', function ()
     jQuery('#ix_template_new').val('');
 
     // Loading Wrapper
-    const loading = (new ListdomButtonLoader($button));
-    loading.start("<?php echo esc_js( __('Mapping', 'listdom') ); ?>");
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Mapping', 'listdom') ); ?>");
 
     // Disable Button
     $submit.attr('disabled', 'disabled');
@@ -191,7 +195,7 @@ jQuery('#lsd_ix_csv_load_template_map').on('click', function ()
                     }
                 }
 
-                listdom_toastify("<?php echo esc_js(__('Template mapping was successful', 'listdom')) ?>", 'lsd-success');
+                listdom_toastify("<?php echo esc_js(esc_html__('Template mapping was successful', 'listdom')) ?>", 'lsd-success');
 
                 jQuery('#lsd_csv_template_name_toggle').trigger('change');
             }
@@ -214,8 +218,8 @@ jQuery('#lsd_ix_csv_auto_map').on('click', function ()
     const ai_profile = jQuery("#ix_ai_profile").val();
 
     // Loading Wrapper
-    const loading = (new ListdomButtonLoader($button));
-    loading.start("<?php echo esc_js( __('Mapping', 'listdom') ); ?>");
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Mapping', 'listdom') ); ?>");
 
     // Disable Buttons
     $submit.attr('disabled', 'disabled');

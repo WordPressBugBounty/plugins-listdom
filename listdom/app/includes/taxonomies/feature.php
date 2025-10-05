@@ -70,18 +70,18 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
             <p class="description"><?php esc_html_e("The icon will show on the website frontend next to the feature.", 'listdom'); ?></p>
         </div>
         <?php if (!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
-    <?php else: ?>
-        <div class="form-field">
-            <label for="lsd_itemprop"><?php esc_html_e('Schema Property', 'listdom'); ?></label>
-            <?php echo LSD_Form::text([
-                'name' => 'lsd_itemprop',
-                'id' => 'lsd_itemprop',
-                'placeholder' => 'additionalProperty',
-            ]); ?>
-            <p class="description"><?php esc_html_e("Schema Item Property (https://schema.org/)", 'listdom'); ?></p>
-        </div>
-    <?php endif; ?>
-        <?php
+        <?php else: ?>
+            <div class="form-field">
+                <label for="lsd_itemprop"><?php esc_html_e('Schema Property', 'listdom'); ?></label>
+                <?php echo LSD_Form::text([
+                    'name' => 'lsd_itemprop',
+                    'id' => 'lsd_itemprop',
+                    'placeholder' => 'additionalProperty',
+                ]); ?>
+                <p class="description"><?php esc_html_e("Schema Item Property (https://schema.org/)", 'listdom'); ?></p>
+            </div>
+        <?php endif;
+        wp_nonce_field('lsd_save_feature_meta', 'lsd_feature_meta_nonce');
     }
 
     public function edit_form($term)
@@ -117,8 +117,8 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
                 <p class="description"><?php esc_html_e("Schema Item Property (https://schema.org/)", 'listdom'); ?></p>
             </td>
         </tr>
-        <?php endif; ?>
-        <?php
+        <?php endif;
+        wp_nonce_field('lsd_save_feature_meta', 'lsd_feature_meta_nonce');
     }
 
     public function save_metadata($term_id)
@@ -126,8 +126,14 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
         // It's quick edit
         if (!isset($_POST['lsd_icon'])) return;
 
-        $icon = sanitize_text_field($_POST['lsd_icon']);
-        $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? sanitize_text_field($_POST['lsd_itemprop']) : '';
+        $nonce = isset($_POST['lsd_feature_meta_nonce']) ? sanitize_text_field(wp_unslash($_POST['lsd_feature_meta_nonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_save_feature_meta')) return;
+
+        $taxonomy = get_taxonomy(LSD_Base::TAX_FEATURE);
+        if (!$taxonomy || !current_user_can($taxonomy->cap->edit_terms)) return;
+
+        $icon = sanitize_text_field(wp_unslash($_POST['lsd_icon']));
+        $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? sanitize_text_field(wp_unslash($_POST['lsd_itemprop'])) : '';
 
         update_term_meta($term_id, 'lsd_icon', $icon);
         update_term_meta($term_id, 'lsd_itemprop', $itemprop);

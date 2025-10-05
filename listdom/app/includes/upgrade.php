@@ -61,7 +61,7 @@ class LSD_Upgrade extends LSD_Base
     private function roles()
     {
         remove_role('listdom_author');
-        add_role('listdom_author', __('Listdom Author', 'listdom'), [
+        add_role('listdom_author', esc_html__('Listdom Author', 'listdom'), [
             'read' => true,
             'edit_posts' => true,
             'delete_posts' => true,
@@ -74,7 +74,7 @@ class LSD_Upgrade extends LSD_Base
         ]);
 
         remove_role('listdom_publisher');
-        add_role('listdom_publisher', __('Listdom Publisher', 'listdom'), [
+        add_role('listdom_publisher', esc_html__('Listdom Publisher', 'listdom'), [
             'read' => true,
             'edit_posts' => true,
             'delete_posts' => true,

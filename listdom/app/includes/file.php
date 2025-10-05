@@ -26,7 +26,9 @@ class LSD_File extends LSD_Base
     {
         if (!file_exists($path)) return true;
 
-        return unlink($path);
+        if (!function_exists('wp_delete_file')) require_once ABSPATH . 'wp-admin/includes/file.php';
+
+        return (bool) wp_delete_file($path);
     }
 
     public static function download($url, $body = null)

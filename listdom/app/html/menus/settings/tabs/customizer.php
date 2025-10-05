@@ -16,7 +16,13 @@ $options = (new LSD_Customizer())->options();
     <div class="lsd-m-0">
         <div class="lsd-alert lsd-warning">
             <strong><?php esc_html_e('Heads Up!', 'listdom'); ?></strong>
-            <?php echo sprintf(esc_html__("If you're using a page builder like %s, %s or %s, we recommend managing your styles (colors, typography, spacing, etc.) directly through the page builder’s controls. Changes made in this Customizer may not affect elements created with a page builder but can still apply to parts of the site not built with one.", 'listdom'), '<strong>'.esc_html__('Elementor', 'listdom').'</strong>', '<strong>'.esc_html__('Bricks', 'listdom').'</strong>', '<strong>'.esc_html__('Divi', 'listdom').'</strong>'); ?>
+            <?php echo sprintf(
+                /* translators: 1: Elementor link, 2: Bricks link, 3: Divi link. */
+                esc_html__("If you're using a page builder like %1\$s, %2\$s or %3\$s, we recommend managing your styles (colors, typography, spacing, etc.) directly through the page builder’s controls. Changes made in this Customizer may not affect elements created with a page builder but can still apply to parts of the site not built with one.", 'listdom'),
+                '<strong>'.esc_html__('Elementor', 'listdom').'</strong>',
+                '<strong>'.esc_html__('Bricks', 'listdom').'</strong>',
+                '<strong>'.esc_html__('Divi', 'listdom').'</strong>'
+            ); ?>
         </div>
     </div>
     <?php endif; ?>
@@ -24,12 +30,12 @@ $options = (new LSD_Customizer())->options();
     <div class="lsd-title-reset-section">
         <div class="lsd-flex lsd-gap-3">
             <h3 id="lsd_customizer_tab_title" class="lsd-m-0 lsd-admin-title"></h3>
-            <div class="lsd-tooltip lsd-tooltip-left lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
+            <div class="lsd-tooltip lsd-tooltip-right lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
                 <i class="lsdi lsdi-reset"></i>
             </div>
         </div>
         <form id="lsd_settings_reset" class="lsd-flex lsd-flex-row lsd-flex-items-stretch lsd-flex-content-end lsd-gap-3 lsd-p-0">
-            <input id="lsd_reset_confirm" placeholder="<?php esc_attr_e("Type 'reset' to confirm your action.", 'listdom'); ?>" title="<?php esc_attr_e('Confirm'); ?>">
+            <input id="lsd_reset_confirm" placeholder="<?php esc_attr_e("Type 'reset' to confirm your action.", 'listdom'); ?>" title="<?php esc_attr_e('Confirm', 'listdom'); ?>">
             <?php LSD_Form::nonce('lsd_settings_form'); ?>
             <button type="submit" class="lsd-neutral-button" id="lsd_settings_reset_button"><?php esc_html_e('Reset Customizer', 'listdom'); ?></button>
         </form>
@@ -37,7 +43,7 @@ $options = (new LSD_Customizer())->options();
 
     <form id="lsd_settings_form">
         <?php $c = 0; foreach ($options as $ck => $category): $c++; ?>
-        <div id="lsd_panel_customizer_<?php echo esc_html(strtolower(str_replace(' ', '-', $category['title'] ?? ''))); ?>" data-category="<?php echo esc_attr($ck); ?>" data-title="<?php echo esc_html__($category['title'], 'listdom'); ?>" class="lsd-settings-form-group lsd-tab-content <?php echo ($this->subtab ? $this->subtab === $ck : $c === 1) ? 'lsd-tab-content-active' : ''; ?>">
+        <div id="lsd_panel_customizer_<?php echo esc_html(strtolower(str_replace(' ', '-', $category['title'] ?? ''))); ?>" data-category="<?php echo esc_attr($ck); ?>" data-title="<?php echo esc_html($category['title']); ?>" class="lsd-settings-form-group lsd-tab-content <?php echo ($this->subtab ? $this->subtab === $ck : $c === 1) ? 'lsd-tab-content-active' : ''; ?>">
             <?php if (isset($category['sections']) && is_array($category['sections']) && (count($category['sections']) > 1 || (isset($category['display_sections_force']) && $category['display_sections_force']))): ?>
                 <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex lsd-mb-4" data-for=".lsd-customizer-<?php echo esc_attr($ck); ?>-category-tab-switcher-content">
                     <?php $s = 0; foreach ($category['sections'] as $sk => $section): $s++; ?>
@@ -51,7 +57,7 @@ $options = (new LSD_Customizer())->options();
                     <div class="lsd-tab-switcher-content lsd-customizer-<?php echo esc_attr($ck); ?>-category-tab-switcher-content <?php echo $s === 1 ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-customizer-<?php echo esc_attr($ck); ?>-<?php echo esc_attr($sk); ?>-content">
                         <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-4">
                             <?php if (isset($section['description']) && trim($section['description'])): ?>
-                                <p class="description lsd-my-0"><?php echo esc_html($section['description']); ?></p>
+                                <p class="lsd-admin-description lsd-my-0"><?php echo esc_html($section['description']); ?></p>
                             <?php endif; ?>
 
                             <?php if (isset($section['inherit']) && is_array($section['inherit'])): $inherit = $values[$ck][$sk]['inherit'] ?? (int) $section['inherit']['enabled'] ?? 0 ?>
@@ -62,7 +68,7 @@ $options = (new LSD_Customizer())->options();
                                         'toggle' => '#lsd-customizer-'.$ck.'-'.$sk.'-divisions',
                                         'value' => $inherit
                                     ]); ?></div>
-                                    <label for="<?php echo esc_attr('lsd-customizer-'.$ck.'-'.$sk.'-inherit'); ?>"><?php echo esc_html($section['inherit']['text']); ?></label>
+                                    <label class="lsd-fields-label" for="<?php echo esc_attr('lsd-customizer-'.$ck.'-'.$sk.'-inherit'); ?>"><?php echo esc_html($section['inherit']['text']); ?></label>
                                     <?php echo LSD_Form::hidden([
                                         'name' => 'lsd['.$ck.']['.$sk.'][inherit_from]',
                                         'value' => $section['inherit']['key'] ?? ''
@@ -76,17 +82,17 @@ $options = (new LSD_Customizer())->options();
                                         <?php $g = 0; foreach ($section['groups'] as $gk => $group): $g++; ?>
                                             <div class="lsd-settings-fields-wrapper lsd-form-group lsd-featured-form-group lsd-px-4 lsd-my-0 lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-4">
                                                 <div class="lsd-flex lsd-flex-row lsd-flex-items-start">
-                                                    <div class="<?php echo isset($group['sub_title']) && trim($group['sub_title']) ? 'lsd-mb-4' : ''; ?>">
+                                                    <div class="<?php echo isset($group['sub_title']) && trim($group['sub_title']) ? 'lsd-admin-section-heading' : ''; ?>">
                                                         <div class="lsd-flex lsd-gap-3 lsd-flex-align-items-baseline">
                                                         <?php if (isset($group['title']) && trim($group['title'])): ?>
                                                             <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html($group['title']); ?></h3>
                                                         <?php endif; ?>
-                                                            <div class="lsd-tooltip lsd-tooltip-left lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-category="<?php echo esc_attr($ck.'.'.$sk.'.'.$gk); ?>" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
+                                                            <div class="lsd-tooltip lsd-tooltip-right lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-category="<?php echo esc_attr($ck.'.'.$sk.'.'.$gk); ?>" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
                                                                 <i class="lsdi lsdi-reset"></i>
                                                             </div>
                                                         </div>
                                                         <?php if (isset($group['sub_title']) && trim($group['sub_title'])): ?>
-                                                            <p class="description lsd-my-0"><?php echo esc_html($group['sub_title']); ?></p>
+                                                            <p class="lsd-admin-description lsd-my-0"><?php echo esc_html($group['sub_title']); ?></p>
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>
@@ -130,11 +136,12 @@ $options = (new LSD_Customizer())->options();
                                                                             // Typography
                                                                             else if ($type === 'typography') $f = LSD_Form::typography(array_merge($field, $args));
                                                                             // Select
-                                                                            else if ($type === 'select') $f = LSD_Form::select(array_merge($field, $args));
+                                                                            else if ($type === 'select') $f = LSD_Form::select(array_merge($field, array_merge($args , ['class' => 'lsd-admin-input'])));
                                                                             // Text
-                                                                            else if ($type === 'text') $f = LSD_Form::text(array_merge($field, $args));
+                                                                            else if ($type === 'text') $f = LSD_Form::text(array_merge($field, array_merge($args , ['class' => 'lsd-admin-input'])));
                                                                             // Number
-                                                                            else if ($type === 'number') $f = LSD_Form::number(array_merge($field, $args));
+                                                                            else if ($type === 'number') $f = LSD_Form::number(array_merge($field, array_merge($args , ['class' => 'lsd-admin-input'])));
+
                                                                             else if ($type === 'unit_number') $f = LSD_Form::unit_number(array_merge($field, $args));
                                                                             // Image
                                                                             else if ($type === 'image') $f = LSD_Form::imagepicker(array_merge($field, $args));
@@ -143,11 +150,11 @@ $options = (new LSD_Customizer())->options();
                                                                             ?>
                                                                             <div>
                                                                                 <div class="lsd-flex lsd-flex-row lsd-flex-items-start lsd-gap-4">
-                                                                                    <div class="lsd-flex-1"><?php echo LSD_Form::label(array_merge($field, ['for' => $id])); ?></div>
+                                                                                    <div class="lsd-flex-1"><?php echo LSD_Form::label(array_merge($field, ['for' => $id, 'class' => 'lsd-fields-label'])); ?></div>
                                                                                     <div class="lsd-flex-5"><?php echo LSD_Kses::form($f); ?></div>
                                                                                 </div>
                                                                                 <?php if (isset($field['description']) && trim($field['description'])): ?>
-                                                                                    <p class="description lsd-mt-4 lsd-mb-0"><?php echo esc_html($field['description']); ?></p>
+                                                                                    <p class="lsd-admin-description-tiny lsd-mt-2 lsd-mb-0"><?php echo esc_html($field['description']); ?></p>
                                                                                 <?php endif; ?>
                                                                             </div>
                                                                         <?php endforeach; ?>
@@ -177,10 +184,6 @@ $options = (new LSD_Customizer())->options();
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
                     <i class='lsdi lsdi-checkmark-circle'></i>
                 </button>
-                <div>
-                    <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
-                    <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
-                </div>
             </div>
         </div>
     </form>
@@ -195,18 +198,11 @@ jQuery('#lsd_settings_form').on('submit', function (e)
 
     // Elements
     const $button = jQuery("#lsd_settings_save_button");
-    const $success = jQuery(".lsd-settings-success-message");
-    const $error = jQuery(".lsd-settings-error-message");
-    const $tab = jQuery('.nav-tab-active');
-
-    // Loading Styles
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
+    const $tab = jQuery('.lsd-nav-tab-active');
 
     // Loading Wrapper
-    const loading = (new ListdomLoadingWrapper());
-
-    // Loading
-    loading.start();
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Saving', 'listdom') ); ?>");
 
     const settings = jQuery(this).serialize();
     jQuery.ajax(
@@ -218,21 +214,19 @@ jQuery('#lsd_settings_form').on('submit', function (e)
         {
             $tab.attr('data-saved', 'true');
 
-            // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save The Changes', 'listdom')); ?><i class='lsdi lsdi-checkmark-circle'></i>");
+            listdom_toastify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
 
             // Unloading
-            loading.stop($success, 2000);
+            loading.stop();
         },
         error: function ()
         {
             $tab.attr('data-saved', 'false');
 
-            // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save The Changes', 'listdom')); ?><i class='lsdi lsdi-checkmark-circle'></i>");
+            listdom_toastify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
 
             // Unloading
-            loading.stop($error, 2000);
+            loading.stop();
         }
     });
 });
@@ -262,8 +256,9 @@ jQuery('.lsd-customizer-reset-category').on('click', function (e)
     }
     else $button.data('confirm', 0).removeClass('lsd-need-confirm');
 
-    // Loading Styles
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
+    // Loading Wrapper
+    const loading = new ListdomButtonLoader($button);
+    loading.start("");
 
     jQuery.ajax(
     {
@@ -272,16 +267,16 @@ jQuery('.lsd-customizer-reset-category').on('click', function (e)
         data: "action=lsd_reset_customizer&_wpnonce="+$button.data('nonce')+'&category='+$button.data('category'),
         success: function ()
         {
-            // Loading Styles
-            $button.removeClass('loading').html('<i class="lsdi lsdi-reset"></i>');
+            // Unloading
+            loading.stop();
 
             // Reload
             window.location.reload();
         },
         error: function ()
         {
-            // Loading Styles
-            $button.removeClass('loading').html('<i class="lsdi lsdi-reset"></i>');
+            // Unloading
+            loading.stop();
         }
     });
 });
@@ -297,8 +292,9 @@ jQuery('#lsd_settings_reset').on('submit', function (e)
     // Not confirmed
     if ($confirm.val() !== "reset" && $confirm.val() !== "'reset'") return;
 
-    // Loading Styles
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
+    // Loading Wrapper
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Reset Customizer', 'listdom') ); ?>");
 
     const data = jQuery(this).serialize();
     jQuery.ajax(
@@ -308,16 +304,16 @@ jQuery('#lsd_settings_reset').on('submit', function (e)
         data: "action=lsd_reset_customizer&" + data,
         success: function ()
         {
-            // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Reset display options', 'listdom')); ?>");
+            // Unloading
+            loading.stop();
 
             // Reload
             window.location.reload();
         },
         error: function ()
         {
-            // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Reset display options', 'listdom')); ?>");
+            // Unloading
+            loading.stop();
         }
     });
 });

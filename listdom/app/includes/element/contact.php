@@ -36,7 +36,7 @@ class LSD_Element_Contact extends LSD_Element
     protected function general_settings(array $data): string
     {
         return '<div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_display_icon">' . esc_html__('Display Icon', 'listdom') . '</label>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_display_icon">' . esc_html__('Display Icon', 'listdom') . '</label>
             ' . LSD_Form::switcher([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_icon',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_icon]',
@@ -44,7 +44,7 @@ class LSD_Element_Contact extends LSD_Element
             ]) . '
         </div>
         <div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_display_label">' . esc_html__('Display Label', 'listdom') . '</label>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_display_label">' . esc_html__('Display Label', 'listdom') . '</label>
             ' . LSD_Form::switcher([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_display_label',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][display_label]',

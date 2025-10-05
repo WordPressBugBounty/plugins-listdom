@@ -59,12 +59,16 @@ $datetime_format = LSD_Base::datetime_format();
         const loading = new ListdomButtonLoader($button);
         loading.start('');
 
-        const msgUsed = "<?php echo esc_js( sprintf( __('%s is used in an auto import job. By removing this template, the related job will also be deleted. Are you sure you want to continue?', 'listdom'), '%s' ) ); ?>";
-        const msgDelete = "<?php echo esc_js(__('Are you sure you want to delete this?', 'listdom')); ?>";
+        const msgUsed = "<?php echo esc_js(sprintf(
+            /* translators: %s: Template name placeholder (kept for runtime replacement). */
+            esc_html__('%1$s is used in an auto import job. By removing this template, the related job will also be deleted. Are you sure you want to continue?', 'listdom'),
+            '%s'
+        )); ?>";
+        const msgDelete = "<?php echo esc_js(esc_html__('Are you sure you want to delete this?', 'listdom')); ?>";
         const message = isUsed ? msgUsed.replace('%s', name) : msgDelete;
 
-        const confirmText = "<?php echo esc_js(__('Confirm', 'listdom')); ?>";
-        const cancelText = "<?php echo esc_js(__('Cancel', 'listdom')); ?>";
+        const confirmText = "<?php echo esc_js(esc_html__('Confirm', 'listdom')); ?>";
+        const cancelText = "<?php echo esc_js(esc_html__('Cancel', 'listdom')); ?>";
 
         listdom_toastify(message, "lsd-confirm", {
             position: "lsd-center-center",
@@ -99,7 +103,7 @@ $datetime_format = LSD_Base::datetime_format();
                                     if (!jQuery('.lsd-ix-auto-import-jobs tbody tr').length) jQuery('.lsd-ix-auto-import-existing-jobs').addClass('lsd-util-hide');
                                 }
 
-                                listdom_toastify(name + ' ' + "<?php echo esc_js(__('Removed', 'listdom')); ?>", 'lsd-success');
+                                listdom_toastify(name + ' ' + "<?php echo esc_js(esc_html__('Removed', 'listdom')); ?>", 'lsd-success');
                             }
 
                         },
@@ -109,6 +113,9 @@ $datetime_format = LSD_Base::datetime_format();
                     });
                 },
                 onCancel: function(toast) {
+                    loading.stop();
+                },
+                onCloseOverlay: function(toast) {
                     loading.stop();
                 }
             }

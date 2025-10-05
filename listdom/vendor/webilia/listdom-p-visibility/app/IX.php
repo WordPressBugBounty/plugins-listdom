@@ -86,10 +86,10 @@ class IX extends Base
     public function data($data, $listing_id)
     {
         $visible_from = get_post_meta($listing_id, 'lsd_visible_from', true);
-        $data[] = $visible_from ? date('Y-m-d', $visible_from) : '';
+        $data[] = $visible_from ? lsd_date('Y-m-d', $visible_from) : '';
 
         $visible_until = get_post_meta($listing_id, 'lsd_visible_until', true);
-        $data[] = $visible_until ? date('Y-m-d', $visible_until) : '';
+        $data[] = $visible_until ? lsd_date('Y-m-d', $visible_until) : '';
 
         return $data;
     }

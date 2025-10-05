@@ -22,7 +22,7 @@ class LSD_API_Resources_Availability extends LSD_API_Resource
             else if (isset($availability[$daycode]) and isset($availability[$daycode]['hours'])) $hours = $availability[$daycode]['hours'];
 
             $rendered[$daycode] = [
-                'day' => esc_html__($weekday['day'], 'listdom'),
+                'day' => esc_html($weekday['day']),
                 'hours' => $hours,
                 'off' => $off,
             ];

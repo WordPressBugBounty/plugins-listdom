@@ -28,8 +28,8 @@ jQuery(document).ready(function()
         ajax: '.$this->ajax.',
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         nonce: "'.wp_create_nonce('lsd_search_form').'",
-        sf: '.json_encode($this->sf).',
-        connected_shortcodes: '.json_encode($this->connected_shortcodes, JSON_NUMERIC_CHECK).',
+        sf: '.wp_json_encode($this->sf).',
+        connected_shortcodes: '.wp_json_encode($this->connected_shortcodes, JSON_NUMERIC_CHECK).',
         select2: {
             noResults: "'.esc_js(esc_html__('No results found.', 'listdom')).'"
         }

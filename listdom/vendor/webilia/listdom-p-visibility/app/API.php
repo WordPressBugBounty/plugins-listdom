@@ -77,9 +77,9 @@ class API extends Base
         $date_format = get_option('date_format');
 
         $listing['visibility'] = [
-            'from_date' => $visible_from ? date($date_format, $visible_from) : '',
+            'from_date' => $visible_from ? lsd_date($date_format, $visible_from) : '',
             'from_timestamp' => $visible_from,
-            'until_date' => $visible_until ? date($date_format, $visible_until) : '',
+            'until_date' => $visible_until ? lsd_date($date_format, $visible_until) : '',
             'until_timestamp' => $visible_until,
         ];
 

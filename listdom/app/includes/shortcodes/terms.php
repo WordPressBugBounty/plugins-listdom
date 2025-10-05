@@ -23,7 +23,7 @@ class LSD_Shortcodes_Terms extends LSD_Shortcodes
         $hierarchical = isset($this->atts['hierarchical']) && $this->atts['hierarchical'];
         $show_count = isset($this->atts['show_count']) && $this->atts['show_count'];
         $taxonomy = isset($this->atts['taxonomy']) && in_array($this->atts['taxonomy'], $this->taxonomies()) ? $this->atts['taxonomy'] : LSD_Base::TAX_CATEGORY;
-        $id = LSD_id::get($this->atts['id'] ?? mt_rand(100, 999));
+        $id = LSD_id::get($this->atts['id'] ?? wp_rand(100, 999));
 
         // Generate output
         ob_start();

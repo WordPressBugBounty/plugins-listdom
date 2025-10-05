@@ -23,7 +23,8 @@ jQuery(document).ready(function()
         infinite_scroll: "'.($this->pagination === 'scroll' ? '1' : '0').'",
         single_listing_style: "'.$this->single_listing_style.'",
         next_page: "'.$this->next_page.'",
-        limit: "'.$this->limit.'"
+        limit: "'.$this->limit.'",
+        nonce: "' . esc_js(wp_create_nonce('lsd_search_form')) . '"
     });
 });
 </script>');

@@ -16,7 +16,7 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
     public function upload()
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : null;
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : null;
 
         // Check if nonce is not set
         if (!trim($wpnonce)) $this->response(['success' => 0, 'message' => esc_html__('Security nonce missed!', 'listdom'), 'code' => 'NONCE_MISSING']);
@@ -24,39 +24,39 @@ class LSD_Menus_IX_CSV extends LSD_Base
         // Verify that the nonce is valid.
         if (!wp_verify_nonce($wpnonce, 'lsd_ix_csv_upload')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid!', 'listdom'), 'code' => 'NONCE_IS_INVALID']);
 
+        if (!current_user_can('manage_options')) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to perform this action.', 'listdom'), 'code' => 'NO_ACCESS']);
+
         $uploaded_file = $_FILES['file'] ?? null;
 
         // No file
         if (!$uploaded_file) $this->response(['success' => 0, 'message' => esc_html__('Please upload a file first!', 'listdom'), 'code' => 'NO_FILE']);
 
-        $ex = explode('.', $uploaded_file['name']);
+        $ex = explode('.', sanitize_file_name(wp_unslash($uploaded_file['name'])));
         $extension = end($ex);
 
         // Invalid Extension
         if ($extension !== 'csv') $this->response(['success' => 0, 'message' => esc_html__('Invalid file extension! Only CSV files are allowed.', 'listdom'), 'code' => 'INVALID_EXTENSION']);
 
-        // Main Library
-        $main = new LSD_Main();
-
         // Upload File
-        $file = time() . '.' . $extension;
-        $destination = $main->get_upload_path() . $file;
-
         $data = [];
         $output = '';
+        $file = time() . '.' . $extension;
 
-        if (move_uploaded_file($uploaded_file['tmp_name'], $destination))
+        $uploaded = $this->upload_to_listdom_dir($uploaded_file, $file);
+
+        if ($uploaded && !isset($uploaded['error']))
         {
             $success = 1;
             $message = esc_html__('The file is uploaded. Please map the CSV file fields with Listdom fields and then import it.', 'listdom');
 
+            $file = basename($uploaded['file']);
             $data = ['file' => $file];
             $output = $this->mapping_form($file);
         }
         else
         {
             $success = 0;
-            $message = esc_html__('An error occurred during uploading the file!', 'listdom');
+            $message = isset($uploaded['error']) ? esc_html($uploaded['error']) : esc_html__('An error occurred during uploading the file!', 'listdom');
         }
 
         $this->response(['success' => $success, 'message' => $message, 'data' => $data, 'output' => $output]);
@@ -64,7 +64,7 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
     public function import()
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : null;
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : null;
 
         // Check if nonce is not set
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
@@ -72,14 +72,16 @@ class LSD_Menus_IX_CSV extends LSD_Base
         // Verify that the nonce is valid.
         if (!wp_verify_nonce($wpnonce, 'lsd_ix_csv_import')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
 
+        if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
+
         // Get Parameters
-        $ix = $_POST['ix'] ?? [];
+        $ix = isset($_POST['ix']) && is_array($_POST['ix']) ? wp_unslash($_POST['ix']) : [];
 
         // Sanitization
         array_walk_recursive($ix, 'sanitize_text_field');
 
         // File
-        $file = $ix['file'] ?? '';
+        $file = isset($ix['file']) ? sanitize_text_field($ix['file']) : '';
 
         // No File
         if (trim($file) === '') $this->response(['success' => 0, 'code' => 'FILE_MISSED']);
@@ -92,9 +94,6 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
         // File Not Found
         if (!LSD_File::exists($path)) $this->response(['success' => 0, 'code' => 'FILE_NOT_FOUND']);
-
-        // Unlimited Time Needed!
-        set_time_limit(0);
 
         // Offset & Limit
         $offset = $ix['offset'] ?? 0;
@@ -126,7 +125,11 @@ class LSD_Menus_IX_CSV extends LSD_Base
         [$count] = $csv->import_by_mapping($path, $ix['mapping'], $offset, $limit);
 
         // Message
-        $message = sprintf(esc_html__("%s listing(s) imported successfully! Please be patient and do not close the window. Continuing to import the remaining listings...", 'listdom'), '<strong>' . (($offset / $limit) + 1) * $count . '</strong>');
+        $message = sprintf(
+            /* translators: %s: Number of listings processed so far (HTML wrapped). */
+            esc_html__("%s listing(s) imported successfully! Please be patient and do not close the window. Continuing to import the remaining listings...", 'listdom'),
+            '<strong>' . (($offset / $limit) + 1) * $count . '</strong>'
+        );
         $done = 0;
 
         // Import Finished
@@ -140,7 +143,11 @@ class LSD_Menus_IX_CSV extends LSD_Base
             do_action('lsd_import_finished');
 
             // Message
-            $message = sprintf(esc_html__("%s listing(s) imported successfully! The import process is now complete.", 'listdom'), $offset + $count);
+            $message = sprintf(
+                /* translators: %s: Total number of imported listings. */
+                esc_html__("%s listing(s) imported successfully! The import process is now complete.", 'listdom'),
+                $offset + $count
+            );
             $done = 1;
         }
 
@@ -156,7 +163,7 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
     public function template()
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : null;
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : null;
 
         // Check if nonce is not set
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
@@ -164,8 +171,10 @@ class LSD_Menus_IX_CSV extends LSD_Base
         // Verify that the nonce is valid.
         if (!wp_verify_nonce($wpnonce, 'lsd_ix_csv_load_template')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
 
+        if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
+
         // Get Parameters
-        $key = isset($_POST['template']) ? sanitize_text_field($_POST['template']) : [];
+        $key = isset($_POST['template']) ? sanitize_text_field(wp_unslash($_POST['template'])) : [];
 
         // Template Library
         $tpl = new LSD_IX_Templates_CSV();
@@ -176,7 +185,7 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
     public function ai_mapping()
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : null;
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : null;
 
         // Check if nonce is not set
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
@@ -184,9 +193,11 @@ class LSD_Menus_IX_CSV extends LSD_Base
         // Verify that the nonce is valid.
         if (!wp_verify_nonce($wpnonce, 'lsd_ix_csv_ai_mapping')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
 
+        if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
+
         // Parameters
-        $file = isset($_POST['file']) ? sanitize_text_field($_POST['file']) : '';
-        $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field($_POST['ai_profile']) : '';
+        $file = isset($_POST['file']) ? sanitize_text_field(wp_unslash($_POST['file'])) : '';
+        $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field(wp_unslash($_POST['ai_profile'])) : '';
 
         // Feed Path / URL
         $path = $this->get_upload_path().$file;
@@ -223,7 +234,7 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
     public function remove_template()
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : null;
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : null;
 
         // Check if nonce is not set
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
@@ -231,8 +242,10 @@ class LSD_Menus_IX_CSV extends LSD_Base
         // Verify that the nonce is valid.
         if (!wp_verify_nonce($wpnonce, 'lsd_csv_template_remove')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
 
+        if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
+
         // Get Parameters
-        $key = isset($_POST['key']) ? sanitize_text_field($_POST['key']) : [];
+        $key = isset($_POST['key']) ? sanitize_text_field(wp_unslash($_POST['key'])) : [];
 
         // Template Library
         $tpl = new LSD_IX_Templates_CSV();

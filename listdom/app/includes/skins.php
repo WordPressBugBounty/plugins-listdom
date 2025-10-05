@@ -71,6 +71,10 @@ class LSD_Skins extends LSD_Base
     public $map_position;
     public $map_component = true;
 
+    protected $sort_meta_key = null;
+    protected $sort_meta_orderby = null;
+    protected $sort_meta_type = null;
+
     public function __construct()
     {
         // Settings
@@ -102,13 +106,20 @@ class LSD_Skins extends LSD_Base
         (new LSD_Skins_Masonry())->init();
         (new LSD_Skins_Accordion())->init();
         (new LSD_Skins_Mosaic())->init();
+        (new LSD_Skins_Timeline())->init();
         (new LSD_Skins_Gallery())->init();
     }
 
     public function start($atts)
     {
         $this->atts = apply_filters('lsd_skins_atts', $atts);
-        $this->id = LSD_id::get(isset($this->atts['id']) ? sanitize_text_field($this->atts['id']) : mt_rand(100, 999));
+        $this->id = LSD_id::get(isset($this->atts['id'])
+            ? (int) $this->atts['id']
+            : wp_rand(100, 999)
+        );
+
+        $update_address_bar = apply_filters('lsd_update_page_address', true, $this);
+        LSD_Assets::update_address_bar($update_address_bar, $this->id);
 
         // Skin Options
         $this->skin_options = $this->atts['lsd_display'][$this->skin] ?? [];
@@ -448,13 +459,45 @@ class LSD_Skins extends LSD_Base
         // Sort Options
         $this->sorts = $this->atts['lsd_sorts'] ?? LSD_Options::defaults('sorts');
 
+        $available_options = $this->get_available_sort_options();
+        if (!isset($this->sorts['options']) || !is_array($this->sorts['options']))
+        {
+            $this->sorts['options'] = $available_options;
+        }
+        else
+        {
+            foreach ($available_options as $key => $option)
+            {
+                if (!isset($this->sorts['options'][$key]) || !is_array($this->sorts['options'][$key]))
+                {
+                    $this->sorts['options'][$key] = $option;
+                }
+                else
+                {
+                    $this->sorts['options'][$key] = wp_parse_args($this->sorts['options'][$key], $option);
+                }
+            }
+        }
+
         // Sortbar Status
         $this->sortbar = isset($this->sorts['display']) && $this->sorts['display'];
         $this->sort_style = isset($this->sorts['sort_style']) && $this->sorts['sort_style'];
 
         // Order and Order By and Style
         $this->orderby = $this->sorts['default']['orderby'] ?? 'post_date';
-        $this->order = $this->sorts['default']['order'] ?? 'DESC';
+
+        if (!isset($this->sorts['options'][$this->orderby])) $this->orderby = 'post_date';
+
+        $default_option = $this->sorts['options'][$this->orderby] ?? [];
+        $order = $this->sorts['default']['order'] ?? ($default_option['order'] ?? 'DESC');
+        $order = strtoupper($order);
+        if (!in_array($order, ['ASC', 'DESC'], true))
+        {
+            $order = strtoupper($default_option['order'] ?? 'DESC');
+            if (!in_array($order, ['ASC', 'DESC'], true)) $order = 'DESC';
+        }
+
+        $this->order = $order;
 
         // Sort Query
         $this->args = $this->query_sort($this->args, $this->orderby, $this->order);
@@ -463,12 +506,38 @@ class LSD_Skins extends LSD_Base
     public function query_sort($args, $orderby, $order = 'DESC')
     {
         // Sort by Meta
-        if (strpos($this->orderby, 'lsd_') !== false)
+        $order = strtoupper($order);
+        if (!in_array($order, ['ASC', 'DESC'], true)) $order = 'DESC';
+        $args['order'] = $order;
+
+        $option = $this->sorts['options'][$orderby] ?? [];
+        $meta_key = $option['meta_key'] ?? null;
+        if (!$meta_key && strpos($orderby, 'lsd_') === 0) $meta_key = $orderby;
+
+        $this->sort_meta_key = null;
+        $this->sort_meta_orderby = null;
+        $this->sort_meta_type = null;
+
+        if ($meta_key)
         {
-            $args['orderby'] = 'meta_value_num';
-            $args['meta_key'] = $this->orderby;
+            $orderby_type = $option['orderby'] ?? null;
+            if ($orderby_type !== 'meta_value' && $orderby_type !== 'meta_value_num')
+            {
+                $orderby_type = strpos($meta_key, 'lsd_') === 0 ? 'meta_value_num' : 'meta_value';
+            }
+
+            $this->sort_meta_key = $meta_key;
+            $this->sort_meta_orderby = $orderby_type;
+            $this->sort_meta_type = isset($option['meta_type']) && trim($option['meta_type']) ? $option['meta_type'] : null;
+
+            unset($args['meta_key'], $args['meta_type']);
+            $args['orderby'] = 'post_date';
         }
-        else $args['orderby'] = $this->orderby;
+        else
+        {
+            $args['orderby'] = $orderby;
+            unset($args['meta_key'], $args['meta_type']);
+        }
 
         // Order
         $args['order'] = $this->order;
@@ -547,14 +616,29 @@ class LSD_Skins extends LSD_Base
         // Random Order
         if (isset($args['orderby']) && $args['orderby'] === 'rand')
         {
-            $seed = isset($this->atts['seed']) && isset($args['paged']) && $args['paged'] != 1 ? $this->atts['seed'] : rand(10000, 99999);
+            $seed = isset($this->atts['seed']) && isset($args['paged']) && $args['paged'] != 1 ? $this->atts['seed'] : wp_rand(10000, 99999);
 
             $args['orderby'] = 'RAND(' . $seed . ')';
             $this->atts['seed'] = $seed;
         }
 
+        $clauses_filter_added = false;
+        if ($this->sort_meta_key)
+        {
+            add_filter('posts_clauses', [$this, 'apply_sort_meta_clauses'], 10, 2);
+            $clauses_filter_added = true;
+        }
+
         // The Query
         $query = new WP_Query($args);
+
+        if ($clauses_filter_added)
+        {
+            remove_filter('posts_clauses', [$this, 'apply_sort_meta_clauses'], 10);
+            $this->sort_meta_key = null;
+            $this->sort_meta_orderby = null;
+            $this->sort_meta_type = null;
+        }
 
         $ids = [];
         if ($query->have_posts())
@@ -579,6 +663,68 @@ class LSD_Skins extends LSD_Base
         return $ids;
     }
 
+    public function apply_sort_meta_clauses(array $clauses, WP_Query $wp_query): array
+    {
+        if (!$wp_query->get('lsd-init', false) || !$this->sort_meta_key)
+        {
+            return $clauses;
+        }
+
+        global $wpdb;
+
+        $alias = 'lsd_sort_meta';
+        if (strpos($clauses['join'], $alias) === false)
+        {
+            $meta_key = esc_sql($this->sort_meta_key);
+            $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS {$alias} ON {$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = '{$meta_key}'";
+        }
+
+        $order = strtoupper($this->order);
+        if (!in_array($order, ['ASC', 'DESC'], true)) $order = 'DESC';
+
+        $orderby_type = $this->sort_meta_orderby;
+        $meta_type = $this->sort_meta_type;
+
+        $value_expression = "{$alias}.meta_value";
+
+        if ($orderby_type === 'meta_value_num')
+        {
+            $value_expression = "CAST({$alias}.meta_value AS DECIMAL(20,6))";
+        }
+
+        if ($meta_type && trim($meta_type))
+        {
+            $sanitized_type = strtoupper(preg_replace('/[^A-Z0-9_(), ]/', '', $meta_type));
+            if ($sanitized_type)
+            {
+                if ($sanitized_type === 'DATETIME')
+                {
+                    $value_expression = "CAST(REPLACE({$alias}.meta_value, 'T', ' ') AS DATETIME)";
+                }
+                else
+                {
+                    $value_expression = "CAST({$alias}.meta_value AS {$sanitized_type})";
+                }
+            }
+        }
+
+        $ordered_value = "CASE WHEN {$alias}.meta_value IS NULL OR {$alias}.meta_value = '' THEN NULL ELSE {$value_expression} END";
+        $empties_last = "CASE WHEN {$alias}.meta_value IS NULL OR {$alias}.meta_value = '' THEN 1 ELSE 0 END ASC";
+
+        $orderby_clause = $empties_last . ', ' . $ordered_value . ' ' . $order;
+        if (!empty($clauses['orderby'])) $orderby_clause .= ', ' . $clauses['orderby'];
+
+        $fallback_order = "{$wpdb->posts}.ID {$order}";
+        if (strpos($orderby_clause, $fallback_order) === false)
+        {
+            $orderby_clause .= ', ' . $fallback_order;
+        }
+
+        $clauses['orderby'] = $orderby_clause;
+
+        return $clauses;
+    }
+
     /**
      * @param array $search
      * @param string $limitType
@@ -590,8 +736,19 @@ class LSD_Skins extends LSD_Base
         $args = [];
 
         // Order
-        $this->orderby = isset($search['orderby']) ? sanitize_text_field($search['orderby']) : $this->orderby;
-        $this->order = isset($search['order']) ? sanitize_text_field($search['order']) : $this->order;
+        $requested_orderby = isset($search['orderby']) ? sanitize_text_field($search['orderby']) : $this->orderby;
+        if (isset($this->sorts['options'][$requested_orderby])) $this->orderby = $requested_orderby;
+        else if (!isset($this->sorts['options'][$this->orderby])) $this->orderby = 'post_date';
+
+        $requested_order = isset($search['order']) ? sanitize_text_field($search['order']) : $this->order;
+        $order_upper = strtoupper($requested_order);
+        if (!in_array($order_upper, ['ASC', 'DESC'], true))
+        {
+            $order_upper = strtoupper($this->sorts['options'][$this->orderby]['order'] ?? 'DESC');
+            if (!in_array($order_upper, ['ASC', 'DESC'], true)) $order_upper = 'DESC';
+        }
+
+        $this->order = $order_upper;
 
         $args = $this->query_sort($args, $this->orderby, $this->order);
 
@@ -605,14 +762,11 @@ class LSD_Skins extends LSD_Base
         $args['paged'] = isset($search['page']) ? sanitize_text_field($search['page']) : (get_query_var('paged') ?: 1);
 
         // Search Parameters
-        $sf = isset($search['sf']) && is_array($search['sf']) ? $search['sf'] : [];
-        $shape = isset($sf['shape']) ? sanitize_text_field($sf['shape']) : null;
+        $sf = isset($search['sf']) && is_array($search['sf']) ? LSD_Sanitize::search($search['sf']) : [];
+        $shape = $sf['shape'] ?? null;
 
         // Boundary Search
-        if (!$shape && isset($sf['min_latitude']) && trim($sf['min_latitude']) &&
-            isset($sf['max_latitude']) && trim($sf['max_latitude']) &&
-            isset($sf['min_longitude']) && trim($sf['min_longitude']) &&
-            isset($sf['max_longitude']) && trim($sf['max_longitude']))
+        if (!$shape && isset($sf['min_latitude'], $sf['max_latitude'], $sf['min_longitude'], $sf['max_longitude']))
         {
             $args['lsd-boundary'] = [
                 'min_latitude' => $sf['min_latitude'],
@@ -623,7 +777,7 @@ class LSD_Skins extends LSD_Base
         }
 
         // Rectangle Search
-        if ($shape == 'rectangle')
+        if ($shape === 'rectangle' && isset($sf['rect_min_latitude'], $sf['rect_max_latitude'], $sf['rect_min_longitude'], $sf['rect_max_longitude']))
         {
             $args['lsd-boundary'] = [
                 'min_latitude' => $sf['rect_min_latitude'],
@@ -634,7 +788,7 @@ class LSD_Skins extends LSD_Base
         }
 
         // Circle Search
-        if ($shape == 'circle')
+        if ($shape === 'circle' && isset($sf['circle_latitude'], $sf['circle_longitude'], $sf['circle_radius']))
         {
             $args['lsd-circle'] = [
                 'center' => [$sf['circle_latitude'], $sf['circle_longitude']],
@@ -643,7 +797,7 @@ class LSD_Skins extends LSD_Base
         }
 
         // Polygon Search
-        if ($shape == 'polygon')
+        if ($shape === 'polygon' && isset($sf['polygon']) && trim($sf['polygon']) !== '')
         {
             $args['lsd-polygon'] = [
                 'points' => $sf['polygon'],
@@ -686,6 +840,9 @@ class LSD_Skins extends LSD_Base
 
     public function filter()
     {
+        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_search_form')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom')]);
+
         // Get attributes
         $atts = $_POST['atts'] ?? [];
 
@@ -779,6 +936,7 @@ class LSD_Skins extends LSD_Base
             'side' => esc_html__('Side by Side View', 'listdom'),
             'accordion' => esc_html__('Accordion View', 'listdom'),
             'mosaic' => esc_html__('Mosaic View', 'listdom'),
+            'timeline' => esc_html__('Timeline View', 'listdom'),
             'gallery' => esc_html__('Gallery View', 'listdom'),
         ]);
 

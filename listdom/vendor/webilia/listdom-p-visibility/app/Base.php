@@ -93,7 +93,7 @@ class Base
 
     public function response(array $response)
     {
-        echo json_encode($response, JSON_NUMERIC_CHECK);
+        echo wp_json_encode($response, JSON_NUMERIC_CHECK);
         exit;
     }
 }

@@ -74,7 +74,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'key' => 'taxonomies[' . LSD_Base::TAX_TAG . ']',
                         'method' => 'textarea',
                         'label' => esc_html__('Tags', 'listdom'),
-                        'placeholder' => esc_html__('Tag1,Tag2,Tag3', 'listdom'),
+                        'placeholder' => esc_attr__('Tag1,Tag2,Tag3', 'listdom'),
                         'values' => LSD_API_Resources_Taxonomy::collection(
                             $taxonomies->hierarchy(LSD_Base::TAX_TAG)
                         ),
@@ -219,8 +219,8 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                 $ava_fields['ava_' . $daycode . '_hour'] = [
                     'key' => 'ava[' . $daycode . '][hours]',
                     'method' => 'text-input',
-                    'label' => esc_html__($weekday['day'], 'listdom'),
-                    'placeholder' => esc_html__('9 - 18, 9 AM to 9 PM', 'listdom'),
+                    'label' => esc_html($weekday['day']),
+                    'placeholder' => esc_attr__('9 - 18, 9 AM to 9 PM', 'listdom'),
                     'required' => false,
                 ];
 
@@ -253,14 +253,14 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'key' => 'email',
                         'method' => 'email-input',
                         'label' => esc_html__('Email', 'listdom'),
-                        'placeholder' => esc_html__('Email', 'listdom'),
+                        'placeholder' => esc_attr__('Email', 'listdom'),
                         'required' => false,
                     ],
                     'phone' => [
                         'key' => 'phone',
                         'method' => 'tel-input',
                         'label' => esc_html__('Phone', 'listdom'),
-                        'placeholder' => esc_html__('Phone', 'listdom'),
+                        'placeholder' => esc_attr__('Phone', 'listdom'),
                         'required' => false,
                     ],
                     'link' => [
@@ -287,7 +287,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'key' => 'remark',
                         'method' => 'textarea',
                         'label' => esc_html__('Owner Message', 'listdom'),
-                        'placeholder' => esc_html__('Owner message to the visitors ...', 'listdom'),
+                        'placeholder' => esc_attr__('Owner message to the visitors ...', 'listdom'),
                         'required' => false,
                     ],
                 ],
@@ -325,14 +325,14 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                         'key' => 'embeds[][name]',
                         'method' => 'text-input',
                         'label' => esc_html__('Title', 'listdom'),
-                        'placeholder' => esc_html__('Title', 'listdom'),
+                        'placeholder' => esc_attr__('Title', 'listdom'),
                         'required' => false,
                     ],
                     'embeds_code' => [
                         'key' => 'embeds[][code]',
                         'method' => 'textarea',
                         'label' => esc_html__('Code', 'listdom'),
-                        'placeholder' => esc_html__('Code', 'listdom'),
+                        'placeholder' => esc_attr__('Code', 'listdom'),
                         'required' => false,
                     ],
                 ],
@@ -397,14 +397,14 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                     'key' => 'guest_email',
                     'method' => 'email-input',
                     'label' => esc_html__('Email', 'listdom'),
-                    'placeholder' => esc_html__('Your Email', 'listdom'),
+                    'placeholder' => esc_attr__('Your Email', 'listdom'),
                     'required' => true,
                 ],
                 'guest_message' => [
                     'key' => 'guest_message',
                     'method' => 'textarea',
                     'label' => esc_html__('Message', 'listdom'),
-                    'placeholder' => esc_html__('Message to Reviewer', 'listdom'),
+                    'placeholder' => esc_attr__('Message to Reviewer', 'listdom'),
                     'required' => false,
                 ],
             ];
@@ -415,7 +415,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                     'key' => 'guest_fullname',
                     'method' => 'text-input',
                     'label' => esc_html__('Full Name', 'listdom'),
-                    'placeholder' => esc_html__('Please insert your full name', 'listdom'),
+                    'placeholder' => esc_attr__('Please insert your full name', 'listdom'),
                     'required' => false,
                 ];
             }
@@ -426,7 +426,7 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
                     'key' => 'guest_password',
                     'method' => 'password-input',
                     'label' => esc_html__('Password', 'listdom'),
-                    'placeholder' => esc_html__('Should be at-least 8 characters', 'listdom'),
+                    'placeholder' => esc_attr__('Should be at-least 8 characters', 'listdom'),
                     'required' => true,
                 ];
             }

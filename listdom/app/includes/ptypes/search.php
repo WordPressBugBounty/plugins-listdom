@@ -130,16 +130,14 @@ class LSD_PTypes_Search extends LSD_PTypes
         if (!isset($_POST['_lsdnonce'])) return;
 
         // Nonce is not valid!
-        if (!wp_verify_nonce(sanitize_text_field($_POST['_lsdnonce']), 'lsd_search_cpt')) return;
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_lsdnonce'])), 'lsd_search_cpt')) return;
 
         // We don't need to do anything on post auto save
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
 
         // Get Listdom Data
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Desktop Fields
         $desktop = $lsd['fields'] ?? [];
@@ -190,10 +188,10 @@ class LSD_PTypes_Search extends LSD_PTypes
 
     public function params()
     {
-        $device_key = isset($_POST['device_key']) ? sanitize_text_field($_POST['device_key']) : 'fields';
+        $device_key = isset($_POST['device_key']) ? sanitize_text_field(wp_unslash($_POST['device_key'])) : 'fields';
         $i = isset($_POST['i']) ? sanitize_text_field($_POST['i']) : 1;
-        $key = isset($_POST['key']) ? sanitize_text_field($_POST['key']) : null;
-        $title = isset($_POST['title']) ? trim(sanitize_text_field($_POST['title'])) : null;
+        $key = isset($_POST['key']) ? sanitize_text_field(wp_unslash($_POST['key'])) : null;
+        $title = isset($_POST['title']) ? trim(sanitize_text_field(wp_unslash($_POST['title']))) : null;
 
         $builder = new LSD_Search_Builder();
         $html = $builder->params($device_key, $key, ['title' => $title], $i);
@@ -204,9 +202,9 @@ class LSD_PTypes_Search extends LSD_PTypes
     public function row()
     {
         $i = isset($_POST['i']) ? sanitize_text_field($_POST['i']) : 1;
-        $post_id = isset($_POST['post_id']) ? sanitize_text_field($_POST['post_id']) : 0;
-        $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : 'row';
-        $device_key = isset($_POST['device_key']) ? sanitize_text_field($_POST['device_key']) : 'fields';
+        $post_id = isset($_POST['post_id']) ? absint(wp_unslash($_POST['post_id'])) : 0;
+        $type = isset($_POST['type']) ? sanitize_text_field(wp_unslash($_POST['type'])) : 'row';
+        $device_key = isset($_POST['device_key']) ? sanitize_text_field(wp_unslash($_POST['device_key'])) : 'fields';
 
         $builder = new LSD_Search_Builder();
         $html = $builder->row($post_id, $device_key, [

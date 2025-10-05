@@ -78,6 +78,74 @@ class LSD_Base
         return $upload_dir['baseurl'] . '/listdom/';
     }
 
+    public function upload_to_listdom_dir(array $file, string $filename, array $overrides = []): array
+    {
+        if (!function_exists('wp_handle_upload')) require_once ABSPATH . 'wp-admin/includes/file.php';
+
+        $path = untrailingslashit($this->get_upload_path());
+        $url = untrailingslashit($this->get_upload_url());
+
+        $upload_dir_filter = static function ($dirs) use ($path, $url)
+        {
+            $dirs['path'] = $path;
+            $dirs['url'] = $url;
+            $dirs['subdir'] = '';
+            $dirs['basedir'] = $path;
+            $dirs['baseurl'] = $url;
+
+            return $dirs;
+        };
+
+        add_filter('upload_dir', $upload_dir_filter);
+
+        $mime_types = $overrides['mimes'] ?? [];
+        $mime_filter = null;
+        $check_filter = null;
+
+        if (is_array($mime_types) && count($mime_types))
+        {
+            $mime_filter = static function ($mimes) use ($mime_types) {
+                return array_merge($mimes, $mime_types);
+            };
+
+            add_filter('upload_mimes', $mime_filter);
+
+            $check_filter = static function ($checked, $file_path, $filename, $mimes = null, $real_mime = null) use ($mime_types)
+            {
+                $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                if ($extension && isset($mime_types[$extension]))
+                {
+                    $checked['ext'] = $extension;
+                    $checked['type'] = $mime_types[$extension];
+                }
+
+                return $checked;
+            };
+
+            add_filter('wp_check_filetype_and_ext', $check_filter, 10, 5);
+        }
+
+        $overrides = array_merge([
+            'test_form' => false,
+        ], $overrides);
+
+        if ($filename !== '' && !isset($overrides['unique_filename_callback']))
+        {
+            $overrides['unique_filename_callback'] = static function () use ($filename) {
+                return $filename;
+            };
+        }
+
+        $uploaded = wp_handle_upload($file, $overrides);
+
+        if ($check_filter) remove_filter('wp_check_filetype_and_ext', $check_filter);
+        if ($mime_filter) remove_filter('upload_mimes', $mime_filter);
+
+        remove_filter('upload_dir', $upload_dir_filter);
+
+        return $uploaded;
+    }
+
     public function lsd_url(): string
     {
         return plugins_url() . '/' . LSD_DIRNAME;
@@ -95,11 +163,28 @@ class LSD_Base
 
     public function current_ip()
     {
-        if (isset($_SERVER['HTTP_TRUE_CLIENT_IP']) and trim($_SERVER['HTTP_TRUE_CLIENT_IP'])) $ip = $_SERVER['HTTP_TRUE_CLIENT_IP'];
-        else if (isset($_SERVER['HTTP_CLIENT_IP']) and trim($_SERVER['HTTP_CLIENT_IP'])) $ip = $_SERVER['HTTP_CLIENT_IP'];
-        else $ip = $_SERVER['REMOTE_ADDR'];
+        foreach (['HTTP_TRUE_CLIENT_IP', 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR'] as $key)
+        {
+            if (!isset($_SERVER[$key])) continue;
 
-        return $ip;
+            $value = wp_unslash($_SERVER[$key]);
+            if (!is_string($value)) continue;
+
+            $value = trim($value);
+            if ($value === '') continue;
+
+            $value = explode(',', $value)[0];
+            $value = trim($value);
+            if ($value === '') continue;
+
+            $ip = filter_var($value, FILTER_VALIDATE_IP);
+            if ($ip !== false) return $ip;
+
+            $sanitized = sanitize_text_field($value);
+            if ($sanitized !== '') return $sanitized;
+        }
+
+        return '';
     }
 
     public function get_post_meta($post_id): array
@@ -196,15 +281,55 @@ class LSD_Base
                 'status' => 0,
                 'name' => esc_html__('Price', 'listdom'),
                 'order' => 'ASC',
+                'orderby' => 'meta_value_num',
             ],
             'lsd_visits' => [
                 'status' => 0,
                 'name' => esc_html__('Most Viewed', 'listdom'),
                 'order' => 'DESC',
+                'orderby' => 'meta_value_num',
             ],
         ];
 
         if (!LSD_Components::pricing()) unset($options['lsd_price']);
+
+        $attributes = LSD_Main::get_attributes_details();
+        foreach ($attributes as $attribute)
+        {
+            $field_type = $attribute['field_type'] ?? '';
+            if (in_array($field_type, ['separator', 'image'], true)) continue;
+
+            $key = 'lsd_attribute_' . $attribute['slug'];
+            $is_numeric = $field_type === 'number';
+            $is_datetime = in_array($field_type, ['date', 'time', 'datetime'], true);
+
+            $options[$key] = [
+                'status' => 0,
+                'name' => $attribute['name'],
+                'order' => $is_numeric ? 'DESC' : 'ASC',
+                'orderby' => $is_numeric ? 'meta_value_num' : 'meta_value',
+            ];
+
+            if ($is_datetime)
+            {
+                $options[$key]['order'] = 'ASC';
+
+                switch ($field_type)
+                {
+                    case 'datetime':
+                        $options[$key]['meta_type'] = 'DATETIME';
+                        break;
+
+                    case 'date':
+                        $options[$key]['meta_type'] = 'DATE';
+                        break;
+
+                    case 'time':
+                        $options[$key]['meta_type'] = 'TIME';
+                        break;
+                }
+            }
+        }
 
         return apply_filters('lsd_sort_options', $options);
     }
@@ -386,15 +511,41 @@ class LSD_Base
         $installed = is_plugin_active('listdom-pro/listdom.php');
         if ($installed)
         {
-            if ($type === 'short') return sprintf(esc_html__("Activate to the %s first!", 'listdom'), '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>');
-            else if ($type === 'tiny') return sprintf(esc_html__("%s needed!", 'listdom'), '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('License activation', 'listdom') . '</strong></a>');
-            else return sprintf(esc_html__("You're using %s of listdom. You should activate the %s to enjoy all the features!", 'listdom'), '<strong>' . esc_html__('Basic Version', 'listdom') . '</strong>', '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>');
+            if ($type === 'short') return sprintf(
+                /* translators: %s: Link to the Listdom Pro activation page. */
+                esc_html__("Activate to the %s first!", 'listdom'),
+                '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>'
+            );
+            else if ($type === 'tiny') return sprintf(
+                /* translators: %s: Link to the license activation page. */
+                esc_html__("%s needed!", 'listdom'),
+                '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('License activation', 'listdom') . '</strong></a>'
+            );
+            else return sprintf(
+                /* translators: 1: Current product version label, 2: Link to activate Listdom Pro. */
+                esc_html__("You're using %1\$s of listdom. You should activate the %2\$s to enjoy all the features!", 'listdom'),
+                '<strong>' . esc_html__('Basic Version', 'listdom') . '</strong>',
+                '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>'
+            );
         }
         else
         {
-            if ($type === 'short') return sprintf(esc_html__("Upgrade to the %s first!", 'listdom'), '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
-            else if ($type === 'tiny') return sprintf(esc_html__("%s needed!", 'listdom'), '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Upgrade', 'listdom') . '</strong></a>');
-            else return sprintf(esc_html__("You're using %s of listdom. You should upgrade to the %s to enjoy all features of listdom!", 'listdom'), '<strong>' . esc_html__('Basic Version', 'listdom') . '</strong>', '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
+            if ($type === 'short') return sprintf(
+                /* translators: %s: Link to purchase the Listdom Pro add-on. */
+                esc_html__("Upgrade to the %s first!", 'listdom'),
+                '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>'
+            );
+            else if ($type === 'tiny') return sprintf(
+                /* translators: %s: Link to the upgrade page. */
+                esc_html__("%s needed!", 'listdom'),
+                '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Upgrade', 'listdom') . '</strong></a>'
+            );
+            else return sprintf(
+                /* translators: 1: Current product version label, 2: Link to upgrade to the pro add-on. */
+                esc_html__("You're using %1\$s of listdom. You should upgrade to the %2\$s to enjoy all features of listdom!", 'listdom'),
+                '<strong>' . esc_html__('Basic Version', 'listdom') . '</strong>',
+                '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>'
+            );
         }
     }
 
@@ -411,19 +562,44 @@ class LSD_Base
         $installed = is_plugin_active('listdom-pro/listdom.php');
         if ($installed)
         {
-            if ($multiple) return sprintf(esc_html__('%s are included in the pro add-on. You should activate the %s now to enjoy all its features!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>');
-            else return sprintf(esc_html__('%s is included in the pro add-on. You should activate the %s now to enjoy all its features!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>');
+            if ($multiple) return sprintf(
+                /* translators: 1: Feature names, 2: Link to activate Listdom Pro. */
+                esc_html__('%1$s are included in the pro add-on. You should activate the %2$s now to enjoy all its features!', 'listdom'),
+                $feature_html,
+                '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>'
+            );
+            else return sprintf(
+                /* translators: 1: Feature name, 2: Link to activate Listdom Pro. */
+                esc_html__('%1$s is included in the pro add-on. You should activate the %2$s now to enjoy all its features!', 'listdom'),
+                $feature_html,
+                '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>'
+            );
         }
         else
         {
-            if ($multiple) return sprintf(esc_html__('%s are included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
-            else return sprintf(esc_html__('%s is included in the pro add-on. You can upgrade to the %s now to enjoy all of the features of the Listdom!', 'listdom'), $feature_html, '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>');
+            if ($multiple) return sprintf(
+                /* translators: 1: Feature names, 2: Link to purchase the pro add-on. */
+                esc_html__('%1$s are included in the pro add-on. You can upgrade to the %2$s now to enjoy all of the features of the Listdom!', 'listdom'),
+                $feature_html,
+                '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>'
+            );
+            else return sprintf(
+                /* translators: 1: Feature name, 2: Link to purchase the pro add-on. */
+                esc_html__('%1$s is included in the pro add-on. You can upgrade to the %2$s now to enjoy all of the features of the Listdom!', 'listdom'),
+                $feature_html,
+                '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>'
+            );
         }
     }
 
     public static function missAddonMessage($addon = '', $feature = ''): string
     {
-        return sprintf(esc_html__('Activate the %s add-on to use the %s feature.', 'listdom'), ('<a href="' . LSD_Base::getAddonURL($addon) . '" target="_blank"><strong>' . esc_html__($addon, 'listdom') . '</strong></a>'), '<strong>' . $feature . '</strong>');
+        return sprintf(
+            /* translators: 1: Add-on name link, 2: Feature name. */
+            esc_html__('Activate the %1$s add-on to use the %2$s feature.', 'listdom'),
+            ('<a href="' . LSD_Base::getAddonURL($addon) . '" target="_blank"><strong>' . esc_html($addon) . '</strong></a>'),
+            '<strong>' . $feature . '</strong>'
+        );
     }
 
     public static function optionalAddonsMessage(array $addon_features = []): string
@@ -442,7 +618,8 @@ class LSD_Base
 
         return sprintf(
             esc_html(
-                _n('To use the %s feature, you need to install %s add-on.', 'To use the %s features, you need to install %s add-ons.', $count, 'listdom')
+                /* translators: 1: Feature names, 2: Add-on names. */
+                _n('To use the %1$s feature, you need to install %2$s add-on.', 'To use the %1$s features, you need to install %2$s add-ons.', $count, 'listdom')
             ),
             trim($features, ', '),
             trim($addons, ', ')
@@ -577,20 +754,26 @@ class LSD_Base
     public function current_url(): string
     {
         // get $_SERVER
-        $server = $_SERVER;
+        $server = wp_unslash($_SERVER);
+        if (!is_array($server)) $server = [];
 
         // Check protocol
-        $page_url = 'http';
-        if (isset($server['HTTPS']) && $server['HTTPS'] == 'on') $page_url .= 's';
+        $https = isset($server['HTTPS']) && is_string($server['HTTPS']) ? sanitize_text_field($server['HTTPS']) : '';
+        $is_https = in_array(strtolower($https), ['on', '1'], true);
+        $scheme = $is_https ? 'https' : 'http';
 
         // Get domain
-        $site_domain = isset($server['HTTP_HOST']) && trim($server['HTTP_HOST']) !== '' ? $server['HTTP_HOST'] : $server['SERVER_NAME'];
+        if (isset($server['HTTP_HOST']) && is_string($server['HTTP_HOST'])) $site_domain = sanitize_text_field($server['HTTP_HOST']);
+        else if (isset($server['SERVER_NAME']) && is_string($server['SERVER_NAME'])) $site_domain = sanitize_text_field($server['SERVER_NAME']);
+        else $site_domain = '';
 
-        $page_url .= '://';
-        $page_url .= $site_domain . $server['REQUEST_URI'];
+        $request_uri = isset($server['REQUEST_URI']) && is_string($server['REQUEST_URI']) ? sanitize_text_field($server['REQUEST_URI']) : '';
+        $request_uri = $request_uri !== '' ? '/' . ltrim($request_uri, '/') : '/';
+
+        if ($site_domain === '') return home_url($request_uri, $scheme);
 
         // Return full URL
-        return $page_url;
+        return $scheme . '://' . $site_domain . $request_uri;
     }
 
     public function remove_qs_var($key, $url = '')
@@ -627,7 +810,7 @@ class LSD_Base
         $count = strlen($characters);
 
         $string = '';
-        for ($i = 0; $i < $length; $i++) $string .= $characters[rand(0, $count - 1)];
+        for ($i = 0; $i < $length; $i++) $string .= $characters[wp_rand(0, $count - 1)];
 
         return $string;
     }
@@ -717,7 +900,11 @@ class LSD_Base
         // Rounded Stars
         $rounded = round($stars);
 
-        $output = '<span class="lsd-stars" title="' . ($stars ? sprintf(esc_html__('%s from 5', 'listdom'), $stars) : '') . '">';
+        $output = '<span class="lsd-stars" title="' . ($stars ? sprintf(
+            /* translators: %s: Rating value. */
+            esc_html__('%s from 5', 'listdom'),
+            $stars
+        ) : '') . '">';
         for ($i = 1; $i <= 5; $i++) $output .= '<span><i class="lsd-icon ' . ($rounded >= $i ? 'fas fa-star' : 'far fa-star') . '"></i></span>';
         $output .= '</span>';
 
@@ -745,7 +932,7 @@ class LSD_Base
         if (is_null($format)) $format = LSD_Base::date_format();
 
         if (function_exists('wp_date')) return wp_date($format, $time);
-        else return date($format, $time);
+        else return gmdate($format, $time);
     }
 
     public static function time($time, $format = null)
@@ -754,7 +941,7 @@ class LSD_Base
         if (is_null($format)) $format = LSD_Base::time_format();
 
         if (function_exists('wp_date')) return wp_date($format, $time);
-        else return date($format, $time);
+        else return gmdate($format, $time);
     }
 
     public static function datetime($time, $format = null)
@@ -763,7 +950,7 @@ class LSD_Base
         if (is_null($format)) $format = LSD_Base::datetime_format();
 
         if (function_exists('wp_date')) return wp_date($format, $time);
-        return date($format, $time);
+        return gmdate($format, $time);
     }
 
     public static function strtotime($time)
@@ -1175,7 +1362,7 @@ class LSD_Base
 
     public function response(array $response)
     {
-        echo json_encode($response, JSON_NUMERIC_CHECK);
+        echo wp_json_encode($response, JSON_NUMERIC_CHECK);
         exit;
     }
 

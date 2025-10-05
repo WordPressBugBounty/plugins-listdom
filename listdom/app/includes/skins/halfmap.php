@@ -21,7 +21,7 @@ class LSD_Skins_Halfmap extends LSD_Skins
         $this->map_limit = isset($this->skin_options['maplimit']) && trim($this->skin_options['maplimit']) ? (int) $this->skin_options['maplimit'] : 300;
 
         // Current View
-        $this->default_view = isset($_POST['view']) ? sanitize_text_field($_POST['view']) : $this->default_view;
+        $this->default_view = isset($_POST['view']) ? sanitize_text_field(wp_unslash($_POST['view'])) : $this->default_view;
     }
 
     public function output()

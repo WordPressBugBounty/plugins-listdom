@@ -89,7 +89,7 @@ class LSD_Dashboard_Terms extends LSD_Base
         foreach ($terms as $term)
         {
             $output .= '<li>';
-            $output .= '<label class="selectit"><input value="' . esc_attr($term->term_id) . '" type="checkbox" name="' . esc_attr($name) . '[]" id="in-listdom-location-' . esc_attr($term->term_id) . '" ' . (in_array($term->term_id, $selected) ? 'checked="checked"' : '') . '> ' . esc_html(($prefix . (trim($prefix) ? ' ' : '') . $term->name)) . '</label>';
+            $output .= '<label class="selectit lsd-fields-label"><input value="' . esc_attr($term->term_id) . '" type="checkbox" name="' . esc_attr($name) . '[]" id="in-listdom-location-' . esc_attr($term->term_id) . '" ' . (in_array($term->term_id, $selected) ? 'checked="checked"' : '') . '> ' . esc_html(($prefix . (trim($prefix) ? ' ' : '') . $term->name)) . '</label>';
 
             $children = get_term_children($term->term_id, $args['taxonomy']);
             if (is_array($children) and count($children))

@@ -37,7 +37,7 @@ class LSD_Shortcodes_Simplemap extends LSD_Shortcodes
         $zoomlevel = $atts['zoomlevel'] ?? 14;
         $map_provider = isset($atts['provider']) ? LSD_Map_Provider::get($atts['provider']) : LSD_Map_Provider::def();
         $style = $atts['style'] ?? '';
-        $id = LSD_id::get($atts['id'] ?? mt_rand(100, 999));
+        $id = LSD_id::get($atts['id'] ?? wp_rand(100, 999));
         $icon = $atts['icon'] ?? $assets->lsd_asset_url('img/markers/blue.png');
 
         return lsd_map([], [

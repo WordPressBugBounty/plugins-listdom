@@ -37,7 +37,11 @@ $content = get_post_meta($post->ID, 'lsd_content', true);
             <ul class="lsd-m-0">
                 <li><?php esc_html_e("Notification title will be used as email subject.", 'listdom'); ?></li>
                 <li><?php esc_html_e("Please assign your notification to the correct hook otherwise it won't work as expected!", 'listdom'); ?></li>
-                <li><?php echo sprintf(esc_html__('You can use %s of right side to insert dynamic data into the notification content and subject.', 'listdom'), '<strong>'.esc_html__("#placeholders#", 'listdom').'</strong>'); ?></li>
+                <li><?php echo sprintf(
+                    /* translators: %s: Placeholder tag reference. */
+                    esc_html__('You can use %s of right side to insert dynamic data into the notification content and subject.', 'listdom'),
+                    '<strong>'.esc_html__("#placeholders#", 'listdom').'</strong>'
+                ); ?></li>
                 <li><?php echo esc_html__('You can add custom recipients to the email using CC and BCC options.', 'listdom'); ?></li>
                 <li><?php echo esc_html__('Shortcodes and HTML codes are allowed in the content.', 'listdom'); ?></li>
                 <li><?php echo esc_html__('If you want to disable a notification, you can simply unpublish it.', 'listdom'); ?></li>

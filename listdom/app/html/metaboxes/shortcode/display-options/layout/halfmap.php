@@ -64,7 +64,12 @@ $halfmap = $options['halfmap'] ?? [];
                     'name' => 'lsd[display][halfmap][limit]',
                     'value' => $halfmap['limit'] ?? '12'
                 ]); ?>
-                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php echo sprintf(esc_html__("Number of the Listings per page. It should be a multiple of the %s option. For example if the %s is set to 3, then you should set the limit to 3, 6, 9, 12, 30, etc.", 'listdom'), '<strong>'.esc_html__('Listings Per Row', 'listdom').'</strong>', '<strong>'.esc_html__('Listings Per Row', 'listdom').'</strong>'); ?></p>
+                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php echo sprintf(
+                    /* translators: 1: Listings per row label, 2: Listings per row label repeated for explanation. */
+                    esc_html__("Number of the Listings per page. It should be a multiple of the %1\$s option. For example if the %2\$s is set to 3, then you should set the limit to 3, 6, 9, 12, 30, etc.", 'listdom'),
+                    '<strong>'.esc_html__('Listings Per Row', 'listdom').'</strong>',
+                    '<strong>'.esc_html__('Listings Per Row', 'listdom').'</strong>'
+                ); ?></p>
             </div>
         </div>
         <div class="lsd-form-row">

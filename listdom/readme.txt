@@ -1,11 +1,11 @@
-=== AI-Powered Business Directory and Classified Ads Listings WordPress Plugin - Listdom ===
+=== AI-Powered Business Directory and Classified Ads Listings – Listdom ===
 Contributors: webilia
 Donate link: https://listdom.net
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.2
 Requires PHP: 7.2
 Tested up to: 6.8
-Stable tag: 4.7.1
+Stable tag: 4.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,7 +28,7 @@ Listdom has more than 80 different skins and views that are responsive and mobil
 ✅ [Live Chat](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
 
 == How to import Demo with Listdomer Theme 👇 ==
-Listdom has a dedicated theme called Listdomer that helps you to import full website demos: 
+Listdom has a dedicated theme called Listdomer that helps you to import full website demos:
 
 [youtube https://www.youtube.com/watch?v=8tigW7yriZ8]
 
@@ -94,6 +94,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 *   [Stunning map styles](https://demo.webilia.com/listdom/single-map/) (Apple, Facebook, Ultralight, Dark and many more map styles)
 *   Address module and Google map support
 *   Address to location conversion feature
+*   Address autosuggest in admin Add Listing form 
 
 **👉 Frontend Dashboard**
 
@@ -113,6 +114,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 *   Search and filter by custom fields/attributes
 *   Image gallery element with several styles
 *   Advanced availability time module (Work hours and off days)
+*   Related or Nearby listings on the single listing page
 *   Advanced price module
 *   Global and per listing currency manager
 *   Define contact information for each listing
@@ -133,7 +135,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 *   Listing image
 *   Comment for listings
 *   Numeric, Load more button, and infinite scroll pagination methods
-*   Advanced component menu to simplify the directory management
+*   advanced components system to disable unused Listdom Core features
 
 **👉 Search and Filter Options of Listdom WordPress Directory Plugin**
 
@@ -148,6 +150,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 
 **👉 AI Tools**
 
+*   Several AI providers support including: Openai, Claude, Gemini
 *   CSV import auto mapping
 *   Text generation
 *   Work hours generation
@@ -155,6 +158,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 **👉 Advanced Management Tools**
 
 *   Powerful login, register, and forgot password shortcodes
+*   Separate login forms for different user roles
 *   Block access of different user roles to WordPress dashboard
 *   CSV importer
 *   Powerful notifications manager (Admin and user notification emails)
@@ -173,16 +177,6 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 **👉 Seo Ready**
 *   [Friendly slug manager](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Friendly+slug+manager) (Change the slug of listings, categories, features, tags, attributes, labels, locations)
 *   Compatible with popular SEO plugins e.g. Yoast SEO, RankMath, AIOSEO
-
-**👉 Functionality**
-
-*   Easy online plugin update (no FTP required)
-*   Cache plugins compatibility
-
-**👉 Development Ready**
-
-*   RTL-ready!
-*   Translation ready (WPML and PolyLang support for building a multilingual directory)
 
 **👉 Developer Features**
 
@@ -226,7 +220,7 @@ For users seeking additional features and capabilities for a [WordPress director
 *   Range slider search method
 *   [Drawing tools on the map for search](https://demo.webilia.com/listdom/skins/list-view/style-1-of-list-view-map-first/)
 *   Listing cards link options and image status
-*   [OpenStreetMap](https://demo.webilia.com/listdom/single-map/openstreetmap/) (Display maps using OpenStreetMap with Leaflet.js - 100% free)
+*   [OpenStreetMap](https://demo.webilia.com/listdom/single-map/openstreetmap/) (Display maps using OpenStreetMap with Leaflet.js – 100% free)
 *   Mapbox tiles support
 *   Change style and modules per category
 *   Change style and modules per listing
@@ -290,58 +284,6 @@ Listdom prides itself on its exceptional support. Whether you need assistance vi
 
 Listdom, the robust WordPress directory plugin, offers comprehensive documentation. Our step-by-step guides cover all features, ensuring a smooth experience for users. Whether you’re setting up your directory for the first time or looking to explore advanced features, our documentation of the WordPress listing plugin is there to guide you every step of the way.
 
-== The Best WordPress Business Directory Plugin Addons ==
-
-Listdom also offers about 30 add-ons to enhance the functionality of your WordPress directory listing further. These add-ons include features like Claim Feature, Topup Listings, Bookmarks Listings, Rank Addon, Reviews, Subscriptions, Labelize, and Advanced Map. These addons provide additional layers of interactivity and customization, allowing you to tailor your classified site to your specific needs.
-
-*   Bridge Addon (For a fast migration)
-*   Pro Addon
-*   Claim Listings (Claim existing listings with full Woocommerce support)
-*   Connect Addon (Manage contact requests)
-*   Topup Listings
-*   Bookmarks and Favorite Listings
-*   Excel Addon
-*   CSV Auto Importer Addon
-*   Rank Addon
-*   Reviews Addon (Customizable multi-criteria 5-star rating reviews)
-*   Subscriptions (Charge users for submitting new listings with full WooCommerce support)
-*   Labelize Addon
-*   Booking Addon
-*   Team Addon
-*   Multiple Categories
-*   Advanced Icon
-*   KML Addon (FREE)
-*   Auction Addon
-*   Stats Addon
-*   APS Addon
-*   Compare Addon
-*   Franchise Addon
-*   Jobs Addon
-*   SMS Addon
-*   ADS Addon (FREE)
-*   Divi Addon (Design single listing page, listing cards, archives, and map info windows with Divi)
-*   Elementor Addon (Design single listing page, listing cards, archives, and map info windows with Elementor)
-*   Advanced Map
-*   Visibility Addon
-*   BuddyPress profile page integration
-*   Advanced Custom Fields (ACF) Addon
-*   PMS (Paid Member Subscriptions plugin) Addon
-*   Memberpress plugin Addon 
-
-You can see the details of the addons on [Listdom](https://listdom.net/pricing/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Listdom) website.
-
-== Listdomer: The Compatible WordPress Directory Theme by Webilia ==
-
-In addition to Listdom, Webilia offers [Listdomer](https://wordpress.org/themes/listdomer/), a WordPress directory theme designed to complement the functionality of the Listdom plugin. This theme provides a visually appealing and user-friendly layout for your  WordPress directory site. It includes a variety of design options, enabling you to customize your directory’s aesthetics to match your brand identity.
-
-== PRO Versions Pricing ==
-
-While Listdom and Listdomer both offer free versions, they also provide enhanced features through their respective Pro versions, which are available for purchase. Listdom Pro add-ons are also paid. However, Webilia offers a cost-effective solution through its All-Pass plans. By subscribing to these plans, users can access all products at a significantly reduced cost, **saving up to 85%** with a 30-day money-back guarantee. This provides a comprehensive solution for users seeking to leverage the full potential of this WordPress directory plugin while also ensuring affordability.
-
-👉 Official Facebook Page: [Follow on Facebook](https://www.facebook.com/webilia)
-👉 Official X Account: [Follow on X](https://twitter.com/Webilia_Inc)
-👉 Official LinkedIn: [Follow on LinkedIn](https://www.linkedin.com/company/webilia)
-
 == Commercial ==
 
 This plugin is free but offers additional paid commercial upgrades and support. [Learn more](https://listdom.net)
@@ -350,7 +292,7 @@ This plugin is free but offers additional paid commercial upgrades and support. 
 
 *   Gateways Direct Support
 *   Chat Module
-*   And many more ...
+*   And many more …
 
 == Installation ==
 
@@ -374,9 +316,84 @@ Follow these steps to install **Listdom** on your WordPress website:
 
 **🎉 What’s Next?**
 
-- Once activated, a new **Listdom** menu will appear in your WordPress dashboard.
-- Use the **Setup Wizard** to start configuring your directory.
-- Start adding listings under the **Listings** menu.
+– Once activated, a new **Listdom** menu will appear in your WordPress dashboard.
+– Use the **Setup Wizard** to start configuring your directory.
+– Start adding listings under the **Listings** menu.
+
+== External Services ==
+
+Listdom connects to several third-party services so it can provide mapping, AI-assisted content, marketing integrations, and product updates. The plugin only calls these services when you enable the related feature. The list below explains what is sent and links to the provider’s policies so you can review them with your stakeholders.
+
+* **Google Maps Platform** (`maps.googleapis.com`)
+  * **Purpose:** Loads the Maps JavaScript API and performs optional geocoding for addresses shown on maps.
+  * **Data Sent:** Your Google Maps API key (if configured), map usage metadata, and any addresses you ask the plugin to geocode. Visitor IPs are shared when browsers load the Maps scripts.
+  * **Terms:** [https://cloud.google.com/maps-platform/terms](https://cloud.google.com/maps-platform/terms)
+  * **Privacy:** [https://policies.google.com/privacy](https://policies.google.com/privacy)
+* **OpenStreetMap Nominatim** (`nominatim.openstreetmap.org`)
+  * **Purpose:** Geocodes listing addresses when you rely on the OpenStreetMap provider.
+  * **Data Sent:** The address string you submit for lookup plus the user agent supplied by your site.
+  * **Usage Policy:** [https://operations.osmfoundation.org/policies/nominatim/](https://operations.osmfoundation.org/policies/nominatim/)
+  * **Privacy:** [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy)
+* **Google Geocoding API** (`maps.googleapis.com/maps/api/geocode`)
+  * **Purpose:** Provides fallback geocoding when Google Maps is enabled.
+  * **Data Sent:** Address queries you request and your Google Geocoding API key (if configured).
+  * **Terms:** [https://cloud.google.com/maps-platform/terms](https://cloud.google.com/maps-platform/terms)
+  * **Privacy:** [https://policies.google.com/privacy](https://policies.google.com/privacy)
+* **Google reCAPTCHA** (`www.google.com/recaptcha`)
+  * **Purpose:** Protects Listdom forms from spam.
+  * **Data Sent:** Site key and challenge responses from visitors, including their IP address when the verification call is made.
+  * **Terms:** [https://policies.google.com/terms](https://policies.google.com/terms)
+  * **Privacy:** [https://policies.google.com/privacy](https://policies.google.com/privacy)
+* **Google Fonts** (`fonts.googleapis.com`)
+  * **Purpose:** Loads Google Fonts that you select inside the personalization tools.
+  * **Data Sent:** Requested font families and visitor IP addresses when the stylesheet is downloaded.
+  * **Terms:** [https://policies.google.com/terms](https://policies.google.com/terms)
+  * **Privacy:** [https://policies.google.com/privacy](https://policies.google.com/privacy)
+* **Mapbox** (`api.tiles.mapbox.com`)
+  * **Purpose:** Serves map tiles when you choose Mapbox as the map provider.
+  * **Data Sent:** Map tile requests include your Mapbox access token and visitor IP addresses.
+  * **Terms:** [https://www.mapbox.com/legal/tos](https://www.mapbox.com/legal/tos)
+  * **Privacy:** [https://www.mapbox.com/legal/privacy](https://www.mapbox.com/legal/privacy)
+* **OpenStreetMap Tile Servers** (`{s}.tile.openstreetmap.org`)
+  * **Purpose:** Serves map tiles when you use the Leaflet/OpenStreetMap map option.
+  * **Data Sent:** Map tile requests made by visitors, including their IP addresses.
+  * **Tile Usage Policy:** [https://operations.osmfoundation.org/policies/tiles/](https://operations.osmfoundation.org/policies/tiles/)
+  * **Privacy:** [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy)
+* **Mailchimp Marketing API** (`<dc>.api.mailchimp.com`)
+  * **Purpose:** Adds subscribers to your Mailchimp audience when the integration is active.
+  * **Data Sent:** Subscriber details you map in the integration (for example email address, name, and merge fields).
+  * **Terms:** [https://mailchimp.com/legal/terms/](https://mailchimp.com/legal/terms/)
+  * **Privacy:** [https://www.intuit.com/privacy/statement/](https://www.intuit.com/privacy/statement/)
+* **OpenAI API** (`api.openai.com`)
+  * **Purpose:** Powers AI tasks such as field mapping, availability suggestions, and content drafting.
+  * **Data Sent:** Prompts generated from your content (for example field labels, column titles, or listing details) along with your OpenAI API key.
+  * **Terms:** [https://openai.com/policies/terms-of-use](https://openai.com/policies/terms-of-use)
+  * **Privacy:** [https://openai.com/policies/privacy-policy](https://openai.com/policies/privacy-policy)
+* **Google Generative Language API** (`generativelanguage.googleapis.com`)
+  * **Purpose:** Alternative AI provider for the same Listdom AI tasks.
+  * **Data Sent:** Prompts generated from your content together with your Google AI API key.
+  * **Terms:** [https://ai.google.dev/terms](https://ai.google.dev/terms)
+  * **Privacy:** [https://policies.google.com/privacy](https://policies.google.com/privacy)
+* **Anthropic API** (`api.anthropic.com`)
+  * **Purpose:** Alternative AI provider for the same Listdom AI tasks.
+  * **Data Sent:** Prompts generated from your content alongside your Anthropic API key.
+  * **Terms:** [https://www.anthropic.com/legal/consumer-terms](https://www.anthropic.com/legal/consumer-terms)
+  * **Privacy:** [https://www.anthropic.com/legal/privacy](https://www.anthropic.com/legal/privacy)
+* **Webilia Update & Licensing Service** (`api.webilia.com`)
+  * **Purpose:** Checks for plugin/add-on updates, validates license keys, and lists available Listdom products inside the admin area.
+  * **Data Sent:** Your site URL, installed plugin details, and any license or activation keys you supply.
+  * **Terms:** [https://webilia.com/terms-and-conditions/](https://webilia.com/terms-and-conditions/)
+  * **Privacy:** [https://webilia.com/privacy-policy/](https://webilia.com/privacy-policy/)
+* **Listdom News Feed** (`listdom.net/blog/feed/`)
+  * **Purpose:** Displays the latest Listdom announcements in the admin dashboard.
+  * **Data Sent:** Your server requests the RSS feed URL, which discloses your site’s IP address.
+  * **Terms:** [https://listdom.net/terms/](https://listdom.net/terms/)
+  * **Privacy:** [https://listdom.net/privacy-policy/](https://listdom.net/privacy-policy/)
+* **YouTube (nocookie)** (`www.youtube-nocookie.com`)
+  * **Purpose:** Shows tutorial videos within the welcome and dashboard screens.
+  * **Data Sent:** Loads the embedded video player from YouTube, sharing visitor IP addresses with Google/YouTube.
+  * **Terms:** [https://www.youtube.com/t/terms](https://www.youtube.com/t/terms)
+  * **Privacy:** [https://policies.google.com/privacy](https://policies.google.com/privacy)
 
 == Frequently Asked Questions ==
 
@@ -426,6 +443,16 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 4.8.1 =
+* Addressed some background issues.
+
+= 4.8.0 =
+* [Pro] Added a Timeline skin.
+* Added comprehensive GDPR compliance.
+* Improved various parts of the plugin based on WordPress team feedback.
+* Fixed an issue with the standalone add listing form.
+* Fixed several interface issues in the Listdom backend and frontend.
 
 = 4.7.1 =
 * Fixed some interface issues in the Listdom backend and frontend.

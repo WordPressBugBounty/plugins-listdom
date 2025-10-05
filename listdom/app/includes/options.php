@@ -10,6 +10,14 @@ class LSD_Options extends LSD_Base
         );
     }
 
+    public static function privacy(): array
+    {
+        return self::parse_args(
+            get_option('lsd_settings', []),
+            self::defaults()
+        );
+    }
+
     public static function api(): array
     {
         $defaults = self::defaults('api');
@@ -272,10 +280,10 @@ class LSD_Options extends LSD_Base
                         'breadcrumb' => ['enabled' => 0, 'show_title' => 0, 'icon' => 1, 'taxonomy' => LSD_Base::TAX_CATEGORY],
                         'map' => ['enabled' => 1, 'show_title' => 0, 'infowindow' => 0],
                         'availability' => ['enabled' => 1, 'show_title' => 1],
-                        'owner' => ['enabled' => 1, 'show_title' => 0],
+                        'owner' => ['enabled' => 1, 'show_title' => 0, 'pc_enabled' => 1, 'pc_label' => ''],
                         'share' => ['enabled' => 1, 'show_title' => 0],
                         'related' => ['enabled' => 0, 'show_title' => 0],
-                        'abuse' => ['enabled' => 0, 'show_title' => 0],
+                        'abuse' => ['enabled' => 0, 'show_title' => 0, 'pc_enabled' => 1, 'pc_label' => ''],
                         'excerpt' => ['enabled' => 0, 'show_title' => 0],
                     ],
                 ];
@@ -339,6 +347,7 @@ class LSD_Options extends LSD_Base
                             'status' => '0',
                             'name' => esc_html__('Most Viewed', 'listdom'),
                             'order' => 'DESC',
+                            'orderby' => 'meta_value_num',
                         ],
                     ],
                 ];
@@ -381,12 +390,12 @@ class LSD_Options extends LSD_Base
                         'hide_login_form' => 0,
                         'hide_register_form' => 0,
                         'hide_forgot_password_form' => 0,
-                        'register_tab_label' => __('Register', 'listdom'),
-                        'register_link_label' => __('Not a member? Register.', 'listdom'),
-                        'login_tab_label' => __('Login', 'listdom'),
-                        'login_link_label' => __('Already a member? Login.', 'listdom'),
-                        'forgot_password_tab_label' => __('Forgot Password', 'listdom'),
-                        'forgot_password_link_label' => __('Forgot your password?', 'listdom'),
+                        'register_tab_label' => esc_html__('Register', 'listdom'),
+                        'register_link_label' => esc_html__('Not a member? Register.', 'listdom'),
+                        'login_tab_label' => esc_html__('Login', 'listdom'),
+                        'login_link_label' => esc_html__('Already a member? Login.', 'listdom'),
+                        'forgot_password_tab_label' => esc_html__('Forgot Password', 'listdom'),
+                        'forgot_password_link_label' => esc_html__('Forgot your password?', 'listdom'),
                         'login_form' => 0,
                         'login_page' => '',
                         'register_form' => 0,
@@ -400,13 +409,15 @@ class LSD_Options extends LSD_Base
                         'redirect_contributor' => 0,
                         'redirect_listdom_author' => 0,
                         'redirect_listdom_publisher' => 0,
-                        'username_label' => __('Username', 'listdom'),
-                        'username_placeholder' => __('Enter your username', 'listdom'),
-                        'password_label' => __('Password', 'listdom'),
-                        'password_placeholder' => __('Enter your password', 'listdom'),
-                        'email_label' => __('Email', 'listdom'),
-                        'email_placeholder' => __('Enter your email address', 'listdom'),
-                        'submit_label' => __('Register', 'listdom'),
+                        'username_label' => esc_html__('Username', 'listdom'),
+                        'username_placeholder' => esc_html__('Enter your username', 'listdom'),
+                        'password_label' => esc_html__('Password', 'listdom'),
+                        'password_placeholder' => esc_html__('Enter your password', 'listdom'),
+                        'email_label' => esc_html__('Email', 'listdom'),
+                        'email_placeholder' => esc_html__('Enter your email address', 'listdom'),
+                        'pc_enabled' => 1,
+                        'pc_label' => esc_html__('I agree to the {{privacy_policy}}.', 'listdom'),
+                        'submit_label' => esc_html__('Register', 'listdom'),
                         'login_after_register' => 1,
                         'strong_password' => 1,
                         'password_length' => 8,
@@ -421,18 +432,18 @@ class LSD_Options extends LSD_Base
                         'redirect_contributor' => 0,
                         'redirect_listdom_author' => 0,
                         'redirect_listdom_publisher' => 0,
-                        'username_label' => __('Username', 'listdom'),
-                        'password_label' => __('Password', 'listdom'),
-                        'username_placeholder' => __('Enter your username', 'listdom'),
-                        'password_placeholder' => __('Enter your password', 'listdom'),
-                        'remember_label' => __('Remember Me', 'listdom'),
-                        'submit_label' => __('Log In', 'listdom'),
+                        'username_label' => esc_html__('Username', 'listdom'),
+                        'password_label' => esc_html__('Password', 'listdom'),
+                        'username_placeholder' => esc_html__('Enter your username', 'listdom'),
+                        'password_placeholder' => esc_html__('Enter your password', 'listdom'),
+                        'remember_label' => esc_html__('Remember Me', 'listdom'),
+                        'submit_label' => esc_html__('Log In', 'listdom'),
                     ],
                     'forgot_password' => [
                         'redirect' => get_option('page_on_front') ?? 0,
-                        'email_label' => __('Email', 'listdom'),
-                        'email_placeholder' => __('Enter your Email Address', 'listdom'),
-                        'submit_label' => __('Reset Password', 'listdom'),
+                        'email_label' => esc_html__('Email', 'listdom'),
+                        'email_placeholder' => esc_html__('Enter your Email Address', 'listdom'),
+                        'submit_label' => esc_html__('Reset Password', 'listdom'),
                     ],
                     'account' => [
                         'redirect' => get_option('page_on_front') ?? 0,
@@ -443,6 +454,8 @@ class LSD_Options extends LSD_Base
                     'profile' => [
                         'page' => get_option('page_on_front') ?? 0,
                         'shortcode' => 'list',
+                        'pc_enabled' => 1,
+                        'pc_label' => esc_html__('I agree to the {{privacy_policy}}.', 'listdom'),
                     ],
                 ];
                 break;
@@ -502,6 +515,19 @@ class LSD_Options extends LSD_Base
                     'mailchimp_status' => 0,
                     'mailchimp_api_key' => '',
                     'mailchimp_list_id' => '',
+                    'submission_pc_enabled' => 1,
+                    'submission_pc_label' => '',
+                    'privacy_consent' => [
+                        'enabled' => 1,
+                        'default_label' => 'I agree to the {{privacy_policy}}.',
+                        'required_message' => 'Please confirm that you agree to our privacy policy before continuing.',
+                        'policy_content' => implode("\n\n", [
+                            'Listdom stores personal information that you provide when you submit listings, send contact or report forms, register for an account, or manage your profile. This data can include names, email addresses, phone numbers, and any messages that you send through the plugin.',
+                            'The information is saved inside your WordPress database as user metadata or listing metadata and is retained until you delete the related record (for example, removing a listing or user account) or process an erasure request with the WordPress privacy tools.',
+                            'Administrators can review, export, or erase Listdom data from WordPress admin by using Tools → Export Personal Data and Tools → Erase Personal Data.',
+                            'Listdom can load map services (Google Maps or OpenStreetMap) and Google reCAPTCHA when they are enabled. These services may receive visitor IP addresses or other usage data. Please reference their privacy documentation in your site policy.',
+                        ]),
+                    ],
                     'mailchimp_checked' => 0,
                     'mailchimp_message' => '',
                     'location_archive' => '',

@@ -46,7 +46,7 @@ foreach ($jobs as $job)
                 <tbody>
                 <?php foreach ($jobs as $key => $j): ?>
                     <tr>
-                        <td><a href="<?php echo esc_url_raw($j['url']); ?>" target="_blank"><?php echo esc_html($j['url']); ?></a></td>
+                        <td><a href="<?php echo esc_url($j['url']); ?>" target="_blank"><?php echo esc_html($j['url']); ?></a></td>
                         <td><?php echo wp_date($datetime_format, $key); ?></td>
                         <td><?php echo esc_html($template->get($j['mapping'])['name'] ?? ''); ?></td>
                         <td><?php echo esc_html($j['size']); ?></td>
@@ -80,14 +80,14 @@ foreach ($jobs as $job)
             const name = $button.data('name');
 
             // Loading Wrapper
-            const loading = (new ListdomButtonLoader($button));
+            const loading = new ListdomButtonLoader($button);
             loading.start("");
 
-            listdom_toastify("<?php echo esc_js(__("Are you sure you want to delete this?", 'listdom')); ?>", "lsd-confirm", {
+            listdom_toastify("<?php echo esc_js(esc_html__("Are you sure you want to delete this?", 'listdom')); ?>", "lsd-confirm", {
                 position: "lsd-center-center",
                 confirm: {
-                    confirmText: "<?php echo esc_js(__('Confirm', 'listdom')); ?>",
-                    cancelText:  "<?php echo esc_js(__('Cancel', 'listdom')); ?>",
+                    confirmText: "<?php echo esc_js(esc_html__('Confirm', 'listdom')); ?>",
+                    cancelText:  "<?php echo esc_js(esc_html__('Cancel', 'listdom')); ?>",
                     onConfirm: function(toast) {
                         jQuery.ajax({
                             type: "POST",
@@ -104,7 +104,7 @@ foreach ($jobs as $job)
                                     if (!jQuery('.lsd-ix-auto-import-jobs tbody tr').length) {
                                         jQuery('.lsd-ix-auto-import-existing-jobs').addClass('lsd-util-hide');
                                     }
-                                    listdom_toastify(name + ' ' + "<?php echo esc_js(__('Removed', 'listdom')); ?>", 'lsd-success');
+                                    listdom_toastify(name + ' ' + "<?php echo esc_js(esc_html__('Removed', 'listdom')); ?>", 'lsd-success');
                                 }
                             },
                             error: function() {
@@ -113,6 +113,9 @@ foreach ($jobs as $job)
                         });
                     },
                     onCancel: function(toast) {
+                        loading.stop();
+                    },
+                    onCloseOverlay: function(toast) {
                         loading.stop();
                     }
                 }

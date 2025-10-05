@@ -64,13 +64,33 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_attributes', $attributes);
 
         // Save attributes one by one
-        foreach ($attributes as $key => $attribute)
+        $attributes_input = $data['attributes'] ?? [];
+        $attribute_types = [];
+        foreach (LSD_Main::get_attributes_details() as $attribute_detail)
         {
-            if (is_array($attribute)) $attribute = implode(',', array_map('sanitize_text_field', $attribute));
-            else $attribute = sanitize_text_field($attribute);
-
-            update_post_meta($this->post->ID, 'lsd_attribute_' . $key, $attribute);
+            $attribute_types[$attribute_detail['slug']] = $attribute_detail['field_type'];
         }
+
+        $normalized_attributes = [];
+        foreach ($attributes_input as $key => $attribute_value)
+        {
+            if (is_array($attribute_value))
+            {
+                $normalized_array = array_map('sanitize_text_field', $attribute_value);
+                $normalized_attributes[$key] = $normalized_array;
+                $stored_value = implode(',', $normalized_array);
+            }
+            else
+            {
+                $normalized_value = $this->normalize_attribute_value($attribute_value, $attribute_types[$key] ?? '');
+                $normalized_attributes[$key] = $normalized_value;
+                $stored_value = $normalized_value;
+            }
+
+            update_post_meta($this->post->ID, 'lsd_attribute_' . $key, $stored_value);
+        }
+
+        update_post_meta($this->post->ID, 'lsd_attributes', $normalized_attributes);
 
         // Related Listings
         update_post_meta($this->post->ID, 'lsd_related_listings', isset($data['related_listings']) && is_array($data['related_listings']) ? $data['related_listings'] : []);
@@ -93,6 +113,22 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_phone', isset($data['phone']) ? sanitize_text_field($data['phone']) : '');
         update_post_meta($this->post->ID, 'lsd_website', isset($data['website']) ? esc_url($data['website']) : '');
         update_post_meta($this->post->ID, 'lsd_contact_address', isset($data['contact_address']) ? sanitize_text_field($data['contact_address']) : '');
+
+        if (!empty($data['privacy_consent']) && LSD_Privacy::is_consent_enabled('dashboard'))
+        {
+            $log_extra = [
+                'context' => 'listing_submission',
+                'listing_id' => $this->post->ID,
+            ];
+
+            if (!empty($data['guest_email'])) $log_extra['email'] = sanitize_email($data['guest_email']);
+            else if (!empty($data['email'])) $log_extra['email'] = sanitize_email($data['email']);
+
+            $current_user = get_current_user_id();
+            if ($current_user) $log_extra['user_id'] = $current_user;
+
+            update_post_meta($this->post->ID, 'lsd_privacy_consent', LSD_Privacy::create_log($log_extra));
+        }
 
         // add zero Visits
         add_post_meta($this->id(), 'lsd_visits', 0, true);
@@ -604,6 +640,62 @@ class LSD_Entity_Listing extends LSD_Entity
         }
         // Link is Disabled
         else return LSD_Kses::element($this->get_title());
+    }
+
+    protected function normalize_attribute_value($value, string $type): string
+    {
+        if (is_array($value) || is_object($value)) return '';
+
+        $value = sanitize_text_field((string) $value);
+        $value = trim($value);
+
+        if ($value === '') return '';
+
+        switch ($type)
+        {
+            case 'date':
+
+                $dt = \DateTime::createFromFormat('Y-m-d', $value);
+                if ($dt instanceof \DateTime) return sanitize_text_field($dt->format('Y-m-d'));
+
+                $timestamp = strtotime($value);
+                if ($timestamp !== false) return sanitize_text_field(lsd_date('Y-m-d', $timestamp));
+
+                break;
+
+            case 'time':
+
+                foreach (['H:i', 'H:i:s'] as $format)
+                {
+                    $dt = \DateTime::createFromFormat($format, $value);
+                    if ($dt instanceof \DateTime) return sanitize_text_field($dt->format($format));
+                }
+
+                $timestamp = strtotime($value);
+                if ($timestamp !== false) return sanitize_text_field(lsd_date('H:i', $timestamp));
+
+                break;
+
+            case 'datetime':
+
+                $normalized = str_replace(' ', 'T', $value);
+
+                foreach (['Y-m-d\TH:i', 'Y-m-d\TH:i:s', 'Y-m-d H:i', 'Y-m-d H:i:s'] as $format)
+                {
+                    $dt = \DateTime::createFromFormat($format, $normalized);
+                    if ($dt instanceof \DateTime) return sanitize_text_field($dt->format('Y-m-d\TH:i'));
+                }
+
+                $timestamp = strtotime(str_replace('T', ' ', $normalized));
+                if ($timestamp !== false) return sanitize_text_field(lsd_date('Y-m-d\TH:i', $timestamp));
+
+                break;
+
+            default:
+                break;
+        }
+
+        return $value;
     }
 
     public function is($key = null): bool

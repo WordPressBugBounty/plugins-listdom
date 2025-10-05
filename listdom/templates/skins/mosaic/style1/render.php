@@ -61,7 +61,7 @@ $index = 0;
 
                 <div class="lsd-listing-bottom-bar">
                     <?php if ($listing->get_price() && $this->display_price): ?>
-                        <div class="lsd-listing-price lsd-color-m-bg <?php echo esc_attr($listing->get_text_class()); ?>" <?php echo lsd_schema()->priceRange(); ?>>
+                        <div class="lsd-listing-price" <?php echo lsd_schema()->priceRange(); ?>>
                             <?php echo LSD_Kses::element($listing->get_price()); ?>
                         </div>
                     <?php endif; ?>

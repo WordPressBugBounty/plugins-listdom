@@ -20,7 +20,7 @@ $visible_until = get_post_meta($post->ID, 'lsd_visible_until', true);
             <?php echo LSD_Form::datepicker([
                 'name' => 'lsd[visible_from]',
                 'id' => 'lsd_listing_visible_from',
-                'value' => trim($visible_from) ? date('Y-m-d', $visible_from) : '',
+                'value' => trim($visible_from) ? lsd_date('Y-m-d', $visible_from) : '',
             ]); ?>
             <p class="description"><?php esc_html_e('Leave blank to display immediately', 'listdom-visibility'); ?></p>
         </div>
@@ -37,7 +37,7 @@ $visible_until = get_post_meta($post->ID, 'lsd_visible_until', true);
             <?php echo LSD_Form::datepicker([
                 'name' => 'lsd[visible_until]',
                 'id' => 'lsd_listing_visible_until',
-                'value' => trim($visible_until) ? date('Y-m-d', $visible_until) : '',
+                'value' => trim($visible_until) ? lsd_date('Y-m-d', $visible_until) : '',
             ]); ?>
             <p class="description"><?php esc_html_e('Leave blank for unlimited visibility', 'listdom-visibility'); ?></p>
         </div>

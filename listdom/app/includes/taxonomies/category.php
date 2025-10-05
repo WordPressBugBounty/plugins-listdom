@@ -159,6 +159,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
             <?php endif; ?>
         </div>
         <?php
+        wp_nonce_field('lsd_save_category_meta', 'lsd_category_meta_nonce');
     }
 
     public function edit_form($term)
@@ -239,6 +240,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
             </td>
         </tr>
         <?php endif;
+        wp_nonce_field('lsd_save_category_meta', 'lsd_category_meta_nonce');
     }
 
     public function save_metadata($term_id): bool
@@ -246,11 +248,17 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         // It's quick edit
         if (!isset($_POST['lsd_icon'])) return false;
 
-        $icon = sanitize_text_field($_POST['lsd_icon']);
-        $color = isset($_POST['lsd_color']) ? sanitize_text_field($_POST['lsd_color']) : '';
-        $image = isset($_POST['lsd_image']) ? sanitize_text_field($_POST['lsd_image']) : '';
-        $disable = isset($_POST['lsd_disabled_icon']) ? (int) sanitize_text_field($_POST['lsd_disabled_icon']) : 0;
-        $schema = isset($_POST['lsd_schema']) && trim($_POST['lsd_schema']) ? sanitize_text_field($_POST['lsd_schema']) : 'https://schema.org/LocalBusiness';
+        $nonce = isset($_POST['lsd_category_meta_nonce']) ? sanitize_text_field(wp_unslash($_POST['lsd_category_meta_nonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_save_category_meta')) return false;
+
+        $taxonomy = get_taxonomy(LSD_Base::TAX_CATEGORY);
+        if (!$taxonomy || !current_user_can($taxonomy->cap->edit_terms)) return false;
+
+        $icon = sanitize_text_field(wp_unslash($_POST['lsd_icon']));
+        $color = isset($_POST['lsd_color']) ? sanitize_text_field(wp_unslash($_POST['lsd_color'])) : '';
+        $image = isset($_POST['lsd_image']) ? sanitize_text_field(wp_unslash($_POST['lsd_image'])) : '';
+        $disable = isset($_POST['lsd_disabled_icon']) ? (int) sanitize_text_field(wp_unslash($_POST['lsd_disabled_icon'])) : 0;
+        $schema = isset($_POST['lsd_schema']) && trim($_POST['lsd_schema']) ? sanitize_text_field(wp_unslash($_POST['lsd_schema'])) : 'https://schema.org/LocalBusiness';
 
         update_term_meta($term_id, 'lsd_icon', $icon);
         update_term_meta($term_id, 'lsd_color', $color);

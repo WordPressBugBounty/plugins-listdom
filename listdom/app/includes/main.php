@@ -24,6 +24,13 @@ class LSD_Main extends LSD_Base
     {
         $address = urlencode(apply_filters('lsd_geopoint_address', $address));
 
+        $user_agent = 'listdom';
+        if (isset($_SERVER['HTTP_USER_AGENT']) && is_string($_SERVER['HTTP_USER_AGENT']))
+        {
+            $user_agent = sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT']));
+            if ($user_agent === '') $user_agent = 'listdom';
+        }
+
         /**
          * OSM (OpenStreetMap)
          */
@@ -33,7 +40,7 @@ class LSD_Main extends LSD_Base
         // Getting Geo Point
         $JSON = LSD_Main::download($url, [
             'timeout' => 10,
-            'user-agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'listdom',
+            'user-agent' => $user_agent,
             'sslverify' => false,
         ]);
 
@@ -57,7 +64,7 @@ class LSD_Main extends LSD_Base
         // Getting Geo Point
         $JSON = LSD_Main::download($url, [
             'timeout' => 10,
-            'user-agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'listdom',
+            'user-agent' => $user_agent,
             'sslverify' => false,
         ]);
 
@@ -138,7 +145,11 @@ class LSD_Main extends LSD_Base
         if (!$secretkey) return false;
 
         // Get the IP
-        if (is_null($remote_ip)) $remote_ip = $_SERVER["REMOTE_ADDR"] ?? '';
+        if (is_null($remote_ip))
+        {
+            if (isset($_SERVER['REMOTE_ADDR']) && is_string($_SERVER['REMOTE_ADDR'])) $remote_ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
+            else $remote_ip = '';
+        }
 
         // Data
         $data = ['secret' => $secretkey, 'remoteip' => $remote_ip, 'response' => $g_recaptcha_response];
@@ -180,7 +191,7 @@ class LSD_Main extends LSD_Base
             $date = $d[2] . '-' . $d[1] . '-' . $d[0];
         }
 
-        return date($to, LSD_Base::strtotime($date));
+        return lsd_date($to, LSD_Base::strtotime($date));
     }
 
     public function jstophp_format($js_format = 'yyyy-mm-dd'): string
@@ -211,6 +222,9 @@ class LSD_Main extends LSD_Base
 
     public function is_geo_request(): bool
     {
+        $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_search_form')) return false;
+
         $vars = array_merge($_GET, $_POST);
 
         $sf = isset($vars['sf']) && is_array($vars['sf']) ? $vars['sf'] : [];
@@ -298,7 +312,7 @@ class LSD_Main extends LSD_Base
     public static function get_uncategorized_category_id(): int
     {
         $term = get_term_by('slug', 'uncategorized', LSD_Base::TAX_CATEGORY);
-        return $term instanceof WP_Term ? (int) $term->term_id : 0;
+        return $term instanceof WP_Term ? $term->term_id : 0;
     }
 
     public static function allowed_statuses(): array

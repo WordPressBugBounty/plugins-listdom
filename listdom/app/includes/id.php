@@ -61,9 +61,9 @@ class LSD_id
         self::$IDs[] = $id;
     }
 
-    public function unique()
+    public function unique(): int
     {
-        $id = mt_rand(1000, 9999);
+        $id = wp_rand(1000, 9999);
         if ($this->duplicated($id)) $id = $this->unique();
 
         return $id;

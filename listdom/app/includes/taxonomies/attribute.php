@@ -76,6 +76,9 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                     <option value="email"><?php esc_html_e('Email Input', 'listdom'); ?></option>
                     <option value="tel"><?php esc_html_e('Tel Input', 'listdom'); ?></option>
                     <option value="url"><?php esc_html_e('URL Input', 'listdom'); ?></option>
+                    <option value="date"><?php esc_html_e('Date Input', 'listdom'); ?></option>
+                    <option value="time"><?php esc_html_e('Time Input', 'listdom'); ?></option>
+                    <option value="datetime"><?php esc_html_e('Date & Time Input', 'listdom'); ?></option>
                     <option value="image"><?php esc_html_e('Image', 'listdom'); ?></option>
                     <option value="dropdown"><?php esc_html_e('Dropdown', 'listdom'); ?></option>
                     <option value="textarea"><?php esc_html_e('Textarea', 'listdom'); ?></option>
@@ -99,7 +102,11 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                     </div>
                     <div id="lsd_categories_wp" class="lsd-util-hide">
                         <?php if (!count($categories)): ?>
-                            <p><?php echo sprintf(esc_html__('There is no category. You can define some categories %s', 'listdom'), '<a href="' . admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_CATEGORY) . '&post_type=' . LSD_Base::PTYPE_LISTING . '">' . esc_html__('here', 'listdom') . '</a>'); ?></p>
+                            <p><?php echo sprintf(
+                                /* translators: %s: Link to the categories settings screen. */
+                                esc_html__('There is no category. You can define some categories %s', 'listdom'),
+                                '<a href="' . admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_CATEGORY) . '&post_type=' . LSD_Base::PTYPE_LISTING . '">' . esc_html__('here', 'listdom') . '</a>'
+                            ); ?></p>
                         <?php else: ?>
                             <ul>
                                 <?php echo LSD_Kses::form($this->tax_checkboxes([
@@ -113,8 +120,7 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                     <p class="description"><?php esc_html_e('You can create category specific attributes.', 'listdom'); ?></p>
                 </div>
             </div>
-            <div
-                class="form-field lsd-field-type-dependent lsd-field-type-text lsd-field-type-number lsd-field-type-email lsd-field-type-tel lsd-field-type-url lsd-field-type-dropdown lsd-field-type-textarea lsd-field-type-radio lsd-field-type-checkbox lsd-field-type-image">
+            <div class="form-field lsd-field-type-dependent lsd-field-type-text lsd-field-type-number lsd-field-type-email lsd-field-type-tel lsd-field-type-url lsd-field-type-date lsd-field-type-time lsd-field-type-datetime lsd-field-type-dropdown lsd-field-type-textarea lsd-field-type-radio lsd-field-type-checkbox lsd-field-type-image">
                 <label for="lsd_required"><?php esc_html_e('Required', 'listdom'); ?></label>
                 <?php echo LSD_Form::switcher([
                     'name' => 'lsd_required',
@@ -166,6 +172,7 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
             </div>
         </div>
         <?php
+        wp_nonce_field('lsd_save_attribute_meta', 'lsd_attribute_meta_nonce');
     }
 
     public function edit_form($term)
@@ -198,6 +205,9 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                             <option value="email" <?php echo $field_type === 'email' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Email Input', 'listdom'); ?></option>
                             <option value="tel" <?php echo $field_type === 'tel' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Tel Input', 'listdom'); ?></option>
                             <option value="url" <?php echo $field_type === 'url' ? 'selected="selected"' : ''; ?>><?php esc_html_e('URL Input', 'listdom'); ?></option>
+                            <option value="date" <?php echo $field_type === 'date' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Date Input', 'listdom'); ?></option>
+                            <option value="time" <?php echo $field_type === 'time' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Time Input', 'listdom'); ?></option>
+                            <option value="datetime" <?php echo $field_type === 'datetime' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Date & Time Input', 'listdom'); ?></option>
                             <option value="image" <?php echo $field_type === 'image' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Image', 'listdom'); ?></option>
                             <option value="dropdown" <?php echo $field_type === 'dropdown' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Dropdown', 'listdom'); ?></option>
                             <option value="textarea" <?php echo $field_type === 'textarea' ? 'selected="selected"' : ''; ?>><?php esc_html_e('Textarea', 'listdom'); ?></option>
@@ -221,7 +231,11 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                         </div>
                         <div id="lsd_categories_wp" class="<?php echo $all_categories ? 'lsd-util-hide' : 'lsd-util-show'; ?>">
                             <?php if (!count($categories)): ?>
-                                <p><?php echo sprintf(esc_html__('There is no category. You can define some categories %s', 'listdom'), '<a href="' . admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_CATEGORY . '&post_type=' . LSD_Base::PTYPE_LISTING) . '">' . esc_html__('here', 'listdom') . '</a>'); ?></p>
+                                <p><?php echo sprintf(
+                                    /* translators: %s: Link to the categories settings screen. */
+                                    esc_html__('There is no category. You can define some categories %s', 'listdom'),
+                                    '<a href="' . admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_CATEGORY . '&post_type=' . LSD_Base::PTYPE_LISTING) . '">' . esc_html__('here', 'listdom') . '</a>'
+                                ); ?></p>
                             <?php else: ?>
                                 <ul>
                                     <?php echo LSD_Kses::form($this->tax_checkboxes([
@@ -234,7 +248,7 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
                         </div>
                         <p class="description"><?php esc_html_e('You can create category specific attributes.', 'listdom'); ?></p>
                     </div>
-                    <div class="form-field lsd-field-type-dependent lsd-field-type-text lsd-field-type-number lsd-field-type-email lsd-field-type-tel lsd-field-type-url lsd-field-type-dropdown lsd-field-type-textarea lsd-field-type-radio lsd-field-type-checkbox lsd-field-type-image">
+                    <div class="form-field lsd-field-type-dependent lsd-field-type-text lsd-field-type-number lsd-field-type-email lsd-field-type-tel lsd-field-type-url lsd-field-type-date lsd-field-type-time lsd-field-type-datetime lsd-field-type-dropdown lsd-field-type-textarea lsd-field-type-radio lsd-field-type-checkbox lsd-field-type-image">
                         <label for="lsd_required"><?php esc_html_e('Required', 'listdom'); ?></label>
                         <?php echo LSD_Form::switcher([
                             'name' => 'lsd_required',
@@ -289,6 +303,7 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
             </td>
         </tr>
         <?php
+        wp_nonce_field('lsd_save_attribute_meta', 'lsd_attribute_meta_nonce');
     }
 
     public function save_metadata($term_id): bool
@@ -296,11 +311,17 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
         // It's quick edit
         if (!isset($_POST['lsd_field_type'])) return false;
 
-        $field_type = sanitize_text_field($_POST['lsd_field_type']);
-        $values = isset($_POST['lsd_values']) ? preg_replace('/,\s/', ',', sanitize_text_field($_POST['lsd_values'])) : '';
-        $index = isset($_POST['lsd_index']) ? sanitize_text_field($_POST['lsd_index']) : '99.00';
-        $all_categories = isset($_POST['lsd_all_categories']) ? sanitize_text_field($_POST['lsd_all_categories']) : '1';
-        $categories = $_POST['lsd_categories'] ?? [];
+        $nonce = isset($_POST['lsd_attribute_meta_nonce']) ? sanitize_text_field(wp_unslash($_POST['lsd_attribute_meta_nonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_save_attribute_meta')) return false;
+
+        $taxonomy = get_taxonomy(LSD_Base::TAX_ATTRIBUTE);
+        if (!$taxonomy || !current_user_can($taxonomy->cap->edit_terms)) return false;
+
+        $field_type = sanitize_text_field(wp_unslash($_POST['lsd_field_type']));
+        $values = isset($_POST['lsd_values']) ? preg_replace('/,\s/', ',', sanitize_text_field(wp_unslash($_POST['lsd_values']))) : '';
+        $index = isset($_POST['lsd_index']) ? sanitize_text_field(wp_unslash($_POST['lsd_index'])) : '99.00';
+        $all_categories = isset($_POST['lsd_all_categories']) ? sanitize_text_field(wp_unslash($_POST['lsd_all_categories'])) : '1';
+        $categories = isset($_POST['lsd_categories']) ? wp_unslash($_POST['lsd_categories']) : [];
 
         // Sanitization
         array_walk_recursive($categories, 'sanitize_text_field');
@@ -316,14 +337,14 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
         update_term_meta($term_id, 'lsd_all_categories', $all_categories);
         update_term_meta($term_id, 'lsd_categories', $categories);
 
-        $icon = isset($_POST['lsd_icon']) ? sanitize_text_field($_POST['lsd_icon']) : '';
-        $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? sanitize_text_field($_POST['lsd_itemprop']) : '';
-        $required = isset($_POST['lsd_required']) ? (int) sanitize_text_field($_POST['lsd_required']) : 0;
+        $icon = isset($_POST['lsd_icon']) ? sanitize_text_field(wp_unslash($_POST['lsd_icon'])) : '';
+        $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? sanitize_text_field(wp_unslash($_POST['lsd_itemprop'])) : '';
+        $required = isset($_POST['lsd_required']) ? (int) sanitize_text_field(wp_unslash($_POST['lsd_required'])) : 0;
 
-        $editor = isset($_POST['lsd_editor']) ? (int) sanitize_text_field($_POST['lsd_editor']) : 0;
+        $editor = isset($_POST['lsd_editor']) ? (int) sanitize_text_field(wp_unslash($_POST['lsd_editor'])) : 0;
         if ($editor) $required = 0;
 
-        $link_label = isset($_POST['lsd_link_label']) ? sanitize_text_field($_POST['lsd_link_label']) : '';
+        $link_label = isset($_POST['lsd_link_label']) ? sanitize_text_field(wp_unslash($_POST['lsd_link_label'])) : '';
         if (!in_array($field_type, ['url', 'email', 'tel'])) $link_label = '';
 
         update_term_meta($term_id, 'lsd_icon', $icon);

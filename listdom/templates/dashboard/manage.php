@@ -12,7 +12,7 @@ jQuery(document).ready(function()
     jQuery("#lsd_dashboard").listdomDashboard(
     {
         ajax_url: "' . admin_url('admin-ajax.php', null) . '",
-        page: ' . json_encode($this->page) . ',
+        page: ' . wp_json_encode($this->page) . ',
         nonce: "' . wp_create_nonce('lsd_dashboard') . '"
     });
 });
@@ -40,8 +40,8 @@ $counts = $this->listing_counts();
                     'empty_label' => esc_html__('View All', 'listdom'),
                     'value' => $this->category ?: ''
                 ]); ?>
-                <?php echo LSD_Form::search(['id' => 'lsd_dashboard_search', 'name' => 'lsd_s', 'placeholder' => esc_html__('Search…', 'listdom'), 'value' => $this->search]); ?>
-                <button type="submit" class="lsd-neutral-button"><?php esc_html_e('Search', 'listdom'); ?></button>
+                <?php echo LSD_Form::search(['id' => 'lsd_dashboard_search', 'name' => 'lsd_s', 'placeholder' => esc_attr__('Search…', 'listdom'), 'value' => $this->search]); ?>
+                <button type="submit" class="lsd-search-button"><?php esc_html_e('Search', 'listdom'); ?></button>
             </form>
 
             <?php if (count($counts) && is_array($wp_post_statuses) && count($wp_post_statuses)): ?>
@@ -72,7 +72,11 @@ $counts = $this->listing_counts();
                         'prev_next' => true,
                     ]); ?>
                 </div>
-            <?php else: echo LSD_Base::alert(sprintf(esc_html__("No listing found! %s your first listing now.", 'listdom'), '<a href="' . esc_url($this->get_form_link()) . '">' . esc_html__('Add', 'listdom') . '</a>')); ?>
+            <?php else: echo LSD_Base::alert(sprintf(
+                /* translators: %s: Link to add a new listing. */
+                esc_html__("No listing found! %s your first listing now.", 'listdom'),
+                '<a href="' . esc_url($this->get_form_link()) . '">' . esc_html__('Add', 'listdom') . '</a>'
+            )); ?>
             <?php endif; ?>
         </div>
     </div>

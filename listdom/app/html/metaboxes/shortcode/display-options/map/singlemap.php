@@ -64,7 +64,7 @@ $mapsearch = $singlemap['mapsearch'] ?? '1';
                                 'suggestions' => 'lsd_display_options_skin_singlemap_connected_shortcodes_suggestions',
                                 'values' => $singlemap['connected_shortcodes'] ?? [],
                                 'max_items' => 3,
-                                'placeholder' => esc_html__("Enter at least 3 characters of the shortcode's title ...", 'listdom'),
+                                'placeholder' => esc_attr__("Enter at least 3 characters of the shortcode's title ...", 'listdom'),
                                 'description' => esc_html__('You should select up to 3 search-able skin shortcodes e.g. List, Grid, Masonry, List + Grid, Half Map, Side By Side, etc.', 'listdom'),
                             ]); ?>
                         </div>

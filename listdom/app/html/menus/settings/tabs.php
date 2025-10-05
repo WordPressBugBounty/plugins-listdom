@@ -65,7 +65,7 @@ $addon = apply_filters('lsd_is_addon_installed', false);
         ?>
 
         <li class="lsd-has-children lsd-users-nav <?php echo $this->tab === 'auth' ? ' lsd-nav-expanded' : ''; ?>">
-            <a class="lsd-nav-tab <?php echo $this->tab === 'auth' ? 'lsd-nav-tab-active' : ''; ?>"   href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>">
+            <a class="lsd-nav-tab <?php echo $this->tab === 'auth' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>">
                 <i class="listdom-icon lsdi-user-circle lsd-m-0"></i>
                 <?php esc_html_e('Users', 'listdom'); ?>
             </a>
@@ -79,11 +79,15 @@ $addon = apply_filters('lsd_is_addon_installed', false);
                 <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'block-admin-access' ? 'lsd-nav-tab-active' : ''; ?>" data-key="block-admin-access"><?php esc_html_e('Block Admin Access', 'listdom'); ?></li>
             </ul>
         </li>
-        <li class="lsd-single-listing-nav">
+        <li class="lsd-has-children lsd-single-listing-nav <?php echo $this->tab === 'single-listing' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'single-listing' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=single-listing')); ?>">
                 <i class="listdom-icon lsdi-list-view lsd-m-0"></i>
                 <?php esc_html_e('Single Listing', 'listdom'); ?>
             </a>
+            <ul data-parent="single-listing" class="lsd-nav-sub-tabs lsd-tabs">
+                <li class="lsd-nav-tab <?php echo $this->tab === 'single-listing' && ($this->subtab === 'style-elements' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="style-elements"><?php esc_html_e('Style & Elements', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'single-listing' && $this->subtab === 'display-options' ? 'lsd-nav-tab-active' : ''; ?>" data-key="display-options"><?php esc_html_e('Display Options', 'listdom'); ?></li>
+            </ul>
         </li>
         <li class="lsd-has-children lsd-advanced-nav <?php echo $this->tab === 'advanced' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'advanced' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=advanced')); ?>">
@@ -136,20 +140,11 @@ $addon = apply_filters('lsd_is_addon_installed', false);
             do_action('lsd_admin_settings_tabs_after_addons', $this);
         ?>
     </ul>
-    <p class="lsd-nav-support-link"><?php echo sprintf(esc_html__("Have Problems? %s", 'listdom'), '<strong><a href="' . LSD_Base::getSupportURL() . '" target="_blank">' . esc_html__('Contact Support', 'listdom') . '</a></strong>'); ?></p>
-</div>
-<!-- Custom Modal HTML -->
-<div id="tabSwitchModal" class="lsd-modal">
-    <div class="lsd-modal-content">
-        <div class="lsd-switch-modal-message">
-            <p class="lsd-m-0"><?php esc_html_e('You have unsaved changes.', 'listdom'); ?></p>
-            <p class="lsd-m-0"><?php esc_html_e('Do you want to leave without saving? ', 'listdom'); ?></p>
-        </div>
-        <div class="lsd-switch-modal-buttons">
-            <button id="confirmLeaveBtn" class="lsd-secondary-button"><?php esc_html_e('Leave Now', 'listdom'); ?></button>
-            <button id="saveLeaveBtn" class="lsd-secondary-button"><?php esc_html_e('Save & Leave', 'listdom'); ?></button>
-        </div>
-    </div>
+    <p class="lsd-nav-support-link"><?php echo sprintf(
+        /* translators: %s: Contact support link. */
+        esc_html__('Have Problems? %s', 'listdom'),
+        '<strong><a href="' . LSD_Base::getSupportURL() . '" target="_blank">' . esc_html__('Contact Support', 'listdom') . '</a></strong>'
+    ); ?></p>
 </div>
 
 <script>
@@ -157,7 +152,7 @@ jQuery(document).ready(function ($)
 {
     const tabs = $('.lsd-nav-tab-wrapper a.lsd-nav-tab');
     let currentTab = $('.lsd-nav-tab-active');
-    const formSelectors = ['#lsd_settings_form', '#lsd_addons_form', '#lsd_api_form', '#lsd_auth_form'];
+    const formSelectors = ['#lsd_settings_form', '#lsd_addons_form', '#lsd_api_form', '#lsd_ai_form', '#lsd_auth_form'];
 
     // Function to check if there are unsaved changes
     const hasUnsavedChanges = () => currentTab.attr('data-saved') === 'false';
@@ -170,12 +165,22 @@ jQuery(document).ready(function ($)
         if (hasUnsavedChanges())
         {
             e.preventDefault();
-            listdomConfirmModal('#tabSwitchModal', '#confirmLeaveBtn', '#saveLeaveBtn', (confirmLeave) =>
-            {
-                if (confirmLeave) {
-                    updateTab(newTab);
-                    window.location.href = newTab.attr('href');
-                } else handleFormSubmission(newTab);
+
+            listdom_toastify("<?php echo esc_js(esc_html__("You have unsaved changes. Do you want to leave without saving? ", 'listdom')); ?>", "lsd-confirm", {
+                position: "lsd-center-center",
+                confirm: {
+                    confirmText: "<?php echo esc_js(esc_html__('Save & Leave', 'listdom')); ?>",
+                    cancelText:  "<?php echo esc_js(esc_html__('Leave Now', 'listdom')); ?>",
+                    onConfirm: function(toast)
+                    {
+                        handleFormSubmission(newTab)
+                    },
+                    onCancel: function(toast)
+                    {
+                        updateTab(newTab);
+                        window.location.href = newTab.attr('href');
+                    }
+                }
             });
         }
         else updateTab(newTab);

@@ -36,28 +36,28 @@ class LSD_User extends LSD_Base
         $user_email = apply_filters('user_registration_email', $user_email);
 
         // Check the username.
-        if ('' === $sanitized_user_login) $errors->add('empty_username', __('<strong>Error</strong>: Please enter a username.'));
+        if ('' === $sanitized_user_login) $errors->add('empty_username', wp_kses_post(__('<strong>Error</strong>: Please enter a username.', 'listdom')));
         else if (!validate_username($user_login))
         {
-            $errors->add('invalid_username', __('<strong>Error</strong>: This username is invalid because it uses illegal characters. Please enter a valid username.'));
+            $errors->add('invalid_username', wp_kses_post(__('<strong>Error</strong>: This username is invalid because it uses illegal characters. Please enter a valid username.', 'listdom')));
             $sanitized_user_login = '';
         }
-        else if (username_exists($sanitized_user_login)) $errors->add('username_exists', __('<strong>Error</strong>: This username is already registered. Please choose another one.'));
+        else if (username_exists($sanitized_user_login)) $errors->add('username_exists', wp_kses_post(__('<strong>Error</strong>: This username is already registered. Please choose another one.', 'listdom')));
         else
         {
             /** This filter is documented in wp-includes/user.php */
             $illegal_user_logins = (array) apply_filters('illegal_user_logins', []);
-            if (in_array(strtolower($sanitized_user_login), array_map('strtolower', $illegal_user_logins), true)) $errors->add('invalid_username', __('<strong>Error</strong>: Sorry, that username is not allowed.'));
+            if (in_array(strtolower($sanitized_user_login), array_map('strtolower', $illegal_user_logins), true)) $errors->add('invalid_username', wp_kses_post(__('<strong>Error</strong>: Sorry, that username is not allowed.', 'listdom')));
         }
 
         // Check the email address.
-        if ('' === $user_email) $errors->add('empty_email', __('<strong>Error</strong>: Please type your email address.'));
+        if ('' === $user_email) $errors->add('empty_email', wp_kses_post(__('<strong>Error</strong>: Please type your email address.', 'listdom')));
         else if (!is_email($user_email))
         {
-            $errors->add('invalid_email', __('<strong>Error</strong>: The email address isn&#8217;t correct.'));
+            $errors->add('invalid_email', wp_kses_post(__('<strong>Error</strong>: The email address isn&#8217;t correct.', 'listdom')));
             $user_email = '';
         }
-        else if (email_exists($user_email)) $errors->add('email_exists', __('<strong>Error</strong>: This email is already registered. Please choose another one.'));
+        else if (email_exists($user_email)) $errors->add('email_exists', wp_kses_post(__('<strong>Error</strong>: This email is already registered. Please choose another one.', 'listdom')));
 
         /**
          * Fires when submitting registration form data, before the user is created.
@@ -97,7 +97,8 @@ class LSD_User extends LSD_Base
         if (!$user_id || is_wp_error($user_id))
         {
             $errors->add('registerfail', sprintf(
-                __('<strong>Error</strong>: Couldn&#8217;t register you&hellip; please contact the <a href="mailto:%s">site admin</a>!'),
+                /* translators: %s: Support email address. */
+                wp_kses_post(__('<strong>Error</strong>: Couldn&#8217;t register you&hellip; please contact the <a href="mailto:%s">site admin</a>!', 'listdom')),
                 get_option('admin_email')
             ));
 
@@ -245,14 +246,18 @@ class LSD_User extends LSD_Base
         $reset_link = network_site_url("wp-login.php?action=rp&key=$reset_key&login=" . rawurlencode($user->user_login), 'login');
 
         // Send password reset email
-        $message = __('Someone has requested a password reset for the following account:', 'listdom') . "\r\n\r\n";
+        $message = esc_html__('Someone has requested a password reset for the following account:', 'listdom') . "\r\n\r\n";
         $message .= network_home_url('/') . "\r\n\r\n";
-        $message .= sprintf(__('Username: %s', 'listdom'), $user->user_login) . "\r\n\r\n";
-        $message .= __('If this was a mistake, just ignore this email and nothing will happen.', 'listdom') . "\r\n\r\n";
-        $message .= __('To reset your password, visit the following address:', 'listdom') . "\r\n\r\n";
+        $message .= sprintf(
+            /* translators: %s: Username for the account. */
+            esc_html__('Username: %s', 'listdom'),
+            $user->user_login
+        ) . "\r\n\r\n";
+        $message .= esc_html__('If this was a mistake, just ignore this email and nothing will happen.', 'listdom') . "\r\n\r\n";
+        $message .= esc_html__('To reset your password, visit the following address:', 'listdom') . "\r\n\r\n";
         $message .= '<a href="' . esc_url($reset_link) . '">' . esc_url($reset_link) . '</a>' . "\r\n";
 
-        return wp_mail($user->user_email, __('Password Reset Request', 'listdom'), $message);
+        return wp_mail($user->user_email, esc_html__('Password Reset Request', 'listdom'), $message);
     }
 
     public static function profile_link(int $id): string

@@ -17,20 +17,25 @@ $api = LSD_Options::api();
                     <div class="lsd-settings-group-wrapper">
                         <div class="lsd-settings-fields-wrapper">
                             <div class="lsd-my-0">
-                                <p class="description lsd-mt-0 lsd-mb-0"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
-                                <div class="lsd-alert lsd-info"><?php echo sprintf(esc_html__('You can use the %s URL as the API base URL.', 'listdom'), '<code>'.get_rest_url().'</code>'); ?></div>
-                                <button type="button" class="button" id="lsd_settings_api_add_token"><?php esc_html_e('Add Token', 'listdom'); ?></button>
+                                <p class="lsd-admin-description lsd-m-0"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
+                                <div class="lsd-alert lsd-info"><?php echo sprintf(
+                                    /* translators: %s: REST API base URL. */
+                                    esc_html__('You can use the %s URL as the API base URL.', 'listdom'),
+                                    '<code>'.get_rest_url().'</code>'
+                                ); ?></div>
+                                <button type="button" class="lsd-secondary-button" id="lsd_settings_api_add_token"><?php esc_html_e('Add Token', 'listdom'); ?></button>
                             </div>
                             <?php foreach($api['tokens'] as $i => $token): ?>
                             <div class="lsd-form-row" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>">
                                 <div class="lsd-col-3"><?php echo LSD_Form::text([
+                                    'class' => 'lsd-admin-input',
                                     'id' => 'lsd_settings_api_tokens_'.esc_attr($i).'_name',
                                     'name' => 'lsd[tokens]['.esc_attr($i).'][name]',
                                     'value' => $token['name'],
-                                    'placeholder' => esc_html__('Token Name', 'listdom'),
+                                    'placeholder' => esc_attr__('Token Name', 'listdom'),
                                 ]); ?></div>
                                 <div class="lsd-col-6">
-                                    <input title="" type="text" name="lsd[tokens][<?php echo esc_attr($i); ?>][key]" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>_key" value="<?php echo esc_attr($token['key']); ?>" placeholder="<?php esc_attr_e('Token Key', 'listdom'); ?>" readonly>
+                                    <input class="lsd-admin-input" title="" type="text" name="lsd[tokens][<?php echo esc_attr($i); ?>][key]" id="lsd_settings_api_tokens_<?php echo esc_attr($i); ?>_key" value="<?php echo esc_attr($token['key']); ?>" placeholder="<?php esc_attr_e('Token Key', 'listdom'); ?>" readonly>
                                 </div>
                                 <div class="lsd-col-1">
                                     <div class="lsd-api-remove-token lsd-pt-2 lsd-cursor-pointer" data-i="<?php echo esc_attr($i); ?>" data-confirm="0"><i class="lsd-icon fas fa-trash-alt"></i></div>
@@ -60,11 +65,11 @@ $api = LSD_Options::api();
 // Add Token
 jQuery('#lsd_settings_api_add_token').on('click', function()
 {
-    // Loading Wrapper
-    const loading = (new ListdomLoadingWrapper());
+    const $button = jQuery(this);
 
-    // Loading
-    loading.start();
+    // Loading Wrapper
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Adding', 'listdom') ); ?>");
 
     jQuery.ajax(
     {
@@ -75,14 +80,14 @@ jQuery('#lsd_settings_api_add_token').on('click', function()
         success: function(response)
         {
             // Unloading
-            loading.stop(null, 200);
+            loading.stop();
 
             if(response.success === 1) location.reload();
         },
         error: function()
         {
             // Unloading
-            loading.stop(null, 200);
+            loading.stop();
         }
     });
 });
@@ -110,10 +115,8 @@ jQuery('.lsd-api-remove-token').on('click', function()
     }
 
     // Loading Wrapper
-    const loading = (new ListdomLoadingWrapper());
-
-    // Loading
-    loading.start();
+    const loading = new ListdomButtonLoader($button);
+    loading.start("");
 
     jQuery.ajax(
     {
@@ -129,13 +132,13 @@ jQuery('.lsd-api-remove-token').on('click', function()
                 jQuery('#lsd_settings_api_tokens_'+i).remove();
 
                 // Unloading
-                loading.stop(null, 200);
+                loading.stop();
             }
         },
         error: function()
         {
             // Unloading
-            loading.stop(null, 200);
+            loading.stop();
         }
     });
 });
@@ -145,12 +148,12 @@ jQuery('#lsd_api_form').on('submit', function(event)
 {
     event.preventDefault();
 
-    // Loading Wrapper
-    const loading = (new ListdomLoadingWrapper());
-    const $tab = jQuery('.nav-tab-active');
+    const $button = jQuery('#lsd_api_save_button')
+    const $tab = jQuery('.lsd-nav-tab-active');
 
-    // Loading
-    loading.start();
+    // Loading Wrapper
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Saving', 'listdom') ); ?>");
 
     const settings = jQuery(this).serialize();
     jQuery.ajax(
@@ -162,15 +165,19 @@ jQuery('#lsd_api_form').on('submit', function(event)
         {
             $tab.attr('data-saved', 'true');
 
+            listdom_toastify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
+
             // Unloading
-            loading.stop(null, 1000);
+            loading.stop();
         },
         error: function()
         {
             $tab.attr('data-saved', 'false');
 
+            listdom_toastify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
+
             // Unloading
-            loading.stop(null, 1000);
+            loading.stop();
         }
     });
 });

@@ -115,6 +115,9 @@ class LSD_Socials extends LSD_Base
             // Social Network is not Enabled
             if (!$obj || !$obj->option('profile')) continue;
 
+            // Not Set
+            if (!isset($_POST['lsd_' . $obj->key()])) continue;
+
             // Save
             update_user_meta($user_id, 'lsd_' . $obj->key(), sanitize_text_field($_POST['lsd_' . $obj->key()]));
         }
@@ -141,7 +144,7 @@ class LSD_Socials extends LSD_Base
 
             echo '<div class="lsd-form-row">
                 <div class="lsd-col-2 lsd-text-right">
-                    <label for="lsd_' . $obj->key() . '">' . $obj->label() . ($dashboard && $dashboard->is_required($obj->key()) ? ' ' . LSD_Base::REQ_HTML : '') . '</label>
+                    <label class="lsd-fields-label" for="lsd_' . $obj->key() . '">' . $obj->label() . ($dashboard && $dashboard->is_required($obj->key()) ? ' ' . LSD_Base::REQ_HTML : '') . '</label>
                 </div>
                 <div class="lsd-col-8">
                     <input type="' . esc_attr($type) . '" name="lsd[sc][' . $obj->key() . ']" id="lsd_' . $obj->key() . '" placeholder="" value="' . ($type === 'url' ? esc_url($value) : esc_attr($value)) . '">

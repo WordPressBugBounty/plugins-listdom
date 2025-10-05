@@ -25,7 +25,7 @@ class LSD_Breadcrumb extends LSD_Base
         $items = [];
 
         // Home link with optional icon
-        $home_label = ($icon ? '<i class="fas fa-home"></i> ' : '') . __('Home', 'listdom');
+        $home_label = ($icon ? '<i class="fas fa-home"></i> ' : '') . esc_html__('Home', 'listdom');
         $items[] = self::item(home_url(), $home_label, 'lsd-home-page');
 
         if (is_singular())

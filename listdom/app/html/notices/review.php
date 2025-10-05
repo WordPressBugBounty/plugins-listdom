@@ -8,7 +8,7 @@ defined('ABSPATH') || die();
 ?>
 <?php if ($this->can_display_notice($notice)): ?>
     <div class="lsd-ask-review-wrapper <?php echo $home ? 'lsd-my-0' : 'notice notice-info'; ?> lsd-flex lsd-flex-row lsd-gap-5 lsd-flex-content-start lsd-flex-items-start">
-        <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/rating.svg')); ?>" alt="">
+        <img src="<?php echo esc_url($this->lsd_asset_url('img/rating.svg')); ?>" alt="">
         <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-flex-items-start">
             <h3 class="lsd-m-0 lsd-admin-title"><?php echo esc_html__('Looks like you\'ve been using Listdom for a while.' ,'listdom'); ?></h3>
             <p class="lsd-m-0"><?php echo esc_html__('Could you give a 5-star rating on the WordPress repository? It helps the Listdom team know their efforts are useful to you.', 'listdom'); ?></p>

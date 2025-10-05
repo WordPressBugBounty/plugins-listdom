@@ -56,12 +56,19 @@ class LSD_Duplicate
      */
     public function duplicate()
     {
-        if (empty($_GET['post']) || empty($_GET['lsd_duplicate_nonce']) || !wp_verify_nonce($_GET['lsd_duplicate_nonce'], basename(__FILE__)))
+        if (
+            empty($_GET['post'])
+            || empty($_GET['lsd_duplicate_nonce'])
+            || !wp_verify_nonce(
+                sanitize_text_field(wp_unslash($_GET['lsd_duplicate_nonce'])),
+                basename(__FILE__)
+            )
+        )
         {
             return;
         }
 
-        $post_id = absint($_GET['post']);
+        $post_id = absint(wp_unslash($_GET['post']));
         $post = get_post($post_id);
 
         // Copy the post and set its status to draft

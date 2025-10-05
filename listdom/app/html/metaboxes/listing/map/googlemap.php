@@ -182,7 +182,7 @@ jQuery(document).ready(function($)
         <?php if(isset($shape['type']) and $shape['type'] == 'polyline'): ?>
         overlay = new google.maps.Polyline(
         {
-            path: <?php echo json_encode($shape['boundaries'], JSON_NUMERIC_CHECK); ?>,
+            path: <?php echo wp_json_encode($shape['boundaries'], JSON_NUMERIC_CHECK); ?>,
             strokeOpacity: stroke_opacity,
             strokeColor: stroke_color,
             strokeWeight: stroke_weight,
@@ -225,7 +225,7 @@ jQuery(document).ready(function($)
         <?php elseif(isset($shape['type']) and $shape['type'] == 'polygon'): ?>
         overlay = new google.maps.Polygon(
         {
-            paths: <?php echo json_encode($shape['boundaries'], JSON_NUMERIC_CHECK); ?>,
+            paths: <?php echo wp_json_encode($shape['boundaries'], JSON_NUMERIC_CHECK); ?>,
             fillColor: fill_color,
             fillOpacity: fill_opacity,
             strokeOpacity: stroke_opacity,
@@ -252,7 +252,7 @@ jQuery(document).ready(function($)
             strokeWeight: stroke_weight,
             clickable: false,
             editable: true,
-            center: <?php echo json_encode($shape['center'], JSON_NUMERIC_CHECK); ?>,
+            center: <?php echo wp_json_encode($shape['center'], JSON_NUMERIC_CHECK); ?>,
             radius: <?php echo esc_js($shape['radius']); ?>
         });
 

@@ -39,7 +39,11 @@ class LSD_Plugin_Notice extends LSD_Base
         if ($home && !$force) return;
 
         // Theme / Plugin Update or Install
-        if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'update.php') !== false) return;
+        $request_uri = isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI'])
+            ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI']))
+            : '';
+
+        if ($request_uri !== '' && strpos($request_uri, 'update.php') !== false) return;
 
         // If a specific notice key is provided, display only that notice
         if (trim($notice))

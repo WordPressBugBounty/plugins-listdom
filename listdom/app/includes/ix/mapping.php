@@ -215,7 +215,11 @@ class LSD_IX_Mapping extends LSD_IX
                 'label' => esc_html($obj->label()),
                 'type' => $type,
                 'mandatory' => false,
-                'description' => sprintf(esc_html__("A %s field should be mapped.", 'listdom'), $type),
+                'description' => sprintf(
+                    /* translators: %s: Field type label. */
+                    esc_html__("A %s field should be mapped.", 'listdom'),
+                    $type
+                ),
                 'default' => [$default, $type],
             ];
         }
@@ -234,7 +238,11 @@ class LSD_IX_Mapping extends LSD_IX
                 'label' => $attribute->name,
                 'type' => $mapping_type,
                 'mandatory' => false,
-                'description' => sprintf(esc_html__("A %s field should be mapped.", 'listdom'), $mapping_type),
+                'description' => sprintf(
+                    /* translators: %s: Attribute field type. */
+                    esc_html__("A %s field should be mapped.", 'listdom'),
+                    $mapping_type
+                ),
                 'default' => [$default, $mapping_type],
             ];
         }
@@ -300,7 +308,11 @@ class LSD_IX_Mapping extends LSD_IX
             $value = !is_null($field) && isset($raw[$field]) && trim($raw[$field]) !== '' ? $raw[$field] : $default;
 
             // Normalize the Value
-            $value = $value && !preg_match('!!u', $value) ? utf8_encode($value) : $value;
+            if ($value && !preg_match('!!u', $value))
+            {
+                $detected_encoding = mb_detect_encoding($value, mb_detect_order(), true);
+                $value = mb_convert_encoding($value, 'UTF-8', $detected_encoding ?: 'ISO-8859-1');
+            }
 
             // Add to Mapped Data
             $mapped[$key] = $value;

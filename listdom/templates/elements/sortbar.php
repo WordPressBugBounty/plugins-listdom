@@ -26,8 +26,8 @@ if(!count($enableds)) return '';
 <div class="lsd-view-sortbar-wrapper<?php echo $sort_style ? ' lsd-sort-style-'. esc_attr($sort_style) : ''; ?>">
 	<ul class="lsd-sortbar-list">
 		<?php foreach($enableds as $key => $option): ?>
-		<li data-orderby="<?php echo esc_attr($key); ?>" data-order="<?php echo ($this->orderby == $key ? ($this->order == 'DESC' ? 'ASC' : 'DESC') : (isset($option['sort']) ? esc_attr($option['sort']) : 'DESC')); ?>" class="<?php echo ($this->orderby == $key ? 'lsd-active' : ''); ?>">
-			<?php esc_html_e($option['name'], 'listdom'); ?>
+                <li data-orderby="<?php echo esc_attr($key); ?>" data-order="<?php echo ($this->orderby == $key ? ($this->order == 'DESC' ? 'ASC' : 'DESC') : (isset($option['sort']) ? esc_attr($option['sort']) : 'DESC')); ?>" class="<?php echo ($this->orderby == $key ? 'lsd-active' : ''); ?>">
+                        <?php echo esc_html($option['name']); ?>
 			<?php if($this->orderby == $key): ?>
 			<i class="lsd-icon fas fa-sort-amount-<?php echo ($this->order == 'DESC' ? 'down' : 'up'); ?>" aria-hidden="true"></i>
 			<?php endif; ?>
@@ -41,8 +41,8 @@ if(!count($enableds)) return '';
 		</span>
 		<select title="<?php esc_attr_e('Sort By', 'listdom'); ?>">
 			<?php foreach($enableds as $key => $option): ?>
-			<option value="<?php echo esc_attr($key); ?>" data-order="ASC" <?php echo $this->orderby == $key && $this->order == 'ASC' ? 'selected="selected"' : ''; ?>><?php echo esc_html__($option['name'], 'listdom'); ?> &#8593;</option>
-			<option value="<?php echo esc_attr($key); ?>" data-order="DESC" <?php echo $this->orderby == $key && $this->order == 'DESC' ? 'selected="selected"' : ''; ?>><?php echo esc_html__($option['name'], 'listdom'); ?> &#8595;</option>
+                        <option value="<?php echo esc_attr($key); ?>" data-order="ASC" <?php echo $this->orderby == $key && $this->order == 'ASC' ? 'selected="selected"' : ''; ?>><?php echo esc_html($option['name']); ?> &#8593;</option>
+                        <option value="<?php echo esc_attr($key); ?>" data-order="DESC" <?php echo $this->orderby == $key && $this->order == 'DESC' ? 'selected="selected"' : ''; ?>><?php echo esc_html($option['name']); ?> &#8595;</option>
 			<?php endforeach; ?>
 		</select>
 	</div>

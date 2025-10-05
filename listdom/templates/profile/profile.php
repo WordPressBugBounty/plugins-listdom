@@ -35,6 +35,12 @@ $user_roles = $user_object->roles;
 
 // Check if user has allowed role
 $allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
+
+$profile_privacy_field = LSD_Privacy::consent_field([
+    'id' => 'lsd_profile_privacy_consent_' . absint($user['ID']),
+    'wrapper_class' => 'lsd-profile-privacy-consent-field',
+    'context' => 'profile',
+]);
 ?>
 <div class="lsd-profile-wrapper lsd-mb-4">
     <div class="lsd-hero-image">
@@ -69,7 +75,11 @@ $allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
                 <button class="lsd-message-modal-button">
                     <?php
                         $name = !empty($user['first_name']) ? $user['first_name'] : (!empty($user['last_name']) ? $user['last_name'] : $user['display_name']);
-                        echo sprintf(esc_html__('Message %s', 'listdom'), esc_html($name));
+                        echo sprintf(
+                            /* translators: %s: Profile owner name. */
+                            esc_html__('Message %s', 'listdom'),
+                            esc_html($name)
+                        );
                     ?>
                 </button>
                 <div id="lsd-message-modal" class="lsd-modal">
@@ -88,7 +98,7 @@ $allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
                                             value="<?php echo $current_id ? esc_attr(trim($current_user->first_name . ' ' . $current_user->last_name)) : ''; ?>"
                                             required
                                         >
-                                        <i class="lsd-icon fa fa-user"></i>
+                                        <i class="lsd-icon fa fa-user lsd-profile-contact-form-icon" aria-hidden="true"></i>
                                     </div>
 
                                     <div class="lsd-profile-contact-form-row lsd-profile-contact-form-row-email">
@@ -101,7 +111,7 @@ $allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
                                             value="<?php echo $current_id ? esc_attr($current_user->user_email) : ''; ?>"
                                             required
                                         >
-                                        <i class="lsd-icon fa fa-envelope"></i>
+                                        <i class="lsd-icon fa fa-envelope lsd-profile-contact-form-icon" aria-hidden="true"></i>
                                     </div>
 
                                     <div class="lsd-profile-contact-form-row lsd-profile-contact-form-row-phone">
@@ -114,7 +124,7 @@ $allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
                                             value="<?php echo $current_id ? esc_attr(get_user_meta($current_id, 'lsd_phone', true)) : ''; ?>"
                                             required
                                         >
-                                        <i class="lsd-icon fas fa-phone-alt"></i>
+                                        <i class="lsd-icon fas fa-phone-alt lsd-profile-contact-form-icon" aria-hidden="true"></i>
                                     </div>
                                 </div>
 
@@ -132,14 +142,20 @@ $allowed_roles = ['listdom_author', 'listdom_publisher', 'administrator'];
                                 <div class="lsd-profile-contact-form-row">
                                     <label>
                                         <input type="checkbox" name="lsd_subscribe" value="1" <?php echo isset($settings['mailchimp_checked']) && $settings['mailchimp_checked'] ? 'checked' : ''; ?>>
-                                        <?php echo esc_html($settings['mailchimp_message'] ?: __('Subscribe to our newsletter.', 'listdom')); ?>
+                                        <?php echo esc_html($settings['mailchimp_message'] ?: esc_html__('Subscribe to our newsletter.', 'listdom')); ?>
                                     </label>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if ($profile_privacy_field !== ''): ?>
+                                <div class="lsd-profile-contact-form-row lsd-profile-contact-form-row-consent">
+                                    <?php echo $profile_privacy_field; ?>
                                 </div>
                                 <?php endif; ?>
 
                                 <div class="lsd-profile-contact-form-row lsd-profile-contact-form-third-row">
                                     <?php echo LSD_Main::grecaptcha_field('transform-95'); ?>
-                                    <button class="lsd-form-submit lsd-widefat lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" type="submit">
+                                    <button class="lsd-general-button" type="submit">
                                         <?php esc_html_e('Send', 'listdom'); ?>
                                     </button>
 

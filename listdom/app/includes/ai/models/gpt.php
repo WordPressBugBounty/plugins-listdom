@@ -36,7 +36,7 @@ abstract class LSD_AI_Models_GPT extends LSD_AI_Models_Base
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . $this->api_key(),
             ],
-            'body' => json_encode($body),
+            'body' => wp_json_encode($body),
             'data_format' => 'body', // Important: tells WP to send body as raw data
         ]);
 

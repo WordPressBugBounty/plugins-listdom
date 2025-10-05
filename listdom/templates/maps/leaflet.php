@@ -31,7 +31,7 @@ $access_token = LSD_Options::mapbox_token();
 $force_to_show = isset($args['force_to_show']) && $args['force_to_show'];
 
 // The Unique ID
-$id = $args['id'] ?? mt_rand(100, 999);
+$id = $args['id'] ?? wp_rand(100, 999);
 
 if (isset($args['objects']) && is_array($args['objects']))
 {
@@ -57,7 +57,7 @@ jQuery(document).ready(function()
         id: '.$id.',
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         zoom: '.$zoomlevel.',
-        objects: '.json_encode($objects, JSON_NUMERIC_CHECK).',
+        objects: '.wp_json_encode($objects, JSON_NUMERIC_CHECK).',
         args: "'.http_build_query(['args'=>$args], '', '&').'",
         richmarker: "",
         infobox: "",
@@ -75,14 +75,14 @@ jQuery(document).ready(function()
         autoGPS: '.($autoGPS ? 'true' : 'false').',
         geo_request: '.($main->is_geo_request() ? 'true' : 'false').',
         display_infowindow: '.($infowindow ? 'true' : 'false').',
-        max_bounds: '.json_encode($max_bounds, JSON_NUMERIC_CHECK).',
+        max_bounds: '.wp_json_encode($max_bounds, JSON_NUMERIC_CHECK).',
         gps_zoom: {
             zl: '.$gps_zl.',
             current: '.$gps_zl_current.'
         },
         access_token: "'.$access_token.'",
         tileserver: '.apply_filters('lsd_leaflet_tileserver', '""').',
-        layers: '.json_encode(apply_filters('lsd_map_layers', [], LSD_MP_LEAFLET), JSON_NUMERIC_CHECK).',
+        layers: '.wp_json_encode(apply_filters('lsd_map_layers', [], LSD_MP_LEAFLET), JSON_NUMERIC_CHECK).',
     });
     
     // Listdom Maps

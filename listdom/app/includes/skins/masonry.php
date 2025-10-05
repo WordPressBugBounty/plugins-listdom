@@ -27,17 +27,27 @@ class LSD_Skins_Masonry extends LSD_Skins
         $this->duration = $this->skin_options['duration'] ?? 400;
 
         // All Listings Tab Label
-        $this->filter_all_label = $this->skin_options['filter_all_label'] ?? __('All', 'listdom');
+        $this->filter_all_label = $this->skin_options['filter_all_label'] ?? esc_html__('All', 'listdom');
     }
 
     public function filters(): string
     {
-        $output = '<div class="lsd-masonry-filters"><a href="#" class="lsd-selected" data-filter="*">' . esc_html__($this->filter_all_label, 'listdom') . '<div class="lsd-border lsd-color-m-bg"></div></a>';
-        $terms = get_terms($this->filter_by, [
-            'hide_empty' => true,
-            'include' => isset($this->atts[$this->filter_by]) && trim($this->atts[$this->filter_by]) ? $this->atts[$this->filter_by] : '',
-        ]);
+        $output = '<div class="lsd-masonry-filters"><a href="#" class="lsd-selected" data-filter="*">' . esc_html($this->filter_all_label) . '<div class="lsd-border lsd-color-m-bg"></div></a>';
 
+        $include = [];
+        if (isset($this->atts[$this->filter_by]) && trim($this->atts[$this->filter_by]))
+        {
+            $include = array_filter(array_map('intval', explode(',', $this->atts[$this->filter_by])));
+        }
+
+        $args = [
+            'taxonomy'   => $this->filter_by,
+            'hide_empty' => true,
+        ];
+
+        if (count($include)) $args['include'] = $include;
+
+        $terms = get_terms($args);
         foreach ($terms as $term)
         {
             // Current term doesn't have listing in current results

@@ -30,6 +30,14 @@ function lsd_schema(): LSD_Schema
     return new LSD_Schema();
 }
 
+function lsd_date(string $format = '', $time = null): string
+{
+    if (!$time) $time = current_time('timestamp', true);
+    if (!$format) $format = LSD_Base::datetime_format();
+
+    return LSD_Base::datetime($time, $format);
+}
+
 function lsd_ads(string $position): string
 {
     $ads = get_transient('lsd_ads');
@@ -39,8 +47,6 @@ function lsd_ads(string $position): string
         $ads = $api->getAds([
             'premium' => LSD_Base::isPro() ? 1 : 0,
         ]);
-
-        if (!is_array($ads)) $ads = [];
 
         set_transient('lsd_ads', $ads, DAY_IN_SECONDS);
     }

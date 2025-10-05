@@ -59,9 +59,15 @@ $progress_class = $status['progress_class'];
                             <?php if ($grace): ?>
                                 <span><?php esc_html_e('Error loading the details', 'listdom'); ?></span>
                             <?php elseif ($expired || $expiring): ?>
-                                <span><?php echo sprintf(esc_html__("%d days remaining", 'listdom'), $days_remaining); ?></span>
+                                <span><?php
+                                echo sprintf(
+                                    /* translators: %s: Number of days remaining on the license. */
+                                    esc_html__("%d days remaining", 'listdom'),
+                                    $days_remaining
+                                );
+                                ?></span>
                             <?php else: ?>
-                                <span><?php esc_html_e($validation_status['expiry']); ?></span>
+                                <span><?php echo esc_html($validation_status['expiry']); ?></span>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -69,7 +75,7 @@ $progress_class = $status['progress_class'];
             </div>
             <?php if ($expired || $expiring || $grace): ?>
                 <div>
-                    <a class="lsd-primary-button" href="<?php echo esc_url_raw($this->getWebiliaShopUrl()); ?>"
+                    <a class="lsd-primary-button" href="<?php echo esc_url($this->getWebiliaShopUrl()); ?>"
                        target="_blank">
                         <?php esc_html_e('Renew License', 'listdom'); ?>
                         <i class="listdom-icon lsdi-key"></i>
@@ -94,14 +100,16 @@ $progress_class = $status['progress_class'];
                     else if ($expiring && $valid === 1)
                     {
                         $message = sprintf(
-                            esc_html__('Your license will expire in %s days. Please renew it to avoid any interruption in using Elementor Addon.', 'listdom'),
+                            /* translators: 1: Number of days remaining on the license. */
+                            esc_html__('Your license will expire in %1$s days. Please renew it to avoid any interruption in using Elementor Addon.', 'listdom'),
                             $days_remaining
                         );
                     }
                     else if ($valid === 0)
                     {
                         $message = sprintf(
-                            esc_html__("To use %s addon you need to activate it first. If you don't have a valid license key or yours has expired, you can obtain one from the %s website.", 'listdom'),
+                            /* translators: 1: Add-on name, 2: Vendor website HTML link. */
+                            esc_html__("To use %1\$s addon you need to activate it first. If you don't have a valid license key or yours has expired, you can obtain one from the %2\$s website.", 'listdom'),
                             '<strong>' . $product['name'] . '</strong>',
                             '<a href="' . $this->getWebiliaShopURL() . '" target="_blank"><strong>Webilia</strong></a>'
                         );
@@ -109,7 +117,8 @@ $progress_class = $status['progress_class'];
                     else if ($grace)
                     {
                         $message = sprintf(
-                            esc_html__('There seems to be an issue verifying your license, which may be due to a connection problem between our server and yours, or because your license has expired. You are now in a 7-day grace period. If your license is expired, please renew or activate your license within the next %s days to avoid any disruption in using %s. If you believe this is an error, kindly check your server connection or contact Webilia support for assistance.', 'listdom'),
+                            /* translators: 1: Remaining grace period in days, 2: Add-on name. */
+                            esc_html__('There seems to be an issue verifying your license, which may be due to a connection problem between our server and yours, or because your license has expired. You are now in a 7-day grace period. If your license is expired, please renew or activate your license within the next %1$s days to avoid any disruption in using %2$s. If you believe this is an error, kindly check your server connection or contact Webilia support for assistance.', 'listdom'),
                             '<strong style="color: red;">' . esc_html(LSD_Licensing::remainingGracePeriod($prefix)) . '</strong>',
                             '<strong>' . esc_html($product['name']) . '</strong>'
                         );
@@ -125,13 +134,14 @@ $progress_class = $status['progress_class'];
                 <div class="lsd-form-row lsd-mb-0">
                     <div class="lsd-col-12">
                         <p class="lsd-m-0"><?php echo sprintf(
-                            esc_html__('Please activate your license promptly. You have less than %1$s days remaining to activate %2$s; after that, %2$s will no longer be operational.', 'listdom'),
+                            /* translators: 1: Remaining trial period in days, 2: Add-on name. */
+                            esc_html__('Please activate your license promptly. You have less than %1\$s days remaining to activate %2$s; after that, %2$s will no longer be operational.', 'listdom'),
                             '<strong style="color: red;">' . esc_html(LSD_Licensing::remainingTrialPeriod($prefix)) . '</strong>',
                             '<strong>' . esc_html($product['name']) . '</strong>'
                         ); ?></p>
                     </div>
                 </div>
-                <a class="lsd-primary-button" href="<?php echo esc_url_raw($this->getWebiliaShopUrl()); ?>" target="_blank">
+                <a class="lsd-primary-button" href="<?php echo esc_url($this->getWebiliaShopUrl()); ?>" target="_blank">
                     <?php esc_html_e('Get License', 'listdom'); ?>
                     <i class="listdom-icon lsdi-key"></i>
                 </a>
@@ -186,7 +196,14 @@ $progress_class = $status['progress_class'];
         <?php endif; ?>
     <?php else: ?>
         <?php if ($expiring): ?>
-            <div class="lsd-alert lsd-warning lsd-my-0"><?php echo sprintf(esc_html__('Your license will expire in %s days. Please renew it to avoid any interruption in using %s.', 'listdom'), '<strong style="color: red;">' . esc_html($days_remaining) . '</strong>', '<strong>' . esc_html($product['name']) . '</strong>'); ?></div>
+            <div class="lsd-alert lsd-warning lsd-my-0"><?php
+            echo sprintf(
+                /* translators: 1: Remaining days, 2: Add-on name. */
+                esc_html__('Your license will expire in %1\$s days. Please renew it to avoid any interruption in using %2$s.', 'listdom'),
+                '<strong style="color: red;">' . esc_html($days_remaining) . '</strong>',
+                '<strong>' . esc_html($product['name']) . '</strong>'
+            );
+            ?></div>
         <?php endif; ?>
         <div class="lsd-alert lsd-success lsd-my-0"><?php esc_html_e("The functionality, auto update, and customer service are activated.", 'listdom'); ?></div>
         <div class="lsd-license-manage">
@@ -206,7 +223,7 @@ $progress_class = $status['progress_class'];
                     </a>
                 </div>
             </div>
-            <a class="lsd-neutral-button lsd-w-auto" href="<?php echo esc_url_raw($this->getManageLicensesURL()); ?>"
+            <a class="lsd-neutral-button lsd-w-auto" href="<?php echo esc_url($this->getManageLicensesURL()); ?>"
                target="_blank">
                 <?php esc_html_e('Manage Licenses', 'listdom'); ?>
                 <i class="listdom-icon lsdi-link-square"></i>

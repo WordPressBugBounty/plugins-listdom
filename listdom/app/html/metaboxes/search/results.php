@@ -68,7 +68,7 @@ $connected_shortcodes = $form['connected_shortcodes'] ?? [];
                     'values' => $connected_shortcodes,
                     'max_items' => 4,
                     'toggle' => '.lsd-search-ajax-method',
-                    'placeholder' => esc_html__("Enter shortcode's title ...", 'listdom'),
+                    'placeholder' => esc_attr__("Enter shortcode's title ...", 'listdom'),
                     'description' => esc_html__("You can select up to 4 searchable skin shortcodes, such as List, Grid, Masonry, List + Grid, Half Map, Side By Side, etc. These shortcodes must be on the same page as the search form; otherwise, they will not be updated.", 'listdom'),
                 ]); ?>
             </div>

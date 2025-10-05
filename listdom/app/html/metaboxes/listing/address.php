@@ -38,7 +38,7 @@ $shape = LSD_Shape::get([
     <div class="lsd-object-type-address">
         <div class="lsd-form-row">
             <div class="lsd-col-12">
-                <label for="lsd_object_type_address" class="lsd-address-label"><?php esc_html_e('Address', 'listdom'); ?></label>
+                <label for="lsd_object_type_address" class="lsd-fields-label"><?php esc_html_e('Address', 'listdom'); ?></label>
                 <input type="text" name="lsd[address]" id="lsd_object_type_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($address); ?>">
             </div>
         </div>
@@ -57,7 +57,11 @@ $shape = LSD_Shape::get([
     </div>
     <?php
         // Show Warning of Missing Google Maps API Key
-        if(LSD_Map_Provider::def() === LSD_MP_GOOGLE && (!isset($this->settings['googlemaps_api_key']) || !trim($this->settings['googlemaps_api_key']))) echo LSD_Base::alert(sprintf(esc_html__('You should insert Google Maps API key in %s menu first!', 'listdom'), '<a href="'.admin_url('admin.php?page=listdom-settings').'" target="_blank"><strong>'.esc_html__('settings', 'listdom').'</strong></a>'), 'warning');
+        if(LSD_Map_Provider::def() === LSD_MP_GOOGLE && (!isset($this->settings['googlemaps_api_key']) || !trim($this->settings['googlemaps_api_key']))) echo LSD_Base::alert(sprintf(
+            /* translators: %s: Link to the settings menu. */
+            esc_html__('You should insert Google Maps API key in %s menu first!', 'listdom'),
+            '<a href="'.admin_url('admin.php?page=listdom-settings').'" target="_blank"><strong>'.esc_html__('settings', 'listdom').'</strong></a>'
+        ), 'warning');
     ?>
     <div class="lsd-tabs lsd-object-type-tabs">
         <ul class="nav-tab-wrapper">

@@ -52,5 +52,9 @@ defined('ABSPATH') || die();
         do_action('lsd_admin_ix_tabs', $this->tab);
         ?>
     </ul>
-    <p class="lsd-nav-support-link"><?php echo sprintf(esc_html__("Have Problems? %s", 'listdom'), '<strong><a href="' . LSD_Base::getSupportURL() . '" target="_blank">' . esc_html__('Contact Support', 'listdom') . '</a></strong>'); ?></p>
+    <p class="lsd-nav-support-link"><?php echo sprintf(
+        /* translators: %s: Contact support link. */
+        esc_html__('Have Problems? %s', 'listdom'),
+        '<strong><a href="' . LSD_Base::getSupportURL() . '" target="_blank">' . esc_html__('Contact Support', 'listdom') . '</a></strong>'
+    ); ?></p>
 </div>

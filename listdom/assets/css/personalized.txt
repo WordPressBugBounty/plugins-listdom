@@ -1,0 +1,450 @@
+:root {
+  --listdom-main-gbg1: ((dply_main_color));
+  --listdom-gap-tiny: ((gap_tiny));
+  --listdom-gap-small: ((gap_small));
+  --listdom-gap-compact: ((gap_compact));
+  --listdom-gap: ((gap_base));
+  --listdom-gap-wide: ((gap_wide));
+  --listdom-gap-large: ((gap_large));
+  --listdom-gap-huge: ((gap_huge));
+
+  /* Button Colors */
+  --listdom-primary-button-bg: ((primary_button_bg_color)); /* Primary Button Background Color */
+  --listdom-primary-button-bg-2: ((primary_button_bg_color_2)); /* Primary Button Background Color 2 */
+  --listdom-primary-button-text: ((primary_button_text_color)); /* Primary Button Text Color */
+  --listdom-primary-button-hover-bg: ((primary_button_hover_bg_color)); /* Primary Button Hover Background Color */
+  --listdom-primary-button-hover-bg-2: ((primary_button_hover_bg_color_2)); /* Primary Button Hover Background Color */
+  --listdom-primary-button-hover-text: ((primary_button_hover_text_color)); /* Primary Button Hover Text Color */
+  --listdom-primary-button-padding: ((primary_button_padding)); /* Primary Button Padding */
+  --listdom-primary-button-border: ((primary_button_border)); /* Primary Button Border */
+  --listdom-primary-button-border-style: ((primary_button_border_style)); /* Primary Button Border Style */
+  --listdom-primary-button-border-color: ((primary_button_border_color)); /* Primary Button Border Color */
+  --listdom-primary-button-border-hover: ((primary_button_border_hover)); /* Primary Button Hover Border */
+  --listdom-primary-button-border-hover-style: ((primary_button_border_hover_style)); /* Primary Button Border hover Style */
+  --listdom-primary-button-border-hover-color: ((primary_button_border_hover_color)); /* Primary Button Border hover color */
+  --listdom-primary-button-border-radius: ((primary_button_border_radius)); /* Primary Button Border Radius */
+  --listdom-primary-button-hover-border-radius: ((primary_button_hover_border_radius)); /* Primary Button Border Radius */
+
+  --listdom-primary-button-font-family: ((primary_button_font_family)); /* Primary Button Typography */
+  --listdom-primary-button-font-weight: ((primary_button_font_weight)); /* Primary Button Typography */
+  --listdom-primary-button-text-align: ((primary_button_text_align)); /* Primary Button Typography */
+  --listdom-primary-button-font-size: ((primary_button_font_size)); /* Primary Button Typography */
+  --listdom-primary-button-line-height: ((primary_button_line_height)); /* Primary Button Typography */
+
+  --listdom-search-button-bg: ((search_button_bg_color)); /* Search Button Background Color */
+  --listdom-search-button-bg-2: ((search_button_bg_color_2)); /* Search Button Background Color 2 */
+  --listdom-search-button-text: ((search_button_text_color)); /* Search Button Text Color */
+  --listdom-search-button-hover-bg: ((search_button_hover_bg_color)); /* Search Button Hover Background Color */
+  --listdom-search-button-hover-bg-2: ((search_button_hover_bg_color_2)); /* Search Button Hover Background Color */
+  --listdom-search-button-hover-text: ((search_button_hover_text_color)); /* Search Button Hover Text Color */
+  --listdom-search-button-padding: ((search_button_padding)); /* Search Button Padding */
+  --listdom-search-button-border: ((search_button_border)); /* Search Button Border */
+  --listdom-search-button-border-style: ((search_button_border_style)); /* Search Button Border Style */
+  --listdom-search-button-border-color: ((search_button_border_color)); /* Search Button Border Color */
+  --listdom-search-button-border-hover: ((search_button_border_hover)); /* Search Button Hover Border */
+  --listdom-search-button-border-hover-style: ((search_button_border_hover_style)); /* Search Button Border hover Style */
+  --listdom-search-button-border-hover-color: ((search_button_border_hover_color)); /* Search Button Border hover color */
+  --listdom-search-button-border-radius: ((search_button_border_radius)); /* Search Button Border Radius */
+  --listdom-search-button-hover-border-radius: ((search_button_hover_border_radius)); /* Search Button Border Radius */
+
+  --listdom-search-button-font-family: ((search_button_font_family)); /* Search Button Typography */
+  --listdom-search-button-font-weight: ((search_button_font_weight)); /* Search Button Typography */
+  --listdom-search-button-text-align: ((search_button_text_align)); /* Search Button Typography */
+  --listdom-search-button-font-size: ((search_button_font_size)); /* Search Button Typography */
+  --listdom-search-button-line-height: ((search_button_line_height)); /* Search Button Typography */
+
+  --listdom-pagination-button-bg: ((pagination_button_bg_color)); /* Pagination Button Background Color */
+  --listdom-pagination-button-bg-2: ((pagination_button_bg_color_2)); /* Pagination Button Background Color 2 */
+  --listdom-pagination-button-text: ((pagination_button_text_color)); /* Pagination Button Text Color */
+  --listdom-pagination-button-hover-bg: ((pagination_button_hover_bg_color)); /* Pagination Button Hover Background Color */
+  --listdom-pagination-button-hover-bg-2: ((pagination_button_hover_bg_color_2)); /* Pagination Button Hover Background Color */
+  --listdom-pagination-button-hover-text: ((pagination_button_hover_text_color)); /* Pagination Button Hover Text Color */
+  --listdom-pagination-button-padding: ((pagination_button_padding)); /* Pagination Button Padding */
+  --listdom-pagination-button-border: ((pagination_button_border)); /* Pagination Button Border */
+  --listdom-pagination-button-border-style: ((pagination_button_border_style)); /* Pagination Button Border Style */
+  --listdom-pagination-button-border-color: ((pagination_button_border_color)); /* Pagination Button Border Color */
+  --listdom-pagination-button-border-hover: ((pagination_button_border_hover)); /* Pagination Button Hover Border */
+  --listdom-pagination-button-border-hover-style: ((pagination_button_border_hover_style)); /* Pagination Button Border hover Style */
+  --listdom-pagination-button-border-hover-color: ((pagination_button_border_hover_color)); /* Pagination Button Border hover color */
+  --listdom-pagination-button-border-radius: ((pagination_button_border_radius)); /* Pagination Button Border Radius */
+  --listdom-pagination-button-hover-border-radius: ((pagination_button_hover_border_radius)); /* Pagination Button Border Radius */
+
+  --listdom-pagination-button-font-family: ((pagination_button_font_family)); /* Pagination Button Typography */
+  --listdom-pagination-button-font-weight: ((pagination_button_font_weight)); /* Pagination Button Typography */
+  --listdom-pagination-button-text-align: ((pagination_button_text_align)); /* Pagination Button Typography */
+  --listdom-pagination-button-font-size: ((pagination_button_font_size)); /* Pagination Button Typography */
+  --listdom-pagination-button-line-height: ((pagination_button_line_height)); /* Pagination Button Typography */
+
+  --listdom-secondary-button-bg: ((secondary_button_bg_color)); /* secondary Button Background Color */
+  --listdom-secondary-button-bg-2: ((secondary_button_bg_color_2)); /* secondary Button Background Color 2 */
+  --listdom-secondary-button-text: ((secondary_button_text_color)); /* secondary Button Text Color */
+  --listdom-secondary-button-hover-bg: ((secondary_button_hover_bg_color)); /* secondary Button Hover Background Color */
+  --listdom-secondary-button-hover-bg-2: ((secondary_button_hover_bg_color_2)); /* secondary Button Hover Background Color */
+  --listdom-secondary-button-hover-text: ((secondary_button_hover_text_color)); /* secondary Button Hover Text Color */
+  --listdom-secondary-button-padding: ((secondary_button_padding)); /* Secondary Button Padding */
+  --listdom-secondary-button-border: ((secondary_button_border)); /* secondary Button Border */
+  --listdom-secondary-button-border-style: ((secondary_button_border_style)); /* secondary Button Border Style */
+  --listdom-secondary-button-border-color: ((secondary_button_border_color)); /* secondary Button Border Color */
+  --listdom-secondary-button-border-hover: ((secondary_button_border_hover)); /* secondary Button Hover Border */
+  --listdom-secondary-button-border-hover-style: ((secondary_button_border_hover_style)); /* secondary Button Border hover Style */
+  --listdom-secondary-button-border-hover-color: ((secondary_button_border_hover_color)); /* secondary Button Border hover color */
+  --listdom-secondary-button-border-radius: ((secondary_button_border_radius)); /* secondary Button Border Radius */
+  --listdom-secondary-button-hover-border-radius: ((secondary_button_hover_border_radius)); /* secondary Button Border Radius */
+
+  --listdom-secondary-button-font-family: ((secondary_button_font_family)); /* Secondary Button Typography */
+  --listdom-secondary-button-font-weight: ((secondary_button_font_weight)); /* Secondary Button Typography */
+  --listdom-secondary-button-text-align: ((secondary_button_text_align)); /* Secondary Button Typography */
+  --listdom-secondary-button-font-size: ((secondary_button_font_size)); /* Secondary Button Typography */
+  --listdom-secondary-button-line-height: ((secondary_button_line_height)); /* Secondary Button Typography */
+
+  --listdom-solid-button-bg: ((solid_button_bg_color)); /* Solid Button Background Color */
+  --listdom-solid-button-bg-2: ((solid_button_bg_color_2)); /* Solid Button Background Color 2 */
+  --listdom-solid-button-text: ((solid_button_text_color)); /* Solid Button Text Color */
+  --listdom-solid-button-hover-bg: ((solid_button_hover_bg_color)); /* Solid Button Hover Background Color */
+  --listdom-solid-button-hover-bg-2: ((solid_button_hover_bg_color_2)); /* Solid Button Hover Background Color */
+  --listdom-solid-button-hover-text: ((solid_button_hover_text_color)); /* Solid Button Hover Text Color */
+  --listdom-solid-button-padding: ((solid_button_padding)); /* Solid Button Padding */
+  --listdom-solid-button-border: ((solid_button_border)); /* Solid Button Border */
+  --listdom-solid-button-border-style: ((solid_button_border_style)); /* Solid Button Border Style */
+  --listdom-solid-button-border-color: ((solid_button_border_color)); /* Solid Button Border Color */
+  --listdom-solid-button-border-hover: ((solid_button_border_hover)); /* Solid Button Hover Border */
+  --listdom-solid-button-border-hover-style: ((solid_button_border_hover_style)); /* Solid Button Border hover Style */
+  --listdom-solid-button-border-hover-color: ((solid_button_border_hover_color)); /* Solid Button Border hover color */
+  --listdom-solid-button-border-radius: ((solid_button_border_radius)); /* Solid Button Border Radius */
+  --listdom-solid-button-hover-border-radius: ((solid_button_hover_border_radius)); /* Solid Button Border Radius */
+
+  --listdom-solid-button-font-family: ((solid_button_font_family)); /* Solid Button Typography */
+  --listdom-solid-button-font-weight: ((solid_button_font_weight)); /* Solid Button Typography */
+  --listdom-solid-button-text-align: ((solid_button_text_align)); /* Solid Button Typography */
+  --listdom-solid-button-font-size: ((solid_button_font_size)); /* Solid Button Typography */
+  --listdom-solid-button-line-height: ((solid_button_line_height)); /* Solid Button Typography */
+
+  --listdom-form-input-bg-color: ((general_form_input_bg_color)); /* Input Background Color */
+  --listdom-form-input-text-color: ((general_form_input_text_color)); /* Input Text Color */
+  --listdom-form-input-border-width: ((general_form_input_border_width)); /* Input Border Width */
+  --listdom-form-input-border-style: ((general_form_input_border_style)); /* Input Border Style */
+  --listdom-form-input-border-color: ((general_form_input_border_color)); /* Input Border Color */
+  --listdom-form-input-placeholder-text-color: ((general_form_input_placeholder_text_color)); /* Placeholder Text Color */
+  --listdom-form-input-focus-border-width: ((general_form_input_hover_border_width)); /* Input Focus Border Width */
+  --listdom-form-input-focus-border-style: ((general_form_input_hover_border_style)); /* Input Focus Border Style */
+  --listdom-form-input-focus-border-color: ((general_form_input_hover_border_color)); /* Input Focus Border Color */
+  --listdom-form-input-focus-bg-color: ((general_form_input_hover_bg_color)); /* Input Background Color */
+  --listdom-form-input-radius: ((general_form_input_border_radius)); /* Input Border Radius */
+  --listdom-form-input-focus-radius: ((general_form_input_hover_border_radius)); /* Input Border Radius */
+
+  --listdom-form-input-font-family: ((general_form_input_font_family)); /* General Form Typography */
+  --listdom-form-input-font-weight: ((general_form_input_font_weight)); /* General Form Typography */
+  --listdom-form-input-text-align: ((general_form_input_text_align)); /* General Form Typography */
+  --listdom-form-input-font-size: ((general_form_input_font_size)); /* General Form Typography */
+  --listdom-form-input-line-height: ((general_form_input_line_height)); /* General Form Typography */
+
+  --listdom-search-form-bg-color: ((search_form_bg_color)); /* Input Background Color */
+  --listdom-search-form-input-bg-color: ((search_form_input_bg_color)); /* Input Background Color */
+  --listdom-search-form-input-text-color: ((search_form_input_text_color)); /* Input Text Color */
+  --listdom-search-form-input-border-width: ((search_form_input_border_width)); /* Input Border Width */
+  --listdom-search-form-input-border-style: ((search_form_input_border_style)); /* Input Border Style */
+  --listdom-search-form-input-border-color: ((search_form_input_border_color)); /* Input Border Color */
+  --listdom-search-form-input-placeholder-text-color: ((search_form_input_placeholder_text_color)); /* Placeholder Text Color */
+  --listdom-search-form-input-focus-border-width: ((search_form_input_hover_border_width)); /* Input Focus Border Width */
+  --listdom-search-form-input-focus-border-style: ((search_form_input_hover_border_style)); /* Input Focus Border Style */
+  --listdom-search-form-input-focus-border-color: ((search_form_input_hover_border_color)); /* Input Focus Border Color */
+  --listdom-search-form-input-focus-bg-color: ((search_form_input_hover_bg_color)); /* Input Background Color */
+  --listdom-search-form-input-radius: ((search_form_input_border_radius)); /* Input Border Radius */
+  --listdom-search-form-input-focus-radius: ((search_form_input_hover_border_radius)); /* Input Border Radius */
+  --listdom-search-form-input-icons-color: ((search_form_input_icons_color));
+
+  --listdom-search-form-input-font-family: ((search_form_input_font_family)); /* Search Form Typography */
+  --listdom-search-form-input-font-weight: ((search_form_input_font_weight)); /* Search Form Typography */
+  --listdom-search-form-input-text-align: ((search_form_input_text_align)); /* Search Form Typography */
+  --listdom-search-form-input-font-size: ((search_form_input_font_size)); /* Search Form Typography */
+  --listdom-search-form-input-line-height: ((search_form_input_line_height)); /* Search Form Typography */
+
+  --listdom-cloud-widget-bg-color: ((cloud_widget_bg_color)); /* Cloud Widget Bg Color */
+  --listdom-cloud-widget-text-color: ((cloud_widget_title_text_color)); /* Cloud Widget Text Color */
+  --listdom-cloud-widget-hover-bg-color: ((cloud_widget_hover_bg_color)); /* Cloud Widget Hover Bg Color */
+  --listdom-cloud-widget-text-hover-color: ((cloud_widget_hover_text_color)); /* Cloud Widget Text Hover Color */
+  --listdom-cloud-widget-border: ((cloud_widget_border)); /* Cloud Widget Border */
+  --listdom-cloud-widget-padding: ((cloud_widget_padding)); /* Cloud Widget Border */
+  --listdom-cloud-widget-border-style: ((cloud_widget_border_style)); /* Cloud Widget Border Style */
+  --listdom-cloud-widget-border-color: ((cloud_widget_border_color)); /* Cloud Widget Border Color */
+  --listdom-cloud-widget-border-hover: ((cloud_widget_border_hover)); /* Cloud Widget Hover Border */
+  --listdom-cloud-widget-padding-hover: ((cloud_widget_padding_hover)); /* Cloud Widget Hover Border */
+  --listdom-cloud-widget-border-hover-style: ((cloud_widget_border_hover_style)); /* Cloud Widget Border hover style */
+  --listdom-cloud-widget-border-hover-color: ((cloud_widget_border_hover_color)); /* Cloud Widget Border hover color */
+  --listdom-cloud-widget-border-radius: ((cloud_widget_border_radius)); /* Cloud Widget Border Radius */
+  --listdom-cloud-widget-hover-border-radius: ((cloud_widget_hover_border_radius)); /* Cloud Widget Border Radius */
+
+  --listdom-cloud-widget-font-family: ((cloud_widget_font_family)); /* Cloud Widget Typography */
+  --listdom-cloud-widget-font-weight: ((cloud_widget_font_weight)); /* Cloud Widget Typography */
+  --listdom-cloud-widget-text-align: ((cloud_widget_text_align)); /* Cloud Widget Typography */
+  --listdom-cloud-widget-font-size: ((cloud_widget_font_size)); /* Cloud Widget Typography */
+  --listdom-cloud-widget-line-height: ((cloud_widget_line_height)); /* Cloud Widget Typography */
+
+  --listdom-terms-widget-bg-color: ((terms_widget_bg_color)); /* Terms Widget Bg Color */
+  --listdom-terms-widget-text-color: ((terms_widget_title_text_color)); /* Terms Widget Text Color */
+  --listdom-terms-widget-hover-bg-color: ((terms_widget_hover_bg_color)); /* Terms Widget Hover Bg Color */
+  --listdom-terms-widget-text-hover-color: ((terms_widget_hover_text_color)); /* Terms Widget Text Hover Color */
+  --listdom-terms-widget-border: ((terms_widget_border)); /* Terms Widget Border */
+  --listdom-terms-widget-padding: ((terms_widget_padding)); /* Terms Widget Border */
+  --listdom-terms-widget-border-style: ((terms_widget_border_style)); /* Terms Widget Border Style */
+  --listdom-terms-widget-border-color: ((terms_widget_border_color)); /* Terms Widget Border Color */
+  --listdom-terms-widget-border-hover: ((terms_widget_border_hover)); /* Terms Widget Hover Border */
+  --listdom-terms-widget-padding-hover: ((terms_widget_padding_hover)); /* Terms Widget Hover Border */
+  --listdom-terms-widget-border-hover-style: ((terms_widget_border_hover_style)); /* Terms Widget Border hover style */
+  --listdom-terms-widget-border-hover-color: ((terms_widget_border_hover_color)); /* Terms Widget Border hover color */
+  --listdom-terms-widget-border-radius: ((terms_widget_border_radius)); /* Terms Widget Border Radius */
+  --listdom-terms-widget-hover-border-radius: ((terms_widget_hover_border_radius)); /* Terms Widget Border Radius */
+
+  --listdom-terms-widget-font-family: ((terms_widget_font_family)); /* Terms Widget Typography */
+  --listdom-terms-widget-font-weight: ((terms_widget_font_weight)); /* Terms Widget Typography */
+  --listdom-terms-widget-text-align: ((terms_widget_text_align)); /* Terms Widget Typography */
+  --listdom-terms-widget-font-size: ((terms_widget_font_size)); /* Terms Widget Typography */
+  --listdom-terms-widget-line-height: ((terms_widget_line_height)); /* Terms Widget Typography */
+
+  /* Frontend Dashboard */
+  --listdom-dashboard-container-bg: ((dashboard_container_bg_color)); /* Dashboard Container Background Color */
+  --listdom-dashboard-bg: ((dashboard_bg_color)); /* Dashboard Background Color */
+  --listdom-dashboard-text: ((dashboard_text_color)); /* Dashboard Text Color */
+  --listdom-dashboard-icon: ((dashboard_icon_color)); /* Dashboard Icon Color */
+  --listdom-dashboard-hover-bg: ((dashboard_hover_bg_color)); /* Dashboard Hover Background Color */
+  --listdom-dashboard-hover-text: ((dashboard_hover_text_color)); /* Dashboard Hover Text Color */
+  --listdom-dashboard-border: ((dashboard_border)); /* Dashboard Border */
+  --listdom-dashboard-border-style: ((dashboard_border_style)); /* Dashboard Border Style */
+  --listdom-dashboard-border-color: ((dashboard_border_color)); /* Dashboard Border Color */
+  --listdom-dashboard-border-hover: ((dashboard_border_hover)); /* Dashboard Hover Border */
+  --listdom-dashboard-border-hover-style: ((dashboard_border_hover_style)); /* Dashboard Border hover style */
+  --listdom-dashboard-border-hover-color: ((dashboard_border_hover_color)); /* Dashboard Border hover color */
+  --listdom-dashboard-border-radius: ((dashboard_border_radius)); /* Dashboard Border Radius */
+  --listdom-dashboard-hover-border-radius: ((dashboard_hover_border_radius)); /* Dashboard Border Radius */
+
+  --listdom-dashboard-font-family: ((dashboard_font_family)); /* Dashboard Typography */
+  --listdom-dashboard-font-weight: ((dashboard_font_weight)); /* Dashboard Typography */
+  --listdom-dashboard-text-align: ((dashboard_text_align)); /* Dashboard Typography */
+  --listdom-dashboard-font-size: ((dashboard_font_size)); /* Dashboard Typography */
+  --listdom-dashboard-line-height: ((dashboard_line_height)); /* Dashboard Typography */
+
+  /* Frontend Dashboard - Auth */
+  --listdom-auth-form-box-bg: ((auth_forms_box_bg));
+  --listdom-auth-form-box-padding: ((auth_forms_box_padding));
+  --listdom-auth-form-box-border: ((auth_forms_box_border));
+  --listdom-auth-form-box-border-style: ((auth_forms_box_border_style));
+  --listdom-auth-form-box-border-color: ((auth_forms_box_border_color));
+  --listdom-auth-form-box-border-radius: ((auth_forms_box_border_radius));
+  --listdom-auth-form-label-color: ((auth_forms_labels_color));
+  --listdom-auth-form-label-font-family: ((auth_forms_labels_font_family));
+  --listdom-auth-form-label-font-weight: ((auth_forms_labels_font_weight));
+  --listdom-auth-form-label-text-align: ((auth_forms_labels_text_align));
+  --listdom-auth-form-label-font-size: ((auth_forms_labels_font_size));
+  --listdom-auth-form-label-line-height: ((auth_forms_labels_line_height));
+  --listdom-auth-form-tabs-normal-bg1: ((auth_forms_tabs_normal_bg1));
+  --listdom-auth-form-tabs-normal-bg2: ((auth_forms_tabs_normal_bg2));
+  --listdom-auth-form-tabs-normal-text: ((auth_forms_tabs_normal_text));
+  --listdom-auth-form-tabs-normal-border: ((auth_forms_tabs_normal_border));
+  --listdom-auth-form-tabs-normal-border-style: ((auth_forms_tabs_normal_border_style));
+  --listdom-auth-form-tabs-normal-border-color: ((auth_forms_tabs_normal_border_color));
+  --listdom-auth-form-tabs-normal-border-radius: ((auth_forms_tabs_normal_border_radius));
+  --listdom-auth-form-tabs-normal-padding: ((auth_forms_tabs_normal_padding));
+  --listdom-auth-form-tabs-normal-font-family: ((auth_forms_tabs_normal_font_family));
+  --listdom-auth-form-tabs-normal-font-weight: ((auth_forms_tabs_normal_font_weight));
+  --listdom-auth-form-tabs-normal-text-align: ((auth_forms_tabs_normal_text_align));
+  --listdom-auth-form-tabs-normal-font-size: ((auth_forms_tabs_normal_font_size));
+  --listdom-auth-form-tabs-normal-line-height: ((auth_forms_tabs_normal_line_height));
+  --listdom-auth-form-tabs-hover-bg1: ((auth_forms_tabs_hover_bg1));
+  --listdom-auth-form-tabs-hover-bg2: ((auth_forms_tabs_hover_bg2));
+  --listdom-auth-form-tabs-hover-text: ((auth_forms_tabs_hover_text));
+  --listdom-auth-form-tabs-hover-border: ((auth_forms_tabs_hover_border));
+  --listdom-auth-form-tabs-hover-border-style: ((auth_forms_tabs_hover_border_style));
+  --listdom-auth-form-tabs-hover-border-color: ((auth_forms_tabs_hover_border_color));
+  --listdom-auth-form-tabs-hover-border-radius: ((auth_forms_tabs_hover_border_radius));
+  --listdom-auth-form-tabs-hover-padding: ((auth_forms_tabs_hover_padding));
+  --listdom-auth-form-tabs-hover-font-family: ((auth_forms_tabs_hover_font_family));
+  --listdom-auth-form-tabs-hover-font-weight: ((auth_forms_tabs_hover_font_weight));
+  --listdom-auth-form-tabs-hover-text-align: ((auth_forms_tabs_hover_text_align));
+  --listdom-auth-form-tabs-hover-font-size: ((auth_forms_tabs_hover_font_size));
+  --listdom-auth-form-tabs-hover-line-height: ((auth_forms_tabs_hover_line_height));
+  --listdom-auth-form-tabs-active-bg1: ((auth_forms_tabs_active_bg1));
+  --listdom-auth-form-tabs-active-bg2: ((auth_forms_tabs_active_bg2));
+  --listdom-auth-form-tabs-active-text: ((auth_forms_tabs_active_text));
+  --listdom-auth-form-tabs-active-border: ((auth_forms_tabs_active_border));
+  --listdom-auth-form-tabs-active-border-style: ((auth_forms_tabs_active_border_style));
+  --listdom-auth-form-tabs-active-border-color: ((auth_forms_tabs_active_border_color));
+  --listdom-auth-form-tabs-active-border-radius: ((auth_forms_tabs_active_border_radius));
+  --listdom-auth-form-tabs-active-padding: ((auth_forms_tabs_active_padding));
+  --listdom-auth-form-tabs-active-font-family: ((auth_forms_tabs_active_font_family));
+  --listdom-auth-form-tabs-active-font-weight: ((auth_forms_tabs_active_font_weight));
+  --listdom-auth-form-tabs-active-text-align: ((auth_forms_tabs_active_text_align));
+  --listdom-auth-form-tabs-active-font-size: ((auth_forms_tabs_active_font_size));
+  --listdom-auth-form-tabs-active-line-height: ((auth_forms_tabs_active_line_height));
+
+  --listdom-masonry-tabs-bg: ((masonry_tabs_bg_color)); /* Masonry Tabs Background Color */
+  --listdom-masonry-tabs-text: ((masonry_tabs_text_color)); /* Masonry Tabs Text Color */
+  --listdom-masonry-tabs-hover-bg: ((masonry_tabs_hover_bg_color)); /* Masonry Tabs Hover Background Color */
+  --listdom-masonry-tabs-hover-text: ((masonry_tabs_hover_text_color)); /* Masonry Tabs Hover Text Color */
+  --listdom-masonry-tabs-border: ((masonry_tabs_border)); /* Masonry Tabs Border */
+  --listdom-masonry-tabs-border-style: ((masonry_tabs_border_style)); /* Masonry Tabs Border Style */
+  --listdom-masonry-tabs-border-color: ((masonry_tabs_border_color)); /* Masonry Tabs Border Color */
+  --listdom-masonry-tabs-border-hover: ((masonry_tabs_border_hover)); /* Masonry Tabs Hover Border */
+  --listdom-masonry-tabs-border-hover-style: ((masonry_tabs_border_hover_style)); /* Masonry Tabs Border hover style */
+  --listdom-masonry-tabs-border-hover-color: ((masonry_tabs_border_hover_color)); /* Masonry Tabs Border hover color */
+  --listdom-masonry-tabs-border-radius: ((masonry_tabs_border_radius)); /* Masonry Tabs Border Radius */
+  --listdom-masonry-tabs-hover-border-radius: ((masonry_tabs_hover_border_radius)); /* Masonry Tabs Border Radius */
+
+  --listdom-slider-arrows-icon-color: ((slider_arrows_icon_color)); /* Slider Icons Color */
+
+  --listdom-reviews-tabs-bg: ((reviews_tabs_bg_color)); /* Reviews Tabs Background Color */
+  --listdom-reviews-tabs-text: ((reviews_tabs_text_color)); /* Reviews Tabs Text Color */
+  --listdom-reviews-tabs-hover-bg: ((reviews_tabs_hover_bg_color)); /* Reviews Tabs Hover Background Color */
+  --listdom-reviews-tabs-hover-text: ((reviews_tabs_hover_text_color)); /* Reviews Tabs Hover Text Color */
+  --listdom-reviews-tabs-border: ((reviews_tabs_border)); /* Reviews Tabs Border */
+  --listdom-reviews-tabs-border-style: ((reviews_tabs_border_style)); /* Reviews Tabs Border Style */
+  --listdom-reviews-tabs-border-color: ((reviews_tabs_border_color)); /* Reviews Tabs Border Color */
+  --listdom-reviews-tabs-border-hover: ((reviews_tabs_border_hover)); /* Reviews Tabs Hover Border */
+  --listdom-reviews-tabs-border-hover-style: ((reviews_tabs_border_hover_style)); /* Reviews Tabs Border hover style */
+  --listdom-reviews-tabs-border-hover-color: ((reviews_tabs_border_hover_color)); /* Reviews Tabs Border hover color */
+  --listdom-reviews-tabs-border-radius: ((reviews_tabs_border_radius)); /* Reviews Tabs Border Radius */
+  --listdom-reviews-tabs-hover-border-radius: ((reviews_tabs_hover_border_radius)); /* Reviews Tabs Border Radius */
+
+  --listdom-features-icons-bg-color: ((features_icons_bg_color));
+  --listdom-features-icons-text-color: ((features_icons_text_color));
+
+  --listdom-price-bg-color: ((price_bg_color)); /* Price Bg Color */
+  --listdom-price-text-color: ((price_text_color)); /* Price Text Color */
+  --listdom-price-hover-bg-color: ((price_hover_bg_color)); /* Price Hover Bg Color */
+  --listdom-price-text-hover-color: ((price_hover_text_color)); /* Price Text Hover Color */
+  --listdom-price-border: ((price_border)); /* Price Border */
+  --listdom-price-padding: ((price_padding)); /* Price Border */
+  --listdom-price-border-style: ((price_border_style)); /* Price Border Style */
+  --listdom-price-border-color: ((price_border_color)); /* Price Border Color */
+  --listdom-price-border-hover: ((price_border_hover)); /* Price Hover Border */
+  --listdom-price-padding-hover: ((price_padding_hover)); /* Price Hover Border */
+  --listdom-price-border-hover-style: ((price_border_hover_style)); /* Price Border hover style */
+  --listdom-price-border-hover-color: ((price_border_hover_color)); /* Price Border hover color */
+  --listdom-price-border-radius: ((price_border_radius)); /* Price Border Radius */
+  --listdom-price-hover-border-radius: ((price_hover_border_radius)); /* Price Border Radius */
+  --listdom-price-font-family: ((price_font_family)); /* Price Typography */
+  --listdom-price-font-weight: ((price_font_weight)); /* Price Typography */
+  --listdom-price-text-align: ((price_text_align)); /* Price Typography */
+  --listdom-price-font-size: ((price_font_size)); /* Price Typography */
+  --listdom-price-line-height: ((price_line_height)); /* Price Typography */
+
+  --listdom-single-ic: #33bdfc; /* Listdom Icon Color */
+  --listdom-single-ic2: #2b93ff; /* Listdom Icon Color 2 */
+  --listdom-single-sc: #fecc39; /* Listdom Star Color */
+  --listdom-single-ac: #a4a8b5; /* Listdom Active Color */
+  --listdom-single-sb-bg: #000000; /* Listdom Slider Button Background */
+  --listdom-single-sb-c: #ffffff; /* Listdom Slider Button Color */
+
+  /* Profile */
+  --listdom-profile-container-bg: ((profile_container_bg_color)); /* Profile Container Background Color */
+  --listdom-profile-border: ((profile_container_border)); /* Profile Border */
+  --listdom-profile-border-style: ((profile_container_border_style)); /* Profile Border Style */
+  --listdom-profile-border-color: ((profile_container_border_color)); /* Profile Border Color */
+  --listdom-profile-border-radius: ((profile_container_border_radius)); /* Profile Border Radius */
+  --listdom-profile-padding: ((profile_container_padding)); /* Profile Border Radius */
+
+  --listdom-profile-title-text-color: ((profile_title_text_color)); /* Profile Title Color */
+  --listdom-profile-title-font-family: ((profile_title_font_family)); /* Profile Typography */
+  --listdom-profile-title-font-weight: ((profile_title_font_weight)); /* Profile Typography */
+  --listdom-profile-title-text-align: ((profile_title_text_align)); /* Profile Typography */
+  --listdom-profile-title-font-size: ((profile_title_font_size)); /* Profile Typography */
+  --listdom-profile-title-line-height: ((profile_title_line_height)); /* Profile Typography */
+
+  --listdom-profile-name-text-color: ((profile_name_text_color)); /* Profile Title Color */
+  --listdom-profile-name-font-family: ((profile_name_font_family)); /* Profile Typography */
+  --listdom-profile-name-font-weight: ((profile_name_font_weight)); /* Profile Typography */
+  --listdom-profile-name-text-align: ((profile_name_text_align)); /* Profile Typography */
+  --listdom-profile-name-font-size: ((profile_name_font_size)); /* Profile Typography */
+  --listdom-profile-name-line-height: ((profile_name_line_height)); /* Profile Typography */
+
+  --listdom-profile-job-title-text-color: ((profile_job_title_text_color)); /* Profile Title Color */
+  --listdom-profile-job-title-font-family: ((profile_job_title_font_family)); /* Profile Typography */
+  --listdom-profile-job-title-font-weight: ((profile_job_title_font_weight)); /* Profile Typography */
+  --listdom-profile-job-title-text-align: ((profile_job_title_text_align)); /* Profile Typography */
+  --listdom-profile-job-title-font-size: ((profile_job_title_font_size)); /* Profile Typography */
+  --listdom-profile-job-title-line-height: ((profile_job_title_line_height)); /* Profile Typography */
+
+  --listdom-profile-count-text-color: ((profile_count_text_color)); /* Profile Title Color */
+  --listdom-profile-count-icon-color: ((profile_count_icon_color)); /* Profile Title Color */
+  --listdom-profile-count-font-family: ((profile_count_font_family)); /* Profile Typography */
+  --listdom-profile-count-font-weight: ((profile_count_font_weight)); /* Profile Typography */
+  --listdom-profile-count-text-align: ((profile_count_text_align)); /* Profile Typography */
+  --listdom-profile-count-font-size: ((profile_count_font_size)); /* Profile Typography */
+  --listdom-profile-count-line-height: ((profile_count_line_height)); /* Profile Typography */
+
+  --listdom-profile-contact-info-text-color: ((profile_contact_info_text_color)); /* Profile Title Color */
+  --listdom-profile-contact-info-icon-color: ((profile_contact_info_icon_color)); /* Profile Title Color */
+  --listdom-profile-contact-info-socials-icon-color: ((profile_contact_info_socials_icon_color)); /* Profile Title Color */
+  --listdom-profile-contact-info-font-family: ((profile_contact_info_font_family)); /* Profile Typography */
+  --listdom-profile-contact-info-font-weight: ((profile_contact_info_font_weight)); /* Profile Typography */
+  --listdom-profile-contact-info-text-align: ((profile_contact_info_text_align)); /* Profile Typography */
+  --listdom-profile-contact-info-font-size: ((profile_contact_info_font_size)); /* Profile Typography */
+  --listdom-profile-contact-info-line-height: ((profile_contact_info_line_height)); /* Profile Typography */
+
+  --listdom-profile-bio-text-color: ((profile_bio_text_color)); /* Profile Title Color */
+  --listdom-profile-bio-font-family: ((profile_bio_font_family)); /* Profile Typography */
+  --listdom-profile-bio-font-weight: ((profile_bio_font_weight)); /* Profile Typography */
+  --listdom-profile-bio-text-align: ((profile_bio_text_align)); /* Profile Typography */
+  --listdom-profile-bio-font-size: ((profile_bio_font_size)); /* Profile Typography */
+  --listdom-profile-bio-line-height: ((profile_bio_line_height)); /* Profile Typography */
+
+  /* Users */
+  --listdom-user-profile-container-bg: ((user_profile_container_bg_color)); /* Profile Container Background Color */
+  --listdom-user-profile-border: ((user_profile_container_border)); /* Profile Border */
+  --listdom-user-profile-border-style: ((user_profile_container_border_style)); /* Profile Border Style */
+  --listdom-user-profile-border-color: ((user_profile_container_border_color)); /* Profile Border Color */
+  --listdom-user-profile-border-radius: ((user_profile_container_border_radius)); /* Profile Border Radius */
+  --listdom-user-profile-padding: ((user_profile_container_padding)); /* Profile Border Radius */
+
+  --listdom-user-profile-name-text-color: ((user_profile_name_text_color)); /* Profile Title Color */
+  --listdom-user-profile-name-font-family: ((user_profile_name_font_family)); /* Profile Typography */
+  --listdom-user-profile-name-font-weight: ((user_profile_name_font_weight)); /* Profile Typography */
+  --listdom-user-profile-name-text-align: ((user_profile_name_text_align)); /* Profile Typography */
+  --listdom-user-profile-name-font-size: ((user_profile_name_font_size)); /* Profile Typography */
+  --listdom-user-profile-name-line-height: ((user_profile_name_line_height)); /* Profile Typography */
+
+  --listdom-user-profile-job-title-text-color: ((user_profile_job_title_text_color)); /* Profile Title Color */
+  --listdom-user-profile-job-title-font-family: ((user_profile_job_title_font_family)); /* Profile Typography */
+  --listdom-user-profile-job-title-font-weight: ((user_profile_job_title_font_weight)); /* Profile Typography */
+  --listdom-user-profile-job-title-text-align: ((user_profile_job_title_text_align)); /* Profile Typography */
+  --listdom-user-profile-job-title-font-size: ((user_profile_job_title_font_size)); /* Profile Typography */
+  --listdom-user-profile-job-title-line-height: ((user_profile_job_title_line_height)); /* Profile Typography */
+
+  --listdom-user-profile-contact-info-icon-color: ((user_profile_contact_info_icon_color)); /* Profile Title Color */
+
+  --listdom-user-profile-bio-text-color: ((user_profile_bio_text_color)); /* Profile Title Color */
+  --listdom-user-profile-bio-font-family: ((user_profile_bio_font_family)); /* Profile Typography */
+  --listdom-user-profile-bio-font-weight: ((user_profile_bio_font_weight)); /* Profile Typography */
+  --listdom-user-profile-bio-text-align: ((user_profile_bio_text_align)); /* Profile Typography */
+  --listdom-user-profile-bio-font-size: ((user_profile_bio_font_size)); /* Profile Typography */
+  --listdom-user-profile-bio-line-height: ((user_profile_bio_line_height)); /* Profile Typography */
+
+  --listdom-home-breadcrumb-text-color: ((home_breadcrumb_text_color)); /* Home Breadcrumb Title Color */
+  --listdom-home-breadcrumb-icon-gap: ((home_breadcrumb_icon_gap)); /* Home Breadcrumb Title Color */
+  --listdom-home-breadcrumb-icon-color: ((home_breadcrumb_icon_color)); /* Home Breadcrumb Title Color */
+  --listdom-home-breadcrumb-font-family: ((home_breadcrumb_font_family)); /* Home Breadcrumb Typography */
+  --listdom-home-breadcrumb-font-weight: ((home_breadcrumb_font_weight)); /* Home Breadcrumb Typography */
+  --listdom-home-breadcrumb-text-align: ((home_breadcrumb_text_align)); /* Home Breadcrumb Typography */
+  --listdom-home-breadcrumb-font-size: ((home_breadcrumb_font_size)); /* Home Breadcrumb Typography */
+  --listdom-home-breadcrumb-line-height: ((home_breadcrumb_line_height)); /* Home Breadcrumb Typography */
+
+  --listdom-taxonomy-breadcrumb-text-color: ((taxonomy_breadcrumb_text_color)); /* Taxonomy Breadcrumb Title Color */
+  --listdom-taxonomy-breadcrumb-font-family: ((taxonomy_breadcrumb_font_family)); /* Taxonomy Breadcrumb Typography */
+  --listdom-taxonomy-breadcrumb-font-weight: ((taxonomy_breadcrumb_font_weight)); /* Taxonomy Breadcrumb Typography */
+  --listdom-taxonomy-breadcrumb-text-align: ((taxonomy_breadcrumb_text_align)); /* Taxonomy Breadcrumb Typography */
+  --listdom-taxonomy-breadcrumb-font-size: ((taxonomy_breadcrumb_font_size)); /* Taxonomy Breadcrumb Typography */
+  --listdom-taxonomy-breadcrumb-line-height: ((taxonomy_breadcrumb_line_height)); /* Taxonomy Breadcrumb Typography */
+
+  --listdom-current-breadcrumb-text-color: ((current_breadcrumb_text_color)); /* Current Breadcrumb Title Color */
+  --listdom-current-breadcrumb-font-family: ((current_breadcrumb_font_family)); /* Current Breadcrumb Typography */
+  --listdom-current-breadcrumb-font-weight: ((current_breadcrumb_font_weight)); /* Current Breadcrumb Typography */
+  --listdom-current-breadcrumb-text-align: ((current_breadcrumb_text_align)); /* Current Breadcrumb Typography */
+  --listdom-current-breadcrumb-font-size: ((current_breadcrumb_font_size)); /* Current Breadcrumb Typography */
+  --listdom-current-breadcrumb-line-height: ((current_breadcrumb_line_height)); /* Current Breadcrumb Typography */
+
+  --listdom-separator-breadcrumb-text-color: ((separator_breadcrumb_text_color)); /* Separator Breadcrumb Title Color */
+}
+
+.lsd-color-m-txt{color: ((dply_main_color)) !important;}
+.lsd-color-m-bg{background-color: ((dply_main_color)) ;}
+.lsd-color-m-brd{border-color: ((dply_main_color)) !important;}
+.lsd-font-m{font-family: ((dply_main_font));}

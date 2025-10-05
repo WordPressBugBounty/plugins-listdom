@@ -26,6 +26,7 @@ jQuery(document).ready(function()
         duration: ' . ((int) $this->duration) . ',
         next_page: ' . $this->next_page . ',
         limit: ' . $this->limit . ',
+        nonce: "' . esc_js(wp_create_nonce('lsd_search_form')) . '",
     });
 });
 </script>');

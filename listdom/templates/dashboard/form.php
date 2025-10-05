@@ -26,6 +26,17 @@ $selected_category_id = $category && isset($category->term_id)
 $postType = new LSD_PTypes_Listing();
 $gallery_max_size = $this->settings['submission_max_image_upload_size'] ?? '';
 
+// Privacy Consent
+$privacy = LSD_Options::privacy();
+
+$dashboard_privacy_field = LSD_Privacy::consent_field([
+    'id' => 'lsd_dashboard_privacy_consent_' . $this->post->ID,
+    'name' => 'lsd[privacy_consent]',
+    'checked' => $privacy['privacy_consent']['submission_pc_enabled'] ?? 0,
+    'wrapper_class' => 'lsd-dashboard-privacy-consent-field',
+    'context' => 'dashboard',
+]);
+
 // Add JS codes to footer
 $assets = new LSD_Assets();
 $assets->footer('<script>
@@ -145,6 +156,12 @@ jQuery(document).ready(function()
                             <?php LSD_Form::nonce('lsd_dashboard'); ?>
                             <?php /* Security Nonce */ LSD_Form::nonce('lsd_listing_cpt', '_lsdnonce'); ?>
 
+                            <?php if ($dashboard_privacy_field !== ''): ?>
+                            <div class="lsd-dashboard-privacy-consent">
+                                <?php echo $dashboard_privacy_field; ?>
+                            </div>
+                            <?php endif; ?>
+
                             <?php if (current_user_can('publish_posts')): ?>
                                 <div class="lsd-dashboard-listing-status">
                                     <?php echo LSD_Form::select([
@@ -165,7 +182,7 @@ jQuery(document).ready(function()
                                 <?php echo LSD_Main::grecaptcha_field(); ?>
                             </div>
 
-                            <button type="submit" class="lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>">
+                            <button type="submit" class="lsd-general-button <?php echo esc_attr($this->get_text_class()); ?>">
                                 <?php esc_html_e('Save', 'listdom'); ?>
                             </button>
 
@@ -293,8 +310,12 @@ jQuery(document).ready(function()
                                 <span id="lsd_dashboard_featured_image_preview"><?php echo trim($featured_image) ? '<img src="'.esc_url($featured_image).'">' : ''; ?></span>
                                 <input type="hidden" id="lsd_featured_image" name="lsd[featured_image]" value="<?php echo esc_attr($attachment_id); ?>">
                                 <input class="lsd-util-hide" type="file" id="lsd_featured_image_file">
-                                <label for="lsd_featured_image_file" class="lsd-choose-file"><?php echo esc_html__('Choose Image', 'listdom'); ?></label>
-                                <p class="description"><?php sprintf(esc_html__('The uploaded image exceeds the maximum allowed size of %s KB.', 'listdom'), $gallery_max_size)?></p>
+                                <label for="lsd_featured_image_file" class="lsd-choose-file lsd-light-button"><?php echo esc_html__('Choose Image', 'listdom'); ?></label>
+                                <p class="description"><?php sprintf(
+                                    /* translators: %s: Maximum allowed image size in kilobytes. */
+                                    esc_html__('The uploaded image exceeds the maximum allowed size of %s KB.', 'listdom'),
+                                    $gallery_max_size
+                                ); ?></p>
 
                                 <div class="lsd-dashboard-feature-image-remove-wrapper">
                                     <span id="lsd_featured_image_remove_button" class="lsd-remove-image-button <?php echo esc_attr($this->get_text_class()); ?> <?php echo trim($featured_image) ? '' : 'lsd-util-hide'; ?>">

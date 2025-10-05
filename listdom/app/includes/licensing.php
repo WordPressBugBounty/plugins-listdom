@@ -356,7 +356,7 @@ class LSD_Licensing extends LSD_Base
 
         $validation_status = self::validate($basename, $prefix);
         $installed_at = (int) get_option($prefix . '_installed_at', 0);
-        $installed_date = $installed_at ? date('M j, Y', $installed_at) : '';
+        $installed_date = $installed_at ? lsd_date('M j, Y', $installed_at) : '';
 
         $expiry_time = 0;
         if (isset($validation_status['expiry_timestamp'])) $expiry_time = (int) $validation_status['expiry_timestamp'];

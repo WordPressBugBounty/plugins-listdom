@@ -30,6 +30,7 @@ jQuery(document).ready(function()
         atts: "' . http_build_query(['atts' => $this->atts], '', '&') . '",
         next_page: "' . $this->next_page . '",
         limit: "' . $this->limit . '",
+        nonce: "' . esc_js(wp_create_nonce('lsd_search_form')) . '",
     });
 });
 </script>');
@@ -55,7 +56,7 @@ jQuery(document).ready(function()
                                 <?php foreach ($titles as $key => $title): ?>
                                     <?php if (isset($columns[$key]['enabled']) && $columns[$key]['enabled'] == '1'): ?>
                                         <th style="width: <?php echo isset($columns[$key]['width']) && is_numeric($columns[$key]['width']) ? $columns[$key]['width'] . 'px' : '150px'; ?>">
-                                            <?php esc_html_e($title, 'listdom'); ?>
+                                            <?php echo esc_html($title); ?>
                                         </th>
                                     <?php endif; ?>
                                 <?php endforeach; ?>

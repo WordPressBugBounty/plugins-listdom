@@ -28,7 +28,7 @@ class LSD_Element_Content extends LSD_Element
         $has_more = false;
         if ($limit > 0)
         {
-            $words = explode(' ', strip_tags($excerpt));
+            $words = explode(' ', wp_strip_all_tags($excerpt));
             $excerpt = array_slice($words, 0, $limit);
             $excerpt = implode(' ', $excerpt);
 

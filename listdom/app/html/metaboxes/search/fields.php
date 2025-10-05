@@ -28,7 +28,11 @@ jQuery(document).ready(function()
             <ul class="lsd-m-0">
                 <li><?php esc_html_e("You can create as many rows as you like and put any number of the fields in each row.", 'listdom'); ?></li>
                 <li><?php esc_html_e('Drag the fields from "Available Fields" section into rows.', 'listdom'); ?></li>
-                <li><?php echo sprintf(esc_html__('To put some fields in %s section you can put a "More Options" row above them.', 'listdom'), '<strong>'.esc_html__("More Options", 'listdom').'</strong>'); ?></li>
+                <li><?php echo sprintf(
+                    /* translators: %s: More Options section label. */
+                    esc_html__('To put some fields in %s section you can put a "More Options" row above them.', 'listdom'),
+                    '<strong>'.esc_html__("More Options", 'listdom').'</strong>'
+                ); ?></li>
             </ul>
         </div>
     </div>

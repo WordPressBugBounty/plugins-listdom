@@ -56,8 +56,9 @@ class LSD_Element_Gallery extends LSD_Element
     protected function general_settings(array $data): string
     {
         return '<div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_lightbox">' . esc_html__('Lightbox', 'listdom') . '</label>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_lightbox">' . esc_html__('Lightbox', 'listdom') . '</label>
             ' . LSD_Form::select([
+                'class' => 'lsd-admin-input',
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_lightbox',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][lightbox]',
                 'value' => $data['lightbox'] ?? '1',
@@ -68,11 +69,11 @@ class LSD_Element_Gallery extends LSD_Element
             ]) . '
         </div>
         <div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_style">' . esc_html__('Style', 'listdom') . '</label>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_style">' . esc_html__('Style', 'listdom') . '</label>
             ' . LSD_Form::select([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_style',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][style]',
-                'class' => 'lsd-gallery-element-style-toggle',
+                'class' => 'lsd-gallery-element-style-toggle lsd-admin-input',
                 'value' => $data['style'] ?? 'list',
                 'options' => [
                     'list' => esc_html__('List', 'listdom'),
@@ -87,8 +88,9 @@ class LSD_Element_Gallery extends LSD_Element
         <div class="lsd-gallery-element">
              <div class="lsd-gallery-element-style-dependency lsd-gallery-element-style-dependency-list lsd-gallery-element-style-dependency-slider">
 
-                <label for="lsd_elements_' . esc_attr($this->key) . '_thumbnail_status">' . esc_html__('Thumbnail Status', 'listdom') . '</label>
+                <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_thumbnail_status">' . esc_html__('Thumbnail Status', 'listdom') . '</label>
                 ' . LSD_Form::select([
+                    'class' => 'lsd-admin-input',
                     'id' => 'lsd_elements_' . esc_attr($this->key) . '_thumbnail_status',
                     'name' => 'lsd[elements][' . esc_attr($this->key) . '][thumbnail_status]',
                     'value' => $data['thumbnail_status'] ?? 'image',
@@ -101,7 +103,7 @@ class LSD_Element_Gallery extends LSD_Element
             </div>
         </div>
         <div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_thumbnail">' . esc_html__('Add Featured Image', 'listdom') . '</label>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_thumbnail">' . esc_html__('Add Featured Image', 'listdom') . '</label>
             ' . LSD_Form::switcher([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_thumbnail',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][thumbnail]',
@@ -111,20 +113,21 @@ class LSD_Element_Gallery extends LSD_Element
 
         <div class="lsd-gallery-element">
             <div class="lsd-gallery-element-style-dependency lsd-gallery-element-style-dependency-linear">
-                <label for="lsd_elements_' . esc_attr($this->key) . '_image_height">' . esc_html__('Image Height (px)', 'listdom') . '</label>
-                <input type="number" id="lsd_elements_' . esc_attr($this->key) . '_image_height" name="lsd[elements][' . esc_attr($this->key) . '][image_height]" value="' . esc_attr($data['image_height'] ?? '300') . '" min="0" step="1" required>
+                <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_image_height">' . esc_html__('Image Height (px)', 'listdom') . '</label>
+                <input class="lsd-admin-input" type="number" id="lsd_elements_' . esc_attr($this->key) . '_image_height" name="lsd[elements][' . esc_attr($this->key) . '][image_height]" value="' . esc_attr($data['image_height'] ?? '300') . '" min="0" step="1" required>
             </div>
         </div>
         <div class="lsd-gallery-element">
             <div class="lsd-gallery-element-style-dependency lsd-gallery-element-style-dependency-linear">
-                <label for="lsd_elements_' . esc_attr($this->key) . '_image_limit">' . esc_html__('Number of Images', 'listdom') . '</label>
-                <input type="number" id="lsd_elements_' . esc_attr($this->key) . '_image_limit" name="lsd[elements][' . esc_attr($this->key) . '][image_limit]" value="' . esc_attr($data['image_limit'] ?? '4') . '" min="1" step="1">
+                <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_image_limit">' . esc_html__('Number of Images', 'listdom') . '</label>
+                <input class="lsd-admin-input" type="number" id="lsd_elements_' . esc_attr($this->key) . '_image_limit" name="lsd[elements][' . esc_attr($this->key) . '][image_limit]" value="' . esc_attr($data['image_limit'] ?? '4') . '" min="1" step="1">
             </div>
         </div>
          <div class="lsd-gallery-element">
              <div class="lsd-gallery-element-style-dependency lsd-gallery-element-style-dependency-linear">
-                <label for="lsd_elements_' . esc_attr($this->key) . '_image_fit">' . esc_html__('Image Fit', 'listdom') . '</label>
+                <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_image_fit">' . esc_html__('Image Fit', 'listdom') . '</label>
                 ' . LSD_Form::select([
+                    'class' => 'lsd-admin-input',
                     'id' => 'lsd_elements_' . esc_attr($this->key) . '_image_fit',
                     'name' => 'lsd[elements][' . esc_attr($this->key) . '][image_fit]',
                     'value' => $data['image_fit'] ?? 'cover',

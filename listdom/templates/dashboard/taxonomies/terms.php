@@ -36,7 +36,8 @@ jQuery(document).ready(function($)
     <div class="lsd-new-tax-link">
         <?php
         echo sprintf(
-            esc_html__('Select the %s or %s', 'listdom'),
+            /* translators: 1: Taxonomy name, 2: Link to add a new taxonomy term. */
+            esc_html__('Select the %1$s or %2$s', 'listdom'),
             esc_html($tax_name),
             '<a href="#" id="lsd_show_create_taxonomy_form_' . esc_attr($taxonomy) . '">' . esc_html__('Add a new one', 'listdom') . '</a>'
         );
@@ -44,25 +45,32 @@ jQuery(document).ready(function($)
     </div>
     <div class="lsd-dashboard-new-term-form lsd-modal" id="lsd_dashboard_new_term_<?php echo esc_attr($taxonomy); ?>">
         <div class="lsd-modal-content">
-            <h3 class="lsd-tax-title lsd-fe-title"><?php echo sprintf(esc_html__('New %s', 'listdom') , $tax_name); ?></h3>
+            <h3 class="lsd-tax-title lsd-fe-title"><?php echo sprintf(
+                /* translators: %s: Taxonomy name. */
+                esc_html__('New %s', 'listdom'),
+                $tax_name
+            ); ?></h3>
             <?php if ($mode === 'express'): ?>
                 <div class="lsd-add-term-express">
                     <div class="lsd-new-tax-inputs">
                         <?php echo LSD_Form::label([
-                            'title' => sprintf(esc_attr__('%s Name', 'listdom'), $tax_name),
+                            /* translators: %s: Taxonomy name. */
+                            'title' => sprintf(esc_attr__('%1$s Name', 'listdom'), $tax_name),
                             'for' => 'lsd_express_term_name_'. $taxonomy,
                         ]); ?>
                         <?php echo LSD_Form::input([
                             'name' => 'term_name',
                             'id' => 'lsd_express_term_name_'. $taxonomy,
                             'class' => 'lsd_express_term_name',
-                            'placeholder' => sprintf(esc_attr__('%s Name', 'listdom'), $tax_name),
+                            /* translators: %s: Taxonomy name. */
+                            'placeholder' => sprintf(esc_attr__('%1$s Name', 'listdom'), $tax_name),
                         ]);
                         ?>
                     </div>
                     <div class="lsd-flex lsd-flex-content-center lsd-mt-3">
                         <?php echo LSD_Form::submit([
                             'class' => 'lsd_add_express_term_btn',
+                            /* translators: %s: Taxonomy name. */
                             'label' => sprintf(esc_html__('Add %s', 'listdom'), $tax_name),
                         ]); ?>
                     </div>
@@ -72,14 +80,16 @@ jQuery(document).ready(function($)
                 <div class="lsd-add-term-detailed lsd-new-term-<?php echo esc_attr($taxonomy); ?>">
                         <div class="lsd-w-full lsd-new-tax-inputs">
                             <?php echo LSD_Form::label([
-                                'title' => sprintf(esc_attr__('%s Name', 'listdom'), $tax_name),
+                                /* translators: %s: Taxonomy name. */
+                                'title' => sprintf(esc_attr__('%1$s Name', 'listdom'), $tax_name),
                                 'for' => 'lsd_detailed_term_name_'. $taxonomy,
                             ]); ?>
                             <?php echo LSD_Form::input([
                                 'name' => 'term_name',
                                 'id' => 'lsd_detailed_term_name_'. $taxonomy,
                                 'class' => 'lsd_detailed_term_name',
-                                'placeholder' => sprintf(esc_attr__('%s Name', 'listdom'), $tax_name),
+                                /* translators: %s: Taxonomy name. */
+                                'placeholder' => sprintf(esc_attr__('%1$s Name', 'listdom'), $tax_name),
                             ]); ?>
                         </div>
                         <?php if ($taxonomy !== LSD_Base::TAX_TAG && $taxonomy !== LSD_Base::TAX_FEATURE && $taxonomy !== LSD_Base::TAX_LABEL): ?>
@@ -150,6 +160,7 @@ jQuery(document).ready(function($)
                     <div class="lsd-flex lsd-flex-content-center lsd-mt-3">
                         <?php echo LSD_Form::submit([
                             'class' => 'lsd_add_term_btn',
+                            /* translators: %s: Taxonomy name. */
                             'label' => sprintf(esc_html__('Add %s', 'listdom'), $tax_name),
                         ]); ?>
                     </div>

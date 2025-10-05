@@ -3,6 +3,30 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v4.8.1 <span>October 1st, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Addressed some background issues.', 'listdom'); ?></span>
+        </li>
+    </ul>
+    <h2>v4.8.0 <span>September 29th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('[Pro] Added a Timeline skin.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-added"><?php esc_html_e('Added comprehensive GDPR compliance.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved various parts of the plugin based on WordPress team feedback.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed an issue with the standalone add listing form.', 'listdom'); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed several interface issues in the Listdom backend and frontend.', 'listdom'); ?></span>
+        </li>
+    </ul>
     <h2>v4.7.1 <span>September 8th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>
@@ -628,7 +652,11 @@ defined('ABSPATH') || die();
     <h2>v3.4.0 <span>September 3rd, 2024</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Connect', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Connect', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Added a design builder for creating flexible and visually appealing single listing pages.', 'listdom'); ?></span>
@@ -817,10 +845,18 @@ defined('ABSPATH') || die();
     <h2>v2.5.0 <span>October 30th, 2022</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Network', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Network', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Ads', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Ads', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added ability to display image slider in archive shortcodes instead of featured image.', 'listdom'); ?></span>
@@ -892,10 +928,18 @@ defined('ABSPATH') || die();
     <h2>v2.2.0 <span>October 10th, 2021</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Elementor Compatibility', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Elementor Compatibility', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Divi Builder Compatibility', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Divi Builder Compatibility', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Added webp image support.', 'listdom'); ?></span>
@@ -955,16 +999,32 @@ defined('ABSPATH') || die();
     <h2>v2.0.0 <span>February 27th, 2021</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Franchise', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Franchise', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Compare', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Compare', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('APS', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('APS', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Stats', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Stats', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added an ability to disable image display per short-code.', 'listdom'); ?></span>
@@ -989,16 +1049,32 @@ defined('ABSPATH') || die();
     <h2>v1.9.0 <span>November 8th, 2020</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('ACF Integration', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('ACF Integration', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Auction', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Auction', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('BuddyPress Integration', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('BuddyPress Integration', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('KML', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('KML', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Added price class feature.', 'listdom'); ?></span>
@@ -1035,16 +1111,32 @@ defined('ABSPATH') || die();
     <h2>v1.8.0 <span>September 4th, 2020</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Booking', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Booking', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Multiple Categories', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Multiple Categories', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Advanced Icon', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Advanced Icon', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Listing Visibility', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Listing Visibility', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added an option to load locations and features in multiple dropdown instead of checkboxes in frontend dashboard.', 'listdom'); ?></span>
@@ -1084,7 +1176,11 @@ defined('ABSPATH') || die();
     <h2>v1.7.0 <span>July 11th, 2020</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Team', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Team', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Added an option to load single listing page into light-box on click of marker.', 'listdom'); ?></span>
@@ -1107,7 +1203,11 @@ defined('ABSPATH') || die();
     <h2>v1.6.2 <span>June 5th, 2020</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Rate & Review', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Rate & Review', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added radius search in search module.', 'listdom'); ?></span>
@@ -1138,13 +1238,25 @@ defined('ABSPATH') || die();
     <h2>v1.6.1 <span>May 10th, 2020</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Labelize', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Labelize', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Subscriptions', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Subscriptions', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Paid Member Subscriptions Integration', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Paid Member Subscriptions Integration', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added hierarchical dropdown method for taxonomies in search builder.', 'listdom'); ?></span>
@@ -1166,10 +1278,18 @@ defined('ABSPATH') || die();
     <h2>v1.6.0 <span>March 23rd, 2020</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Claim', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Claim', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Topup', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Topup', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Added an ability to show all values of a certain attribute in the search builder.', 'listdom'); ?></span>
@@ -1185,10 +1305,18 @@ defined('ABSPATH') || die();
     <h2>v1.5.0 <span>February 8th, 2020</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Favorites', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Favorites', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Rank', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Rank', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added schema (Structured Data) feature to boost SEO.', 'listdom'); ?></span>
@@ -1210,7 +1338,11 @@ defined('ABSPATH') || die();
     <h2>v1.4.0 <span>January 11th, 2020</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Mobile Application', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Mobile Application', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Added Listdom Restful API.', 'listdom'); ?></span>
@@ -1232,7 +1364,11 @@ defined('ABSPATH') || die();
     <h2>v1.3.1 <span>December 17th, 2019</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('CSV', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('CSV', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added dashboard module controls so the modules can be disabled / enabled.', 'listdom'); ?></span>
@@ -1251,7 +1387,11 @@ defined('ABSPATH') || die();
     <h2>v1.3.0 <span>December 2nd, 2019</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-addon"><?php echo sprintf(esc_html__('[ADDON] Released %s addon!', 'listdom'), '<strong>'.esc_html__('Advanced Map', 'listdom').'</strong>'); ?></span>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released %s addon!', 'listdom'),
+                '<strong>'.esc_html__('Advanced Map', 'listdom').'</strong>'
+            ); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added advanced import and export system.', 'listdom'); ?></span>

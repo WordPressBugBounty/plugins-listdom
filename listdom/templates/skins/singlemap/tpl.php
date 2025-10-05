@@ -15,6 +15,7 @@ jQuery(document).ready(function()
         sidebar: "'.($this->sidebar ? '1' : '0').'",
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
+        nonce: "' . esc_js(wp_create_nonce('lsd_search_form')) . '",
     });
 });
 </script>');

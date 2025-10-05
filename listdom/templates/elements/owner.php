@@ -28,6 +28,12 @@ $socials = (new LSD_Socials())->list($owner_id);
 // Current User
 $current = wp_get_current_user();
 $current_id = get_current_user_id();
+
+$owner_privacy_field = LSD_Privacy::consent_field([
+    'id' => 'lsd_owner_privacy_consent_' . absint($post_id),
+    'wrapper_class' => 'lsd-owner-privacy-consent-field',
+    'context' => 'contact',
+]);
 ?>
 <?php if ($this->layout === 'image-name'): $size = $this->args['size'] ?? 48; ?>
 <div class="lsd-owner-image-name">
@@ -43,7 +49,7 @@ $current_id = get_current_user_id();
         		<?php if($display_avatar) :?>
                     <div class="lsd-owner-image-wrapper">
                         <?php if ($link_avatar): ?>
-                            <a href="<?php echo esc_url_raw(LSD_User::profile_link($owner_id)); ?>">
+                            <a href="<?php echo esc_url(LSD_User::profile_link($owner_id)); ?>">
                                 <?php echo get_avatar($owner_id, 250); ?>
                             </a>
                             <?php else: echo get_avatar($owner_id, 250); ?>
@@ -53,8 +59,8 @@ $current_id = get_current_user_id();
         		<div class="lsd-owner-information-part-1">
                     <?php if ($display_name): ?>
 					<h4 class="lsd-owner-name" <?php echo lsd_schema()->name(); ?>>
-						<?php if ($author_link): ?>
-							<a href="<?php echo esc_url_raw(LSD_User::profile_link($owner_id)); ?>">
+                        <?php if ($author_link): ?>
+                            <a href="<?php echo esc_url(LSD_User::profile_link($owner_id)); ?>">
 								<?php echo esc_html(get_the_author_meta('display_name', $owner_id)); ?>
 							</a>
 						<?php else: echo esc_html(get_the_author_meta('display_name', $owner_id)); ?>
@@ -176,18 +182,24 @@ $current_id = get_current_user_id();
 			></textarea>
 		</div>
 
+        <?php if ($owner_privacy_field !== ''): ?>
+            <div class="lsd-owner-contact-form-row lsd-owner-contact-form-row-consent">
+                <?php echo $owner_privacy_field; ?>
+            </div>
+        <?php endif; ?>
+
 		<?php if (isset($this->settings['mailchimp_status']) && $this->settings['mailchimp_status']): ?>
 		<div class="lsd-owner-contact-form-row">
 			<label>
 				<input type="checkbox" name="lsd_subscribe" value="1" <?php echo isset($this->settings['mailchimp_checked']) && $this->settings['mailchimp_checked'] ? 'checked' : ''; ?>>
-				<?php echo esc_html($this->settings['mailchimp_message'] ?: __('Subscribe to our newsletter.', 'listdom')); ?>
+				<?php echo esc_html($this->settings['mailchimp_message'] ?: esc_html__('Subscribe to our newsletter.', 'listdom')); ?>
 			</label>
 		</div>
 		<?php endif; ?>
 
 		<div class="lsd-owner-contact-form-row lsd-owner-contact-form-third-row">
 			<?php echo LSD_Main::grecaptcha_field('transform-95'); ?>
-			<button class="lsd-form-submit lsd-widefat lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" type="submit"><?php esc_html_e('Send', 'listdom'); ?></button>
+			<button class="lsd-general-button" type="submit"><?php esc_html_e('Send', 'listdom'); ?></button>
 
 			<?php wp_nonce_field('lsd_contact_'.$post_id); ?>
 			<input type="hidden" name="lsd_post_id" value="<?php echo esc_attr($post_id); ?>">

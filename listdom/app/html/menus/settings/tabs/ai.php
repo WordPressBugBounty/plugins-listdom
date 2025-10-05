@@ -17,11 +17,12 @@ $modules = (new LSD_AI())->modules();
             <div class="lsd-settings-form-group lsd-box-white lsd-rounded">
                 <div class="lsd-settings-group-wrapper">
                     <div class="lsd-settings-fields-wrapper">
-                        <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Profiles', 'listdom'); ?></h3>
-                        <div class="lsd-mt-0">
-                            <p class="description lsd-mt-0"><?php esc_html_e("You can create and manage multiple AI profiles, each configured with a specific model and settings. This allows you to choose the best AI for different tasks, such as low-cost models for auto-mapping or powerful models for content and image generation.", 'listdom'); ?></p>
-                            <button type="button" class="button" id="lsd_settings_ai_add_profile"><?php esc_html_e('Add New Profile', 'listdom'); ?></button>
+                        <div class="lsd-admin-section-heading">
+                            <h3 class="lsd-admin-title"><?php esc_html_e('Profiles', 'listdom'); ?></h3>
+                            <p class="lsd-admin-description lsd-m-0"><?php esc_html_e("You can create and manage multiple AI profiles, each configured with a specific model and settings. This allows you to choose the best AI for different tasks, such as low-cost models for auto-mapping or powerful models for content and image generation.", 'listdom'); ?></p>
                         </div>
+
+                        <button type="button" class="lsd-secondary-button" id="lsd_settings_ai_add_profile"><?php esc_html_e('Add New Profile', 'listdom'); ?></button>
 
                         <?php if (!isset($ai['profiles']) || !is_array($ai['profiles']) || !count($ai['profiles'])): ?>
                             <div class="lsd-alert-no-my"><div class="lsd-alert lsd-info"><?php esc_html_e('Unlock AI capabilities by creating your first profile. You can then assign specific AI models to various tasks.', 'listdom'); ?></div></div>
@@ -30,7 +31,7 @@ $modules = (new LSD_AI())->modules();
                                 <?php foreach($ai['profiles'] as $i => $profile): ?>
                                     <div class="lsd-box-white lsd-settings-fields-wrapper lsd-rounded lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-4" id="lsd_settings_ai_profiles_<?php echo esc_attr($i); ?>">
                                         <div class="lsd-flex lsd-flex-row">
-                                            <h4 class="lsd-my-0"><?php echo esc_html($profile['name'] ?? 'N/A'); ?></h4>
+                                            <h4 class="lsd-admin-title"><?php echo esc_html($profile['name'] ?? 'N/A'); ?></h4>
                                             <?php echo LSD_Form::hidden([
                                                 'name' => 'lsd[profiles]['.esc_attr($i).'][id]',
                                                 'value' => $profile['id'] ?? LSD_Base::str_random(10),
@@ -39,22 +40,26 @@ $modules = (new LSD_AI())->modules();
                                         </div>
                                         <div>
                                             <?php echo LSD_Form::label([
+                                                'class' => 'lsd-fields-label',
                                                 'for' => 'lsd_settings_ai_profile_'.esc_attr($i).'_name',
                                                 'title' => esc_html__('Descriptive Name', 'listdom'),
                                             ]); ?>
                                             <?php echo LSD_Form::text([
+                                                'class' => 'lsd-admin-input',
                                                 'id' => 'lsd_settings_ai_profile_'.esc_attr($i).'_name',
                                                 'name' => 'lsd[profiles]['.esc_attr($i).'][name]',
                                                 'value' => $profile['name'] ?? '',
-                                                'placeholder' => esc_html__('Profile Name', 'listdom'),
+                                                'placeholder' => esc_attr__('Profile Name', 'listdom'),
                                             ]); ?>
                                         </div>
                                         <div>
                                             <?php echo LSD_Form::label([
+                                                'class' => 'lsd-fields-label',
                                                 'for' => 'lsd_settings_ai_profile_'.esc_attr($i).'_model',
                                                 'title' => esc_html__('Model', 'listdom'),
                                             ]); ?>
                                             <?php echo LSD_Form::ai_providers([
+                                                'class' => 'lsd-admin-input',
                                                 'id' => 'lsd_settings_ai_profile_'.esc_attr($i).'_model',
                                                 'value' => $profile['model'] ?? '',
                                                 'name' => 'lsd[profiles]['.esc_attr($i).'][model]',
@@ -62,14 +67,16 @@ $modules = (new LSD_AI())->modules();
                                         </div>
                                         <div>
                                             <?php echo LSD_Form::label([
+                                                'class' => 'lsd-fields-label',
                                                 'for' => 'lsd_settings_ai_profile_'.esc_attr($i).'_api_key',
                                                 'title' => esc_html__('API Key', 'listdom'),
                                             ]); ?>
                                             <?php echo LSD_Form::text([
+                                                'class' => 'lsd-admin-input',
                                                 'id' => 'lsd_settings_ai_profile_'.esc_attr($i).'_api_key',
                                                 'value' => $profile['api_key'] ?? '',
                                                 'name' => 'lsd[profiles]['.esc_attr($i).'][api_key]',
-                                                'placeholder' => esc_html__('API Key (Required)', 'listdom'),
+                                                'placeholder' => esc_attr__('API Key (Required)', 'listdom'),
                                             ]); ?>
                                         </div>
                                     </div>
@@ -78,18 +85,19 @@ $modules = (new LSD_AI())->modules();
                         <?php endif; ?>
                     </div>
                     <div class="lsd-settings-fields-wrapper">
-                        <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Modules', 'listdom'); ?></h3>
+                        <h3 class="lsd-admin-title"><?php esc_html_e('Modules', 'listdom'); ?></h3>
                         <div class="lsd-ai-modules-wrapper">
                             <?php foreach ($modules as $key => $label): ?>
                                 <div>
-                                    <h3 class="lsd-my-0"><?php esc_html_e($label, 'listdom'); ?></h3>
+                                    <h3 class="lsd-admin-title"><?php echo esc_html($label); ?></h3>
                                     <div class="lsd-form-row">
                                         <div class="lsd-col-3">
                                             <?php echo LSD_Form::label([
+                                                'class' => 'lsd-fields-label',
                                                 'title' => esc_html__('Access', 'listdom'),
                                             ]); ?>
                                         </div>
-                                        <div class="lsd-col-4">
+                                        <div class="lsd-col-5">
                                             <?php
                                             echo LSD_Form::checkboxes([
                                                 'class' => 'lsd-mt-0',
@@ -115,10 +123,6 @@ $modules = (new LSD_AI())->modules();
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
                     <i class='lsdi lsdi-checkmark-circle'></i>
                 </button>
-                <div>
-                    <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
-                    <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
-                </div>
 			</div>
         </div>
     </form>
@@ -127,11 +131,11 @@ $modules = (new LSD_AI())->modules();
 // Add Profile
 jQuery('#lsd_settings_ai_add_profile').on('click', function ()
 {
-    // Loading Wrapper
-    const loading = (new ListdomLoadingWrapper());
+    const $button = jQuery(this);
 
-    // Loading
-    loading.start();
+    // Loading Wrapper
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Adding', 'listdom') ); ?>");
 
     jQuery.ajax(
     {
@@ -142,14 +146,14 @@ jQuery('#lsd_settings_ai_add_profile').on('click', function ()
         success: function(response)
         {
             // Unloading
-            loading.stop(null, 200);
+            loading.stop();
 
             if(response.success === 1) location.reload();
         },
         error: function()
         {
             // Unloading
-            loading.stop(null, 200);
+            loading.stop();
         }
     });
 });
@@ -177,10 +181,8 @@ jQuery('.lsd-ai-remove-profile').on('click', function()
     }
 
     // Loading Wrapper
-    const loading = (new ListdomLoadingWrapper());
-
-    // Loading
-    loading.start();
+    const loading = new ListdomButtonLoader($button);
+    loading.start("");
 
     jQuery.ajax(
     {
@@ -196,13 +198,13 @@ jQuery('.lsd-ai-remove-profile').on('click', function()
                 jQuery('#lsd_settings_ai_profiles_'+i).remove();
 
                 // Unloading
-                loading.stop(null, 200);
+                loading.stop();
             }
         },
         error: function()
         {
             // Unloading
-            loading.stop(null, 200);
+            loading.stop();
         }
     });
 });
@@ -212,14 +214,14 @@ jQuery('#lsd_ai_form').on('submit', function (event)
 {
     event.preventDefault();
 
-    // Loading Wrapper
-    const loading = (new ListdomLoadingWrapper());
-    const $success = jQuery('.lsd-settings-success-message');
-    const $error = jQuery('.lsd-settings-error-message');
-    const $tab = jQuery('.nav-tab-active');
+    const $button = jQuery('#lsd_ai_save_button');
 
-    // Loading
-    loading.start();
+    // Loading Wrapper
+    const $tab = jQuery('.lsd-nav-tab-active');
+
+    // Loading Wrapper
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Saving', 'listdom') ); ?>");
 
     const settings = jQuery(this).serialize();
     jQuery.ajax(
@@ -231,15 +233,19 @@ jQuery('#lsd_ai_form').on('submit', function (event)
         {
             $tab.attr('data-saved', 'true');
 
+            listdom_toastify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
+
             // Unloading
-            loading.stop($success, 1000);
+            loading.stop();
         },
         error: function ()
         {
             $tab.attr('data-saved', 'false');
 
+            listdom_toastify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
+
             // Unloading
-            loading.stop($error, 1000);
+            loading.stop();
         }
     });
 });

@@ -169,8 +169,8 @@ jQuery('#lsd_dummy_data_form').on('submit', function(event)
     const $button = jQuery("#lsd_dummy_data_save_button");
 
     // Loading Wrapper
-    const loading = (new ListdomButtonLoader($button));
-    loading.start("<?php echo esc_js(__('Importing Dummy Data', 'listdom') ); ?>");
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js(esc_html__('Importing Dummy Data', 'listdom') ); ?>");
 
     const dummy = jQuery(this).serialize();
     jQuery.ajax(
@@ -180,7 +180,7 @@ jQuery('#lsd_dummy_data_form').on('submit', function(event)
         data: "action=lsd_dummy&" + dummy,
         success: function()
         {
-            listdom_toastify("<?php echo esc_js(__("Dummy Data imported completely.", 'listdom')); ?>", 'lsd-success');
+            listdom_toastify("<?php echo esc_js(esc_html__("Dummy Data imported completely.", 'listdom')); ?>", 'lsd-success');
 
             // Unloading
             loading.stop();

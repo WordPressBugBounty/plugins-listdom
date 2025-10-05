@@ -25,21 +25,28 @@ class LSD_Ajax extends LSD_Base
 
     public function search()
     {
-        $args = (isset($_POST['args']) and is_array($_POST['args'])) ? $_POST['args'] : [];
+        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_search_form')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom')]);
+
+        $post = wp_unslash($_POST);
+        $args = isset($post['args']) && is_array($post['args']) ? $post['args'] : [];
 
         // Get From Request
-        if (!count($args)) $args = $_POST;
+        if (!count($args)) $args = $post;
 
         // Sanitization
-        array_walk_recursive($args, 'sanitize_text_field');
+        $args = LSD_Sanitize::deep($args);
 
-        $atts = (isset($args['atts']) and is_array($args['atts'])) ? $args['atts'] : [];
+        $atts = isset($args['atts']) && is_array($args['atts']) ? $args['atts'] : [];
 
         // Listdom Shortcode
         $LSD = new LSD_Shortcodes_Listdom();
 
         // Skin
-        $skin = (isset($atts['lsd_display']) and isset($atts['lsd_display']['skin'])) ? sanitize_text_field($atts['lsd_display']['skin']) : $LSD->get_default_skin();
+        $skin = isset($atts['lsd_display']['skin'])
+            ? sanitize_text_field($atts['lsd_display']['skin'])
+            : $LSD->get_default_skin();
+
         $limit = $atts['lsd_display'][$skin]['limit'] ?? 300;
         $pagination = $atts['lsd_display'][$skin]['pagination'] ?? 'loadmore';
 
@@ -51,13 +58,14 @@ class LSD_Ajax extends LSD_Base
         $SKO->after_start();
 
         // Current View
-        $SKO->setField('default_view', (isset($_POST['view']) ? sanitize_text_field($_POST['view']) : 'grid'));
+        $view = isset($post['view']) ? sanitize_text_field($post['view']) : 'grid';
+        $SKO->setField('default_view', $view);
 
         // Generate the Query
         $SKO->query();
 
         // Apply Search
-        $SKO->apply_search($_POST, 'map');
+        $SKO->apply_search($post, 'map');
 
         // Get Map Objects
         $archive = new LSD_PTypes_Listing_Archive();
@@ -87,20 +95,22 @@ class LSD_Ajax extends LSD_Base
             'count' => count($IDs),
             'total' => $total,
             'limit' => $limit,
-            'pagination' => $pagination === 'numeric' ?  $SKO->get_pagination() : ''
+            'pagination' => $pagination === 'numeric' ? $SKO->get_pagination() : '',
         ]);
     }
 
     public function autosuggest()
     {
+        $request = wp_unslash($_REQUEST);
+
         // Check if security nonce is set
-        if (!isset($_REQUEST['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is required.', 'listdom')]);
+        if (!isset($request['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is required.', 'listdom')]);
 
         // Verify that the nonce is valid
-        if (!wp_verify_nonce(sanitize_text_field($_REQUEST['_wpnonce']), 'lsd_autosuggest')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom')]);
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($request['_wpnonce'])), 'lsd_autosuggest')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom')]);
 
-        $term = isset($_REQUEST['term']) ? sanitize_text_field($_REQUEST['term']) : '';
-        $source = isset($_REQUEST['source']) ? sanitize_text_field($_REQUEST['source']) : '';
+        $term = isset($request['term']) ? sanitize_text_field($request['term']) : '';
+        $source = isset($request['source']) ? sanitize_key($request['source']) : '';
 
         $total = 0;
         $items = '';
@@ -180,16 +190,19 @@ class LSD_Ajax extends LSD_Base
 
     public function terms()
     {
+        $request = wp_unslash($_REQUEST);
+
         // Check if security nonce is set
-        if (!isset($_REQUEST['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__("Security nonce is required.", 'listdom')]);
+        if (!isset($request['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__("Security nonce is required.", 'listdom')]);
 
         // Verify that the nonce is valid
-        if (!wp_verify_nonce(sanitize_text_field($_REQUEST['_wpnonce']), 'lsd_search_form')) $this->response(['success' => 0, 'message' => esc_html__("Security nonce is invalid.", 'listdom')]);
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($request['_wpnonce'])), 'lsd_search_form')) $this->response(['success' => 0, 'message' => esc_html__("Security nonce is invalid.", 'listdom')]);
 
         // Taxonomy
-        $taxonomy = $_REQUEST['taxonomy'] ?? LSD_Base::TAX_LOCATION;
-        $hide_empty = $_REQUEST['hide_empty'] ?? 0;
-        $parent = $_REQUEST['parent'] ?? 0;
+        $taxonomy = isset($request['taxonomy']) ? sanitize_key($request['taxonomy']) : LSD_Base::TAX_LOCATION;
+
+        $hide_empty = isset($request['hide_empty']) ? absint($request['hide_empty']) : 0;
+        $parent = isset($request['parent']) ? absint($request['parent']) : 0;
 
         $terms = get_terms([
             'taxonomy' => $taxonomy,
@@ -218,7 +231,8 @@ class LSD_Ajax extends LSD_Base
 
     public function availability_ai()
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : '';
+        $post = wp_unslash($_POST);
+        $wpnonce = isset($post['_wpnonce']) ? sanitize_text_field(wp_unslash($post['_wpnonce'])) : '';
 
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
         if (!wp_verify_nonce($wpnonce, 'lsd_ai_availability')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
@@ -226,8 +240,8 @@ class LSD_Ajax extends LSD_Base
         // No Access
         if (!(new LSD_AI())->has_access(LSD_AI::TASK_AVAILABILITY)) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
 
-        $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field($_POST['ai_profile']) : '';
-        $text = isset($_POST['text']) ? sanitize_text_field($_POST['text']) : '';
+        $ai_profile = isset($post['ai_profile']) ? sanitize_text_field($post['ai_profile']) : '';
+        $text = isset($post['text']) ? sanitize_textarea_field($post['text']) : '';
 
         $ai = (new LSD_AI())->by_profile($ai_profile);
         $availability = $ai ? $ai->availability($text) : [];
@@ -241,7 +255,8 @@ class LSD_Ajax extends LSD_Base
 
     public function content_ai()
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : '';
+        $post = wp_unslash($_POST);
+        $wpnonce = isset($post['_wpnonce']) ? sanitize_text_field(wp_unslash($post['_wpnonce'])) : '';
 
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
         if (!wp_verify_nonce($wpnonce, 'lsd_ai_content')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
@@ -249,8 +264,8 @@ class LSD_Ajax extends LSD_Base
         // No Access
         if (!(new LSD_AI())->has_access(LSD_AI::TASK_CONTENT)) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
 
-        $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field($_POST['ai_profile']) : '';
-        $text = isset($_POST['text']) ? sanitize_text_field($_POST['text']) : '';
+        $ai_profile = isset($post['ai_profile']) ? sanitize_text_field($post['ai_profile']) : '';
+        $text = isset($post['text']) ? sanitize_textarea_field($post['text']) : '';
 
         $ai = (new LSD_AI())->by_profile($ai_profile);
         $content = $ai ? $ai->content($text) : '';

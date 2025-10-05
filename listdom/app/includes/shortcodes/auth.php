@@ -70,7 +70,8 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Get Redirect from Request
         if (isset($_REQUEST['redirect_to']) && trim($_REQUEST['redirect_to']))
         {
-            $redirect = urldecode($_REQUEST['redirect_to']);
+            $requested_redirect = wp_sanitize_redirect(wp_unslash($_REQUEST['redirect_to']));
+            if ($requested_redirect !== '') $redirect = wp_validate_redirect($requested_redirect, $redirect);
         }
 
         ob_start();
@@ -131,24 +132,30 @@ class LSD_Shortcodes_Auth extends LSD_Base
     public function signin()
     {
         // Check for nonce
-        if (!isset($_POST['lsd_login'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing!', 'listdom')]);
+        if (
+            !isset($_POST['lsd_login'])
+            || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['lsd_login'])), 'lsd_login')
+        ) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
+
+        $user_login = isset($_POST['log']) ? wp_unslash($_POST['log']) : '';
+        $user_password = isset($_POST['pwd']) ? wp_unslash($_POST['pwd']) : '';
 
         // Check for login credentials
-        if (empty($_POST['log']) || empty($_POST['pwd'])) $this->response(['success' => 0, 'message' => esc_html__('Username or password is empty.', 'listdom')]);
+        if ($user_login === '' || $user_password === '') $this->response(['success' => 0, 'message' => esc_html__('Username or password is empty.', 'listdom')]);
 
         $credentials = [
-            'user_login' => sanitize_text_field($_POST['log']),
-            'user_password' => sanitize_text_field($_POST['pwd']),
+            'user_login' => sanitize_text_field($user_login),
+            'user_password' => $user_password,
             'remember' => isset($_POST['rememberme']),
         ];
 
         // Redirect Url
         $redirect_to = isset($_POST['redirect_to']) && $_POST['redirect_to']
-            ? sanitize_text_field($_POST['redirect_to'])
+            ? wp_validate_redirect(wp_sanitize_redirect(wp_unslash($_POST['redirect_to'])), '')
             : '';
 
         // Role Restriction
-        $role = isset($_POST['lsd_role']) ? sanitize_text_field($_POST['lsd_role']) : '';
+        $role = isset($_POST['lsd_role']) ? sanitize_text_field(wp_unslash($_POST['lsd_role'])) : '';
         if (!in_array($role, LSD_User::roles(true), true)) $role = '';
 
         if ($role)
@@ -182,7 +189,10 @@ class LSD_Shortcodes_Auth extends LSD_Base
     public function signup()
     {
         // Check for nonce security
-        if (!isset($_POST['lsd_register_nonce'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing!', 'listdom')]);
+        if (
+            !isset($_POST['lsd_register_nonce'])
+            || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['lsd_register_nonce'])), 'lsd_register_nonce')
+        ) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
 
         // Check required fields
         if (empty($_POST['lsd_username']) || empty($_POST['lsd_email']) || empty($_POST['lsd_password'])) $this->response(['success' => 0, 'message' => esc_html__('All fields are required.', 'listdom')]);
@@ -198,15 +208,23 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $contain_specials = isset($auth['register']['contain_specials']) && $auth['register']['contain_specials'];
 
         // Sanitize form values
-        $username = sanitize_text_field($_POST['lsd_username']);
-        $email = sanitize_email($_POST['lsd_email']);
-        $password = $_POST['lsd_password'];
+        $username = sanitize_text_field(wp_unslash($_POST['lsd_username']));
+        $email = sanitize_email(wp_unslash($_POST['lsd_email']));
+        $password = wp_unslash($_POST['lsd_password']);
+
+        $consent = isset($_POST['lsd_privacy_consent']) ? sanitize_text_field(wp_unslash($_POST['lsd_privacy_consent'])) : '';
+        $consent_enabled = LSD_Privacy::is_consent_enabled('register');
+        if ($consent_enabled && $consent !== '1') $this->response(['success' => 0, 'message' => LSD_Privacy::consent_required_text()]);
 
         // Ensure Password Policy is Met
         if (isset($auth['register']['strong_password']) && $auth['register']['strong_password'])
         {
             // Check for minimum length
-            if (strlen($password) < $length) $this->response(['success' => 0, 'message' => sprintf(esc_html__('Password must be at-least %s characters long.', 'listdom'), $length)]);
+            if (strlen($password) < $length) $this->response(['success' => 0, 'message' => sprintf(
+                /* translators: %s: Minimum required password length. */
+                esc_html__('Password must be at-least %s characters long.', 'listdom'),
+                $length
+            )]);
 
             // Check for lowercase letters
             if ($contain_lowercase && !preg_match('/[a-z]/', $password)) $this->response(['success' => 0, 'message' => esc_html__('Password must contain at-least one lowercase letter.', 'listdom')]);
@@ -225,7 +243,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         if (username_exists($username) || email_exists($email)) $this->response(['success' => 0, 'message' => esc_html__('Username and / or email already exist.', 'listdom')]);
 
         // Role Restriction
-        $role = isset($_POST['lsd_role']) ? sanitize_text_field($_POST['lsd_role']) : '';
+        $role = isset($_POST['lsd_role']) ? sanitize_text_field(wp_unslash($_POST['lsd_role'])) : '';
         if (!in_array($role, LSD_User::roles(true), true)) $role = '';
 
         // Create the user
@@ -241,6 +259,15 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Check for errors
         if (is_wp_error($user_id)) $this->response(['success' => 0, 'message' => esc_html($user_id->get_error_message())]);
 
+        if ($consent_enabled && $consent === '1')
+        {
+            update_user_meta($user_id, 'lsd_privacy_consent', LSD_Privacy::create_log([
+                'context' => 'user_registration',
+                'email' => $email,
+                'user_id' => $user_id,
+            ]));
+        }
+
         // Auto Login
         if (isset($auth['register']['login_after_register']) && $auth['register']['login_after_register'])
         {
@@ -252,7 +279,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
         if ($auth['register']['login_after_register'] == 1)
         {
             $user = get_user_by('id', $user_id);
-            $redirect_url = $this->role_based_redirect('register', $user, $_POST['lsd_redirect'] ?? '');
+
+            $redirect_value = isset($_POST['lsd_redirect']) ? wp_sanitize_redirect(wp_unslash($_POST['lsd_redirect'])) : '';
+            $redirect_url = $this->role_based_redirect('register', $user, wp_validate_redirect($redirect_value, ''));
         }
 
         // Send success message with redirect
@@ -266,13 +295,19 @@ class LSD_Shortcodes_Auth extends LSD_Base
     public function forgot_password_request()
     {
         // Check for nonce security
-        if (!isset($_POST['lsd_forgot_password_nonce']) || !wp_verify_nonce($_POST['lsd_forgot_password_nonce'], 'lsd_forgot_password_nonce')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
+        if (
+            !isset($_POST['lsd_forgot_password_nonce'])
+            || !wp_verify_nonce(
+                sanitize_text_field(wp_unslash($_POST['lsd_forgot_password_nonce'])),
+                'lsd_forgot_password_nonce'
+            )
+        ) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
 
         // Check required fields
-        if (!isset($_POST['user_login']) || !trim($_POST['user_login'])) $this->response(['success' => 0, 'message' => esc_html__('Email is required.', 'listdom')]);
+        if (!isset($_POST['user_login']) || !trim(wp_unslash($_POST['user_login']))) $this->response(['success' => 0, 'message' => esc_html__('Email is required.', 'listdom')]);
 
         // Sanitize form values
-        $email = sanitize_email($_POST['user_login']);
+        $email = sanitize_email(wp_unslash($_POST['user_login']));
 
         // Check if the email exists
         if (!email_exists($email)) $this->response(['success' => 0, 'message' => esc_html__('Email does not exist.', 'listdom')]);
@@ -297,13 +332,19 @@ class LSD_Shortcodes_Auth extends LSD_Base
     public function reset_password_request()
     {
         // Check for nonce security
-        if (!isset($_POST['lsd_reset_password_nonce']) || !wp_verify_nonce($_POST['lsd_reset_password_nonce'], 'lsd_reset_password_nonce')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
+        if (
+            !isset($_POST['lsd_reset_password_nonce'])
+            || !wp_verify_nonce(
+                sanitize_text_field(wp_unslash($_POST['lsd_reset_password_nonce'])),
+                'lsd_reset_password_nonce'
+            )
+        ) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
 
         // Required fields
         if (!isset($_POST['password']) || !isset($_POST['password_confirmation']) || !trim($_POST['password']) || !trim($_POST['password_confirmation'])) $this->response(['success' => 0, 'message' => esc_html__('Password is required.', 'listdom')]);
 
-        $password = $_POST['password'];
-        $password_confirmation = $_POST['password_confirmation'];
+        $password = wp_unslash($_POST['password']);
+        $password_confirmation = wp_unslash($_POST['password_confirmation']);
 
         // Password length
         if (strlen($password) < 6) $this->response(['success' => 0, 'message' => esc_html__("Password is too short! It should be at least 6 characters.", 'listdom')]);
@@ -311,8 +352,8 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Password confirmation
         if ($password !== $password_confirmation) $this->response(['success' => 0, 'message' => esc_html__("Password does not match its confirmation.", 'listdom')]);
 
-        $login = isset($_POST['user_login']) ? sanitize_user($_POST['user_login']) : '';
-        $key = isset($_POST['reset_key']) ? sanitize_text_field($_POST['reset_key']) : '';
+        $login = isset($_POST['user_login']) ? sanitize_user(wp_unslash($_POST['user_login'])) : '';
+        $key = isset($_POST['reset_key']) ? sanitize_text_field(wp_unslash($_POST['reset_key'])) : '';
 
         // Validate reset key
         $user = check_password_reset_key($key, $login);
@@ -453,26 +494,35 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
     public function wp_redirect()
     {
-        if (strpos($_SERVER['REQUEST_URI'], 'wp-login.php') === false) return;
+        $request_uri = isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI'])
+            ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI']))
+            : '';
+
+        if (strpos($request_uri, 'wp-login.php') === false) return;
 
         // Login Page Redirect
-        if ($this->option('login_form') && !$this->option('hide_login_form') && !isset($_GET['action']))
+        $action = isset($_GET['action']) ? sanitize_text_field(wp_unslash($_GET['action'])) : '';
+
+        if ($this->option('login_form') && !$this->option('hide_login_form') && !$action)
         {
-            wp_redirect($this->get_login_url($_GET['redirect_to'] ?? '', $_GET['reauth'] ?? ''));
+            $redirect_to = isset($_GET['redirect_to']) ? sanitize_text_field(wp_unslash($_GET['redirect_to'])) : '';
+            $reauth = isset($_GET['reauth']) ? sanitize_text_field(wp_unslash($_GET['reauth'])) : '';
+            wp_redirect($this->get_login_url($redirect_to, $reauth));
             exit;
         }
 
         // Registration Page Redirect
-        if ($this->option('register_form') && !$this->option('hide_register_form') && isset($_GET['action']) && $_GET['action'] === 'register')
+        if ($this->option('register_form') && !$this->option('hide_register_form') && $action === 'register')
         {
             wp_redirect($this->get_register_url());
             exit;
         }
 
         // Forgot Password Page Redirect
-        if ($this->option('forgot_password_form') && !$this->option('hide_forgot_password_form') && isset($_GET['action']) && $_GET['action'] === 'lostpassword')
+        if ($this->option('forgot_password_form') && !$this->option('hide_forgot_password_form') && $action === 'lostpassword')
         {
-            $url = $this->get_forgot_url($_GET['redirect_to'] ?? '');
+            $redirect_to = isset($_GET['redirect_to']) ? sanitize_text_field(wp_unslash($_GET['redirect_to'])) : '';
+            $url = $this->get_forgot_url($redirect_to);
             if (trim($url))
             {
                 wp_redirect($url);
@@ -481,16 +531,19 @@ class LSD_Shortcodes_Auth extends LSD_Base
         }
 
         // Reset Password Page Redirect
-        if ($this->option('forgot_password_form') && !$this->option('hide_forgot_password_form') && isset($_GET['action']) && in_array($_GET['action'], ['rp', 'resetpass'], true))
+        if ($this->option('forgot_password_form') && !$this->option('hide_forgot_password_form') && in_array($action, ['rp', 'resetpass'], true))
         {
-            $url = $this->get_forgot_url($_GET['redirect_to'] ?? '');
+            $redirect_to = isset($_GET['redirect_to']) ? sanitize_text_field(wp_unslash($_GET['redirect_to'])) : '';
+            $url = $this->get_forgot_url($redirect_to);
 
             if (trim($url))
             {
+                $key = isset($_GET['key']) ? sanitize_text_field(wp_unslash($_GET['key'])) : '';
+                $login = isset($_GET['login']) ? sanitize_user(wp_unslash($_GET['login'])) : '';
                 $url = add_query_arg([
-                    'action' => sanitize_text_field($_GET['action']),
-                    'key' => sanitize_text_field($_GET['key'] ?? ''),
-                    'login' => sanitize_user($_GET['login'] ?? ''),
+                    'action' => $action,
+                    'key' => $key,
+                    'login' => $login,
                 ], $url);
 
                 wp_redirect($url);

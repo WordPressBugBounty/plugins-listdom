@@ -34,7 +34,7 @@ LSD_Assets::map();
                         <?php echo LSD_Form::text([
                             'class' => 'lsd-admin-input',
                             'id' => 'lsd_address',
-                            'placeholder' => esc_html__('Type at least 3 characters of the location ...', 'listdom'),
+                            'placeholder' => esc_attr__('Type at least 3 characters of the location ...', 'listdom'),
                         ]); ?>
                     </div>
                 </div>
@@ -44,7 +44,7 @@ LSD_Assets::map();
                             'id' => 'lsd_settings_map_backend_lt',
                             'name' => 'lsd[map_backend_lt]',
                             'value' => $settings['map_backend_lt'] ?? '',
-                            'placeholder' => esc_html__("It's for Google Maps in Add/Edit Map Objects menu.", 'listdom'),
+                            'placeholder' => esc_attr__("It's for Google Maps in Add/Edit Map Objects menu.", 'listdom'),
                         ]); ?>
                     </div>
                 </div>
@@ -54,7 +54,7 @@ LSD_Assets::map();
                             'id' => 'lsd_settings_map_backend_ln',
                             'name' => 'lsd[map_backend_ln]',
                             'value' => $settings['map_backend_ln'] ?? '',
-                            'placeholder' => esc_html__("It's for Google Maps in Add/Edit Listing menu.", 'listdom')
+                            'placeholder' => esc_attr__("It's for Google Maps in Add/Edit Listing menu.", 'listdom')
                         ]); ?>
                     </div>
                 </div>
@@ -231,8 +231,8 @@ jQuery(function($)
         e.preventDefault();
         const $button = $(this);
 
-        const loading = (new ListdomButtonLoader($button));
-        loading.start("<?php echo esc_js( __('Saving', 'listdom') ); ?>");
+        const loading = new ListdomButtonLoader($button);
+        loading.start("<?php echo esc_js( esc_html__('Saving', 'listdom') ); ?>");
 
         const settings = $("#lsd_settings_form").serialize();
         $.ajax(
@@ -254,7 +254,7 @@ jQuery(function($)
             error: function ()
             {
                 loading.stop();
-                listdom_toastify("<?php echo esc_js(__('There was an issue', 'listdom')); ?>", 'lsd-error');
+                listdom_toastify("<?php echo esc_js(esc_html__('There was an issue', 'listdom')); ?>", 'lsd-error');
             }
         });
     });

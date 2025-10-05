@@ -28,10 +28,14 @@ $walker = new LSD_Walker_Taxonomy();
         <div id="lsd_metabox_filter_options" class="lsd-metabox lsd-metabox-filter-options">
 
             <?php if (!class_exists(LSDADDAPS::class) && !class_exists(\LSDPACAPS\Base::class)): ?>
-                <div class="lsd-my-4"><?php echo LSD_Base::alert(sprintf(esc_html__('Did you know that with the %s add-on, you can customize the matching logic for taxonomies?', 'listdom'), '<strong>'.esc_html__('Advanced Portal Search', 'listdom').'</strong>')); ?></div>
+                <div class="lsd-my-4"><?php echo LSD_Base::alert(sprintf(
+                    /* translators: %s: Advanced Portal Search add-on label. */
+                    esc_html__('Did you know that with the %s add-on, you can customize the matching logic for taxonomies?', 'listdom'),
+                    '<strong>'.esc_html__('Advanced Portal Search', 'listdom').'</strong>'
+                )); ?></div>
             <?php endif; ?>
 
-            <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex" data-for=".lsd-tab-switcher-content-filter-options">
+            <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex lsd-mb-3" data-for=".lsd-tab-switcher-content-filter-options">
                 <li data-tab="categories" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Categories', 'listdom'); ?></a></li>
                 <li data-tab="locations"><a href="#"><?php esc_html_e('Locations', 'listdom'); ?></a></li>
                 <li data-tab="tags"><a href="#"><?php esc_html_e('Tags', 'listdom'); ?></a></li>
@@ -289,7 +293,7 @@ $walker = new LSD_Walker_Taxonomy();
                                                         'class' => 'lsd-admin-input',
                                                         'name' => 'lsd[filter]['.LSD_Base::TAX_ATTRIBUTE .'][' . esc_attr($attr['id']) .'-bt-min]',
                                                         'value' => $min,
-                                                        'placeholder' => esc_html__('Min number', 'listdom'),
+                                                        'placeholder' => esc_attr__('Min number', 'listdom'),
                                                         'id' => 'lsd_attribute_'.esc_attr($attr['id']),
                                                     ]);
 
@@ -297,7 +301,7 @@ $walker = new LSD_Walker_Taxonomy();
                                                         'class' => 'lsd-admin-input',
                                                         'name' => 'lsd[filter]['.LSD_Base::TAX_ATTRIBUTE .'][' . esc_attr($attr['id']) .'-bt-max]',
                                                         'value' => $max,
-                                                        'placeholder' => esc_html__('Max number', 'listdom'),
+                                                        'placeholder' => esc_attr__('Max number', 'listdom'),
                                                         'id' => 'lsd_attribute_'.esc_attr($attr['id']) . '-max',
                                                     ]);
 
@@ -330,7 +334,11 @@ $walker = new LSD_Walker_Taxonomy();
                                                     'id' => 'lsd_attribute_'.esc_attr($attr['id']),
                                                     'name' => 'lsd[filter][attributes][' . esc_attr($attr['id']) .'-lk]',
                                                     'value' => $options['attributes'][$attr['id'] . '-lk'] ?? '',
-                                                    'placeholder' => sprintf(esc_html__('Enter %s', 'listdom'), esc_html($attr['name'])),
+                                                    'placeholder' => sprintf(
+                                                        /* translators: %s: Attribute name. */
+                                                        esc_html__('Enter %s', 'listdom'),
+                                                        esc_html($attr['name'])
+                                                    ),
                                                 ]);
                                                 ?>
                                             <?php endif; ?>
@@ -359,7 +367,7 @@ $walker = new LSD_Walker_Taxonomy();
                                 'input_id' => 'in_lsd_author',
                                 'suggestions' => 'lsd_filter_author_suggestions',
                                 'values' => $options['authors'] ?? [],
-                                'placeholder' => esc_html__("Enter at least 3 characters of the author's name ...", 'listdom'),
+                                'placeholder' => esc_attr__("Enter at least 3 characters of the author's name ...", 'listdom'),
                                 'description' => esc_html__('You can select multiple authors.', 'listdom'),
                                 'description_class' => 'lsd-mb-0',
                             ]); ?>
@@ -375,7 +383,7 @@ $walker = new LSD_Walker_Taxonomy();
                                     'input_id' => 'ex_lsd_author',
                                     'suggestions' => 'lsd_exclude_author_suggestions',
                                     'values' => $exclude['authors'] ?? [],
-                                    'placeholder' => esc_html__("Enter at least 3 characters of the author's name ...", 'listdom'),
+                                    'placeholder' => esc_attr__("Enter at least 3 characters of the author's name ...", 'listdom'),
                                     'description' => esc_html__('You can select multiple authors.', 'listdom'),
                                     'description_class' => 'lsd-mb-0',
                                 ]); ?>

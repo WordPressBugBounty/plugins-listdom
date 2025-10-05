@@ -19,7 +19,11 @@ if (!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
             <a href="<?php echo esc_url(get_term_link($term->term_id)); ?>">
                 <span class="lsd-title"><?php echo esc_html($term->name); ?></span>
                 <?php if (!isset($this->atts['show_count']) || $this->atts['show_count']): ?>
-                    <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdomer'), $term->count); ?></span>
+                    <span class="lsd-count"><?php echo sprintf(
+                        /* translators: %s: Listing count. */
+                        esc_html__('%s Listings', 'listdom'),
+                        $term->count
+                    ); ?></span>
                 <?php endif; ?>
             </a>
 
@@ -31,7 +35,11 @@ if (!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
                         <div class="lsd-title">
                             <?php echo esc_html($child->name); ?>
                             <?php if(isset($this->atts['show_count']) && $this->atts['show_count']): ?>
-                                <span class="lsd-count"><?php echo sprintf(esc_html__('%s Listings', 'listdomer'), $child->count); ?></span>
+                                <span class="lsd-count"><?php echo sprintf(
+                                    /* translators: %s: Listing count. */
+                                    esc_html__('%s Listings', 'listdom'),
+                                    $child->count
+                                ); ?></span>
                             <?php endif; ?>
                         </div>
                     </a>

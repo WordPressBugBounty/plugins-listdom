@@ -73,7 +73,9 @@ class LSD_Shortcodes_TaxonomyCloud extends LSD_Shortcodes
         $args['number'] = $this->atts['limit'] ?? 8;
 
         // Get the terms
-        return get_terms($TX, $args);
+        return get_terms(
+            array_merge(['taxonomy' => $TX], $args)
+        );
     }
 }
 

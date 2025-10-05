@@ -17,6 +17,6 @@ class LSD_Skins_Listgrid extends LSD_Skins
     public function after_start()
     {
         // Current View
-        $this->default_view = isset($_POST['view']) ? sanitize_text_field($_POST['view']) : $this->default_view;
+        $this->default_view = isset($_POST['view']) ? sanitize_text_field(wp_unslash($_POST['view'])) : $this->default_view;
     }
 }

@@ -49,6 +49,7 @@ class LSD_Shortcodes_AddListing extends LSD_Shortcodes_Dashboard
         $this->form_type = true;
 
         // Payload
+        LSD_Payload::set('dashboard', $this);
         LSD_Payload::set('add_listing', $this);
 
         // Form
@@ -61,7 +62,11 @@ class LSD_Shortcodes_AddListing extends LSD_Shortcodes_Dashboard
     {
         if (!get_current_user_id() && !$this->guest_status)
         {
-            return $this->alert(sprintf(esc_html__("Unfortunately you don't have permission to view this page. Please %s first.", 'listdom'), '<a href="' . wp_login_url($this->current_url()) . '">' . esc_html__('login', 'listdom') . '</a>'), 'error');
+            return $this->alert(sprintf(
+                /* translators: %s: Link to the login page. */
+                esc_html__("Unfortunately you don't have permission to view this page. Please %s first.", 'listdom'),
+                '<a href="' . wp_login_url($this->current_url()) . '">' . esc_html__('login', 'listdom') . '</a>'
+            ), 'error');
         }
         else if (!$this->add_listing)
         {

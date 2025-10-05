@@ -158,7 +158,7 @@ class LSD_Taxonomies extends LSD_Base
             $ids = [];
             foreach ($term as $t)
             {
-                $term = get_term_by('name', $t, $taxonomy);
+                $term = get_term_by('name', sanitize_text_field($t), $taxonomy);
                 if ($term && isset($term->term_id)) $ids[] = $term->term_id;
             }
 
@@ -166,7 +166,7 @@ class LSD_Taxonomies extends LSD_Base
         }
         else
         {
-            $term = get_term_by('name', $term, $taxonomy);
+            $term = get_term_by('name', sanitize_text_field($term), $taxonomy);
             return $term ? $term->term_id : 0;
         }
     }
@@ -178,17 +178,20 @@ class LSD_Taxonomies extends LSD_Base
             $names = [];
             foreach ($term as $t)
             {
+                $t = (int) $t;
+                if (!$t) continue;
+
                 $term = get_term_by('term_id', $t, $taxonomy);
                 if ($term && isset($term->name)) $names[] = $term->name;
             }
 
             return $names;
         }
-        else
-        {
-            $term = get_term_by('term_id', $term, $taxonomy);
-            return $term ? $term->name : '';
-        }
+
+        $term = (int) $term;
+
+        $term = get_term_by('term_id', $term, $taxonomy);
+        return $term ? $term->name : '';
     }
 
     public static function parents($term, $current = [])

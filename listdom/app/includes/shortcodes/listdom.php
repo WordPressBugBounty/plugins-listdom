@@ -86,6 +86,7 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
         else if ($skin === 'masonry') $SKO = new LSD_Skins_Masonry();
         else if ($skin === 'accordion') $SKO = new LSD_Skins_Accordion();
         else if ($skin === 'mosaic') $SKO = new LSD_Skins_Mosaic();
+        else if ($skin === 'timeline') $SKO = new LSD_Skins_Timeline();
         else if ($skin === 'gallery') $SKO = new LSD_Skins_Gallery();
         else $SKO = new LSD_Skins_Grid();
 

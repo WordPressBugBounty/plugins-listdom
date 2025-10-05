@@ -31,7 +31,7 @@ $halfmap = $options['halfmap'] ?? [];
             </div>
         </div>
 
-        <div class="lsd_display_options_skin_halfmap_map_options lsd-form-row-map-needed lsd-p-0 lsd-m-0">
+        <div class="lsd-settings-fields-sub-wrapper lsd_display_options_skin_halfmap_map_options lsd-form-row-map-needed lsd-p-0 lsd-m-0">
             <div class="lsd-form-row lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
                 <div class="lsd-col-3"><?php echo LSD_Form::label([
                         'class' => 'lsd-fields-label',

@@ -30,7 +30,7 @@ $gallery = $options['gallery'] ?? [];
                 ]); ?>
             </div>
         </div>
-        <div class="lsd_display_options_skin_gallery_map_options lsd-form-group lsd-form-row-map-needed lsd-p-0 lsd-m-0 <?php echo isset($gallery['map_provider']) && $gallery['map_provider'] ? '' : 'lsd-util-hide'; ?>">
+        <div class="lsd-settings-fields-sub-wrapper lsd_display_options_skin_gallery_map_options lsd-form-group lsd-form-row-map-needed lsd-p-0 lsd-m-0 <?php echo isset($gallery['map_provider']) && $gallery['map_provider'] ? '' : 'lsd-util-hide'; ?>">
             <div class="lsd-form-row">
                 <div class="lsd-col-3"><?php echo LSD_Form::label([
                     'class' => 'lsd-fields-label',

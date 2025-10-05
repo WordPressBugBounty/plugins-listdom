@@ -23,12 +23,12 @@ $users = get_users([
             <?php $info = LSD_User::get_user_info($user->user_login); ?>
             <div class="lsd-user-card">
                 <div class="lsd-user-avatar">
-                    <a href="<?php echo esc_url_raw(LSD_User::profile_link($user->ID)); ?>">
+                    <a href="<?php echo esc_url(LSD_User::profile_link($user->ID)); ?>">
                         <?php echo $this->user_profile($info, 191); ?>
                     </a>
                 </div>
                 <div class="lsd-user-top-bar">
-                    <a href="<?php echo esc_url_raw(LSD_User::profile_link($user->ID)); ?>">
+                    <a href="<?php echo esc_url(LSD_User::profile_link($user->ID)); ?>">
                         <h3 class="lsd-user-name"><?php echo esc_html($user->display_name); ?></h3>
                     </a>
                     <p class="lsd-user-job-title"><?php echo esc_html($info['job_title']); ?></p>
@@ -55,11 +55,11 @@ $users = get_users([
 
                             <?php if (!empty($info['website'])): ?>
                                 <div class="lsd-profile-website" title="<?php esc_attr_e('Website', 'listdom'); ?>">
-                                    <a href="<?php echo esc_html($info['website']); ?>"><i class="lsd-icon fas fa-link"></i></a>
+                                    <a href="<?php echo esc_url($info['website']); ?>"><i class="lsd-icon fas fa-link"></i></a>
                                 </div>
                             <?php endif; ?>
                         </div>
-                        <a href="<?php echo esc_url_raw(LSD_User::profile_link($user->ID)); ?>" class="lsd-view-profile-button"><?php echo esc_html__('Profile', 'listdom'); ?></a>
+                        <a href="<?php echo esc_url(LSD_User::profile_link($user->ID)); ?>" class="lsd-view-profile-button"><?php echo esc_html__('Profile', 'listdom'); ?></a>
                     </div>
                 </div>
             </div>

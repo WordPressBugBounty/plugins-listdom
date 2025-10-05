@@ -66,7 +66,7 @@ $price_components = LSD_Options::price_components();
             </div>
         </div>
         <div id="lsd_tab_content_map" class="lsd-tab-content">
-            <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex" data-for=".lsd-tab-switcher-content-map">
+            <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex lsd-mb-3" data-for=".lsd-tab-switcher-content-map">
                 <li data-tab="map" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Settings', 'listdom'); ?></a></li>
                 <li data-tab="map-controls" class="lsd-metabox-map-controls-tab"><a href="#"><?php esc_html_e('Google Maps Controls', 'listdom'); ?></a></li>
             </ul>
@@ -99,7 +99,7 @@ $price_components = LSD_Options::price_components();
             <?php endforeach; ?>
         </div>
         <div id="lsd_tab_content_sort" class="lsd-tab-content">
-            <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex" data-for=".lsd-tab-switcher-content-sort">
+            <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex lsd-mb-3" data-for=".lsd-tab-switcher-content-sort">
                 <li data-tab="default-sort" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Default Sort', 'listdom'); ?></a></li>
                 <li data-tab="sort" id="lsd_metabox_sort_options_tab"><a href="#"><?php esc_html_e('Sort Options', 'listdom'); ?></a></li>
             </ul>

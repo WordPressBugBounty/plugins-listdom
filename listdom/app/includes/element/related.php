@@ -46,13 +46,14 @@ class LSD_Element_Related extends LSD_Element
             LSD_Base::TAX_FEATURE => esc_html__('Feature', 'listdom'),
         ];
 
-        $output = '<div class="lsd-w-full"><label>' . esc_html__('Taxonomies', 'listdom') . '</label>';
+        $output = '<div class="lsd-w-full"><label class="lsd-fields-label lsd-mb-2">' . esc_html__('Taxonomies', 'listdom') . '</label>';
         $output .= '<div class="lsd-taxonomy-checkboxes">';
 
         foreach ($taxonomies as $value => $label)
         {
             $output .= '<div>';
             $output .= LSD_Form::label([
+                'class' => 'lsd-fields-label-tiny',
                 'title' => $label,
                 'for' => 'lsd_elements_' . esc_attr($this->key) . '_taxonomy_' . esc_attr($value),
             ]);
@@ -67,22 +68,26 @@ class LSD_Element_Related extends LSD_Element
 
         $output .= '<div>';
         $output .= LSD_Form::label([
+            'class' => 'lsd-fields-label-tiny',
             'title' => esc_html__('Radius (m)', 'listdom'),
             'for' => 'lsd_elements_' . esc_attr($this->key) . '_radius',
         ]);
         $output .= LSD_Form::input([
+            'class' => 'lsd-admin-input',
             'id' => 'lsd_elements_' . esc_attr($this->key) . '_radius',
             'name' => 'lsd[elements][' . esc_attr($this->key) . '][radius]',
             'value' => $data['radius'] ?? '',
-            'placeholder' => esc_html__('500m', 'listdom'),
+            'placeholder' => esc_attr__('500m', 'listdom'),
         ]) . '</div>';
 
         $output .= '<div>';
         $output .= LSD_Form::label([
+            'class' => 'lsd-fields-label-tiny',
             'title' => esc_html__('Shortcode', 'listdom'),
             'for' => 'lsd_elements_' . esc_attr($this->key) . '_shortcode',
         ]);
         $output .= LSD_Form::shortcodes([
+            'class' => 'lsd-admin-input',
             'id' => 'lsd_elements_' . esc_attr($this->key) . '_shortcode',
             'name' => 'lsd[elements][' . esc_attr($this->key) . '][shortcode]',
             'value' => $data['shortcode'] ?? '',

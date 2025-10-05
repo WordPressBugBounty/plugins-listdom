@@ -13,6 +13,12 @@ $field_phone = !isset($this->args['phone_field']) || $this->args['phone_field'];
 // Current User
 $current = wp_get_current_user();
 $current_id = get_current_user_id();
+
+$report_privacy_field = LSD_Privacy::consent_field([
+    'id' => 'lsd_abuse_privacy_consent_' . absint($post_id),
+    'wrapper_class' => 'lsd-report-abuse-privacy-consent-field',
+    'context' => 'report',
+]);
 ?>
 <div class="lsd-report-abuse-form-wrapper">
 	<form class="lsd-report-abuse-form" id="lsd_report_abuse_form_<?php echo esc_attr($post_id); ?>" data-id="<?php echo esc_attr($post_id); ?>">
@@ -71,10 +77,16 @@ $current_id = get_current_user_id();
 				required
 			></textarea>
 		</div>
+
+        <?php if ($report_privacy_field !== ''): ?>
+            <div class="lsd-report-abuse-form-row lsd-report-abuse-form-row-consent">
+                <?php echo $report_privacy_field; ?>
+            </div>
+        <?php endif; ?>
 		
 		<div class="lsd-report-abuse-form-row lsd-report-abuse-form-third-row">
 			<?php echo LSD_Main::grecaptcha_field('transform-95'); ?>
-			<button type="submit" class="lsd-form-submit lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>"><?php esc_html_e('Send', 'listdom'); ?></button>
+			<button type="submit" class="lsd-general-button"><?php esc_html_e('Send', 'listdom'); ?></button>
 
 			<?php wp_nonce_field('lsd_abuse_' . $post_id); ?>
 			<input type="hidden" name="lsd_post_id" value="<?php echo esc_attr($post_id); ?>">

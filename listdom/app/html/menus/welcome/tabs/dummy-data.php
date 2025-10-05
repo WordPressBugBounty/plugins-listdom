@@ -17,7 +17,7 @@ $dummy = LSD_Options::dummy();
 
     <div class="lsd-welcome-content-wrapper">
         <div class="lsd-dummy-data-content">
-            <img src="<?php echo esc_url_raw($this->lsd_asset_url('img/wizard-dummy.png')); ?>" alt="">
+            <img src="<?php echo esc_url($this->lsd_asset_url('img/wizard-dummy.png')); ?>" alt="">
             <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('The dummy data includes several listings, categories, locations, labels, etc.', 'listdom'); ?></p>
             <form id="lsd_dummy_data_form" class="lsd-util-hide">
                 <div class="lsd-dummy-settings">
@@ -154,8 +154,8 @@ jQuery('#lsd_dummy_data_save_button').on('click', function (event)
     const $button = jQuery(this);
 
     // Loading Wrapper
-    const loading = (new ListdomButtonLoader($button));
-    loading.start("<?php echo esc_js( __('Importing', 'listdom') ); ?>");
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Importing', 'listdom') ); ?>");
 
     const dummy = jQuery('#lsd_dummy_data_form').serialize();
     jQuery.ajax(

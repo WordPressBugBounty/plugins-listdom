@@ -111,6 +111,7 @@ else
         <div class="form-group">
             <?php
             echo LSD_Form::submit([
+                'class' => 'lsd-general-button',
                 'id' => 'lsd_reset_password_submit',
                 'label' => esc_html__('Change Password', 'listdom'),
             ]);
@@ -132,7 +133,7 @@ else
             echo LSD_Form::email([
                 'name' => 'user_login',
                 'id' => 'lsd_forgot_password',
-                'value' => isset($_POST['user_login']) ? esc_attr($_POST['user_login']) : '',
+                'value' => isset($_POST['user_login']) ? sanitize_text_field($_POST['user_login']) : '',
                 'required' => true,
                 'placeholder' => $email_placeholder
             ]);
@@ -141,6 +142,7 @@ else
         <div class="form-group">
             <?php
             echo LSD_Form::submit([
+                'class' => 'lsd-general-button',
                 'id' => 'lsd_forgot_password_submit',
                 'label' => $submit_label,
             ]);

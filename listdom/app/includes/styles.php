@@ -56,6 +56,13 @@ class LSD_Styles extends LSD_Base
         ], 'mosaic');
     }
 
+    public static function timeline()
+    {
+        return LSD_Styles::filter([
+            'style1' => esc_html__('Style 1', 'listdom'),
+        ], 'timeline');
+    }
+
     public static function grid()
     {
         return LSD_Styles::filter([

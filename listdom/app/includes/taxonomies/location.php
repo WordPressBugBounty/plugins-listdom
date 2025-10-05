@@ -72,6 +72,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
             ]); ?>
         </div>
         <?php
+        wp_nonce_field('lsd_save_location_meta', 'lsd_location_meta_nonce');
     }
 
     public function edit_form($term)
@@ -91,6 +92,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
             </td>
         </tr>
         <?php
+        wp_nonce_field('lsd_save_location_meta', 'lsd_location_meta_nonce');
     }
 
     public function save_metadata($term_id): bool
@@ -98,7 +100,13 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
         // It's quick edit
         if (!isset($_POST['lsd_image'])) return false;
 
-        $image = sanitize_text_field($_POST['lsd_image']);
+        $nonce = isset($_POST['lsd_location_meta_nonce']) ? sanitize_text_field(wp_unslash($_POST['lsd_location_meta_nonce'])) : '';
+
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_save_location_meta')) return false;
+
+        if (!current_user_can('edit_term', $term_id)) return false;
+
+        $image = sanitize_text_field(wp_unslash($_POST['lsd_image']));
         update_term_meta($term_id, 'lsd_image', $image);
 
         return true;
@@ -149,10 +157,13 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
 
     public function ajax_get_location_terms()
     {
+        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_get_location_terms')) $this->response(['success' => false, 'content' => 'Invalid nonce']);
+
         if (!current_user_can('edit_posts')) $this->response(['success' => false, 'content' => 'Unauthorized']);
 
-        $post_id = absint($_POST['post_id'] ?? 0);
-        $new_term_id = absint($_POST['new_term_id'] ?? 0);
+        $post_id = absint(isset($_POST['post_id']) ? wp_unslash($_POST['post_id']) : 0);
+        $new_term_id = absint(isset($_POST['new_term_id']) ? wp_unslash($_POST['new_term_id']) : 0);
 
         if (!$post_id) $this->response(['success' => false, 'content' => 'Invalid post ID']);
 
@@ -178,6 +189,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
             jQuery(document).ready(function ($)
             {
                 const taxonomy = "' . esc_js($taxonomy) . '";
+                const locationNonce = "' . esc_js(wp_create_nonce('lsd_get_location_terms')) . '";
                 const $add_button = $("#" + taxonomy + "-add-submit");
             
                 $add_button.on("click", function ()
@@ -194,7 +206,8 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
                         $.post(ajaxurl, {
                             action: "lsd_get_location_terms",
                             post_id: $("#post_ID").val(),
-                            new_term_id: 0
+                            new_term_id: 0,
+                            _wpnonce: locationNonce
                         }, function (response)
                         {
                             if (typeof response === "string") response = JSON.parse(response);

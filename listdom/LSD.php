@@ -9,7 +9,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '4.7.1';
+    public $version = '4.8.1';
 
     /**
      * The single instance of the class.
@@ -177,6 +177,10 @@ final class Listdom
         // Listdom Notifications
         $notifications = new LSD_Notifications();
         $notifications->init();
+
+        // Listdom Privacy
+        $privacy = new LSD_Privacy();
+        $privacy->init();
 
         // Listdom AJAX
         $ajax = new LSD_Ajax();

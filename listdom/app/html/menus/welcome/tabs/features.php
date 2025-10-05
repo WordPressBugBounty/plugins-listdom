@@ -62,7 +62,7 @@ $settings = LSD_Options::settings();
                             'value' => $settings['components']['work_hours'] ?? '1',
                         ]); ?>
                     </div>
-                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Useful for directories with location-based listings.', 'listdom'); ?></p>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Useful for directories where listings have opening and closing times.', 'listdom'); ?></p>
                 </div>
                 <div class="lsd-form-row lsd-flex-align-items-center lsd-m-0">
                     <div class="lsd-col-3"><?php echo LSD_Form::label([
@@ -77,7 +77,7 @@ $settings = LSD_Options::settings();
                             'value' => $settings['components']['visibility'] ?? '1',
                         ]); ?>
                     </div>
-                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Useful for directories with location-based listings.', 'listdom'); ?></p>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Useful for directories where listings can have expiration date.', 'listdom'); ?></p>
                 </div>
                 <div class="lsd-form-row lsd-flex-align-items-center lsd-m-0">
                     <div class="lsd-col-3"><?php echo LSD_Form::label([
@@ -92,7 +92,7 @@ $settings = LSD_Options::settings();
                             'value' => $settings['components']['socials'] ?? '1',
                         ]); ?>
                     </div>
-                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Useful for directories with location-based listings.', 'listdom'); ?></p>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Useful for directories where listings include links to social media profiles.', 'listdom'); ?></p>
                 </div>
             </div>
             <?php LSD_Form::nonce('lsd_settings_form'); ?>
@@ -141,8 +141,8 @@ jQuery('#lsd_settings_features_save_button').on('click', function (event)
     event.preventDefault();
     const $button = jQuery(this);
 
-    const loading = (new ListdomButtonLoader($button));
-    loading.start("<?php echo esc_js( __('Saving', 'listdom') ); ?>");
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Saving', 'listdom') ); ?>");
 
     const settings = jQuery("#lsd_features_settings_form").serialize();
     jQuery.ajax(
@@ -164,7 +164,7 @@ jQuery('#lsd_settings_features_save_button').on('click', function (event)
         error: function ()
         {
             loading.stop();
-            listdom_toastify("<?php echo esc_js(__('There was an issue', 'listdom')); ?>", 'lsd-error');
+            listdom_toastify("<?php echo esc_js(esc_html__('There was an issue', 'listdom')); ?>", 'lsd-error');
         }
     });
 });

@@ -409,7 +409,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
         // the guest registration method is set to submission
         if (is_email($guest_email))
         {
-            $user = get_user_by_email($guest_email);
+            $user = get_user_by('email', $guest_email);
             $owner_id = (int) get_post_field('post_author', $listing_id);
 
             // Owner is different

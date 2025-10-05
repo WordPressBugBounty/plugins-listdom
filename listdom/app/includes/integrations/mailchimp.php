@@ -25,7 +25,7 @@ class LSD_Integrations_Mailchimp extends LSD_Integrations
         $dc = end($parts);
 
         $url = 'https://' . $dc . '.api.mailchimp.com/3.0/lists/' . $list_id . '/members/';
-        $body = json_encode([
+        $body = wp_json_encode([
             'email_address' => $email,
             'status_if_new' => 'subscribed',
             'status' => 'subscribed',

@@ -32,7 +32,7 @@ class LSD_IX extends LSD_Base
                  'ID', 'comment_count', 'comment_status', 'filter', 'guid',
                  'menu_order', 'ping_status', 'pinged', 'to_ping', 'post_content_filtered',
                  'post_parent', 'post_mime_type',
-             ] as $key) unset($listing[$key]);
+             ] as $key) if (isset($listing[$key])) unset($listing[$key]);
 
             $metas = $this->get_post_meta($listing_id);
 
@@ -68,9 +68,6 @@ class LSD_IX extends LSD_Base
 
     public function import($file)
     {
-        // Unlimited Time Needed!
-        set_time_limit(0);
-
         // Content to Import
         $content = LSD_File::read($file);
 
@@ -115,7 +112,7 @@ class LSD_IX extends LSD_Base
             'post_content' => $listing['post_content'] ?? '',
             'post_type' => LSD_Base::PTYPE_LISTING,
             'post_status' => $listing['post_status'] ?? 'publish',
-            'post_date' => isset($listing['post_date']) ? date('Y-m-d', strtotime($listing['post_date'])) : null,
+            'post_date' => isset($listing['post_date']) ? lsd_date('Y-m-d', strtotime($listing['post_date'])) : null,
             'post_password' => $listing['post_password'] ?? '',
         ];
 
@@ -164,23 +161,43 @@ class LSD_IX extends LSD_Base
         $taxonomies = isset($listing['taxonomies']) && is_array($listing['taxonomies']) ? $listing['taxonomies'] : [];
         foreach ($taxonomies as $taxonomy => $terms)
         {
+            if (!is_array($terms) || !count($terms)) continue;
+
             $t = [];
             foreach ($terms as $term)
             {
-                $exists = term_exists($term['name'], $taxonomy);
+                if (is_string($term)) $term = ['name' => $term];
+                if (!is_array($term)) continue;
 
-                if (is_array($exists) && isset($exists['term_id'])) $term_id = (int) $exists['term_id'];
+                $term_name = isset($term['name']) ? trim($term['name']) : '';
+                $term_slug = isset($term['slug']) ? sanitize_title($term['slug']) : '';
+
+                if ($term_slug)
+                {
+                    $exists = term_exists($term_slug, $taxonomy);
+                    if (!$term_name) $term_name = $term_slug;
+                }
+                else if ($term_name) $exists = term_exists($term_name, $taxonomy);
+                else continue;
+
+                if (is_array($exists) && isset($exists['term_id']))
+                {
+                    $term_id = (int) $exists['term_id'];
+                }
                 else
                 {
-                    // Create Term
-                    $wpt = wp_insert_term($term['name'], $taxonomy, [
+                    $term_args = [
                         'description' => $term['description'] ?? '',
-                        'parent' => $term['parent'] ?? 0,
-                        'slug' => $term['slug'] ?? '',
-                    ]);
+                        'parent' => isset($term['parent']) ? (int) $term['parent'] : 0,
+                    ];
+
+                    if ($term_slug) $term_args['slug'] = $term_slug;
+
+                    // Create Term
+                    $wpt = wp_insert_term($term_name, $taxonomy, $term_args);
 
                     // An Error Occurred
-                    if (!is_array($wpt)) continue;
+                    if (!is_array($wpt) || !isset($wpt['term_id'])) continue;
 
                     // Term ID
                     $term_id = (int) $wpt['term_id'];
@@ -192,17 +209,17 @@ class LSD_IX extends LSD_Base
                     }
 
                     // Import Image
-                    if (isset($term['image']) && trim($term['image']))
+                    if (!empty($term['image']))
                     {
                         $attachment_id = $this->attach($term['image']);
                         if ($attachment_id) update_term_meta($term_id, 'lsd_image', $attachment_id);
                     }
                 }
 
-                $t[] = $term_id;
+                if ($term_id) $t[] = $term_id;
             }
 
-            wp_set_post_terms($post_id, $t, $taxonomy);
+            if (count($t)) wp_set_post_terms($post_id, $t, $taxonomy);
         }
 
         // Import Image
@@ -232,16 +249,21 @@ class LSD_IX extends LSD_Base
                 $term = $attribute['term'] ?? [];
                 if (!is_array($term) || !count($term)) continue;
 
-                $slug = $term['slug'] ?? '';
-                $exists = $slug ? term_exists($slug, LSD_Base::TAX_ATTRIBUTE) : term_exists($term['name'], LSD_Base::TAX_ATTRIBUTE);
+                $term_name = isset($term['name']) ? trim((string) $term['name']) : '';
+                $slug = isset($term['slug']) ? sanitize_title((string) $term['slug']) : '';
+
+                if (!$term_name && $slug) $term_name = $slug;
+                if (!$term_name) continue;
+
+                $exists = $slug ? term_exists($slug, LSD_Base::TAX_ATTRIBUTE) : term_exists($term_name, LSD_Base::TAX_ATTRIBUTE);
 
                 if (is_array($exists) && isset($exists['term_id'])) $term_id = (int) $exists['term_id'];
                 else
                 {
                     // Create Term
-                    $wpt = wp_insert_term($term['name'], LSD_Base::TAX_ATTRIBUTE, [
+                    $wpt = wp_insert_term($term_name, LSD_Base::TAX_ATTRIBUTE, [
                         'description' => $term['description'] ?? '',
-                        'parent' => $term['parent'] ?? 0,
+                        'parent' => isset($term['parent']) ? (int) $term['parent'] : 0,
                         'slug' => $slug,
                     ]);
 
@@ -351,7 +373,7 @@ class LSD_IX extends LSD_Base
             foreach ([
                  'count', 'filter', 'term_group',
                  'term_id', 'term_taxonomy_id',
-             ] as $key) unset($term[$key]);
+             ] as $key) if (isset($term[$key])) unset($term[$key]);
 
             // Meta Values
             $term['meta'] = $this->get_term_meta($term_id);
@@ -395,7 +417,7 @@ class LSD_IX extends LSD_Base
                     foreach ([
                          'count', 'filter',
                          'term_group', 'term_taxonomy_id',
-                     ] as $key) unset($term[$key]);
+                     ] as $key) if (isset($term[$key])) unset($term[$key]);
 
                     // Metas
                     $metas = $this->get_term_meta($term_id);

@@ -39,7 +39,7 @@ $listing = isset($cover['listing']) && is_array($cover['listing'])
                         'suggestions' => 'lsd_display_options_skin_cover_listing_suggestions',
                         'values' => $listing ? [$listing] : [],
                         'max_items' => 1,
-                        'placeholder' => esc_html__("Enter at least 3 characters of the listing's title ...", 'listdom'),
+                        'placeholder' => esc_attr__("Enter at least 3 characters of the listing's title ...", 'listdom'),
                         'description' => esc_html__('You can select only one listing.', 'listdom'),
                     ]); ?>
                 <?php else: ?>

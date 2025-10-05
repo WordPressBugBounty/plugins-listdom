@@ -408,7 +408,11 @@ class LSD_Meta extends LSD_Base
                 $metas[$key] = [
                     'key' => $key,
                     'type' => LSD_Meta::URL,
-                    'name' => sprintf(esc_html__('Author %s', 'listdom'), $obj->label()),
+                    'name' => sprintf(
+                        /* translators: %s: Social network label. */
+                        esc_html__('Author %s', 'listdom'),
+                        $obj->label()
+                    ),
                     'get' => function ($key, $id) use ($obj)
                     {
                         // Post

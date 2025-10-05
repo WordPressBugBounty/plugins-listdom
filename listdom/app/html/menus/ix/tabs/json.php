@@ -33,7 +33,7 @@ defined('ABSPATH') || die();
                                 'id' => 'lsd_ix_listdom_import_file',
                                 'name' => 'ix[file]',
                             ]); ?>
-                            <label for="lsd_ix_listdom_import_file_input" class="lsd-neutral-button lsd-json-import-choose-file lsd-w-max"><?php echo esc_html__('Choose File', 'listdom-jobs'); ?></label>
+                            <label for="lsd_ix_listdom_import_file_input" class="lsd-neutral-button lsd-json-import-choose-file lsd-w-max"><?php echo esc_html__('Choose File', 'listdom'); ?></label>
                         </div>
                     </div>
                     <p class="lsd-util-hide lsd-m-0" id="lsd_ix_listdom_import_message"></p>
@@ -81,7 +81,7 @@ jQuery('#lsd_ix_listdom_import_file_input').on('change', function()
     $file.attr('disabled', 'disabled');
 
     // Loading
-    loading.start("<?php echo esc_js( __('Uploading', 'listdom') ); ?>");
+    loading.start("<?php echo esc_js( esc_html__('Uploading', 'listdom') ); ?>");
 
     jQuery.ajax(
     {
@@ -129,10 +129,10 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
     $button.removeClass('lsd-util-hide');
 
     // Loading Wrapper
-    const loading = (new ListdomButtonLoader($button));
-    loading.start("<?php echo esc_js( __('Importing', 'listdom') ); ?>");
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js(esc_html__('Importing', 'listdom')); ?>");
 
-    listdom_toastify("<?php echo esc_js(esc_attr__('Please wait ...', 'listdom')); ?>", 'lsd-in-progress');
+    listdom_toastify("<?php echo esc_js(esc_html__('Please wait ...', 'listdom')); ?>", 'lsd-in-progress');
     jQuery("#lsd_ix_listdom_import_message").addClass('lsd-util-hide');
 
     const data = jQuery(this).serialize();
@@ -167,7 +167,7 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
         {
             loading.stop();
             $button.addClass('lsd-util-hide');
-            listdom_toastify("<?php echo esc_js(esc_attr__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
+            listdom_toastify("<?php echo esc_js(esc_html__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
         }
     });
 });

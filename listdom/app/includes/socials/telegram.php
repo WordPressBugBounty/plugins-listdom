@@ -22,7 +22,7 @@ class LSD_Socials_Telegram extends LSD_Socials
 
     public function icon($url): string
     {
-        return '<a class="lsd-share-telegram" href="' . esc_url_raw($url) . '" target="_blank">
+        return '<a class="lsd-share-telegram" href="' . esc_url($url) . '" target="_blank">
             <i class="lsd-icon fab fa-telegram"></i>
         </a>';
     }

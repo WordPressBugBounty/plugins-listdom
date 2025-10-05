@@ -78,6 +78,21 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Save Profile
         add_action('wp_ajax_lsd_dashboard_profile_save', [$this, 'save_profile']);
         add_action('wp_ajax_nopriv_lsd_dashboard_profile_save', [$this, 'save_profile']);
+
+        add_filter('body_class', [$this, 'listdom_dashboard_class']);
+    }
+
+    public function listdom_dashboard_class($classes)
+    {
+        if (!is_array($classes)) $classes = [];
+
+        $dashboard_page_id   = LSD_Options::post_id('submission_page');
+        $add_listing_page_id = LSD_Options::post_id('add_listing_page');
+        $current_page_id     = (int) get_queried_object_id();
+
+        if ($current_page_id === $dashboard_page_id || $current_page_id === $add_listing_page_id) $classes[] = 'lsd-dashboard-page';
+
+        return $classes;
     }
 
     public function output($atts = [])
@@ -112,7 +127,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             if ($id > 0) $bar->add($id);
             else $bar->menu(
                 admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_LISTING),
-                __('Add Listing', 'listdom')
+                esc_html__('Add Listing', 'listdom')
             );
         }
 
@@ -122,7 +137,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Dashboard Settings in Listdom Bar
         $bar->menu(
             admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard'),
-            __('Dashboard Settings', 'listdom')
+            esc_html__('Dashboard Settings', 'listdom')
         );
 
         // Dashboard
@@ -428,6 +443,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $social = $lsd['sc'] ?? []; // Social
         $tax = isset($_POST['tax_input']) && is_array($_POST['tax_input']) ? $_POST['tax_input'] : [];
 
+        $consent = isset($lsd['privacy_consent']) ? sanitize_text_field($lsd['privacy_consent']) : '';
+        $consent_enabled = LSD_Privacy::is_consent_enabled('dashboard');
+        if ($consent_enabled && $consent !== '1') $this->response(['success' => 0, 'message' => LSD_Privacy::consent_required_text()]);
+        if (!$consent_enabled && isset($lsd['privacy_consent'])) unset($lsd['privacy_consent']);
+
         $post_title = isset($lsd['title']) ? sanitize_text_field($lsd['title']) : '';
         $post_content = $lsd['content'] ?? '';
         $post_excerpt = $lsd['excerpt'] ?? '';
@@ -502,8 +522,16 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 continue;
             }
 
-            if (is_array($value) && !count($value)) $errors[] = sprintf(esc_html__('At-least one value for %s field is required!', 'listdom'), strtolower($field['label']));
-            else if (!is_array($value) && trim((string) $value) === '') $errors[] = sprintf(esc_html__('%s field is required!', 'listdom'), $field['label']);
+            if (is_array($value) && !count($value)) $errors[] = sprintf(
+                /* translators: %s: Field label. */
+                esc_html__('At-least one value for %s field is required!', 'listdom'),
+                strtolower($field['label'])
+            );
+            else if (!is_array($value) && trim((string) $value) === '') $errors[] = sprintf(
+                /* translators: %s: Field label. */
+                esc_html__('%s field is required!', 'listdom'),
+                $field['label']
+            );
         }
 
         // Restrictions
@@ -512,7 +540,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Maximum Gallery Images
         if (trim($restrictions['max_gallery_images']) != '' && isset($lsd['gallery']) && is_array($lsd['gallery']) && count($lsd['gallery']) > $restrictions['max_gallery_images'])
         {
-            $errors[] = sprintf(esc_html__("You can only upload a maximum of %s gallery images. You've uploaded %s.", 'listdom'), $restrictions['max_gallery_images'], count($lsd['gallery']));
+            $errors[] = sprintf(
+                /* translators: 1: Allowed number of gallery images, 2: Number of uploaded images. */
+                esc_html__("You can only upload a maximum of %1\$s gallery images. You've uploaded %2\$s.", 'listdom'),
+                $restrictions['max_gallery_images'],
+                count($lsd['gallery'])
+            );
         }
 
         // Maximum Image Size
@@ -536,7 +569,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                     if ($file_size > $max_image_size_bytes)
                     {
                         $errors[] = sprintf(
-                            esc_html__("The image '%s' exceeds the maximum allowed size of %s KB. The image size is %s KB.", 'listdom'),
+                            /* translators: 1: Image file name, 2: Maximum allowed size in KB, 3: Current size in KB. */
+                            esc_html__("The image '%1\$s' exceeds the maximum allowed size of %2\$s KB. The image size is %3\$s KB.", 'listdom'),
                             esc_html($image_name),
                             $restrictions['max_upload_size'],
                             round($file_size / 1024) // Convert bytes to KB
@@ -547,15 +581,29 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         }
 
         // Description Length
-        if (trim($restrictions['description_length']) != '' && strlen(trim(strip_tags($post_content))) > $restrictions['description_length'])
+        if (trim($restrictions['description_length']) != '' && strlen(trim(wp_strip_all_tags($post_content))) > $restrictions['description_length'])
         {
-            $errors[] = sprintf(esc_html__("The maximum length for listing content is %s characters. You've written %s characters.", 'listdom'), $restrictions['description_length'], strlen(trim(strip_tags($post_content))));
+            $errors[] = sprintf(
+                /* translators: 1: Allowed character count, 2: Current character count. */
+                esc_html__("The maximum length for listing content is %1\$s characters. You've written %2\$s characters.", 'listdom'),
+                $restrictions['description_length'],
+                strlen(trim(wp_strip_all_tags($post_content)))
+            );
         }
 
+        $tags = isset($_POST['tags']) ?
+            (is_array($_POST['tags']) ? $_POST['tags'] : explode(',', $_POST['tags']))
+            : [];
+
         // Maximum Tags
-        if (trim($restrictions['max_tags']) != '' && $this->is_enabled('tags') && isset($_POST['tags']) && count(explode(',', $_POST['tags'])) > $restrictions['max_tags'])
+        if (trim($restrictions['max_tags']) != '' && $this->is_enabled('tags') && count($tags) > $restrictions['max_tags'])
         {
-            $errors[] = sprintf(esc_html__("The maximum allowed tags is %s tags. You've added %s tags.", 'listdom'), $restrictions['max_tags'], count(explode(',', $_POST['tags'])));
+            $errors[] = sprintf(
+                /* translators: 1: Maximum allowed tags, 2: Current tag count. */
+                esc_html__("The maximum allowed tags is %1\$s tags. You've added %2\$s tags.", 'listdom'),
+                $restrictions['max_tags'],
+                count(explode(',', $_POST['tags']))
+            );
         }
 
         // There are some Errors
@@ -649,7 +697,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $entity = new LSD_Entity_Listing($id);
         $entity->save($lsd);
 
-        if ($status == 'publish') $message = sprintf(esc_html__('The listing has been published. %s', 'listdom'), '<a href="' . get_permalink($id) . '" target="_blank">' . esc_html__('View Listing', 'listdom') . '</a>');
+        if ($status == 'publish') $message = sprintf(
+            /* translators: %s: Link to view the published listing. */
+            esc_html__('The listing has been published. %s', 'listdom'),
+            '<a href="' . get_permalink($id) . '" target="_blank">' . esc_html__('View Listing', 'listdom') . '</a>'
+        );
         else $message = esc_html__('The listing has been submitted. It will be reviewed as soon as possible.', 'listdom');
 
         // Trigger Event
@@ -669,6 +721,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         $user_id = get_current_user_id();
         if (!$user_id) $this->response(['success' => 0, 'message' => esc_html__('User not found!', 'listdom')]);
+
+        if (!current_user_can('edit_user', $user_id)) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to update this profile.', 'listdom')]);
 
         $lsd = $_POST['lsd'] ?? [];
 
@@ -732,7 +786,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             wp_set_password($lsd['password'], $user_id);
 
             // Success Message
-            echo json_encode(['success' => 1, 'message' => esc_html__('Password updated successfully! Please log in again.', 'listdom')], JSON_NUMERIC_CHECK);
+            echo wp_json_encode(['success' => 1, 'message' => esc_html__('Password updated successfully! Please log in again.', 'listdom')], JSON_NUMERIC_CHECK);
 
             // Force the user to re-login
             wp_destroy_current_session();
@@ -795,7 +849,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         {
             $this->response([
                 'success' => 0,
-                'message' => sprintf(esc_html__('The uploaded image exceeds the maximum allowed size of %s KB.', 'listdom'), $restrictions['max_upload_size']),
+                'message' => sprintf(
+                    /* translators: %s: Maximum allowed image size in kilobytes. */
+                    esc_html__('The uploaded image exceeds the maximum allowed size of %s KB.', 'listdom'),
+                    $restrictions['max_upload_size']
+                ),
             ]);
         }
 
@@ -906,7 +964,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             if ($max_size > 0 && $image['size'] > $max_size)
             {
                 $errors[] = sprintf(
-                    esc_html__("The image '%s' exceeds the maximum allowed size of %s KB. The image size is %s KB.", 'listdom'),
+                    /* translators: 1: Image file name, 2: Maximum allowed size in KB, 3: Current size in KB. */
+                    esc_html__("The image '%1\$s' exceeds the maximum allowed size of %2\$s KB. The image size is %3\$s KB.", 'listdom'),
                     $image_name,
                     $restrictions['max_upload_size'],
                     round($image['size'] / 1024)
@@ -921,6 +980,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             if (!in_array(strtolower($extension), $allowed))
             {
                 $errors[] = sprintf(
+                    /* translators: %s: Image file name. */
                     esc_html__("The image '%s' has an invalid extension. Only JPG, PNG, and WebP files are allowed.", 'listdom'),
                     $image_name
                 );

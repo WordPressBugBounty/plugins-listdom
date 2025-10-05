@@ -37,7 +37,7 @@ abstract class LSD_AI_Models_Google extends LSD_AI_Models_Base
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
-            'body' => json_encode($body),
+            'body' => wp_json_encode($body),
             'data_format' => 'body',
         ]);
 

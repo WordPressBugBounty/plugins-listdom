@@ -10,11 +10,25 @@ class LSD_Dummy extends LSD_Base
 
     public function dummy()
     {
+        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_dummy_data_form'))
+        {
+            $this->response(['success' => 0, 'message' => esc_html__('Security check failed.', 'listdom')]);
+        }
+
+        if (!current_user_can('manage_options'))
+        {
+            $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to perform this action.', 'listdom')]);
+        }
+
         // Include Needed Library
         if (!function_exists('post_exists')) require_once ABSPATH . 'wp-admin/includes/post.php';
 
         // Request
-        $dummy = $_POST['lsd']['dummy'] ?? [];
+        $dummy = isset($_POST['lsd']['dummy']) && is_array($_POST['lsd']['dummy'])
+            ? wp_unslash($_POST['lsd']['dummy'])
+            : [];
 
         $import_listings = isset($dummy['listings']) && $dummy['listings'];
         $import_categories = isset($dummy['categories']) && $dummy['categories'];
@@ -664,7 +678,11 @@ class LSD_Dummy extends LSD_Base
                 $post_id = $this->shortcode($shortcode['title'], $shortcode['meta']);
 
                 // Prepare associated page data
-                $page_title = sprintf(esc_html__('All Listings in %s Skin', 'listdom'), $shortcode['title']);
+                $page_title = sprintf(
+                    /* translators: %s: Shortcode skin title. */
+                    esc_html__('All Listings in %s Skin', 'listdom'),
+                    $shortcode['title']
+                );
                 $page_shortcode = '[listdom id="' . $post_id . '"]';
 
                 // Get or create page
@@ -706,7 +724,7 @@ class LSD_Dummy extends LSD_Base
                             ['name' => 'Bank'],
                         ],
                     ],
-                    'image' => 'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2020/09/bank.jpg',
+                    'image' => $this->lsd_asset_url('img/listings/bank.jpg'),
                     'meta' => [
                         'lsd_object_type' => 'marker',
                         'lsd_zoomlevel' => 6,
@@ -757,8 +775,8 @@ class LSD_Dummy extends LSD_Base
                         ],
                     ],
                     'gallery' => [
-                        'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2020/09/bank-interior.jpg',
-                        'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2020/09/bank-entrance.jpg',
+                        $this->lsd_asset_url('img/listings/bank-interior.webp'),
+                        $this->lsd_asset_url('img/listings/bank-entrance.webp'),
                     ],
                 ],
                 [
@@ -772,7 +790,7 @@ class LSD_Dummy extends LSD_Base
                             ['name' => 'Clinic'],
                         ],
                     ],
-                    'image' => 'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2020/10/business-2.jpg',
+                    'image' => $this->lsd_asset_url('img/listings/business-2.jpg'),
                     'meta' => [
                         'lsd_object_type' => 'marker',
                         'lsd_zoomlevel' => 5,
@@ -823,7 +841,7 @@ class LSD_Dummy extends LSD_Base
                         ],
                     ],
                     'gallery' => [
-                        'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2020/10/business-interior.jpg',
+                        $this->lsd_asset_url('img/listings/business-interior.webp'),
                     ],
                     'attributes' => [
                         [
@@ -845,7 +863,7 @@ class LSD_Dummy extends LSD_Base
                             ['name' => 'Restaurant'],
                         ],
                     ],
-                    'image' => 'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2023/11/pablo-merchan-montes-Orz90t6o0e4-unsplash.jpg',
+                    'image' => $this->lsd_asset_url('img/listings/pablo-merchan-montes-Orz90t6o0e4-unsplash.jpg'),
                     'meta' => [
                         'lsd_object_type' => 'marker',
                         'lsd_zoomlevel' => 4,
@@ -896,8 +914,8 @@ class LSD_Dummy extends LSD_Base
                         ],
                     ],
                     'gallery' => [
-                        'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2023/11/priscilla-du-preez-W3SEyZODn8U-unsplash.jpg',
-                        'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2023/11/pablo-merchan-montes-Orz90t6o0e4-unsplash.jpg',
+                        $this->lsd_asset_url('img/listings/priscilla-du-preez-W3SEyZODn8U-unsplash.jpg'),
+                        $this->lsd_asset_url('img/listings/pablo-merchan-montes-Orz90t6o0e4-unsplash.jpg'),
                     ],
                 ],
                 [
@@ -910,7 +928,7 @@ class LSD_Dummy extends LSD_Base
                             ['name' => 'Motivational Speaker'],
                         ],
                     ],
-                    'image' => 'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2024/09/pexels-chlsoekalaartist-1043474-copy.jpg',
+                    'image' => $this->lsd_asset_url('img/listings/pexels-chlsoekalaartist-1043474-copy.jpg'),
                     'meta' => [
                         'lsd_object_type' => 'marker',
                         'lsd_zoomlevel' => 1,
@@ -961,7 +979,7 @@ class LSD_Dummy extends LSD_Base
                         ],
                     ],
                     'gallery' => [
-                        'https://demo.webilia.com/listdom/wp-content/uploads/sites/2/2024/09/pexels-chlsoekalaartist-1043474-copy.jpg',
+                        $this->lsd_asset_url('img/listings/pexels-chlsoekalaartist-1043474-copy.jpg')
                     ],
                 ],
             ];

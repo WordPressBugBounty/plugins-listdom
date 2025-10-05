@@ -68,7 +68,7 @@ class LSD_Widgets_Shortcode extends WP_Widget
         }
         else
         {
-            echo '<p class="lsd-widget-row lsd-no-shortcodes"><a href="' . admin_url('edit.php?post_type=' . LSD_Base::PTYPE_SHORTCODE) . '">' . esc_html__('Please create some shortcodes first!') . '</a></p>';
+            echo '<p class="lsd-widget-row lsd-no-shortcodes"><a href="' . admin_url('edit.php?post_type=' . LSD_Base::PTYPE_SHORTCODE) . '">' . esc_html__('Please create some shortcodes first!', 'listdom') . '</a></p>';
         }
     }
 

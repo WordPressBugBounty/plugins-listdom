@@ -17,6 +17,7 @@ $type_labels = $this->get_download_labels();
 
         <?php if (!$grouped_addons): ?>
             <p><?php echo LSD_Main::alert(sprintf(
+                /* translators: %s: Link to the Listdom website. */
                 esc_html__('It seems there is a problem to get list of addons from Webilia server. Please try again later or check our website at %s', 'listdom'),
                 '<a href="https://listdom.net" target="_blank"><strong>listdom.net</strong></a>'
             ), 'warning'); ?></p>
@@ -78,6 +79,7 @@ $type_labels = $this->get_download_labels();
             <?php endforeach; ?>
 
             <p class="lsd-mt-5"><?php echo sprintf(
+                /* translators: %s: Support email address link. */
                 esc_html__('Not sure which addon is suitable for your need? You can always send us an email at %s', 'listdom'),
                 '<a href="mailto:hello@webilia.com"><strong>hello@webilia.com</strong></a>'
             ); ?></p>

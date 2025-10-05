@@ -7,9 +7,21 @@ defined('ABSPATH') || die();
 <div class="welcome-panel lsd-flex lsd-flex-col lsd-gap-4 lsd-flex-items-start lsd-flex-items-full-width">
     <?php if ($count = LSD_Activation::getLicenseActivationRequiredCount()): ?>
         <div class="lsd-alert lsd-warning lsd-p-4 lsd-my-0">
-            <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(esc_html__('%s of your installed products require activation. Please activate them as soon as possible using the license key you received upon purchase; otherwise, the functionality will cease.', 'listdom'), '<strong>(' . $count . ')</strong>'); ?></p>
-            <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(esc_html__("If you have misplaced your license key or are unable to locate it, please don't hesitate to contact %s. We are here to assist you.", 'listdom'), '<strong><a href="' . LSD_Base::getSupportURL() . '" target="_blank">' . esc_html__('Webilia Support', 'listdom') . '</a></strong>'); ?></p>
-            <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(esc_html__("If, for any reason, you do not have a license key, you can obtain one from the %s.", 'listdom'), '<strong><a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank">' . esc_html__('Webilia Website', 'listdom') . '</a></strong>'); ?></p>
+            <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(
+                /* translators: %s: Number of products that still need activation (HTML wrapped). */
+                esc_html__('%s of your installed products require activation. Please activate them as soon as possible using the license key you received upon purchase; otherwise, the functionality will cease.', 'listdom'),
+                '<strong>(' . $count . ')</strong>'
+            ); ?></p>
+            <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(
+                /* translators: %s: Support link HTML. */
+                esc_html__("If you have misplaced your license key or are unable to locate it, please don't hesitate to contact %s. We are here to assist you.", 'listdom'),
+                '<strong><a href="' . LSD_Base::getSupportURL() . '" target="_blank">' . esc_html__('Webilia Support', 'listdom') . '</a></strong>'
+            ); ?></p>
+            <p class="lsd-mt-0 lsd-mb-1"><?php echo sprintf(
+                /* translators: %s: Link to the Webilia store. */
+                esc_html__("If, for any reason, you do not have a license key, you can obtain one from the %s.", 'listdom'),
+                '<strong><a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank">' . esc_html__('Webilia Website', 'listdom') . '</a></strong>'
+            ); ?></p>
         </div>
     <?php endif; ?>
 
@@ -25,7 +37,7 @@ defined('ABSPATH') || die();
                     <span><?php esc_html_e('Publish a Listing', 'listdom'); ?></span>
                     <i class="listdom-icon lsdi-right-arrow"></i>
                 </a>
-                <a class="lsd-text-button" href="<?php echo esc_url_raw(LSD_Base::getListdomWelcomeWizardUrl()); ?>">
+                <a class="lsd-text-button" href="<?php echo esc_url(LSD_Base::getListdomWelcomeWizardUrl()); ?>">
                     <span><?php esc_html_e('Start Welcome Wizard', 'listdom'); ?></span>
                     <i class="listdom-icon lsdi-wizard"></i>
                 </a>
@@ -34,10 +46,10 @@ defined('ABSPATH') || die();
 
         <div class="welcome-video">
             <iframe width="640" height="360"
-                    src="https://www.youtube-nocookie.com/embed/du_96cv6BAw?si=E1LwDdzdgdZNXpkw"
-                    title="YouTube video player" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                src="https://www.youtube-nocookie.com/embed/du_96cv6BAw?si=E1LwDdzdgdZNXpkw"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
     </div>
 
@@ -69,7 +81,6 @@ defined('ABSPATH') || die();
                     <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_FEATURE . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-neutral-button">
                         <i class="listdom-icon lsdi-add-plus"></i>
                         <?php esc_html_e('Add a Feature', 'listdom'); ?>
-
                     </a>
                 </li>
                 <li>
@@ -155,13 +166,13 @@ defined('ABSPATH') || die();
 
     <div class="lsd-welcome-bottom-big-banner">
         <div class="lsd-banner">
-            <img class="lsd-icon" src="<?php echo esc_url_raw($this->lsd_asset_url('img/dashboard/listdom-mobile.png')); ?>" alt="">
+            <img class="lsd-icon" src="<?php echo esc_url($this->lsd_asset_url('img/dashboard/listdom-mobile.png')); ?>" alt="">
             <div class="lsd-banner-right-side">
                 <div>
                     <span class="lsd-admin-title"><?php esc_html_e('Get Your Directory Mobile App', 'listdom'); ?></span>
                     <p class="lsd-m-0"><?php esc_html_e('Bring your directory to users’ fingertips with the Listdom Mobile App. Browse listings, contact authors, get directions, and receive real-time updates. All from an intuitive, fast, and fully customizable mobile experience for Android and iOS.', 'listdom'); ?></p>
                 </div>
-                <a class="lsd-primary-button" href="<?php echo esc_url_raw(LSD_Base::getMobileApp()); ?>" target="_blank">
+                <a class="lsd-primary-button" href="<?php echo esc_url(LSD_Base::getMobileApp()); ?>" target="_blank">
                     <span><?php esc_html_e('Show Me the Features', 'listdom'); ?></span>
                     <i class="listdom-icon lsdi-right-arrow"></i>
                 </a>
@@ -172,22 +183,22 @@ defined('ABSPATH') || die();
     <div class="lsd-welcome-bottom">
         <div class="lsd-docs-problem">
             <div class="lsd-welcome-panel-container lsd-documentation">
-                <img class="lsd-icon" src="<?php echo esc_url_raw($this->lsd_asset_url('img/dashboard/search.png')); ?>" alt="">
+                <img class="lsd-icon" src="<?php echo esc_url($this->lsd_asset_url('img/dashboard/search.png')); ?>" alt="">
                 <div>
                     <span class="lsd-admin-title"><?php esc_html_e('Documentation', 'listdom'); ?></span>
                     <p class="lsd-m-0"><?php esc_html_e('Discover everything in Listdom’s documentation', 'listdom'); ?></p>
-                    <a class="lsd-neutral-button" href="<?php echo esc_url_raw(LSD_Base::getListdomDocsURL()); ?>" target="_blank">
+                    <a class="lsd-neutral-button" href="<?php echo esc_url(LSD_Base::getListdomDocsURL()); ?>" target="_blank">
                         <span><?php esc_html_e('Documentation', 'listdom'); ?></span>
                         <i class="listdom-icon lsdi-right-arrow"></i>
                     </a>
                 </div>
             </div>
             <div class="lsd-welcome-panel-container lsd-problem">
-                <img class="lsd-icon" src="<?php echo esc_url_raw($this->lsd_asset_url('img/dashboard/support.png')); ?>" alt="">
+                <img class="lsd-icon" src="<?php echo esc_url($this->lsd_asset_url('img/dashboard/support.png')); ?>" alt="">
                 <div>
                     <span class="lsd-admin-title"><?php esc_html_e('Have Problems?', 'listdom'); ?></span>
                     <p class="lsd-m-0"><?php esc_html_e('Visit our support center for help with Listdom.', 'listdom'); ?></p>
-                    <a class="lsd-neutral-button" href="<?php echo esc_url_raw(LSD_Base::getSupportURL()); ?>" target="_blank">
+                    <a class="lsd-neutral-button" href="<?php echo esc_url(LSD_Base::getSupportURL()); ?>" target="_blank">
                         <span><?php esc_html_e('Support', 'listdom'); ?></span>
                         <i class="listdom-icon lsdi-right-arrow"></i>
                     </a>
@@ -206,7 +217,7 @@ defined('ABSPATH') || die();
     <div class="lsd-welcome-bottom-banner">
         <div class="lsd-banner">
             <div class="lsd-banner-right-side">
-                <img class="lsd-icon" src="<?php echo esc_url_raw($this->lsd_asset_url('img/dashboard/vertex.png')); ?>" alt="">
+                <img class="lsd-icon" src="<?php echo esc_url($this->lsd_asset_url('img/dashboard/vertex.png')); ?>" alt="">
                 <div>
                     <span class="lsd-admin-title"><?php esc_html_e('Working with Elementor?', 'listdom'); ?></span>
                     <p class="lsd-m-0"><?php esc_html_e('Try using the Vertex addons for Elementor. A new plugin developed by Webilia.', 'listdom'); ?></p>

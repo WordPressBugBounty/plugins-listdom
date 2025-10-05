@@ -35,8 +35,8 @@ class LSD_Menus_Settings extends LSD_Menus
     public function output()
     {
         // Get the current tab
-        $this->tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
-        $this->subtab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : $this->get_default_subtab();
+        $this->tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : 'general';
+        $this->subtab = isset($_GET['subtab']) ? sanitize_text_field(wp_unslash($_GET['subtab'])) : $this->get_default_subtab();
 
         // Generate output
         $this->include_html_file('menus/settings/tpl.php');
@@ -47,6 +47,7 @@ class LSD_Menus_Settings extends LSD_Menus
         if ($this->tab === 'frontend-dashboard') return 'pages';
         if ($this->tab === 'auth') return 'authentication';
         if ($this->tab === 'advanced') return 'assets-loading';
+        if ($this->tab === 'single-listing') return 'style-elements';
 
         return 'general';
     }
@@ -55,7 +56,7 @@ class LSD_Menus_Settings extends LSD_Menus
     public function addons_tab(): string
     {
         [$addons, $default] = $this->get_addons_default();
-        $subtab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : $default;
+        $subtab = isset($_GET['subtab']) ? sanitize_text_field(wp_unslash($_GET['subtab'])) : $default;
 
         $output = '';
         foreach ($addons as $key => $addon)
@@ -66,7 +67,7 @@ class LSD_Menus_Settings extends LSD_Menus
             $name = ucwords(strtolower($addon['name']));
 
             $output .= '<li class="lsd-nav-tab ' . esc_attr($key === $subtab ? 'lsd-nav-tab-active' : '') . '" data-key="' . esc_attr($key) . '">';
-            $output .= esc_html__($name, 'listdom-'. $key);
+            $output .= esc_html($name);
             $output .= '</li>';
         }
 
@@ -86,7 +87,7 @@ class LSD_Menus_Settings extends LSD_Menus
 
     public function check_access(string $action = 'lsd_settings_form', string $capability = 'manage_options')
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field($_POST['_wpnonce']) : '';
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
 
         // Check if nonce is not set
         if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
@@ -104,10 +105,8 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access();
 
         // Get Listdom options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Separate social settings
         $social_settings = array_filter($lsd, function ($key)
@@ -150,10 +149,8 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access();
 
         // Get Listdom options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Save Styles
         LSD_Options::merge('lsd_styles', $lsd);
@@ -177,14 +174,8 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access();
 
         // Get Listdom options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, function (&$value)
-        {
-            $value = stripslashes($value);
-            $value = sanitize_text_field($value);
-        });
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Get current Listdom options
         $current = get_option('lsd_settings', []);
@@ -212,14 +203,8 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access();
 
         // Get Listdom options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, function (&$value)
-        {
-            $value = stripslashes($value);
-            $value = sanitize_text_field($value);
-        });
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Get current options
         $current = get_option('lsd_customizer', []);
@@ -244,7 +229,7 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access();
 
         // Get Listdom options
-        $category = $_POST['category'] ?? '';
+        $category = isset($_POST['category']) ? sanitize_text_field(wp_unslash($_POST['category'])) : '';
 
         // Reset Only a Category
         if ($category)
@@ -296,18 +281,19 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access();
 
         // Get Listdom options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         $pattern = '';
-        foreach ($lsd['elements'] as $key => $element)
+        if (isset($lsd['elements']) && is_array($lsd['elements']))
         {
             // Element is disabled
-            if (!isset($element['enabled']) || !$element['enabled']) continue;
+            foreach ($lsd['elements'] as $key => $element)
+            {
+                if (!isset($element['enabled']) || !$element['enabled']) continue;
 
-            $pattern .= '{' . $key . '}';
+                $pattern .= '{' . $key . '}';
+            }
         }
 
         // Save single listing pattern
@@ -326,10 +312,8 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access('lsd_addons_form');
 
         // Get Listdom options
-        $lsd = $_POST['addons'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['addons']) ? wp_unslash($_POST['addons']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Save options
         update_option('lsd_addons', $lsd);
@@ -362,10 +346,10 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access('lsd_api_remove_token');
 
         // Index
-        $i = $_POST['i'] ?? '';
+        $i = isset($_POST['i']) ? sanitize_text_field(wp_unslash($_POST['i'])) : '';
 
         // Invalid Index
-        if (trim($i) === '') $this->response(['success' => 0, 'code' => 'INVALID_INDEX']);
+        if ($i === '') $this->response(['success' => 0, 'code' => 'INVALID_INDEX']);
 
         // Get API Options
         $api = LSD_Options::api();
@@ -386,10 +370,8 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access('lsd_api_form');
 
         // Get API options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Save options
         update_option('lsd_api', $lsd);
@@ -427,10 +409,10 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access('lsd_ai_remove_profile');
 
         // Index
-        $i = $_POST['i'] ?? '';
+        $i = isset($_POST['i']) ? sanitize_text_field(wp_unslash($_POST['i'])) : '';
 
         // Invalid Index
-        if (trim($i) === '') $this->response(['success' => 0, 'code' => 'INVALID_INDEX']);
+        if ($i === '') $this->response(['success' => 0, 'code' => 'INVALID_INDEX']);
 
         // Get AI Options
         $ai = LSD_Options::ai();
@@ -451,10 +433,8 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access('lsd_ai_form');
 
         // Get AI options
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Save options
         update_option('lsd_ai', $lsd);
@@ -469,19 +449,15 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->check_access('lsd_auth_form');
 
         // Get Auth
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
         // Save Auth
         update_option('lsd_auth', $lsd);
 
         // Get Settings
-        $settings = $_POST['settings'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($settings, 'sanitize_text_field');
+        $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : [];
+        $settings = is_array($settings) ? LSD_Sanitize::deep($settings) : [];
 
         // Save Settings
         LSD_Options::merge('lsd_settings', $settings);

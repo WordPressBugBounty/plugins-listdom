@@ -22,23 +22,41 @@ class LSD_Author extends LSD_Base
         // No Access
         if (!current_user_can('edit_user', $user_id)) return false;
 
+        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'update-user_' . $user_id)) return false;
+
         // Job Title
-        update_user_meta($user_id, 'lsd_job_title', sanitize_text_field($_POST['lsd_job_title']));
+        update_user_meta($user_id, 'lsd_job_title', isset($_POST['lsd_job_title'])
+            ? sanitize_text_field(wp_unslash($_POST['lsd_job_title']))
+            : ''
+        );
 
         // Save Social Networks
         do_action('lsd_social_networks_profile_save', $user_id);
 
         // Phone
-        update_user_meta($user_id, 'lsd_phone', sanitize_text_field($_POST['lsd_phone']));
+        update_user_meta($user_id, 'lsd_phone', isset($_POST['lsd_phone'])
+            ? sanitize_text_field(wp_unslash($_POST['lsd_phone']))
+            : ''
+        );
 
         // Mobile
-        update_user_meta($user_id, 'lsd_mobile', sanitize_text_field($_POST['lsd_mobile']));
+        update_user_meta($user_id, 'lsd_mobile', isset($_POST['lsd_mobile'])
+            ? sanitize_text_field(wp_unslash($_POST['lsd_mobile']))
+            : ''
+        );
 
         // Website
-        update_user_meta($user_id, 'lsd_website', sanitize_text_field($_POST['lsd_website']));
+        update_user_meta($user_id, 'lsd_website', isset($_POST['lsd_website'])
+            ? sanitize_text_field(wp_unslash($_POST['lsd_website']))
+            : ''
+        );
 
         // Fax
-        update_user_meta($user_id, 'lsd_fax', sanitize_text_field($_POST['lsd_fax']));
+        update_user_meta($user_id, 'lsd_fax', isset($_POST['lsd_fax'])
+            ? sanitize_text_field(wp_unslash($_POST['lsd_fax']))
+            : ''
+        );
 
         return true;
     }

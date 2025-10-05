@@ -39,11 +39,14 @@ if (!is_array($raw)) $raw = [];
 
             $editor = get_term_meta($attribute->term_id, 'lsd_editor', true);
             if (trim($editor) === '') $editor = 0;
+
+            $meta_value = get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true);
             ?>
             <div class="lsd-form-row lsd-category-specific lsd-attribute-type-<?php echo esc_attr($type); ?>  <?php echo esc_attr(trim($categories_class)); ?>" id="lsd_attribute_<?php echo esc_attr($attribute->term_id); ?>">
                 <div class="lsd-col-2 lsd-label-col">
                     <?php if ($type !== 'separator'): ?>
                         <?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
                             'for' => 'lsd_listing_attributes' . $attribute->term_id,
                             'title' => $attribute->name,
                             'required' => $required
@@ -58,14 +61,14 @@ if (!is_array($raw)) $raw = [];
                         'options' => $options,
                         'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'required' => $required,
-                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true),
+                        'value' => $meta_value,
                         'attributes' => [
                             'data-required' => $data_required,
                         ],
                     ]);
                     else if ($type === 'radio' && count($options))
                     {
-                        $saved_value = trim((string) get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true));
+                        $saved_value = trim((string) $meta_value);
 
                         echo '<div class="lsd-attribute-radio" data-required-message="' . esc_attr__('Please select at least one option.', 'listdom') . '" data-required="' . esc_attr($required) . '">';
 
@@ -87,6 +90,7 @@ if (!is_array($raw)) $raw = [];
                                 'attributes' => $attributes,
                             ], 'radio');
                             echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
                                 'for' => 'lsd_listing_attributes_' . $attribute->term_id . $r,
                                 'title' => $option,
                             ]);
@@ -96,7 +100,7 @@ if (!is_array($raw)) $raw = [];
                     }
                     else if ($type === 'checkbox' && count($options))
                     {
-                        $saved_values = get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true) ?? [];
+                        $saved_values = $meta_value ?? [];
                         if (!is_array($saved_values)) $saved_values = array_map('trim', explode(',', $saved_values));
 
                         echo '<div class="lsd-attribute-checkbox" data-required-message="' . esc_attr__('Please select at least one option.', 'listdom') . '" data-required="' . esc_attr($required) . '">';
@@ -117,6 +121,7 @@ if (!is_array($raw)) $raw = [];
                                 'attributes' => $attributes,
                             ]);
                             echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
                                 'for' => 'lsd_listing_attributes_' . $attribute->term_id . $c,
                                 'title' => $option,
                             ]);
@@ -129,7 +134,7 @@ if (!is_array($raw)) $raw = [];
                         'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'required' => $required,
                         'rows' => 8,
-                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true),
+                        'value' => $meta_value,
                         'attributes' => [
                             'data-required' => $data_required,
                         ],
@@ -145,7 +150,7 @@ if (!is_array($raw)) $raw = [];
                         echo LSD_Form::imagepicker([
                             'id' => 'lsd_listing_attributes' . $attribute->term_id,
                             'name' => 'lsd[attributes][' . $attribute->slug . ']',
-                            'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true),
+                            'value' => $meta_value,
                             'required' => $required,
                         ]);
                         echo '</div>';
@@ -154,19 +159,24 @@ if (!is_array($raw)) $raw = [];
                     {
                         echo '<h3>' . esc_html($attribute->name) . '</h3>';
                     }
-                    else echo LSD_Form::input([
-                        'id' => 'lsd_listing_attributes' . $attribute->term_id,
-                        'name' => 'lsd[attributes][' . $attribute->slug . ']',
-                        'required' => $required,
-                        'value' => get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true),
-                        'attributes' => [
-                            'data-required' => $data_required,
-                        ],
-                    ], $type);
+                    else
+                    {
+                        $value = is_string($meta_value) ? $meta_value : '';
+                        if ($type === 'datetime') $value = str_replace(' ', 'T', trim($value));
+
+                        echo LSD_Form::input([
+                            'id' => 'lsd_listing_attributes' . $attribute->term_id,
+                            'name' => 'lsd[attributes][' . $attribute->slug . ']',
+                            'required' => $required,
+                            'value' => $value,
+                            'attributes' => [
+                                'data-required' => $data_required,
+                            ],
+                        ], $type === 'datetime' ? 'datetime-local' : $type);
+                    }
                     ?>
                 </div>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
-

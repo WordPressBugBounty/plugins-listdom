@@ -30,7 +30,7 @@ class LSD_Element_Breadcrumb extends LSD_Element
     protected function general_settings(array $data): string
     {
         return '<div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_icon">' . esc_html__('Show Home Icon', 'listdom') . '</label>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_icon">' . esc_html__('Show Home Icon', 'listdom') . '</label>
             ' . LSD_Form::switcher([
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_icon',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][icon]',
@@ -38,8 +38,9 @@ class LSD_Element_Breadcrumb extends LSD_Element
             ]) . '
         </div>
         <div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_taxonomy">' . esc_html__('Second Layer', 'listdom') . '</label>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_taxonomy">' . esc_html__('Second Layer', 'listdom') . '</label>
             ' . LSD_Form::select([
+                'class' => 'lsd-admin-input',
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_taxonomy',
                 'name' => 'lsd[elements][' . esc_attr($this->key) . '][taxonomy]',
                 'value' => $data['taxonomy'] ?? 'category',

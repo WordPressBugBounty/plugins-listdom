@@ -72,7 +72,7 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
                     <span class="lsd-contact-info-label"><?php esc_html_e('Website', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
                 <?php endif; ?>
                 <span <?php echo lsd_schema()->url(); ?>>
-                    <a href="<?php echo esc_url_raw($website); ?>"
+                    <a href="<?php echo esc_url($website); ?>"
                        target="_blank"><?php echo esc_html(LSD_Base::remove_protocols($website)); ?></a>
                 </span>
             </li>

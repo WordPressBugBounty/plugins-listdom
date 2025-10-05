@@ -35,7 +35,7 @@ $bcc = get_post_meta($post->ID, 'lsd_bcc', true);
                 <?php echo LSD_Form::textarea([
                     'id' => 'lsd_notification_recipients_to',
                     'name' => 'lsd[to]',
-                    'placeholder' => esc_html__('Comma separated emails ...', 'listdom'),
+                    'placeholder' => esc_attr__('Comma separated emails ...', 'listdom'),
                     'value' => $to,
                 ]); ?>
             </div>
@@ -50,7 +50,7 @@ $bcc = get_post_meta($post->ID, 'lsd_bcc', true);
             <?php echo LSD_Form::textarea([
                 'id' => 'lsd_notification_recipients_cc',
                 'name' => 'lsd[cc]',
-                'placeholder' => esc_html__('Comma separated emails ...', 'listdom'),
+                'placeholder' => esc_attr__('Comma separated emails ...', 'listdom'),
                 'value' => $cc,
             ]); ?>
         </div>
@@ -64,7 +64,7 @@ $bcc = get_post_meta($post->ID, 'lsd_bcc', true);
             <?php echo LSD_Form::textarea([
                 'id' => 'lsd_notification_recipients_bcc',
                 'name' => 'lsd[bcc]',
-                'placeholder' => esc_html__('Comma separated emails ...', 'listdom'),
+                'placeholder' => esc_attr__('Comma separated emails ...', 'listdom'),
                 'value' => $bcc,
             ]); ?>
         </div>

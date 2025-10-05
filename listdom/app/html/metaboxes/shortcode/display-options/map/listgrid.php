@@ -32,7 +32,7 @@ $listgrid = $options['listgrid'] ?? [];
             </div>
         </div>
 
-        <div class="lsd-form-group lsd_display_options_skin_listgrid_map_options lsd-form-row-map-needed lsd-p-0 lsd-m-0 <?php echo isset($listgrid['map_provider']) && $listgrid['map_provider'] ? '' : 'lsd-util-hide'; ?>">
+        <div class="lsd-settings-fields-sub-wrapper lsd-form-group lsd_display_options_skin_listgrid_map_options lsd-form-row-map-needed lsd-p-0 lsd-m-0 <?php echo isset($listgrid['map_provider']) && $listgrid['map_provider'] ? '' : 'lsd-util-hide'; ?>">
             <div class="lsd-form-row">
                 <div class="lsd-col-3"><?php echo LSD_Form::label([
                         'class' => 'lsd-fields-label',

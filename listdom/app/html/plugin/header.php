@@ -11,7 +11,7 @@ defined('ABSPATH') || die();
 <div class="lsd-dashboard-top-bar">
     <div class="lsd-logo-section">
         <a href="<?php echo esc_url($url ?: admin_url('admin.php?page=' . $page)); ?>">
-            <img class="lsd-logo" alt="<?php esc_attr__('logo', 'listdom') ?>" src="<?php echo esc_url_raw($this->lsd_asset_url('img/listdom-logo.svg')); ?>">
+            <img class="lsd-logo" alt="<?php esc_attr__('logo', 'listdom') ?>" src="<?php echo esc_url($this->lsd_asset_url('img/listdom-logo.svg')); ?>">
             <span><?php echo LSD_Kses::element($title); ?></span>
         </a>
     </div>

@@ -32,11 +32,15 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
             $valid_styles = '';
             foreach ($this->valid_styles as $valid_style) $valid_styles .= '<strong>' . esc_html($valid_style) . '</strong>, ';
 
-            return $this->alert(sprintf(esc_html__('Style is invalid! Valid styles are: %s', 'listdom'), trim($valid_styles, ', ')), 'warning');
+            return $this->alert(sprintf(
+                /* translators: %s: Comma-separated list of allowed styles. */
+                esc_html__('Style is invalid! Valid styles are: %s', 'listdom'),
+                trim($valid_styles, ', ')
+            ), 'warning');
         }
 
         // Unique ID
-        $this->id = LSD_id::get(mt_rand(1000, 9999));
+        $this->id = LSD_id::get(wp_rand(1000, 9999));
 
         // Hierarchical
         $this->hierarchical = isset($this->atts['hierarchical']) && $this->atts['hierarchical'];
@@ -110,7 +114,9 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         $args['number'] = $this->atts['limit'] ?? 8;
 
         // Get the terms
-        return get_terms($this->TX, $args);
+        return get_terms(
+            array_merge(['taxonomy' => $this->TX], $args)
+        );
     }
 
     public function image(): string

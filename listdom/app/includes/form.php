@@ -150,7 +150,7 @@ class LSD_Form extends LSD_Base
         }
 
         $required = isset($args['required']) && $args['required'];
-        return '<textarea name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" placeholder="' . (isset($args['placeholder']) ? esc_attr($args['placeholder']) : '') . '" rows="' . (isset($args['rows']) ? esc_attr($args['rows']) : '') . '" ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '>' . (isset($args['value']) ? esc_textarea(stripslashes($args['value'])) : '') . '</textarea>';
+        return '<textarea class="' . (isset($args['class']) ? esc_attr($args['class']) : '') .'" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" placeholder="' . (isset($args['placeholder']) ? esc_attr($args['placeholder']) : '') . '" rows="' . (isset($args['rows']) ? esc_attr($args['rows']) : '') . '" ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '>' . (isset($args['value']) ? esc_textarea(stripslashes($args['value'])) : '') . '</textarea>';
     }
 
     public static function editor($args = [])
@@ -234,11 +234,13 @@ class LSD_Form extends LSD_Base
 
         $required = isset($args['required']) && $args['required'];
 
+        $class = isset($args['class']) ? ' ' . esc_attr($args['class']) : ' button';
+
         return '<div>
             <div id="' . esc_attr($args['id']) . '_img" class="lsd-imagepicker-image-placeholder lsd-mb-2">' . (trim($image) ? $image : '') . '</div>
             <input type="hidden" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" value="' . esc_attr($image_id) . '"' . $attributes . ($required ? ' required' : '') . '>
-            <button type="button" class="lsd-choose-file lsd-select-image-button button ' . ($image_id ? 'lsd-util-hide' : '') . '" id="' . esc_attr($args['id']) . '_button" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Upload/Select image', 'listdom') . '</button>
-            <button type="button" class="lsd-choose-file lsd-remove-image-button button ' . ($image_id ? '' : 'lsd-util-hide') . '" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Remove image', 'listdom') . '</button>
+            <button type="button" class="lsd-choose-file lsd-select-image-button lsd-w-auto lsd-neutral-button lsd-light-button ' . ($image_id ? 'lsd-util-hide' : '') . '" id="' . esc_attr($args['id']) . '_button" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Upload/Select image', 'listdom') . '</button>
+            <button type="button" class="lsd-choose-file lsd-remove-image-button lsd-w-auto lsd-neutral-button lsd-light-button ' . ($image_id ? '' : 'lsd-util-hide') . '" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Remove image', 'listdom') . '</button>
         </div>';
     }
 
@@ -302,7 +304,19 @@ class LSD_Form extends LSD_Base
             $query['meta_query'] = [
                 [
                     'key' => 'lsd_skin',
-                    'value' => ['list', 'grid', 'halfmap', 'listgrid', 'masonry', 'singlemap', 'table', 'side', 'mosaic', 'accordion'],
+                    'value' => ['list', 'grid', 'halfmap', 'listgrid', 'masonry', 'singlemap', 'table', 'side', 'mosaic', 'accordion', 'timeline'],
+                    'compare' => 'IN',
+                ],
+            ];
+        }
+
+        // Show Custom Skins
+        if (!empty($args['skins']) && is_array($args['skins']))
+        {
+            $query['meta_query'] = [
+                [
+                    'key'     => 'lsd_skin',
+                    'value'   => $args['skins'],
                     'compare' => 'IN',
                 ],
             ];
@@ -577,7 +591,7 @@ class LSD_Form extends LSD_Base
             else
             {
                 $post = get_post($value);
-                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $post->ID . '" data-lsd-tooltip="' . esc_attr__('Click twice to delete', 'listdom') . '">' . $post->post_title . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($post->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $post->ID . '"></span>';
+                if ($post instanceof WP_Post) $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $post->ID . '" data-lsd-tooltip="' . esc_attr__('Click twice to delete', 'listdom') . '">' . $post->post_title . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($post->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $post->ID . '"></span>';
             }
         }
 
@@ -628,10 +642,26 @@ class LSD_Form extends LSD_Base
             $label = sprintf("%02d", $h);
             if ($method === 12)
             {
-                if ($h === 0) $label = sprintf(__('%d AM', 'listdom'), 12);
-                else if ($h >= 1 && $h <= 11) $label = sprintf(__('%d AM', 'listdom'), $h);
-                else if ($h === 12) $label = sprintf(__('%d PM', 'listdom'), 12);
-                else if ($h >= 13) $label = sprintf(__('%d PM', 'listdom'), ($h - 12));
+                if ($h === 0) $label = sprintf(
+                    /* translators: %d: Hour formatted for 12-hour clock. */
+                    esc_html__('%1$d AM', 'listdom'),
+                    12
+                );
+                else if ($h >= 1 && $h <= 11) $label = sprintf(
+                    /* translators: %d: Hour formatted for 12-hour clock. */
+                    esc_html__('%1$d AM', 'listdom'),
+                    $h
+                );
+                else if ($h === 12) $label = sprintf(
+                    /* translators: %d: Hour formatted for 12-hour clock. */
+                    esc_html__('%1$d PM', 'listdom'),
+                    12
+                );
+                else if ($h >= 13) $label = sprintf(
+                    /* translators: %d: Hour formatted for 12-hour clock. */
+                    esc_html__('%1$d PM', 'listdom'),
+                    ($h - 12)
+                );
             }
 
             $output .= '<option value="' . esc_attr($h) . '" ' . ($hour == $h ? 'selected="selected"' : '') . '>' . $label . '</option>';
@@ -806,16 +836,18 @@ class LSD_Form extends LSD_Base
         $value = isset($args['value']) && is_array($args['value']) ? $args['value'] : [];
 
         return '<div class="lsd-border-wrapper">
-            <div class="lsd-border-width-wrapper lsd-flex-3">
+            <div class="lsd-border-width-wrapper lsd-flex-2">
                 <div class="lsd-border-width-top">
                     '.LSD_Form::label([
-                        'title' => esc_html__('Border Top', 'listdom'),
+                        'class' => 'lsd-fields-label-tiny',
+                        'title' => esc_html__('Top', 'listdom'),
                         'for' => $id.'_top'
                     ]).'
                     '.LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => $id.'_top',
                         'name' => $name.'[top]',
-                        'placeholder' => esc_html__('Top', 'listdom'),
+                        'placeholder' => esc_attr__('Top', 'listdom'),
                         'attributes' => [
                             'min' => 0,
                             'max' => 10,
@@ -826,13 +858,15 @@ class LSD_Form extends LSD_Base
                 </div>
                 <div class="lsd-border-width-right">
                     '.LSD_Form::label([
-                        'title' => esc_html__('Border Right', 'listdom'),
+                        'class' => 'lsd-fields-label-tiny',
+                        'title' => esc_html__('Right', 'listdom'),
                         'for' => $id.'_right'
                     ]).'
                     '.LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => $id.'_right',
                         'name' => $name.'[right]',
-                        'placeholder' => esc_html__('Right', 'listdom'),
+                        'placeholder' => esc_attr__('Right', 'listdom'),
                         'attributes' => [
                             'min' => 0,
                             'max' => 10,
@@ -843,13 +877,15 @@ class LSD_Form extends LSD_Base
                 </div>
                 <div class="lsd-border-width-bottom">
                     '.LSD_Form::label([
-                        'title' => esc_html__('Border Bottom', 'listdom'),
+                        'class' => 'lsd-fields-label-tiny',
+                        'title' => esc_html__('Bottom', 'listdom'),
                         'for' => $id.'_bottom'
                     ]).'
                     '.LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => $id.'_bottom',
                         'name' => $name.'[bottom]',
-                        'placeholder' => esc_html__('Bottom', 'listdom'),
+                        'placeholder' => esc_attr__('Bottom', 'listdom'),
                         'attributes' => [
                             'min' => 0,
                             'max' => 10,
@@ -860,13 +896,15 @@ class LSD_Form extends LSD_Base
                 </div>
                 <div class="lsd-border-width-left">
                     '.LSD_Form::label([
-                        'title' => esc_html__('Border Left', 'listdom'),
+                        'class' => 'lsd-fields-label-tiny',
+                        'title' => esc_html__('Left', 'listdom'),
                         'for' => $id.'_left'
                     ]).'
                     '.LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => $id.'_left',
                         'name' => $name.'[left]',
-                        'placeholder' => esc_html__('Left', 'listdom'),
+                        'placeholder' => esc_attr__('Left', 'listdom'),
                         'attributes' => [
                             'min' => 0,
                             'max' => 10,
@@ -876,26 +914,17 @@ class LSD_Form extends LSD_Base
                     ]).'
                 </div>
             </div>
-            <div class="lsd-border-color-wrapper lsd-flex-1">
-                '.LSD_Form::label([
-                    'title' => esc_html__('Border Color', 'listdom'),
-                    'for' => $id.'_color'
-                ]).'
-                '.LSD_Form::colorpicker([
-                    'id' => $id.'_color',
-                    'name' => $name.'[color]',
-                    'value' => $value['color'] ?? ''
-                ]).'
-            </div>
             <div class="lsd-border-radius-wrapper lsd-flex-1">
                 '.LSD_Form::label([
+                    'class' => 'lsd-fields-label-tiny',
                     'title' => esc_html__('Border Radius', 'listdom'),
                     'for' => $id.'_radius'
                 ]).'
                 '.LSD_Form::number([
+                    'class' => 'lsd-admin-input',
                     'id' => $id.'_radius',
                     'name' => $name.'[radius]',
-                    'placeholder' => esc_html__('Radius', 'listdom'),
+                    'placeholder' => esc_attr__('Radius', 'listdom'),
                     'attributes' => [
                         'min' => 0,
                         'max' => 50,
@@ -906,10 +935,12 @@ class LSD_Form extends LSD_Base
             </div>
             <div class="lsd-border-style-wrapper lsd-flex-1">
                 '.LSD_Form::label([
-                    'title' => esc_html__('Border Style', 'listdom'),
+                    'class' => 'lsd-fields-label-tiny',
+                    'title' => esc_html__('Style', 'listdom'),
                     'for' => $id.'_style'
                 ]).'
                 '.LSD_Form::select([
+                    'class' => 'lsd-admin-input',
                     'id' => $id.'_style',
                     'name' => $name.'[style]',
                     'options' => [
@@ -921,6 +952,18 @@ class LSD_Form extends LSD_Base
                     ],
                     'value' => $value['style'] ?? 'none'
                 ]).'
+            </div>
+            <div class="lsd-border-color-wrapper lsd-flex-1">
+                '.LSD_Form::label([
+                'class' => 'lsd-fields-label-tiny',
+                'title' => esc_html__('Color', 'listdom'),
+                'for' => $id.'_color'
+            ]).'
+                '.LSD_Form::colorpicker([
+                'id' => $id.'_color',
+                'name' => $name.'[color]',
+                'value' => $value['color'] ?? ''
+            ]).'
             </div>
         </div>';
     }
@@ -935,13 +978,15 @@ class LSD_Form extends LSD_Base
             <div class="lsd-padding-width-wrapper lsd-flex-1">
                 <div class="lsd-padding-top">
                     '.LSD_Form::label([
-                        'title' => esc_html__('Padding Top', 'listdom'),
+                        'class' => 'lsd-fields-label-tiny',
+                        'title' => esc_html__('Top', 'listdom'),
                         'for' => $id.'_top'
                     ]).'
                     '.LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => $id.'_top',
                         'name' => $name.'[top]',
-                        'placeholder' => esc_html__('Top', 'listdom'),
+                        'placeholder' => esc_attr__('Top', 'listdom'),
                         'attributes' => [
                             'min' => 0,
                             'increment' => 1
@@ -951,13 +996,15 @@ class LSD_Form extends LSD_Base
                 </div>
                 <div class="lsd-padding-right">
                     '.LSD_Form::label([
-                        'title' => esc_html__('Padding Right', 'listdom'),
+                        'class' => 'lsd-fields-label-tiny',
+                        'title' => esc_html__('Right', 'listdom'),
                         'for' => $id.'_right'
                     ]).'
                     '.LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => $id.'_right',
                         'name' => $name.'[right]',
-                        'placeholder' => esc_html__('Right', 'listdom'),
+                        'placeholder' => esc_attr__('Right', 'listdom'),
                         'attributes' => [
                             'min' => 0,
                             'increment' => 1
@@ -967,13 +1014,15 @@ class LSD_Form extends LSD_Base
                 </div>
                 <div class="lsd-padding-bottom">
                     '.LSD_Form::label([
-                        'title' => esc_html__('Padding Bottom', 'listdom'),
+                        'class' => 'lsd-fields-label-tiny',
+                        'title' => esc_html__('Bottom', 'listdom'),
                         'for' => $id.'_bottom'
                     ]).'
                     '.LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => $id.'_bottom',
                         'name' => $name.'[bottom]',
-                        'placeholder' => esc_html__('Bottom', 'listdom'),
+                        'placeholder' => esc_attr__('Bottom', 'listdom'),
                         'attributes' => [
                             'min' => 0,
                             'increment' => 1
@@ -983,13 +1032,15 @@ class LSD_Form extends LSD_Base
                 </div>
                 <div class="lsd-padding-left">
                     '.LSD_Form::label([
-                        'title' => esc_html__('Padding Left', 'listdom'),
+                        'class' => 'lsd-fields-label-tiny',
+                        'title' => esc_html__('Left', 'listdom'),
                         'for' => $id.'_left'
                     ]).'
                     '.LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => $id.'_left',
                         'name' => $name.'[left]',
-                        'placeholder' => esc_html__('Left', 'listdom'),
+                        'placeholder' => esc_attr__('Left', 'listdom'),
                         'attributes' => [
                             'min' => 0,
                             'increment' => 1
@@ -1011,10 +1062,12 @@ class LSD_Form extends LSD_Base
         $row1 = ''
             . (!$include || in_array('family', $include) ? '<div class="lsd-typography-family-wrapper lsd-flex-2">
                 '.LSD_Form::label([
+                    'class' => 'lsd-fields-label-tiny',
                     'title' => esc_html__('Font Family', 'listdom'),
                     'for' => $id.'_family'
                 ]).'
                 '.LSD_Form::fontpicker([
+                    'class' => 'lsd-admin-input',
                     'id' => $id.'_family',
                     'name' => $name.'[family]',
                     'value' => $value['family'] ?? 'inherit',
@@ -1023,10 +1076,12 @@ class LSD_Form extends LSD_Base
             </div>' : '' )
             . (!$include || in_array('weight', $include) ? '<div class="lsd-typography-weight-wrapper lsd-flex-2">
                 '.LSD_Form::label([
+                    'class' => 'lsd-fields-label-tiny',
                     'title' => esc_html__('Font Weight', 'listdom'),
                     'for' => $id.'_weight'
                 ]).'
                 '.LSD_Form::select([
+                    'class' => 'lsd-admin-input',
                     'id' => $id.'_weight',
                     'name' => $name.'[weight]',
                     'options' => [
@@ -1046,10 +1101,12 @@ class LSD_Form extends LSD_Base
             </div>' : '' )
             . (!$include || in_array('align', $include) ? '<div class="lsd-typography-align-wrapper lsd-flex-1">
                 '.LSD_Form::label([
+                    'class' => 'lsd-fields-label-tiny',
                     'title' => esc_html__('Text Align', 'listdom'),
                     'for' => $id.'_align'
                 ]).'
                 '.LSD_Form::select([
+                    'class' => 'lsd-admin-input',
                     'id' => $id.'_align',
                     'name' => $name.'[align]',
                     'options' => [
@@ -1067,10 +1124,12 @@ class LSD_Form extends LSD_Base
         $row2 = ''
             . (!$include || in_array('size', $include) ? '<div class="lsd-typography-size-wrapper lsd-flex-1">'.
                 LSD_Form::label([
+                    'class' => 'lsd-fields-label-tiny',
                     'title' => esc_html__('Size', 'listdom'),
                     'for' => $id.'_size_value'
                 ]).'
                 '.LSD_Form::unit_number([
+                    'class' => 'lsd-admin-input',
                     'id' => $id.'_size',
                     'name' => $name.'[size]',
                     'value' => $value['size'] ?? '',
@@ -1079,10 +1138,12 @@ class LSD_Form extends LSD_Base
             </div>' : '' )
             . (!$include || in_array('line_height', $include) ? '<div class="lsd-typography-line-height-wrapper lsd-flex-1">'.
                 LSD_Form::label([
+                    'class' => 'lsd-fields-label-tiny',
                     'title' => esc_html__('Line Height', 'listdom'),
                     'for' => $id.'_line_height_value'
                 ]).'
                 '.LSD_Form::unit_number([
+                    'class' => 'lsd-admin-input',
                     'id' => $id.'_line_height',
                     'name' => $name.'[line_height]',
                     'value' => $value['line_height'] ?? '',
@@ -1109,6 +1170,7 @@ class LSD_Form extends LSD_Base
         $name = $args['name'] ?? 'unit_number';
 
         $number_field = self::number([
+            'class' => 'lsd-admin-input',
             'id' => $id . '_value',
             'name' => $name . '[value]',
             'value' => $number,
@@ -1119,6 +1181,7 @@ class LSD_Form extends LSD_Base
         ]);
 
         $unit_field = self::select([
+            'class' => 'lsd-admin-input',
             'id' => $id . '_unit',
             'name' => $name . '[unit]',
             'options' => array_combine($units, $units),

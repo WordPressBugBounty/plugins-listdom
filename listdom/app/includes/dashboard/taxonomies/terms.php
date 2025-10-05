@@ -47,7 +47,7 @@ class LSD_Dashboard_Taxonomies_Terms extends LSD_Base
 
         $this->response([
             'success' => 1,
-            'message' => __('Term successfully added.', 'listdom'),
+            'message' => esc_html__('Term successfully added.', 'listdom'),
             'data' => [
                 'term_id' => $term_id,
                 'term_name' => $term_name,

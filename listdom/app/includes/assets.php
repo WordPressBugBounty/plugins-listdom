@@ -64,10 +64,10 @@ class LSD_Assets extends LSD_Base
         ]);
 
         // Include Listdom frontend CSS file
-        wp_enqueue_style('lsd-frontend', $this->lsd_asset_url('css/frontend.css'), [], $this->version());
+        wp_enqueue_style('lsd-frontend', $this->lsd_asset_url('css/frontend.min.css'), [], $this->version());
 
         // RTL Style
-        if (is_rtl()) wp_enqueue_style('lsd-frontend-rtl', $this->lsd_asset_url('css/frontend-rtl.css'), ['lsd-frontend'], $this->version());
+        if (is_rtl()) wp_enqueue_style('lsd-frontend-rtl', $this->lsd_asset_url('css/frontend-rtl.min.css'), ['lsd-frontend'], $this->version());
 
         // Include Personalize Assets
         $personalize = new LSD_Personalize();
@@ -101,7 +101,7 @@ class LSD_Assets extends LSD_Base
     public function admin()
     {
         // Include Listdom backend CSS file for WordPress
-        wp_enqueue_style('lsd-wp-backend', $this->lsd_asset_url('css/wp-backend.css'), [], $this->version());
+        wp_enqueue_style('lsd-wp-backend', $this->lsd_asset_url('css/wp-backend.min.css'), [], $this->version());
 
         // Check to see if we should include the assets or not
         if (!$this->should_include('backend')) return;
@@ -117,16 +117,16 @@ class LSD_Assets extends LSD_Base
         wp_localize_script('lsd-backend', 'lsd', [
             'ajaxurl' => admin_url('admin-ajax.php'),
             'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
-            'i18n_field_search' => __('Add the “More Options” fields in the row below', 'listdom'),
-            'i18n_field_delete' => __('Click twice to delete', 'listdom'),
-            'i18n_field_label' => __('Label', 'listdom'),
-            'i18n_placeholder_label' => __('Enter the menu name', 'listdom'),
-            'i18n_placeholder_slug' => __('Enter the menu Slug', 'listdom'),
-            'i18n_placeholder_icon' => __('Enter the icon class', 'listdom'),
-            'i18n_description_label' => __('This is the label for your menu item.', 'listdom'),
-            'i18n_description_slug' => __('Provide a unique slug for this menu.', 'listdom'),
-            'i18n_description_icon' => __('Select the icon.', 'listdom'),
-            'i18n_description_content' => __('Type dashboard content, You can also use shortcodes.', 'listdom'),
+            'i18n_field_search' => esc_html__('Add the “More Options” fields in the row below', 'listdom'),
+            'i18n_field_delete' => esc_html__('Click twice to delete', 'listdom'),
+            'i18n_field_label' => esc_html__('Label', 'listdom'),
+            'i18n_placeholder_label' => esc_html__('Enter the menu name', 'listdom'),
+            'i18n_placeholder_slug' => esc_html__('Enter the menu Slug', 'listdom'),
+            'i18n_placeholder_icon' => esc_html__('Enter the icon class', 'listdom'),
+            'i18n_description_label' => esc_html__('This is the label for your menu item.', 'listdom'),
+            'i18n_description_slug' => esc_html__('Provide a unique slug for this menu.', 'listdom'),
+            'i18n_description_icon' => esc_html__('Select the icon.', 'listdom'),
+            'i18n_description_content' => esc_html__('Type dashboard content, You can also use shortcodes.', 'listdom'),
             'icon_options' => $icon_options,
         ]);
 
@@ -134,7 +134,7 @@ class LSD_Assets extends LSD_Base
         wp_enqueue_editor();
 
         // Include Listdom backend CSS file
-        wp_enqueue_style('lsd-backend', $this->lsd_asset_url('css/backend.css'), [], $this->version());
+        wp_enqueue_style('lsd-backend', $this->lsd_asset_url('css/backend.min.css'), [], $this->version());
 
         // WordPress Media
         $this->media();
@@ -163,7 +163,7 @@ class LSD_Assets extends LSD_Base
         // There is no Custom Styles
         if (!trim($styles['CSS'])) return;
 
-        $CSS = strip_tags($styles['CSS']);
+        $CSS = wp_strip_all_tags($styles['CSS']);
         echo '<style>' . stripslashes($CSS) . '</style>';
     }
 
@@ -271,7 +271,7 @@ class LSD_Assets extends LSD_Base
     public function moment()
     {
         // Include Moment JavaScript file
-        wp_enqueue_script('moment', $this->lsd_asset_url('packages/moment/moment.min.js'), [], LSD_Assets::version());
+        wp_enqueue_script('moment');
     }
 
     public function daterangepicker()
@@ -388,7 +388,7 @@ class LSD_Assets extends LSD_Base
         wp_enqueue_script('lsd-print', $base->lsd_asset_url('js/print.min.js'), [], LSD_Assets::version(), true);
 
         // Enqueue Print CSS
-        wp_enqueue_style('lsd-print', $base->lsd_asset_url('css/print.css'), [], LSD_Assets::version(), 'print');
+        wp_enqueue_style('lsd-print', $base->lsd_asset_url('css/print.min.css'), [], LSD_Assets::version(), 'print');
     }
 
     public function async_googlemaps($tag, $handle)
@@ -419,6 +419,14 @@ class LSD_Assets extends LSD_Base
     {
         if (class_exists(\Elementor\Plugin::class) && \Elementor\Plugin::instance()->editor->is_edit_mode()) echo $string;
         else self::footer($string);
+    }
+
+    public static function update_address_bar(bool $update, int $id): void
+    {
+        // No need to add anything
+        if ($update) return;
+
+        self::footer('<script>window.lsd_update_page_address = window.lsd_update_page_address || {}; window.lsd_update_page_address["' . $id . '"] = false;</script>');
     }
 
     public static function params($param, $key = 'footer')

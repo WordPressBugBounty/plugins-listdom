@@ -18,10 +18,6 @@ defined('ABSPATH') || die();
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
                     <i class='lsdi lsdi-checkmark-circle'></i>
                 </button>
-                <div>
-                    <p class="lsd-util-hide lsd-settings-success-message lsd-alert lsd-success lsd-m-0"><?php esc_html_e('Options saved successfully.', 'listdom'); ?></p>
-                    <p class="lsd-util-hide lsd-settings-error-message lsd-alert lsd-error lsd-m-0"><?php esc_html_e('Error: Unable to save options.', 'listdom'); ?></p>
-                </div>
 			</div>
         </div>
     </form>
@@ -33,20 +29,11 @@ jQuery('#lsd_addons_form').on('submit', function(e)
 
     // Elements
     const $button = jQuery("#lsd_addons_save_button");
-    const $success = jQuery(".lsd-settings-success-message");
-    const $error = jQuery(".lsd-settings-error-message");
-    const $tab = jQuery('.nav-tab-active');
-
-    // Loading Styles
-    $button.addClass('loading').html('<i class="lsd-icon fa fa-spinner fa-pulse fa-fw"></i>');
-    $success.addClass('lsd-util-hide');
-    $error.addClass('lsd-util-hide');
+    const $tab = jQuery('.lsd-nav-tab-active');
 
     // Loading Wrapper
-    const loading = (new ListdomLoadingWrapper());
-
-    // Loading
-    loading.start();
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Saving', 'listdom') ); ?>");
 
     const addons = jQuery(this).serialize();
     jQuery.ajax(
@@ -58,23 +45,19 @@ jQuery('#lsd_addons_form').on('submit', function(e)
         {
             $tab.attr('data-saved', 'true');
 
-            // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save The Changes', 'listdom')); ?><i class='lsdi lsdi-checkmark-circle'></i>");
-            $success.removeClass('lsd-util-hide');
+            listdom_toastify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
 
             // Unloading
-            loading.stop($success, 2000);
+            loading.stop();
         },
         error: function()
         {
             $tab.attr('data-saved', 'false');
 
-            // Loading Styles
-            $button.removeClass('loading').html("<?php echo esc_js(esc_attr__('Save The Changes', 'listdom')); ?><i class='lsdi lsdi-checkmark-circle'></i>");
-            $error.removeClass('lsd-util-hide');
+            listdom_toastify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
 
             // Unloading
-            loading.stop($error, 2000);
+            loading.stop();
         }
     });
 });

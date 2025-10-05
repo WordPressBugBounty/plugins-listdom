@@ -287,6 +287,7 @@ class LSD_Admin extends LSD_Base
             if (is_array($form) && isset($form['page']) && $form['page'])
             {
                 $pages[(int) $form['page']] = sprintf(
+                    /* translators: %s: Search form title. */
                     esc_html__('Search Results (%s)', 'listdom'),
                     $search->post_title
                 );

@@ -27,7 +27,11 @@ class LSD_API extends LSD_Base
     public function language()
     {
         // Requested Language
-        $locale = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null;
+        $locale = null;
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+        {
+            $locale = sanitize_text_field(wp_unslash($_SERVER['HTTP_ACCEPT_LANGUAGE']));
+        }
 
         // No Locale
         if (!$locale) return;

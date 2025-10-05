@@ -15,8 +15,8 @@ $pagination_links = paginate_links([
     'current'   => $this->page,
     'total'     => $total_pages,
     'type'      => 'array',
-    'prev_text' => __('« Previous', 'listdom'),
-    'next_text' => __('Next »', 'listdom'),
+    'prev_text' => esc_html__('« Previous', 'listdom'),
+    'next_text' => esc_html__('Next »', 'listdom'),
 ]);
 ?>
 <div class="lsd-numeric-pagination-wrapper">

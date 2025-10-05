@@ -219,8 +219,8 @@ class LSD_Search_Helper extends LSD_Base
         $name = $args['name'] ?? 'sf-' . $key . '-lk';
         $current = $args['current'] ?? '';
 
-        $output = '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
-        $output .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
+        $output = '<label for="' . esc_attr($id) . '">' . esc_html($title) . '</label>';
+        $output .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($current) . '">';
 
         return $output;
     }
@@ -240,16 +240,16 @@ class LSD_Search_Helper extends LSD_Base
         $current = $args['current'] ?? '';
 
         $output = '<div class="' . esc_attr($class) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html__($title, 'listdom') . '</label>';
+        $output .= '<label for="' . esc_attr($id) . '">' . esc_html($title) . '</label>';
         $output .= $method === 'range' ? '<div class="lsd-search-range-inner">' : '';
 
         if ($method === 'number-input')
         {
-            $output .= '<input type="number" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" value="' . esc_attr($current) . '">';
+            $output .= '<input type="number" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($current) . '">';
         }
         else if ($method === 'dropdown')
         {
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
             $output .= '<option value="">' . esc_html($placeholder) . '</option>';
 
             if (strpos($name, 'sf-acf-') !== false)
@@ -275,7 +275,7 @@ class LSD_Search_Helper extends LSD_Base
             $name = $args['dropdown_name'] ?? '';
             $current = $args['dropdown_current'] ?? '';
 
-            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+            $output .= '<select name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
             $output .= '<option value="">' . esc_html($placeholder) . '</option>';
 
             $i = $min;
@@ -349,8 +349,8 @@ class LSD_Search_Helper extends LSD_Base
         $name = $args['name'] ?? 'sf-' . $key;
         $current = $args['current'] ?? null;
 
-        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
-        $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
+        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+        $output .= '<option value="">' . esc_html($placeholder) . '</option>';
         $output .= $this->dropdown_options($filter, 0, $current);
         $output .= '</select>';
 
@@ -445,8 +445,8 @@ class LSD_Search_Helper extends LSD_Base
             $level_terms = isset($hierarchy[$l]) && is_array($hierarchy[$l]) ? $hierarchy[$l] : [];
             $placeholder = $placeholders[($l - 1)] ?? $placeholders[0];
 
-            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-level="' . esc_attr($l) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
-            $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
+            $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr($placeholder) . '" data-level="' . esc_attr($l) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+            $output .= '<option value="">' . esc_html($placeholder) . '</option>';
 
             foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id || in_array($level_term->term_id, $current_parents)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';
             $output .= '</select>';
@@ -491,8 +491,8 @@ class LSD_Search_Helper extends LSD_Base
         $current = $args['current'] ?? null;
         $options = $args['options'] ?? [];
 
-        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr__($placeholder, 'listdom') . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
-        $output .= '<option value="">' . esc_html__($placeholder, 'listdom') . '</option>';
+        $output = '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
+        $output .= '<option value="">' . esc_html($placeholder) . '</option>';
         $output .= $this->acf_dropdown_options($options, $current);
         $output .= '</select>';
 

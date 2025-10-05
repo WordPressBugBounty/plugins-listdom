@@ -53,7 +53,8 @@ jQuery(document).ready(function()
                 'label_log_in' => $login_submit_label,
                 'remember' => true,
                 'placeholder_username' => $username_placeholder,
-                'placeholder_password' => $password_placeholder
+                'placeholder_password' => $password_placeholder,
+                'id_submit' => 'lsd-auth-login-submit',
             ]); ?>
             <?php LSD_Form::nonce('lsd_login','lsd_login'); ?>
             <?php if (trim($role)) echo LSD_Form::hidden([

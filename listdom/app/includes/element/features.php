@@ -62,22 +62,22 @@ class LSD_Element_Features extends LSD_Element
         $enable_link = isset($data['enable_link']) ? (int) $data['enable_link'] : 1;
 
         return '<div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_show_icons">' . esc_html__('Show Icons', 'listdom') . '</label>
-            <select name="lsd[elements][' . esc_attr($this->key) . '][show_icons]" id="lsd_elements_' . esc_attr($this->key) . '_show_icons">
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_show_icons">' . esc_html__('Show Icons', 'listdom') . '</label>
+            <select class="lsd-admin-input" name="lsd[elements][' . esc_attr($this->key) . '][show_icons]" id="lsd_elements_' . esc_attr($this->key) . '_show_icons">
                 <option value="0" ' . (isset($data['show_icons']) && $data['show_icons'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
                 <option value="1" ' . (isset($data['show_icons']) && $data['show_icons'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
             </select>
         </div>
         <div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_enable_link">' . esc_html__('Enable Link To Archive', 'listdom') . '</label>
-            <select name="lsd[elements][' . esc_attr($this->key) . '][enable_link]" id="lsd_elements_' . esc_attr($this->key) . '_enable_link">
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_enable_link">' . esc_html__('Enable Link To Archive', 'listdom') . '</label>
+            <select class="lsd-admin-input" name="lsd[elements][' . esc_attr($this->key) . '][enable_link]" id="lsd_elements_' . esc_attr($this->key) . '_enable_link">
                 <option value="1" ' . ($enable_link === 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
                 <option value="0" ' . ($enable_link === 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
             </select>
         </div>
         <div>
-            <label for="lsd_elements_' . esc_attr($this->key) . '_list_style">' . esc_html__('Layout', 'listdom') . '</label>
-            <select name="lsd[elements][' . esc_attr($this->key) . '][list_style]" id="lsd_elements_' . esc_attr($this->key) . '_list_style">
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_list_style">' . esc_html__('Layout', 'listdom') . '</label>
+            <select class="lsd-admin-input" name="lsd[elements][' . esc_attr($this->key) . '][list_style]" id="lsd_elements_' . esc_attr($this->key) . '_list_style">
                 <option value="per-row" ' . ($list_style === 'per-row' ? 'selected="selected"' : '') . '>' . esc_html__('One Per Row', 'listdom') . '</option>
                 <option value="inline" ' . ($list_style === 'inline' ? 'selected="selected"' : '') . '>' . esc_html__('Inline', 'listdom') . '</option>
             </select>

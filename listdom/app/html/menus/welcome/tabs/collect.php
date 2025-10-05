@@ -25,7 +25,7 @@ $settings = LSD_Options::settings();
                         <?php echo LSD_Form::email([
                             'class' => 'lsd-admin-input',
                             'id' => 'lsd_subscription_email',
-                            'placeholder' => esc_html__("Enter your email here", 'listdom'),
+                            'placeholder' => esc_attr__("Enter your email here", 'listdom'),
                         ]); ?>
                     </div>
                     <div class="lsd-col-3">
@@ -49,6 +49,7 @@ $settings = LSD_Options::settings();
                     <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Send anonymous usage data to help improve Listdom.', 'listdom'); ?></p>
                 </div>
             </div>
+            <?php wp_nonce_field('lsd_submit_newsletter', 'lsd_submit_newsletter_nonce', false); ?>
             <?php LSD_Form::nonce('lsd_settings_form'); ?>
         </form>
     </div>
@@ -67,8 +68,8 @@ jQuery('#lsd_settings_collect_data_button').on('click', function (event)
     event.preventDefault();
     const $button = jQuery(this);
 
-    const loading = (new ListdomButtonLoader($button));
-    loading.start("<?php echo esc_js( __('Saving', 'listdom') ); ?>");
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js( esc_html__('Saving', 'listdom') ); ?>");
 
     const settings = jQuery("#lsd_collect_settings_form").serialize();
     jQuery.ajax(
@@ -102,12 +103,12 @@ jQuery('#lsd_submit_newsletter').on('click', function (event)
 
     if (!email)
     {
-        listdom_toastify("<?php echo esc_js(__('Please enter a valid email address.', 'listdom')); ?>", 'lsd-error');
+        listdom_toastify("<?php echo esc_js(esc_html__('Please enter a valid email address.', 'listdom')); ?>", 'lsd-error');
         return;
     }
 
-    const loading = (new ListdomButtonLoader($button));
-    loading.start("<?php echo esc_js(__('Submitting', 'listdom')); ?>");
+    const loading = new ListdomButtonLoader($button);
+    loading.start("<?php echo esc_js(esc_html__('Submitting', 'listdom')); ?>");
 
     jQuery.ajax(
     {
@@ -115,7 +116,8 @@ jQuery('#lsd_submit_newsletter').on('click', function (event)
         url: ajaxurl,
         data: {
             action: 'lsd_submit_newsletter',
-            email: email
+            email: email,
+            lsd_submit_newsletter_nonce: jQuery('#lsd_collect_settings_form').find('[name="lsd_submit_newsletter_nonce"]').val()
         },
         dataType: 'json',
         success: function(response)
@@ -135,7 +137,7 @@ jQuery('#lsd_submit_newsletter').on('click', function (event)
         error: function ()
         {
             loading.stop();
-            listdom_toastify("<?php echo esc_js(__('There was an issue with the subscription, try again later.', 'listdom')); ?>", 'lsd-error');
+            listdom_toastify("<?php echo esc_js(esc_html__('There was an issue with the subscription, try again later.', 'listdom')); ?>", 'lsd-error');
         }
     });
 });

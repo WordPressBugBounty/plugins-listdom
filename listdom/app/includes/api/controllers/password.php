@@ -90,14 +90,26 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         if (is_multisite()) $site_name = get_network()->site_name;
         else $site_name = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
-        $message = esc_html__('Someone has requested a password reset for the following account:') . "\r\n\r\n";
-        $message .= sprintf(esc_html__('Site Name: %s'), $site_name) . "\r\n\r\n";
-        $message .= sprintf(esc_html__('Username: %s'), $user_login) . "\r\n\r\n";
-        $message .= esc_html__('If this was a mistake, just ignore this email and nothing will happen.') . "\r\n\r\n";
-        $message .= esc_html__('To reset your password, visit the following address:') . "\r\n\r\n";
+        $message = esc_html__('Someone has requested a password reset for the following account:', 'listdom') . "\r\n\r\n";
+        $message .= sprintf(
+            /* translators: %s: Site name. */
+            esc_html__('Site Name: %s', 'listdom'),
+            $site_name
+        ) . "\r\n\r\n";
+        $message .= sprintf(
+            /* translators: %s: Username requesting a password reset. */
+            esc_html__('Username: %s', 'listdom'),
+            $user_login
+        ) . "\r\n\r\n";
+        $message .= esc_html__('If this was a mistake, just ignore this email and nothing will happen.', 'listdom') . "\r\n\r\n";
+        $message .= esc_html__('To reset your password, visit the following address:', 'listdom') . "\r\n\r\n";
         $message .= '<' . network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login') . ">\r\n";
 
-        $title = sprintf(esc_html__('[%s] Password Reset'), $site_name);
+        $title = sprintf(
+            /* translators: %s: Site name. */
+            esc_html__('[%s] Password Reset', 'listdom'),
+            $site_name
+        );
         $title = apply_filters('retrieve_password_title', $title, $user_login, $user);
         $message = apply_filters('retrieve_password_message', $message, $key, $user_login, $user);
 

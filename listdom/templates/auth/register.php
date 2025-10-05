@@ -20,6 +20,12 @@ $email_label = $auth['register']['email_label'];
 $email_placeholder = $auth['register']['email_placeholder'];
 $register_submit_label = $auth['register']['submit_label'];
 
+$register_privacy_field = LSD_Privacy::consent_field([
+    'id' => 'lsd_register_privacy_consent',
+    'wrapper_class' => 'lsd-register-privacy-consent-field',
+    'context' => 'register',
+]);
+
 $assets = new LSD_Assets();
 $assets->footer('<script>
 jQuery(document).ready(function()
@@ -45,7 +51,7 @@ jQuery(document).ready(function()
                 echo LSD_Form::text([
                     'name' => 'lsd_username',
                     'id' => 'lsd_register_username',
-                    'value' => isset($_POST['lsd_username']) ? esc_attr($_POST['lsd_username']) : '',
+                    'value' => isset($_POST['lsd_username']) ? sanitize_text_field(wp_unslash($_POST['lsd_username'])) : '',
                     'required' => true,
                     'placeholder' => $username_placeholder
                 ]);
@@ -61,7 +67,7 @@ jQuery(document).ready(function()
                 echo LSD_Form::email([
                     'name' => 'lsd_email',
                     'id' => 'lsd_email',
-                    'value' => isset($_POST['reg_email']) ? esc_attr($_POST['reg_email']) : '',
+                    'value' => isset($_POST['reg_email']) ? sanitize_email(wp_unslash($_POST['reg_email'])) : '',
                     'required' => true,
                     'placeholder' => $email_placeholder
                 ]);
@@ -112,9 +118,15 @@ jQuery(document).ready(function()
             ]);
         }
         ?>
+        <?php if ($register_privacy_field !== ''): ?>
+        <div class="form-group lsd-register-privacy-consent">
+            <?php echo $register_privacy_field; ?>
+        </div>
+        <?php endif; ?>
         <div class="form-group">
             <?php
                 echo LSD_Form::submit([
+                    'class' => 'lsd-general-button',
                     'id' => 'lsd_register_submit',
                     'label' => $register_submit_label,
                 ]);

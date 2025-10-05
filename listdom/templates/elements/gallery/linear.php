@@ -48,13 +48,21 @@ if (!count($gallery)) return '';
     ?>
 
     <button class="lsd-all-photos-button">
-        <?php printf(esc_html__('See all %d photos', 'listdom'), count($gallery)); ?>
+        <?php printf(
+            /* translators: %d: Total number of gallery photos. */
+            esc_html__('See all %d photos', 'listdom'),
+            count($gallery)
+        ); ?>
     </button>
 
     <div id="lsd-gallery-modal" class="lsd-gallery-modal">
         <div class="lsd-gallery-modal-wrapper">
             <div class="lsd-gallery-modal-top-bar">
-                <h3><?php echo sprintf(esc_html__('Photos for %s', 'listdom'), get_the_title($post_id)); ?></h3>
+                <h3><?php echo sprintf(
+                    /* translators: %s: Listing title. */
+                    esc_html__('Photos for %s', 'listdom'),
+                    get_the_title($post_id)
+                ); ?></h3>
                 <span class="lsd-gallery-modal-close">&times;</span>
             </div>
             <div class="lsd-gallery-modal-content">

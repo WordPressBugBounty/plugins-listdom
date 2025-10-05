@@ -17,8 +17,8 @@ trait LSD_AI_Tasks_Mapping
             ];
         }
 
-        $listdom_fields_json = json_encode($listdom_fields_compact, JSON_PRETTY_PRINT);
-        $source_fields_json = json_encode($source_fields, JSON_PRETTY_PRINT);
+        $listdom_fields_json = wp_json_encode($listdom_fields_compact, JSON_PRETTY_PRINT);
+        $source_fields_json = wp_json_encode($source_fields, JSON_PRETTY_PRINT);
 
         $prompt = 'You are an intelligent field-mapping assistant. Your task is to map Listdom fields to the most appropriate column indices from a provided CSV or Excel file.
 

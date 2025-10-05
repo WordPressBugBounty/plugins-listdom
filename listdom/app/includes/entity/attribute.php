@@ -61,6 +61,39 @@ class LSD_Entity_Attribute extends LSD_Base
 
                 return $editor ? wpautop($data) : esc_html($data);
 
+            case 'date':
+
+                $timestamp = strtotime((string) $data);
+                if ($timestamp !== false) return esc_html(date_i18n(get_option('date_format'), $timestamp));
+
+                return esc_html($data);
+
+            case 'time':
+
+                $time_value = is_string($data) ? trim($data) : '';
+                if ($time_value !== '')
+                {
+                    $timestamp = strtotime('1970-01-01 ' . str_replace('T', ' ', $time_value));
+                    if ($timestamp !== false) return esc_html(date_i18n(get_option('time_format'), $timestamp));
+                }
+
+                return esc_html($time_value);
+
+            case 'datetime':
+
+                $datetime_value = is_string($data) ? str_replace('T', ' ', $data) : '';
+                if ($datetime_value !== '')
+                {
+                    $timestamp = strtotime($datetime_value);
+                    if ($timestamp !== false)
+                    {
+                        $format = trim(get_option('date_format') . ' ' . get_option('time_format'));
+                        return esc_html(date_i18n($format, $timestamp));
+                    }
+                }
+
+                return esc_html($datetime_value);
+
             case 'checkbox':
 
                 if (is_array($data))

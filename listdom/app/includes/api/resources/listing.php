@@ -52,7 +52,7 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
                     'label' => $status->label,
                 ],
                 'address' => $metas['lsd_address'] ?? null,
-                'price' => $pricing ? strip_tags($price) : null,
+                'price' => $pricing ? wp_strip_all_tags($price) : null,
                 'price_class' => $pricing ? $price_class : null,
                 'latitude' => $metas['lsd_latitude'] ?? null,
                 'longitude' => $metas['lsd_longitude'] ?? null,
@@ -72,7 +72,7 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
                 'claimed' => apply_filters('lsd_is_claimed', 0, $listing->ID),
             ],
             'raw' => [
-                'content' => strip_tags(apply_filters('the_content', $listing->post_content)),
+                'content' => wp_strip_all_tags(apply_filters('the_content', $listing->post_content)),
                 'price' => $pricing ? $min_price : null,
                 'price_max' => $pricing ? $max_price : null,
                 'price_after' => $pricing ? $text_price : null,

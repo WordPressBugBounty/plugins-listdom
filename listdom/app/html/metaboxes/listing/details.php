@@ -92,7 +92,7 @@ $ai = new LSD_AI();
         <?php if ($price_components['currency']): ?>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_currency"><?php esc_html_e('Currency', 'listdom'); ?></label>
+                <label class="lsd-fields-label" for="lsd_currency"><?php esc_html_e('Currency', 'listdom'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <select name="lsd[currency]" id="lsd_currency">
@@ -105,7 +105,7 @@ $ai = new LSD_AI();
         <?php endif; ?>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_price"><?php esc_html_e('Price', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price'); ?></label>
+                <label class="lsd-fields-label" for="lsd_price"><?php esc_html_e('Price', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <input type="text" name="lsd[price]" id="lsd_price" placeholder="<?php esc_attr_e('Price', 'listdom'); ?>" value="<?php echo esc_attr($price); ?>">
@@ -114,7 +114,7 @@ $ai = new LSD_AI();
         <?php if ($price_components['max']): ?>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_price_max"><?php esc_html_e('Price (Max)', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_max'); ?></label>
+                <label class="lsd-fields-label" for="lsd_price_max"><?php esc_html_e('Price (Max)', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_max'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <input type="text" name="lsd[price_max]" id="lsd_price_max" placeholder="<?php esc_attr_e('Price (Max)', 'listdom'); ?>" value="<?php echo esc_attr($price_max); ?>">
@@ -124,7 +124,7 @@ $ai = new LSD_AI();
         <?php if ($price_components['after']): ?>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_price_after"><?php esc_html_e('Price Description', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_after'); ?></label>
+                <label class="lsd-fields-label" for="lsd_price_after"><?php esc_html_e('Price Description', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_after'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <input type="text" name="lsd[price_after]" id="lsd_price_after" placeholder="<?php esc_attr_e('Per night, Per cup, ...', 'listdom'); ?>" value="<?php echo esc_attr($price_after); ?>">
@@ -134,7 +134,7 @@ $ai = new LSD_AI();
         <?php if ($price_components['class']): ?>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_price_class"><?php esc_html_e('Price Class', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_class'); ?></label>
+                <label class="lsd-fields-label" for="lsd_price_class"><?php esc_html_e('Price Class', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_class'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <select name="lsd[price_class]" id="lsd_price_class">
@@ -156,7 +156,7 @@ $ai = new LSD_AI();
             <div class="lsd-col-8 lsd-flex lsd-flex-row lsd-flex-content-start lsd-flex-items-center lsd-gap-3">
                 <?php if ($ai->has_access(LSD_AI::TASK_AVAILABILITY)): ?>
                 <div class="lsd-inline-popup-wrapper lsd-no-button-styles">
-                    <button type="button" class="button lsd-inline-popup-trigger" data-focus="#lsd_ava_ai_text" data-for="#lsd-availability-ai-popup" id="lsd_ava_ai_open"><i class="listdom-icon lsdi-stars"></i></button>
+                    <button type="button" class="button lsd-inline-popup-trigger lsd-solid-button" data-focus="#lsd_ava_ai_text" data-for="#lsd-availability-ai-popup" id="lsd_ava_ai_open"><i class="listdom-icon lsdi-stars"></i></button>
                     <div id="lsd-availability-ai-popup" class="lsd-inline-popup-content">
                         <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-3">
                             <div>
@@ -179,13 +179,13 @@ $ai = new LSD_AI();
         <?php foreach (LSD_Main::get_weekdays() as $weekday): $daycode = $weekday['code']; ?>
         <div class="lsd-form-row" id="lsd-ava-<?php echo esc_attr($daycode); ?>">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_ava<?php echo esc_attr($daycode); ?>"><?php esc_html_e($weekday['day'], 'listdom'); ?></label>
+                <label class="lsd-fields-label" for="lsd_ava<?php echo esc_attr($daycode); ?>"><?php echo esc_html($weekday['day']); ?></label>
             </div>
             <div class="lsd-col-7 lsd-ava-hours">
                 <input type="text" name="lsd[ava][<?php echo esc_attr($daycode); ?>][hours]" id="lsd_ava<?php echo esc_attr($daycode); ?>" placeholder="<?php esc_attr_e('9 - 18, 9 AM to 9 PM', 'listdom'); ?>" value="<?php echo isset($ava[$daycode]['hours']) ? esc_attr($ava[$daycode]['hours']) : ''; ?>">
             </div>
             <div class="lsd-col-1 lsd-ava-off">
-                <label>
+                <label class="lsd-fields-label">
                     <input type="hidden" name="lsd[ava][<?php echo esc_attr($daycode); ?>][off]" value="0">
                     <input type="checkbox" name="lsd[ava][<?php echo esc_attr($daycode); ?>][off]" value="1" class="lsd-ava-off" data-daycode="<?php echo esc_attr($daycode); ?>" <?php echo isset($ava[$daycode]['off']) && $ava[$daycode]['off'] ? 'checked="checked"' : ''; ?>>
                     <?php esc_html_e('Off', 'listdom'); ?>
@@ -254,7 +254,7 @@ $ai = new LSD_AI();
         </div>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_email"><?php esc_html_e('Email', 'listdom'); ?><?php $dashboard && $dashboard->required_html('email'); ?></label>
+                <label class="lsd-fields-label" for="lsd_email"><?php esc_html_e('Email', 'listdom'); ?><?php $dashboard && $dashboard->required_html('email'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <input type="email" name="lsd[email]" id="lsd_email" placeholder="<?php esc_attr_e('Email', 'listdom'); ?>" value="<?php echo esc_attr($email); ?>">
@@ -262,7 +262,7 @@ $ai = new LSD_AI();
         </div>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_phone"><?php esc_html_e('Phone', 'listdom'); ?><?php $dashboard && $dashboard->required_html('phone'); ?></label>
+                <label class="lsd-fields-label" for="lsd_phone"><?php esc_html_e('Phone', 'listdom'); ?><?php $dashboard && $dashboard->required_html('phone'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <input type="tel" name="lsd[phone]" id="lsd_phone" placeholder="<?php esc_attr_e('Phone', 'listdom'); ?>" value="<?php echo esc_attr($phone); ?>">
@@ -270,7 +270,7 @@ $ai = new LSD_AI();
         </div>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_website"><?php esc_html_e('Website', 'listdom'); ?><?php $dashboard && $dashboard->required_html('website'); ?></label>
+                <label class="lsd-fields-label" for="lsd_website"><?php esc_html_e('Website', 'listdom'); ?><?php $dashboard && $dashboard->required_html('website'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <input type="url" name="lsd[website]" id="lsd_website" placeholder="<?php esc_attr_e('https://yourwebsite.com', 'listdom'); ?>" value="<?php echo esc_url($website); ?>">
@@ -278,7 +278,7 @@ $ai = new LSD_AI();
         </div>
         <div class="lsd-form-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_contact_address"><?php esc_html_e('Contact Address', 'listdom'); ?><?php $dashboard && $dashboard->required_html('contact_address'); ?></label>
+                <label class="lsd-fields-label" for="lsd_contact_address"><?php esc_html_e('Contact Address', 'listdom'); ?><?php $dashboard && $dashboard->required_html('contact_address'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <input type="text" name="lsd[contact_address]" id="lsd_contact_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($contact_address); ?>">
@@ -291,7 +291,7 @@ $ai = new LSD_AI();
     <?php if (!isset($this->settings['listing_link_status']) || (isset($this->settings['listing_link_status']) && $this->settings['listing_link_status'])): ?>
     <div class="lsd-form-row">
         <div class="lsd-col-2 lsd-text-right">
-            <label for="lsd_link"><?php esc_html_e('Listing Custom Link', 'listdom'); ?><?php $dashboard && $dashboard->required_html('link'); ?></label>
+            <label class="lsd-fields-label" for="lsd_link"><?php esc_html_e('Listing Custom Link', 'listdom'); ?><?php $dashboard && $dashboard->required_html('link'); ?></label>
         </div>
         <div class="lsd-col-8">
             <input type="url" name="lsd[link]" id="lsd_link" placeholder="<?php esc_attr_e('https://anothersite.com/listing-page/', 'listdom'); ?>" value="<?php echo esc_attr($link); ?>">
@@ -317,7 +317,7 @@ $ai = new LSD_AI();
         </div>
         <div class="lsd-form-row lsd-remark-row">
             <div class="lsd-col-2 lsd-text-right">
-                <label for="lsd_remark"><?php esc_html_e('Owner Message', 'listdom'); ?><?php $dashboard && $dashboard->required_html('remark'); ?></label>
+                <label class="lsd-fields-label" for="lsd_remark"><?php esc_html_e('Owner Message', 'listdom'); ?><?php $dashboard && $dashboard->required_html('remark'); ?></label>
             </div>
             <div class="lsd-col-8">
                 <?php wp_editor($remark, 'lsd_remark', [
@@ -338,14 +338,18 @@ $ai = new LSD_AI();
             <div class="lsd-col-2"></div>
             <div class="lsd-col-2"><h3 class="lsd-mt-0"><?php esc_html_e('Gallery', 'listdom'); ?><?php $dashboard && $dashboard->required_html('_gallery'); ?></h3></div>
 			<div class="lsd-col-6 lsd-gallery-buttons">
-				<button class="button lsd-color-m-bg <?php echo $gallery_method === 'wp' && LSD_Capability::can('upload_files') ? 'lsd-select-gallery-button' : 'lsd-upload-gallery-button'; ?> <?php echo esc_attr($this->get_text_class()); ?>" data-for="#lsd_listing_gallery" data-name="lsd[_gallery][]" type="button"><?php esc_html_e('Add Images', 'listdom'); ?></button>
-                <button class="button lsd-remove-gallery-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($gallery) ? '' : 'lsd-util-hide'; ?>" data-for="#lsd_listing_gallery" type="button"><?php esc_html_e('Remove All Images', 'listdom'); ?></button>
+				<button class="lsd-neutral-button lsd-w-auto lsd-color-m-bg <?php echo $gallery_method === 'wp' && LSD_Capability::can('upload_files') ? 'lsd-select-gallery-button' : 'lsd-upload-gallery-button'; ?> <?php echo esc_attr($this->get_text_class()); ?>" data-for="#lsd_listing_gallery" data-name="lsd[_gallery][]" type="button"><?php esc_html_e('Add Images', 'listdom'); ?></button>
+                <button class="lsd-neutral-button lsd-w-auto lsd-remove-gallery-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($gallery) ? '' : 'lsd-util-hide'; ?>" data-for="#lsd_listing_gallery" type="button"><?php esc_html_e('Remove All Images', 'listdom'); ?></button>
 			</div>
         </div>
         <?php if ($gallery_method === 'uploader'): ?>
         <div class="lsd-form-row">
             <?php if ($dashboard && trim($gallery_max_size)): ?>
-            <p class="description"><?php echo sprintf(esc_html__('Maximum Allowed Image Size: %s KB', 'listdom'), $gallery_max_size); ?></p>
+            <p class="description"><?php echo sprintf(
+                /* translators: %s: Maximum allowed image size in kilobytes. */
+                esc_html__('Maximum Allowed Image Size: %s KB', 'listdom'),
+                $gallery_max_size
+            ); ?></p>
             <?php endif; ?>
             <div class="lsd-col-12" id="lsd_listing_gallery_uploader_message"></div>
             <input type="file" class="lsd-util-hide" id="lsd_listing_gallery_uploader" multiple data-for="#lsd_listing_gallery" data-name="lsd[_gallery][]">
@@ -374,8 +378,8 @@ $ai = new LSD_AI();
             <div class="lsd-col-2"></div>
             <div class="lsd-col-2"><h3 class="lsd-mt-0"><?php esc_html_e('Embed', 'listdom'); ?><?php $dashboard && $dashboard->required_html('_embeds'); ?></h3></div>
             <div class="lsd-col-6 lsd-embeds-buttons">
-                <button class="button lsd-add-embed-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" data-template="#lsd_listing_embeds_template" data-for="#lsd_listing_embeds" type="button"><?php esc_html_e('Add', 'listdom'); ?></button>
-                <button class="button lsd-remove-embed-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($embeds) ? '' : 'lsd-util-hide'; ?>" data-for="#lsd_listing_embeds" type="button"><?php esc_html_e('Remove All Embed Codes', 'listdom'); ?></button>
+                <button class="lsd-neutral-button lsd-w-auto lsd-add-embed-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" data-template="#lsd_listing_embeds_template" data-for="#lsd_listing_embeds" type="button"><?php esc_html_e('Add', 'listdom'); ?></button>
+                <button class="lsd-neutral-button lsd-w-auto lsd-remove-embed-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($embeds) ? '' : 'lsd-util-hide'; ?>" data-for="#lsd_listing_embeds" type="button"><?php esc_html_e('Remove All Embed Codes', 'listdom'); ?></button>
             </div>
         </div>
         <div class="lsd-form-row">
@@ -441,7 +445,7 @@ $ai = new LSD_AI();
                     'suggestions' => 'lsd_related_listing_manual_selection_suggestion',
                     'values' => $related,
                     'max_items' => 20,
-                    'placeholder' => esc_html__("Enter at least 3 characters of the Listing's title ...", 'listdom'),
+                    'placeholder' => esc_attr__("Enter at least 3 characters of the Listing's title ...", 'listdom'),
                 ]); ?>
             </div>
         </div>

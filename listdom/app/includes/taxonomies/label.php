@@ -66,6 +66,7 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
             ]); ?>
         </div>
         <?php
+        wp_nonce_field('lsd_save_label_meta', 'lsd_label_meta_nonce');
     }
 
     public function edit_form($term)
@@ -86,6 +87,7 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
             </td>
         </tr>
         <?php
+        wp_nonce_field('lsd_save_label_meta', 'lsd_label_meta_nonce');
     }
 
     public function save_metadata($term_id)
@@ -93,7 +95,13 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
         // It's quick edit
         if (!isset($_POST['lsd_color'])) return;
 
-        $color = sanitize_text_field($_POST['lsd_color']);
+        $nonce = isset($_POST['lsd_label_meta_nonce']) ? sanitize_text_field(wp_unslash($_POST['lsd_label_meta_nonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_save_label_meta')) return;
+
+        $taxonomy = get_taxonomy(LSD_Base::TAX_LABEL);
+        if (!$taxonomy || !current_user_can($taxonomy->cap->edit_terms)) return;
+
+        $color = sanitize_text_field(wp_unslash($_POST['lsd_color']));
         update_term_meta($term_id, 'lsd_color', $color);
     }
 

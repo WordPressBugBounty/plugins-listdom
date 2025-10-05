@@ -11,16 +11,18 @@ $visibility = LSD_Options::addons('visibility');
         <div class="lsd-settings-fields-wrapper">
             <div class="lsd-row">
                 <div class="lsd-col-12">
-                    <p class="description lsd-my-0"><?php esc_html_e('Set the listing visibility date range in the Add/Edit form.', 'listdom-visibility'); ?></p>
+                    <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Set the listing visibility date range in the Add/Edit form.', 'listdom-visibility'); ?></p>
                 </div>
             </div>
-            <div class="lsd-form-row lsd-mt-4">
-                <div class="lsd-col-2"><?php echo LSD_Form::label([
+            <div class="lsd-form-row">
+                <div class="lsd-col-3"><?php echo LSD_Form::label([
+                    'class' => 'lsd-fields-label',
                     'title' => esc_html__('Maximum Visits', 'listdom-visibility'),
                     'for' => 'lsd_addons_visibility_max_visits',
                 ]); ?></div>
-                <div class="lsd-col-4">
+                <div class="lsd-col-5">
                     <?php echo LSD_Form::number([
+                        'class' => 'lsd-admin-input',
                         'id' => 'lsd_addons_visibility_max_visits',
                         'name' => 'addons[visibility][max_visits]',
                         'value' => $visibility['max_visits'] ?? null,
@@ -29,7 +31,7 @@ $visibility = LSD_Options::addons('visibility');
                             'step' => '1',
                         ],
                     ]); ?>
-                    <p class="description lsd-mb-0"><?php esc_html_e('Leave blank for unlimited visits.', 'listdom-visibility'); ?></p>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Leave blank for unlimited visits.', 'listdom-visibility'); ?></p>
                 </div>
             </div>
         </div>

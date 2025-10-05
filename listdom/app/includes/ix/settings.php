@@ -14,7 +14,8 @@ class LSD_IX_Settings extends LSD_Base
         if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'ADMIN_ONLY']);
 
         // Verify that the nonce is valid
-        if (!wp_verify_nonce(sanitize_text_field($_GET['_wpnonce']), 'lsd_settings_export')) $this->response(['success' => 0, 'code' => 'INVALID_REQUEST']);
+        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field($_GET['_wpnonce']), 'lsd_settings_export'))
+            $this->response(['success' => 0, 'code' => 'INVALID_REQUEST']);
 
         // Settings
         $settings = LSD_Options::settings();
@@ -38,12 +39,12 @@ class LSD_IX_Settings extends LSD_Base
         ];
 
         // JSON
-        $JSON = json_encode(apply_filters('lsd_ix_settings_export', $content));
+        $JSON = wp_json_encode(apply_filters('lsd_ix_settings_export', $content));
 
         // Headers
         header('Content-type: application/txt');
         header('Content-Description: Listdom Settings');
-        header('Content-Disposition: attachment; filename="lsd_settings_' . date('Y-m-d-H-i') . '.json"');
+        header('Content-Disposition: attachment; filename="lsd_settings_' . lsd_date('Y-m-d-H-i') . '.json"');
         header('Content-Transfer-Encoding: binary');
         header('Expires: 0');
         header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
@@ -59,7 +60,8 @@ class LSD_IX_Settings extends LSD_Base
         if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'ADMIN_ONLY']);
 
         // Verify that the nonce is valid
-        if (!wp_verify_nonce(sanitize_text_field($_POST['_wpnonce']), 'lsd_settings_import')) $this->response(['success' => 0, 'code' => 'INVALID_REQUEST']);
+        if (!isset($_POST['_wpnonce']) || !wp_verify_nonce(sanitize_text_field($_POST['_wpnonce']), 'lsd_settings_import'))
+            $this->response(['success' => 0, 'code' => 'INVALID_REQUEST']);
 
         $file = $_FILES['import'] ?? [];
 
@@ -81,23 +83,30 @@ class LSD_IX_Settings extends LSD_Base
             ]);
         }
 
-        // Main Library
-        $main = new LSD_Main();
-
-        // Upload File
         $name = time() . '.' . $extension;
-        $destination = $main->get_upload_path() . $name;
 
-        if (move_uploaded_file($file['tmp_name'], $destination))
+        $uploaded = $this->upload_to_listdom_dir($file, $name, [
+            'mimes' => [
+                'json' => 'application/json',
+            ],
+        ]);
+
+        if ($uploaded && !isset($uploaded['error']))
         {
-            LSD_IX_Settings::import($destination);
+            LSD_IX_Settings::import($uploaded['file']);
 
             // Response
             $this->response(['success' => 1, 'code' => 'SUCCESS']);
         }
 
+        $message = isset($uploaded['error']) ? esc_html($uploaded['error']) : esc_html__('An error occurred during uploading the file!', 'listdom');
+
         // Response
-        $this->response(['success' => 0, 'code' => 'UPLOAD_ERROR']);
+        $this->response([
+            'success' => 0,
+            'code' => 'UPLOAD_ERROR',
+            'message' => $message,
+        ]);
     }
 
     public static function import(string $file, bool $delete = true): bool

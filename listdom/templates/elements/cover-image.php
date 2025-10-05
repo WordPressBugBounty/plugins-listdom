@@ -15,7 +15,7 @@ $assets = new LSD_Assets();
 $image = get_the_post_thumbnail($post_id, $size, (string) lsd_schema()->prop('contentUrl'));
 
 // No Image
-$no_image = '<img alt="' . esc_attr__('No Image', 'listdom') . '" src="' . esc_url_raw($assets->lsd_asset_url('/img/no-image.jpg')) . '">';
+$no_image = '<img alt="' . esc_attr__('No Image', 'listdom') . '" src="' . esc_url($assets->lsd_asset_url('/img/no-image.jpg')) . '">';
 ?>
 <?php if (in_array($link_method, ['normal', 'blank', 'lightbox', 'left-panel', 'right-panel', 'bottom-panel'])): ?>
 <a

@@ -9,7 +9,7 @@ class LSD_IX_Listdom extends LSD_IX
         header('Content-disposition: attachment; filename=listings-' . current_time('Y-m-d-H-i') . '.json');
         header('Content-type: application/json');
 
-        echo json_encode($data);
+        echo wp_json_encode($data);
         exit;
     }
 
