@@ -3,11 +3,15 @@ namespace LSDPACVIS;
 
 class Addon extends Base
 {
-    protected $options;
-
-    public function __construct()
+    protected function get_max_visits()
     {
-        $this->options = \LSD_Options::addons('visibility');
+        $settings = \LSD_Options::settings();
+        
+        $max_visits = $settings['visibility_max_visits'] ?? '';
+        if (!is_numeric($max_visits)) return '';
+
+        $max_visits = (int) $max_visits;
+        return $max_visits >= 0 ? $max_visits : '';
     }
 
     public function form($default)
@@ -50,7 +54,7 @@ class Addon extends Base
         $visible_until = (int) get_post_meta($listing->ID, 'lsd_visible_until', true);
 
         // Max Visits
-        $max_visits = $this->options['max_visits'] ?? '';
+        $max_visits = $this->get_max_visits();
         $max_visits = apply_filters('lsd_visibility_max_visits', $max_visits, $listing);
         $visible = true;
 

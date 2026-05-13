@@ -9,27 +9,17 @@ defined('ABSPATH') || die();
 $licensing = $product['licensing'] ?? null;
 if (!$licensing) return;
 
-$basename = $licensing->getBasename();
+$status = LSD_Licensing::getStatus($licensing->getBasename(), $licensing->getPrefix());
 $prefix = $licensing->getPrefix();
-$license_key = $licensing->getLicenseKey();
+$shop_url = $this->getWebiliaShopURL();
+$state = $status['state'];
 
-$status = LSD_Licensing::getStatus($basename, $prefix);
-
-$valid = $status['valid'];
-$trial = $status['trial'];
-$grace = $status['grace'];
-$validation_status = $status['validation_status'];
-$installed_date = $status['installed_date'];
-$expired = $status['expired'];
-$expiring = $status['expiring'];
-$progress = $status['progress'];
-$days_remaining = $status['days_remaining'];
-$valid_license = $status['valid_license'];
-$badge = $status['badge'];
-$progress_class = $status['progress_class'];
+$primary_message_payload = LSD_Licensing::getMessagePayload($status, $product, 'primary', $prefix, $shop_url);
+$trial_notice_payload = LSD_Licensing::getMessagePayload($status, $product, 'trial_notice', $prefix, $shop_url);
+$trial_inline_payload = LSD_Licensing::getMessagePayload($status, $product, 'trial_inline', $prefix, $shop_url);
+$expiring_notice_payload = LSD_Licensing::getMessagePayload($status, $product, 'expiring_notice', $prefix, $shop_url);
 ?>
-<div id="lsd-license-card-<?php echo esc_attr($key); ?>"
-     class="lsd-license-card <?php echo $valid_license ? 'lsd-activation-valid' : ($grace ? 'lsd-activation-grace' : ($expiring ? 'lsd-activation-expiring' : ($expired ? 'lsd-activation-expired' : ''))); ?>">
+<div id="lsd-license-card-<?php echo esc_attr($key); ?>" class="lsd-license-card <?php echo esc_attr($status['card_class']); ?>">
     <div class="lsd-validation">
         <div class="lsd-addon-image">
             <?php if (isset($product['icon'])): ?>
@@ -37,111 +27,87 @@ $progress_class = $status['progress_class'];
             <?php endif; ?>
         </div>
         <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html($product['name']); ?></h3>
-        <div class="lsd-badge <?php echo esc_attr($badge['class']); ?>">
-            <i class="listdom-icon <?php echo esc_attr($badge['icon']); ?>"></i>
-            <?php echo $badge['text']; ?>
+        <div class="lsd-badge <?php echo esc_attr($status['badge']['class']); ?>">
+            <i class="listdom-icon <?php echo esc_attr($status['badge']['icon']); ?>"></i>
+            <?php echo esc_html($status['badge']['text']); ?>
         </div>
     </div>
-    <?php if (isset($validation_status['status']) && !$trial): ?>
+    <?php if ($status['show_status']): ?>
         <div class="lsd-license-status">
             <div class="lsd-expiry-status">
                 <div class="lsd-progress-bar">
-                    <div class="lsd-progress-fill <?php echo esc_attr($progress_class); ?>"
-                         style="width: <?php echo esc_attr($progress); ?>%;"></div>
+                    <div class="lsd-progress-fill <?php echo esc_attr($status['progress_class']); ?>" style="width: <?php echo esc_attr($status['progress']); ?>%;"></div>
                 </div>
                 <div class="lsd-expiry-details">
-                    <?php if (!$grace): ?>
-                        <span class="lsd-valid-date"><?php echo sprintf("Valid from %s", $installed_date); ?></span>
+                    <?php if ($status['status_text']): ?>
+                        <span><?php echo esc_html($status['status_text']); ?></span>
                     <?php endif; ?>
-                    <?php if ($grace || isset($validation_status['expiry'])): ?>
-                        <div class="lsd-expiry">
-                            <span class="lsd-circle"></span>
-                            <?php if ($grace): ?>
+                    <?php if ($status['show_valid_from']): ?>
+                        <span class="lsd-valid-date"><?php echo sprintf("Valid from %s", $status['installed_date']); ?></span>
+                    <?php endif; ?>
+                    <?php if ($status['expiry_mode'] !== 'none'): ?>
+                        <div class="lsd-expiry lsd-expiry-<?php echo esc_attr($status['state']); ?>">
+                            <?php if ($status['expiry_mode'] === 'error'): ?>
                                 <span><?php esc_html_e('Error loading the details', 'listdom'); ?></span>
-                            <?php elseif ($expired || $expiring): ?>
-                                <span><?php
-                                echo sprintf(
-                                    /* translators: %s: Number of days remaining on the license. */
-                                    esc_html__("%d days remaining", 'listdom'),
-                                    $days_remaining
-                                );
+                            <?php elseif ($status['expiry_mode'] === 'days_remaining'): ?>
+                                <span class="lsd-circle"></span>
+                                <span class="lsd-expiry-text"><?php
+                                    echo wp_kses(
+                                        sprintf(
+                                        /* translators: %s: Number of days remaining on the license. */
+                                            __('%s days remaining', 'listdom'),
+                                            '<span class="lsd-days">' . intval($status['days_remaining']) . '</span>'
+                                        ),
+                                        [
+                                            'span' => ['class' => []],
+                                        ]
+                                    );
                                 ?></span>
                             <?php else: ?>
-                                <span><?php echo esc_html($validation_status['expiry']); ?></span>
+                                <?php if($status['state'] === 'active'): ?>
+                                    <span class="lsd-circle"></span>
+                                    <span class="lsd-expiry-text lsd-expiry-lifetime"><?php echo esc_html($status['validation_status']['expiry']); ?></span>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 </div>
             </div>
-            <?php if ($expired || $expiring || $grace): ?>
+            <?php if ($status['action'] === 'renew'): ?>
                 <div>
-                    <a class="lsd-primary-button" href="<?php echo esc_url($this->getWebiliaShopUrl()); ?>"
+                    <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>"
                        target="_blank">
                         <?php esc_html_e('Renew License', 'listdom'); ?>
+                        <i class="listdom-icon lsdi-key"></i>
+                    </a>
+                </div>
+            <?php elseif ($status['action'] === 'get_license'): ?>
+                <div>
+                    <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>"
+                       target="_blank">
+                        <?php esc_html_e('Get License', 'listdom'); ?>
                         <i class="listdom-icon lsdi-key"></i>
                     </a>
                 </div>
             <?php endif; ?>
         </div>
     <?php endif; ?>
-    <?php if (!$valid_license): ?>
-        <?php if ($expired || $valid === 0 || $grace || $expiring): ?>
+    <?php if (!$status['valid_license']): ?>
+        <?php if ($state !== 'trial' && !empty($primary_message_payload['message'])): ?>
             <div class="lsd-form-row lsd-activation-guide">
                 <div class="lsd-col-12">
-                    <?php
-                    $message = '';
-                    $type = 'warning';
-
-                    if ($expired || (trim($license_key) && $valid === 0))
-                    {
-                        $message = esc_html__('The license Key / Purchase Code is expired. It is required for functionality, auto update, and customer service!', 'listdom');
-                        $type = 'error';
-                    }
-                    else if ($expiring && $valid === 1)
-                    {
-                        $message = sprintf(
-                            /* translators: 1: Number of days remaining on the license. */
-                            esc_html__('Your license will expire in %1$s days. Please renew it to avoid any interruption in using Elementor Addon.', 'listdom'),
-                            $days_remaining
-                        );
-                    }
-                    else if ($valid === 0)
-                    {
-                        $message = sprintf(
-                            /* translators: 1: Add-on name, 2: Vendor website HTML link. */
-                            esc_html__("To use %1\$s addon you need to activate it first. If you don't have a valid license key or yours has expired, you can obtain one from the %2\$s website.", 'listdom'),
-                            '<strong>' . $product['name'] . '</strong>',
-                            '<a href="' . $this->getWebiliaShopURL() . '" target="_blank"><strong>Webilia</strong></a>'
-                        );
-                    }
-                    else if ($grace)
-                    {
-                        $message = sprintf(
-                            /* translators: 1: Remaining grace period in days, 2: Add-on name. */
-                            esc_html__('There seems to be an issue verifying your license, which may be due to a connection problem between our server and yours, or because your license has expired. You are now in a 7-day grace period. If your license is expired, please renew or activate your license within the next %1$s days to avoid any disruption in using %2$s. If you believe this is an error, kindly check your server connection or contact Webilia support for assistance.', 'listdom'),
-                            '<strong style="color: red;">' . esc_html(LSD_Licensing::remainingGracePeriod($prefix)) . '</strong>',
-                            '<strong>' . esc_html($product['name']) . '</strong>'
-                        );
-                    }
-
-                    if ($message) echo $this->alert($message, $type);
-                    ?>
+                    <?php echo $this->alert($primary_message_payload['message'], $primary_message_payload['type']); ?>
                 </div>
             </div>
         <?php endif; ?>
-        <?php if ($trial && !$expired && !$grace): ?>
+        <?php if ($state === 'trial' && !empty($trial_notice_payload['message'])): ?>
             <div class="lsd-trial">
                 <div class="lsd-form-row lsd-mb-0">
                     <div class="lsd-col-12">
-                        <p class="lsd-m-0"><?php echo sprintf(
-                            /* translators: 1: Remaining trial period in days, 2: Add-on name. */
-                            esc_html__('Please activate your license promptly. You have less than %1\$s days remaining to activate %2$s; after that, %2$s will no longer be operational.', 'listdom'),
-                            '<strong style="color: red;">' . esc_html(LSD_Licensing::remainingTrialPeriod($prefix)) . '</strong>',
-                            '<strong>' . esc_html($product['name']) . '</strong>'
-                        ); ?></p>
+                        <p class="lsd-m-0"><?php echo $trial_notice_payload['message']; ?></p>
                     </div>
                 </div>
-                <a class="lsd-primary-button" href="<?php echo esc_url($this->getWebiliaShopUrl()); ?>" target="_blank">
+                <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>" target="_blank">
                     <?php esc_html_e('Get License', 'listdom'); ?>
                     <i class="listdom-icon lsdi-key"></i>
                 </a>
@@ -149,7 +115,7 @@ $progress_class = $status['progress_class'];
         <?php endif; ?>
 
         <div class="lsd-activation">
-            <form class="lsd-activation-form" data-key="<?php echo esc_attr($key); ?>">
+            <form class="lsd-activation-form lsd-alert-no-my" data-key="<?php echo esc_attr($key); ?>">
                 <div class="lsd-form-row lsd-my-0">
                     <div class="lsd-col-12">
                         <div class="lsd-w-full">
@@ -157,7 +123,7 @@ $progress_class = $status['progress_class'];
                                 'id' => $key . '_license_key',
                                 'class' => 'lsd-admin-input',
                                 'name' => 'license_key',
-                                'value' => $license_key,
+                                'value' => $licensing->getLicenseKey(),
                                 'placeholder' => esc_attr__('Enter the license here', 'listdom'),
                             ]); ?>
                         </div>
@@ -179,11 +145,11 @@ $progress_class = $status['progress_class'];
                         </div>
                     </div>
                 </div>
-                <?php if ($trial): ?>
-                    <div class="lsd-alert lsd-info lsd-my-0"><?php esc_html_e("License Key / Purchase Code is required for functionality, auto update, and customer service!", 'listdom'); ?></div>
+                <?php if ($state === 'trial' && !empty($trial_inline_payload['message'])): ?>
+                    <?php echo $this->alert($trial_inline_payload['message'], $trial_inline_payload['type']); ?>
                 <?php endif; ?>
-                <div class="lsd-w-full">
-                    <div id="<?php echo esc_attr($key); ?>_activation_alert"></div>
+                <div class="lsd-w-full lsd-activation-form-alert-wrapper">
+                    <div class="lsd-activation-form-alert" id="<?php echo esc_attr($key); ?>_activation_alert"></div>
                 </div>
             </form>
         </div>
@@ -195,17 +161,12 @@ $progress_class = $status['progress_class'];
             </div>
         <?php endif; ?>
     <?php else: ?>
-        <?php if ($expiring): ?>
-            <div class="lsd-alert lsd-warning lsd-my-0"><?php
-            echo sprintf(
-                /* translators: 1: Remaining days, 2: Add-on name. */
-                esc_html__('Your license will expire in %1\$s days. Please renew it to avoid any interruption in using %2$s.', 'listdom'),
-                '<strong style="color: red;">' . esc_html($days_remaining) . '</strong>',
-                '<strong>' . esc_html($product['name']) . '</strong>'
-            );
-            ?></div>
+        <?php if ($state === 'expiring' && !empty($expiring_notice_payload['message'])): ?>
+            <?php echo $this->alert($expiring_notice_payload['message'], $expiring_notice_payload['type']); ?>
         <?php endif; ?>
-        <div class="lsd-alert lsd-success lsd-my-0"><?php esc_html_e("The functionality, auto update, and customer service are activated.", 'listdom'); ?></div>
+        <?php if ($status['state'] === 'active'): ?>
+            <div class="lsd-alert lsd-success lsd-my-0"><?php esc_html_e("The functionality, auto update, and customer service are activated.", 'listdom'); ?></div>
+        <?php endif; ?>
         <div class="lsd-license-manage">
             <div class="lsd-license-key">
                 <h3 class="lsd-my-0 lsd-fields-label">
@@ -229,7 +190,7 @@ $progress_class = $status['progress_class'];
                 <i class="listdom-icon lsdi-link-square"></i>
             </a>
         </div>
-        <div class="lsd-w-full lsd-deactivation">
+    <div class="lsd-w-full lsd-deactivation">
             <form class="lsd-deactivation-form" data-key="<?php echo esc_attr($key); ?>">
                 <div class="lsd-form-row lsd-deactivation-wrapper lsd-m-0">
                     <div class="lsd-col-12">

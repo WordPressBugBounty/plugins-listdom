@@ -35,7 +35,7 @@ $report_privacy_field = LSD_Privacy::consent_field([
 					value="<?php echo $current_id ? esc_attr(trim($current->first_name.' '.$current->last_name)) : ''; ?>"
 					required
 				>
-				<i class="lsd-icon fa fa-user"></i>
+				<i class="lsd-fe-icon fa fa-user"></i>
 			</div>
 			<?php endif; ?>
 
@@ -49,7 +49,7 @@ $report_privacy_field = LSD_Privacy::consent_field([
 					value="<?php echo $current_id ? esc_attr($current->user_email) : ''; ?>"
 					required
 				>
-				<i class="lsd-icon fa fa-envelope"></i>
+				<i class="lsd-fe-icon fa fa-envelope"></i>
 			</div>
 
             <?php if ($field_phone): ?>
@@ -63,7 +63,7 @@ $report_privacy_field = LSD_Privacy::consent_field([
                     value="<?php echo $current_id ? esc_attr(get_user_meta($current_id, 'lsd_phone', true)) : ''; ?>"
                     required
                 >
-                <i class="lsd-icon fas fa-phone-alt"></i>
+                <i class="lsd-fe-icon fas fa-phone-alt"></i>
             </div>
             <?php endif; ?>
         </div>

@@ -22,7 +22,7 @@ if ($this->horizontal)
     $items_wrapper_classes[] = 'lsd-timeline-align-' . $horizontal_alignment;
 }
 
-// Add List Skin JS codes to footer
+// Add Timeline Skin JS codes to footer
 $assets = new LSD_Assets();
 $assets->footer('<script>
 jQuery(document).ready(function()
@@ -71,10 +71,8 @@ jQuery(document).ready(function()
             <?php echo LSD_Kses::form($this->get_sortbar()); ?>
 
             <div class="lsd-timeline-view-listings-wrapper lsd-viewstyle-timeline">
-                <div class="lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?>">
-                    <div class="<?php echo esc_attr(implode(' ', array_map('sanitize_html_class', $items_wrapper_classes))); ?>">
-                        <?php echo LSD_Kses::full($listings_html); ?>
-                    </div>
+                <div class="<?php echo esc_attr(implode(' ', array_map('sanitize_html_class', $items_wrapper_classes))); ?> lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?>">
+                    <?php echo LSD_Kses::full($listings_html); ?>
                 </div>
             </div>
 

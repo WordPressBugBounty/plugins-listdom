@@ -19,18 +19,36 @@ class LSD_IX_Settings extends LSD_Base
 
         // Settings
         $settings = LSD_Options::settings();
+        $payments = LSD_Options::payments();
 
         // Unset Private Data
         if (isset($settings['googlemaps_api_key'])) unset($settings['googlemaps_api_key']);
         if (isset($settings['mapbox_access_token'])) unset($settings['mapbox_access_token']);
         if (isset($settings['grecaptcha_sitekey'])) unset($settings['grecaptcha_sitekey']);
         if (isset($settings['grecaptcha_secretkey'])) unset($settings['grecaptcha_secretkey']);
+        if (isset($payments['gateways']) && is_array($payments['gateways']))
+        {
+            $sensitive_keys = ['publishable_key', 'secret_key', 'webhook_secret', 'client_id', 'secret', 'access_token', 'api_key'];
+
+            foreach ($payments['gateways'] as $gateway_key => $gateway)
+            {
+                if (!is_array($gateway)) continue;
+
+                foreach ($sensitive_keys as $sensitive_key)
+                {
+                    if (isset($gateway[$sensitive_key])) unset($gateway[$sensitive_key]);
+                }
+
+                $payments['gateways'][$gateway_key] = $gateway;
+            }
+        }
 
         // Settings Content
         $content = [
             'settings' => $settings,
             'customizer' => LSD_Options::customizer(),
             'auth' => LSD_Options::auth(),
+            'payments' => $payments,
             'styles' => LSD_Options::styles(),
             'details_page' => LSD_Options::details_page(),
             'socials' => LSD_Options::socials(),
@@ -130,6 +148,11 @@ class LSD_IX_Settings extends LSD_Base
         // Merge Auth
         update_option('lsd_auth', array_merge(
             LSD_Options::auth(), isset($options['auth']) && is_array($options['auth']) ? $options['auth'] : []
+        ));
+
+        // Merge Payments
+        update_option('lsd_payments', array_merge(
+            LSD_Options::payments(), isset($options['payments']) && is_array($options['payments']) ? $options['payments'] : []
         ));
 
         // Merge Styles

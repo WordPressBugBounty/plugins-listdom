@@ -6,11 +6,17 @@ defined('ABSPATH') || die();
 /** @var string $title */
 /** @var string $url */
 /** @var array $menus */
+/** @var string $notice */
+
+$notice = $notice ?? '';
 ?>
-<style>.wrap > h1.wp-heading-inline, .wrap > .page-title-action {display: none;}</style>
+<style>.wrap > h1.wp-heading-inline, .wrap > .page-title-action {display: none;} .wrap > span.subtitle {padding-left: 0}</style>
 <div id="lsd-ptype-header" class="wrap about-wrap lsd-wrap">
     <?php LSD_Menus::header($title, $url, $menus ?? []); ?>
 </div>
+<?php if ($notice !== ''): ?>
+    <div class="wrap"><?php echo $notice; ?></div>
+<?php endif; ?>
 <script>
 (function ($)
 {

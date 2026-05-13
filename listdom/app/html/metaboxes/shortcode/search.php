@@ -7,6 +7,7 @@ defined('ABSPATH') || die();
 
 // Search Options
 $search = get_post_meta($post->ID, 'lsd_search', true);
+$search = is_array($search) ? $search : [];
 
 // Searchable
 $searchable = $search['searchable'] ?? 1;
@@ -77,24 +78,88 @@ $searchable = $search['searchable'] ?? 1;
 
                     <div class="lsd-col-7">
                         <?php echo LSD_Form::select([
-                            'class' => 'lsd-admin-input',
+                            'class' => 'lsd-admin-input lsd-trigger-select-options',
                             'id' => 'lsd_search_position',
                             'name' => 'lsd[search][position]',
                             'options' => [
-                                'top' => esc_html__('Show on top', 'listdom'),
-                                'bottom' => esc_html__('Show on bottom', 'listdom'),
-                                'left' => esc_html__('Show on left', 'listdom'),
-                                'right' => esc_html__('Show on right', 'listdom'),
-                                'before_listings' => esc_html__('Show before the listings', 'listdom')
+                                'top' => [
+                                    'label' => esc_html__('Show on top', 'listdom'),
+                                    'attributes' => [
+                                        'data-lsd-hide' => '.lsd-search-sticky-row, .lsd-search-sticky-offset-row'
+                                    ],
+                                ],
+                                'bottom' => [
+                                    'label' => esc_html__('Show on bottom', 'listdom'),
+                                    'attributes' => [
+                                        'data-lsd-hide' => '.lsd-search-sticky-row, .lsd-search-sticky-offset-row'
+                                    ],
+                                ],
+                                'left' => [
+                                    'label' => esc_html__('Show on left', 'listdom'),
+                                    'attributes' => [
+                                        'data-lsd-show' => '.lsd-search-sticky-row',
+                                    ],
+                                ],
+                                'right' => [
+                                    'label' => esc_html__('Show on right', 'listdom'),
+                                    'attributes' => [
+                                        'data-lsd-show' => '.lsd-search-sticky-row',
+                                    ],
+                                ],
+                                'before_listings' => [
+                                    'label' => esc_html__('Show before the listings', 'listdom'),
+                                    'attributes' => [
+                                        'data-lsd-hide' => '.lsd-search-sticky-row, .lsd-search-sticky-offset-row'
+                                    ],
+                                ],
                             ],
                             'value' => $search['position'] ?? 'top'
                         ]); ?>
                     </div>
                 </div>
+                <div class="lsd-search-sticky-row <?php echo in_array($search['position'] ?? '', ['left', 'right'], true) ? '' : ' lsd-util-hide'; ?>">
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3">
+                            <?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Sticky Search Form', 'listdom'),
+                                'for' => 'lsd_search_sticky',
+                            ]); ?>
+                        </div>
 
+                        <div class="lsd-col-7">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_search_sticky',
+                                'name' => 'lsd[search][sticky]',
+                                'value' => $search['sticky'] ?? 0,
+                                'toggle' => '.lsd-search-sticky-offset-row',
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Keep the left or right search form visible while scrolling. A scrollbar is added automatically if the form becomes taller than the viewport.", 'listdom'); ?></p>
+                        </div>
+                    </div>
+                    <div class="lsd-form-row lsd-search-sticky-offset-row <?php echo (in_array($search['position'] ?? '', ['left', 'right'], true) && !empty($search['sticky'])) ? '' : ' lsd-util-hide'; ?>">
+                        <div class="lsd-col-3">
+                            <?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Sticky Offset (px)', 'listdom'),
+                                'for' => 'lsd_search_sticky_offset',
+                            ]); ?>
+                        </div>
+
+                        <div class="lsd-col-7">
+                            <?php echo LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => 'lsd_search_sticky_offset',
+                                'name' => 'lsd[search][sticky_offset]',
+                                'value' => isset($search['sticky_offset']) && trim((string) $search['sticky_offset']) !== '' ? max(0, (int) $search['sticky_offset']) : '',
+                                'attributes' => ['min' => 0, 'step' => 1],
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Set the distance from the top of the viewport for sticky search forms. Leave it empty to use the default spacing.", 'listdom'); ?></p>
+                        </div>
+                    </div>
+                </div>
                 <?php do_action('lsd_shortcode_search_metabox_end', $post, $search); ?>
             </div>
         </div>
     </div>
 </div>
-

@@ -28,29 +28,31 @@ class LSD_Fields extends LSD_Base
             'availability' => ['label' => esc_html__('Work Hours', 'listdom'), 'enabled' => 1],
             'phone' => ['label' => esc_html__('Phone', 'listdom'), 'enabled' => 1],
             'email' => ['label' => esc_html__('Email', 'listdom'), 'enabled' => 0],
-            'labels' => ['label' => esc_html__('Labels', 'listdom'), 'enabled' => 0],
+            'labels' => ['label' => esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural')), 'enabled' => 0],
             'website' => ['label' => esc_html__('Website', 'listdom'), 'enabled' => 0],
             'image' => ['label' => esc_html__('Featured Image', 'listdom'), 'enabled' => 0],
             'description' => ['label' => esc_html__('Listing Description', 'listdom'), 'enabled' => 0],
             'remark' => ['label' => esc_html__('Remark', 'listdom'), 'enabled' => 0],
             'price_class' => ['label' => esc_html__('Price Class', 'listdom'), 'enabled' => 0],
             'contact' => ['label' => esc_html__('Contact Address', 'listdom'), 'enabled' => 0],
-            'category' => ['label' => esc_html__('Category', 'listdom'), 'enabled' => 0],
-            'tags' => ['label' => esc_html__('Tags', 'listdom'), 'enabled' => 0],
-            'locations' => ['label' => esc_html__('Locations', 'listdom'), 'enabled' => 0],
-            'features' => ['label' => esc_html__('Features', 'listdom'), 'enabled' => 0],
+            'cta' => ['label' => esc_html__('Call to Action', 'listdom'), 'enabled' => 0],
+            'category' => ['label' => esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY)), 'enabled' => 0],
+            'tags' => ['label' => esc_html(lsd_t_label(LSD_Base::TAX_TAG, 'plural')), 'enabled' => 0],
+            'locations' => ['label' => esc_html(lsd_t_label(LSD_Base::TAX_LOCATION, 'plural')), 'enabled' => 0],
+            'features' => ['label' => esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural')), 'enabled' => 0],
             'map' => ['label' => esc_html__('Map', 'listdom'), 'enabled' => 0],
         ];
 
         if (!LSD_Components::pricing()) unset($fields['price'], $fields['price_class']);
+        if (!LSD_Components::cta()) unset($fields['cta']);
         if (!LSD_Components::work_hours()) unset($fields['availability']);
         if (!LSD_Components::map()) unset($fields['address'], $fields['map']);
 
         // Conditionally include or exclude fields based on specific class existence
         if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)) $fields['review_stars'] = ['label' => esc_html__('Review Rates', 'listdom'), 'enabled' => 0];
-        if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)) $fields['compare'] = ['label' => esc_html__('Compare', 'listdom'), 'enabled' => 0];
-        if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)) $fields['favorite'] = ['label' => esc_html__('Favorite', 'listdom'), 'enabled' => 0];
-        if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)) $fields['claim'] = ['label' => esc_html__('Claim', 'listdom'), 'enabled' => 0];
+        if (class_exists(\LSDPACCMP\Base::class)) $fields['compare'] = ['label' => esc_html__('Compare', 'listdom'), 'enabled' => 0];
+        if (class_exists(\LSDPACFAV\Base::class)) $fields['favorite'] = ['label' => esc_html__('Favorite', 'listdom'), 'enabled' => 0];
+        if (class_exists(\LSDPACCLM\Base::class)) $fields['claim'] = ['label' => esc_html__('Claim', 'listdom'), 'enabled' => 0];
 
         $SN = new LSD_Socials();
         $networks = LSD_Options::socials();
@@ -176,6 +178,10 @@ class LSD_Fields extends LSD_Base
                 $output = LSD_Kses::element($listing->get_excerpt(50));
                 break;
 
+            case 'cta':
+                if (LSD_Components::cta()) $output = '<div class="lsd-listing-cta lsd-cta-align-left">' . LSD_Kses::element($listing->get_cta('table')) . '</div>';
+                break;
+
             case 'features':
                 $output = LSD_Kses::element($listing->get_features());
                 break;
@@ -189,7 +195,9 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'claim':
-                $output = LSD_Kses::element($listing->get_claim_button());
+                $output = $listing->is_claimed()
+                    ? '<span class="lsd-tooltip" data-lsd-tooltip="' . esc_attr__('Verified', 'listdom') . '"><i class="lsd-fe-icon fas fa-check-circle lsd-claimed-icon"></i></span>'
+                    : LSD_Kses::element($listing->get_claim_button());
                 break;
 
             case 'favorite':
@@ -201,18 +209,15 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case is_numeric($key):
-                $attributes = get_post_meta($listing->id(), 'lsd_attributes', true);
-                if (!is_array($attributes)) $attributes = [];
-
                 $att = new LSD_Entity_Attribute($key);
-                $output = LSD_Kses::element($att->render($attributes[$att->slug()] ?? ''));
+                $output = LSD_Kses::element($att->render($att->value($listing->id())));
                 break;
 
             case substr($key, 0, 3) === 'sn_':
                 $key_without_prefix = substr($key, 3);
                 $value = $listing->get_meta('lsd_' . $key_without_prefix);
 
-                if (!empty($value)) $output = '<a href="' . esc_url($value) . '" target="_blank"><i class="lsd-icon fab fa-' . $key_without_prefix . '"></i></a>';
+                if (!empty($value)) $output = '<a href="' . esc_url($value) . '" target="_blank"><i class="lsd-fe-icon fab fa-' . $key_without_prefix . '"></i></a>';
                 break;
 
             case substr($key, 0, 4) === 'acf_':
@@ -280,7 +285,29 @@ class LSD_Fields extends LSD_Base
                 break;
 
             default:
-                $output = lsd_schema()->prop($key);
+                $normalized = strtolower(trim((string) $key));
+                $normalized = preg_replace('/([a-z])([A-Z])/', '$1_$2', $normalized);
+                $normalized = preg_replace('/[\s\-]+/', '_', $normalized);
+                $normalized = preg_replace('/_+/', '_', $normalized);
+
+                $simplified = str_replace('_', '', $normalized);
+
+                $map = [
+                    'website' => 'url',
+                    'web' => 'url',
+                    'site' => 'url',
+                    'link' => 'url',
+                    'socials' => 'sameAs',
+                    'social_links' => 'sameAs',
+                    'sociallinks' => 'sameAs',
+                    'email' => 'email',
+                    'fax' => 'faxNumber',
+                    'opening_hours' => 'openingHours',
+                    'openinghours' => 'openingHours',
+                ];
+
+                if (isset($map[$normalized])) $output = lsd_schema()->prop($map[$normalized]);
+                else if (isset($map[$simplified])) $output = lsd_schema()->prop($map[$simplified]);
                 break;
         }
 
@@ -350,5 +377,4 @@ class LSD_Fields extends LSD_Base
 
         return '';
     }
-
 }

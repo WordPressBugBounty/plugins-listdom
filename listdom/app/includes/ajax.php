@@ -25,9 +25,6 @@ class LSD_Ajax extends LSD_Base
 
     public function search()
     {
-        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
-        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_search_form')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom')]);
-
         $post = wp_unslash($_POST);
         $args = isset($post['args']) && is_array($post['args']) ? $post['args'] : [];
 
@@ -88,6 +85,12 @@ class LSD_Ajax extends LSD_Base
         $total = $SKO->getField('found_listings');
         $next_page = $SKO->getField('next_page');
 
+        $filters = '';
+        if (method_exists($SKO, 'filters'))
+        {
+            $filters = LSD_Kses::element($SKO->filters());
+        }
+
         $this->response([
             'objects' => $objects,
             'listings' => LSD_Kses::full($listings),
@@ -96,6 +99,7 @@ class LSD_Ajax extends LSD_Base
             'total' => $total,
             'limit' => $limit,
             'pagination' => $pagination === 'numeric' ? $SKO->get_pagination() : '',
+            'filters' => $filters,
         ]);
     }
 
@@ -126,7 +130,7 @@ class LSD_Ajax extends LSD_Base
             foreach ($users as $user)
             {
                 $total++;
-                $items .= '<li data-value="' . esc_attr($user->ID) . '">' . $user->user_email . '</li>';
+                $items .= '<li data-value="' . esc_attr($user->ID) . '">' . esc_html($user->user_email) . '</li>';
             }
         }
         else if (in_array($source, get_taxonomies()))
@@ -137,6 +141,16 @@ class LSD_Ajax extends LSD_Base
                 'hide_empty' => false,
                 'number' => 10,
             ]);
+
+            if (is_wp_error($terms))
+            {
+                $message = $terms->get_error_message();
+                $this->response([
+                    'success' => 0,
+                    'message' => $message ? esc_html($message) : esc_html__('Unable to fetch taxonomy terms.', 'listdom'),
+                ]);
+                return;
+            }
 
             foreach ($terms as $term)
             {
@@ -149,7 +163,9 @@ class LSD_Ajax extends LSD_Base
             $posts = get_posts([
                 'post_type' => LSD_Base::PTYPE_SHORTCODE,
                 's' => $term,
-                'numberposts' => 10,
+                'posts_per_page' => -1,
+                'orderby' => 'title',
+                'order' => 'ASC',
                 'post_status' => 'publish',
             ]);
 
@@ -162,7 +178,7 @@ class LSD_Ajax extends LSD_Base
                 if (!in_array($skin, $skins)) continue;
 
                 $total++;
-                $items .= '<li data-value="' . esc_attr($post->ID) . '">' . $post->post_title . '</li>';
+                $items .= '<li data-value="' . esc_attr($post->ID) . '">' . esc_html($post->post_title) . '</li>';
             }
         }
         else
@@ -177,7 +193,7 @@ class LSD_Ajax extends LSD_Base
             foreach ($posts as $post)
             {
                 $total++;
-                $items .= '<li data-value="' . esc_attr($post->ID) . '">' . $post->post_title . '</li>';
+                $items .= '<li data-value="' . esc_attr($post->ID) . '">' . esc_html($post->post_title) . '</li>';
             }
         }
 
@@ -192,12 +208,6 @@ class LSD_Ajax extends LSD_Base
     {
         $request = wp_unslash($_REQUEST);
 
-        // Check if security nonce is set
-        if (!isset($request['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__("Security nonce is required.", 'listdom')]);
-
-        // Verify that the nonce is valid
-        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($request['_wpnonce'])), 'lsd_search_form')) $this->response(['success' => 0, 'message' => esc_html__("Security nonce is invalid.", 'listdom')]);
-
         // Taxonomy
         $taxonomy = isset($request['taxonomy']) ? sanitize_key($request['taxonomy']) : LSD_Base::TAX_LOCATION;
 
@@ -211,6 +221,16 @@ class LSD_Ajax extends LSD_Base
             'orderby' => 'name',
             'order' => 'ASC',
         ]);
+
+        if (is_wp_error($terms))
+        {
+            $this->response([
+                'success' => 0,
+                'found' => 0,
+                'items' => [],
+                'message' => esc_html($terms->get_error_message()),
+            ]);
+        }
 
         $items = [];
         foreach ($terms as $term)

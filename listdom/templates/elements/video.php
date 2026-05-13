@@ -16,7 +16,7 @@ if(!count($embeds)) return '';
             <?php if(isset($embed['featured']) && $embed['featured'] == 1): ?>
                 <li <?php echo lsd_schema()->subjectOf(); ?> <?php echo lsd_schema()->scope()->type('https://schema.org/VideoObject'); ?>>
                     <?php if(isset($embed['name']) && trim($embed['name'])): ?>
-                        <h2 class="lsd-single-page-section-title" <?php echo lsd_schema()->name(); ?> ><?php echo esc_html($embed['name']); ?></h2>
+                        <h2 class="lsd-single-page-section-title lsd-fe-title" <?php echo lsd_schema()->name(); ?> ><?php echo esc_html($embed['name']); ?></h2>
                     <?php endif; ?>
                     <div class="lsd-embed-code-wrapper">
                         <?php

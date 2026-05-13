@@ -46,7 +46,7 @@ $listgrid = $options['listgrid'] ?? [];
                     'id' => 'lsd_display_options_skin_listgrid_columns',
                     'name' => 'lsd[display][listgrid][columns]',
                     'options' => ['2' => 2, '3' => 3, '4' => 4, '6' => 6],
-                    'value' => $listgrid['columns'] ?? '3'
+                    'value' => $listgrid['columns'] ?? '2'
                 ]); ?>
                 <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Set the count of the listing cards per row for the Grid view.", 'listdom'); ?></p>
             </div>

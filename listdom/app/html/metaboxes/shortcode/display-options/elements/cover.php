@@ -47,6 +47,13 @@ $optional_addons = [];
             </div>
 
             <div class="lsd-elements-section">
+                <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/partials/cta.php', [
+                    'parameters' => [
+                        'skin' => 'cover',
+                        'settings' => $cover,
+                    ],
+                ]); ?>
+
                 <div class="lsd-elements-subsection">
                     <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Other Elements', 'listdom'); ?></h4>
                     <div class="lsd-elements-fields">
@@ -188,8 +195,8 @@ $optional_addons = [];
                                 ]); ?>
                             </div>
                         </div>
-                        <?php if(class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
-                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style4 <?php echo !isset($cover['display_title']) || $cover['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_cover_is_claimed_wrapper">
+                        <?php if (class_exists(\LSDPACCLM\Base::class)): ?>
+                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4 <?php echo !isset($cover['display_title']) || $cover['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_cover_is_claimed_wrapper">
                                 <div class="lsd-form-row">
                                     <div class="lsd-col-5"><?php echo LSD_Form::label([
                                             'class' => 'lsd-fields-label',
@@ -219,4 +226,3 @@ $optional_addons = [];
         </div>
     </div>
 </div>
-

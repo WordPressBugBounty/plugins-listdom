@@ -30,7 +30,7 @@ $optional_addons = [];
     </div>
 
     <div class="lsd-settings-fields-wrapper">
-        <div class="lsd-form-row-style-needed lsd-display-options-style-dependency lsd-display-options-style-dependency-style1" id="lsd_display_options_style">
+        <div class="lsd-form-row-style-needed lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2" id="lsd_display_options_style">
             <div class="lsd-admin-section-heading">
                 <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Elements", 'listdom'); ?></h3>
                 <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
@@ -76,15 +76,42 @@ $optional_addons = [];
                                     <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Cover shows only featured image but slider shows all gallery images.", 'listdom'); ?></p>
                                 </div>
                             </div>
+                            <div class="lsd-image-row lsd-display-options-skin-timeline-image-options <?php echo !isset($timeline['display_image']) || $timeline['display_image'] ? '' : 'lsd-util-hide'; ?>">
+                                <div><?php echo LSD_Form::label([
+                                        'class' => 'lsd-fields-label',
+                                        'title' => esc_html__('Image Fit', 'listdom'),
+                                        'for' => 'lsd_display_options_skin_timeline_image_fit',
+                                    ]); ?></div>
+                                <div>
+                                    <?php echo LSD_Form::select([
+                                        'class' => 'lsd-admin-input',
+                                        'id' => 'lsd_display_options_skin_timeline_image_fit',
+                                        'name' => 'lsd[display][timeline][image_fit]',
+                                        'options' => [
+                                            'cover' => esc_html__('Cover', 'listdom'),
+                                            'contain' => esc_html__('Contain', 'listdom'),
+                                        ],
+                                        'value' => $timeline['image_fit'] ?? 'cover'
+                                    ]); ?>
+                                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Cover shows featured image as object fit cover.", 'listdom'); ?></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 <?php else: $optional_addons[] = ['pro', esc_html__('Display Image', 'listdom')]; ?>
                 <?php endif; ?>
 
+                <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/partials/cta.php', [
+                    'parameters' => [
+                        'skin' => 'timeline',
+                        'settings' => $timeline,
+                    ],
+                ]); ?>
+
                 <div class="lsd-elements-subsection">
                     <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Other Elements', 'listdom'); ?></h4>
                     <div class="lsd-elements-fields">
-                        <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
+                        <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2">
                             <div class="lsd-col-8"><?php echo LSD_Form::label([
                                     'class' => 'lsd-fields-label',
                                     'title' => esc_html__('Contact Info', 'listdom'),
@@ -98,62 +125,6 @@ $optional_addons = [];
                                 ]); ?>
                             </div>
                         </div>
-
-                        <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
-                            <div class="lsd-form-row lsd-display-options-builder-option">
-                                <div class="lsd-col-8"><?php echo LSD_Form::label([
-                                        'class' => 'lsd-fields-label',
-                                        'title' => esc_html__('Content', 'listdom'),
-                                        'for' => 'lsd_display_options_skin_timeline_display_description',
-                                    ]); ?></div>
-                                <div class="lsd-col-4">
-                                    <?php echo LSD_Form::switcher([
-                                        'id' => 'lsd_display_options_skin_timeline_display_description',
-                                        'name' => 'lsd[display][timeline][display_description]',
-                                        'value' => $timeline['display_description'] ?? '1',
-                                        'toggle' => '#lsd_display_options_skin_timeline_description_length_wrapper, #lsd_display_options_skin_timeline_content_type_wrapper'
-                                    ]); ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <?php if (LSD_Components::map()): ?>
-                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
-                                <div class="lsd-form-row">
-                                    <div class="lsd-col-8"><?php echo LSD_Form::label([
-                                            'class' => 'lsd-fields-label',
-                                            'title' => esc_html__('Address', 'listdom'),
-                                            'for' => 'lsd_display_options_skin_timeline_display_address',
-                                        ]); ?></div>
-                                    <div class="lsd-col-4">
-                                        <?php echo LSD_Form::switcher([
-                                            'id' => 'lsd_display_options_skin_timeline_display_address',
-                                            'name' => 'lsd[display][timeline][display_address]',
-                                            'value' => $timeline['display_address'] ?? '1'
-                                        ]); ?>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if (LSD_Components::work_hours()): ?>
-                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
-                                <div class="lsd-form-row ">
-                                    <div class="lsd-col-8"><?php echo LSD_Form::label([
-                                            'class' => 'lsd-fields-label',
-                                            'title' => esc_html__('Work Hours', 'listdom'),
-                                            'for' => 'lsd_display_options_skin_timeline_display_availability',
-                                        ]); ?></div>
-                                    <div class="lsd-col-4">
-                                        <?php echo LSD_Form::switcher([
-                                            'id' => 'lsd_display_options_skin_timeline_display_availability',
-                                            'name' => 'lsd[display][timeline][display_availability]',
-                                            'value' => $timeline['display_availability'] ?? '1'
-                                        ]); ?>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
 
                         <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
                             <div class="lsd-form-row lsd-display-options-builder-option">
@@ -173,7 +144,7 @@ $optional_addons = [];
                         </div>
 
                         <?php if (LSD_Components::socials()): ?>
-                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
+                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2">
                                 <div class="lsd-form-row lsd-display-options-builder-option">
                                     <div class="lsd-col-8"><?php echo LSD_Form::label([
                                             'class' => 'lsd-fields-label',
@@ -192,7 +163,7 @@ $optional_addons = [];
                         <?php endif; ?>
 
                         <?php if (LSD_Components::pricing()): ?>
-                            <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1">
+                            <div class="lsd-form-row lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
                                         'title' => esc_html__('Price', 'listdom'),
@@ -223,8 +194,8 @@ $optional_addons = [];
                                 ]); ?>
                             </div>
                         </div>
-                        <?php if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
-                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 <?php echo !isset($timeline['display_title']) || $timeline['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_timeline_is_claimed_wrapper">
+                        <?php if (class_exists(\LSDPACCLM\Base::class)): ?>
+                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 <?php echo !isset($timeline['display_title']) || $timeline['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_timeline_is_claimed_wrapper">
                                 <div class="lsd-form-row">
                                     <div class="lsd-col-8"><?php echo LSD_Form::label([
                                             'class' => 'lsd-fields-label',
@@ -258,7 +229,7 @@ $optional_addons = [];
                             </div>
                         </div>
 
-                        <?php if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACFAV\Base::class)): ?>
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
@@ -276,7 +247,7 @@ $optional_addons = [];
                         <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
                         <?php endif; ?>
 
-                        <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACCMP\Base::class)): ?>
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
@@ -314,6 +285,7 @@ $optional_addons = [];
                     </div>
                 </div>
             </div>
+
             <?php if (count($optional_addons)): ?>
                 <div class="lsd-alert-no-my lsd-mt-5">
                     <?php echo LSD_Base::alert(LSD_Base::optionalAddonsMessage($optional_addons),'warning'); ?>
@@ -321,5 +293,4 @@ $optional_addons = [];
             <?php endif; ?>
         </div>
     </div>
-
 </div>

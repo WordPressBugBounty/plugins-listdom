@@ -89,7 +89,7 @@ class LSD_Personalize_Forms extends LSD_Personalize
         $labels = $config['labels']['_'] ?? [];
 
         // Box
-        $CSS = str_replace('((auth_forms_box_bg))', sanitize_text_field($box['bg'] ?: 'transparent'), $CSS);
+        $CSS = str_replace('((auth_forms_box_bg))', sanitize_text_field($box['bg'] ?: '#fff'), $CSS);
         $CSS = str_replace('((auth_forms_box_padding))', self::paddings($box['padding'] ?? []), $CSS);
         $CSS = str_replace('((auth_forms_box_border))', self::borders($box['border'] ?? []), $CSS);
         $CSS = str_replace('((auth_forms_box_border_style))', sanitize_text_field($box['border']['style'] ?: 'none'), $CSS);

@@ -9,7 +9,7 @@ class LSD_Element_Attributes extends LSD_Element
     {
         parent::__construct();
 
-        $this->label = esc_html__('Custom Fields', 'listdom');
+        $this->label = esc_html(lsd_t_label(LSD_Base::TAX_ATTRIBUTE, 'plural'));
     }
 
     public function get($post_id = null, $show_icons = 0, $show_attribute_title = 1)

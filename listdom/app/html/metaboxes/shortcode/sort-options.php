@@ -26,7 +26,7 @@ else
         <div class="lsd-settings-fields-wrapper">
             <div class="lsd-admin-section-heading">
                 <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Style", 'listdom'); ?></h3>
-                <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("Set default sorting logic and order—by date, title, views, price, rating, and more.", 'listdom'); ?> </p>
+                <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("Enable the sort for this shortcode and select the style of it.", 'listdom'); ?> </p>
             </div>
 
             <div class="lsd-form-row lsd-flex-align-items-center">
@@ -58,7 +58,7 @@ else
             <div class="lsd-settings-fields-wrapper">
                 <div class="lsd-admin-section-heading">
                     <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Sort Options", 'listdom'); ?></h3>
-                    <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("Set default sorting logic and order—by date, title, views, price, rating, and more.", 'listdom'); ?> </p>
+                    <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("Enable and configure the sort options.", 'listdom'); ?> </p>
                 </div>
                 <div class="lsd-sortable lsd-flex lsd-flex-col lsd-gap-4 lsd-flex-align-items-start">
                     <?php foreach ($options as $key=>$option): ?>
@@ -69,11 +69,11 @@ else
                         $status = $option['status'] ?? $base['status'];
                         ?>
                         <div class="lsd-metabox-sort-option <?php echo $status ? '': 'lsd-metabox-sort-option-disable'; ?>" id="lsd-sort-options-<?php echo esc_attr($key); ?>">
-                            <div class="lsd-form-row">
-                                <div class="lsd-cursor-move lsd-text-left">
-                                    <i class="lsd-icon fas fa-arrows-alt"></i>
-                                </div>
-                                <div class="lsd-col-9">
+                            <div class="lsd-metabox-sort-option-head">
+                                <div class="lsd-metabox-sort-option-handle">
+                                    <div class="lsd-cursor-move lsd-text-left">
+                                        <i class="lsd-icon fas fa-arrows-alt"></i>
+                                    </div>
                                     <?php if (isset($base['name'])): ?>
                                         <strong><?php echo esc_html($base['name']); ?></strong>
                                     <?php endif; ?>
@@ -83,7 +83,7 @@ else
                                 </div>
                             </div>
                             <div class="lsd-form-row">
-                                <div class="lsd-col-12">
+                                <div class="lsd-col-12 lsd-metabox-sort-options-inputs">
                                     <input type="hidden" name="lsd[sorts][options][<?php echo esc_attr($key); ?>][status]" value="<?php echo esc_attr($status); ?>" id="lsd-sort-options-<?php echo esc_attr($key); ?>-status">
                                     <input class="lsd-admin-input" type="text" name="lsd[sorts][options][<?php echo esc_attr($key); ?>][name]" placeholder="<?php esc_attr_e('Name', 'listdom'); ?>" title="<?php esc_attr_e('Name', 'listdom'); ?>" value="<?php echo $option['name'] ?? ($base['name'] ?? ''); ?>" <?php echo $status ? '' : 'disabled="disabled"'; ?>>
                                     <select class="lsd-admin-input" name="lsd[sorts][options][<?php echo esc_attr($key); ?>][order]" title="<?php esc_attr_e('Default Order', 'listdom'); ?>" <?php echo ($status ? '' : 'disabled="disabled"'); ?>>

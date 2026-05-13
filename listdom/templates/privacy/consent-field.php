@@ -14,11 +14,11 @@ $required = !empty($field['required']);
 $checked = !empty($field['checked']);
 $required_message = isset($field['required_message']) ? sanitize_text_field($field['required_message']) : '';
 ?>
-<div class="<?php echo sanitize_html_class($wrapper_class); ?>">
-    <label class="lsd-privacy-consent-label" for="<?php echo esc_attr($id); ?>">
+<div class="<?php echo esc_attr($wrapper_class); ?>">
+    <label class="lsd-privacy-consent-label lsd-fields-label" for="<?php echo esc_attr($id); ?>">
         <input
             type="checkbox"
-            class="<?php echo sanitize_html_class($input_class); ?>"
+            class="<?php echo esc_attr($input_class); ?>"
             name="<?php echo esc_attr($name); ?>"
             id="<?php echo esc_attr($id); ?>"
             value="1"

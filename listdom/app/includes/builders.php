@@ -28,13 +28,15 @@ class LSD_Builders extends LSD_Base
     {
         $template = get_post($template_id);
 
+        if (!($template instanceof WP_Post)) return '';
+
         // Listdom Bar
-        (LSD_Bar::instance())->add($template_id);
+        if (is_numeric($template_id)) (LSD_Bar::instance())->add($template_id);
 
         // Elementor
         if (
             class_exists(\LSDPACELM\Base::class) &&
-            class_exists('Elementor\Plugin') &&
+            class_exists(\Elementor\Plugin::class) &&
             $template->post_type === \LSDPACELM\Base::PTYPE_DETAILS
         ) return $this->elementor($template_id);
 
@@ -44,6 +46,14 @@ class LSD_Builders extends LSD_Base
             function_exists('et_theme_builder_frontend_render_layout') &&
             $template->post_type === \LSDPACDIV\Base::PTYPE_DETAILS
         ) return $this->divi($template_id);
+
+        // Bricks
+        if (
+            class_exists(\LSDPACBRX\Base::class) &&
+            class_exists(\LSDPACBRX\Builder::class) &&
+            class_exists(\Bricks\Frontend::class) &&
+            $template->post_type === \LSDPACBRX\Base::PTYPE_DETAILS
+        ) return $this->bricks($template_id);
 
         // Anything
         return $this->content($template_id);
@@ -81,6 +91,25 @@ class LSD_Builders extends LSD_Base
         // Build Content
         $template_content = get_post_field('post_content', $template_id);
         $output = et_core_intentionally_unescaped(et_builder_render_layout($template_content), 'html');
+
+        // Back to Original Post
+        if ($this->listing) LSD_LifeCycle::reset();
+
+        return $output;
+    }
+
+    public function bricks($template_id): string
+    {
+        LSD_Payload::set('single', $this->single);
+        LSD_Payload::set('listing', $this->listing);
+
+        $builder = (new \LSDPACBRX\Builder())->single($this->single);
+        if ($this->listing) $builder->listing($this->listing);
+
+        // Set Current Post
+        if ($this->listing) LSD_LifeCycle::post($this->listing->id());
+
+        $output = $builder->build((int) $template_id);
 
         // Back to Original Post
         if ($this->listing) LSD_LifeCycle::reset();

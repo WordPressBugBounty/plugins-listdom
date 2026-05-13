@@ -28,8 +28,10 @@ $gps_zl_current = $settings['map_gps_zl_current'] ?? 7;
 $max_bounds = isset($args['max_bounds']) && is_array($args['max_bounds']) ? $args['max_bounds'] : [];
 $gplaces = isset($args['gplaces']) && $args['gplaces'];
 $infowindow = !isset($args['infowindow']) || $args['infowindow'];
+$infowindow_trigger = $args['infowindow_trigger'] ?? 'click';
 $direction = isset($args['direction']) && $args['direction'];
 $force_to_show = isset($args['force_to_show']) && $args['force_to_show'];
+$mousewheel_zoom = isset($args['mousewheel_zoom']) && $args['mousewheel_zoom'];
 $connected_shortcodes = isset($args['connected_shortcodes']) && is_array($args['connected_shortcodes'])
 	? $args['connected_shortcodes']
 	: [];
@@ -83,7 +85,9 @@ jQuery(document).ready(function()
             atts: "'.http_build_query(['atts'=>$atts], '', '&').'",
             mapsearch: '.($mapsearch ? 'true' : 'false').',
             autoGPS: '.($autoGPS ? 'true' : 'false').',
+            mousewheel_zoom: '.($mousewheel_zoom ? 'true' : 'false').',
             display_infowindow: '.($infowindow ? 'true' : 'false').',
+            infowindow_trigger: "'.esc_js($infowindow_trigger).'",
             connected_shortcodes: '.wp_json_encode($connected_shortcodes, JSON_NUMERIC_CHECK).',
             geo_request: '.($main->is_geo_request() ? 'true' : 'false').',
             gps_zoom: {
@@ -116,15 +120,15 @@ jQuery(document).ready(function()
 
     <?php if($direction): ?>
     <div class="lsd-direction">
-        <form method="post" action="#" id="lsd_direction_form<?php echo esc_attr($id); ?>">
+        <form method="post" action="#" id="lsd_direction_form<?php echo esc_attr($id); ?>" data-message="<?php esc_html_e('No routes found. Try to change the address.','listdom'); ?>">
 			<div class="lsd-row">
 				<div class="lsd-col-9 lsd-direction-address-wrapper">
-					<input class="lsd-direction-address" type="text" placeholder="<?php esc_attr_e('Address from ...', 'listdom') ?>" title="<?php esc_attr_e('Address from ...', 'listdom') ?>" id="lsd_direction_address<?php echo esc_attr($id); ?>">
-					<span class="lsd-direction-reset lsd-util-hide" id="lsd_direction_reset<?php echo esc_attr($id); ?>">X</span>
+					<input class="lsd-direction-address" type="text" placeholder="<?php esc_attr_e('Address from ...', 'listdom') ?>" title="<?php esc_attr_e('Address from ...', 'listdom') ?>" id="lsd_direction_address<?php echo esc_attr($id); ?>" required>
+					<span class="lsd-direction-reset lsd-util-hide" id="lsd_direction_reset<?php echo esc_attr($id); ?>"><i class="lsd-fe-icon lsdi-cross"></i></span>
 					<div class="lsd-direction-position-wrapper">
 						<input type="hidden" id="lsd_direction_latitude<?php echo esc_attr($id); ?>">
 						<input type="hidden" id="lsd_direction_longitude<?php echo esc_attr($id); ?>">
-						<span class="lsd-direction-gps" id="lsd_direction_gps<?php echo esc_attr($id); ?>" title="<?php esc_attr_e('Your current location', 'listdom') ?>"><i class="lsd-icon fa fa-location-arrow"></i></span>
+						<span class="lsd-direction-gps" id="lsd_direction_gps<?php echo esc_attr($id); ?>" title="<?php esc_attr_e('Your current location', 'listdom') ?>"><i class="lsd-fe-icon fa-solid fa-crosshairs"></i></span>
 					</div>
 				</div>
 				<div class="lsd-col-3">

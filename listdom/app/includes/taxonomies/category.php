@@ -19,27 +19,32 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
 
     public function register()
     {
+        $singular = lsd_t_label(LSD_Base::TAX_CATEGORY);
+        $plural = lsd_t_label(LSD_Base::TAX_CATEGORY, 'plural');
+        $singular_lc = lsd_t_label_lc(LSD_Base::TAX_CATEGORY);
+        $plural_lc = lsd_t_label_lc(LSD_Base::TAX_CATEGORY, 'plural');
+
         $args = [
-            'label' => esc_html__('Categories', 'listdom'),
+            'label' => $plural,
             'labels' => [
-                'name' => esc_html__('Categories', 'listdom'),
-                'singular_name' => esc_html__('Category', 'listdom'),
-                'all_items' => esc_html__('All Categories', 'listdom'),
-                'edit_item' => esc_html__('Edit Category', 'listdom'),
-                'view_item' => esc_html__('View Category', 'listdom'),
-                'update_item' => esc_html__('Update Category', 'listdom'),
-                'add_new_item' => esc_html__('Add New Category', 'listdom'),
-                'new_item_name' => esc_html__('New Category Name', 'listdom'),
-                'popular_items' => esc_html__('Popular Categories', 'listdom'),
-                'search_items' => esc_html__('Search Categories', 'listdom'),
-                'separate_items_with_commas' => esc_html__('Separate categories with commas', 'listdom'),
-                'add_or_remove_items' => esc_html__('Add or remove categories', 'listdom'),
-                'choose_from_most_used' => esc_html__('Choose from the most used categories', 'listdom'),
-                'not_found' => esc_html__('No categories found.', 'listdom'),
-                'back_to_items' => esc_html__('← Back to Categories', 'listdom'),
-                'parent_item' => esc_html__('Parent Category', 'listdom'),
-                'parent_item_colon' => esc_html__('Parent Category:', 'listdom'),
-                'no_terms' => esc_html__('No Categories', 'listdom'),
+                'name' => $plural,
+                'singular_name' => $singular,
+                'all_items' => sprintf(esc_html__('All %s', 'listdom'), $plural),
+                'edit_item' => sprintf(esc_html__('Edit %s', 'listdom'), $singular),
+                'view_item' => sprintf(esc_html__('View %s', 'listdom'), $singular),
+                'update_item' => sprintf(esc_html__('Update %s', 'listdom'), $singular),
+                'add_new_item' => sprintf(esc_html__('Add New %s', 'listdom'), $singular),
+                'new_item_name' => sprintf(esc_html__('New %s Name', 'listdom'), $singular),
+                'popular_items' => sprintf(esc_html__('Popular %s', 'listdom'), $plural),
+                'search_items' => sprintf(esc_html__('Search %s', 'listdom'), $plural),
+                'separate_items_with_commas' => sprintf(esc_html__('Separate %s with commas', 'listdom'), $plural_lc),
+                'add_or_remove_items' => sprintf(esc_html__('Add or remove %s', 'listdom'), $plural_lc),
+                'choose_from_most_used' => sprintf(esc_html__('Choose from the most used %s', 'listdom'), $plural_lc),
+                'not_found' => sprintf(esc_html__('No %s found.', 'listdom'), $plural_lc),
+                'back_to_items' => sprintf(esc_html__('← Back to %s', 'listdom'), $plural),
+                'parent_item' => sprintf(esc_html__('Parent %s', 'listdom'), $singular),
+                'parent_item_colon' => sprintf(esc_html__('Parent %s:', 'listdom'), $singular),
+                'no_terms' => sprintf(esc_html__('No %s', 'listdom'), $plural),
             ],
             'public' => true,
             'show_ui' => true,
@@ -61,7 +66,14 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
 
     public function register_metaboxes()
     {
-        add_meta_box('lsd_metabox_category', esc_html__('Category', 'listdom') . ' ' . LSD_Base::REQ_HTML, [$this, 'metabox_category'], LSD_Base::PTYPE_LISTING, 'side', 'low');
+        add_meta_box(
+            'lsd_metabox_category',
+            esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY)) . ' ' . LSD_Base::REQ_HTML,
+            [$this, 'metabox_category'],
+            LSD_Base::PTYPE_LISTING,
+            'side',
+            'low'
+        );
     }
 
     public function metabox_category($post)
@@ -83,7 +95,10 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         // Security Nonce
         LSD_Form::nonce('lsd_listing_cpt', '_lsdnonce');
 
-        echo '<p>' . esc_html__('Please select primary category.', 'listdom') . '</p>';
+        echo '<p>' . sprintf(
+            esc_html__('Select the primary %s.', 'listdom'),
+            esc_html(lsd_t_label_lc(LSD_Base::TAX_CATEGORY))
+        ) . '</p>';
         echo wp_dropdown_categories([
             'echo' => 0,
             'hide_empty' => 0,
@@ -92,7 +107,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
             'taxonomy' => LSD_Base::TAX_CATEGORY,
             'show_option_none' => '-----',
             'selected' => $selected,
-            'class' => 'widefat',
+            'class' => 'widefat lsd-admin-input',
             'hierarchical' => 1,
             'orderby' => 'name',
             'order' => 'ASC',

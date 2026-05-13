@@ -9,8 +9,8 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Listing
         $listing = get_post($id);
 
-        // Not Found!
-        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        // Guard: stop early if the listing post can't be loaded.
+        if (!($listing instanceof WP_Post) || $listing->post_type !== LSD_Base::PTYPE_LISTING) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -117,8 +117,8 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Listing
         $listing = get_post($id);
 
-        // Not Found!
-        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        // Guard: stop early if the listing post can't be loaded.
+        if (!($listing instanceof WP_Post) || $listing->post_type !== LSD_Base::PTYPE_LISTING) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -190,8 +190,8 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Listing
         $listing = get_post($id);
 
-        // Not Found!
-        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        // Guard: stop early if the listing post can't be loaded.
+        if (!($listing instanceof WP_Post) || $listing->post_type !== LSD_Base::PTYPE_LISTING) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -224,8 +224,8 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Listing
         $listing = get_post($id);
 
-        // Not Found!
-        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        // Guard: stop early if the listing post can't be loaded.
+        if (!($listing instanceof WP_Post) || $listing->post_type !== LSD_Base::PTYPE_LISTING) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -252,8 +252,8 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Listing
         $listing = get_post($id);
 
-        // Not Found!
-        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        // Guard: stop early if the listing post can't be loaded.
+        if (!($listing instanceof WP_Post) || $listing->post_type !== LSD_Base::PTYPE_LISTING) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);
@@ -306,8 +306,8 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Listing
         $listing = get_post($id);
 
-        // Not Found!
-        if (!$listing || (isset($listing->post_type) && $listing->post_type !== LSD_Base::PTYPE_LISTING)) return $this->response([
+        // Guard: stop early if the listing post can't be loaded.
+        if (!($listing instanceof WP_Post) || $listing->post_type !== LSD_Base::PTYPE_LISTING) return $this->response([
             'data' => new WP_Error('404', esc_html__('Listing not found!', 'listdom')),
             'status' => 404,
         ]);

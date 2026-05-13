@@ -38,6 +38,14 @@ class LSD_Upgrade extends LSD_Base
         if (version_compare($version, '3.8.0', '<')) $this->v380();
         if (version_compare($version, '4.1.0', '<')) $this->v410();
         if (version_compare($version, '4.5.0', '<')) $this->v450();
+        if (version_compare($version, '4.8.0', '<')) $this->v480();
+        if (version_compare($version, '5.2.1', '<')) $this->v521();
+        if (version_compare($version, '5.3.0', '<')) $this->v530();
+        if (version_compare($version, '5.3.1', '<')) $this->v531();
+        if (version_compare($version, '5.4.0', '<')) $this->v540();
+
+        // Regenerate personalized CSS after any update
+        LSD_Personalize::generate();
     }
 
     private function socials()
@@ -56,36 +64,6 @@ class LSD_Upgrade extends LSD_Base
         $db = new LSD_db();
 
         $db->q("DELETE FROM `#__options` WHERE `option_name` LIKE '%lsd_product_validation_%'");
-    }
-
-    private function roles()
-    {
-        remove_role('listdom_author');
-        add_role('listdom_author', esc_html__('Listdom Author', 'listdom'), [
-            'read' => true,
-            'edit_posts' => true,
-            'delete_posts' => true,
-            'delete_published_posts' => true,
-            'edit_published_posts' => true,
-            'edit_listings' => true,
-            'delete_listings' => true,
-            'edit_listing' => true,
-            'upload_files' => true,
-        ]);
-
-        remove_role('listdom_publisher');
-        add_role('listdom_publisher', esc_html__('Listdom Publisher', 'listdom'), [
-            'read' => true,
-            'edit_posts' => true,
-            'delete_posts' => true,
-            'publish_posts' => true,
-            'delete_published_posts' => true,
-            'edit_published_posts' => true,
-            'edit_listings' => true,
-            'delete_listings' => true,
-            'edit_listing' => true,
-            'upload_files' => true,
-        ]);
     }
 
     private function v121()
@@ -151,7 +129,7 @@ class LSD_Upgrade extends LSD_Base
         $taxonomies = [
             LSD_Base::TAX_CATEGORY,
             LSD_Base::TAX_FEATURE,
-            LSD_Base::TAX_ATTRIBUTE
+            LSD_Base::TAX_ATTRIBUTE,
         ];
 
         // Icons to be Replaced
@@ -512,13 +490,13 @@ class LSD_Upgrade extends LSD_Base
                     'key' => 'lsd_primary_category',
                     'compare' => 'NOT EXISTS',
                 ],
-            ]
+            ],
         ]);
 
         foreach ($listings as $listing)
         {
             $category = LSD_Entity_Listing::get_primary_category($listing->ID);
-            add_post_meta($listing->ID, 'lsd_primary_category', ($category ? $category->term_id : null), true);
+            add_post_meta($listing->ID, 'lsd_primary_category', ($category ? $category->slug : null), true);
         }
     }
 
@@ -533,7 +511,7 @@ class LSD_Upgrade extends LSD_Base
                     'key' => 'lsd_price_class',
                     'compare' => 'NOT EXISTS',
                 ],
-            ]
+            ],
         ]);
 
         foreach ($listings as $listing) add_post_meta($listing->ID, 'lsd_price_class', 2, true);
@@ -622,7 +600,7 @@ class LSD_Upgrade extends LSD_Base
 
     private function v330()
     {
-        $this->roles();
+        LSD_Roles::add(true);
     }
 
     private function v331()
@@ -633,12 +611,12 @@ class LSD_Upgrade extends LSD_Base
 
     private function v340()
     {
-        $this->roles();
+        LSD_Roles::add(true);
     }
 
     private function v350()
     {
-        $this->roles();
+        LSD_Roles::add(true);
     }
 
     private function v380()
@@ -652,7 +630,7 @@ class LSD_Upgrade extends LSD_Base
                     'key' => 'lsd_visits',
                     'compare' => 'NOT EXISTS',
                 ],
-            ]
+            ],
         ]);
 
         foreach ($listings as $listing) add_post_meta($listing->ID, 'lsd_visits', 0, true);
@@ -717,10 +695,512 @@ class LSD_Upgrade extends LSD_Base
                 $slug = $attr_map[$id];
                 if ($slug && !array_key_exists($slug, $values)) $values[$slug] = $val;
 
-                update_post_meta($meta['post_id'], 'lsd_attribute_'.$slug, $val);
+                update_post_meta($meta['post_id'], 'lsd_attribute_' . $slug, $val);
             }
 
             update_post_meta($meta['post_id'], 'lsd_attributes', $values);
         }
+    }
+
+    private function v480()
+    {
+        $notifications = [
+            'completed' => [
+                'title' => 'Order Completed!',
+                'content' => 'Hi #customer_name#,
+
+                Your order #order_id# has been completed.
+
+                Total: #order_total#
+
+                Invoice: #order_invoice_url#
+
+                Regards,
+                #site_name#',
+            ],
+            'canceled' => [
+                'title' => 'Order Canceled!',
+                'content' => 'Hi #customer_name#,
+
+                Your order #order_id# has been canceled.
+
+                Total: #order_total#
+
+                Regards,
+                #site_name#',
+            ],
+            'refunded' => [
+                'title' => 'Order Refunded!',
+                'content' => 'Hi #customer_name#,
+
+                Your order #order_id# has been refunded.
+
+                Total: #order_total#
+
+                Regards,
+                #site_name#',
+            ],
+            'new_receiver' => [
+                'title' => 'New Order Received!',
+                'content' => 'Hi Admin,
+
+                A new order #order_id# has been received.
+
+                #order_admin_link#
+
+                Total: #order_total#
+                Customer Name: #customer_name#
+                Customer Email: #customer_email#
+
+                Regards,
+                #site_name#',
+            ],
+            'new_payer' => [
+                'title' => 'Order Received!',
+                'content' => 'Hi #customer_name#,
+
+                Your order #order_id# has been received.
+
+                Total: #order_total#
+
+                Regards,
+                #site_name#',
+            ],
+        ];
+
+        foreach ($notifications as $event => $data)
+        {
+            $post_id = wp_insert_post([
+                'post_type' => LSD_Base::PTYPE_NOTIFICATION,
+                'post_status' => 'publish',
+                'post_title' => $data['title'],
+                'post_content' => '',
+            ]);
+
+            update_post_meta($post_id, 'lsd_hook', 'lsd_payments_order_' . $event);
+            update_post_meta($post_id, 'lsd_original_to', 1);
+            update_post_meta($post_id, 'lsd_to', '');
+            update_post_meta($post_id, 'lsd_cc', '');
+            update_post_meta($post_id, 'lsd_bcc', '');
+            update_post_meta($post_id, 'lsd_content', $data['content']);
+        }
+    }
+
+    private function v521()
+    {
+        // Update Searches
+        $search_ids = get_posts([
+            'post_type' => LSD_Base::PTYPE_SEARCH,
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'inherit', 'trash'],
+        ]);
+
+        if (is_array($search_ids) && count($search_ids))
+        {
+            $unit_divisor = static function (string $unit): float
+            {
+                if ($unit === 'km') return 1000.0;
+                if ($unit === 'mile') return 1609.0;
+                return 1.0;
+            };
+
+            $format_value = static function (float $value): string
+            {
+                $formatted = rtrim(rtrim(sprintf('%.3f', $value), '0'), '.');
+                return $formatted === '-0' ? '0' : $formatted;
+            };
+
+            $convert_values = static function (string $values, string $unit) use ($unit_divisor, $format_value): string
+            {
+                $divisor = $unit_divisor($unit);
+                if ($divisor === 1.0) return $values;
+
+                $items = array_map('trim', explode(',', $values));
+                $converted = [];
+
+                foreach ($items as $item)
+                {
+                    if ($item === '') continue;
+                    if (!is_numeric($item))
+                    {
+                        $converted[] = $item;
+                        continue;
+                    }
+
+                    $converted[] = $format_value(((float) $item) / $divisor);
+                }
+
+                return implode(',', $converted);
+            };
+
+            foreach ($search_ids as $search_id)
+            {
+                foreach (['lsd_fields', 'lsd_tablet', 'lsd_mobile'] as $meta_key)
+                {
+                    $fields = get_post_meta($search_id, $meta_key, true);
+                    if (!is_array($fields) || !count($fields)) continue;
+
+                    $updated = false;
+                    foreach ($fields as $row_index => $row)
+                    {
+                        if (!isset($row['filters']) || !is_array($row['filters'])) continue;
+
+                        foreach ($row['filters'] as $filter_key => $filter)
+                        {
+                            if (!is_array($filter)) continue;
+
+                            $key = $filter['key'] ?? $filter_key;
+                            if ($key !== 'address') continue;
+
+                            $method = $filter['method'] ?? '';
+                            $unit = $filter['radius_display_unit'] ?? 'm';
+                            if (!in_array($unit, ['m', 'km', 'mile'], true)) $unit = 'm';
+
+                            if ($method === 'radius-dropdown' && isset($filter['radius_values']) && is_string($filter['radius_values']))
+                            {
+                                $converted = $convert_values($filter['radius_values'], $unit);
+                                if ($converted !== $filter['radius_values'])
+                                {
+                                    $fields[$row_index]['filters'][$filter_key]['radius_values'] = $converted;
+                                    $updated = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if ($updated) update_post_meta($search_id, $meta_key, $fields);
+                }
+            }
+        }
+
+        // Update Memberships
+        if (class_exists(LSDPACSUB\Base::class))
+        {
+            $listing_ids = get_posts([
+                'post_type' => LSD_Base::PTYPE_LISTING,
+                'posts_per_page' => 1000,
+                'fields' => 'ids',
+                'post_status' => ['publish', LSD_Base::STATUS_HOLD, LSD_Base::STATUS_EXPIRED],
+                'meta_query' => [
+                    [
+                        'key' => 'lsd_subscription',
+                        'compare' => 'EXISTS',
+                    ],
+                    [
+                        'key' => 'lsd_package',
+                        'compare' => 'NOT EXISTS',
+                    ],
+                ],
+            ]);
+
+            if (is_array($listing_ids) && count($listing_ids))
+            {
+                foreach ($listing_ids as $listing_id)
+                {
+                    $subscription_id = get_post_meta($listing_id, 'lsd_subscription', true);
+                    if (!$subscription_id) continue;
+
+                    $package_id = get_post_meta($subscription_id, 'lsd_package', true);
+                    if (!$package_id) continue;
+
+                    update_post_meta($listing_id, 'lsd_package', $package_id);
+                }
+            }
+        }
+    }
+
+    private function v530()
+    {
+        $shortcode_ids = get_posts([
+            'post_type' => LSD_Base::PTYPE_SHORTCODE,
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'inherit', 'trash'],
+        ]);
+
+        if (!is_array($shortcode_ids) || !count($shortcode_ids)) return;
+
+        $taxonomies = [
+            LSD_Base::TAX_CATEGORY,
+            LSD_Base::TAX_LOCATION,
+            LSD_Base::TAX_FEATURE,
+            LSD_Base::TAX_LABEL,
+            LSD_Base::TAX_TAG,
+        ];
+
+        foreach ($shortcode_ids as $shortcode_id)
+        {
+            $filter = get_post_meta($shortcode_id, 'lsd_filter', true);
+            $exclude = get_post_meta($shortcode_id, 'lsd_exclude', true);
+
+            $filter_changed = false;
+            $exclude_changed = false;
+
+            if (is_array($filter))
+            {
+                foreach ($taxonomies as $tax)
+                {
+                    if (!isset($filter[$tax])) continue;
+
+                    $original = $filter[$tax];
+                    $filter[$tax] = LSD_Taxonomies::ids_to_slugs($tax, $filter[$tax]);
+
+                    if ($filter[$tax] !== $original) $filter_changed = true;
+                }
+            }
+
+            if (is_array($exclude))
+            {
+                foreach ($taxonomies as $tax)
+                {
+                    if (!isset($exclude[$tax])) continue;
+
+                    $original = $exclude[$tax];
+                    $exclude[$tax] = LSD_Taxonomies::ids_to_slugs($tax, $exclude[$tax]);
+
+                    if ($exclude[$tax] !== $original) $exclude_changed = true;
+                }
+            }
+
+            if ($filter_changed) update_post_meta($shortcode_id, 'lsd_filter', $filter);
+            if ($exclude_changed) update_post_meta($shortcode_id, 'lsd_exclude', $exclude);
+        }
+    }
+
+    private function v531()
+    {
+        if (!taxonomy_exists(LSD_Base::TAX_ATTRIBUTE)) return;
+
+        $attribute_ids = get_terms([
+            'taxonomy' => LSD_Base::TAX_ATTRIBUTE,
+            'hide_empty' => false,
+            'fields' => 'ids',
+        ]);
+
+        if (!is_array($attribute_ids) || !count($attribute_ids)) return;
+
+        foreach ($attribute_ids as $attribute_id)
+        {
+            $all_categories = get_term_meta((int) $attribute_id, 'lsd_all_categories', true);
+            if (trim((string) $all_categories) === '') $all_categories = 1;
+
+            $categories = get_term_meta((int) $attribute_id, 'lsd_categories', true);
+            $normalized = $all_categories ? [] : LSD_Taxonomies_Attribute::normalize_categories($categories);
+
+            if (!is_array($categories) || $categories !== $normalized)
+            {
+                update_term_meta((int) $attribute_id, 'lsd_categories', $normalized);
+            }
+        }
+    }
+
+    private function v540()
+    {
+        $this->shortcode_filters();
+        $this->primary_categories();
+
+        $map = [];
+        foreach (LSD_Main::get_attributes_details() as $attribute)
+        {
+            $attribute_id = isset($attribute['id']) ? (int) $attribute['id'] : 0;
+            $slug = isset($attribute['slug']) ? sanitize_title($attribute['slug']) : '';
+
+            if ($attribute_id <= 0 || $slug === '') continue;
+            $map['lsd_attribute_' . $attribute_id] = 'lsd_attribute_' . $slug;
+        }
+
+        if (!count($map)) return;
+
+        $db = new LSD_db();
+        $metas = $db->select(
+            "SELECT `meta_id`, `meta_value` FROM `#__postmeta` WHERE `meta_key` IN ('_elementor_data', '_elementor_page_settings') AND `meta_value` LIKE '%lsd_attribute_%' ORDER BY `meta_id` ASC",
+            'loadAssocList'
+        );
+
+        if (!is_array($metas) || !count($metas)) return;
+
+        foreach ($metas as $meta)
+        {
+            $meta_id = isset($meta['meta_id']) ? (int) $meta['meta_id'] : 0;
+            if ($meta_id <= 0 || !array_key_exists('meta_value', $meta)) continue;
+
+            $value = $meta['meta_value'];
+            $changed = false;
+            $prepared = $value;
+
+            if (is_string($value))
+            {
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded))
+                {
+                    $changed = $this->elementor($decoded, $map);
+                    $prepared = $changed ? wp_json_encode($decoded) : $value;
+                }
+                else
+                {
+                    $unserialized = maybe_unserialize($value);
+                    if (is_array($unserialized))
+                    {
+                        $changed = $this->elementor($unserialized, $map);
+                        $prepared = $changed ? $unserialized : $value;
+                    }
+                }
+            }
+            else if (is_array($value))
+            {
+                $changed = $this->elementor($value, $map);
+                $prepared = $value;
+            }
+
+            if (!$changed) continue;
+            update_metadata_by_mid('post', $meta_id, $prepared);
+        }
+    }
+
+    private function primary_categories()
+    {
+        $listing_ids = get_posts([
+            'post_type' => LSD_Base::PTYPE_LISTING,
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'inherit', 'trash'],
+            'meta_query' => [
+                [
+                    'key' => 'lsd_primary_category',
+                    'compare' => 'EXISTS',
+                ],
+            ],
+        ]);
+
+        if (!is_array($listing_ids) || !count($listing_ids)) return;
+
+        foreach ($listing_ids as $listing_id)
+        {
+            $primary = get_post_meta($listing_id, 'lsd_primary_category', true);
+            if (!is_scalar($primary)) continue;
+
+            $primary = trim((string) $primary);
+            if ($primary === '') continue;
+
+            $term = null;
+            if (is_numeric($primary))
+            {
+                $term = get_term((int) $primary, LSD_Base::TAX_CATEGORY);
+            }
+            else
+            {
+                $term = get_term_by('slug', sanitize_title($primary), LSD_Base::TAX_CATEGORY);
+            }
+
+            if (!$term || is_wp_error($term) || !isset($term->slug)) continue;
+
+            $slug = sanitize_title($term->slug);
+            if ($slug === '' || $slug === $primary) continue;
+
+            update_post_meta($listing_id, 'lsd_primary_category', $slug);
+        }
+    }
+
+    private function shortcode_filters()
+    {
+        if (!taxonomy_exists(LSD_Base::TAX_ATTRIBUTE)) return;
+
+        $shortcode_ids = get_posts([
+            'post_type' => LSD_Base::PTYPE_SHORTCODE,
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'inherit', 'trash'],
+        ]);
+
+        if (!is_array($shortcode_ids) || !count($shortcode_ids)) return;
+
+        foreach ($shortcode_ids as $shortcode_id)
+        {
+            $filter = get_post_meta($shortcode_id, 'lsd_filter', true);
+            if (!is_array($filter) || !isset($filter['attributes']) || !is_array($filter['attributes'])) continue;
+
+            $normalized = [];
+            foreach ($filter['attributes'] as $key => $value)
+            {
+                $separator = strrpos((string) $key, '-');
+                if ($separator === false) continue;
+
+                $slug = substr($key, 0, $separator);
+                $query = trim(substr($key, $separator + 1));
+                if ($query === '') continue;
+
+                if (is_numeric($slug))
+                {
+                    $slug = LSD_Taxonomies::to_slug(LSD_Base::TAX_ATTRIBUTE, $slug);
+                    if ($slug === '') continue;
+                }
+
+                $migrated_key = LSD_Taxonomies_Attribute::normalize_filter_attribute_key($slug . '-' . $query);
+                if ($migrated_key === '') continue;
+
+                if (isset($normalized[$migrated_key]) && is_array($normalized[$migrated_key]))
+                {
+                    $incoming = is_array($value) ? $value : [$value];
+                    $normalized[$migrated_key] = array_values(array_unique(array_merge($normalized[$migrated_key], $incoming)));
+
+                    continue;
+                }
+
+                $normalized[$migrated_key] = $value;
+            }
+
+            if ($normalized === $filter['attributes']) continue;
+
+            $filter['attributes'] = $normalized;
+            update_post_meta($shortcode_id, 'lsd_filter', $filter);
+        }
+    }
+
+    private function elementor(array &$data, array $map): bool
+    {
+        $changed = false;
+        foreach ($data as $key => &$value)
+        {
+            if ($key === 'lsd_meta' && is_string($value) && isset($map[$value]))
+            {
+                $value = $map[$value];
+                $changed = true;
+
+                continue;
+            }
+
+            if (is_array($value))
+            {
+                if ($this->elementor($value, $map)) $changed = true;
+                continue;
+            }
+
+            if (!is_string($value)) continue;
+            if (strpos($value, 'lsd_attribute_') === false) continue;
+
+            $is_dynamic = strpos($value, 'lsd_meta') !== false
+                || strpos($value, 'elementor-tag') !== false
+                || strpos($value, '%22lsd_meta%22') !== false;
+
+            if ($is_dynamic)
+            {
+                $migrated = preg_replace_callback('/lsd_attribute_\d+\b/', static function (array $matches) use ($map)
+                {
+                    $match = $matches[0] ?? '';
+                    return $map[$match] ?? $match;
+                }, $value);
+
+                if (!is_string($migrated)) continue;
+
+                if ($migrated !== $value)
+                {
+                    $value = $migrated;
+                    $changed = true;
+                }
+            }
+        }
+
+        return $changed;
     }
 }

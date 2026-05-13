@@ -17,6 +17,7 @@ $features = isset($elements['features']['enabled']) && $elements['features']['en
 $content = isset($elements['content']['enabled']) && $elements['content']['enabled'] ? $this->content($this->filtered_content) : '';
 $excerpt = isset($elements['excerpt']['enabled']) && $elements['excerpt']['enabled'] ? $this->excerpt() : '';
 $embeds = isset($elements['embed']['enabled']) && $elements['embed']['enabled'] ? $this->embeds() : '';
+$faq = isset($elements['faq']['enabled']) && $elements['faq']['enabled'] ? $this->faq() : '';
 $video = isset($elements['video']['enabled']) && $elements['video']['enabled'] ? $this->featured_video() : '';
 $price = isset($elements['price']['enabled']) && $elements['price']['enabled'] ? $this->price() : '';
 $address = isset($elements['address']['enabled']) && $elements['address']['enabled'] ? $this->address() : '';
@@ -36,6 +37,7 @@ $availability = isset($elements['availability']['enabled']) && $elements['availa
 $minified_availability = $this->entity->get_availability(true);
 $claim = $this->entity->get_claim_button();
 $rate_summary = $this->entity->get_rate_stars('summary');
+$cta = isset($elements['cta']['enabled']) && $elements['cta']['enabled'] ? $this->cta() : '';
 ?>
 <div class="lsd-row">
     <div class="lsd-col-12">
@@ -49,8 +51,6 @@ $rate_summary = $this->entity->get_rate_stars('summary');
         <div class="listdom-single-title-wrapper">
             <?php if ($title) echo LSD_Kses::element($title); ?>
             <?php if ($contact_info) echo LSD_Kses::element($contact_info); ?>
-
-            <?php echo $this->entity->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="' . esc_attr__('Verified', 'listdom') . '"></i>' : ''; ?>
         </div>
 
         <?php if ($minified_availability || $claim || $discussion_status || $rate_summary): ?>
@@ -87,7 +87,7 @@ $rate_summary = $this->entity->get_rate_stars('summary');
     </div>
 </div>
 <div class="lsd-row">
-    <div class="lsd-col-12">
+    <div class="lsd-col-12 lsd-single-listing-wrapper">
 
         <?php if ($price) echo '<div class="lsd-single-page-price lsd-single-page-section">' . LSD_Kses::element($price) . '</div>'; ?>
         <?php if ($excerpt) echo LSD_Kses::element($excerpt); ?>
@@ -95,7 +95,9 @@ $rate_summary = $this->entity->get_rate_stars('summary');
         <?php if ($content) echo LSD_Kses::element($content); ?>
         <?php if ($gallery) echo LSD_Kses::element($gallery); ?>
         <?php if ($remark) echo LSD_Kses::element($remark); ?>
+        <?php if ($faq) echo LSD_Kses::element($faq); ?>
         <?php if ($availability) echo LSD_Kses::element($availability); ?>
+        <?php if ($cta) echo LSD_Kses::element($cta); ?>
 
         <?php if ($locations || $address): ?>
             <div class="lsd-single-page-section-map-top">
@@ -106,6 +108,7 @@ $rate_summary = $this->entity->get_rate_stars('summary');
         <?php if ($map) echo LSD_Kses::form($map); ?>
 
         {locallogic}
+        {google_places}
 
         {team}
 

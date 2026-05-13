@@ -38,6 +38,7 @@ $shape = LSD_Shape::get([
                     <label for="lsd_object_type_address" class="lsd-address-label lsd-col-12"><?php esc_html_e('Address', 'listdom'); ?></label>
                     <div class="lsd-col-12">
                         <input class="lsd-update-listener" type="text" id="lsd_object_type_address" placeholder="<?php esc_attr_e('Listing Address', 'listdom'); ?>" value="<?php echo esc_attr($address); ?>">
+                        <div id="lsd_object_type_address_dropdown" class="lsd-address-autocomplete-dropdown lsd-address-autocomplete-popup" data-placeholder="<?php echo esc_html__('Select an address', 'listdom'); ?>" data-loading-text="<?php echo esc_attr__('Loading addresses…', 'listdom'); ?>" aria-label="<?php echo esc_html__('Select an address', 'listdom'); ?>" role="listbox" aria-hidden="true"></div>
                     </div>
                 </div>
                 <div class="lsd-form-row">

@@ -29,9 +29,6 @@ if (!$this->display_slider_arrows) LSD_Assets::footer('<style>.owl-nav{display:n
                 <?php if ($this->display_title): ?>
                     <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
                         <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
-                        <?php if ($this->display_is_claimed): ?>
-                            <?php echo($listing->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="' . esc_attr__('Verified', 'listdom') . '"></i>' : ''); ?>
-                        <?php endif; ?>
                     </h3>
                 <?php endif; ?>
             </div>
@@ -40,7 +37,7 @@ if (!$this->display_slider_arrows) LSD_Assets::footer('<style>.owl-nav{display:n
                 <div class="lsd-row">
                     <div class="lsd-col-9">
                         <?php if ($this->display_address): ?>
-                            <div class="lsd-listing-address">
+                            <div class="lsd-listing-address" <?php echo lsd_schema()->address(); ?>>
                                 <?php echo LSD_Kses::element($listing->get_address()); ?>
                             </div>
                         <?php endif; ?>
@@ -52,6 +49,12 @@ if (!$this->display_slider_arrows) LSD_Assets::footer('<style>.owl-nav{display:n
                     </div>
                 </div>
             </div>
+
+            <?php if ($this->display_cta): ?>
+                <div class="lsd-listing-call-to-action">
+                    <?php echo $this->listing_cta($listing); ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

@@ -20,14 +20,16 @@ jQuery(document).ready(function()
 
 global $wp_post_statuses;
 $counts = $this->listing_counts();
-?>
-<div class="lsd-dashboard" id="lsd_dashboard">
 
-    <div class="lsd-row">
-        <div class="lsd-col-2 lsd-dashboard-menus-wrapper">
+$dashboard_wrapper = $this->get_dashboard_wrapper();
+?>
+<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="lsd_dashboard"<?php echo $dashboard_wrapper['attributes']; ?>>
+
+    <div class="lsd-row lsd-dashboard-wrapper">
+        <div class="lsd-dashboard-menus-wrapper">
             <?php echo LSD_Kses::element($this->menus()); ?>
         </div>
-        <div class="lsd-col-10 lsd-dashboard-listings-list">
+        <div class="lsd-dashboard-content-wrapper lsd-dashboard-listings-list">
             <form class="lsd-dashboard-search-form" method="get">
                 <input type="hidden" name="mode" value="manage">
                 <?php if (isset($_GET['status'])): ?>

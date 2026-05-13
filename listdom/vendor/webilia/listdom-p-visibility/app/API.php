@@ -23,6 +23,9 @@ class API extends Base
         // Post
         $post = get_post($post_id);
 
+        // Guard: if the post lookup fails, exit to avoid accessing properties on null.
+        if (!($post instanceof \WP_Post)) return;
+
         // It's not a listing
         if ($post->post_type !== \LSD_Base::PTYPE_LISTING) return;
 

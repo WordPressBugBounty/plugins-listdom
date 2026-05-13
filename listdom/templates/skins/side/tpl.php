@@ -24,7 +24,6 @@ jQuery(document).ready(function()
         single_listing_style: "'.$this->single_listing_style.'",
         next_page: "'.$this->next_page.'",
         limit: "'.$this->limit.'",
-        nonce: "' . esc_js(wp_create_nonce('lsd_search_form')) . '"
     });
 });
 </script>');
@@ -47,7 +46,7 @@ jQuery(document).ready(function()
                 <?php echo LSD_Kses::element($this->get_pagination()); ?>
             </div>
             <div class="lsd-side-details">
-                <div class="lsd-side-details-close"><i class="lsd-icon fa fa-window-close"></i></div>
+                <div class="lsd-side-details-close"><i class="lsd-fe-icon fa fa-window-close"></i></div>
                 <div class="lsd-side-details-iframe"></div>
             </div>
         </div>

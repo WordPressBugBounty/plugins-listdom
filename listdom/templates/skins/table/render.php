@@ -6,8 +6,6 @@ defined('ABSPATH') || die();
 
 switch ($this->style)
 {
-    case 'style3':
-    case 'style2':
     case 'style1':
 
         include lsd_template('skins/' . $this->skin . '/style1/render.php');

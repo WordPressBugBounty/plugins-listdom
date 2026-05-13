@@ -9,7 +9,7 @@ final class Listdom
      *
      * @var string
      */
-    public $version = '4.8.1';
+    public $version = '5.5.0';
 
     /**
      * The single instance of the class.
@@ -107,6 +107,9 @@ final class Listdom
         // Plugin Activation / Deactivation / Uninstall
         LSD_Plugin_Hooks::instance();
 
+        // Repair Listdom roles when a site lost them after activation.
+        LSD_Roles::ensure();
+
         // Life Cycle
         $life_cycle = new LSD_LifeCycle();
         $life_cycle->init();
@@ -153,6 +156,10 @@ final class Listdom
         // Listdom Shortcodes
         $shortcodes = new LSD_Shortcodes();
         $shortcodes->init();
+
+        // Listdom RSS Feeds
+        $feeds = new LSD_Feed();
+        $feeds->init();
 
         // Listdom Widgets
         $widgets = new LSD_Widgets();
@@ -238,6 +245,12 @@ final class Listdom
 
         // Listing Visibility
         (new LSD_Visibility())->init();
+
+        // Payments
+        if (LSD_Payments_Engine::instance()->listdom())
+        {
+            (new LSD_Payments())->init();
+        }
 
         // Initialize Lite Features
         if ($main->isLite())

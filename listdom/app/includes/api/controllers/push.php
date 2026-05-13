@@ -128,10 +128,9 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
         {
             $term = get_term_by('name', $primary_category, LSD_Base::TAX_CATEGORY);
 
-            // Primary Category Meta
-            if (!is_wp_error($term))
+            // Primary Category
+            if ($term && !is_wp_error($term))
             {
-                update_post_meta($id, 'lsd_primary_category', $term->term_id);
                 $vars['listing_category'] = $term->term_id;
             }
         }
@@ -222,6 +221,7 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
                 'message' => $message,
                 'listing' => [
                     'id' => $id,
+                    'url' => get_permalink($id),
                 ],
             ],
             'status' => 200,

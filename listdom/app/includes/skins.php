@@ -12,6 +12,8 @@ class LSD_Skins extends LSD_Base
     public $search_options = [];
     public $sm_shortcode;
     public $sm_position;
+    public $sm_sticky = 0;
+    public $sm_sticky_offset = null;
     public $sm_ajax = 0;
     public $mapcontrols = [];
     public $sorts = [];
@@ -48,6 +50,7 @@ class LSD_Skins extends LSD_Base
     public $display_review_stars = true;
     public $display_slider_arrows = true;
     public $display_read_more_button = true;
+    public $display_cta = false;
     public $description_length = 12;
     public $content_type = 'excerpt';
 
@@ -58,6 +61,8 @@ class LSD_Skins extends LSD_Base
     public $default_view = 'grid';
     public $html_class = '';
     public $widget = false;
+    public $cta_mode = 'inherit';
+    public $cta_alignment = 'left';
     public $post_id;
     public $mapsearch = false;
     public $autoplay = true;
@@ -65,11 +70,13 @@ class LSD_Skins extends LSD_Base
     public $maxBounds = [];
     public $map_provider = 'leaflet';
     public $map_height;
+    public $mousewheel_zoom = false;
     public $ignore_map_exclusion = false;
     public $price_components = [];
     public $connected_shortcodes = [];
     public $map_position;
     public $map_component = true;
+    protected $cta_override = [];
 
     protected $sort_meta_key = null;
     protected $sort_meta_orderby = null;
@@ -131,6 +138,9 @@ class LSD_Skins extends LSD_Base
         $this->search_options = $this->atts['lsd_search'] ?? [];
         $this->sm_shortcode = isset($this->search_options['shortcode']) && trim($this->search_options['shortcode']) ? $this->search_options['shortcode'] : null;
         $this->sm_position = isset($this->search_options['position']) && trim($this->search_options['position']) ? $this->search_options['position'] : 'top';
+        $this->sm_sticky = isset($this->search_options['sticky']) && trim((string) $this->search_options['sticky']) !== '' ? (int) $this->search_options['sticky'] : 0;
+        $sm_sticky_offset = isset($this->search_options['sticky_offset']) ? trim((string) $this->search_options['sticky_offset']) : '';
+        $this->sm_sticky_offset = $sm_sticky_offset === '' ? null : max(0, (int) $sm_sticky_offset);
         $this->sm_ajax = isset($this->search_options['ajax']) && trim($this->search_options['ajax']) !== '' ? (int) $this->search_options['ajax'] : 0;
 
         // Requested Page
@@ -143,7 +153,56 @@ class LSD_Skins extends LSD_Base
                 : []
         );
 
+        if (isset($this->filter_options['circle']) && is_array($this->filter_options['circle']))
+        {
+            $circle = LSD_Sanitize::search(['circle' => $this->filter_options['circle']]);
+
+            if (isset($circle['circle']) && is_array($circle['circle']) && count($circle['circle']))
+                $this->filter_options['circle'] = $circle['circle'];
+            else unset($this->filter_options['circle']);
+        }
+
         $this->exclude_options = $this->atts['lsd_exclude'] ?? [];
+
+        foreach ([
+            LSD_Base::TAX_CATEGORY,
+            LSD_Base::TAX_LOCATION,
+            LSD_Base::TAX_FEATURE,
+            LSD_Base::TAX_LABEL,
+        ] as $tax)
+        {
+            if (isset($this->filter_options[$tax]))
+            {
+                $this->filter_options[$tax] = LSD_Taxonomies::resolve_term_ids($tax, $this->filter_options[$tax]);
+            }
+
+            if (isset($this->exclude_options[$tax]))
+            {
+                $this->exclude_options[$tax] = LSD_Taxonomies::resolve_term_ids($tax, $this->exclude_options[$tax]);
+            }
+        }
+
+        if (isset($this->filter_options[LSD_Base::TAX_TAG]))
+        {
+            if (is_array($this->filter_options[LSD_Base::TAX_TAG]) || is_numeric($this->filter_options[LSD_Base::TAX_TAG]))
+            {
+                $this->filter_options[LSD_Base::TAX_TAG] = LSD_Taxonomies::resolve_term_ids(
+                    LSD_Base::TAX_TAG,
+                    $this->filter_options[LSD_Base::TAX_TAG]
+                );
+            }
+        }
+
+        if (isset($this->exclude_options[LSD_Base::TAX_TAG]))
+        {
+            if (is_array($this->exclude_options[LSD_Base::TAX_TAG]) || is_numeric($this->exclude_options[LSD_Base::TAX_TAG]))
+            {
+                $this->exclude_options[LSD_Base::TAX_TAG] = LSD_Taxonomies::resolve_term_ids(
+                    LSD_Base::TAX_TAG,
+                    $this->exclude_options[LSD_Base::TAX_TAG]
+                );
+            }
+        }
 
         // Map Controls Options
         $this->mapcontrols = $this->atts['lsd_mapcontrols'] ?? [];
@@ -171,22 +230,58 @@ class LSD_Skins extends LSD_Base
         $this->display_availability = (!isset($this->skin_options['display_availability']) || $this->skin_options['display_availability']) && LSD_Components::work_hours();
         $this->display_categories = !isset($this->skin_options['display_categories']) || $this->skin_options['display_categories'];
         $this->display_price = (!isset($this->skin_options['display_price']) || $this->skin_options['display_price']) && LSD_Components::pricing();
-        $this->display_favorite_icon = !isset($this->skin_options['display_favorite_icon']) || $this->skin_options['display_favorite_icon'];
-        $this->display_compare_icon = !isset($this->skin_options['display_compare_icon']) || $this->skin_options['display_compare_icon'];
+        $this->display_favorite_icon = (!isset($this->skin_options['display_favorite_icon']) || $this->skin_options['display_favorite_icon']) && class_exists(LSDPACFAV\Base::class);
+        $this->display_compare_icon = (!isset($this->skin_options['display_compare_icon']) || $this->skin_options['display_compare_icon']) && class_exists(LSDPACCMP\Base::class);
         $this->display_review_stars = !isset($this->skin_options['display_review_stars']) || $this->skin_options['display_review_stars'];
         $this->display_labels = !isset($this->skin_options['display_labels']) || $this->skin_options['display_labels'];
         $this->display_title = !isset($this->skin_options['display_title']) || $this->skin_options['display_title'];
-        $this->display_is_claimed = !isset($this->skin_options['display_is_claimed']) || $this->skin_options['display_is_claimed'];
+        $this->display_is_claimed = (!isset($this->skin_options['display_is_claimed']) || $this->skin_options['display_is_claimed']) && class_exists(LSDPACCLM\Base::class);
         $this->display_share_buttons = (!isset($this->skin_options['display_share_buttons']) || $this->skin_options['display_share_buttons']) && LSD_Components::socials();
         $this->display_slider_arrows = !isset($this->skin_options['display_slider_arrows']) || $this->skin_options['display_slider_arrows'];
         $this->default_view = isset($this->skin_options['default_view']) ? sanitize_text_field($this->skin_options['default_view']) : 'grid';
+
+        $cta_settings = isset($this->skin_options['cta']) && is_array($this->skin_options['cta'])
+            ? $this->skin_options['cta']
+            : [];
+
+        $cta_mode = $cta_settings['mode'] ?? null;
+        if (!in_array($cta_mode, ['inherit', 'custom', 'disabled'], true))
+        {
+            if (isset($cta_settings['inherit'])) $cta_mode = $cta_settings['inherit'] ? 'inherit' : 'custom';
+            else if (isset($cta_settings['enabled'])) $cta_mode = $cta_settings['enabled'] ? 'inherit' : 'disabled';
+            else
+            {
+                $legacy = $this->skin_options['display_cta'] ?? null;
+
+                if ($legacy === '0' || $legacy === 0 || $legacy === false) $cta_mode = 'disabled';
+                else if ($legacy === '1' || $legacy === 1 || $legacy === true) $cta_mode = 'inherit';
+                else $cta_mode = empty($cta_settings) ? 'disabled' : 'inherit';
+            }
+        }
+
+        if (!LSD_Components::cta()) $cta_mode = 'disabled';
+
+        $alignment_options = ['left', 'center', 'right', 'stretch'];
+        $alignment = isset($cta_settings['alignment']) ? sanitize_text_field($cta_settings['alignment']) : '';
+        if (!in_array($alignment, $alignment_options, true)) $alignment = 'left';
+
+        $this->cta_mode = $cta_mode;
+        $this->cta_alignment = $alignment;
+
+        $this->cta_override = $cta_mode === 'custom'
+            ? [
+                'text' => $cta_settings['text'] ?? '',
+                'target' => $cta_settings['target'] ?? '',
+                'url' => $cta_settings['url'] ?? '',
+                'content' => $cta_settings['content'] ?? '',
+            ]
+            : [];
+
+        $this->display_cta = $this->is_cta_enabled();
         $this->description_length = isset($this->skin_options['description_length']) && is_numeric($this->skin_options['description_length']) ? $this->skin_options['description_length'] : 12;
         $this->content_type = $this->skin_options['content_type'] ?? 'excerpt';
 
         $this->columns = isset($this->skin_options['columns']) && $this->skin_options['columns'] ? sanitize_text_field($this->skin_options['columns']) : 3;
-
-        // Style4 Columns
-        if ($this->style === 'style4') $this->columns = 2;
 
         // Autoplay
         $this->autoplay = !isset($this->skin_options['autoplay']) || $this->skin_options['autoplay'];
@@ -200,6 +295,7 @@ class LSD_Skins extends LSD_Base
         // Map height
         $this->map_height = isset($this->skin_options['map_height']) && trim($this->skin_options['map_height']) ? $this->skin_options['map_height'] : '500px';
         if (is_numeric($this->map_height)) $this->map_height .= 'px';
+        $this->mousewheel_zoom = isset($this->skin_options['mousewheel_zoom']) && $this->skin_options['mousewheel_zoom'];
 
         // HTML Class
         $this->html_class = isset($this->atts['html_class']) && trim($this->atts['html_class']) ? sanitize_text_field($this->atts['html_class']) : '';
@@ -227,6 +323,45 @@ class LSD_Skins extends LSD_Base
 
         // Set to Payload Options
         LSD_Payload::set('shortcode', $this);
+    }
+
+    public function is_cta_enabled(): bool
+    {
+        if (!LSD_Components::cta() || $this->cta_mode === 'disabled') return false;
+
+        $cta_settings = isset($this->skin_options['cta']) && is_array($this->skin_options['cta'])
+            ? $this->skin_options['cta']
+            : [];
+
+        $cta_enabled = $this->skin_options['display_cta'] ?? ($cta_settings['enabled'] ?? false);
+
+        $filtered = filter_var($cta_enabled, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return is_null($filtered) ? (bool) $cta_enabled : $filtered;
+    }
+
+    protected function has_listing_price(LSD_Entity_Listing $listing): bool
+    {
+        return $this->display_price && (bool) $listing->get_price();
+    }
+
+    protected function has_listing_address(LSD_Entity_Listing $listing): bool
+    {
+        return $this->display_address && (bool) $listing->get_address();
+    }
+
+    public function has_bottom_bar(LSD_Entity_Listing $listing): bool
+    {
+        return false;
+    }
+
+    public function has_body(LSD_Entity_Listing $listing): bool
+    {
+        return true;
+    }
+
+    public function has_after_content_hook(): bool
+    {
+        return false !== has_action('lsd_skins_after_content');
     }
 
     public function after_start()
@@ -291,77 +426,59 @@ class LSD_Skins extends LSD_Base
     {
         $tax_query = ['relation' => 'AND'];
 
+        $normalize_terms = function (string $taxonomy, $values): array
+        {
+            if (is_array($values))
+            {
+                return LSD_Taxonomies::resolve_term_ids($taxonomy, $values);
+            }
+
+            if (is_scalar($values))
+            {
+                $value = trim((string) $values);
+                if ($value === '') return [];
+
+                $parts = array_map('trim', explode(',', $value));
+                return LSD_Taxonomies::resolve_term_ids($taxonomy, $parts);
+            }
+
+            return [];
+        };
+
         foreach ([
             LSD_Base::TAX_CATEGORY,
             LSD_Base::TAX_LOCATION,
             LSD_Base::TAX_FEATURE,
             LSD_Base::TAX_LABEL,
+            LSD_Base::TAX_TAG,
         ] as $tax)
         {
-            if (isset($this->filter_options[$tax]) && is_array($this->filter_options[$tax]) && count($this->filter_options[$tax]))
+            if (isset($this->filter_options[$tax]))
             {
-                $tax_query[] = [
-                    'taxonomy' => $tax,
-                    'field' => 'term_id',
-                    'terms' => $this->filter_options[$tax],
-                    'operator' => apply_filters('lsd_search_' . $tax . '_operator', 'IN', $tax),
-                ];
+                $terms = $normalize_terms($tax, $this->filter_options[$tax]);
+                if (count($terms))
+                {
+                    $tax_query[] = [
+                        'taxonomy' => $tax,
+                        'field' => 'term_id',
+                        'terms' => $terms,
+                        'operator' => apply_filters('lsd_search_' . $tax . '_operator', 'IN', $tax),
+                    ];
+                }
             }
 
-            if (isset($this->exclude_options[$tax]) && is_array($this->exclude_options[$tax]) && count($this->exclude_options[$tax]))
+            if (isset($this->exclude_options[$tax]))
             {
-                $tax_query[] = [
-                    'taxonomy' => $tax,
-                    'field' => 'term_id',
-                    'terms' => $this->exclude_options[$tax],
-                    'operator' => apply_filters('lsd_search_' . $tax . '_exclude_operator', 'NOT IN', $tax),
-                ];
-            }
-        }
-
-        // Tags Include
-        if (isset($this->filter_options[LSD_Base::TAX_TAG]))
-        {
-            if (is_array($this->filter_options[LSD_Base::TAX_TAG]))
-            {
-                $tax_query[] = [
-                    'taxonomy' => LSD_Base::TAX_TAG,
-                    'field' => 'term_id',
-                    'terms' => $this->filter_options[LSD_Base::TAX_TAG],
-                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_operator', 'IN', LSD_Base::TAX_TAG),
-                ];
-            }
-            else if (trim($this->filter_options[LSD_Base::TAX_TAG]))
-            {
-                $tax_query[] = [
-                    'taxonomy' => LSD_Base::TAX_TAG,
-                    'field' => 'name',
-                    'terms' => explode(',', sanitize_text_field(trim($this->filter_options[LSD_Base::TAX_TAG], ', '))),
-                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_operator', 'IN', LSD_Base::TAX_TAG),
-                ];
-            }
-        }
-
-        // Tags Exclude
-        if (isset($this->exclude_options[LSD_Base::TAX_TAG]))
-        {
-            if (is_array($this->exclude_options[LSD_Base::TAX_TAG]))
-            {
-                $tax_query[] = [
-                    'taxonomy' => LSD_Base::TAX_TAG,
-                    'field' => 'term_id',
-                    'terms' => $this->exclude_options[LSD_Base::TAX_TAG],
-                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_exclude_operator', 'NOT IN', LSD_Base::TAX_TAG),
-                ];
-            }
-            else if (trim($this->exclude_options[LSD_Base::TAX_TAG]))
-            {
-                $tax_query[] = [
-                    'taxonomy' => LSD_Base::TAX_TAG,
-                    'field' => 'name',
-                    'terms' => explode(',', sanitize_text_field(trim($this->exclude_options[LSD_Base::TAX_TAG], ', '))),
-                    'operator' => apply_filters('lsd_search_' . LSD_Base::TAX_TAG . '_exclude_operator', 'NOT IN', LSD_Base::TAX_TAG),
-                ];
+                $terms = $normalize_terms($tax, $this->exclude_options[$tax]);
+                if (count($terms))
+                {
+                    $tax_query[] = [
+                        'taxonomy' => $tax,
+                        'field' => 'term_id',
+                        'terms' => $terms,
+                        'operator' => apply_filters('lsd_search_' . $tax . '_exclude_operator', 'NOT IN', $tax),
+                    ];
+                }
             }
         }
 
@@ -505,12 +622,8 @@ class LSD_Skins extends LSD_Base
 
     public function query_sort($args, $orderby, $order = 'DESC')
     {
-        // Sort by Meta
-        $order = strtoupper($order);
-        if (!in_array($order, ['ASC', 'DESC'], true)) $order = 'DESC';
-        $args['order'] = $order;
-
         $option = $this->sorts['options'][$orderby] ?? [];
+
         $meta_key = $option['meta_key'] ?? null;
         if (!$meta_key && strpos($orderby, 'lsd_') === 0) $meta_key = $orderby;
 
@@ -561,15 +674,30 @@ class LSD_Skins extends LSD_Base
         if (is_string($wp_query->query_vars['post_type']) and $wp_query->query_vars['post_type'] == LSD_Base::PTYPE_LISTING and $wp_query->get('lsd-init', false))
         {
             // Boundary Search
-            if ($boundary = $wp_query->get('lsd-boundary', false))
+            if (
+                ($boundary = $wp_query->get('lsd-boundary', false))
+                && isset($boundary['min_latitude'], $boundary['max_latitude'], $boundary['min_longitude'], $boundary['max_longitude'])
+            )
             {
-                $where .= " AND lsddata.`latitude` >= '" . $boundary['min_latitude'] . "' AND lsddata.`latitude` <= '" . $boundary['max_latitude'] . "' AND lsddata.`longitude` >= '" . $boundary['min_longitude'] . "' AND lsddata.`longitude` <= '" . $boundary['max_longitude'] . "'";
+                $min_latitude = esc_sql((string) (float) $boundary['min_latitude']);
+                $max_latitude = esc_sql((string) (float) $boundary['max_latitude']);
+                $min_longitude = esc_sql((string) (float) $boundary['min_longitude']);
+                $max_longitude = esc_sql((string) (float) $boundary['max_longitude']);
+
+                $where .= " AND lsddata.`latitude` >= $min_latitude AND lsddata.`latitude` <= $max_latitude AND lsddata.`longitude` >= $min_longitude AND lsddata.`longitude` <= $max_longitude";
             }
 
             // Circle Search
-            if ($circle = $wp_query->get('lsd-circle', false))
+            if (
+                ($circle = $wp_query->get('lsd-circle', false))
+                && isset($circle['center'][0], $circle['center'][1], $circle['radius'])
+            )
             {
-                $where .= " AND ((6371000 * acos(cos(radians(" . $circle['center'][0] . ")) * cos(radians(lsddata.`latitude`)) * cos(radians(lsddata.`longitude`) - radians(" . $circle['center'][1] . ")) + sin(radians(" . $circle['center'][0] . ")) * sin(radians(lsddata.`latitude`)))) < " . ($circle['radius']) . ")";
+                $circle_latitude = esc_sql((string) (float) $circle['center'][0]);
+                $circle_longitude = esc_sql((string) (float) $circle['center'][1]);
+                $circle_radius = esc_sql((string) (float) $circle['radius']);
+
+                $where .= " AND ((6371000 * acos(cos(radians($circle_latitude)) * cos(radians(lsddata.`latitude`)) * cos(radians(lsddata.`longitude`) - radians($circle_longitude)) + sin(radians($circle_latitude)) * sin(radians(lsddata.`latitude`)))) < $circle_radius)";
             }
 
             // Polygon Search
@@ -634,7 +762,7 @@ class LSD_Skins extends LSD_Base
 
         if ($clauses_filter_added)
         {
-            remove_filter('posts_clauses', [$this, 'apply_sort_meta_clauses'], 10);
+            remove_filter('posts_clauses', [$this, 'apply_sort_meta_clauses']);
             $this->sort_meta_key = null;
             $this->sort_meta_orderby = null;
             $this->sort_meta_type = null;
@@ -676,7 +804,7 @@ class LSD_Skins extends LSD_Base
         if (strpos($clauses['join'], $alias) === false)
         {
             $meta_key = esc_sql($this->sort_meta_key);
-            $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS {$alias} ON {$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = '{$meta_key}'";
+            $clauses['join'] .= " LEFT JOIN $wpdb->postmeta AS $alias ON $alias.post_id = $wpdb->posts.ID AND $alias.meta_key = '$meta_key'";
         }
 
         $order = strtoupper($this->order);
@@ -685,11 +813,10 @@ class LSD_Skins extends LSD_Base
         $orderby_type = $this->sort_meta_orderby;
         $meta_type = $this->sort_meta_type;
 
-        $value_expression = "{$alias}.meta_value";
-
+        $value_expression = "$alias.meta_value";
         if ($orderby_type === 'meta_value_num')
         {
-            $value_expression = "CAST({$alias}.meta_value AS DECIMAL(20,6))";
+            $value_expression = "CAST($alias.meta_value AS DECIMAL(20,6))";
         }
 
         if ($meta_type && trim($meta_type))
@@ -699,22 +826,22 @@ class LSD_Skins extends LSD_Base
             {
                 if ($sanitized_type === 'DATETIME')
                 {
-                    $value_expression = "CAST(REPLACE({$alias}.meta_value, 'T', ' ') AS DATETIME)";
+                    $value_expression = "CAST(REPLACE($alias.meta_value, 'T', ' ') AS DATETIME)";
                 }
                 else
                 {
-                    $value_expression = "CAST({$alias}.meta_value AS {$sanitized_type})";
+                    $value_expression = "CAST($alias.meta_value AS $sanitized_type)";
                 }
             }
         }
 
-        $ordered_value = "CASE WHEN {$alias}.meta_value IS NULL OR {$alias}.meta_value = '' THEN NULL ELSE {$value_expression} END";
-        $empties_last = "CASE WHEN {$alias}.meta_value IS NULL OR {$alias}.meta_value = '' THEN 1 ELSE 0 END ASC";
+        $ordered_value = "CASE WHEN $alias.meta_value IS NULL OR $alias.meta_value = '' THEN NULL ELSE $value_expression END";
+        $empties_last = "CASE WHEN $alias.meta_value IS NULL OR $alias.meta_value = '' THEN 1 ELSE 0 END ASC";
 
         $orderby_clause = $empties_last . ', ' . $ordered_value . ' ' . $order;
         if (!empty($clauses['orderby'])) $orderby_clause .= ', ' . $clauses['orderby'];
 
-        $fallback_order = "{$wpdb->posts}.ID {$order}";
+        $fallback_order = "$wpdb->posts.ID $order";
         if (strpos($orderby_clause, $fallback_order) === false)
         {
             $orderby_clause .= ', ' . $fallback_order;
@@ -840,9 +967,6 @@ class LSD_Skins extends LSD_Base
 
     public function filter()
     {
-        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
-        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_search_form')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom')]);
-
         // Get attributes
         $atts = $_POST['atts'] ?? [];
 
@@ -918,6 +1042,109 @@ class LSD_Skins extends LSD_Base
         ob_start();
         include $this->tpl();
         return ob_get_clean();
+    }
+
+    protected static function get_mappable_skin_keys(): array
+    {
+        return apply_filters('lsd_mappable_skins', [
+            'grid',
+            'halfmap',
+            'list',
+            'listgrid',
+            'singlemap',
+            'accordion',
+            'mosaic',
+            'gallery',
+            'timeline',
+        ]);
+    }
+
+    protected static function get_listable_skin_keys(): array
+    {
+        return apply_filters('lsd_listable_skins', [
+            'list',
+            'grid',
+            'listgrid',
+            'halfmap',
+            'table',
+            'masonry',
+            'side',
+            'accordion',
+            'mosaic',
+            'timeline',
+            'gallery',
+        ]);
+    }
+
+    protected static function get_cardable_skin_keys(): array
+    {
+        return apply_filters('lsd_cardable_skins', [
+            'list',
+            'grid',
+            'side',
+            'masonry',
+            'carousel',
+            'slider',
+            'cover',
+            'halfmap',
+            'accordion',
+            'mosaic',
+            'timeline',
+        ]);
+    }
+
+    protected static function get_filterable_skin_keys(): array
+    {
+        $skins = array_keys(self::get_searchable_skins());
+
+        return apply_filters('lsd_filterable_skins', $skins);
+    }
+
+    public static function is_mappable(string $skin): bool
+    {
+        $skin = trim($skin);
+        if ($skin === '') return false;
+
+        return in_array($skin, self::get_mappable_skin_keys(), true);
+    }
+
+    public static function is_listable(string $skin): bool
+    {
+        $skin = trim($skin);
+        if ($skin === '') return false;
+
+        return in_array($skin, self::get_listable_skin_keys(), true);
+    }
+
+    public static function is_filterable(string $skin): bool
+    {
+        $skin = trim($skin);
+        if ($skin === '') return false;
+
+        return in_array($skin, self::get_filterable_skin_keys(), true);
+    }
+
+    public static function is_cardable(string $skin): bool
+    {
+        $skin = trim($skin);
+        if ($skin === '') return false;
+
+        return in_array($skin, self::get_cardable_skin_keys(), true);
+    }
+
+    public static function get_listable_skins(): array
+    {
+        return self::get_listable_skin_keys();
+    }
+
+    public static function get_mappable_skins(): array
+    {
+        return self::get_mappable_skin_keys();
+    }
+
+    public static function get_filterable_skins(): array
+    {
+        return self::get_filterable_skin_keys();
     }
 
     public static function get_skins()
@@ -1033,14 +1260,62 @@ class LSD_Skins extends LSD_Base
         $method = $this->get_listing_link_method();
         $style = $this->get_single_listing_style();
 
-        return $listing->get_title_tag($method, $style);
+        $title = $listing->get_title_tag($method, $style);
+
+        if ($this->skin === 'table' || !$this->display_is_claimed || !$listing->is_claimed()) return $title;
+
+        $icon = '<span class="lsd-tooltip" data-lsd-tooltip="' . esc_attr__('Verified', 'listdom') . '"><i class="lsd-fe-icon fas fa-check-circle lsd-claimed-icon"></i></span>';
+
+        if (in_array($method, ['normal', 'blank', 'lightbox', 'right-panel', 'left-panel', 'bottom-panel']))
+        {
+            if (strpos($title, '</a>') !== false) return str_replace('</a>', ' ' . $icon . '</a>', $title);
+
+            return $title . ' ' . $icon;
+        }
+
+        return $title . ' ' . $icon;
+    }
+
+    public function listing_cta(LSD_Entity_Listing $listing, string $context = 'archive'): string
+    {
+        if (!$this->display_cta || $this->cta_mode === 'disabled' || !LSD_Components::cta()) return '';
+
+        $args = [
+            'button_class' => 'lsd-light-button lsd-cta-button',
+            'lightbox_style' => $this->get_single_listing_style(),
+        ];
+
+        if ($this->cta_mode === 'custom' && !empty($this->cta_override)) $args['cta_override'] = $this->cta_override;
+
+        $cta = $listing->get_cta($context, $args);
+        if (!trim($cta)) return '';
+
+        $alignment_options = ['left', 'center', 'right', 'stretch'];
+        $alignment = in_array($this->cta_alignment, $alignment_options, true) ? $this->cta_alignment : 'left';
+
+        $classes = ['lsd-listing-cta', 'lsd-cta-align-' . sanitize_html_class($alignment)];
+
+        $output = '<div class="' . esc_attr(implode(' ', $classes)) . '">' . LSD_Kses::element($cta) . '</div>';
+
+        return apply_filters('lsd_listing_cta', $output, $listing, $this, $context);
     }
 
     public function get_not_found_message(): string
     {
-        if (isset($this->settings['no_listings_message']) && trim($this->settings['no_listings_message'])) return do_shortcode(stripslashes($this->settings['no_listings_message']));
+        if (isset($this->settings['no_listings_message']) && trim($this->settings['no_listings_message'])) $message = do_shortcode(stripslashes($this->settings['no_listings_message']));
+        else $message = $this->alert(esc_html__('No Listing Found!', 'listdom'));
 
-        return $this->alert(esc_html__('No Listing Found!', 'listdom'));
+        if ($this->skin === 'table' && method_exists($this, 'get_table_columns_display'))
+        {
+            $display = $this->get_table_columns_display();
+
+            $colspan = isset($display['columns_union']) ? count($display['columns_union']) : 1;
+            if ($colspan < 1) $colspan = 1;
+
+            return '<tr class="lsd-no-listing"><td class="lsd-table-no-listing" colspan="' . esc_attr($colspan) . '">' . $message . '</td></tr>';
+        }
+
+        return $message;
     }
 
     public function get_listing_link_method()
@@ -1071,8 +1346,10 @@ class LSD_Skins extends LSD_Base
             'mapstyle' => $this->skin_options['mapstyle'] ?? '',
             'id' => $this->id,
             'onclick' => $this->skin_options['mapobject_onclick'] ?? 'infowindow',
+            'infowindow_trigger' => $this->skin_options['mapobject_infowindow_trigger'] ?? 'click',
             'mapcontrols' => $this->mapcontrols,
             'map_height' => $this->map_height,
+            'mousewheel_zoom' => $this->mousewheel_zoom,
             'atts' => $this->atts,
             'mapsearch' => $this->mapsearch,
             'autoGPS' => $this->autoGPS,
@@ -1095,7 +1372,15 @@ class LSD_Skins extends LSD_Base
         }
 
         // Search
-        if ($search && $this->sm_shortcode && $this->sm_position === 'left') $content .= LSD_Kses::form($this->get_search_module());
+        if ($search && $this->sm_shortcode && $this->sm_position === 'left')
+        {
+            $classes = ['lsd-search-bar-wrapper', 'lsd-search-bar-left-wrapper'];
+            if ($this->sm_sticky) $classes[] = 'lsd-search-bar-sticky';
+
+            $content .= '<div class="' . esc_attr(implode(' ', $classes)) . '"' . $this->get_search_sticky_style() . '>';
+            $content .= LSD_Kses::form($this->get_search_module());
+            $content .= '</div>';
+        }
 
         return trim($content) ? '<div class="lsd-skin-left-bar-wrapper">' . $content . '</div>' : '';
     }
@@ -1113,9 +1398,24 @@ class LSD_Skins extends LSD_Base
         }
 
         // Search
-        if ($search && $this->sm_shortcode && $this->sm_position === 'right') $content .= LSD_Kses::form($this->get_search_module());
+        if ($search && $this->sm_shortcode && $this->sm_position === 'right')
+        {
+            $classes = ['lsd-search-bar-wrapper', 'lsd-search-bar-right-wrapper'];
+            if ($this->sm_sticky) $classes[] = 'lsd-search-bar-sticky';
+
+            $content .= '<div class="' . esc_attr(implode(' ', $classes)) . '"' . $this->get_search_sticky_style() . '>';
+            $content .= LSD_Kses::form($this->get_search_module());
+            $content .= '</div>';
+        }
 
         return trim($content) ? '<div class="lsd-skin-right-bar-wrapper">' . $content . '</div>' : '';
+    }
+
+    public function get_search_sticky_style(): string
+    {
+        if (!$this->sm_sticky || $this->sm_sticky_offset === null) return '';
+
+        return ' style="--lsd-search-sticky-top:' . esc_attr($this->sm_sticky_offset) . 'px;"';
     }
 
     public function get_bar_class(bool $map = true, bool $search = true): string

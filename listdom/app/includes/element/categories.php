@@ -15,7 +15,7 @@ class LSD_Element_Categories extends LSD_Element
     {
         parent::__construct();
 
-        $this->label = esc_html__('Categories', 'listdom');
+        $this->label = esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY, 'plural'));
         $this->has_title_settings = false;
 
         $this->show_color = $args['show_color'] ?? true;

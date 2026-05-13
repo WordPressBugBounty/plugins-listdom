@@ -10,6 +10,12 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
         // Listing
         $listing = get_post($id);
 
+        // Guard: return an empty payload if the listing post cannot be retrieved.
+        if (!($listing instanceof WP_Post)) return [];
+
+        // Listing URL
+        $url = get_permalink($listing);
+
         // Meta Values
         $metas = $resource->get_post_meta($id);
 
@@ -44,6 +50,7 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
             'data' => [
                 'ID' => $listing->ID,
                 'title' => get_the_title($listing),
+                'url' => $url ?: null,
                 'content' => apply_filters('the_content', $listing->post_content),
                 'excerpt' => $listing->post_excerpt,
                 'date' => $listing->post_date,
@@ -105,6 +112,12 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
         // Listing
         $listing = get_post($id);
 
+        // Guard: return an empty payload if the listing post cannot be retrieved.
+        if (!($listing instanceof WP_Post)) return [];
+
+        // Listing URL
+        $url = get_permalink($listing);
+
         // Featured Image
         $thumbnail_id = get_post_thumbnail_id($listing);
 
@@ -116,6 +129,7 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
             'data' => [
                 'ID' => $listing->ID,
                 'title' => get_the_title($listing),
+                'url' => $url ?: null,
                 'status' => [
                     'key' => $listing->post_status,
                     'label' => $status->label,

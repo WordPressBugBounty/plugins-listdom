@@ -72,4 +72,3 @@ $grid = $options['grid'] ?? [];
         <?php $this->field_listing_link('grid', $grid); ?>
     </div>
 </div>
-

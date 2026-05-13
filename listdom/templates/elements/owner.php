@@ -87,35 +87,35 @@ $owner_privacy_field = LSD_Privacy::consent_field([
 			<div class="lsd-owner-information-part-2">
 				<?php if ($display_tel && isset($user['lsd_phone'][0]) && trim($user['lsd_phone'][0])): ?>
 				<div class="lsd-owner-phone" title="<?php esc_attr_e('Phone', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
-					<i class="lsd-icon fas fa-phone-alt"></i>
+					<i class="lsd-fe-icon fas fa-phone-alt"></i>
 					<a href="tel:<?php echo esc_html($user['lsd_phone'][0]); ?>"><?php echo esc_html($user['lsd_phone'][0]); ?></a>
 				</div>
 				<?php endif; ?>
 
                 <?php if ($display_email): ?>
 				<div class="lsd-owner-email" title="<?php esc_attr_e('Email', 'listdom'); ?>" <?php echo lsd_schema()->email(); ?>>
-					<i class="lsd-icon fa fa-envelope"></i>
+					<i class="lsd-fe-icon fa fa-envelope"></i>
 					<a href="mailto:<?php echo esc_html(get_the_author_meta('email', $owner_id)); ?>"><?php echo esc_html(get_the_author_meta('email', $owner_id)); ?></a>
 				</div>
                 <?php endif; ?>
 
 				<?php if ($display_mobile && isset($user['lsd_mobile'][0]) && trim($user['lsd_mobile'][0])): ?>
 				<div class="lsd-owner-mobile" title="<?php esc_attr_e('Mobile', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
-					<i class="lsd-icon fa fa-mobile"></i>
+					<i class="lsd-fe-icon fa fa-mobile"></i>
 					<a href="tel:<?php echo esc_html($user['lsd_mobile'][0]); ?>"><?php echo esc_html($user['lsd_mobile'][0]); ?></a>
 				</div>
 				<?php endif; ?>
 
                 <?php if ($display_website && isset($user['lsd_website'][0]) && trim($user['lsd_website'][0])): ?>
                 <div class="lsd-owner-website" title="<?php esc_attr_e('Website', 'listdom'); ?>">
-                    <i class="lsd-icon fas fa-link"></i>
+                    <i class="lsd-fe-icon fas fa-link"></i>
                     <a href="<?php echo esc_url($user['lsd_website'][0]); ?>" target="_blank"><?php echo esc_html(LSD_Base::remove_protocols($user['lsd_website'][0])); ?></a>
                 </div>
                 <?php endif; ?>
 
 				<?php if ($display_fax && isset($user['lsd_fax'][0]) && trim($user['lsd_fax'][0])): ?>
 				<div class="lsd-owner-fax" title="<?php esc_attr_e('Fax', 'listdom'); ?>" <?php echo lsd_schema()->faxNumber(); ?>>
-					<i class="lsd-icon fa fa-fax"></i>
+					<i class="lsd-fe-icon fa fa-fax"></i>
 					<span><?php echo esc_html($user['lsd_fax'][0]); ?></span>
 				</div>
 				<?php endif; ?>
@@ -139,7 +139,7 @@ $owner_privacy_field = LSD_Privacy::consent_field([
 					value="<?php echo $current_id ? esc_attr(trim($current->first_name.' '.$current->last_name)) : ''; ?>"
 					required
 				>
-				<i class="lsd-icon fa fa-user"></i>
+				<i class="lsd-fe-icon fa fa-user"></i>
 			</div>
 			<?php endif; ?>
 
@@ -153,7 +153,7 @@ $owner_privacy_field = LSD_Privacy::consent_field([
 					value="<?php echo $current_id ? esc_attr($current->user_email) : ''; ?>"
 					required
 				>
-				<i class="lsd-icon fa fa-envelope"></i>
+				<i class="lsd-fe-icon fa fa-envelope"></i>
 			</div>
 
 			<?php if ($field_phone): ?>
@@ -167,7 +167,7 @@ $owner_privacy_field = LSD_Privacy::consent_field([
 					value="<?php echo $current_id ? esc_attr(get_user_meta($current_id, 'lsd_phone', true)) : ''; ?>"
 					required
 				>
-				<i class="lsd-icon fas fa-phone-alt"></i>
+				<i class="lsd-fe-icon fas fa-phone-alt"></i>
 			</div>
 			<?php endif; ?>
 		</div>

@@ -18,7 +18,7 @@ class LSD_Integrations_KC extends LSD_Integrations
             'meta_query' => [
                 [
                     'key' => 'lsd_skin',
-                    'value' => ['list', 'grid', 'halfmap', 'listgrid', 'masonry', 'singlemap', 'table', 'side', 'accordion', 'mosaic', 'timeline'],
+                    'value' => LSD_Skins::get_listable_skins(),
                     'compare' => 'IN',
                 ],
             ],

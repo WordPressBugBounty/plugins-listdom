@@ -25,27 +25,33 @@ class LSD_File extends LSD_Base
     public static function delete($path): bool
     {
         if (!file_exists($path)) return true;
-
         if (!function_exists('wp_delete_file')) require_once ABSPATH . 'wp-admin/includes/file.php';
 
-        return (bool) wp_delete_file($path);
+        return wp_delete_file($path);
     }
 
     public static function download($url, $body = null)
     {
-        $request = wp_remote_get($url, [
-            'sslverify' => false,
+        $args = [
             'timeout' => 15,
             'body' => $body,
-        ]);
+            'sslverify' => apply_filters('lsd_http_sslverify', true, $url, $body),
+        ];
 
-        $code = wp_remote_retrieve_response_code($request);
+        $response = wp_remote_get($url, $args);
+        if (is_wp_error($response))
+        {
+            do_action('lsd_http_request_failed', $response, $url, $args);
+            return false;
+        }
+
+        $code = wp_remote_retrieve_response_code($response);
         if ($code !== 200) return false;
 
-        $type = wp_remote_retrieve_header($request, 'content-type');
+        $type = wp_remote_retrieve_header($response, 'content-type');
         if (!$type) return false;
 
-        return wp_remote_retrieve_body($request);
+        return wp_remote_retrieve_body($response);
     }
 
     public static function upload($file)

@@ -50,7 +50,7 @@ $price_components = LSD_Options::price_components();
         <div id="lsd_tab_content_elements" class="lsd-tab-content">
             <div id="lsd_skin_display_options_container">
                 <?php foreach ($skins->get_skins() as $skin => $label): ?>
-                <div class="lsd-skin-display-options" id="lsd_skin_display_options_<?php echo esc_attr($skin); ?>">
+                <div class="lsd-skin-display-options" id="lsd_skin_display_options_<?php echo esc_attr($skin); ?>" data-skin="<?php echo esc_attr($skin); ?>">
                     <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/'.$skin.'.php', [
                         'parameters' => [
                             'options' => $options,
@@ -61,7 +61,7 @@ $price_components = LSD_Options::price_components();
                 </div>
                 <?php endforeach; ?>
             </div>
-            <div class="lsd-display-options-builder-skin <?php echo is_numeric($list['style'] ?? 'style1') ? '' : 'lsd-util-hide'; ?>">
+            <div id="lsd_display_options_builder_message_elements" class="lsd-display-options-builder-skin lsd-util-hide">
                 <p class="lsd-alert lsd-info"><?php esc_html_e("Because you're using a custom style, certain display options in the shortcode will be turned off. You can adjust them in the custom layout settings.", 'listdom'); ?></p>
             </div>
         </div>
@@ -73,7 +73,7 @@ $price_components = LSD_Options::price_components();
             <div class="lsd-tab-content-map-controls">
                 <div class="lsd-tab-switcher-content lsd-tab-switcher-content-map lsd-tab-switcher-content-active" id="lsd-tab-switcher-map-content">
                     <?php foreach ($skins->get_skins() as $skin => $label): ?>
-                        <div class="lsd-skin-display-options lsd_skins_map_options" id="lsd_skin_display_options_map_<?php echo esc_attr($skin); ?>">
+                        <div class="lsd-skin-display-options lsd_skins_map_options" id="lsd_skin_display_options_map_<?php echo esc_attr($skin); ?>" data-skin="<?php echo esc_attr($skin); ?>">
                             <?php $this->include_html_file('metaboxes/shortcode/display-options/map/'.$skin.'.php', [
                                 'parameters' => [
                                     'options' => $options,
@@ -88,7 +88,7 @@ $price_components = LSD_Options::price_components();
         </div>
         <div id="lsd_tab_content_layout" class="lsd-tab-content">
             <?php foreach ($skins->get_skins() as $skin => $label): ?>
-                <div class="lsd-skin-display-options" id="lsd_skin_display_options_layout_<?php echo esc_attr($skin); ?>">
+                <div class="lsd-skin-display-options" id="lsd_skin_display_options_layout_<?php echo esc_attr($skin); ?>" data-skin="<?php echo esc_attr($skin); ?>">
                     <?php $this->include_html_file('metaboxes/shortcode/display-options/layout/'.$skin.'.php', [
                         'parameters' => [
                             'options' => $options,

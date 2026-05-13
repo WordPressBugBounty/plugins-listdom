@@ -6,6 +6,8 @@ defined('ABSPATH') || die();
 
 // Settings
 $settings = LSD_Options::settings();
+$thousand_separator_options = LSD_Options::currency_separators();
+$decimal_separator_options = LSD_Options::currency_separators('decimal');
 
 // Pro version
 $is_pro = LSD_Base::isPro();
@@ -18,6 +20,12 @@ $networks = LSD_Options::socials();
 
 // Privacy Settings
 $privacy = LSD_Options::privacy();
+
+// Google reCAPTCHA
+$grecaptcha_status = isset($settings['grecaptcha_status'], $settings['grecaptcha_sitekey'], $settings['grecaptcha_secretkey'])
+    && $settings['grecaptcha_status']
+    && trim($settings['grecaptcha_sitekey'])
+    && trim($settings['grecaptcha_secretkey']);
 ?>
 <div class="lsd-settings-wrap">
     <form id="lsd_settings_form">
@@ -108,6 +116,38 @@ $privacy = LSD_Options::privacy();
                             <p class="lsd-admin-description-tiny lsd-mt-2 lsd-mb-0"><?php esc_html_e("Select the default currency used in the listings.", 'listdom'); ?></p>
                         </div>
                     </div>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Thousands Separator', 'listdom'),
+                            'for' => 'lsd_settings_currency_thousand_separator',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::select([
+                                'class' => 'lsd-admin-input',
+                                'id' => 'lsd_settings_currency_thousand_separator',
+                                'name' => 'lsd[currency_thousand_separator]',
+                                'value' => LSD_Options::currency_separator(),
+                                'options' => $thousand_separator_options,
+                            ]); ?>
+                        </div>
+                    </div>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Decimal Separator', 'listdom'),
+                            'for' => 'lsd_settings_currency_decimal_separator',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::select([
+                                'class' => 'lsd-admin-input',
+                                'id' => 'lsd_settings_currency_decimal_separator',
+                                'name' => 'lsd[currency_decimal_separator]',
+                                'value' => LSD_Options::currency_separator('decimal'),
+                                'options' => $decimal_separator_options,
+                            ]); ?>
+                        </div>
+                    </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
                     <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Listing', 'listdom'); ?></h3>
@@ -123,7 +163,7 @@ $privacy = LSD_Options::privacy();
                                 'name' => 'lsd[listing_link_status]',
                                 'value' => $settings['listing_link_status'] ?? '1',
                             ]); ?>
-                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("You can disable the listing custom link field.", 'listdom'); ?></p>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("You can disable the Custom Link field in the Add Listing form.", 'listdom'); ?></p>
                         </div>
                     </div>
                     <div class="lsd-form-row">
@@ -166,6 +206,21 @@ $privacy = LSD_Options::privacy();
                     <div class="lsd-form-row">
                         <div class="lsd-col-3"><?php echo LSD_Form::label([
                             'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Enable Address Autosuggest', 'listdom'),
+                            'for' => 'lsd_settings_address_autosuggest',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_settings_address_autosuggest',
+                                'name' => 'lsd[address_autosuggest]',
+                                'value' => $settings['address_autosuggest'] ?? '1',
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Turn this off to disable address suggestions while editing listings.', 'listdom'); ?></p>
+                        </div>
+                    </div>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
                             'title' => esc_html__('No Listing Message', 'listdom'),
                             'for' => 'lsd_settings_no_listings_message',
                         ]); ?></div>
@@ -181,14 +236,108 @@ $privacy = LSD_Options::privacy();
                             <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("It will be displayed instead of the search results when nothing is found. You can insert a text, HTML, or shortcodes.", 'listdom'); ?></p>
                         </div>
                     </div>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Maximum Visits', 'listdom'),
+                            'for' => 'lsd_settings_visibility_max_visits',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => 'lsd_settings_visibility_max_visits',
+                                'name' => 'lsd[visibility_max_visits]',
+                                'value' => $settings['visibility_max_visits'] ?? '',
+                                'attributes' => [
+                                    'min' => '0',
+                                    'step' => '1',
+                                ],
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Automatically offline listings after they reach this number of visits. Leave blank for unlimited visits.', 'listdom'); ?></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lsd-settings-fields-wrapper">
+                    <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('RSS', 'listdom'); ?></h3>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Enable Listings RSS Feed', 'listdom'),
+                            'for' => 'lsd_settings_rss_status',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php
+                                $feed_url = LSD_Feed::feed_url();
+                                $feed_base = $GLOBALS['wp_rewrite']->feed_base ?? 'feed';
+                            ?>
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_settings_rss_status',
+                                'name' => 'lsd[rss_status]',
+                                'value' => $settings['rss_status'] ?? '1',
+                                'toggle' => '#lsd_rss_slug_row',
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php echo LSD_Kses::element(
+                                sprintf(
+                                    /* translators: 1: RSS feed URL. */
+                                    esc_html__('When enabled, subscribers can follow your listings at %s.', 'listdom'),
+                                    '<a href="' . esc_url($feed_url) . '" target="_blank" rel="noopener noreferrer">' . esc_html($feed_url) . '</a>'
+                                )
+                            ); ?></p>
+                        </div>
+                    </div>
+                    <div id="lsd_rss_slug_row" class="lsd-settings-fields-sub-wrapper<?php echo empty($settings['rss_status']) ? ' lsd-util-hide' : ''; ?>">
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Include Sensitive Details', 'listdom'),
+                                'for' => 'lsd_settings_rss_include_sensitive_details',
+                            ]); ?></div>
+                            <div class="lsd-col-5">
+                                <?php echo LSD_Form::switcher([
+                                    'id' => 'lsd_settings_rss_include_sensitive_details',
+                                    'name' => 'lsd[rss_include_sensitive_details]',
+                                    'value' => $settings['rss_include_sensitive_details'] ?? '0',
+                                ]); ?>
+                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Disabled by default. Enable this only if you want RSS feeds to include listing contact details such as address, phone, email, and website.', 'listdom'); ?></p>
+                            </div>
+                        </div>
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('RSS Slug', 'listdom'),
+                                'for' => 'lsd_settings_rss_slug',
+                            ]); ?></div>
+                            <div class="lsd-col-5">
+                                <?php
+                                    $rss_slug = $settings['rss_slug'] ?? '';
+                                    if ($rss_slug === '') $rss_slug = LSD_Feed::feed_name();
+
+                                    echo LSD_Form::text([
+                                        'class' => 'lsd-admin-input',
+                                        'id' => 'lsd_settings_rss_slug',
+                                        'name' => 'lsd[rss_slug]',
+                                        'value' => $rss_slug,
+                                    ]);
+                                ?>
+                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php echo LSD_Kses::element(
+                                    sprintf(
+                                        /* translators: 1: Feed path after the site domain. */
+                                        esc_html__('This slug comes after the feed base, for example %s.', 'listdom'),
+                                        '<strong>' . esc_html(trailingslashit($feed_base) . LSD_Feed::feed_name() . '/') . '</strong>'
+                                    )
+                                ); ?></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="lsd-settings-fields-wrapper">
                     <div class="lsd-admin-section-heading">
                         <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Data Consent', 'listdom'); ?></h3>
-                        <p class="lsd-admin-description lsd-my-0"><?php esc_html_e('Send anonymous usage data to help improve Listdom.', 'listdom'); ?></p>
+                        <p class="lsd-admin-description lsd-my-0"><?php esc_html_e('Send usage data to help improve Listdom.', 'listdom'); ?></p>
                     </div>
-                    <div class="lsd-form-row lsd-flex-align-items-center lsd-m-0">
+                    <div class="lsd-form-row">
                         <div class="lsd-col-3"><?php echo LSD_Form::label([
                             'class' => 'lsd-fields-label',
                             'title' => esc_html__('Help Improve Listdom', 'listdom'),
@@ -203,6 +352,34 @@ $privacy = LSD_Options::privacy();
                         </div>
                     </div>
                 </div>
+
+                <div class="lsd-settings-fields-wrapper">
+                    <div class="lsd-admin-section-heading">
+                        <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Share the Love!', 'listdom'); ?></h3>
+                        <p class="lsd-admin-description lsd-my-0"><?php esc_html_e('Show a small "Powered by Listdom" credit on single listing pages.', 'listdom'); ?></p>
+                    </div>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Powered by Message', 'listdom'),
+                            'for' => 'lsd_powered_by_message',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_powered_by_message',
+                                'name' => 'lsd[powered_by_message]',
+                                'value' => $settings['powered_by_message'] ?? 0,
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Adds a Powered by Listdom note after single listing content.', 'listdom'); ?></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="lsd_panel_general_gdpr" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'gdpr' ? ' lsd-tab-content-active' : ''; ?>">
+            <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('GDPR', 'listdom'); ?></h3>
+            <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
                     <div class="lsd-admin-section-heading">
                         <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Privacy Consent', 'listdom'); ?></h3>
@@ -225,7 +402,7 @@ $privacy = LSD_Options::privacy();
                                 <?php echo sprintf(
                                     wp_kses(
                                         /* translators: 1: Product name, 2: Additional explanation about per-form settings. */
-                                        esc_html__('Disable to hide consent checkboxes on every %1$s form. %2$s', 'listdom'),
+                                        esc_html__("Disable to hide consent checkboxes on every %1\$s form. %2\$s", 'listdom'),
                                         ['strong' => []]
                                     ),
                                     'Listdom',
@@ -279,7 +456,7 @@ $privacy = LSD_Options::privacy();
                                     'class' => 'lsd-admin-input',
                                     'id' => 'lsd_privacy_consent_policy_content',
                                     'name' => 'lsd[privacy_consent][policy_content]',
-                                    'rows' => 7,
+                                    'rows' => 16,
                                     'value' => $privacy['privacy_consent']['policy_content'],
                                 ]); ?>
                                 <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('This content is suggested on the WordPress Privacy Policy guide. Use blank lines to separate paragraphs and {{privacy_policy}} to automatically include the default privacy policy page link when available.', 'listdom'); ?></p>
@@ -396,14 +573,14 @@ $privacy = LSD_Options::privacy();
                                     LSD_Form::select([
                                         'id' => 'lsd_settings_map_gps_zl',
                                         'name' => 'lsd[map_gps_zl]',
-                                        'class' => 'lsd-d-inline lsd-admin-input lsd-w-auto',
+                                        'class' => 'lsd-admin-input lsd-w-auto lsd-min-w-60',
                                         'value' => $settings['map_gps_zl'] ?? '',
                                         'options' => ['4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8,'9'=>9,'10'=>10,'11'=>11,'12'=>12,'13'=>13,'14'=>14]
                                     ]),
                                     LSD_Form::select([
-                                        'class' => 'lsd-admin-input lsd-w-auto',
                                         'id' => 'lsd_settings_map_gps_zl_current',
                                         'name' => 'lsd[map_gps_zl_current]',
+                                        'class' => 'lsd-admin-input lsd-w-auto lsd-min-w-60',
                                         'value' => $settings['map_gps_zl_current'] ?? '',
                                         'options' => ['4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8,'9'=>9,'10'=>10,'11'=>11,'12'=>12,'13'=>13,'14'=>14]
                                     ])
@@ -602,9 +779,9 @@ $privacy = LSD_Options::privacy();
                 <div class="lsd-settings-fields-wrapper">
                     <div class="lsd-form-row">
                         <div class="lsd-col-3"></div>
-                        <div class="lsd-col-2 lsd-fields-label"><?php esc_html_e('Author Profile', 'listdom'); ?></div>
-                        <div class="lsd-col-2 lsd-fields-label"><?php esc_html_e('Listing Card', 'listdom'); ?></div>
-                        <div class="lsd-col-2 lsd-fields-label"><?php esc_html_e('Single Listing', 'listdom'); ?></div>
+                        <div class="lsd-col-2 lsd-fields-label"><?php esc_html_e('Single Listing Author', 'listdom'); ?></div>
+                        <div class="lsd-col-2 lsd-fields-label"><?php esc_html_e('Listing Card Share', 'listdom'); ?></div>
+                        <div class="lsd-col-2 lsd-fields-label"><?php esc_html_e('Single Listing Share', 'listdom'); ?></div>
                         <div class="lsd-col-2 lsd-fields-label"><?php esc_html_e('Listing Contact', 'listdom'); ?></div>
                     </div>
                     <div class="lsd-social-networks lsd-sortable">
@@ -626,18 +803,22 @@ $privacy = LSD_Options::privacy();
                                     </label>
                                 </div>
                                 <div class="lsd-col-2">
-                                    <label class="lsd-switch">
-                                        <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][archive_share]" value="0">
-                                        <input type="checkbox" name="lsd[<?php echo esc_attr($obj->key()); ?>][archive_share]" value="1" <?php echo $obj->option('archive_share') == 1 ? 'checked="checked"' : ''; ?>>
-                                        <span class="lsd-slider"></span>
-                                    </label>
+                                    <?php if ($obj->supports('archive_share')): ?>
+                                        <label class="lsd-switch">
+                                            <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][archive_share]" value="0">
+                                            <input type="checkbox" name="lsd[<?php echo esc_attr($obj->key()); ?>][archive_share]" value="1" <?php echo $obj->option('archive_share') == 1 ? 'checked="checked"' : ''; ?>>
+                                            <span class="lsd-slider"></span>
+                                        </label>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="lsd-col-2">
-                                    <label class="lsd-switch">
-                                        <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][single_share]" value="0">
-                                        <input type="checkbox" name="lsd[<?php echo esc_attr($obj->key()); ?>][single_share]" value="1" <?php echo $obj->option('single_share') == 1 ? 'checked="checked"' : ''; ?>>
-                                        <span class="lsd-slider"></span>
-                                    </label>
+                                    <?php if ($obj->supports('single_share')): ?>
+                                        <label class="lsd-switch">
+                                            <input type="hidden" name="lsd[<?php echo esc_attr($obj->key()); ?>][single_share]" value="0">
+                                            <input type="checkbox" name="lsd[<?php echo esc_attr($obj->key()); ?>][single_share]" value="1" <?php echo $obj->option('single_share') == 1 ? 'checked="checked"' : ''; ?>>
+                                            <span class="lsd-slider"></span>
+                                        </label>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="lsd-col-2">
                                     <label class="lsd-switch">
@@ -698,7 +879,7 @@ $privacy = LSD_Options::privacy();
                     </div>
                     <div class="lsd-form-row">
                         <div class="lsd-col-3"><?php echo LSD_Form::label([
-                            'class' => 'lsd-fiedls-label',
+                            'class' => 'lsd-fields-label',
                             'title' => esc_html__('Tag', 'listdom'),
                             'for' => 'lsd_settings_tag_archive',
                         ]); ?></div>
@@ -826,7 +1007,7 @@ $privacy = LSD_Options::privacy();
                                     <li><code>%locations%</code>: <?php esc_html_e('Includes the slug of the first location and its parent locations in the URL, such as united-states/california or canada/bc.', 'listdom'); ?></li>
                                     <li><?php echo sprintf(
                                         /* translators: 1: Slash character, 2: Hyphen character. */
-                                        esc_html__('Make sure to use %1$s or %2$s to separate parts of the slug.', 'listdom'),
+                                        esc_html__("Make sure to use %1\$s or %2\$s to separate parts of the slug.", 'listdom'),
                                         '<code>/</code>',
                                         '<code>-</code>'
                                     ); ?></li>
@@ -935,14 +1116,14 @@ $privacy = LSD_Options::privacy();
                         <div class="lsd-col-9">
                             <?php echo LSD_Form::switcher([
                                 'id' => 'lsd_settings_grecaptcha_status',
-                                'value' => $settings['grecaptcha_status'] ?? false,
+                                'value' => $grecaptcha_status,
                                 'name' => 'lsd[grecaptcha_status]',
                                 'toggle' => '#lsd_settings_grecaptcha_options'
                             ]); ?>
                             <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Protect Listdom forms against spammer robots using Google reCAPTCHA V2.", 'listdom'); ?></p>
                         </div>
                     </div>
-                    <div id="lsd_settings_grecaptcha_options" class="lsd-settings-fields-sub-wrapper <?php echo isset($settings['grecaptcha_status']) && $settings['grecaptcha_status'] ? '' : 'lsd-util-hide'; ?>">
+                    <div id="lsd_settings_grecaptcha_options" class="lsd-settings-fields-sub-wrapper <?php echo $grecaptcha_status ? '' : 'lsd-util-hide'; ?>">
                         <div class="lsd-form-row">
                             <div class="lsd-col-3"><?php echo LSD_Form::label([
                                 'class' => 'lsd-fields-label',

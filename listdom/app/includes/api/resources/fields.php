@@ -67,13 +67,13 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         {
             $form['tags'] = [
                 'section' => [
-                    'title' => esc_html__('Tags', 'listdom'),
+                    'title' => esc_html(lsd_t_label(LSD_Base::TAX_TAG, 'plural')),
                 ],
                 'fields' => [
                     'tags' => [
                         'key' => 'taxonomies[' . LSD_Base::TAX_TAG . ']',
                         'method' => 'textarea',
-                        'label' => esc_html__('Tags', 'listdom'),
+                        'label' => esc_html(lsd_t_label(LSD_Base::TAX_TAG, 'plural')),
                         'placeholder' => esc_attr__('Tag1,Tag2,Tag3', 'listdom'),
                         'values' => LSD_API_Resources_Taxonomy::collection(
                             $taxonomies->hierarchy(LSD_Base::TAX_TAG)
@@ -89,13 +89,13 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         {
             $form['features'] = [
                 'section' => [
-                    'title' => esc_html__('Features', 'listdom'),
+                    'title' => esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural')),
                 ],
                 'fields' => [
                     'features' => [
                         'key' => 'taxonomies[' . LSD_Base::TAX_FEATURE . ']',
                         'method' => 'checkboxes',
-                        'label' => esc_html__('Features', 'listdom'),
+                        'label' => esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural')),
                         'values' => LSD_API_Resources_Taxonomy::collection($taxonomies->hierarchy(LSD_Base::TAX_FEATURE)),
                         'required' => false,
                     ],
@@ -108,13 +108,13 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         {
             $form['labels'] = [
                 'section' => [
-                    'title' => esc_html__('Labels', 'listdom'),
+                    'title' => esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural')),
                 ],
                 'fields' => [
                     'labels' => [
                         'key' => 'taxonomies[' . LSD_Base::TAX_LABEL . ']',
                         'method' => 'checkboxes',
-                        'label' => esc_html__('Labels', 'listdom'),
+                        'label' => esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural')),
                         'values' => LSD_API_Resources_Taxonomy::collection($taxonomies->hierarchy(LSD_Base::TAX_LABEL)),
                         'required' => false,
                     ],
@@ -344,21 +344,23 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
         {
             // Attributes
             $terms = LSD_Main::get_attributes();
+            $attribute_context = LSD_Taxonomies_Attribute::context([
+                'resolve_post_category' => false,
+                'submission' => true,
+            ]);
 
             $attributes = [];
             foreach ($terms as $term)
             {
+                if (!LSD_Taxonomies_Attribute::package_context((int) $term->term_id, $attribute_context)) continue;
+
                 $type = get_term_meta($term->term_id, 'lsd_field_type', true);
                 if (in_array($type, ['text', 'number', 'email', 'url', 'tel'])) $type = $type . '-input';
-                else if ($type === 'image') $type = 'file';
+                else if (in_array($type, ['image', 'file'], true)) $type = 'file';
 
-                // Get all category status
-                $all_categories = get_term_meta($term->term_id, 'lsd_all_categories', true);
-                if (trim($all_categories) == '') $all_categories = 1;
-
-                // Get specific categories
-                $categories = get_term_meta($term->term_id, 'lsd_categories', true);
-                if ($all_categories || !is_array($categories)) $categories = [];
+                $rules = LSD_Taxonomies_Attribute::category_rules((int) $term->term_id);
+                $all_categories = $rules['all_categories'];
+                $categories = $rules['categories'];
 
                 $values = [];
                 $values_str = get_term_meta($term->term_id, 'lsd_values', true);

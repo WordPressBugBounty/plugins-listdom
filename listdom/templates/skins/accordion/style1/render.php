@@ -7,7 +7,7 @@ defined('ABSPATH') || die();
 $ids = $this->listings;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
-    <div class="lsd-accordion-item">
+    <div class="lsd-accordion-item" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
         <div class="lsd-accordion-header" role="button" tabindex="0">
             <div class="lsd-listing-title-section">
                 <?php if ($this->display_title): ?>
@@ -33,14 +33,13 @@ $ids = $this->listings;
                     </div>
                 <?php endif; ?>
                 <div class="lsd-accordion-toggle-icon" title="<?php echo esc_html__('Toggle details', 'listdom'); ?>">
-                    <i class="fas fa-chevron-down accordion-arrow"></i>
+                    <i class="lsd-fe-icon fas fa-chevron-down accordion-arrow"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Accordion Body -->
         <div class="lsd-accordion-body" style="display: none;">
-            <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
+            <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>">
 
                 <div class="lsd-listing-body-wrapper">
                     <div class="lsd-listing-body">
@@ -75,14 +74,14 @@ $ids = $this->listings;
                             <div class="lsd-divider"></div>
 
                             <?php if ($this->display_description): ?>
-                                <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
+                                <div class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
                                     <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length, false, $this->content_type === 'description')); ?>
-                                </p>
+                                </div>
                             <?php endif; ?>
 
                             <div class="lsd-listing-meta-middle">
                                 <?php if ($this->display_address): ?>
-                                    <div class="lsd-listing-address">
+                                    <div class="lsd-listing-address" <?php echo lsd_schema()->address(); ?>>
                                         <?php echo LSD_Kses::element($listing->get_address()); ?>
                                     </div>
                                 <?php endif; ?>
@@ -108,6 +107,12 @@ $ids = $this->listings;
                                     <?php endif; ?>
                                 </div>
                             </div>
+
+                            <?php if ($this->display_cta): ?>
+                                <div class="lsd-listing-call-to-action">
+                                    <?php echo $this->listing_cta($listing); ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <?php if ($this->display_contact_info): ?>

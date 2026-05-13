@@ -2,6 +2,118 @@
 
 class LSD_User extends LSD_Base
 {
+    public const META_VERIFICATION_STATUS = 'lsd_email_verification_status';
+    public const META_VERIFICATION_TOKEN = 'lsd_email_verification_token';
+
+    public static function requires_email_verification(): bool
+    {
+        $auth = LSD_Options::auth();
+        return !empty($auth['register']['email_verification']);
+    }
+
+    public static function is_email_verified(int $user_id): bool
+    {
+        if (!$user_id) return false;
+
+        if (!self::requires_email_verification()) return true;
+
+        $status = get_user_meta($user_id, self::META_VERIFICATION_STATUS, true);
+        if ($status === 'pending') return false;
+        if ($status === 'verified') return true;
+
+        // Treat users without a status as verified to preserve backward compatibility.
+        return true;
+    }
+
+    public static function verification_required_message(): string
+    {
+        $message = esc_html__('Your account is pending email verification. Please check your inbox to confirm your email address.', 'listdom');
+        return apply_filters('lsd_email_verification_required_message', $message);
+    }
+
+    public static function verification_success_message(): string
+    {
+        $message = esc_html__('Your email address has been verified. You can now log in.', 'listdom');
+        return apply_filters('lsd_email_verification_success_message', $message);
+    }
+
+    public static function verification_failed_message(): string
+    {
+        $message = esc_html__('Email verification link is invalid or has already been used.', 'listdom');
+        return apply_filters('lsd_email_verification_failed_message', $message);
+    }
+
+    public static function request_email_verification(int $user_id): string
+    {
+        if (!$user_id) return '';
+
+        $token = wp_generate_password(32, false);
+
+        update_user_meta($user_id, self::META_VERIFICATION_TOKEN, $token);
+        update_user_meta($user_id, self::META_VERIFICATION_STATUS, 'pending');
+        update_user_meta($user_id, 'lsd_email_verification_requested', current_time('mysql'));
+
+        return $token;
+    }
+
+    public static function verification_url(int $user_id, string $token): string
+    {
+        $url = add_query_arg([
+            'lsd_verify' => $user_id,
+            'lsd_key' => $token,
+        ], home_url('/'));
+
+        return apply_filters('lsd_email_verification_url', $url, $user_id, $token);
+    }
+
+    public static function maybe_send_verification_email(int $user_id)
+    {
+        if (!$user_id || !self::requires_email_verification()) return;
+
+        $status = get_user_meta($user_id, self::META_VERIFICATION_STATUS, true);
+        if ($status === 'verified') return;
+
+        $token = get_user_meta($user_id, self::META_VERIFICATION_TOKEN, true);
+
+        // When a pending token already exists, reuse it to avoid invalidating
+        // previously issued verification links (for example, when multiple
+        // registration hooks trigger this method).
+        if ($status !== 'pending' || !$token)
+        {
+            $token = self::request_email_verification($user_id);
+            if (!$token) return;
+        }
+
+        $url = self::verification_url($user_id, $token);
+
+        do_action('lsd_user_email_verification', $user_id, $token, $url);
+    }
+
+    public static function verify_email(int $user_id, string $token): bool
+    {
+        if (!$user_id) return false;
+
+        $token = sanitize_text_field($token);
+        if (!$token) return false;
+
+        $saved_token = get_user_meta($user_id, self::META_VERIFICATION_TOKEN, true);
+        if (!$saved_token) return false;
+
+        $is_valid = function_exists('hash_equals')
+            ? hash_equals($saved_token, $token)
+            : $saved_token === $token;
+
+        if (!$is_valid) return false;
+
+        delete_user_meta($user_id, self::META_VERIFICATION_TOKEN);
+        update_user_meta($user_id, self::META_VERIFICATION_STATUS, 'verified');
+        update_user_meta($user_id, 'lsd_email_verification_time', current_time('mysql'));
+
+        do_action('lsd_user_email_verified', $user_id);
+
+        return true;
+    }
+
     public static function create(string $email)
     {
         $email = sanitize_email($email);
@@ -116,6 +228,8 @@ class LSD_User extends LSD_Base
          */
         do_action('register_new_user', $user_id);
 
+        self::maybe_send_verification_email($user_id);
+
         return $user_id;
     }
 
@@ -181,7 +295,40 @@ class LSD_User extends LSD_Base
             $id_or_email = $user_id;
         }
 
+        $user_id = 0;
+
+        if (is_numeric($id_or_email)) $user_id = (int) $id_or_email;
+        else if (is_object($id_or_email) && isset($id_or_email->ID)) $user_id = (int) $id_or_email->ID;
+        else if (is_string($id_or_email) && is_email($id_or_email))
+        {
+            $user = get_user_by('email', $id_or_email);
+            if ($user) $user_id = $user->ID;
+        }
+
+        if ($user_id)
+        {
+            $profile_image_id = get_user_meta($user_id, 'lsd_profile_image', true);
+            if ($profile_image_id)
+            {
+                $profile_image_url = wp_get_attachment_url($profile_image_id);
+                if ($profile_image_url) return '<img src="' . esc_url($profile_image_url) . '" class="avatar avatar-' . esc_attr($size) . ' photo" height="' . esc_attr($size) . '" width="' . esc_attr($size) . '" alt="' . esc_attr__('Profile Image', 'listdom') . '">';
+            }
+        }
+
         return get_avatar($id_or_email, $size);
+    }
+
+    public static function get_user_image_url(int $user_id, string $meta_key): string
+    {
+        if (!$user_id || !$meta_key) return '';
+
+        $attachment_id = (int) get_user_meta($user_id, $meta_key, true);
+        if (!$attachment_id) return '';
+
+        $url = wp_get_attachment_url($attachment_id);
+        if ($url) return $url;
+
+        return '';
     }
 
     public static function get_user_info($username = ''): array
@@ -235,6 +382,108 @@ class LSD_User extends LSD_Base
             'first_name' => $user->first_name ?: '',
             'last_name' => $user->last_name ?: '',
         ], $user_meta);
+    }
+
+    public static function profile_edit_fields_defaults(): array
+    {
+        $social = [];
+        foreach (self::profile_social_networks() as $network) $social[$network] = 1;
+
+        return [
+            'job_title' => 1,
+            'bio' => 1,
+            'profile_image' => 1,
+            'hero_image' => 1,
+            'email' => 1,
+            'phone' => 1,
+            'mobile' => 1,
+            'website' => 1,
+            'fax' => 1,
+            'social' => $social,
+        ];
+    }
+
+    public static function profile_social_networks(): array
+    {
+        $networks = [
+            'facebook',
+            'twitter',
+            'pinterest',
+            'linkedin',
+            'instagram',
+            'whatsapp',
+            'youtube',
+            'tiktok',
+            'telegram',
+        ];
+
+        $socials = LSD_Options::socials();
+        foreach ($socials as $network => $options)
+        {
+            if (!is_string($network) || trim($network) === '') continue;
+            if (!in_array($network, $networks, true)) $networks[] = $network;
+        }
+
+        return $networks;
+    }
+
+    public static function profile_edit_fields(): array
+    {
+        $auth = LSD_Options::auth();
+        $fields = isset($auth['profile']['fields']) && is_array($auth['profile']['fields']) ? $auth['profile']['fields'] : [];
+        $defaults = self::profile_edit_fields_defaults();
+
+        $fields = self::parse_args($fields, $defaults);
+        foreach (['job_title', 'bio', 'profile_image', 'hero_image', 'email', 'phone', 'mobile', 'website', 'fax'] as $field)
+        {
+            $fields[$field] = isset($fields[$field]) && (int) $fields[$field] === 0 ? 0 : 1;
+        }
+
+        $social_defaults = $defaults['social'];
+        $legacy_socials = isset($fields['socials']) && (int) $fields['socials'] === 0 ? 0 : 1;
+        $social = isset($fields['social']) && is_array($fields['social']) ? $fields['social'] : [];
+        $social = self::parse_args($social, $social_defaults);
+
+        foreach ($social_defaults as $network => $enabled)
+        {
+            $social[$network] = ($legacy_socials === 0 || (isset($social[$network]) && (int) $social[$network] === 0)) ? 0 : 1;
+        }
+
+        $fields['social'] = $social;
+        unset($fields['socials']);
+
+        return $fields;
+    }
+
+    public static function is_profile_edit_field_enabled(string $field): bool
+    {
+        $fields = self::profile_edit_fields();
+        if (!array_key_exists($field, $fields)) return true;
+
+        return (int) $fields[$field] === 1;
+    }
+
+    public static function is_profile_social_field_enabled(string $network): bool
+    {
+        $fields = self::profile_edit_fields();
+
+        if (!isset($fields['social']) || !is_array($fields['social'])) return true;
+        if (!array_key_exists($network, $fields['social'])) return true;
+
+        return (int) $fields['social'][$network] === 1;
+    }
+
+    public static function has_enabled_profile_social_fields(): bool
+    {
+        $fields = self::profile_edit_fields();
+        if (!isset($fields['social']) || !is_array($fields['social'])) return true;
+
+        foreach ($fields['social'] as $enabled)
+        {
+            if ((int) $enabled === 1) return true;
+        }
+
+        return false;
     }
 
     public static function send_forgot_password_email(WP_User $user): bool
@@ -296,26 +545,8 @@ class LSD_User extends LSD_Base
         return get_author_posts_url($id);
     }
 
-    public static function all_roles(): array
-    {
-        $roles = [];
-        foreach (wp_roles()->roles as $key => $details) $roles[$key] = translate_user_role($details['name']);
-
-        return $roles;
-    }
-
     public static function roles(bool $only_keys = false): array
     {
-        $roles = apply_filters('lsd_user_supported_roles', [
-            'subscriber' => esc_html__('Subscriber', 'listdom'),
-            'contributor' => esc_html__('Contributor', 'listdom'),
-            'listdom_author' => esc_html__('Listdom Author', 'listdom'),
-            'listdom_publisher' => esc_html__('Listdom Publisher', 'listdom'),
-        ]);
-
-        // Only Keys
-        if ($only_keys) return array_keys($roles);
-
-        return $roles;
+        return LSD_Roles::supported($only_keys);
     }
 }

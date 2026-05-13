@@ -6,12 +6,17 @@ class LSD_Base
     const PTYPE_SHORTCODE = 'listdom-shortcode';
     const PTYPE_SEARCH = 'listdom-search';
     const PTYPE_NOTIFICATION = 'listdom-notification';
+    const PTYPE_ORDER = 'listdom-order';
+    const PTYPE_RECURRING = 'listdom-recurring';
+    const PTYPE_PLAN = 'listdom-plan';
+    const PTYPE_COUPON = 'listdom-coupon';
     const TAX_LOCATION = 'listdom-location';
     const TAX_CATEGORY = 'listdom-category';
     const TAX_TAG = 'listdom-tag';
     const TAX_FEATURE = 'listdom-feature';
     const TAX_ATTRIBUTE = 'listdom-attribute';
     const TAX_LABEL = 'listdom-label';
+    const TAX_TAX = 'listdom-tax';
     const STATUS_EXPIRED = 'expired';
     const STATUS_HOLD = 'hold';
     const STATUS_OFFLINE = 'offline';
@@ -76,6 +81,21 @@ class LSD_Base
         // WordPress Upload Directory
         $upload_dir = wp_upload_dir();
         return $upload_dir['baseurl'] . '/listdom/';
+    }
+
+    /**
+     * Determine if the site is served over SSL.
+     */
+    public static function is_ssl_active(): bool
+    {
+        $ssl = is_ssl();
+        if (!$ssl)
+        {
+            $home_url = home_url();
+            if (is_string($home_url) && stripos($home_url, 'https://') === 0) $ssl = true;
+        }
+
+        return $ssl;
     }
 
     public function upload_to_listdom_dir(array $file, string $filename, array $overrides = []): array
@@ -297,7 +317,7 @@ class LSD_Base
         foreach ($attributes as $attribute)
         {
             $field_type = $attribute['field_type'] ?? '';
-            if (in_array($field_type, ['separator', 'image'], true)) continue;
+            if (in_array($field_type, ['separator', 'image', 'file'], true)) continue;
 
             $key = 'lsd_attribute_' . $attribute['slug'];
             $is_numeric = $field_type === 'number';
@@ -365,9 +385,14 @@ class LSD_Base
         return LSD_Color::text_class($color);
     }
 
+    public static function get_lsd_class($base): string
+    {
+        return is_admin() ? 'lsd-admin-'.$base : 'lsd-fe-'.$base;
+    }
+
     public function get_sf($default = [])
     {
-        $vars = array_merge($_GET, $_POST);
+        $vars = wp_unslash(array_merge($_GET, $_POST));
 
         // Sanitization
         array_walk_recursive($vars, 'sanitize_text_field');
@@ -466,20 +491,53 @@ class LSD_Base
             }
         }
 
+        if (isset($sf['circle']['center-lat']) || isset($sf['circle']['center-lng']))
+        {
+            $latitude = isset($sf['circle']['center-lat']) ? trim((string) $sf['circle']['center-lat']) : '';
+            $longitude = isset($sf['circle']['center-lng']) ? trim((string) $sf['circle']['center-lng']) : '';
+
+            unset($sf['circle']['center-lat'], $sf['circle']['center-lng']);
+
+            if ($latitude !== '' && $longitude !== '' && is_numeric($latitude) && is_numeric($longitude))
+            {
+                $sf['circle']['center'] = [
+                    (float) $latitude,
+                    (float) $longitude,
+                ];
+            }
+        }
+
+        if (isset($sf['circle']['center']) && is_string($sf['circle']['center']))
+        {
+            $coordinates = array_map('trim', explode(',', $sf['circle']['center']));
+            if (count($coordinates) === 2 && is_numeric($coordinates[0]) && is_numeric($coordinates[1]))
+            {
+                $sf['circle']['center'] = [
+                    (float) $coordinates[0],
+                    (float) $coordinates[1],
+                ];
+            }
+        }
+
         if (isset($sf['attributes']['price-bt'])) $sf['attributes']['price-bt'] = trim($sf['attributes']['price-bt'], ': ');
 
         return count($sf) ? $sf : $default;
     }
 
-    public static function taxonomies(): array
+    public static function taxonomies($attributes = false): array
     {
-        return [
+        $taxonomies = [
             LSD_Base::TAX_CATEGORY,
             LSD_Base::TAX_LOCATION,
-            LSD_Base::TAX_TAG,
             LSD_Base::TAX_FEATURE,
             LSD_Base::TAX_LABEL,
+            LSD_Base::TAX_TAG,
         ];
+
+        // Add Custom Fields
+        if ($attributes) $taxonomies[] = LSD_Base::TAX_ATTRIBUTE;
+
+        return $taxonomies;
     }
 
     public static function postTypes(): array
@@ -564,13 +622,13 @@ class LSD_Base
         {
             if ($multiple) return sprintf(
                 /* translators: 1: Feature names, 2: Link to activate Listdom Pro. */
-                esc_html__('%1$s are included in the pro add-on. You should activate the %2$s now to enjoy all its features!', 'listdom'),
+                esc_html__("%1\$s are included in the pro add-on. You should activate the %2\$s now to enjoy all its features!", 'listdom'),
                 $feature_html,
                 '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>'
             );
             else return sprintf(
                 /* translators: 1: Feature name, 2: Link to activate Listdom Pro. */
-                esc_html__('%1$s is included in the pro add-on. You should activate the %2$s now to enjoy all its features!', 'listdom'),
+                esc_html__("%1\$s is included in the pro add-on. You should activate the %2\$s now to enjoy all its features!", 'listdom'),
                 $feature_html,
                 '<a href="' . LSD_Base::getActivationURL() . '"><strong>' . esc_html__('Listdom Pro', 'listdom') . '</strong></a>'
             );
@@ -579,13 +637,13 @@ class LSD_Base
         {
             if ($multiple) return sprintf(
                 /* translators: 1: Feature names, 2: Link to purchase the pro add-on. */
-                esc_html__('%1$s are included in the pro add-on. You can upgrade to the %2$s now to enjoy all of the features of the Listdom!', 'listdom'),
+                esc_html__("%1\$s are included in the pro add-on. You can upgrade to the %2\$s now to enjoy all of the features of the Listdom!", 'listdom'),
                 $feature_html,
                 '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>'
             );
             else return sprintf(
                 /* translators: 1: Feature name, 2: Link to purchase the pro add-on. */
-                esc_html__('%1$s is included in the pro add-on. You can upgrade to the %2$s now to enjoy all of the features of the Listdom!', 'listdom'),
+                esc_html__("%1\$s is included in the pro add-on. You can upgrade to the %2\$s now to enjoy all of the features of the Listdom!", 'listdom'),
                 $feature_html,
                 '<a href="' . LSD_Base::getWebiliaShopURL() . '" target="_blank"><strong>' . esc_html__('Pro Add-on', 'listdom') . '</strong></a>'
             );
@@ -596,7 +654,7 @@ class LSD_Base
     {
         return sprintf(
             /* translators: 1: Add-on name link, 2: Feature name. */
-            esc_html__('Activate the %1$s add-on to use the %2$s feature.', 'listdom'),
+            esc_html__("Activate the %1\$s add-on to use the %2\$s feature.", 'listdom'),
             ('<a href="' . LSD_Base::getAddonURL($addon) . '" target="_blank"><strong>' . esc_html($addon) . '</strong></a>'),
             '<strong>' . $feature . '</strong>'
         );
@@ -619,7 +677,7 @@ class LSD_Base
         return sprintf(
             esc_html(
                 /* translators: 1: Feature names, 2: Add-on names. */
-                _n('To use the %1$s feature, you need to install %2$s add-on.', 'To use the %1$s features, you need to install %2$s add-ons.', $count, 'listdom')
+                _n("To use the %1\$s feature, you need to install %2\$s add-on.", "To use the %1\$s features, you need to install %2\$s add-ons.", $count, 'listdom')
             ),
             trim($features, ', '),
             trim($addons, ', ')
@@ -653,7 +711,9 @@ class LSD_Base
 
     public static function getAccountURL(): string
     {
-        return self::addUtmParameters('https://listdom.net/my-account/');
+        return self::addUtmParameters(
+            LSD_Branding::accountUrl()
+        );
     }
 
     public static function getUpgradeURL(): string
@@ -663,17 +723,19 @@ class LSD_Base
 
     public static function getWebiliaShopURL(): string
     {
-        return 'https://api.webilia.com/go/shop';
+        return LSD_Branding::shopUrl();
     }
 
     public static function getManageLicensesURL(): string
     {
-        return 'https://api.webilia.com/go/my-account';
+        return LSD_Branding::manageLicensesUrl();
     }
 
     public static function getSupportURL(): string
     {
-        return self::addUtmParameters('https://listdom.net/support/');
+        return self::addUtmParameters(
+            LSD_Branding::supportUrl()
+        );
     }
 
     public static function getMobileApp(): string
@@ -683,7 +745,9 @@ class LSD_Base
 
     public static function getListdomDocsURL(): string
     {
-        return self::addUtmParameters('https://api.webilia.com/go/listdom-docs');
+        return self::addUtmParameters(
+            LSD_Branding::docsUrl()
+        );
     }
 
     public static function getListdomWelcomeWizardUrl(): string
@@ -863,12 +927,16 @@ class LSD_Base
         return apply_filters('lsd_admin_id', 1);
     }
 
-    public static function minimize($number)
+    public static function minimize($number, string $decimal_separator = '.')
     {
-        if ($number < 1000) return round($number);
-        else if ($number < 100000) return round($number / 1000, 1) . 'K';
-        else if ($number < 1000000) return round($number / 1000) . 'K';
-        else return round($number / 1000000, 2) . 'M';
+        if ($number < 1000) $rendered = (string) round($number);
+        else if ($number < 100000) $rendered = round($number / 1000, 1) . 'K';
+        else if ($number < 1000000) $rendered = round($number / 1000) . 'K';
+        else $rendered = round($number / 1000000, 2) . 'M';
+
+        if ($decimal_separator !== '.') $rendered = str_replace('.', $decimal_separator, $rendered);
+
+        return $rendered;
     }
 
     public static function indexify($array): array
@@ -905,7 +973,7 @@ class LSD_Base
             esc_html__('%s from 5', 'listdom'),
             $stars
         ) : '') . '">';
-        for ($i = 1; $i <= 5; $i++) $output .= '<span><i class="lsd-icon ' . ($rounded >= $i ? 'fas fa-star' : 'far fa-star') . '"></i></span>';
+        for ($i = 1; $i <= 5; $i++) $output .= '<span><i class="lsd-fe-icon ' . ($rounded >= $i ? 'fas fa-star' : 'far fa-star') . '"></i></span>';
         $output .= '</span>';
 
         return $output;
@@ -1023,26 +1091,28 @@ class LSD_Base
         return $id;
     }
 
-    public function render_price($price, $currency, $minimized = false): string
+    public function render_price($price, $currency, $minimized = false, $free = true): string
     {
         // Return Free if price is 0
-        if ($price == '0') return esc_html__('Free', 'listdom');
+        if ($price == '0' && $free) return esc_html__('Free', 'listdom');
 
-        // General Settings
-        $settings = LSD_Options::settings();
+        $thousand_separator = LSD_Options::currency_separator();
+        if ($thousand_separator === 's') $thousand_separator = ' ';
 
-        $thousand_separator = ',';
-        $decimal_separator = '.';
-        $currency_sign_position = isset($settings['currency_position']) && trim($settings['currency_position']) ? $settings['currency_position'] : 'before';
+        $decimal_separator = LSD_Options::currency_separator('decimal');
+        $minimized_decimal_separator = $decimal_separator === '' ? '.' : $decimal_separator;
 
-        // Force to double
-        if (is_string($price)) $price = (double) $price;
+        $currency_sign_position = LSD_Options::currency_position();
+
+        // Normalize first, then detect if there is a non-zero fractional part.
+        $price = is_numeric($price) ? (double) $price : 0.0;
+        $price_has_decimals = abs($price - round($price)) > 0.0000001;
 
         // Disable decimals if not needed
-        if (strpos($price, '.') === false) $decimal_separator = false;
+        if (!$price_has_decimals) $decimal_separator = false;
 
         // Minimize
-        if ($minimized) $rendered = $this->minimize($price);
+        if ($minimized) $rendered = $this->minimize($price, $minimized_decimal_separator);
         else
         {
             $rendered = number_format($price, ($decimal_separator === false ? 0 : 2), ($decimal_separator === false ? '' : $decimal_separator), $thousand_separator);
@@ -1422,15 +1492,15 @@ class LSD_Base
 
     /**
      * @param string $title
-     * @param string $post_type
+     * @param string|array $post_types
      * @return WP_Post|null
      */
-    public static function get_post_by_title(string $title, string $post_type = 'post'): ?WP_Post
+    public static function get_post_by_title(string $title, $post_types = 'post'): ?WP_Post
     {
         // Query
         $query = new WP_Query([
             'title' => $title,
-            'post_type' => $post_type,
+            'post_type' => $post_types,
             'posts_per_page' => 1,
             'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'inherit', 'trash'],
         ]);
@@ -1553,6 +1623,20 @@ class LSD_Base
 
         // Check if the current taxonomy matches any Listdom-related taxonomies
         if ($taxonomy && in_array($taxonomy, LSD_Base::taxonomies())) $status = true;
+
+        // Check for Listdom shortcodes on regular WordPress pages
+        if (!$status)
+        {
+            $post = get_post();
+            if ($post instanceof WP_Post)
+            {
+                $content = $post->post_content ?? '';
+                if (is_string($content) && preg_match('/\[(listdom(?:[-_][\w-]+)?)(\s|]|\/)/i', $content)) $status = true;
+            }
+        }
+
+        // Check if Listdom assets should load for direct invoice views
+        if (!$status && isset($_REQUEST['lsd-invoice']) && trim((string) $_REQUEST['lsd-invoice']) !== '') $status = true;
 
         return apply_filters('lsd_is_listdom_page', $status);
     }

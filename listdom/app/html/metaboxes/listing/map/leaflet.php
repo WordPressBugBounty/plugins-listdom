@@ -13,6 +13,7 @@ const stroke_color = '<?php echo esc_js($settings['map_shape_stroke_color']); ?>
 const stroke_opacity = '<?php echo esc_js($settings['map_shape_stroke_opacity']); ?>';
 const stroke_weight = '<?php echo esc_js($settings['map_shape_stroke_weight']); ?>';
 const mapbox_token = '<?php echo esc_js($settings['mapbox_access_token']); ?>';
+const address_autosuggest_enabled = <?php echo isset($settings['address_autosuggest']) && !$settings['address_autosuggest'] ? 'false' : 'true'; ?>;
 
 jQuery(document).ready(function($)
 {
@@ -20,6 +21,112 @@ jQuery(document).ready(function($)
     const latitude = $('#lsd_object_type_latitude').val();
     const longitude = $('#lsd_object_type_longitude').val();
     const zoomlevel = parseInt($('#lsd_object_type_zoomlevel').val());
+    const $addressField = $('#lsd_object_type_address');
+    const $latitudeField = $('#lsd_object_type_latitude');
+    const $longitudeField = $('#lsd_object_type_longitude');
+    const $locateButton = $('#lsd_object_type_address_locate');
+    const dropdownTriggers = $locateButton.length ? $addressField.add($locateButton) : $addressField;
+    const dropdown = address_autosuggest_enabled ? (function ()
+    {
+        const $dropdownElement = $('#lsd_object_type_address_dropdown');
+        const loadingText =
+            ($dropdownElement.length && $dropdownElement.data('loading-text'))
+                ? $dropdownElement.data('loading-text')
+                : '<?php echo esc_js(__('Loading addresses…', 'listdom')); ?>';
+
+        if (typeof window.lsdGetAddressDropdownController === 'function')
+        {
+            return window.lsdGetAddressDropdownController($dropdownElement, {
+                trigger: dropdownTriggers,
+                storeElement: $dropdownElement,
+                dropdownOptions: {loadingText: loadingText}
+            });
+        }
+
+        if (typeof window.lsdCreateAddressDropdown === 'function')
+        {
+            const instance = window.lsdCreateAddressDropdown($dropdownElement, {loadingText: loadingText});
+            if (instance && instance.$element && instance.$element.length)
+            {
+                instance.$element.data('lsdDropdownTrigger', dropdownTriggers);
+            }
+            return instance;
+        }
+
+        return {
+            $element: $dropdownElement,
+            reset: function () {},
+            populate: function () {},
+            markSelected: function () {},
+            isUpdating: function ()
+            {
+                return false;
+            },
+            selectItem: function () {},
+            hide: function () {},
+            showLoading: function () {},
+            show: function () {},
+        };
+    })() : {
+        $element: $('#lsd_object_type_address_dropdown'),
+        reset: function () {},
+        populate: function () {},
+        markSelected: function () {},
+        isUpdating: function ()
+        {
+            return false;
+        },
+        selectItem: function () {},
+        hide: function () {},
+        showLoading: function () {},
+        show: function () {},
+    };
+
+    if ($addressField.length)
+    {
+        dropdown.markSelected($addressField.val(), {lat: $latitudeField.val(), lon: $longitudeField.val()});
+        $addressField.off('input.lsd-dropdown-reset').on('input.lsd-dropdown-reset', function ()
+        {
+            dropdown.reset();
+        });
+    }
+
+    if (address_autosuggest_enabled && dropdown.$element.length)
+    {
+        dropdown.$element
+            .off('lsd-autocomplete-select.lsd-dropdown')
+            .on('lsd-autocomplete-select.lsd-dropdown', function (event, item)
+            {
+                if (dropdown.isUpdating()) return;
+
+                const hasItem = item && typeof item === 'object';
+                const value = hasItem ? item.value || item.label || '' : '';
+                const lat = hasItem && item.lat ? item.lat : '';
+                const lon = hasItem && item.lon ? item.lon : '';
+
+                if (!value)
+                {
+                    $addressField.val('');
+                    dropdown.markSelected('', null);
+                    return;
+                }
+
+                const label = item.label || value;
+                $addressField.val(label);
+
+                if (lat && lon)
+                {
+                    applyCoordinates(lat, lon, {address: label, reverse: false});
+                }
+                else
+                {
+                    $latitudeField.val('');
+                    $longitudeField.val('').trigger('change');
+                    dropdown.markSelected(label, null);
+                }
+            });
+    }
+
     let overlaysArray = [];
     const center = new L.LatLng(latitude, longitude);
     let overlay;
@@ -49,31 +156,79 @@ jQuery(document).ready(function($)
         }).addTo(map);
     }
 
-    // OSM Autocomplete
-    $('#lsd_object_type_address').autocomplete(
+    let osmRequest = null;
+
+    if (address_autosuggest_enabled && $addressField.length && typeof window.lsdAddressAutocompleteSources !== 'undefined')
     {
-        source: function (request, response)
+        $addressField.off('input.lsd-osm-dropdown').on('input.lsd-osm-dropdown', function ()
         {
-            $.getJSON('https://nominatim.openstreetmap.org/search', {format: 'json', limit: 5, q: request.term}, function (data)
+            if (osmRequest && typeof osmRequest.cancel === 'function') osmRequest.cancel();
+
+            const term = $addressField.val();
+
+            if (!term || term.length < 3)
             {
-                response($.map(data, function (item)
-                {
-                    return {
-                        label: item.display_name,
-                        value: item.display_name,
-                        lat: item.lat,
-                        lon: item.lon
-                    };
-                }));
+                dropdown.reset();
+                return;
+            }
+
+            dropdown.showLoading();
+
+            const requestTerm = term;
+            osmRequest = window.lsdAddressAutocompleteSources.fetch('openstreetmap', requestTerm, {
+                limit: 5,
+                minLength: 3
             });
-        },
-        minLength: 3,
-        select: function (event, ui)
+
+            if (!osmRequest || !osmRequest.promise) return;
+
+            osmRequest.promise
+                .done(function (response)
+                {
+                    if ($addressField.val() !== requestTerm) return;
+
+                    const items = response && response.items ? response.items : [];
+                    if (!items.length)
+                    {
+                        dropdown.reset();
+                        return;
+                    }
+
+                    dropdown.populate(items);
+                })
+                .fail(function ()
+                {
+                    dropdown.reset();
+                });
+        });
+    }
+    else
+    {
+        dropdown.reset();
+    }
+
+    const reverseGeocode = function(lat, lng, callback)
+    {
+        const latNum = parseFloat(lat);
+        const lonNum = parseFloat(lng);
+
+        if (isNaN(latNum) || isNaN(lonNum))
         {
-            $('#lsd_object_type_latitude').val(ui.item.lat);
-            $('#lsd_object_type_longitude').val(ui.item.lon).trigger('change');
+            if (typeof callback === 'function') callback('');
+            return;
         }
-    });
+
+        $.getJSON('https://nominatim.openstreetmap.org/reverse', {format: 'json', lat: latNum, lon: lonNum})
+            .done(function(data)
+            {
+                const label = (data && data.display_name) ? data.display_name : '';
+                if (typeof callback === 'function') callback(label);
+            })
+            .fail(function()
+            {
+                if (typeof callback === 'function') callback('');
+            });
+    };
 
     // Draw Toolbar
     const drawnItems = new L.FeatureGroup();
@@ -187,25 +342,126 @@ jQuery(document).ready(function($)
         draggable: true
     }).addTo(map);
 
+    let coordinateInputsAreUpdating = false;
+
+    const applyCoordinates = function(latValue, lonValue, options = {})
+    {
+        if ((latValue === '' || typeof latValue === 'undefined') || (lonValue === '' || typeof lonValue === 'undefined')) return null;
+
+        const latNum = parseFloat(latValue);
+        const lonNum = parseFloat(lonValue);
+        if (isNaN(latNum) || isNaN(lonNum)) return null;
+
+        coordinateInputsAreUpdating = true;
+        $latitudeField.val(latNum).trigger('change');
+        $longitudeField.val(lonNum).trigger('change');
+        coordinateInputsAreUpdating = false;
+
+        if (!options.skipMarker) marker.setLatLng({ lat: latNum, lng: lonNum });
+
+        if (!options.skipCenter)
+        {
+            const desiredZoom = (typeof options.zoom !== 'undefined') ? options.zoom : map.getZoom();
+            map.setView([latNum, lonNum], desiredZoom);
+        }
+
+        if (options.address && options.address.length) $addressField.val(options.address);
+
+        dropdown.markSelected($addressField.val(), {lat: latNum, lon: lonNum});
+
+        return {lat: latNum, lon: lonNum};
+    };
+
+    const finalizeAddressFromCoordinates = function(latValue, lonValue, fallbackLabel, done)
+    {
+        const latNum = parseFloat(latValue);
+        const lonNum = parseFloat(lonValue);
+        if (isNaN(latNum) || isNaN(lonNum))
+        {
+            if (typeof done === 'function') done();
+            return;
+        }
+
+        reverseGeocode(latNum, lonNum, function(addressText)
+        {
+            if (addressText) $addressField.val(addressText);
+            else if (!$addressField.val() && fallbackLabel) $addressField.val(fallbackLabel);
+
+            dropdown.markSelected($addressField.val(), {lat: latNum, lon: lonNum});
+
+            if (typeof done === 'function') done();
+        });
+    };
+
+    const locateMessages = {
+        unsupported: $locateButton.data('error-unsupported') || '',
+        denied: $locateButton.data('error-denied') || '',
+        failed: $locateButton.data('error-failed') || ''
+    };
+    const locateGpsLabel = $locateButton.data('gps-label') || '';
+
+    const setLocateLoading = function(loading)
+    {
+        if (!$locateButton.length) return;
+        $locateButton.toggleClass('lsd-is-loading', !!loading);
+    };
+
+    const showLocateError = function(message)
+    {
+        if (!message) return;
+
+        if (typeof window.listdom_toastify === 'function') window.listdom_toastify(message, 'lsd-error');
+        else window.alert(message);
+    };
+
+    if ($locateButton.length && typeof window.lsdBindLocateControl === 'function')
+    {
+        window.lsdBindLocateControl($locateButton, {
+            messages: locateMessages,
+            expectsFinalize: true,
+            setLoading: setLocateLoading,
+            showError: showLocateError,
+            onDenied: function ()
+            {
+                $latitudeField.val('');
+                $longitudeField.val('').trigger('change');
+            },
+            onError: function ()
+            {
+                $latitudeField.val('');
+                $longitudeField.val('').trigger('change');
+            },
+            onSuccess: function(lat, lng, done)
+            {
+                const coords = applyCoordinates(lat, lng, {reverse: false, zoom: Math.max(map.getZoom(), 12)});
+                const latNum = coords ? coords.lat : parseFloat(lat) || 0;
+                const lonNum = coords ? coords.lon : parseFloat(lng) || 0;
+
+                finalizeAddressFromCoordinates(latNum, lonNum, locateGpsLabel, done);
+            }
+        });
+    }
+
     /**
      * Marker Event Listeners
      * Marker Drag End
      */
     marker.on('dragend', function()
     {
-        $('#lsd_object_type_latitude').val(marker.getLatLng().lat);
-        $('#lsd_object_type_longitude').val(marker.getLatLng().lng).trigger('change');
+        const position = marker.getLatLng();
+        applyCoordinates(position.lat, position.lng, {reverse: false, skipCenter: true});
+        finalizeAddressFromCoordinates(position.lat, position.lng);
     });
 
     // Latitude and Longitude Changed Manually
     $('#lsd_object_type_latitude, #lsd_object_type_longitude').on('change', function()
     {
+        if (coordinateInputsAreUpdating) return;
+
         const lat = $('#lsd_object_type_latitude').val();
         const lng = $('#lsd_object_type_longitude').val();
-        const position = new L.LatLng(lat, lng);
-
-        marker.setLatLng(position);
-        map.flyTo(position, map.getZoom());
+        const coords = applyCoordinates(lat, lng, {reverse: false});
+        if (coords) finalizeAddressFromCoordinates(coords.lat, coords.lon);
     });
 
     // Object Type is shape so hide the marker

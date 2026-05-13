@@ -12,7 +12,7 @@ $shortcode = LSD_Payload::get('shortcode');
 $assets = new LSD_Assets();
 
 // Listing Image
-$image = get_the_post_thumbnail($post_id, $size, (string) lsd_schema()->prop('contentUrl'));
+$image = get_the_post_thumbnail($post_id, $size, ['itemprop' => 'image']);
 
 // No Image
 $no_image = '<img alt="' . esc_attr__('No Image', 'listdom') . '" src="' . esc_url($assets->lsd_asset_url('/img/no-image.jpg')) . '">';

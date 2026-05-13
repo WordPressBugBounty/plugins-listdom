@@ -27,5 +27,9 @@ class LSD_Integrations extends LSD_Base
         // Mailchimp Integration
         $mailchimp = new LSD_Integrations_Mailchimp();
         $mailchimp->init();
+
+        // WP All Import Integration
+        $allimport = new LSD_Integrations_Allimport();
+        $allimport->init();
     }
 }

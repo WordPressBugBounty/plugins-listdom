@@ -8,20 +8,15 @@ defined('ABSPATH') || die();
 // User is Already Logged-in
 if (is_user_logged_in()) return '';
 
+$instance_id = uniqid('lsd-register-');
+
 $auth = LSD_Options::auth();
 
 $register_redirect_link = isset($auth['register']['redirect']) ? get_permalink($auth['register']['redirect']) : false;
 $redirect = $register_redirect_link ?: home_url();
-$username_label = $auth['register']['username_label'];
-$username_placeholder = $auth['register']['username_placeholder'];
-$password_label = $auth['register']['password_label'];
-$password_placeholder = $auth['register']['password_placeholder'];
-$email_label = $auth['register']['email_label'];
-$email_placeholder = $auth['register']['email_placeholder'];
-$register_submit_label = $auth['register']['submit_label'];
 
 $register_privacy_field = LSD_Privacy::consent_field([
-    'id' => 'lsd_register_privacy_consent',
+    'id' => 'lsd_register_privacy_consent_' . $instance_id,
     'wrapper_class' => 'lsd-register-privacy-consent-field',
     'context' => 'register',
 ]);
@@ -30,7 +25,7 @@ $assets = new LSD_Assets();
 $assets->footer('<script>
 jQuery(document).ready(function()
 {
-    jQuery("#lsd-registration-form").listdomRegisterForm(
+    jQuery("#' . esc_js('lsd-registration-form-' . $instance_id) . '").listdomRegisterForm(
     {
         ajax_url: "' . admin_url('admin-ajax.php', null) . '",
         nonce: "' . wp_create_nonce('lsd_register_nonce') . '"
@@ -39,64 +34,122 @@ jQuery(document).ready(function()
 </script>');
 ?>
 <div class="lsd-register-wrapper">
-    <div id="lsd_register_form_message"></div>
-    <form id="lsd-registration-form" method="post">
+    <div id="<?php echo esc_attr('lsd_register_form_message_' . $instance_id); ?>" class="lsd-register-form-message"></div>
+    <form id="<?php echo esc_attr('lsd-registration-form-' . $instance_id); ?>" method="post" class="lsd-registration-form">
         <?php LSD_Form::nonce('lsd_register_nonce', 'lsd_register_nonce'); ?>
         <div class="form-group">
             <?php
-                echo LSD_Form::label([
-                    'for' => 'lsd_register_username',
-                    'title' => $username_label
-                ]);
-                echo LSD_Form::text([
-                    'name' => 'lsd_username',
-                    'id' => 'lsd_register_username',
-                    'value' => isset($_POST['lsd_username']) ? sanitize_text_field(wp_unslash($_POST['lsd_username'])) : '',
-                    'required' => true,
-                    'placeholder' => $username_placeholder
-                ]);
+            echo LSD_Form::label([
+                'for' => 'lsd_register_username_' . $instance_id,
+                'title' => $auth['register']['username_label']
+            ]);
+            echo LSD_Form::text([
+                'name' => 'lsd_username',
+                'id' => 'lsd_register_username_' . $instance_id,
+                'value' => isset($_POST['lsd_username']) ? sanitize_text_field(wp_unslash($_POST['lsd_username'])) : '',
+                'required' => true,
+                'placeholder' => $auth['register']['username_placeholder']
+            ]);
             ?>
         </div>
 
         <div class="form-group">
             <?php
-                echo LSD_Form::label([
-                    'for' => 'lsd_email',
-                    'title' => $email_label
-                ]);
-                echo LSD_Form::email([
-                    'name' => 'lsd_email',
-                    'id' => 'lsd_email',
-                    'value' => isset($_POST['reg_email']) ? sanitize_email(wp_unslash($_POST['reg_email'])) : '',
-                    'required' => true,
-                    'placeholder' => $email_placeholder
-                ]);
+            echo LSD_Form::label([
+                'for' => 'lsd_email_' . $instance_id,
+                'title' => $auth['register']['email_label']
+            ]);
+            echo LSD_Form::email([
+                'name' => 'lsd_email',
+                'id' => 'lsd_email_' . $instance_id,
+                'value' => isset($_POST['reg_email']) ? sanitize_email(wp_unslash($_POST['reg_email'])) : '',
+                'required' => true,
+                'placeholder' => $auth['register']['email_placeholder']
+            ]);
             ?>
         </div>
 
         <div class="form-group">
             <?php
-                echo LSD_Form::label([
-                    'for' => 'lsd_password',
-                    'title' => $password_label
-                ]);
-                echo LSD_Form::input([
-                    'name' => 'lsd_password',
-                    'id' => 'lsd_password',
-                    'value' => '',
-                    'required' => true,
-                    'placeholder' => $password_placeholder
-                ], 'password');
+            echo LSD_Form::label([
+                'for' => 'lsd_password_' . $instance_id,
+                'title' => $auth['register']['password_label']
+            ]);
+            echo LSD_Form::input([
+                'name' => 'lsd_password',
+                'id' => 'lsd_password_' . $instance_id,
+                'value' => '',
+                'required' => true,
+                'placeholder' => $auth['register']['password_placeholder']
+            ], 'password');
             ?>
-            <div class="lsd-register-password-rules lsd-alert lsd-info">
-                <div class="lsd-mb-4"><?php esc_html_e('Password must contain at least:', 'listdom'); ?></div>
-                <ul>
-                    <li><?php esc_html_e('An uppercase letter','listdom'); ?></li>
-                    <li><?php esc_html_e('A lowercase letter','listdom'); ?></li>
-                    <li><?php esc_html_e('A number','listdom'); ?></li>
-                    <li><?php esc_html_e('A special character e.g. ~`! @#$%^&*()-_+={}[]|;:"<>,./?','listdom'); ?></li>
-                </ul>
-            </div>
+            <?php if ($auth['register']['strong_password']): ?>
+                <?php
+                $length = isset($auth['register']['password_length']) ? intval($auth['register']['password_length']) : 8;
+                $contain_uppercase = isset($auth['register']['contain_uppercase']) && $auth['register']['contain_uppercase'];
+                $contain_lowercase = isset($auth['register']['contain_lowercase']) && $auth['register']['contain_lowercase'];
+                $contain_numbers = isset($auth['register']['contain_numbers']) && $auth['register']['contain_numbers'];
+                $contain_specials = isset($auth['register']['contain_specials']) && $auth['register']['contain_specials'];
+
+                $password_rules = [];
+                if ($length > 0)
+                {
+                    $password_rules[] = [
+                        'rule' => 'length',
+                        'min_length' => $length,
+                        'label' => sprintf(
+                            /* translators: %s: Minimum required password length. */
+                            esc_html__('%s characters long', 'listdom'),
+                            $length
+                        ),
+                    ];
+                }
+                if ($contain_uppercase)
+                {
+                    $password_rules[] = [
+                        'rule' => 'uppercase',
+                        'label' => esc_html__('one uppercase letter', 'listdom'),
+                    ];
+                }
+                if ($contain_lowercase)
+                {
+                    $password_rules[] = [
+                        'rule' => 'lowercase',
+                        'label' => esc_html__('one lowercase letter', 'listdom'),
+                    ];
+                }
+                if ($contain_numbers)
+                {
+                    $password_rules[] = [
+                        'rule' => 'number',
+                        'label' => esc_html__('one number', 'listdom'),
+                    ];
+                }
+                if ($contain_specials)
+                {
+                    $password_rules[] = [
+                        'rule' => 'special',
+                        'label' => esc_html__('one special character', 'listdom'),
+                    ];
+                }
+                ?>
+                <?php if ($password_rules): ?>
+                    <div class="lsd-register-password-rules">
+                        <?php if ($contain_uppercase || $contain_lowercase || $contain_numbers || $contain_specials): ?>
+                            <p class="lsd-fe-description-tiny">
+                                <?php esc_html_e('Password must contain at least:', 'listdom'); ?>
+                            </p>
+                        <?php endif; ?>
+                        <div class="lsd-register-password-rule-list">
+                            <?php foreach ($password_rules as $rule): ?>
+                                <span class="lsd-register-password-rule" data-rule="<?php echo esc_attr($rule['rule']); ?>"<?php echo isset($rule['min_length']) ? ' data-min-length="' . esc_attr($rule['min_length']) . '"' : ''; ?>>
+                                    <?php echo esc_html($rule['label']); ?>
+                                </span>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
 
         <?php
@@ -119,17 +172,17 @@ jQuery(document).ready(function()
         }
         ?>
         <?php if ($register_privacy_field !== ''): ?>
-        <div class="form-group lsd-register-privacy-consent">
-            <?php echo $register_privacy_field; ?>
-        </div>
+            <div class="form-group lsd-register-privacy-consent">
+                <?php echo $register_privacy_field; ?>
+            </div>
         <?php endif; ?>
         <div class="form-group">
             <?php
-                echo LSD_Form::submit([
-                    'class' => 'lsd-general-button',
-                    'id' => 'lsd_register_submit',
-                    'label' => $register_submit_label,
-                ]);
+            echo LSD_Form::submit([
+                'class' => 'lsd-general-button',
+                'id' => 'lsd_register_submit_' . $instance_id,
+                'label' => $auth['register']['submit_label'],
+            ]);
             ?>
         </div>
     </form>

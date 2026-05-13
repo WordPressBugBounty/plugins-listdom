@@ -28,9 +28,9 @@ if ($this->oneday && !$isoffday && !trim($today['hours'])) return '';
 <?php 
 	/** One Day **/ if ($this->oneday):
 ?>
-<div class="lsd-ava-one-day<?php if ($isoffday) echo " lsd-ava-one-day-off" ?>">
+<div class="lsd-fe-icon-wrapper lsd-ava-one-day<?php if ($isoffday) echo " lsd-ava-one-day-off" ?>">
     <?php if ($isoffday || (isset($today['hours']) && trim($today['hours']))): ?>
-    <i class="lsd-icon far fa-calendar-alt" aria-hidden="true"></i>
+    <i class="lsd-fe-icon far fa-calendar-alt" aria-hidden="true"></i>
     <span class="lsd-ava-hour"><?php echo $isoffday ? esc_html__('Off', 'listdom') : LSD_Kses::element($today['hours']); ?></span>
     <?php endif; ?>
 </div>

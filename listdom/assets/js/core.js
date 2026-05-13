@@ -1,61 +1,1095 @@
 /**
+ * Address Autocomplete Dropdown
+ */
+(function($)
+{
+    'use strict';
+
+    if (typeof window.lsdCreateAddressDropdown === 'function') return;
+
+    const createStub = function($element)
+    {
+        const noop = function() {};
+
+        return {
+            $element: $element || $(),
+            reset: noop,
+            populate: noop,
+            markSelected: noop,
+            selectItem: noop,
+            hide: noop,
+            showLoading: noop,
+            show: noop,
+            isUpdating: function()
+            {
+                return false;
+            }
+        };
+    };
+
+    const uniqueNamespace = function()
+    {
+        return '.lsdDropdown-' + Math.random().toString(36).slice(2);
+    };
+
+    window.lsdCreateAddressDropdown = function(element, options)
+    {
+        const $dropdown = element instanceof $ ? element : $(element);
+        if (!$dropdown || !$dropdown.length) return createStub($dropdown);
+
+        const existing = $dropdown.data('lsdDropdownInstance');
+        if (existing) return existing;
+
+        const settings = $.extend({
+            itemIconClass: 'fa-solid fa-location-dot',
+            loadingIconClass: 'fa-solid fa-spinner fa-spin',
+            loadingText: null
+        }, options || {});
+
+        let updating = false;
+        let $list = null;
+        const namespace = uniqueNamespace();
+
+        const $originParent = $dropdown.parent();
+
+        const getLoadingText = function()
+        {
+            return settings.loadingText || $dropdown.data('loading-text') || 'Loading...';
+        };
+
+        const setUpdating = function(state)
+        {
+            updating = !!state;
+            $dropdown.data('lsd-dropdown-updating', updating);
+            if (!updating) $dropdown.removeClass('lsd-address-autocomplete-popup--loading');
+        };
+
+        const ensureStructure = function()
+        {
+            if (!$dropdown.length) return null;
+
+            if (!$dropdown.hasClass('lsd-address-autocomplete-popup'))
+            {
+                $dropdown.addClass('lsd-address-autocomplete-popup');
+            }
+
+            const $parent = $dropdown.parent();
+            if ($parent.length && !$dropdown.hasClass('lsd-address-autocomplete-popup--floating') && $parent.css('position') === 'static')
+            {
+                $parent.css('position', 'relative');
+            }
+
+            if (!$list || !$list.length)
+            {
+                $dropdown.empty();
+                $list = $('<div class="lsd-address-autocomplete-list" role="presentation"></div>');
+                $dropdown.append($list);
+            }
+
+            return $list;
+        };
+
+        const getTrigger = function()
+        {
+            const $trigger = $dropdown.data('lsdDropdownTrigger');
+            if ($trigger && $trigger.length) return $trigger;
+
+            const $fallback = $dropdown.closest('.lsd-radius-search-field').find('.lsd-radius-search-address').first();
+            if ($fallback.length)
+            {
+                $dropdown.data('lsdDropdownTrigger', $fallback);
+                return $fallback;
+            }
+
+            return null;
+        };
+
+        const positionDropdown = function()
+        {
+            const $trigger = getTrigger();
+            if (!$trigger || !$trigger.length) return;
+
+            const offset = $trigger.offset();
+            if (!offset) return;
+
+            const $modalContext = $trigger.closest('.lsd-modal');
+            const $scrollContext = $trigger.closest('.lsd-search-included-in-more');
+            const shouldFloat = $modalContext.length || $scrollContext.length;
+
+            if (shouldFloat)
+            {
+                const $appendTarget = $modalContext.length ? $modalContext : $('body');
+
+                if ($appendTarget.length && !$dropdown.parent().is($appendTarget))
+                {
+                    $dropdown.appendTo($appendTarget);
+                }
+
+                const width = $trigger.outerWidth();
+                const top = offset.top + $trigger.outerHeight();
+
+                $dropdown
+                .addClass('lsd-address-autocomplete-popup--floating')
+                .css({
+                    left: offset.left,
+                    top: top,
+                    width: width,
+                    right: 'auto',
+                    zIndex: Math.max(parseInt($appendTarget.css('z-index'), 10) || 0, 10000)
+                });
+            }
+            else
+            {
+                if ($originParent && $originParent.length && !$dropdown.parent().is($originParent))
+                {
+                    $originParent.append($dropdown);
+                }
+
+                $dropdown
+                .removeClass('lsd-address-autocomplete-popup--floating')
+                .css({ left: '', top: '', width: '', right: '', zIndex: '' });
+            }
+        };
+
+        const bindRepositionEvents = function()
+        {
+            const $trigger = getTrigger();
+            if (!$trigger || !$trigger.length) return;
+
+            $(window)
+            .off('resize' + namespace + ' scroll' + namespace, positionDropdown)
+            .on('resize' + namespace + ' scroll' + namespace, positionDropdown);
+
+            const $scrollable = $trigger.closest('.lsd-search-included-in-more');
+            if ($scrollable.length)
+            {
+                $scrollable
+                .off('scroll' + namespace, positionDropdown)
+                .on('scroll' + namespace, positionDropdown);
+            }
+        };
+
+        const hide = function()
+        {
+            if (!$dropdown.length) return;
+
+            $dropdown.removeClass('lsd-address-autocomplete-popup--open');
+            $dropdown.attr('aria-hidden', 'true');
+            $dropdown.hide();
+        };
+
+        const show = function(force)
+        {
+            if (!$dropdown.length) return;
+
+            const $structure = ensureStructure();
+            if ($structure && ($structure.children().length || force))
+            {
+                positionDropdown();
+                $dropdown.addClass('lsd-address-autocomplete-popup--open');
+                $dropdown.attr('aria-hidden', 'false');
+                $dropdown.show();
+            }
+        };
+
+        const reset = function()
+        {
+            if (!$dropdown.length) return;
+
+            const $structure = ensureStructure();
+            if ($structure) $structure.empty();
+
+            hide();
+            setUpdating(false);
+        };
+
+        const createEntry = function(label, opts)
+        {
+            const options = opts || {};
+            const isMessage = !!options.message;
+            const role = options.role || (isMessage ? 'status' : 'option');
+            const $entry = $('<div class="lsd-address-autocomplete-item"></div>');
+
+            $entry.attr('role', role);
+            if (isMessage)
+            {
+                $entry.addClass('lsd-address-autocomplete-item--message');
+            }
+            else
+            {
+                $entry.attr('tabindex', '0');
+            }
+
+            const iconClass = typeof options.iconClass !== 'undefined' ? options.iconClass : settings.itemIconClass;
+
+            if (iconClass)
+            {
+                const $icon = $('<span class="lsd-address-autocomplete-item-icon" aria-hidden="true"></span>');
+                const $iconInner = $('<i class="lsd-fe-icon"></i>');
+                $iconInner.addClass(iconClass);
+                $icon.append($iconInner);
+                $entry.append($icon);
+            }
+
+            const $label = $('<span class="lsd-address-autocomplete-item-label"></span>');
+            $label.text(label);
+            $entry.append($label);
+
+            return $entry;
+        };
+
+        const showLoading = function(text)
+        {
+            if (!$dropdown.length) return;
+
+            const $structure = ensureStructure();
+            if (!$structure) return;
+
+            setUpdating(true);
+            $dropdown.addClass('lsd-address-autocomplete-popup--loading');
+            $structure.empty();
+
+            const message = text || getLoadingText();
+            const $entry = createEntry(message, {
+                message: true,
+                role: 'status',
+                iconClass: settings.loadingIconClass
+            });
+
+            $structure.append($entry);
+            show(true);
+        };
+
+        const populate = function(items)
+        {
+            if (!$dropdown.length) return;
+
+            const $structure = ensureStructure();
+            if (!$structure) return;
+
+            $dropdown.removeClass('lsd-address-autocomplete-popup--loading');
+            $structure.empty();
+
+            if (!items || !items.length)
+            {
+                hide();
+                setUpdating(false);
+                return;
+            }
+
+            const normalized = $.map(items, function(item)
+            {
+                if (!item) return null;
+                const label = item.label || item.value || '';
+                if (!label) return null;
+
+                const value = item.value || label;
+                const data = $.extend({}, item, {label: label, value: value});
+                const $entry = createEntry(label, {iconClass: item.iconClass});
+
+                $entry.data('lsdDropdownItem', data);
+                return $entry;
+            });
+
+            if (!normalized.length)
+            {
+                hide();
+                setUpdating(false);
+                return;
+            }
+
+            normalized.forEach(function($entry)
+            {
+                $structure.append($entry);
+            });
+
+            show();
+            setUpdating(false);
+        };
+
+        const markSelected = function(label, meta)
+        {
+            if (!$dropdown.length) return;
+
+            const $structure = ensureStructure();
+            if (!$structure) return;
+
+            const selection = (label || '').toString().trim();
+            $structure.children('.lsd-address-autocomplete-item').each(function()
+            {
+                const $item = $(this);
+                const data = $item.data('lsdDropdownItem') || {};
+                const itemLabel = (data.label || data.value || '').toString().trim();
+
+                if (selection && itemLabel === selection)
+                {
+                    $item.addClass('lsd-address-autocomplete-item--selected');
+                    $item.data('lsdDropdownItem', $.extend({}, data, meta || {}));
+                }
+                else
+                {
+                    $item.removeClass('lsd-address-autocomplete-item--selected');
+                }
+            });
+        };
+
+        const selectItem = function(item)
+        {
+            if (!$dropdown.length || !item) return;
+
+            const data = item.data('lsdDropdownItem');
+            if (!data) return;
+
+            const $trigger = $dropdown.data('lsdDropdownTrigger');
+            if ($trigger && $trigger.length)
+            {
+                const event = $.Event('lsd-autocomplete-select');
+                $dropdown.trigger(event, [data]);
+
+                if (!event.isDefaultPrevented())
+                {
+                    $trigger.trigger('lsd-autocomplete-select', [data]);
+                }
+            }
+            else
+            {
+                $dropdown.trigger('lsd-autocomplete-select', [data]);
+            }
+
+            hide();
+        };
+
+        const isUpdating = function()
+        {
+            return updating;
+        };
+
+        const handleKeyboard = function(event)
+        {
+            if (!$dropdown.length) return;
+
+            const $structure = ensureStructure();
+            if (!$structure || !$structure.children().length) return;
+
+            const $items = $structure.children('.lsd-address-autocomplete-item').filter(function()
+            {
+                return !$(this).hasClass('lsd-address-autocomplete-item--message');
+            });
+
+            if (!$items.length) return;
+
+            const KEY_UP = 38;
+            const KEY_DOWN = 40;
+            const KEY_ENTER = 13;
+
+            const activeIndex = $items.index($items.filter('.lsd-address-autocomplete-item--active'));
+
+            if (event.which === KEY_DOWN)
+            {
+                const nextIndex = activeIndex < 0 ? 0 : Math.min(activeIndex + 1, $items.length - 1);
+                $items.removeClass('lsd-address-autocomplete-item--active');
+                $items.eq(nextIndex).addClass('lsd-address-autocomplete-item--active').focus();
+                event.preventDefault();
+            }
+            else if (event.which === KEY_UP)
+            {
+                const prevIndex = activeIndex <= 0 ? 0 : activeIndex - 1;
+                $items.removeClass('lsd-address-autocomplete-item--active');
+                $items.eq(prevIndex).addClass('lsd-address-autocomplete-item--active').focus();
+                event.preventDefault();
+            }
+            else if (event.which === KEY_ENTER && activeIndex >= 0)
+            {
+                selectItem($items.eq(activeIndex));
+                event.preventDefault();
+            }
+        };
+
+        const bindEvents = function()
+        {
+            if (!$dropdown.length) return;
+
+            $dropdown
+                .off(namespace)
+                .on('mousedown' + namespace, '.lsd-address-autocomplete-item', function(event)
+                {
+                    event.preventDefault();
+                })
+                .on('click' + namespace, '.lsd-address-autocomplete-item', function(event)
+                {
+                    event.preventDefault();
+                    selectItem($(this));
+                })
+                .on('mouseenter' + namespace, '.lsd-address-autocomplete-item', function()
+                {
+                    $(this)
+                        .addClass('lsd-address-autocomplete-item--active')
+                        .siblings()
+                        .removeClass('lsd-address-autocomplete-item--active');
+                })
+                .on('mouseleave' + namespace, '.lsd-address-autocomplete-item', function()
+                {
+                    $(this).removeClass('lsd-address-autocomplete-item--active');
+                });
+
+            $(document)
+                .off('keydown' + namespace)
+                .on('keydown' + namespace, function(event)
+                {
+                    const $trigger = $dropdown.data('lsdDropdownTrigger');
+                    if ($trigger && $trigger.length && $(event.target).closest($trigger).length)
+                    {
+                        handleKeyboard(event);
+                    }
+                })
+                .off('click' + namespace)
+                .on('click' + namespace, function(event)
+                {
+                    const $target = $(event.target);
+                    if (!$target.closest($dropdown).length)
+                    {
+                        hide();
+                    }
+                });
+        };
+
+        bindEvents();
+        bindRepositionEvents();
+
+        const api = {
+            $element: $dropdown,
+            reset: reset,
+            populate: populate,
+            markSelected: markSelected,
+            selectItem: function(item)
+            {
+                if (!item) return;
+                if (item.jquery) selectItem(item);
+                else
+                {
+                    const $structure = ensureStructure();
+                    if (!$structure) return;
+
+                    const match = $structure
+                        .children('.lsd-address-autocomplete-item')
+                        .filter(function()
+                        {
+                            const data = $(this).data('lsdDropdownItem') || {};
+                            const value = data.value || data.label || '';
+                            return value === item.value || value === item.label;
+                        })
+                        .first();
+
+                    if (match.length) selectItem(match);
+                }
+            },
+            hide: hide,
+            showLoading: showLoading,
+            show: show,
+            isUpdating: isUpdating
+        };
+
+        $dropdown.data('lsdDropdownInstance', api);
+        return api;
+    };
+
+    window.lsdGetAddressDropdownController = function(target, options)
+    {
+        const config = options || {};
+        const $target = target instanceof $ ? target : $(target);
+
+        const $storeElement = config.storeElement
+            ? (config.storeElement instanceof $ ? config.storeElement : $(config.storeElement))
+            : $target;
+
+        const storeKey = config.storeKey || 'lsdAddressDropdownController';
+        const existing = $storeElement && $storeElement.length ? $storeElement.data(storeKey) : null;
+        if (existing) return existing;
+
+        let $dropdownElement = null;
+
+        if (config.dropdown)
+        {
+            $dropdownElement = config.dropdown instanceof $ ? config.dropdown : $(config.dropdown);
+        }
+
+        if ((!$dropdownElement || !$dropdownElement.length) && config.dropdownSelector)
+        {
+            $dropdownElement = $target.find(config.dropdownSelector).first();
+        }
+
+        if (!$dropdownElement || !$dropdownElement.length)
+        {
+            if ($target.hasClass('lsd-address-autocomplete-popup'))
+            {
+                $dropdownElement = $target;
+            }
+            else if ($target && $target.length)
+            {
+                $dropdownElement = $target.find('.lsd-address-autocomplete-popup').first();
+            }
+        }
+
+        if ((!$dropdownElement || !$dropdownElement.length) && config.create)
+        {
+            $dropdownElement = $('<div class="lsd-address-autocomplete-popup" aria-hidden="true"></div>');
+
+            const $appendTarget = config.createAppendTo
+                ? (config.createAppendTo instanceof $ ? config.createAppendTo : $(config.createAppendTo))
+                : $target;
+
+            if ($appendTarget && $appendTarget.length)
+            {
+                $appendTarget.append($dropdownElement);
+            }
+        }
+
+        let dropdown = null;
+
+        if ($dropdownElement && $dropdownElement.length && typeof window.lsdCreateAddressDropdown === 'function')
+        {
+            dropdown = window.lsdCreateAddressDropdown($dropdownElement, config.dropdownOptions || {});
+        }
+
+        if (!dropdown)
+        {
+            dropdown = createStub($dropdownElement || $());
+        }
+
+        const $trigger = config.trigger
+            ? (config.trigger instanceof $ ? config.trigger : $(config.trigger))
+            : null;
+
+        if ($trigger && $trigger.length && dropdown.$element && dropdown.$element.length)
+        {
+            dropdown.$element.data('lsdDropdownTrigger', $trigger);
+        }
+
+        if ($storeElement && $storeElement.length)
+        {
+            $storeElement.data(storeKey, dropdown);
+        }
+
+        return dropdown;
+    };
+})(jQuery);
+
+/**
+ * Address Autocomplete Sources
+ */
+(function($)
+{
+    'use strict';
+
+    if (typeof window.lsdAddressAutocompleteSources === 'object') return;
+
+    const MIN_LENGTH = 3;
+    const DEFAULT_LIMIT = 5;
+
+    const ensureGoogleServices = function(options)
+    {
+        const config = options || {};
+        const services = config.services || {};
+
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined' || typeof google.maps.places === 'undefined')
+        {
+            return null;
+        }
+
+        if (!services.autocomplete && typeof google.maps.places.AutocompleteService === 'function')
+        {
+            services.autocomplete = new google.maps.places.AutocompleteService();
+        }
+
+        if (!services.places && typeof google.maps.places.PlacesService === 'function')
+        {
+            const element = config.map || config.placesElement || document.createElement('div');
+            services.places = new google.maps.places.PlacesService(element);
+        }
+
+        services.statusEnum = typeof google.maps.places.PlacesServiceStatus !== 'undefined'
+            ? google.maps.places.PlacesServiceStatus
+            : {};
+
+        return services;
+    };
+
+    const fetchGooglePredictions = function(term, options)
+    {
+        const deferred = $.Deferred();
+        const config = options || {};
+        const minLength = typeof config.minLength === 'number' ? config.minLength : MIN_LENGTH;
+
+        const services = ensureGoogleServices(config);
+        if (!services || !services.autocomplete || !term || term.length < minLength)
+        {
+            deferred.resolve({items: [], services: services || null});
+            return {promise: deferred.promise(), cancel: function() {}, services: services || null};
+        }
+
+        if (typeof google.maps.places.AutocompleteSessionToken === 'function' && !services.sessionToken)
+        {
+            services.sessionToken = new google.maps.places.AutocompleteSessionToken();
+        }
+
+        services.autocomplete.getPlacePredictions({input: term, sessionToken: services.sessionToken}, function(predictions, status)
+        {
+            const statusEnum = services.statusEnum || {};
+
+            if (status !== statusEnum.OK || !predictions || !predictions.length)
+            {
+                deferred.resolve({items: [], services: services});
+                return;
+            }
+
+            const items = $.map(predictions, function(prediction)
+            {
+                return {
+                    label: prediction.description,
+                    value: prediction.description,
+                    placeId: prediction.place_id
+                };
+            });
+
+            deferred.resolve({items: items, services: services});
+        });
+
+        return {
+            promise: deferred.promise(),
+            cancel: function() {},
+            services: services
+        };
+    };
+
+    const fetchOpenStreetMap = function(term, options)
+    {
+        const deferred = $.Deferred();
+        const config = options || {};
+        const minLength = typeof config.minLength === 'number' ? config.minLength : MIN_LENGTH;
+
+        if (!term || term.length < minLength)
+        {
+            deferred.resolve({items: []});
+            return {promise: deferred.promise(), cancel: function() {}, request: null};
+        }
+
+        const endpoint = config.endpoint || 'https://nominatim.openstreetmap.org/search';
+        const params = $.extend({format: 'json', limit: config.limit || DEFAULT_LIMIT, q: term}, config.query || {});
+
+        const request = $.getJSON(endpoint, params)
+            .done(function(data)
+            {
+                if (!Array.isArray(data) || !data.length)
+                {
+                    deferred.resolve({items: []});
+                    return;
+                }
+
+                const items = $.map(data, function(item)
+                {
+                    return {
+                        label: item.display_name,
+                        value: item.display_name,
+                        lat: item.lat,
+                        lon: item.lon
+                    };
+                });
+
+                deferred.resolve({items: items});
+            })
+            .fail(function()
+            {
+                deferred.resolve({items: []});
+            });
+
+        return {
+            promise: deferred.promise(),
+            cancel: function()
+            {
+                if (request && typeof request.abort === 'function') request.abort();
+            },
+            request: request
+        };
+    };
+
+    const fetchProviderSuggestions = function(provider, term, options)
+    {
+        const normalized = (provider || '').toLowerCase();
+        if (normalized === 'googlemap' || normalized === 'google' || normalized === 'googlemaps')
+        {
+            return fetchGooglePredictions(term, options || {});
+        }
+
+        return fetchOpenStreetMap(term, options || {});
+    };
+
+    window.lsdAddressAutocompleteSources = {
+        fetch: fetchProviderSuggestions,
+        ensureGoogleServices: ensureGoogleServices
+    };
+})(jQuery);
+
+/**
  * Listing Submission
  */
 (function($)
 {
+    class ListdomModal
+    {
+        constructor(target, options = {})
+        {
+            this.$modal = ListdomModal.resolve(target);
+            this.options = $.extend({
+                appendToBody: false,
+                hideClass: undefined,
+            }, options);
+
+            if (this.$modal.length)
+            {
+                this.$modal.data('listdomModalInstance', this);
+            }
+        }
+
+        static resolve(target)
+        {
+            if (!target) return $();
+            if (target instanceof ListdomModal) return target.$modal;
+            if (target.jquery) return target;
+            return $(target);
+        }
+
+        updateOptions(options = {})
+        {
+            if ($.isPlainObject(options) && !$.isEmptyObject(options))
+            {
+                this.options = $.extend({}, this.options, options);
+            }
+
+            return this;
+        }
+
+        open(options = {})
+        {
+            this.updateOptions(options);
+
+            const $modal = this.$modal;
+            if (!$modal.length) return $();
+
+            const settings = this.options;
+
+            if (settings.appendToBody && !$modal.parent().is('body'))
+            {
+                $modal.appendTo('body');
+            }
+
+            if (typeof settings.hideClass !== 'undefined')
+            {
+                $modal.data('lsdModalHideClass', settings.hideClass);
+            }
+            else if (typeof $modal.data('lsdModalHideClass') === 'undefined')
+            {
+                const attrHideClass = $modal.attr('data-lsd-modal-hide-class');
+                if (typeof attrHideClass !== 'undefined') $modal.data('lsdModalHideClass', attrHideClass);
+            }
+
+            const hideClass = $modal.data('lsdModalHideClass');
+            if (hideClass) $modal.removeClass(hideClass);
+
+            if (!$modal.data('lsdModalActive'))
+            {
+                $modal.data('lsdModalActive', true);
+                ListdomModal.activeCount = (ListdomModal.activeCount || 0) + 1;
+
+                if (typeof ListdomPageScroll !== 'undefined' && ListdomModal.activeCount === 1)
+                {
+                    ListdomPageScroll.stop();
+                }
+            }
+
+            $modal.css('display', 'flex').hide().fadeIn(100, function ()
+            {
+                $(this).trigger('listdom:modal:opened');
+            });
+
+            return $modal;
+        }
+
+        close(options = {})
+        {
+            this.updateOptions(options);
+
+            const $modal = this.$modal;
+            if (!$modal.length) return $();
+
+            let hideClass = this.options.hideClass;
+            if (typeof hideClass !== 'undefined')
+            {
+                $modal.data('lsdModalHideClass', hideClass);
+            }
+            else
+            {
+                hideClass = $modal.data('lsdModalHideClass');
+            }
+
+            $modal.fadeOut(100, function ()
+            {
+                const $element = $(this);
+
+                if ($element.data('lsdModalActive'))
+                {
+                    $element.removeData('lsdModalActive');
+
+                    if (ListdomModal.activeCount > 0) ListdomModal.activeCount--;
+
+                    if (typeof ListdomPageScroll !== 'undefined' && ListdomModal.activeCount === 0)
+                    {
+                        ListdomPageScroll.start();
+                    }
+                }
+
+                if (hideClass) $element.addClass(hideClass);
+                $element.trigger('listdom:modal:closed');
+            });
+
+            return $modal;
+        }
+
+        static get(target, options = {})
+        {
+            if (target instanceof ListdomModal)
+            {
+                return target.updateOptions(options);
+            }
+
+            const $modal = ListdomModal.resolve(target);
+            if (!$modal.length)
+            {
+                return new ListdomModal(target, options);
+            }
+
+            let instance = $modal.data('listdomModalInstance');
+
+            if (!(instance instanceof ListdomModal))
+            {
+                instance = new ListdomModal($modal, options);
+            }
+            else
+            {
+                instance.updateOptions(options);
+            }
+
+            return instance;
+        }
+
+        static open(target, options = {})
+        {
+            return ListdomModal.get(target, options).open();
+        }
+
+        static close(target, options = {})
+        {
+            return ListdomModal.get(target, options).close(options);
+        }
+    }
+
+    window.ListdomModal = ListdomModal;
+    ListdomModal.activeCount = 0;
+
+    $(document)
+    .off('click.listdomModalClose', '.lsd-modal-close')
+    .on('click.listdomModalClose', '.lsd-modal-close', function (e)
+    {
+        e.preventDefault();
+        ListdomModal.close($(this).closest('.lsd-modal'));
+    });
+
+    $(document)
+    .off('click.listdomModalOverlay', '.lsd-modal')
+    .on('click.listdomModalOverlay', '.lsd-modal', function (e)
+    {
+        if ($(e.target).closest('.lsd-modal-content').length) return;
+
+        const $modal = $(this);
+        const overlayPreference = $modal.data('lsdModalOverlayClose');
+        if (overlayPreference === false || overlayPreference === 'false') return;
+
+        ListdomModal.close($modal);
+    });
+
     // Document is Ready!
     $(document).ready(function()
     {
-        function listdomSwitchForm(buttonsSelector, formSelector, fadeDuration)
+        function listdomSwitchForm(buttonsSelector, fadeDuration)
         {
-            jQuery(formSelector).first().show();
-            jQuery(buttonsSelector).first().addClass('active');
-
-            jQuery(buttonsSelector).on('click', function()
+            // Delegate so it works for multiple instances (dropdown tabs, etc.)
+            jQuery(document).on('click', buttonsSelector, function (e)
             {
-                let targetForm = jQuery(this).data('target');
+                e.preventDefault();
 
-                jQuery('.lsd-auth-form-content:visible').fadeOut(fadeDuration, function() {
-                    jQuery(targetForm).fadeIn(fadeDuration);
-                });
+                var $btn = jQuery(this);
 
-                jQuery(buttonsSelector).removeClass('active');
-                jQuery(this).addClass('active');
+                // Limit switching to the current auth wrapper instance
+                var $wrapper = $btn.closest('.lsd-auth-wrapper');
+                if (!$wrapper.length) return;
 
-                jQuery(buttonsSelector).filter(function() {
-                    return jQuery(this).data('target') === targetForm;
+                var targetSelector = $btn.data('target'); // e.g. "#lsd-login-form"
+                if (!targetSelector) return;
+
+                // Find target ONLY inside this wrapper (important when IDs are duplicated)
+                var $target = $wrapper.find(targetSelector).first();
+                if (!$target.length) return;
+
+                var $forms = $wrapper.find('.lsd-auth-form-content');
+                var $visible = $forms.filter(':visible');
+
+                // Switch active class only inside this wrapper (buttons + links)
+                $wrapper.find('.lsd-auth-switch-button').removeClass('active');
+                $btn.addClass('active');
+
+                // If you want "all buttons/links pointing to same target" to be active:
+                $wrapper.find('.lsd-auth-switch-button').filter(function () {
+                    return jQuery(this).data('target') === targetSelector;
                 }).addClass('active');
+
+                // Show/hide with fade
+                if (fadeDuration && fadeDuration > 0)
+                {
+                    if ($visible.length)
+                    {
+                        $visible.stop(true, true).fadeOut(fadeDuration, function () {
+                            $target.stop(true, true).fadeIn(fadeDuration);
+                        });
+                    }
+                    else
+                    {
+                        $target.stop(true, true).fadeIn(fadeDuration);
+                    }
+                }
+                else
+                {
+                    $forms.hide();
+                    $target.show();
+                }
+            });
+
+            // Optional: initialize each wrapper (show first form, set first button active)
+            jQuery('.lsd-auth-wrapper').each(function () {
+                var $w = jQuery(this);
+                var $firstForm = $w.find('.lsd-auth-form-content').first();
+                var $firstBtn  = $w.find('.lsd-auth-switch-button').first();
+
+                if ($firstForm.length) $firstForm.show();
+                if ($firstBtn.length)
+                {
+                    $w.find('.lsd-auth-switch-button').removeClass('active');
+                    $firstBtn.addClass('active');
+                }
             });
         }
 
-        listdomSwitchForm('.lsd-auth-switch-button', '.lsd-auth-form-content', 200);
+        function lsdUpdateGalleryPlaceholder(context)
+        {
+            let $containers;
 
-         // Check for the 'tab' query parameter
+            if (typeof context !== 'undefined' && context !== null)
+            {
+                $containers = $(context);
+
+                if ($containers.is('.lsd-listing-gallery-container'))
+                {
+                    // Already the container
+                }
+                else
+                {
+                    $containers = $containers.closest('.lsd-listing-gallery-container');
+                }
+            }
+            else
+            {
+                $containers = $('.lsd-listing-gallery-container');
+            }
+
+            if (!$containers.length) return;
+
+            $containers.each(function()
+            {
+                const $container = $(this);
+                const $list = $container.find('.lsd-listing-gallery');
+                const $placeholder = $container.find('.lsd-gallery-placeholder');
+                const $removeButton = $container.find('.lsd-remove-gallery-button');
+                const $addMoreButton = $container.find('.lsd-gallery-add-more-button');
+
+                if (!$list.length || !$placeholder.length) return;
+
+                const hasItems = $list.find('li').length > 0;
+
+                if (hasItems)
+                {
+                    $list.removeClass('lsd-util-hide');
+                    $placeholder.addClass('lsd-util-hide');
+                    $removeButton.removeClass('lsd-util-hide');
+                    $addMoreButton.removeClass('lsd-util-hide');
+                }
+                else
+                {
+                    $list.addClass('lsd-util-hide');
+                    $placeholder.removeClass('lsd-util-hide');
+                    $removeButton.addClass('lsd-util-hide');
+                    $addMoreButton.addClass('lsd-util-hide');
+                }
+            });
+        }
+
+        window.lsdUpdateGalleryPlaceholder = lsdUpdateGalleryPlaceholder;
+
+        listdomSwitchForm('.lsd-auth-switch-button', 200);
+        lsdUpdateGalleryPlaceholder();
+
+        // Check for the 'tab' query parameter
         const urlParams = new URLSearchParams(window.location.search);
         const tab = urlParams.get('tab');
+        const action = urlParams.get('action');
 
-        if (tab)
+        let desired = null;
+        if (tab === 'login')
         {
-            const $loginForm = jQuery('.lsd-auth-switch-button[data-target="#lsd-login-form"]');
-            const $registerForm = jQuery('.lsd-auth-switch-button[data-target="#lsd-register-form"]');
-            const $forgotPasswordForm = jQuery('.lsd-auth-switch-button[data-target="#lsd-forgot-password-form"]');
+            desired = 'login';
+        }
+        else if (tab === 'register')
+        {
+            desired = 'register';
+        }
+        else if (tab === 'lostpassword' || action === 'rp' || action === 'resetpass')
+        {
+            desired = 'forgot';
+        }
 
-            // Add the 'active' class to the correct tab based on the tab
-            if (tab === 'login')
-            {
-                $loginForm.trigger('click')
-                    .addClass('active');
-            }
-            else if (tab === 'register')
-            {
-                $registerForm.trigger('click')
-                    .addClass('active');
-            }
-            else if (tab === 'lostpassword')
-            {
-                $forgotPasswordForm.trigger('click')
-                    .addClass('active');
-            }
+        if (desired)
+        {
+            const prefixMap = {
+                login: '#lsd-login-form-',
+                register: '#lsd-register-form-',
+                forgot: '#lsd-forgot-password-form-'
+            };
+
+            jQuery('.lsd-auth-wrapper').each(function () {
+                const $wrapper = jQuery(this);
+                const prefix = prefixMap[desired];
+                let $btn = $wrapper.find('.lsd-auth-switch-button').filter(function () {
+                    const target = jQuery(this).data('target');
+                    return target && target.indexOf(prefix) === 0;
+                }).first();
+
+                if (!$btn.length)
+                {
+                    $btn = $wrapper.find('.lsd-auth-switch-button[data-target="#' + prefix.replace('#', '').replace(/-$/, '') + '"]');
+                }
+
+                if ($btn.length)
+                {
+                    $btn.trigger('click').addClass('active');
+                }
+            });
         }
 
         /**
@@ -160,22 +1194,51 @@
 
                 const target = $(button).data('for');
                 const name = $(button).data('name');
+                const $target = $(target);
+                const $container = $target.closest('.lsd-listing-gallery-container');
+                const ratioLabel = ($container.data('aspectRatio') || '').toString().trim();
+                const ratioValue = parseAspectRatio(ratioLabel);
+                const aspectMessage =
+                    ($container.data('aspectMessage') || '').toString().trim() ||
+                    (ratioLabel ? 'Please upload images with an aspect ratio close to ' + ratioLabel + '.' : '');
+                let hasRatioMismatch = false;
 
                 attachments.map(function(attachment)
                 {
                     attachment = attachment.toJSON();
-                    $(target).append('<li data-id="'+attachment.id+'"><input type="hidden" name="'+name+'" value="'+attachment.id+'"><img src="'+attachment.url+'" alt=""><div class="lsd-gallery-actions"><i class="lsd-icon fas fa-trash-alt lsd-remove-gallery-single-button"></i> <i class="lsd-icon fas fa-arrows-alt lsd-handler"></i></div></li>');
+
+                    if (ratioValue)
+                    {
+                        const width = parseInt(attachment.width, 10) || 0;
+                        const height = parseInt(attachment.height, 10) || 0;
+
+                        if (width && height && !isAspectRatioAllowed(width, height, ratioValue, aspectRatioTolerance))
+                        {
+                            hasRatioMismatch = true;
+                            return;
+                        }
+                    }
+
+                    $target.append('<li data-id="'+attachment.id+'"><input type="hidden" name="'+name+'" value="'+attachment.id+'"><img src="'+attachment.url+'" alt=""><div class="lsd-gallery-actions"><i class="lsd-icon fas fa-trash-alt lsd-remove-gallery-single-button"></i> <i class="lsd-icon fas fa-arrows-alt lsd-handler"></i></div></li>');
                 });
 
-                $('.lsd-remove-gallery-button').toggleClass('lsd-util-hide');
-                frame.close();
+                lsdUpdateGalleryPlaceholder($target);
 
-                // Trigger Remove Button
-                $('.lsd-remove-gallery-single-button').off('click').on('click', function(event)
+                if (hasRatioMismatch)
                 {
-                    event.preventDefault();
-                    $(this).parent().parent().remove();
-                });
+                    const $message = $('#lsd_listing_gallery_uploader_message');
+                    if ($message.length)
+                    {
+                        if (typeof listdom_alertify === 'function') $message.html(listdom_alertify(aspectMessage, 'lsd-error'));
+                        else $message.text(aspectMessage);
+
+                        setTimeout(function()
+                        {
+                            $message.html('');
+                        }, 60000);
+                    }
+                }
+                frame.close();
             });
 
             frame.open();
@@ -198,19 +1261,26 @@
         {
             event.preventDefault();
             const target = $(this).data('for');
+            const $target = $(target);
 
-            $(target).html('');
+            $target.html('');
 
-            $(this).toggleClass('lsd-util-hide');
+            lsdUpdateGalleryPlaceholder($target);
         });
 
         /**
          * Listdom Gallery picker -- Single Remove Button
          */
-        $('.lsd-remove-gallery-single-button').off('click').on('click', function(event)
+        $(document).on('click', '.lsd-remove-gallery-single-button', function(event)
         {
             event.preventDefault();
-            $(this).parent().parent().remove();
+
+            const $item = $(this).closest('li');
+            const $container = $item.closest('.lsd-listing-gallery-container');
+
+            $item.remove();
+
+            lsdUpdateGalleryPlaceholder($container);
         });
 
         /**
@@ -299,6 +1369,59 @@
         });
 
         /**
+         * Listdom FAQ -- Add Button
+         */
+        $('.lsd-add-faq-button').on('click', function(event)
+        {
+            event.preventDefault();
+
+            const template = $(this).data('template');
+            const target = $(this).data('for');
+
+            // New Index
+            const $index = $('#lsd_listing_faqs_index');
+            const index = $index.val();
+            const new_index = parseInt(index)+1;
+
+            // Update Index
+            $index.val(new_index);
+
+            // Content
+            const content = $(template).html().replace(/:i:/g, index);
+
+            $(target).append(content);
+
+            // Trigger Remove Button
+            $('.lsd-remove-faq-single-button').off('click').on('click', function(event)
+            {
+                event.preventDefault();
+                $(this).parent().parent().parent().remove();
+            });
+        });
+
+        /**
+         * Listdom FAQ -- Remove All Button
+         */
+        $('.lsd-remove-faq-button').on('click', function(event)
+        {
+            event.preventDefault();
+            const target = $(this).data('for');
+
+            $(target).html('');
+
+            $(this).toggleClass('lsd-util-hide');
+        });
+
+        /**
+         * Listdom FAQ -- Single Remove Button
+         */
+        $('.lsd-remove-faq-single-button').off('click').on('click', function(event)
+        {
+            event.preventDefault();
+            $(this).parent().parent().parent().remove();
+        });
+
+        /**
          * Listdom file picker -- Upload/Select Button
          */
         $('.lsd-select-file-button').on('click', function(event)
@@ -321,11 +1444,95 @@
                 const attachment = frame.state().get('selection').first();
 
                 const target = $(button).data('for');
-                $(target+'_file').html('<a href="'+attachment.attributes.url+'" target="_blank">'+attachment.attributes.url+'</a>');
-                $(target).val(attachment.id);
+                const $target = $(target);
+                const url = attachment.attributes.url;
+                const label = attachment.attributes.filename || url;
+                const $preview = $(target + '_file');
+                const $scope = $target.closest('.lsd-filepicker-wrapper, .lsd-attribute-file');
+                const $fieldWrapper = $target.closest('.lsd-attribute-file');
+                const $rulesSource = $fieldWrapper.length ? $fieldWrapper : $scope;
+                const $message = $fieldWrapper.length ? $fieldWrapper.find('.lsd-attribute-file-message') : $scope.find('.lsd-attribute-file-message');
 
-                $('.lsd-select-file-button').toggleClass('lsd-util-hide');
-                $('.lsd-remove-file-button').toggleClass('lsd-util-hide');
+                if ($message.length) $message.html('');
+
+                const allowedExtensionsRaw = (($rulesSource.data('allowed-extensions') || '') + '').toLowerCase();
+                const allowedExtensions = allowedExtensionsRaw
+                    ? allowedExtensionsRaw.split(',').map(function (item) {
+                        return $.trim((item || '').toLowerCase().replace(/^\./, ''));
+                    }).filter(Boolean)
+                    : [];
+
+                const extensionFromLabel = ((label || '') + '').split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '');
+                const extensionFromUrl = ((url || '').split('?')[0].split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                const extension = extensionFromLabel || extensionFromUrl;
+                const extensionMessage = $rulesSource.data('extension-message') || 'The selected file has an invalid extension.';
+
+                if (allowedExtensions.length && (!extension || allowedExtensions.indexOf(extension) === -1))
+                {
+                    if ($message.length)
+                    {
+                        if (typeof listdom_alertify === 'function') $message.html(listdom_alertify(extensionMessage, 'lsd-error'));
+                        else $message.text(extensionMessage);
+                    }
+                    frame.close();
+                    return;
+                }
+
+                const maxUploadSize = parseInt($rulesSource.data('max-upload-size'), 10);
+                const sizeMessage = $rulesSource.data('size-message') || 'The selected file exceeds the maximum allowed size.';
+                let fileSize = 0;
+
+                if (attachment && attachment.attributes)
+                {
+                    const size = parseInt(attachment.attributes.filesizeInBytes, 10);
+                    if (!Number.isNaN(size) && size > 0) fileSize = size;
+                }
+
+                if (!fileSize && typeof attachment.get === 'function')
+                {
+                    const size = parseInt(attachment.get('filesizeInBytes'), 10);
+                    if (!Number.isNaN(size) && size > 0) fileSize = size;
+                }
+
+                if (!Number.isNaN(maxUploadSize) && maxUploadSize > 0 && fileSize > 0 && fileSize > maxUploadSize * 1024)
+                {
+                    if ($message.length)
+                    {
+                        if (typeof listdom_alertify === 'function') $message.html(listdom_alertify(sizeMessage, 'lsd-error'));
+                        else $message.text(sizeMessage);
+                    }
+                    frame.close();
+                    return;
+                }
+
+                $preview.html(
+                    $('<a>', {
+                        href: url,
+                        target: '_blank',
+                        rel: 'noopener'
+                    }).text(label)
+                );
+                $target.val(attachment.id);
+
+                if ($scope.length)
+                {
+                    $scope.find('.lsd-image-placeholder-preview').removeClass('lsd-util-hide');
+                    $scope.find('.lsd-image-placeholder-empty').addClass('lsd-util-hide');
+                    $scope.find('.lsd-imagepicker-image-placeholder').addClass('lsd-image-placeholder-has-image');
+                    $scope.find('.lsd-filepicker-preview').removeClass('lsd-checkbox-error lsd-attribute-error');
+                    $scope.find('.lsd-file-error-msg, .lsd-attribute-error-msg').remove();
+                }
+
+                if ($scope.length)
+                {
+                    $scope.find('.lsd-select-file-button[data-for="' + target + '"]').addClass('lsd-util-hide');
+                    $scope.find('.lsd-remove-file-button[data-for="' + target + '"]').removeClass('lsd-util-hide');
+                }
+                else
+                {
+                    $('.lsd-select-file-button[data-for="' + target + '"]').addClass('lsd-util-hide');
+                    $('.lsd-remove-file-button[data-for="' + target + '"]').removeClass('lsd-util-hide');
+                }
 
                 frame.close();
             });
@@ -344,8 +1551,27 @@
             $(target+'_file').html('');
             $(target).val('');
 
-            $('.lsd-select-file-button').toggleClass('lsd-util-hide');
-            $('.lsd-remove-file-button').toggleClass('lsd-util-hide');
+            const $target = $(target);
+            const $scope = $target.closest('.lsd-filepicker-wrapper, .lsd-attribute-file');
+            const $fieldWrapper = $target.closest('.lsd-attribute-file');
+            if ($scope.length)
+            {
+                $scope.find('.lsd-image-placeholder-preview').addClass('lsd-util-hide');
+                $scope.find('.lsd-image-placeholder-empty').removeClass('lsd-util-hide');
+                $scope.find('.lsd-imagepicker-image-placeholder').removeClass('lsd-image-placeholder-has-image');
+            }
+            if ($fieldWrapper.length) $fieldWrapper.find('.lsd-attribute-file-message').html('');
+
+            if ($scope.length)
+            {
+                $scope.find('.lsd-select-file-button[data-for="' + target + '"]').removeClass('lsd-util-hide');
+                $scope.find('.lsd-remove-file-button[data-for="' + target + '"]').addClass('lsd-util-hide');
+            }
+            else
+            {
+                $('.lsd-select-file-button[data-for="' + target + '"]').removeClass('lsd-util-hide');
+                $('.lsd-remove-file-button[data-for="' + target + '"]').addClass('lsd-util-hide');
+            }
         });
 
         /**
@@ -687,7 +1913,19 @@
             const $body = $('body');
 
             const hidePopup = (event) => {
-                if (!$popup.is(event.target) && $popup.has(event.target).length === 0) {
+                const $target = $(event.target);
+
+                // Check if click is inside popup
+                const insidePopup = $popup.is($target) || $popup.has($target).length > 0;
+
+                // Check if Select2 inside popup is open
+                const hasOpenSelect2 = $popup.find('.select2-hidden-accessible').toArray().some(el => {
+                    const select2 = $(el).data('select2');
+                    return select2 && select2.isOpen();
+                });
+
+                // If click is outside popup and no Select2 is open, close popup
+                if (!insidePopup && !hasOpenSelect2) {
                     $body.find('.lsd-inline-popup-active').removeClass('lsd-inline-popup-active');
                     $body.removeClass('lsd-inline-popup-is-open');
                     $body.off('click.lsd-inline-popup', hidePopup);
@@ -719,6 +1957,149 @@
     /**
      * Listdom Image picker -- Upload/Select Button
      */
+    $('.lsd-select-image-files-button, .lsd-add-images-button').on('click', function (event)
+    {
+        event.preventDefault();
+
+        const target = $(this).data('for');
+        const $input = $(target);
+
+        if (!$input.length) return;
+
+        if ($input.prop('multiple'))
+        {
+            const existingFiles = $input.prop('files') || [];
+            if (existingFiles.length)
+            {
+                $input.data('lsdExistingFiles', Array.from(existingFiles));
+            }
+            else
+            {
+                $input.removeData('lsdExistingFiles');
+            }
+        }
+
+        $input.trigger('click');
+    });
+
+    function updateMultiImagepicker($input)
+    {
+        const files = $input.prop('files') || [];
+        const $wrapper = $input.closest('.lsd-imagepicker-wrapper');
+        const $placeholder = $wrapper.find('.lsd-imagepicker-image-placeholder');
+        const $preview = $placeholder.find('.lsd-imagepicker-multiple-preview');
+        const $list = $preview.find('.lsd-imagepicker-multiple-list');
+        const $emptyState = $placeholder.find('.lsd-image-placeholder-empty');
+        const target = '#' + $input.attr('id');
+        const $removeButton = $wrapper.find('.lsd-remove-images-button[data-for="' + target + '"]');
+        const $addButton = $wrapper.find('.lsd-add-images-button[data-for="' + target + '"]');
+        const isMultiple = $input.prop('multiple');
+
+        $list.html('');
+
+        if (!files.length)
+        {
+            $preview.addClass('lsd-util-hide');
+            $emptyState.removeClass('lsd-util-hide');
+            $placeholder.removeClass('lsd-image-placeholder-has-image');
+            $removeButton.addClass('lsd-util-hide');
+            $addButton.addClass('lsd-util-hide');
+            return;
+        }
+
+        $.each(files, function (index, file)
+        {
+            const $item = $('<li class="lsd-imagepicker-multiple-item"></li>');
+
+            if (file && file.type && file.type.indexOf('image') === 0 && typeof FileReader !== 'undefined')
+            {
+                const reader = new FileReader();
+                const $img = $('<img alt="">');
+                $img.attr('alt', file.name || '');
+                reader.onload = function (event)
+                {
+                    $img.attr('src', event.target.result || '');
+                };
+                reader.readAsDataURL(file);
+                $item.append($img);
+            }
+            else if (file && file.name)
+            {
+                $item.append($('<span class="lsd-imagepicker-multiple-filename"></span>').text(file.name));
+            }
+
+            $list.append($item);
+        });
+
+        $preview.removeClass('lsd-util-hide');
+        $emptyState.addClass('lsd-util-hide');
+        $placeholder.addClass('lsd-image-placeholder-has-image');
+        $removeButton.removeClass('lsd-util-hide');
+        if (isMultiple) $addButton.removeClass('lsd-util-hide');
+        else $addButton.addClass('lsd-util-hide');
+    }
+
+    const aspectRatioTolerance = 0.05;
+
+    function parseAspectRatio(value)
+    {
+        if (!value || typeof value !== 'string') return null;
+
+        const trimmed = value.trim();
+        if (!trimmed || trimmed === 'none') return null;
+
+        const parts = trimmed.split(':');
+        if (parts.length !== 2) return null;
+
+        const width = parseFloat(parts[0]);
+        const height = parseFloat(parts[1]);
+
+        if (!width || !height || Number.isNaN(width) || Number.isNaN(height)) return null;
+
+        return width / height;
+    }
+
+    function isAspectRatioAllowed(width, height, ratio, tolerance)
+    {
+        if (!ratio || !width || !height) return true;
+        const actual = width / height;
+        return Math.abs(actual - ratio) / ratio <= tolerance;
+    }
+
+    $('.lsd-imagepicker-file-input').on('change', function ()
+    {
+        const $input = $(this);
+        const existingFiles = $input.data('lsdExistingFiles');
+        const newFiles = $input.prop('files') || [];
+
+        if (existingFiles && existingFiles.length && $input.prop('multiple') && typeof DataTransfer !== 'undefined')
+        {
+            const dataTransfer = new DataTransfer();
+            existingFiles.forEach((file) => dataTransfer.items.add(file));
+            Array.from(newFiles).forEach((file) => dataTransfer.items.add(file));
+            $input[0].files = dataTransfer.files;
+        }
+
+        $input.removeData('lsdExistingFiles');
+        updateMultiImagepicker($input);
+    });
+
+    $('.lsd-remove-images-button').on('click', function (event)
+    {
+        event.preventDefault();
+
+        const target = $(this).data('for');
+        const $input = $(target);
+        if (!$input.length) return;
+
+        $input.val('');
+        $input.removeData('lsdExistingFiles');
+        updateMultiImagepicker($input);
+    });
+
+    /**
+     * Listdom Image picker -- Upload/Select Button
+     */
     $('.lsd-select-image-button').on('click', function (event)
     {
         event.preventDefault();
@@ -737,13 +2118,127 @@
         {
             // Grab the selected attachment.
             const attachment = frame.state().get('selection').first();
+            if (!attachment || !attachment.attributes) {
+                frame.close();
+                return;
+            }
 
             const target = $button.data('for');
-            $(target + '_img').html('<img alt="" src="' + attachment.attributes.url + '">');
-            $(target).val(attachment.id);
+            const $input = $(target);
+            const $wrapper = $button.closest('.lsd-attribute-image');
+            const $placeholder = $(target + '_img');
+            let $message = $wrapper.find('.lsd-attribute-image-message');
 
-            $button.toggleClass('lsd-util-hide');
-            $button.parent().find($('.lsd-remove-image-button')).toggleClass('lsd-util-hide');
+            if (!$message.length) {
+                $message = $('<div class="lsd-attribute-image-message"></div>');
+                $wrapper.append($message);
+            }
+
+            $message.html('');
+            $wrapper.removeClass('lsd-attribute-error');
+            $placeholder.removeClass('lsd-attribute-error');
+
+            const maxUploadSize = parseInt($wrapper.data('maxUploadSize'), 10);
+            let fileSize = 0;
+
+            if (typeof attachment.get === 'function') {
+                const bytes = parseInt(attachment.get('filesizeInBytes'), 10);
+                if (!Number.isNaN(bytes) && bytes) fileSize = bytes;
+            }
+
+            if (!fileSize && attachment.attributes) {
+                const bytes = parseInt(attachment.attributes.filesizeInBytes, 10);
+                if (!Number.isNaN(bytes) && bytes) fileSize = bytes;
+            }
+
+            if (!fileSize && typeof attachment.get === 'function') {
+                const readable = attachment.get('filesizeHumanReadable') || '';
+                const match = readable.match(/([\d.,]+)\s*(KB|MB|GB)/i);
+                if (match) {
+                    const value = parseFloat(match[1].replace(',', '.'));
+                    const unit = match[2].toUpperCase();
+                    const multipliers = { KB: 1024, MB: 1024 * 1024, GB: 1024 * 1024 * 1024 };
+                    if (!Number.isNaN(value) && multipliers[unit]) fileSize = value * multipliers[unit];
+                }
+            }
+
+            if (!Number.isNaN(maxUploadSize) && maxUploadSize > 0 && fileSize && fileSize > maxUploadSize * 1024)
+            {
+                const sizeMessage = $wrapper.data('sizeMessage') || '';
+                const messageContent = sizeMessage || 'The selected image exceeds the maximum allowed size.';
+
+                if (typeof listdom_alertify === 'function') $message.html(listdom_alertify(messageContent, 'lsd-error'));
+                else $message.text(messageContent);
+
+                $wrapper.addClass('lsd-attribute-error');
+                $placeholder.addClass('lsd-attribute-error');
+
+                setTimeout(() => {
+                    $message.html('');
+                }, 9000);
+
+                frame.close();
+                return;
+            }
+
+            const ratioLabel = ($wrapper.data('aspectRatio') || '').toString().trim();
+            const ratioValue = parseAspectRatio(ratioLabel);
+            const aspectMessage =
+                ($wrapper.data('aspectMessage') || '').toString().trim() ||
+                (ratioLabel ? 'Please upload an image with an aspect ratio close to ' + ratioLabel + '.' : '');
+
+            if (ratioValue)
+            {
+                let width = 0;
+                let height = 0;
+
+                if (typeof attachment.get === 'function')
+                {
+                    width = parseInt(attachment.get('width'), 10) || 0;
+                    height = parseInt(attachment.get('height'), 10) || 0;
+                }
+
+                if ((!width || !height) && attachment.attributes)
+                {
+                    width = parseInt(attachment.attributes.width, 10) || 0;
+                    height = parseInt(attachment.attributes.height, 10) || 0;
+                }
+
+                if (width && height && !isAspectRatioAllowed(width, height, ratioValue, aspectRatioTolerance))
+                {
+                    const messageContent = aspectMessage || 'The selected image does not match the required aspect ratio.';
+
+                    if (typeof listdom_alertify === 'function') $message.html(listdom_alertify(messageContent, 'lsd-error'));
+                    else $message.text(messageContent);
+
+                    $wrapper.addClass('lsd-attribute-error');
+                    $placeholder.addClass('lsd-attribute-error');
+
+                    setTimeout(() => {
+                        $message.html('');
+                    }, 9000);
+
+                    frame.close();
+                    return;
+                }
+            }
+
+            const $preview = $placeholder.find('.lsd-image-placeholder-preview');
+            const $emptyState = $placeholder.find('.lsd-image-placeholder-empty');
+            const $removeButton = $('.lsd-remove-image-button[data-for="' + target + '"]');
+
+            $preview.html('<img alt="" src="' + attachment.attributes.url + '">').removeClass('lsd-util-hide');
+            $placeholder.addClass('lsd-image-placeholder-has-image');
+            $emptyState.addClass('lsd-util-hide');
+
+            $input.val(attachment.id);
+
+            $button.addClass('lsd-util-hide');
+            $removeButton.removeClass('lsd-util-hide');
+
+            setTimeout(() => {
+                $message.html('');
+            }, 9000);
 
             frame.close();
         });
@@ -761,11 +2256,25 @@
         const $button = $(this);
         const target = $button.data('for');
 
-        $(target + '_img').html('');
+        const $placeholder = $(target + '_img');
+        const $wrapper = $button.closest('.lsd-attribute-image');
+        const $selectButton = $placeholder.find('.lsd-select-image-button');
+        const $emptyState = $placeholder.find('.lsd-image-placeholder-empty');
+        const $preview = $placeholder.find('.lsd-image-placeholder-preview');
+
+        $preview.html('').addClass('lsd-util-hide');
+        $placeholder.removeClass('lsd-image-placeholder-has-image');
+        $emptyState.removeClass('lsd-util-hide');
         $(target).val('');
 
-        $button.parent().find($('.lsd-select-image-button')).toggleClass('lsd-util-hide');
-        $button.toggleClass('lsd-util-hide');
+        if ($wrapper.length)
+        {
+            $wrapper.removeClass('lsd-attribute-error');
+            $wrapper.find('.lsd-attribute-image-message').html('');
+        }
+
+        $selectButton.removeClass('lsd-util-hide');
+        $button.addClass('lsd-util-hide');
     });
 }(jQuery));
 
@@ -1312,6 +2821,7 @@ const ListdomPageScroll = {
     }
 };
 
+window.ListdomPageScroll = ListdomPageScroll;
 
 function listdom_toastify(alert, type, options = {})
 {
@@ -1331,3 +2841,328 @@ function listdom_toastify(alert, type, options = {})
         confirm: options.confirm
     });
 }
+
+/**
+ * Locate Control Binding
+ */
+(function($)
+{
+    'use strict';
+
+    if (typeof window.lsdBindLocateControl === 'function') return;
+
+    let locateNamespaceCounter = 0;
+
+    const defaultShowError = function(message)
+    {
+        if (!message) return;
+
+        if (typeof window.listdom_toastify === 'function')
+        {
+            window.listdom_toastify(message, 'lsd-error');
+            return;
+        }
+
+        if (typeof window.ListdomToast === 'function')
+        {
+            new window.ListdomToast(message, {type: 'lsd-error'});
+            return;
+        }
+
+        window.alert(message);
+    };
+
+    const mapErrorType = function(error)
+    {
+        if (!error || typeof error.code === 'undefined') return 'failed';
+
+        const code = error.code;
+        const deniedCodes = [1];
+        const unavailableCodes = [2];
+        const timeoutCodes = [3];
+
+        if (typeof error.PERMISSION_DENIED !== 'undefined') deniedCodes.push(error.PERMISSION_DENIED);
+        if (typeof error.POSITION_UNAVAILABLE !== 'undefined') unavailableCodes.push(error.POSITION_UNAVAILABLE);
+        if (typeof error.TIMEOUT !== 'undefined') timeoutCodes.push(error.TIMEOUT);
+
+        if (deniedCodes.indexOf(code) !== -1) return 'denied';
+        if (unavailableCodes.indexOf(code) !== -1) return 'failed';
+        if (timeoutCodes.indexOf(code) !== -1) return 'failed';
+
+        return 'failed';
+    };
+
+    window.lsdBindLocateControl = function(element, options)
+    {
+        const $button = element instanceof $ ? element : $(element);
+        if (!$button || !$button.length) return null;
+
+        const previous = $button.data('lsdLocateControl');
+        if (previous && typeof previous.destroy === 'function') previous.destroy();
+
+        const defaults = {
+            messages: {
+                unsupported: $button.data('error-unsupported') || '',
+                denied: $button.data('error-denied') || '',
+                failed: $button.data('error-failed') || ''
+            },
+            keydown: true,
+            expectsFinalize: false,
+            geolocationOptions: {},
+            loadingClass: 'lsd-is-loading'
+        };
+
+        const settings = $.extend(true, {}, defaults, options || {});
+
+        const showError = function(type)
+        {
+            const message = settings.messages && settings.messages[type] ? settings.messages[type] : '';
+            if (typeof settings.showError === 'function') settings.showError(message, type);
+            else defaultShowError(message);
+        };
+
+        const startLoading = function()
+        {
+            if (typeof settings.onRequestStart === 'function') settings.onRequestStart();
+
+            if (typeof settings.setLoading === 'function') settings.setLoading(true);
+            else if (settings.loadingClass) $button.addClass(settings.loadingClass);
+        };
+
+        const stopLoading = function()
+        {
+            if (typeof settings.setLoading === 'function') settings.setLoading(false);
+            else if (settings.loadingClass) $button.removeClass(settings.loadingClass);
+
+            if (typeof settings.onRequestComplete === 'function') settings.onRequestComplete();
+        };
+
+        const finalize = function()
+        {
+            stopLoading();
+            if (typeof settings.onComplete === 'function') settings.onComplete();
+        };
+
+        const namespace = '.lsdLocateControl-' + (++locateNamespaceCounter);
+
+        const requestGeolocation = function()
+        {
+            if (!navigator.geolocation)
+            {
+                if (typeof settings.onUnsupported === 'function') settings.onUnsupported();
+                showError('unsupported');
+                return;
+            }
+
+            startLoading();
+
+            navigator.geolocation.getCurrentPosition(
+                function(position)
+                {
+                    let finalizeCalled = false;
+                    const done = function()
+                    {
+                        if (finalizeCalled) return;
+                        finalizeCalled = true;
+                        finalize();
+                    };
+
+                    if (typeof settings.onSuccess !== 'function')
+                    {
+                        done();
+                        return;
+                    }
+
+                    let result;
+
+                    try
+                    {
+                        result = settings.onSuccess(position.coords.latitude, position.coords.longitude, done);
+                    }
+                    catch (err)
+                    {
+                        if (typeof settings.onError === 'function') settings.onError(err, 'failed');
+                        showError('failed');
+                        finalize();
+                        return;
+                    }
+
+                    if (!settings.expectsFinalize)
+                    {
+                        if (result && typeof result.then === 'function')
+                        {
+                            result.then(done).catch(function()
+                            {
+                                if (typeof settings.onError === 'function') settings.onError(null, 'failed');
+                                showError('failed');
+                                finalize();
+                            });
+                        }
+                        else done();
+                    }
+                    else if (result && typeof result.then === 'function')
+                    {
+                        result.then(done).catch(function()
+                        {
+                            if (typeof settings.onError === 'function') settings.onError(null, 'failed');
+                            showError('failed');
+                            finalize();
+                        });
+                    }
+                },
+                function(error)
+                {
+                    if (typeof settings.onError === 'function') settings.onError(error, mapErrorType(error));
+                    showError(mapErrorType(error));
+                    finalize();
+                },
+                settings.geolocationOptions || {}
+            );
+        };
+
+        const handlePermission = function()
+        {
+            if (!navigator.permissions || typeof navigator.permissions.query !== 'function')
+            {
+                requestGeolocation();
+                return;
+            }
+
+            navigator.permissions
+                .query({name: 'geolocation'})
+                .then(function(status)
+                {
+                    if (status.state === 'denied')
+                    {
+                        if (typeof settings.onDenied === 'function') settings.onDenied(status);
+                        showError('denied');
+                        return;
+                    }
+
+                    requestGeolocation();
+                })
+                .catch(function()
+                {
+                    requestGeolocation();
+                });
+        };
+
+        const clickHandler = function(event)
+        {
+            if (event) event.preventDefault();
+            handlePermission();
+        };
+
+        const keydownHandler = function(event)
+        {
+            if (!event) return;
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+
+            event.preventDefault();
+            handlePermission();
+        };
+
+        $button.off(namespace).on('click' + namespace, clickHandler);
+        if (settings.keydown) $button.on('keydown' + namespace, keydownHandler);
+
+        const instance = {
+            destroy: function()
+            {
+                $button.off(namespace);
+                $button.removeData('lsdLocateControl');
+            },
+            trigger: function()
+            {
+                handlePermission();
+            },
+            element: $button
+        };
+
+        $button.data('lsdLocateControl', instance);
+        return instance;
+    };
+
+    if (typeof $.fn.select2 === 'function') $(".lsd-select-multiple").select2();
+})(jQuery);
+
+(function ($) {
+    if (window.lsdAuthDropdownInitialized) return;
+    window.lsdAuthDropdownInitialized = true;
+
+    const closeAll = function (except) {
+        $(".lsd-auth-dropdown").each(function () {
+            const dropdown = $(this);
+            if (except && dropdown.is(except)) return;
+
+            dropdown.removeClass("lsd-open");
+            dropdown.find(".lsd-auth-dropdown-panel").attr("aria-hidden", "true");
+            dropdown.find(".lsd-auth-dropdown-toggle").attr("aria-expanded", "false");
+        });
+    };
+
+    $(document).on("click", ".lsd-auth-dropdown-toggle", function (e) {
+        e.preventDefault();
+
+        const dropdown = $(this).closest(".lsd-auth-dropdown");
+
+        if (dropdown.hasClass("lsd-open")) {
+            closeAll();
+            return;
+        }
+
+        closeAll(dropdown);
+        dropdown.addClass("lsd-open");
+        dropdown.find(".lsd-auth-dropdown-panel").attr("aria-hidden", "false");
+        dropdown.find(".lsd-auth-dropdown-toggle").attr("aria-expanded", "true");
+    });
+
+    $(document).on("click", function (e) {
+        if (!$(e.target).closest(".lsd-auth-dropdown").length) closeAll();
+    });
+
+    $(document).on("keydown", function (e) {
+        if (e.key === "Escape") closeAll();
+    });
+
+    $(document).on("click", ".lsd-auth-dropdown-role-tab", function (e) {
+        e.preventDefault();
+
+        const tab = $(this);
+        const dropdown = tab.closest(".lsd-auth-dropdown");
+        const target = tab.data("target");
+        if (!target) return;
+
+        dropdown
+        .find(".lsd-auth-dropdown-role-tab")
+        .removeClass("lsd-active")
+        .attr("aria-selected", "false");
+
+        tab.addClass("lsd-active").attr("aria-selected", "true");
+
+        dropdown
+        .find(".lsd-auth-dropdown-role-panel")
+        .removeClass("lsd-active")
+        .attr("hidden", "hidden");
+
+        dropdown.find(target).addClass("lsd-active").removeAttr("hidden");
+    });
+
+    $(document).ready(function () {
+        $(".lsd-auth-dropdown").each(function () {
+            const dropdown = $(this);
+            const hoverEnabled = parseInt(dropdown.data("hover"), 10) === 1;
+            if (!hoverEnabled) return;
+
+            dropdown.on("mouseenter", function () {
+                closeAll(dropdown);
+                dropdown.addClass("lsd-open");
+                dropdown.find(".lsd-auth-dropdown-panel").attr("aria-hidden", "false");
+                dropdown.find(".lsd-auth-dropdown-toggle").attr("aria-expanded", "true");
+            });
+
+            dropdown.on("mouseleave", function () {
+                closeAll();
+            });
+        });
+    });
+})(jQuery);

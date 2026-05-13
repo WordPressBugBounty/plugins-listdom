@@ -2,20 +2,9 @@
 
 class LSD_Schema extends LSD_Base
 {
-    /**
-     * @var bool
-     */
-    public $pro;
+    public bool $pro;
 
-    /**
-     * @var string
-     */
-    public $type;
-
-    /**
-     * @var array
-     */
-    private $schema;
+    private array $schema;
 
     public function __construct()
     {
@@ -40,11 +29,6 @@ class LSD_Schema extends LSD_Base
         return $this;
     }
 
-    /**
-     * @param string $type
-     * @param WP_Term $category
-     * @return $this
-     */
     public function type($type = null, $category = null): LSD_Schema
     {
         if ($this->pro)
@@ -72,16 +56,41 @@ class LSD_Schema extends LSD_Base
         return $this;
     }
 
+    public function reset(): LSD_Schema
+    {
+        $this->schema = [];
+        return $this;
+    }
+
     public function meta($name, $value): LSD_Schema
     {
-        if ($this->pro) $this->schema[] = '<meta itemprop="' . esc_attr($name) . '" content="' . esc_attr($value) . '">';
+        if ($this->pro)
+        {
+            $name = $this->normalize($name);
+            if (trim($name)) $this->schema[] = '<meta itemprop="' . esc_attr($name) . '" content="' . esc_attr($value) . '">';
+        }
+
         return $this;
     }
 
     public function prop($name): LSD_Schema
     {
-        if ($this->pro) $this->schema[] = 'itemprop="' . esc_attr($name) . '"';
+        if ($this->pro)
+        {
+            $name = $this->normalize($name);
+            if (trim($name)) $this->schema[] = 'itemprop="' . esc_attr($name) . '"';
+        }
+
         return $this;
+    }
+
+    public function normalize($name): string
+    {
+        $name = trim((string) $name);
+        if (!trim($name)) return '';
+
+        $name = preg_replace('/^https?:\/\/schema\.org\//i', '', $name);
+        return trim($name, " \t\n\r\0\x0B/#");
     }
 
     public function name(): LSD_Schema
@@ -101,7 +110,8 @@ class LSD_Schema extends LSD_Base
 
     public function address(): LSD_Schema
     {
-        return $this->prop('address');
+        if ($this->pro) $this->schema[] = 'itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"';
+        return $this;
     }
 
     public function priceRange(): LSD_Schema

@@ -10,7 +10,22 @@ $number_of_users = count_users()['total_users'];
 
 // Filter Options
 $options = get_post_meta($post->ID, 'lsd_filter', true);
+if (!is_array($options)) $options = [];
+
 $exclude = get_post_meta($post->ID, 'lsd_exclude', true);
+if (!is_array($exclude)) $exclude = [];
+
+foreach ([
+    LSD_Base::TAX_CATEGORY,
+    LSD_Base::TAX_LOCATION,
+    LSD_Base::TAX_FEATURE,
+    LSD_Base::TAX_LABEL,
+    LSD_Base::TAX_TAG,
+] as $tax)
+{
+    if (isset($options[$tax])) $options[$tax] = LSD_Taxonomies::resolve_term_ids($tax, $options[$tax]);
+    if (isset($exclude[$tax])) $exclude[$tax] = LSD_Taxonomies::resolve_term_ids($tax, $exclude[$tax]);
+}
 
 // Attributes
 $attributes = LSD_Main::get_attributes_details();
@@ -22,13 +37,18 @@ $walker = new LSD_Walker_Taxonomy();
     <div class="lsd-settings-fields-wrapper">
         <div class="lsd-admin-section-heading">
             <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Filter Options", 'listdom'); ?></h3>
-            <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("Filter which listings appear based on category, location, tags, fields, rank, and more.", 'listdom'); ?> </p>
+            <p class="lsd-admin-description lsd-m-0"><?php echo sprintf(
+                esc_html__('Filter which listings appear based on %1$s, %2$s, %3$s, fields, rank, and more.', 'listdom'),
+                esc_html(lsd_t_label_lc(LSD_Base::TAX_CATEGORY)),
+                esc_html(lsd_t_label_lc(LSD_Base::TAX_LOCATION)),
+                esc_html(lsd_t_label_lc(LSD_Base::TAX_TAG, 'plural'))
+            ); ?></p>
         </div>
 
         <div id="lsd_metabox_filter_options" class="lsd-metabox lsd-metabox-filter-options">
 
             <?php if (!class_exists(LSDADDAPS::class) && !class_exists(\LSDPACAPS\Base::class)): ?>
-                <div class="lsd-my-4"><?php echo LSD_Base::alert(sprintf(
+                <div class="lsd-mb-4 lsd-alert-no-my"><?php echo LSD_Base::alert(sprintf(
                     /* translators: %s: Advanced Portal Search add-on label. */
                     esc_html__('Did you know that with the %s add-on, you can customize the matching logic for taxonomies?', 'listdom'),
                     '<strong>'.esc_html__('Advanced Portal Search', 'listdom').'</strong>'
@@ -36,11 +56,11 @@ $walker = new LSD_Walker_Taxonomy();
             <?php endif; ?>
 
             <ul class="lsd-tab-switcher lsd-level-3-menu lsd-sub-tabs lsd-flex lsd-mb-3" data-for=".lsd-tab-switcher-content-filter-options">
-                <li data-tab="categories" class="lsd-sub-tabs-active"><a href="#"><?php esc_html_e('Categories', 'listdom'); ?></a></li>
-                <li data-tab="locations"><a href="#"><?php esc_html_e('Locations', 'listdom'); ?></a></li>
-                <li data-tab="tags"><a href="#"><?php esc_html_e('Tags', 'listdom'); ?></a></li>
-                <li data-tab="features"><a href="#"><?php esc_html_e('Features', 'listdom'); ?></a></li>
-                <li data-tab="labels"><a href="#"><?php esc_html_e('Labels', 'listdom'); ?></a></li>
+                <li data-tab="categories" class="lsd-sub-tabs-active"><a href="#"><?php echo esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY, 'plural')); ?></a></li>
+                <li data-tab="locations"><a href="#"><?php echo esc_html(lsd_t_label(LSD_Base::TAX_LOCATION, 'plural')); ?></a></li>
+                <li data-tab="tags"><a href="#"><?php echo esc_html(lsd_t_label(LSD_Base::TAX_TAG, 'plural')); ?></a></li>
+                <li data-tab="features"><a href="#"><?php echo esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural')); ?></a></li>
+                <li data-tab="labels"><a href="#"><?php echo esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural')); ?></a></li>
                 <li data-tab="custom-fields"><a href="#"><?php esc_html_e('Custom Fields', 'listdom'); ?></a></li>
                 <li data-tab="authors"><a href="#"><?php esc_html_e('Authors', 'listdom'); ?></a></li>
 
@@ -67,7 +87,10 @@ $walker = new LSD_Walker_Taxonomy();
                                     ]
                                 ]); ?>
                             </div>
-                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("If you don't want to filter the listings by category, simply leave the options unselected.", 'listdom'); ?></p>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php echo sprintf(
+                                esc_html__("If you don't want to filter the listings by %s, simply leave the options unselected.", 'listdom'),
+                                esc_html(lsd_t_label_lc(LSD_Base::TAX_CATEGORY))
+                            ); ?></p>
                         </div>
                         <div class="lsd-tab-switcher-content lsd-tab-switcher-content-category lsd-alert-no-mb" id="lsd-tab-switcher-exclude-content">
                             <?php if (LSD_Base::isPro()): ?>
@@ -82,7 +105,10 @@ $walker = new LSD_Walker_Taxonomy();
                                         ]
                                     ]); ?>
                                 </div>
-                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("If you add a category it will be excluded from shortcode results.", 'listdom'); ?></p>
+                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php echo sprintf(
+                                    esc_html__('If you add a %s it will be excluded from shortcode results.', 'listdom'),
+                                    esc_html(lsd_t_label_lc(LSD_Base::TAX_CATEGORY))
+                                ); ?></p>
                             <?php else: echo LSD_Base::alert(LSD_Base::missFeatureMessage(esc_html__('Exclusion Filter', 'listdom')), 'warning'); ?>
                             <?php endif; ?>
                         </div>
@@ -257,16 +283,16 @@ $walker = new LSD_Walker_Taxonomy();
             </div>
             <div class="lsd-tab-switcher-content lsd-tab-switcher-content-filter-options" id="lsd-tab-switcher-custom-fields-content">
                 <div class="lsd-row">
-                    <div class="lsd-col-12">
-                        <p class="lsd-admin-description-tiny lsd-mt-0"><?php esc_html_e("If you want to filter listings based on custom fields, fill in the following fields. Otherwise, leave them empty to skip filtering.", 'listdom'); ?></p>
-                        <div class="lsd-attributes">
+                    <div class="lsd-col-12 lsd-settings-fields-sub-wrapper">
+                        <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("If you want to filter listings based on custom fields, fill in the following fields. Otherwise, leave them empty to skip filtering.", 'listdom'); ?></p>
+                        <div class="lsd-attributes lsd-settings-fields-sub-wrapper">
                             <?php if (count($attributes)): ?>
-                                <?php foreach ($attributes as $attr): if ($attr['field_type'] === 'image') continue; ?>
+                                <?php foreach ($attributes as $attr): if (in_array($attr['field_type'], ['image', 'file'], true)) continue; ?>
                                     <div class="lsd-form-row">
                                         <div class="lsd-col-3"><?php echo LSD_Form::label([
                                             'class' => 'lsd-fields-label',
                                             'title' => esc_html($attr['name']),
-                                            'for' => 'lsd_attribute_'.esc_attr($attr['id']),
+                                            'for' => 'lsd_attribute_'.esc_attr($attr['slug']),
                                         ]); ?></div>
 
                                         <div class="lsd-col-7">
@@ -274,9 +300,9 @@ $walker = new LSD_Walker_Taxonomy();
                                                 <?php
                                                 echo LSD_Form::select([
                                                     'class' => 'lsd-admin-input',
-                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id']),
-                                                    'name' => 'lsd[filter][attributes][' . esc_attr($attr['id']) .'-in][]',
-                                                    'value' => $options['attributes'][$attr['id'] . '-in'] ?? [],
+                                                    'id' => 'lsd_attribute_'.esc_attr($attr['slug']),
+                                                    'name' => 'lsd[filter][attributes][' . esc_attr($attr['slug']) .'-in][]',
+                                                    'value' => $options['attributes'][$attr['slug'] . '-in'] ?? [],
                                                     'options' => $attr['values'],
                                                     'attributes' => [
                                                         'multiple' => true,
@@ -286,37 +312,38 @@ $walker = new LSD_Walker_Taxonomy();
                                             <?php elseif ($attr['field_type'] === 'number'): ?>
                                                 <div class="lsd-flex lsd-gap-3 lsd-mm-input">
                                                     <?php
-                                                    $min = $options[LSD_Base::TAX_ATTRIBUTE][$attr['id'] . '-bt-min'] ?? '';
-                                                    $max = $options[LSD_Base::TAX_ATTRIBUTE][$attr['id'] . '-bt-max'] ?? '';
+                                                    $between = $options['attributes'][$attr['slug'] . '-bt'] ?? '';
+                                                    $bt = trim($between) ? array_map('trim', explode(':', $between, 2)) : [];
+
+                                                    $min = $bt[0] ?? '';
+                                                    $max = $bt[1] ?? '';
 
                                                     echo LSD_Form::number([
                                                         'class' => 'lsd-admin-input',
-                                                        'name' => 'lsd[filter]['.LSD_Base::TAX_ATTRIBUTE .'][' . esc_attr($attr['id']) .'-bt-min]',
                                                         'value' => $min,
                                                         'placeholder' => esc_attr__('Min number', 'listdom'),
-                                                        'id' => 'lsd_attribute_'.esc_attr($attr['id']),
+                                                        'id' => 'lsd_attribute_'.esc_attr($attr['slug']) . '-min',
                                                     ]);
 
                                                     echo LSD_Form::number([
                                                         'class' => 'lsd-admin-input',
-                                                        'name' => 'lsd[filter]['.LSD_Base::TAX_ATTRIBUTE .'][' . esc_attr($attr['id']) .'-bt-max]',
                                                         'value' => $max,
                                                         'placeholder' => esc_attr__('Max number', 'listdom'),
-                                                        'id' => 'lsd_attribute_'.esc_attr($attr['id']) . '-max',
+                                                        'id' => 'lsd_attribute_'.esc_attr($attr['slug']) . '-max',
                                                     ]);
 
                                                     echo LSD_Form::hidden([
-                                                        'name' => 'lsd[filter][attributes][' . esc_attr($attr['id']) .'-bt]',
-                                                        'id' => 'lsd_attribute_'.esc_attr($attr['id']) . '-hidden',
+                                                        'name' => 'lsd[filter][attributes][' . esc_attr($attr['slug']) .'-bt]',
+                                                        'id' => 'lsd_attribute_'.esc_attr($attr['slug']) . '-hidden',
                                                         'value' => $min && $max ? $min.':'.$max : '',
                                                     ]);
                                                     ?>
                                                     <script>
                                                         jQuery(document).ready(function()
                                                         {
-                                                            const minInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['id']); ?>-min');
-                                                            const maxInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['id']); ?>-max');
-                                                            const hiddenInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['id']); ?>-hidden');
+                                                            const minInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['slug']); ?>-min');
+                                                            const maxInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['slug']); ?>-max');
+                                                            const hiddenInput = jQuery('#lsd_attribute_<?php echo esc_attr($attr['slug']); ?>-hidden');
 
                                                             minInput.add(maxInput).on('input', () => {
                                                                 const minValue = minInput.val().trim();
@@ -331,9 +358,9 @@ $walker = new LSD_Walker_Taxonomy();
                                                 <?php
                                                 echo LSD_Form::text([
                                                     'class' => 'lsd-admin-input',
-                                                    'id' => 'lsd_attribute_'.esc_attr($attr['id']),
-                                                    'name' => 'lsd[filter][attributes][' . esc_attr($attr['id']) .'-lk]',
-                                                    'value' => $options['attributes'][$attr['id'] . '-lk'] ?? '',
+                                                    'id' => 'lsd_attribute_'.esc_attr($attr['slug']),
+                                                    'name' => 'lsd[filter][attributes][' . esc_attr($attr['slug']) .'-lk]',
+                                                    'value' => $options['attributes'][$attr['slug'] . '-lk'] ?? '',
                                                     'placeholder' => sprintf(
                                                         /* translators: %s: Attribute name. */
                                                         esc_html__('Enter %s', 'listdom'),

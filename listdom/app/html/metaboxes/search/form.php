@@ -6,6 +6,8 @@ defined('ABSPATH') || die();
 
 $form = get_post_meta($post->ID, 'lsd_form', true);
 if (!is_array($form)) $form = [];
+
+$styles = LSD_Search::get_styles();
 ?>
 <div class="lsd-metabox lsd-search-form-metabox">
     <div class="lsd-row">
@@ -18,10 +20,7 @@ if (!is_array($form)) $form = [];
                 'id' => 'lsd_search_form_style',
                 'name' => 'lsd[form][style]',
                 'value' => isset($form['style']) && $form['style'] ? $form['style'] : 'default',
-                'options' => [
-                    'default' => esc_html__('Default', 'listdom'),
-                    'sidebar' => esc_html__('Sidebar', 'listdom')
-                ],
+                'options' => $styles,
                 'class' => 'widefat',
             ]); ?>
         </div>

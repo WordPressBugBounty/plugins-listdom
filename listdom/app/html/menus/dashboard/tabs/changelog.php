@@ -3,6 +3,119 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v5.5.0 <span>May 12th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Updated Italian translations for Listdom and its addons.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added more flexible date and time options for custom fields and search, along with more reliable imported values.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced the security of frontend and backend elements and fixed several related issues.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved listing imports with better defaults for work hours and cleaner handling of listing statuses.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced the Licenses menus in the Listdom backend.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved sticky sidebar behavior, popup interactions, and admin settings screens for a smoother experience.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Refined listing cards and review displays for a cleaner frontend appearance.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved dashboard reliability with better role recovery and profile image handling.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed privacy handling in RSS feeds, Stripe checkout notices, geo-search filtering, and several sharing and interface issues.', 'listdom'); ?></li>
+    </ul>
+    <h2>v5.4.0 <span>April 3rd, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: Add-on name. */
+                esc_html__('[ADDON] Released the %s addon to help you build your Listdom directory using Bricks Builder.', 'listdom'),
+                '<strong>'.esc_html__('Bricks', 'listdom').'</strong>'
+            ); ?></span>
+        </li>
+        <li>
+            <span class="lsd-changelog-addon"><?php echo sprintf(
+                /* translators: %s: App name. */
+                esc_html__('[APP] Released the %s app, allowing agencies and site owners to replace Listdom branding.', 'listdom'),
+                '<strong>'.esc_html__('White Label', 'listdom').'</strong>'
+            ); ?></span>
+        </li>
+        <li><?php esc_html_e('Added FAQ schema support.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added thousands and decimal separator options for better currency localization.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added "File" type to Listdom custom fields.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved shortcode, search, and builder filters with cleaner attribute slug handling across listing integrations.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced listing management with more reliable primary category handling, improved category-based filtering, and more stable export sorting.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved the admin experience with clearer notifications, more responsive shortcode builder feedback, and consistent branded menu behavior.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced account recovery and contact-related flows for more reliable frontend login and profile interactions.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed issues with rich custom field formatting and category-restricted attributes on single listing pages.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed several interface issues, including iOS search field styling and admin notifications.', 'listdom'); ?></li>
+    </ul>
+    <h2>v5.3.0 <span>February 25th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added Mobile App style integration to the search builder with filterable search styles and improved desktop tab behavior.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added hierarchical category and location import support for CSV and Excel mapping.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added taxonomy label overrides with locale-aware settings and improved label handling across shortcode filters and import mapping.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added API improvements including the price classes REST endpoint and listing URL in API listing payloads.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added WP All Import map synchronization support for listing location data.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved Frontend Dashboard UX with image aspect ratio controls and clearer maximum image size guidance.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved authentication, custom field, and Select2 UI consistency across backend and frontend forms.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed payment flow issues including checkout privacy consent persistence and payments context handling in menus and exports.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed multiple UI and search issues across skins and widgets, including empty-state alerts and taxonomy slug sync behavior.', 'listdom'); ?></li>
+    </ul>
+    <h2>v5.2.1 <span>February 1st, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added new options to customize Frontend Dashboard menus.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added infowindow trigger and mouse wheel zoom settings to map options in shortcodes.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added options to enforce listing status for new submissions via the Frontend Dashboard.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Optimized CSV export performance for large-scale websites.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced JSON and CSV import/export functionality with support for new data fields.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Resolved various issues in the search widget.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved the user interface for search inputs, map markers, and call-to-action buttons.', 'listdom'); ?></li>
+    </ul>
+    <h2>v5.2.0 <span>January 1st, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added global and region-based tax options to the Listdom payment system.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added an FAQ element for listings.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added the ability to import and export working hours in JSON, CSV, and Excel formats.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added an option to control the login visibility of custom menus in the Frontend Dashboard.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added an option to customize the URL slug of the listings RSS feed.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced recurring payment functionality in Listdom.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved the Table skin.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed an issue with importing custom field values.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed several issues related to maps and directions features.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Resolved multiple interface issues in both the Listdom backend and frontend.', 'listdom'); ?></li>
+    </ul>
+    <h2>v5.1.0 <span>November 28th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added the ability to export/import custom fields and listing taxonomies using the CSV exporter/importer.', 'listdom'); ?></li>
+        <li><?php esc_html_e('[PRO] Added the ability to export/import custom fields and listing taxonomies using the JSON exporter/importer.', 'listdom'); ?></li>
+        <li><?php esc_html_e('[PRO] Improved the Timeline skin.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced user email verification by adding the option to resend the verification link.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed an issue with displaying custom fields in the Listdom API.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed field and title visibility issues in the search module.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Resolved an issue affecting the shortcode builder under certain conditions.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed an issue with listing editing in the "Frontend Dashboard".', 'listdom'); ?></li>
+        <li><?php esc_html_e('Resolved an issue with allowing HTML content in "Frontend Dashboard" custom menus.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed several issues in the Listdom payment engine.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Resolved multiple interface issues in both the Listdom backend and frontend.', 'listdom'); ?></li>
+    </ul>
+    <h2>v5.0.1 <span>November 9th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Fixed an issue in "Locate Me" feature.', 'listdom'); ?></li>
+    </ul>
+    <h2>v5.0.0 <span>November 8th, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added new, modern styles for the listing editor in both the backend and frontend.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Introduced a fully configurable RSS feature for displaying listings.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added a "Locate Me" option for address and radius searches.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added responsive column controls to the Table skin.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added new UI options, including menu type and column settings, for the frontend dashboard.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced the radius search feature.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Resolved various search and AJAX issues in the Masonry skin.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed an unintended visibility issue affecting the Call to Action feature.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed an issue related to saving advanced slugs.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed several issues affecting custom CSS code handling.', 'listdom'); ?></li>
+    </ul>
+    <h2>v4.9.0 <span>October 22nd, 2025</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added the built-in Listdom payment engine.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Introduced a comprehensive Call to Action component to display a CTA button on single listing and search results pages.', 'listdom'); ?></li>
+        <li><?php esc_html_e('[PRO] Added support for the Stripe payment gateway.', 'listdom'); ?></li>
+        <li><?php esc_html_e('[PRO] Enabled recurring payments for memberships and subscriptions.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced the UI and responsiveness of pagination and sort bar components.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Resolved multiple interface issues in both the Listdom backend and frontend.', 'listdom'); ?></li>
+    </ul>
     <h2>v4.8.1 <span>October 1st, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>
@@ -12,7 +125,7 @@ defined('ABSPATH') || die();
     <h2>v4.8.0 <span>September 29th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-added"><?php esc_html_e('[Pro] Added a Timeline skin.', 'listdom'); ?></span>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added a Timeline skin.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Added comprehensive GDPR compliance.', 'listdom'); ?></span>
@@ -36,7 +149,7 @@ defined('ABSPATH') || die();
     <h2>v4.7.0 <span>September 5th, 2025</span></h2>
     <ul class="lsd-changelog">
         <li>
-            <span class="lsd-changelog-added"><?php esc_html_e('[Pro] Added a Gallery skin.', 'listdom'); ?></span>
+            <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added a Gallery skin.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-added"><?php esc_html_e('Added Gemini 2.5 Flash and Gemini 2.5 Flash Lite to the Listdom AI models.', 'listdom'); ?></span>
@@ -728,13 +841,13 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('[PRO] Added maximum number of tags to the frontend listing submission.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-improved"><?php esc_html_e('Improved listdom interfaces in backend and frontend.', 'listdom'); ?></span>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved Listdom interfaces in backend and frontend.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-improved"><?php esc_html_e('Improved loading of Google Maps API.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-improved"><?php esc_html_e('Improved listdom settings menu.', 'listdom'); ?></span>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved Listdom settings menu.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed some issues in trial and license activation.', 'listdom'); ?></span>
@@ -755,7 +868,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('Added an option to disable contact form of owner element.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-improved"><?php esc_html_e('Improved listdom interfaces in WordPress backend.', 'listdom'); ?></span>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved Listdom interfaces in WordPress backend.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-improved"><?php esc_html_e('Improved the license activation section.', 'listdom'); ?></span>
@@ -773,10 +886,10 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('Added sort by price option.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-improved"><?php esc_html_e('Added new icons for listdom and listings menus.', 'listdom'); ?></span>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Added new icons for Listdom and listings menus.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-improved"><?php esc_html_e('Improved listdom dashboard.', 'listdom'); ?></span>
+            <span class="lsd-changelog-improved"><?php esc_html_e('Improved Listdom dashboard.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-improved"><?php esc_html_e('Improved the block editor integration.', 'listdom'); ?></span>
@@ -1186,7 +1299,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('Added an option to load single listing page into light-box on click of marker.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-updated"><?php echo esc_html__('Improved the listdom icons.', 'listdom'); ?></span>
+            <span class="lsd-changelog-updated"><?php echo esc_html__('Improved the Listdom icons.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed some issues.', 'listdom'); ?></span>
@@ -1224,7 +1337,7 @@ defined('ABSPATH') || die();
                 <li><?php esc_html_e('Improved security of Embed feature.', 'listdom'); ?></li>
                 <li><?php esc_html_e('Fixed some issues in loading CSS and JS assets.', 'listdom'); ?></li>
                 <li><?php esc_html_e('Removed inline CSS and JS codes.', 'listdom'); ?></li>
-                <li><?php esc_html_e('Improved the structure of listdom API.', 'listdom'); ?></li>
+                <li><?php esc_html_e('Improved the structure of Listdom API.', 'listdom'); ?></li>
             </ul>
         </li>
         <li>
@@ -1248,7 +1361,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-addon"><?php echo sprintf(
                 /* translators: %s: Add-on name. */
                 esc_html__('[ADDON] Released %s addon!', 'listdom'),
-                '<strong>'.esc_html__('Subscriptions', 'listdom').'</strong>'
+                '<strong>'.esc_html__('Memberships', 'listdom').'</strong>'
             ); ?></span>
         </li>
         <li>
@@ -1265,7 +1378,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('Added some new endpoints to the API.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-updated"><?php esc_html_e('Improved security of listdom and addons.', 'listdom'); ?></span>
+            <span class="lsd-changelog-updated"><?php esc_html_e('Improved security of Listdom and addons.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed an issue in search builder regarding default values.', 'listdom'); ?></span>
@@ -1295,7 +1408,7 @@ defined('ABSPATH') || die();
             <span class="lsd-changelog-added"><?php esc_html_e('Added an ability to show all values of a certain attribute in the search builder.', 'listdom'); ?></span>
         </li>
         <li>
-            <span class="lsd-changelog-updated"><?php esc_html_e('Improved security of listdom.', 'listdom'); ?></span>
+            <span class="lsd-changelog-updated"><?php esc_html_e('Improved security of Listdom.', 'listdom'); ?></span>
         </li>
         <li>
             <span class="lsd-changelog-fixed"><?php esc_html_e('Fixed an issue regarding showing all attributes in API.', 'listdom'); ?></span>

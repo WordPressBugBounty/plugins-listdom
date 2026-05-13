@@ -39,6 +39,7 @@ class LSD_Assets extends LSD_Base
             wp_enqueue_script('lsd-elementor-editor', $this->lsd_asset_url('js/elementor-editor.min.js'), ['jquery'], LSD_Assets::version());
         });
 
+        // Elementor
         add_action('elementor/frontend/after_enqueue_scripts', function ()
         {
             $this->isotope();
@@ -47,6 +48,15 @@ class LSD_Assets extends LSD_Base
 
             wp_enqueue_script('lsd-elementor-preview', $this->lsd_asset_url('js/elementor-preview.min.js'), ['jquery', 'lsd-frontend'], LSD_Assets::version(), true);
         });
+
+        // Bricks Builder Preview
+        add_action('wp_enqueue_scripts', function ()
+        {
+            if (function_exists('bricks_is_builder') && bricks_is_builder())
+            {
+                $this->bricks();
+            }
+        }, 0);
     }
 
     public function site()
@@ -58,16 +68,15 @@ class LSD_Assets extends LSD_Base
         wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'], $this->version(), true);
 
         // Localize Vars
-        wp_localize_script('lsd-frontend', 'lsd', [
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
-        ]);
+        $this->localize();
 
         // Include Listdom frontend CSS file
         wp_enqueue_style('lsd-frontend', $this->lsd_asset_url('css/frontend.min.css'), [], $this->version());
 
         // RTL Style
         if (is_rtl()) wp_enqueue_style('lsd-frontend-rtl', $this->lsd_asset_url('css/frontend-rtl.min.css'), ['lsd-frontend'], $this->version());
+
+        if (LSD_Dashboard::is_dashboard()) $this->media();
 
         // Include Personalize Assets
         $personalize = new LSD_Personalize();
@@ -102,6 +111,9 @@ class LSD_Assets extends LSD_Base
     {
         // Include Listdom backend CSS file for WordPress
         wp_enqueue_style('lsd-wp-backend', $this->lsd_asset_url('css/wp-backend.min.css'), [], $this->version());
+
+        // Listdom Icon
+        $this->lsdi();
 
         // Check to see if we should include the assets or not
         if (!$this->should_include('backend')) return;
@@ -148,9 +160,6 @@ class LSD_Assets extends LSD_Base
         // Include Select2
         $this->select2();
 
-        // Listdom Icon
-        $this->lsdi();
-
         // Include Assets
         do_action('lsd_admin_assets');
     }
@@ -159,12 +168,15 @@ class LSD_Assets extends LSD_Base
     {
         // Add Custom Styles
         $styles = LSD_Options::styles();
+        if (!isset($styles['CSS'])) return;
 
-        // There is no Custom Styles
-        if (!trim($styles['CSS'])) return;
+        $CSS = (string) $styles['CSS'];
+        if (!trim($CSS)) return;
 
-        $CSS = wp_strip_all_tags($styles['CSS']);
-        echo '<style>' . stripslashes($CSS) . '</style>';
+        // Avoid breaking out of the style tag accidentally.
+        $CSS = str_ireplace(['<style>', '</style>'], '', $CSS);
+
+        echo '<style>' . $CSS . '</style>';
     }
 
     public function fontawesome(): bool
@@ -220,10 +232,10 @@ class LSD_Assets extends LSD_Base
     {
         $base = new LSD_Base();
 
-        // Include Select2 JavaScript file
+        // Include LightSlider JavaScript file
         wp_enqueue_script('lightslider', $base->lsd_asset_url('packages/lightslider/js/lightslider.min.js'), [], LSD_Assets::version());
 
-        // Include Select2 CSS file
+        // Include LightSlider CSS file
         wp_enqueue_style('lightslider', $base->lsd_asset_url('packages/lightslider/css/lightslider.min.css'), [], LSD_Assets::version());
     }
 
@@ -285,8 +297,8 @@ class LSD_Assets extends LSD_Base
 
     public function lsdi()
     {
-        // Include Listdom Icomoon CSS file
-        wp_enqueue_style('lsdi', $this->lsd_asset_url('packages/lsdi/lsdi.css'), [], LSD_Assets::version());
+        (new \Webilia\LSDI\Boot(plugins_url('vendor/webilia/lsdi', LSD_ABSPATH . '/listdom.php')))
+            ->enqueue('lsdi', [], LSD_Assets::version());
     }
 
     public static function api()
@@ -315,6 +327,35 @@ class LSD_Assets extends LSD_Base
         else if ($provider === LSD_MP_LEAFLET) self::leaflet($draw);
     }
 
+    protected function bricks(): void
+    {
+        // Frontend Assets
+        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'], $this->version(), true);
+        $this->localize();
+
+        wp_enqueue_style('lsd-frontend', $this->lsd_asset_url('css/frontend.min.css'), [], $this->version());
+
+        if (is_rtl()) wp_enqueue_style('lsd-frontend-rtl', $this->lsd_asset_url('css/frontend-rtl.min.css'), ['lsd-frontend'], $this->version());
+
+        $this->fontawesome();
+        $this->lsdi();
+
+        $this->isotope();
+        $this->googlemaps();
+        $this->leaflet();
+
+        // Ensure map assets and info-windows render in builder preview
+        self::map();
+    }
+
+    protected function localize(): void
+    {
+        wp_localize_script('lsd-frontend', 'lsd', [
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
+        ]);
+    }
+
     public static function leaflet($draw = false): bool
     {
         // Include Leaflet Javascript API
@@ -335,6 +376,40 @@ class LSD_Assets extends LSD_Base
         // Enqueue the JS API
         wp_enqueue_script('leaflet', $base->lsd_asset_url('packages/leaflet/leaflet.js'), $dependencies, LSD_Assets::version());
 
+        /**
+         * - Loads only if clustering is enabled by filter or if you decide to always include it.
+         * - Important: cluster script must depend on leaflet.
+         */
+        $cluster = apply_filters('lsd_leaflet_marker_cluster_include', true);
+        if ($cluster)
+        {
+            wp_enqueue_style(
+                'leaflet-marker-cluster',
+                $base->lsd_asset_url('packages/leaflet/cluster.css'),
+                ['leaflet'],
+                LSD_Assets::version()
+            );
+
+            wp_enqueue_style(
+                'leaflet-marker-cluster-default',
+                $base->lsd_asset_url('packages/leaflet/cluster.default.css'),
+                ['leaflet-marker-cluster'],
+                LSD_Assets::version()
+            );
+
+            wp_enqueue_script(
+                'leaflet-marker-cluster',
+                $base->lsd_asset_url('packages/leaflet/leaflet.cluster.js'),
+                ['leaflet'],
+                LSD_Assets::version(),
+                true
+            );
+
+            // Ensure any later leaflet add-ons use marker cluster if needed
+            $dependencies[] = 'leaflet';
+            $dependencies[] = 'leaflet-marker-cluster';
+        }
+
         if ($draw)
         {
             // Add Leaflet to Dependencies
@@ -344,7 +419,7 @@ class LSD_Assets extends LSD_Base
             wp_enqueue_style('leaflet-draw', $base->lsd_asset_url('packages/leaflet/leaflet.draw.css'), [], LSD_Assets::version());
 
             // Enqueue the JS API
-            wp_enqueue_script('leaflet-draw', $base->lsd_asset_url('packages/leaflet/leaflet.draw.js'), $dependencies, LSD_Assets::version());
+            wp_enqueue_script('leaflet-draw', $base->lsd_asset_url('packages/leaflet/leaflet.draw.js'), $dependencies, LSD_Assets::version(), true);
         }
 
         $omnivore = apply_filters('lsd_leaflet_omnivore_include', false);
@@ -353,7 +428,13 @@ class LSD_Assets extends LSD_Base
             // Add Leaflet to Dependencies
             $dependencies[] = 'leaflet';
 
-            wp_enqueue_script('leaflet-omnivore', $base->lsd_asset_url('packages/leaflet/leaflet.omnivore.js'), $dependencies, LSD_Assets::version());
+            wp_enqueue_script(
+                'leaflet-omnivore',
+                $base->lsd_asset_url('packages/leaflet/leaflet.omnivore.js'),
+                $dependencies,
+                LSD_Assets::version(),
+                true
+            );
         }
 
         return true;

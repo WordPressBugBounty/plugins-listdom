@@ -18,7 +18,7 @@ $options = $this->get_available_sort_options();
     <div class="lsd-settings-fields-wrapper">
         <div class="lsd-admin-section-heading">
             <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html__("Default Sort", 'listdom'); ?></h3>
-            <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("Control how your listings are shown by default.", 'listdom'); ?> </p>
+            <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("Set the default sort options of this shortcode.", 'listdom'); ?> </p>
         </div>
         <div id="lsd_metabox_default_sort" class="lsd-metabox lsd-metabox-sort-options">
             <div class="lsd-metabox-sort-options-default">

@@ -12,7 +12,7 @@ class LSD_Element_Features extends LSD_Element
     {
         parent::__construct();
 
-        $this->label = esc_html__('Features', 'listdom');
+        $this->label = esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural'));
         $this->show_icons = $show_icons;
         $this->enable_link = $enable_link;
     }

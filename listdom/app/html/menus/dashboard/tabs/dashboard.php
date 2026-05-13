@@ -32,7 +32,7 @@ defined('ABSPATH') || die();
             <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Start Your Directory Website', 'listdom'); ?></h3>
             <p class="lsd-m-0"><?php esc_html_e('Thanks for using Listdom. Listdom is a great plugin for creating directory and listing websites. With Listdom you can show the listings in different skins and views such as List, Grid, Half Map etc.', 'listdom') ?></p>
 
-            <div class="lsd-get-start-section lsd-mt-4">
+            <div class="lsd-get-start-section">
                 <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_LISTING)); ?>" target="_blank">
                     <span><?php esc_html_e('Publish a Listing', 'listdom'); ?></span>
                     <i class="listdom-icon lsdi-right-arrow"></i>
@@ -55,42 +55,45 @@ defined('ABSPATH') || die();
 
     <?php (new LSD_Plugin_Notice())->display('review', true); ?>
 
-    <div class="lsd-welcome-panel-container lsd-welcome-icon-box">
+    <div class="lsd-welcome-panel-container lsd-welcome-icon-box lsd-grid lsd-g-3-columns">
         <div class="lsd-icon-box">
-            <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Create the Listings', 'listdom'); ?></h3>
+            <div class="lsd-admin-section-heading">
+                <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Create the Listings', 'listdom'); ?></h3>
+                <p class="lsd-admin-description"><?php esc_html_e('Build your directory content with listings, categories, and locations.', 'listdom'); ?></p>
+            </div>
             <ul>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-list-view"></i>
                         <?php esc_html_e('Create a Listing', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_CATEGORY . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_CATEGORY . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-menu-square"></i>
                         <?php esc_html_e('Add a Category', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_LOCATION . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_LOCATION . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-location"></i>
                         <?php esc_html_e('Add a Location', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_FEATURE . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_FEATURE . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-add-plus"></i>
                         <?php esc_html_e('Add a Feature', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_LABEL . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_LABEL . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-label-important"></i>
                         <?php esc_html_e('Add a Label', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_TAG . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_TAG . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-tag"></i>
                         <?php esc_html_e('Add a Tag', 'listdom'); ?>
                     </a>
@@ -99,34 +102,37 @@ defined('ABSPATH') || die();
         </div>
 
         <div class="lsd-icon-box">
-            <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Build the Essentials', 'listdom'); ?></h3>
+            <div class="lsd-admin-section-heading">
+                <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Build the Essentials', 'listdom'); ?></h3>
+                <p class="lsd-admin-description"><?php esc_html_e('Set up key features like search forms, login/register, and dashboards.', 'listdom'); ?></p>
+            </div>
             <ul>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_SEARCH)); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_SEARCH)); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-search-area"></i>
                         <?php esc_html_e('Create a Search & Filter Form', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_SHORTCODE)); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_SHORTCODE)); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-second-bracket-square"></i>
                         <?php esc_html_e('Create a Skin Shortcode', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-login-method"></i>
                         <?php esc_html_e('Authentication Page', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard')); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-frontend-dashboard"></i>
                         <?php esc_html_e('Frontend Dashboard', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth&subtab=profile')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth&subtab=profile')); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-user-circle"></i>
                         <?php esc_html_e('Author Profile', 'listdom'); ?>
                     </a>
@@ -134,28 +140,31 @@ defined('ABSPATH') || die();
             </ul>
         </div>
         <div class="lsd-icon-box">
-            <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Design Your Directory', 'listdom'); ?></h3>
+            <div class="lsd-admin-section-heading">
+                <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Design Your Directory', 'listdom'); ?></h3>
+                <p class="lsd-admin-description"><?php esc_html_e('Customize listing layouts, search forms, and overall site style.', 'listdom'); ?></p>
+            </div>
             <ul>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=single-listing')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=single-listing')); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-pencil-edit"></i>
                         <?php esc_html_e('Single Listing Styles', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=single-listing')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=single-listing')); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-file-edit-pencil"></i>
                         <?php esc_html_e('Single Listing Customizer', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=forms')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=forms')); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-ai-search"></i>
                         <?php esc_html_e('Search Forms Customizer', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=skins')); ?>" class="lsd-neutral-button">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=skins')); ?>" class="lsd-text-button">
                         <i class="listdom-icon lsdi-property-edit"></i>
                         <?php esc_html_e('Skins Customizer', 'listdom'); ?>
                     </a>

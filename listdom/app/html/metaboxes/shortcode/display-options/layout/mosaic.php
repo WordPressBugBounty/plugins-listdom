@@ -66,4 +66,3 @@ $mosaic = $options['mosaic'] ?? [];
         <?php $this->field_listing_link('mosaic', $mosaic); ?>
     </div>
 </div>
-

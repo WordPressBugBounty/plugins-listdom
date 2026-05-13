@@ -45,8 +45,9 @@ $profile_privacy_field = LSD_Privacy::consent_field([
 <div class="lsd-profile-wrapper lsd-mb-4">
     <div class="lsd-hero-image">
         <img class="lsd-hero" src="<?php
-            echo !empty($user['hero_image'])
-                ? esc_url(wp_get_attachment_url($user['hero_image']))
+            $hero_image_url = LSD_User::get_user_image_url((int) $user['ID'], 'lsd_hero_image');
+            echo $hero_image_url
+                ? esc_url($hero_image_url)
                 : esc_url($this->lsd_asset_url('img/no-image.jpg'));
         ?>" alt="<?php echo esc_attr__('Hero Image', 'listdom'); ?>">
         <div class="lsd-profile-avatar">
@@ -62,7 +63,7 @@ $profile_privacy_field = LSD_Privacy::consent_field([
                     <p class="lsd-job-title"><?php echo esc_html($user['job_title'] ?? ''); ?></p>
                 </div>
                 <div class="lsd-flex lsd-gap-2 lsd-author-listing-count">
-                    <i class="lsd-icon fa fa-clone"></i>
+                    <i class="lsd-fe-icon fa fa-clone"></i>
                     <div class="lsd-flex lsd-gap-1 lsd-flex-align-items-center">
                         <a href="#author_listings">
                             <span><?php echo count($listings);  ?> </span>
@@ -98,7 +99,7 @@ $profile_privacy_field = LSD_Privacy::consent_field([
                                             value="<?php echo $current_id ? esc_attr(trim($current_user->first_name . ' ' . $current_user->last_name)) : ''; ?>"
                                             required
                                         >
-                                        <i class="lsd-icon fa fa-user lsd-profile-contact-form-icon" aria-hidden="true"></i>
+                                        <i class="lsd-fe-icon fa fa-user lsd-profile-contact-form-icon" aria-hidden="true"></i>
                                     </div>
 
                                     <div class="lsd-profile-contact-form-row lsd-profile-contact-form-row-email">
@@ -111,7 +112,7 @@ $profile_privacy_field = LSD_Privacy::consent_field([
                                             value="<?php echo $current_id ? esc_attr($current_user->user_email) : ''; ?>"
                                             required
                                         >
-                                        <i class="lsd-icon fa fa-envelope lsd-profile-contact-form-icon" aria-hidden="true"></i>
+                                        <i class="lsd-fe-icon fa fa-envelope lsd-profile-contact-form-icon" aria-hidden="true"></i>
                                     </div>
 
                                     <div class="lsd-profile-contact-form-row lsd-profile-contact-form-row-phone">
@@ -124,7 +125,7 @@ $profile_privacy_field = LSD_Privacy::consent_field([
                                             value="<?php echo $current_id ? esc_attr(get_user_meta($current_id, 'lsd_phone', true)) : ''; ?>"
                                             required
                                         >
-                                        <i class="lsd-icon fas fa-phone-alt lsd-profile-contact-form-icon" aria-hidden="true"></i>
+                                        <i class="lsd-fe-icon fas fa-phone-alt lsd-profile-contact-form-icon" aria-hidden="true"></i>
                                     </div>
                                 </div>
 
@@ -178,34 +179,34 @@ $profile_privacy_field = LSD_Privacy::consent_field([
                 <div class="lsd-profile-information">
                     <?php if (!empty($user['mobile'])): ?>
                         <div class="lsd-profile-mobile" title="<?php esc_attr_e('Mobile', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
-                            <i class="lsd-icon fa fa-mobile"></i>
+                            <i class="lsd-fe-icon fa fa-mobile"></i>
                             <a href="tel:<?php echo esc_html($user['mobile']); ?>"><?php echo esc_html($user['mobile']); ?></a>
                         </div>
                     <?php endif; ?>
                     <?php if (!empty($user['phone'])): ?>
                         <div class="lsd-profile-phone" title="<?php esc_attr_e('Phone', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
-                            <i class="lsd-icon fas fa-phone-alt"></i>
+                            <i class="lsd-fe-icon fas fa-phone-alt"></i>
                             <a href="tel:<?php echo esc_html($user['phone']); ?>"><?php echo esc_html($user['phone']); ?></a>
                         </div>
                     <?php endif; ?>
 
                     <?php if (!empty($user['email'])): ?>
                         <div class="lsd-profile-email" title="<?php esc_attr_e('Email', 'listdom'); ?>" <?php echo lsd_schema()->email(); ?>>
-                            <i class="lsd-icon fa fa-envelope"></i>
+                            <i class="lsd-fe-icon fa fa-envelope"></i>
                             <a href="mailto:<?php echo esc_html($user['email']); ?>"><?php echo esc_html($user['email']); ?></a>
                         </div>
                     <?php endif; ?>
 
                     <?php if (!empty($user['website'])): ?>
                         <div class="lsd-profile-website" title="<?php esc_attr_e('Website', 'listdom'); ?>">
-                            <i class="lsd-icon fas fa-link"></i>
+                            <i class="lsd-fe-icon fas fa-link"></i>
                             <a href="<?php echo esc_html($user['website']); ?>"><?php echo esc_html($user['website']); ?></a>
                         </div>
                     <?php endif; ?>
 
                     <?php if (!empty($user['fax'])): ?>
                         <div class="lsd-profile-fax" title="<?php esc_attr_e('Fax', 'listdom'); ?>" <?php echo lsd_schema()->faxNumber(); ?>>
-                            <i class="lsd-icon fa fa-fax"></i>
+                            <i class="lsd-fe-icon fa fa-fax"></i>
                             <span><?php echo esc_html($user['fax']); ?></span>
                         </div>
                     <?php endif; ?>

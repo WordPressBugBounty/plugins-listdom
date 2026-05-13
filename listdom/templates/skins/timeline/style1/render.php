@@ -41,27 +41,34 @@ $ids = $this->listings;
     }
     ?>
     <div class="lsd-timeline-item">
+        <?php if($this->horizontal): ?>
+            <div class="lsd-center-line"></div>
+            <div class="lsd-circle"></div>
+        <?php endif; ?>
         <div class="<?php echo esc_attr(implode(' ', array_map('sanitize_html_class', $timeline_classes))); ?>">
             <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
                 <div class="lsd-listing-timeline">
-                    <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
-                        <?php if ($this->display_image): ?>
-                            <div class="lsd-image">
-                                <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
-                            </div>
-                        <?php endif; ?>
+                    <?php if ($this->display_image || $this->display_review_stars || $this->display_labels): ?>
+                        <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
+                            <?php if ($this->display_image): ?>
+                                <div class="lsd-image">
+                                    <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <?php if ($this->display_labels): ?>
-                            <div class="lsd-listing-labels">
-                                <?php echo LSD_Kses::element($listing->get_labels()); ?>
-                            </div>
-                        <?php endif; ?>
+                            <?php if ($this->display_labels): ?>
+                                <div class="lsd-listing-labels">
+                                    <?php echo LSD_Kses::element($listing->get_labels()); ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <?php if ($this->display_review_stars): ?>
-                            <?php echo LSD_Kses::element($listing->get_rate_stars('stars', false)); ?>
-                        <?php endif; ?>
-                    </div>
+                            <?php if ($this->display_review_stars): ?>
+                                <?php echo LSD_Kses::element($listing->get_rate_stars('stars', false)); ?>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
 
+                    <?php if ($this->has_body($listing) || $this->has_after_content_hook()): ?>
                     <div class="lsd-listing-body">
 
                         <div class="lsd-listing-cat-icon-section">
@@ -81,7 +88,7 @@ $ids = $this->listings;
                         </div>
 
                         <?php if ($this->display_title): ?>
-                            <h3 class="lsd-listing-title lsd-m-0" <?php echo lsd_schema()->name(); ?>>
+                            <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
                                 <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
                             </h3>
                         <?php endif; ?>
@@ -94,8 +101,11 @@ $ids = $this->listings;
 
                         <?php do_action('lsd_skins_after_content', $this, $listing); ?>
 
-                        <div class="lsd-divider"></div>
+                        <?php if($this->display_cta || $this->has_bottom_bar($listing)): ?>
+                            <div class="lsd-divider"></div>
+                        <?php endif; ?>
 
+                        <?php if($this->has_bottom_bar($listing)): ?>
                         <div class="lsd-listing-bottom-bar">
                             <?php if ($this->display_price): ?>
                                 <div class="lsd-listing-price" <?php echo lsd_schema()->priceRange(); ?>>
@@ -109,7 +119,14 @@ $ids = $this->listings;
                                 </div>
                             <?php endif; ?>
                         </div>
+                        <?php endif; ?>
+                        <?php if ($this->display_cta): ?>
+                            <div class="lsd-listing-call-to-action">
+                                <?php echo $this->listing_cta($listing); ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

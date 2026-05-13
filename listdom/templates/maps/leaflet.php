@@ -26,9 +26,11 @@ $atts = isset($args['atts']) && is_array($args['atts']) ? $args['atts'] : [];
 $mapsearch = isset($args['mapsearch']) && $args['mapsearch'];
 $autoGPS = isset($args['autoGPS']) && $args['autoGPS'];
 $infowindow = !isset($args['infowindow']) || $args['infowindow'];
+$infowindow_trigger = $args['infowindow_trigger'] ?? 'click';
 $max_bounds = isset($args['max_bounds']) && is_array($args['max_bounds']) ? $args['max_bounds'] : [];
 $access_token = LSD_Options::mapbox_token();
 $force_to_show = isset($args['force_to_show']) && $args['force_to_show'];
+$mousewheel_zoom = isset($args['mousewheel_zoom']) && $args['mousewheel_zoom'];
 
 // The Unique ID
 $id = $args['id'] ?? wp_rand(100, 999);
@@ -74,7 +76,9 @@ jQuery(document).ready(function()
         mapsearch: '.($mapsearch ? 'true' : 'false').',
         autoGPS: '.($autoGPS ? 'true' : 'false').',
         geo_request: '.($main->is_geo_request() ? 'true' : 'false').',
+        mousewheel_zoom: '.($mousewheel_zoom ? 'true' : 'false').',
         display_infowindow: '.($infowindow ? 'true' : 'false').',
+        infowindow_trigger: "'.esc_js($infowindow_trigger).'",
         max_bounds: '.wp_json_encode($max_bounds, JSON_NUMERIC_CHECK).',
         gps_zoom: {
             zl: '.$gps_zl.',

@@ -3,13 +3,14 @@
  * Plugin Name: Listdom
  * Plugin URI: https://listdom.net
  * Description: Listdom is a powerful yet easy-to-use tool for listing anything on your website. It offers modern, responsive skins such as List, Grid, Map, and Masonry to showcase your content beautifully.
- * Version: 4.8.1
+ * Version: 5.5.0
  * Author: Webilia
  * Author URI: https://webilia.com/
  * Requires at least: 4.2
- * Tested up to: 6.8
+ * Requires PHP: 7.4
+ * Tested up to: 6.9
  * License: GPLv2 or later
- * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
  * Text Domain: listdom
  * Domain Path: /i18n/languages/
@@ -22,7 +23,7 @@ defined('ABSPATH') || die();
 $init = true;
 
 // Check Minimum PHP version
-if (version_compare(phpversion(), '7.2', '<'))
+if (version_compare(phpversion(), '7.4', '<'))
 {
     $init = false;
     add_action('admin_notices', function ()
@@ -31,7 +32,7 @@ if (version_compare(phpversion(), '7.2', '<'))
         <div class="notice notice-error is-dismissible">
             <p><?php echo sprintf(
                 /* translators: 1: Plugin name, 2: Current PHP version. */
-                esc_html__("%1\$s requires at least PHP 7.2 or higher, but your server is currently running PHP %2\$s. Please contact your hosting provider to upgrade your PHP version or consider switching to a different host.", 'listdom'),
+                esc_html__("%1\$s requires at least PHP 7.4 or higher, but your server is currently running PHP %2\$s. Please contact your hosting provider to upgrade your PHP version or consider switching to a different host.", 'listdom'),
                 '<strong>Listdom</strong>',
                 '<strong>' . phpversion() . '</strong>'
             ); ?></p>

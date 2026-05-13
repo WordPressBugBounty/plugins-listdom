@@ -49,6 +49,7 @@ class LSD_Bar extends LSD_Base
 
         // Main
         $main = new LSD_Main();
+        $brand_name = esc_html(LSD_Branding::name());
 
         // Unique List
         $list = array_unique(self::$list);
@@ -67,6 +68,8 @@ class LSD_Bar extends LSD_Base
             if (!($post instanceof WP_Post)) continue;
 
             $url = get_edit_post_link($post);
+            if (!is_string($url) || trim($url) === '') continue;
+
             $type = esc_html__('Shortcode', 'listdom');
 
             // Elementor
@@ -90,6 +93,22 @@ class LSD_Bar extends LSD_Base
                 else $type = esc_html__('Single Listing', 'listdom');
             }
 
+            // Bricks
+            if (class_exists(LSDPACBRX\Base::class) && $post->post_type === LSDPACBRX\Base::PTYPE_DETAILS)
+            {
+                $template_type = get_post_meta($id, 'lsd_type', true);
+
+                if ($template_type === 'card') $type = esc_html__('Listing Card', 'listdom');
+                else if ($template_type === 'infowindow') $type = esc_html__('Infowindow', 'listdom');
+                else $type = esc_html__('Single Listing', 'listdom');
+
+                if (class_exists(\Bricks\Helpers::class))
+                {
+                    if (method_exists(\Bricks\Helpers::class, 'get_editor_link')) $url = \Bricks\Helpers::get_editor_link($id);
+                    else if (method_exists(\Bricks\Helpers::class, 'get_edit_link')) $url = \Bricks\Helpers::get_edit_link($id);
+                }
+            }
+
             // Listing, Search or Package
             if ($post->post_type === LSD_Base::PTYPE_LISTING) $type = esc_html__('Listing', 'listdom');
             else if ($post->post_type === LSD_Base::PTYPE_SEARCH) $type = esc_html__('Search', 'listdom');
@@ -99,7 +118,7 @@ class LSD_Bar extends LSD_Base
         }
 
         // Listdom Bar Menu
-        $menu = '<li id="wp-admin-bar-listdom" class="menupop"><a aria-haspopup="true" class="ab-item" href="' . admin_url('admin.php?page=listdom') . '"><span class="lsd-bar-link-title"><img src="' . $main->lsd_asset_url('img/listdom-icon.svg') . '" alt=""><span>Listdom</span></span></a><div class="ab-sub-wrapper"><ul class="ab-submenu" id="wp-admin-bar-listdom-default">' . $items . '</ul></div></li>';
+        $menu = '<li id="wp-admin-bar-listdom" class="menupop"><a aria-haspopup="true" class="ab-item" href="' . admin_url('admin.php?page=listdom') . '"><span class="lsd-bar-link-title"><img src="' . $main->lsd_asset_url('img/listdom-icon.svg') . '" alt=""><span>' . $brand_name . '</span></span></a><div class="ab-sub-wrapper"><ul class="ab-submenu" id="wp-admin-bar-listdom-default">' . $items . '</ul></div></li>';
 
         // Add to WP Bar
         echo "<script>jQuery('#wp-admin-bar-root-default').append('" . $menu . "')</script>";

@@ -38,6 +38,7 @@ class LSD_Search_Helper extends LSD_Base
         // Meta Fields
         else if ($key == 'price') return 'price';
         else if ($key == 'class') return 'class';
+        else if ($key == 'rate') return 'review_rate';
         else if ($key == 'address') return 'address';
         else if ($key == 'period') return 'period';
         else if (in_array($key, ['adults', 'children'])) return 'numeric';
@@ -218,9 +219,27 @@ class LSD_Search_Helper extends LSD_Base
         $id = $args['id'] ?? 'lsd_search_text_' . $key;
         $name = $args['name'] ?? 'sf-' . $key . '-lk';
         $current = $args['current'] ?? '';
+        $input_type = $args['input_type'] ?? 'text';
+        $method = $args['method'] ?? '';
+        $is_clearable = in_array($method, ['date-input', 'time-input', 'datetime-input'], true);
 
-        $output = '<label for="' . esc_attr($id) . '">' . esc_html($title) . '</label>';
-        $output .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($current) . '">';
+        // Date-like custom fields should only use a custom placeholder in text-input mode.
+        if ($input_type !== 'text' && in_array($this->get_type_by_key($key), ['date', 'time', 'datetime'], true))
+        {
+            $placeholder = $title;
+        }
+
+        $show_label = !array_key_exists('show_label', $args) || (bool) $args['show_label'];
+        $output = $show_label ? '<label for="' . esc_attr($id) . '">' . esc_html($title) . '</label>' : '';
+
+        if ($is_clearable) $output .= '<div class="lsd-search-input-clear-wrap">';
+        $output .= '<input type="' . esc_attr($input_type) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($current) . '">';
+
+        if ($is_clearable)
+        {
+            $output .= '<button type="button" class="lsd-search-input-clear lsd-util-hide" data-for="' . esc_attr($id) . '" aria-label="' . esc_attr__('Clear value', 'listdom') . '" title="' . esc_attr__('Clear', 'listdom') . '"><i class="lsd-icon fas fa-times"></i></button>';
+            $output .= '</div>';
+        }
 
         return $output;
     }
@@ -239,8 +258,10 @@ class LSD_Search_Helper extends LSD_Base
 
         $current = $args['current'] ?? '';
 
+        $show_label = !array_key_exists('show_label', $args) || (bool) $args['show_label'];
+
         $output = '<div class="' . esc_attr($class) . '">';
-        $output .= '<label for="' . esc_attr($id) . '">' . esc_html($title) . '</label>';
+        if ($show_label) $output .= '<label for="' . esc_attr($id) . '">' . esc_html($title) . '</label>';
         $output .= $method === 'range' ? '<div class="lsd-search-range-inner">' : '';
 
         if ($method === 'number-input')
@@ -414,23 +435,28 @@ class LSD_Search_Helper extends LSD_Base
         $available_parents_for_childs = $current ? array_merge($current_parents, [$current]) : [];
 
         $terms = get_terms([
-            'taxonomy' => $key,
-            'hide_empty' => $hide_empty,
-            'orderby' => 'name',
-            'order' => 'ASC',
+            'taxonomy'   => $key,
+            'hide_empty' => 0,
+            'orderby'    => 'name',
+            'order'      => 'ASC',
         ]);
 
         $hierarchy = [];
         foreach ($terms as $term)
         {
-            // Term is not in the predefined terms
-            if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$term->term_id])) continue;
-
+            // Calculate level and max_levels from ALL terms (including empty)
             $level = count(LSD_Taxonomies::parents($term)) + 1;
             $max_levels = max($max_levels, $level);
 
+            // If hide_empty is enabled, skip empty terms from being shown,
+            // but we ALREADY used them to update $max_levels above.
+            if ($hide_empty && (int) $term->count === 0) continue;
+
+            // Term is not in the predefined terms
+            if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$term->term_id])) continue;
+
             // Term is not child of current parents
-            if ($current && count($available_parents_for_childs) && $term->parent != 0 && $term->term_id != $current && !in_array($term->parent, $available_parents_for_childs))
+            if ($current && count($available_parents_for_childs) && $term->parent != 0 && $term->term_id != $current && !in_array($term->parent, $available_parents_for_childs, true))
             {
                 continue;
             }
@@ -448,8 +474,10 @@ class LSD_Search_Helper extends LSD_Base
             $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr($placeholder) . '" data-level="' . esc_attr($l) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
             $output .= '<option value="">' . esc_html($placeholder) . '</option>';
 
-            foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id || in_array($level_term->term_id, $current_parents)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';
+            foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id || in_array($level_term->term_id, $current_parents, true)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';
             $output .= '</select>';
+
+            if ($l < $max_levels && $level_status === 'all') $output .= '<div class="lsd-divider"></div>';
         }
 
         $output .= '</div>';

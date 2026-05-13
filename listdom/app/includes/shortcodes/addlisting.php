@@ -54,7 +54,7 @@ class LSD_Shortcodes_AddListing extends LSD_Shortcodes_Dashboard
 
         // Form
         if ($this->mode === 'form') return $this->add_listing();
-        // Subscription Modes
+        // Membership Modes
         else return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'error'), $this);
     }
 

@@ -53,4 +53,3 @@ $accordion = $options['accordion'] ?? [];
         </div>
     </div>
 </div>
-

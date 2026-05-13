@@ -43,7 +43,17 @@ class LSD_API_Resources_Taxonomy extends LSD_API_Resource
         if (isset($metas['lsd_link_label'])) $data['link_label'] = $metas['lsd_link_label'];
         if (isset($metas['lsd_index'])) $data['index'] = $metas['lsd_index'];
         if (isset($metas['lsd_all_categories'])) $data['all_categories'] = $metas['lsd_all_categories'];
-        if (isset($metas['lsd_categories'])) $data['categories'] = $metas['lsd_categories'];
+        if (isset($metas['lsd_categories']))
+        {
+            if (isset($term->taxonomy) && $term->taxonomy === LSD_Base::TAX_ATTRIBUTE)
+            {
+                $data['categories'] = LSD_Taxonomies_Attribute::normalize_categories($metas['lsd_categories']);
+            }
+            else
+            {
+                $data['categories'] = $metas['lsd_categories'];
+            }
+        }
         if (isset($metas['lsd_values']))
         {
             $values = explode(',', trim($metas['lsd_values'], ', '));

@@ -9,7 +9,7 @@ class LSD_Customizer_Single extends LSD_Customizer
                 'title' => esc_html__('Single Listing', 'listdom'),
                 'sections' => [
                     'features' => [
-                        'title' => esc_html__('Features', 'listdom'),
+                        'title' => esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural')),
                         'groups' => [
                             'icons' => [
                                 'title' => esc_html__('Icons', 'listdom'),

@@ -28,9 +28,11 @@ $ids = $this->listings;
             <?php endif; ?>
         </div>
 
+        <?php if ($this->has_body($listing)): ?>
         <div class="lsd-listing-body lsd-mosaic-right-side<?php echo (($index - 3) % 4 === 0) || (($index - 4) % 4 === 0) ? ' lsd-right-side-even-rows' : '' ?>">
             <?php echo (new LSD_Builders())->listing($listing)->build($this->style); ?>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php endforeach;

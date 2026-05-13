@@ -15,6 +15,6 @@ if (!count($terms)) return '';
             $itemprop = get_term_meta($term->term_id, 'lsd_itemprop', true);
             $link = $this->enable_link ? '<a href="' . esc_url(get_term_link($term->term_id)) . '">' . esc_html($term->name) . '</a>' : '<span class="lsd-single-term">'.esc_html($term->name).'</span>';
         ?>
-        <li <?php echo $itemprop ? lsd_schema()->prop($itemprop) : ''; ?>><?php echo $this->show_icons && trim($icon) ? $icon . ' ' : ''; ?><?php echo $link; ?></li>
+        <li class="lsd-fe-icon-wrapper" <?php echo $itemprop ? lsd_schema()->prop($itemprop) : ''; ?>><?php echo $this->show_icons && trim($icon) ? $icon . ' ' : ''; ?><?php echo $link; ?></li>
     <?php endforeach; ?>
 </ul>

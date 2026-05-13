@@ -22,8 +22,8 @@ class LSD_Hooks extends LSD_Base
         if (strpos($file, LSD_BASENAME) !== false)
         {
             $links = array_merge($links, [
-                'documentation' => '<a href="https://api.webilia.com/go/listdom-docs" target="_blank"><strong>' . esc_html__('Documentation', 'listdom') . '</strong></a>',
-                'support' => '<a href="https://listdom.net/support/" target="_blank">' . esc_html__('Support', 'listdom') . '</a>',
+                'documentation' => '<a href="' . esc_url(LSD_Branding::docsUrl()) . '" target="_blank"><strong>' . esc_html__('Documentation', 'listdom') . '</strong></a>',
+                'support' => '<a href="' . esc_url(LSD_Branding::supportUrl()) . '" target="_blank">' . esc_html__('Support', 'listdom') . '</a>',
             ]);
         }
 

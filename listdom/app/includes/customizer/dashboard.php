@@ -85,7 +85,7 @@ class LSD_Customizer_Dashboard extends LSD_Customizer
                     'left' => $defaults['border']['left'] ?? 1,
                     'style' => $defaults['border']['style'] ?? 'solid',
                     'color' => $defaults['border']['color'] ?? '#0ab0fe',
-                    'radius' => $defaults['border']['radius'] ?? 5,
+                    'radius' => $defaults['border']['radius'] ?? 10,
                 ],
             ],
             'typography' => [

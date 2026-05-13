@@ -10,7 +10,7 @@ class LSD_Element_Tags extends LSD_Element
     {
         parent::__construct();
 
-        $this->label = esc_html__('Tags', 'listdom');
+        $this->label = esc_html(lsd_t_label(LSD_Base::TAX_TAG, 'plural'));
         $this->inline_title = true;
         $this->enable_link = $enable_link;
     }

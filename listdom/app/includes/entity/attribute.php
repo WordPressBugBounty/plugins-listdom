@@ -51,15 +51,51 @@ class LSD_Entity_Attribute extends LSD_Base
                 $data = trim($data);
                 return $data ? '<img src="' . esc_url($data) . '" alt="">' : '';
 
+            case 'file':
+
+                $download_url = '';
+                $download_title = '';
+
+                if (is_numeric($data))
+                {
+                    $attachment_id = (int) $data;
+                    $download_url = wp_get_attachment_url($attachment_id) ?: '';
+
+                    if ($download_url)
+                    {
+                        $attached_file = get_attached_file($attachment_id);
+                        if (is_string($attached_file) && trim($attached_file) !== '') $download_title = wp_basename($attached_file);
+                    }
+                }
+                else if (is_string($data))
+                {
+                    $raw_url = trim($data);
+                    if (!filter_var($raw_url, FILTER_VALIDATE_URL)) return '';
+
+                    $download_url = esc_url_raw($raw_url);
+
+                    $path = wp_parse_url($download_url, PHP_URL_PATH);
+                    if (is_string($path) && trim($path) !== '') $download_title = wp_basename($path);
+                }
+
+                if (trim($download_url) === '') return '';
+                $safe_download_url = esc_url($download_url);
+                if (trim($safe_download_url) === '') return '';
+
+                if (trim($download_title) === '')
+                {
+                    $download_title = esc_html__('Download', 'listdom');
+                }
+
+                return '<a href="' . $safe_download_url . '" class="lsd-attribute-file-download" target="_blank" rel="noopener" download>' . esc_html($download_title) . '</a>';
+
             case 'separator':
 
                 return '<div class="lsd-separator">' . esc_html($data) . '</div>';
 
             case 'textarea':
 
-                $editor = get_term_meta($this->term_id, 'lsd_editor', true);
-
-                return $editor ? wpautop($data) : esc_html($data);
+                return $this->is_rich_editor() ? wpautop((string) $data) : nl2br(esc_html((string) $data));
 
             case 'date':
 
@@ -112,10 +148,27 @@ class LSD_Entity_Attribute extends LSD_Base
         }
     }
 
+    public function is_rich_editor(): bool
+    {
+        return $this->type === 'textarea' && (bool) get_term_meta($this->term_id, 'lsd_editor', true);
+    }
+
     public function slug(): string
     {
         $term = get_term($this->term_id);
         return $term && isset($term->slug) ? $term->slug : '';
+    }
+
+    public function value(int $listing_id)
+    {
+        $attributes = get_post_meta($listing_id, 'lsd_attributes', true);
+        if (!is_array($attributes)) return '';
+        if (!LSD_Taxonomies_Attribute::applies($this->term_id, ['post_id' => $listing_id])) return '';
+
+        $slug = $this->slug();
+        if ($slug === '' || !array_key_exists($slug, $attributes)) return '';
+
+        return $attributes[$slug];
     }
 
     public function icon()

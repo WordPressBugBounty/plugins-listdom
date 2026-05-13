@@ -13,11 +13,11 @@ $status = get_post_status_object(get_post_status($listing->ID));
 
             <span class="lsd-dashboard-status" title="<?php echo esc_attr($status->label); ?>">
                 <?php if($listing->post_status == 'publish'): ?>
-                    <i class="lsd-icon far fa-check-circle"></i>
+                    <i class="lsd-fe-icon far fa-check-circle"></i>
                 <?php elseif($listing->post_status == 'trash'): ?>
-                    <i class="lsd-icon fas fa-trash-alt"></i>
+                    <i class="lsd-fe-icon fas fa-trash-alt"></i>
                 <?php else: ?>
-                    <i class="lsd-icon far fa-file-alt"></i>
+                    <i class="lsd-fe-icon far fa-file-alt"></i>
                 <?php endif; ?>
             </span>
 
@@ -34,18 +34,18 @@ $status = get_post_status_object(get_post_status($listing->ID));
                     <?php do_action('lsd_dashboard_actions', $listing, $this); ?>
                 </span>
                 <div class="lsd-flex lsd-gap-2">
-                    <a class="lsd-dashboard-view lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('View', 'listdom'); ?>" href="<?php echo esc_url(get_post_permalink($listing->ID)); ?>" target="_blank">
-                        <i class="lsd-icon fa fa-eye"></i>
+                    <a class="lsd-dashboard-view lsd-tooltip <?php echo $listing->post_status === 'publish' ? '': 'lsd-disable lsd-disable-icon'; ?>" data-lsd-tooltip="<?php esc_attr_e('View', 'listdom'); ?>" href="<?php echo $listing->post_status !== 'publish' ? '#' : esc_url(get_post_permalink($listing->ID)); ?>" target="_blank">
+                        <i class="lsd-fe-icon fa fa-eye"></i>
                     </a>
 
                     <?php if(LSD_Capability::can('edit_listings', 'edit_posts')): ?>
                     <a class="lsd-dashboard-view lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Edit', 'listdom'); ?>"  href="<?php echo esc_url($this->get_form_link($listing->ID)); ?>">
-                        <i class="lsd-icon fa fa-edit"></i>
+                        <i class="lsd-fe-icon fa fa-edit"></i>
                     </a>
                     <?php endif; ?>
 
                     <?php if(LSD_Capability::can('delete_listings', 'delete_posts')): ?>
-                        <span class="lsd-dashboard-delete lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Click twice to delete', 'listdom'); ?>"  data-id="<?php echo esc_attr($listing->ID); ?>" data-confirm="0"><i class="lsd-icon fas fa-trash-alt"></i></span>
+                        <span class="lsd-dashboard-delete lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Click twice to delete', 'listdom'); ?>"  data-id="<?php echo esc_attr($listing->ID); ?>" data-confirm="0"><i class="lsd-fe-icon fas fa-trash-alt"></i></span>
                     <?php endif; ?>
                 </div>
             </div>

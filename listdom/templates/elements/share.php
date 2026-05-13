@@ -11,7 +11,7 @@ $SN = new LSD_Socials();
     <div class="lsd-share lsd-share-archive">
         <div class="lsd-share-icon">
             <span class="lsd-main-icon lsd-color-m-txt lsd-share-modal-button" data-id="<?php echo esc_attr($post_id); ?>">
-                <i class="lsd-icon fa fa-share-alt fa-lg"></i>
+                <i class="lsd-fe-icon fa fa-share-alt fa-lg"></i>
             </span>
         </div>
 

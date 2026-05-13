@@ -29,9 +29,18 @@ switch ($this->tab)
         $this->include_html_file('menus/settings/tabs/addons.php');
         break;
 
+    case 'toolkits':
+
+        $this->include_html_file('menus/settings/tabs/toolkits.php');
+        break;
+
     case 'ai':
 
         $this->include_html_file('menus/settings/tabs/ai.php');
+        break;
+    case 'payments':
+
+        $this->include_html_file('menus/settings/tabs/payments.php');
         break;
 
     case 'api':
@@ -49,8 +58,13 @@ switch ($this->tab)
         $this->include_html_file('menus/settings/tabs/advanced.php');
         break;
 
-    default:
+    case 'general':
 
         $this->include_html_file('menus/settings/tabs/general.php');
+        break;
+
+    default:
+
+        do_action('lsd_settings_custom_content', $this->tab, $this);
         break;
 }

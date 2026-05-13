@@ -95,7 +95,7 @@ class LSD_Element_Map extends LSD_Element
             ]) . '
         </div>
         <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
-            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_gplaces">' . esc_html__('Google Places', 'listdom') . '</label>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_gplaces">' . esc_html__('Nearby Businesses', 'listdom') . '</label>
             ' . LSD_Form::select([
                 'class' => 'lsd-admin-input',
                 'id' => 'lsd_elements_' . esc_attr($this->key) . '_gplaces',

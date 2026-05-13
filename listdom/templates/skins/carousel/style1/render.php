@@ -28,6 +28,7 @@ $ids = $this->listings;
 			<?php endif; ?>
 
 		</div>
+        <?php if ($this->has_body($listing)): ?>
 		<div class="lsd-listing-body">
 			<?php if ($this->display_title): ?>
 				<h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
@@ -44,21 +45,29 @@ $ids = $this->listings;
 					<?php echo LSD_Kses::element($listing->get_contact_info()); ?>
 				</div>
 			<?php endif; ?>
-			<div class="lsd-listing-bottom-bar">
-				<?php if ($this->display_share_buttons): ?>
-					<div class="lsd-listing-share">
-						<?php echo LSD_Kses::element($listing->get_share_buttons()); ?>
-					</div>
-				<?php endif; ?>
+            <?php if ($this->has_bottom_bar($listing)): ?>
+            <div class="lsd-listing-bottom-bar">
+                <?php if ($this->display_share_buttons): ?>
+                    <div class="lsd-listing-share">
+                        <?php echo LSD_Kses::element($listing->get_share_buttons()); ?>
+                    </div>
+                <?php endif; ?>
 
-				<?php if ($this->display_price): ?>
-					<div class="lsd-listing-price" <?php echo lsd_schema()->priceRange(); ?>>
-						<?php echo LSD_Kses::element($listing->get_price()); ?>
-					</div>
-				<?php endif; ?>
-			</div>
+                <?php if ($this->display_price): ?>
+                    <div class="lsd-listing-price" <?php echo lsd_schema()->priceRange(); ?>>
+                        <?php echo LSD_Kses::element($listing->get_price()); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
 
-		</div>
-	</div>
+            <?php if ($this->display_cta): ?>
+                <div class="lsd-listing-call-to-action">
+                    <?php echo $this->listing_cta($listing); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+    </div>
 </div>
 <?php endforeach;

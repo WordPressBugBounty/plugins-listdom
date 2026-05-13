@@ -97,6 +97,13 @@ $optional_addons = [];
                 <?php else: $optional_addons[] = ['pro', esc_html__('Display Image', 'listdom')]; ?>
                 <?php endif; ?>
 
+                <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/partials/cta.php', [
+                    'parameters' => [
+                        'skin' => 'gallery',
+                        'settings' => $gallery,
+                    ],
+                ]); ?>
+
                 <div class="lsd-elements-subsection">
                     <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Other Elements', 'listdom'); ?></h4>
                     <div class="lsd-elements-fields">
@@ -151,7 +158,7 @@ $optional_addons = [];
                                 ]); ?>
                             </div>
                         </div>
-                        <?php if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACCLM\Base::class)): ?>
                             <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 <?php echo !isset($gallery['display_title']) || $gallery['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_gallery_is_claimed_wrapper">
                                 <div class="lsd-form-row">
                                     <div class="lsd-col-8"><?php echo LSD_Form::label([
@@ -186,7 +193,7 @@ $optional_addons = [];
                             </div>
                         </div>
 
-                        <?php if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACFAV\Base::class)): ?>
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
@@ -204,7 +211,7 @@ $optional_addons = [];
                         <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
                         <?php endif; ?>
 
-                        <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACCMP\Base::class)): ?>
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
@@ -239,7 +246,6 @@ $optional_addons = [];
                             </div>
                         <?php else: $optional_addons[] = ['reviews', esc_html__('Reviews Rate', 'listdom')]; ?>
                         <?php endif; ?>
-
                     </div>
                 </div>
             </div>

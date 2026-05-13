@@ -16,6 +16,9 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
 
         // Listing Status Changed
         add_action('lsd_listing_report_abuse', [$this, 'abuse'], 10, 2);
+
+        // User Email Verification
+        add_action('lsd_user_email_verification', [$this, 'user_email_verification'], 10, 3);
     }
 
     public function contact($args): array
@@ -145,6 +148,68 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
     public function abuse($args): array
     {
         return $this->form($args, 'lsd_listing_report_abuse');
+    }
+
+    public function user_email_verification($user_id, $token, $verification_url): array
+    {
+        $user = get_user_by('id', $user_id);
+        if (!$user) return [];
+
+        $notifications = $this->get('lsd_user_email_verification');
+        $mails = [];
+
+        if (!count($notifications))
+        {
+            $subject = sprintf(esc_html__('[%s] Confirm your email address', 'listdom'), get_bloginfo('name'));
+            $message = sprintf(
+                esc_html__("Hi %s,\n\nPlease confirm your email address by visiting the link below:\n%s\n\nThank you!", 'listdom'),
+                $user->display_name ?: $user->user_login,
+                $verification_url
+            );
+
+            $mails[] = wp_mail($user->user_email, $subject, $message);
+            return $mails;
+        }
+
+        foreach ($notifications as $notification)
+        {
+            $content = get_post_meta($notification->ID, 'lsd_content', true);
+            $subject = get_the_title($notification);
+
+            $original_to = get_post_meta($notification->ID, 'lsd_original_to', true);
+            if ($original_to) $to = $user->user_email;
+            else $to = trim(get_post_meta($notification->ID, 'lsd_to', true), ', ');
+
+            $cc = trim(get_post_meta($notification->ID, 'lsd_cc', true), ', ');
+            $bcc = trim(get_post_meta($notification->ID, 'lsd_bcc', true), ', ');
+
+            $link_html = '<a href="' . esc_url($verification_url) . '">' . esc_html($verification_url) . '</a>';
+
+            foreach (['content', 'subject'] as $item)
+            {
+                $$item = str_replace('#user_login#', $user->user_login, $$item);
+                $$item = str_replace('#user_email#', $user->user_email, $$item);
+                $$item = str_replace('#verification_link#', $link_html, $$item);
+            }
+
+            $sender = new LSD_Notifications_Email_Sender();
+            $mails[] = $sender->boot($notification->ID)
+                ->to($to)
+                ->cc($cc)
+                ->bcc($bcc)
+                ->subject($subject)
+                ->content($content)
+                ->render()
+                ->send();
+
+            do_action('lsd_send_notification', $user_id, [
+                'user_login' => $user->user_login,
+                'user_email' => $user->user_email,
+                'verification_link' => $verification_url,
+            ], $notification->ID);
+        }
+
+        return $mails;
     }
 
     public function form($args, $hook): array

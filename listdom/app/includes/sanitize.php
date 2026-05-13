@@ -27,6 +27,21 @@ class LSD_Sanitize extends LSD_Base
         return $values;
     }
 
+    public static function advanced_slug(string $value): string
+    {
+        $value = strtolower(wp_strip_all_tags($value));
+        $value = preg_replace('/\s+/', '', $value);
+
+        return preg_replace('/[^a-z0-9%\/-]+/', '', $value);
+    }
+
+    public static function slug($value): string
+    {
+        if (!is_string($value)) return '';
+
+        return sanitize_title($value);
+    }
+
     public static function search(array $filters): array
     {
         $sanitized = [];

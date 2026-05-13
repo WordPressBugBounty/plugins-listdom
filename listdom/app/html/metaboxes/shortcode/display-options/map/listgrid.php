@@ -6,6 +6,9 @@ defined('ABSPATH') || die();
 /** @var array $options */
 
 $listgrid = $options['listgrid'] ?? [];
+
+$mapobject_onclick = $listgrid['mapobject_onclick'] ?? 'infowindow';
+$infowindow_trigger = $listgrid['mapobject_infowindow_trigger'] ?? 'click';
 ?>
 <?php if (LSD_Components::map()): ?>
 <div class="lsd-settings-group-wrapper">
@@ -86,6 +89,26 @@ $listgrid = $options['listgrid'] ?? [];
                     <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Use this option to set the map height. Enter a value with units, such as 500px or 100vh. If you're unsure, leave it blank.", 'listdom'); ?></p>
                 </div>
             </div>
+            <div class="lsd-form-row">
+                <div class="lsd-col-3"><?php echo LSD_Form::label([
+                        'class' => 'lsd-fields-label',
+                        'title' => esc_html__('Mouse Wheel Zoom', 'listdom'),
+                        'for' => 'lsd_display_options_skin_listgrid_mousewheel_zoom',
+                    ]); ?></div>
+                <div class="lsd-col-7">
+                    <?php echo LSD_Form::select([
+                        'class' => 'lsd-admin-input',
+                        'id' => 'lsd_display_options_skin_listgrid_mousewheel_zoom',
+                        'name' => 'lsd[display][listgrid][mousewheel_zoom]',
+                        'options' => [
+                            '0' => esc_html__('Disabled', 'listdom'),
+                            '1' => esc_html__('Enabled', 'listdom'),
+                        ],
+                        'value' => $listgrid['mousewheel_zoom'] ?? '0',
+                    ]); ?>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Enable or disable mouse wheel zoom on the map.', 'listdom'); ?></p>
+                </div>
+            </div>
 
             <?php
             // Action for KML Layers
@@ -106,18 +129,58 @@ $listgrid = $options['listgrid'] ?? [];
                     ]); ?></div>
                 <div class="lsd-col-7">
                     <?php echo LSD_Form::select([
-                        'class' => 'lsd-admin-input',
+                        'class' => 'lsd-admin-input lsd-trigger-select-options',
                         'id' => 'lsd_display_options_skin_listgrid_mapobject_onclick',
                         'name' => 'lsd[display][listgrid][mapobject_onclick]',
                         'options' => [
-                            'infowindow' => esc_html__('Open Infowindow', 'listdom'),
-                            'redirect' => esc_html__('Redirect to Single Listing Page', 'listdom'),
-                            'lightbox' => esc_html__('Open Single Listing in a Lightbox', 'listdom'),
-                            'none' => esc_html__('None', 'listdom')
+                            'infowindow' => [
+                                'label' => esc_html__('Open Infowindow', 'listdom'),
+                                'attributes' => [
+                                    'data-lsd-show' => '#lsd_display_options_skin_listgrid_infowindow_trigger',
+                                ],
+                            ],
+                            'redirect' => [
+                                'label' => esc_html__('Redirect to Single Listing Page', 'listdom'),
+                                'attributes' => [
+                                    'data-lsd-hide' => '#lsd_display_options_skin_listgrid_infowindow_trigger',
+                                ],
+                            ],
+                            'lightbox' => [
+                                'label' => esc_html__('Open Single Listing in a Lightbox', 'listdom'),
+                                'attributes' => [
+                                    'data-lsd-hide' => '#lsd_display_options_skin_listgrid_infowindow_trigger',
+                                ],
+                            ],
+                            'none' => [
+                                'label' => esc_html__('None', 'listdom'),
+                                'attributes' => [
+                                    'data-lsd-hide' => '#lsd_display_options_skin_listgrid_infowindow_trigger',
+                                ],
+                            ],
                         ],
-                        'value' => $listgrid['mapobject_onclick'] ?? 'infowindow'
+                        'value' => $mapobject_onclick,
                     ]); ?>
                     <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("You can choose to display an info window when someone clicks on a marker or shape on the map, open the single listing page directly, or show the details in a lightbox without reloading the page.", 'listdom'); ?></p>
+                </div>
+            </div>
+            <div class="lsd-form-row <?php echo $mapobject_onclick === 'infowindow' ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_listgrid_infowindow_trigger">
+                <div class="lsd-col-3"><?php echo LSD_Form::label([
+                    'class' => 'lsd-fields-label',
+                    'title' => esc_html__('Info Window Trigger', 'listdom'),
+                    'for' => 'lsd_display_options_skin_listgrid_infowindow_trigger_select',
+                ]); ?></div>
+                <div class="lsd-col-7">
+                    <?php echo LSD_Form::select([
+                        'class' => 'lsd-admin-input',
+                        'id' => 'lsd_display_options_skin_listgrid_infowindow_trigger_select',
+                        'name' => 'lsd[display][listgrid][mapobject_infowindow_trigger]',
+                        'options' => [
+                            'click' => esc_html__('Show on click', 'listdom'),
+                            'hover' => esc_html__('Show on hover', 'listdom'),
+                        ],
+                        'value' => $infowindow_trigger,
+                    ]); ?>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Hover applies only to markers.', 'listdom'); ?></p>
                 </div>
             </div>
             <?php
@@ -186,7 +249,7 @@ $listgrid = $options['listgrid'] ?? [];
                         <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Map Search', 'listdom')); ?></p>
                     <?php endif; ?>
                 </div>
-                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Provide ability to filter listings based on current map position.", 'listdom'); ?></p>
+                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("If enabled, the listing cards will be filtered when the map viewport is changed and only the listings available in that map area will be displayed.", 'listdom'); ?></p>
             </div>
 
             <?php

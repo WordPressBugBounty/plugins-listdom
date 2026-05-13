@@ -63,9 +63,10 @@ if (!is_array($legacy)) $legacy = [];
 <?php
     $button_status = (is_string($row['buttons']) && $row['buttons']) || (is_array($row['buttons']) && isset($row['buttons']['status']) && $row['buttons']['status']) ? 1 : 0;
     $clear_button_status = isset($row['clear']['status']) && $row['clear']['status'] ? 1 : 0;
+    $filters_button_status = class_exists(\LSDPACMA\Base::class) && isset($row['filters_button']['status']) && $row['filters_button']['status'] ? 1 : 0;
 ?>
 <div class="lsd-search-row-params">
-    <div class="lsd-search-row-button-wrapper-params <?php echo $button_status ? 'lsd-search-row-button-enabled' : ''; ?>">
+    <div class="lsd-search-row-button-wrapper-params lsd-search-row-desktop-only <?php echo $button_status ? 'lsd-search-row-button-enabled' : ''; ?>">
         <div class="lsd-flex lsd-flex-row lsd-gap-3">
             <?php echo LSD_Form::switcher([
                 'id' => 'lsd_'.$device_key.'_'.$i.'_buttons',
@@ -117,8 +118,8 @@ if (!is_array($legacy)) $legacy = [];
             </div>
         </div>
     </div>
-    <div class="lsd-search-row-button-divider"></div>
-    <div class="lsd-search-row-button-wrapper-params <?php echo $clear_button_status ? 'lsd-search-row-button-enabled' : ''; ?>">
+    <div class="lsd-search-row-button-divider lsd-search-row-desktop-only"></div>
+    <div class="lsd-search-row-button-wrapper-params lsd-search-row-desktop-only <?php echo $clear_button_status ? 'lsd-search-row-button-enabled' : ''; ?>">
         <div class="lsd-flex lsd-flex-row lsd-gap-3">
             <?php echo LSD_Form::switcher([
                 'id' => 'lsd_'.$device_key.'_'.$i.'_clear_all_buttons',
@@ -170,5 +171,34 @@ if (!is_array($legacy)) $legacy = [];
             </div>
         </div>
     </div>
+    <?php if (class_exists(\LSDPACMA\Base::class)): ?>
+    <div class="lsd-search-row-button-wrapper-params lsd-search-row-mobile-app-only <?php echo $filters_button_status ? 'lsd-search-row-button-enabled' : ''; ?>">
+        <div class="lsd-flex lsd-flex-row lsd-gap-3">
+            <?php echo LSD_Form::switcher([
+                'id' => 'lsd_'.$device_key.'_'.$i.'_filters_button',
+                'name' => 'lsd['.$device_key.']['.$i.'][filters_button][status]',
+                'value' => $filters_button_status,
+            ]); ?>
+            <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_button"><?php esc_html_e('Filters Button', 'listdom'); ?></label>
+        </div>
+        <div class="lsd-search-row-button-params">
+            <div class="lsd-search-button-label lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Button Label', 'listdom'); ?>">
+                <?php echo LSD_Form::text([
+                    'id' => 'lsd_'.$device_key.'_'.$i.'_filters_button_label',
+                    'name' => 'lsd['.$device_key.']['.$i.'][filters_button][label]',
+                    'value' => $row['filters_button']['label'] ?? esc_html__('Filters', 'listdom'),
+                ]); ?>
+            </div>
+            <div class="lsd-search-button-label lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Button Icon', 'listdom'); ?>">
+                <?php echo LSD_Form::iconpicker([
+                    'id' => 'lsd_'.$device_key.'_'.$i.'_filters_button_icon',
+                    'name' => 'lsd['.$device_key.']['.$i.'][filters_button][icon]',
+                    'value' => $row['filters_button']['icon'] ?? 'fa fa-filter',
+                    'class' => 'lsd-iconpicker',
+                ]); ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 <?php endif;

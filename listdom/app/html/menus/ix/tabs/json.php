@@ -3,6 +3,15 @@
 defined('ABSPATH') || die();
 
 /** @var LSD_Menus_IX $this */
+
+$import_types = LSD_IX::import_type_labels();
+$export_url = wp_nonce_url(
+    add_query_arg([
+        'lsd-export' => 'json',
+        'lsd-type' => 'listings'
+    ], admin_url('admin.php?page=listdom-ix')
+    ), 'lsd_ix_form'
+);
 ?>
 <div class="lsd-ix-wrap">
 
@@ -18,13 +27,16 @@ defined('ABSPATH') || die();
         <form id="lsd_ix_listdom_import_form" class="lsd-mt-4" enctype="multipart/form-data">
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-8 lsd-admin-input-file">
-                            <?php echo LSD_Form::label([
-                                'class' => 'lsd-fields-label',
-                                'title' => esc_html__("Select the JSON file exported from listdom", 'listdom'),
-                                'for' => 'lsd_ix_json_import_file_input',
-                            ]) ?>
+                    <p class="lsd-admin-description lsd-my-0"><?php esc_html_e("Please select the data you want to import and upload the JSON file.", 'listdom'); ?></p>
+                    <div class="lsd-flex lsd-gap-3">
+                        <?php echo LSD_Form::select([
+                            'id' => 'lsd_ix_listdom_import_type',
+                            'name' => 'ix[type]',
+                            'class' => 'lsd-admin-input',
+                            'options' => $import_types,
+                            'value' => 'listings',
+                        ]); ?>
+                        <div class="lsd-admin-input-file">
                             <?php echo LSD_Form::file([
                                 'id' => 'lsd_ix_listdom_import_file_input',
                                 'class' => 'lsd-util-hide',
@@ -52,8 +64,16 @@ defined('ABSPATH') || die();
         <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Export', 'listdom'); ?></h3>
         <div class="lsd-settings-group-wrapper">
             <div class="lsd-settings-fields-wrapper">
-                <p class="lsd-admin-description lsd-mb-1 lsd-mt-0"><?php esc_html_e("Please click the button below to download the JSON export of your listings.", 'listdom'); ?></p>
-                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=listdom-ix&lsd-export=json'), 'lsd_ix_form')); ?>" class="lsd-primary-button"><?php esc_html_e('Export', 'listdom'); ?></a>
+                <p class="lsd-admin-description lsd-my-0"><?php esc_html_e("Please select the data you want to export and click the button below to download the JSON file.", 'listdom'); ?></p>
+                <div class="lsd-flex lsd-gap-3">
+                    <?php echo LSD_Form::select([
+                        'id' => 'lsd_ix_json_export_type',
+                        'class' => 'lsd-admin-input',
+                        'options' => $import_types,
+                        'value' => 'listings',
+                    ]); ?>
+                    <a id="lsd_ix_json_export_link" data-base-href="<?php echo esc_attr($export_url); ?>" href="<?php echo esc_url($export_url); ?>" class="lsd-primary-button"><?php esc_html_e('Export Listings', 'listdom'); ?></a>
+                </div>
             </div>
         </div>
     </div>
@@ -145,22 +165,22 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
         success: function(response)
         {
             loading.stop();
+            $button.addClass('lsd-util-hide');
+
+            jQuery('.lsd-in-progress').remove();
+            window.currentToast = null;
+
+            // Reset File
+            jQuery('#lsd_ix_listdom_import_file_input').val('');
+            jQuery("#lsd_ix_listdom_import_file").val('');
 
             if(response.success === 1)
             {
                 listdom_toastify(response.message, 'lsd-success');
-                $button.addClass('lsd-util-hide');
-
-                jQuery('.lsd-in-progress').remove();
-                window.currentToast = null;
-
-                // hidden value
-                jQuery('#lsd_ix_listdom_import_file_input').val('');
-                jQuery("#lsd_ix_listdom_import_file").val('');
             }
             else
             {
-                listdom_toastify(response.message, 'lsd-error');
+                typeof response.message !== 'undefined' && listdom_toastify(response.message, 'lsd-error');
             }
         },
         error: function()
@@ -171,4 +191,44 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
         }
     });
 });
+
+// Export type change
+(function($)
+{
+    const $exportType = $('#lsd_ix_json_export_type');
+    const $exportLink = $('#lsd_ix_json_export_link');
+    const baseHref = $exportLink.data('base-href');
+    const exportLabel = "<?php echo esc_js(esc_html__('Export', 'listdom')); ?>";
+
+    const updateExportHref = function(type)
+    {
+        try
+        {
+            const url = new URL(baseHref);
+            url.searchParams.set('lsd-type', type);
+            $exportLink.attr('href', url.toString());
+        }
+        catch (e)
+        {
+            const pattern = /(lsd-type=)[^&]*/;
+            if (pattern.test(baseHref)) $exportLink.attr('href', baseHref.replace(pattern, '$1' + encodeURIComponent(type)));
+            else $exportLink.attr('href', baseHref + '&lsd-type=' + encodeURIComponent(type));
+        }
+    };
+
+    const updateExportButton = function(type)
+    {
+        updateExportHref(type);
+
+        const label = $exportType.find('option:selected').text();
+        $exportLink.text(exportLabel + ' ' + label);
+    };
+
+    $exportType.on('change', function()
+    {
+        updateExportButton($(this).val());
+    });
+
+    updateExportButton($exportType.val());
+})(jQuery);
 </script>

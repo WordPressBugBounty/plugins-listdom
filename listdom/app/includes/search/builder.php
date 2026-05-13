@@ -39,7 +39,7 @@ class LSD_Search_Builder extends LSD_Base
         if (!in_array(LSD_Base::TAX_CATEGORY, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_CATEGORY,
-            'title' => esc_html__('Categories', 'listdom'),
+            'title' => esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY, 'plural')),
             'methods' => $this->getFieldMethods('taxonomy', LSD_Base::TAX_CATEGORY),
         ];
 
@@ -47,7 +47,7 @@ class LSD_Search_Builder extends LSD_Base
         if (!in_array(LSD_Base::TAX_LOCATION, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_LOCATION,
-            'title' => esc_html__('Locations', 'listdom'),
+            'title' => esc_html(lsd_t_label(LSD_Base::TAX_LOCATION, 'plural')),
             'methods' => $this->getFieldMethods('taxonomy', LSD_Base::TAX_LOCATION),
         ];
 
@@ -55,7 +55,7 @@ class LSD_Search_Builder extends LSD_Base
         if (!in_array(LSD_Base::TAX_TAG, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_TAG,
-            'title' => esc_html__('Tags', 'listdom'),
+            'title' => esc_html(lsd_t_label(LSD_Base::TAX_TAG, 'plural')),
             'methods' => $this->getFieldMethods('taxonomy', LSD_Base::TAX_TAG),
         ];
 
@@ -63,7 +63,7 @@ class LSD_Search_Builder extends LSD_Base
         if (!in_array(LSD_Base::TAX_FEATURE, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_FEATURE,
-            'title' => esc_html__('Features', 'listdom'),
+            'title' => esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural')),
             'methods' => $this->getFieldMethods('taxonomy', LSD_Base::TAX_FEATURE),
         ];
 
@@ -71,7 +71,7 @@ class LSD_Search_Builder extends LSD_Base
         if (!in_array(LSD_Base::TAX_LABEL, $existings)) $fields[] = [
             'type' => 'taxonomy',
             'key' => LSD_Base::TAX_LABEL,
-            'title' => esc_html__('Labels', 'listdom'),
+            'title' => esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural')),
             'methods' => $this->getFieldMethods('taxonomy', LSD_Base::TAX_LABEL),
         ];
 
@@ -91,6 +91,19 @@ class LSD_Search_Builder extends LSD_Base
             'methods' => $this->getFieldMethods('class'),
         ];
 
+        // Average Rate
+        if (!in_array('rate', $existings) && (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class))) $fields[] = [
+            'type' => 'review_rate',
+            'key' => 'rate',
+            'title' => esc_html__('Average Rate', 'listdom'),
+            'method' => 'dropdown-plus',
+            'methods' => $this->getFieldMethods('review_rate'),
+            'min' => 0,
+            'max' => 4,
+            'increment' => 1,
+            'th_separator' => 0,
+        ];
+
         // Address
         if (!in_array('address', $existings) && LSD_Components::map()) $fields[] = [
             'type' => 'address',
@@ -107,8 +120,8 @@ class LSD_Search_Builder extends LSD_Base
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
             $key = 'att-' . $attribute->slug;
 
-            // Skip URL, Email, Image and Separator Fields
-            if (in_array($type, ['url', 'email', 'separator', 'image'])) continue;
+            // Skip URL, Email, Image, File and Separator Fields
+            if (in_array($type, ['url', 'email', 'separator', 'image', 'file'])) continue;
             if (in_array($key, $existings)) continue;
 
             $fields[] = [
@@ -172,6 +185,18 @@ class LSD_Search_Builder extends LSD_Base
             'textarea' => [
                 'text-input' => esc_html__('Text Input', 'listdom'),
             ],
+            'date' => [
+                'text-input' => esc_html__('Text Input', 'listdom'),
+                'date-input' => esc_html__('Date Input', 'listdom'),
+            ],
+            'time' => [
+                'text-input' => esc_html__('Text Input', 'listdom'),
+                'time-input' => esc_html__('Time Input', 'listdom'),
+            ],
+            'datetime' => [
+                'text-input' => esc_html__('Text Input', 'listdom'),
+                'datetime-input' => esc_html__('Date & Time Input', 'listdom'),
+            ],
             'number' => [
                 'number-input' => esc_html__('Number Input', 'listdom'),
                 'dropdown' => esc_html__('Dropdown', 'listdom'),
@@ -207,6 +232,10 @@ class LSD_Search_Builder extends LSD_Base
             'price' => [
                 'dropdown-plus' => esc_html__('Dropdown+', 'listdom'),
                 'mm-input' => esc_html__('Min/Max Input', 'listdom'),
+            ],
+            'review_rate' => [
+                'dropdown-plus' => esc_html__('Dropdown+', 'listdom'),
+                'stars' => esc_html__('Stars', 'listdom'),
             ],
             'class' => [
                 'dropdown' => esc_html__('Dropdown', 'listdom'),

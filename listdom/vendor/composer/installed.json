@@ -1067,6 +1067,68 @@
             "install-path": "../psr/simple-cache"
         },
         {
+            "name": "stripe/stripe-php",
+            "version": "v17.6.0",
+            "version_normalized": "17.6.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stripe/stripe-php.git",
+                "reference": "a6219df5df1324a0d3f1da25fb5e4b8a3307ea16"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/a6219df5df1324a0d3f1da25fb5e4b8a3307ea16",
+                "reference": "a6219df5df1324a0d3f1da25fb5e4b8a3307ea16",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "3.72.0",
+                "phpstan/phpstan": "^1.2",
+                "phpunit/phpunit": "^5.7 || ^9.0"
+            },
+            "time": "2025-08-27T19:32:42+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Stripe\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stripe and contributors",
+                    "homepage": "https://github.com/stripe/stripe-php/contributors"
+                }
+            ],
+            "description": "Stripe PHP Library",
+            "homepage": "https://stripe.com/",
+            "keywords": [
+                "api",
+                "payment processing",
+                "stripe"
+            ],
+            "support": {
+                "issues": "https://github.com/stripe/stripe-php/issues",
+                "source": "https://github.com/stripe/stripe-php/tree/v17.6.0"
+            },
+            "install-path": "../stripe/stripe-php"
+        },
+        {
             "name": "symfony/deprecation-contracts",
             "version": "v3.6.0",
             "version_normalized": "3.6.0.0",
@@ -1655,18 +1717,47 @@
             "install-path": "../webilia/listdom-p-visibility"
         },
         {
+            "name": "webilia/lsdi",
+            "version": "1.0.0",
+            "version_normalized": "1.0.0.0",
+            "dist": {
+                "type": "path",
+                "url": "../../packages/webilia/lsdi",
+                "reference": "a0efbad8189ae095372612e239b164e9514ea844"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webilia\\LSDI\\": "app"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Webilia",
+                    "email": "hello@webilia.com"
+                }
+            ],
+            "description": "Webilia LSDI Icons Package",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webilia/lsdi"
+        },
+        {
             "name": "webilia/wp",
-            "version": "1.0.19",
-            "version_normalized": "1.0.19.0",
+            "version": "1.0.21",
+            "version_normalized": "1.0.21.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webilia/wp.git",
-                "reference": "cd768f420dd4e0d2873706c0d9930e27a371f646"
+                "reference": "9e78d30fea0187834b9dfee393b4a73f7591f814"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webilia/wp/zipball/cd768f420dd4e0d2873706c0d9930e27a371f646",
-                "reference": "cd768f420dd4e0d2873706c0d9930e27a371f646",
+                "url": "https://api.github.com/repos/webilia/wp/zipball/9e78d30fea0187834b9dfee393b4a73f7591f814",
+                "reference": "9e78d30fea0187834b9dfee393b4a73f7591f814",
                 "shasum": ""
             },
             "require": {
@@ -1678,7 +1769,7 @@
                 "squizlabs/php_codesniffer": "*",
                 "szepeviktor/phpstan-wordpress": "^1.1"
             },
-            "time": "2025-09-01T21:06:33+00:00",
+            "time": "2025-11-16T23:47:08+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1703,7 +1794,7 @@
             "description": "A handy set of libraries for WordPress developments.",
             "support": {
                 "issues": "https://github.com/webilia/wp/issues",
-                "source": "https://github.com/webilia/wp/tree/v1.0.19"
+                "source": "https://github.com/webilia/wp/tree/v1.0.21"
             },
             "install-path": "../webilia/wp"
         }

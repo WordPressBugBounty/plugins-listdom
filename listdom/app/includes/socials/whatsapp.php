@@ -19,7 +19,7 @@ class LSD_Socials_Whatsapp extends LSD_Socials
     {
         $url = get_the_permalink($post_id);
         return '<a class="lsd-share-whatsapp" href="https://wa.me/?text=' . esc_attr(urlencode($url)) . '" target="_blank" title="' . esc_attr__('WhatsApp', 'listdom') . '">
-            <i class="lsd-icon fab fa-whatsapp"></i>
+            <i class="lsd-fe-icon fab fa-whatsapp"></i>
         </a>';
     }
 
@@ -27,7 +27,7 @@ class LSD_Socials_Whatsapp extends LSD_Socials
     {
         $tel = str_replace([' ', '-', '(', ')'], '', $url);
         return '<a class="lsd-share-whatsapp" href="https://wa.me/' . esc_attr($tel) . '" target="_blank">
-            <i class="lsd-icon fab fa-whatsapp"></i>
+            <i class="lsd-fe-icon fab fa-whatsapp"></i>
         </a>';
     }
 }

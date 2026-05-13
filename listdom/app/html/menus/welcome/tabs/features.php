@@ -94,6 +94,21 @@ $settings = LSD_Options::settings();
                     </div>
                     <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Useful for directories where listings include links to social media profiles.', 'listdom'); ?></p>
                 </div>
+                <div class="lsd-form-row lsd-flex-align-items-center lsd-m-0">
+                    <div class="lsd-col-3"><?php echo LSD_Form::label([
+                        'class' => 'lsd-fields-label',
+                        'title' => esc_html__('Call to Action', 'listdom'),
+                        'for' => 'lsd_component_cta',
+                    ]); ?></div>
+                    <div class="lsd-col-7">
+                        <?php echo LSD_Form::switcher([
+                            'id' => 'lsd_component_cta',
+                            'name' => 'lsd[components][cta]',
+                            'value' => $settings['components']['cta'] ?? '1',
+                        ]); ?>
+                    </div>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Useful when listings need a customizable button that links visitors to the next step.', 'listdom'); ?></p>
+                </div>
             </div>
             <?php LSD_Form::nonce('lsd_settings_form'); ?>
         </form>

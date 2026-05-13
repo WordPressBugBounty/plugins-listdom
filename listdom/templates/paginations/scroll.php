@@ -7,7 +7,7 @@ defined('ABSPATH') || die();
 <div class="lsd-load-more-wrapper">
     <div class="lsd-load-more">
 		<span class="lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>">
-			<span class="lsd-load-more-spinner"><i class="lsd-icon fa fa-circle-notch fa-spin fa-4x fa-fw"></i></span>
+			<span class="lsd-load-more-spinner"><i class="lsd-fe-icon fa fa-circle-notch fa-spin fa-fw"></i></span>
 		</span>
     </div>
 </div>

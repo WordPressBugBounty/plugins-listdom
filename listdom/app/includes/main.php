@@ -41,11 +41,10 @@ class LSD_Main extends LSD_Base
         $JSON = LSD_Main::download($url, [
             'timeout' => 10,
             'user-agent' => $user_agent,
-            'sslverify' => false,
         ]);
 
         $data = json_decode($JSON, true);
-        $place = $data[0] ?? null;
+        $place = is_array($data) ? ($data[0] ?? null) : null;
 
         if (isset($place['lat']) && $place['lat'] && isset($place['lon']) && $place['lon']) return [$place['lat'], $place['lon']];
 
@@ -65,11 +64,10 @@ class LSD_Main extends LSD_Base
         $JSON = LSD_Main::download($url, [
             'timeout' => 10,
             'user-agent' => $user_agent,
-            'sslverify' => false,
         ]);
 
         $data = json_decode($JSON, true);
-        $geopoint = isset($data['results'][0]) ? $data['results'][0]['geometry']['location'] : null;
+        $geopoint = is_array($data) && isset($data['results'][0]) ? $data['results'][0]['geometry']['location'] : null;
 
         if (isset($geopoint['lat']) && $geopoint['lat'] && isset($geopoint['lng']) && $geopoint['lng']) return [$geopoint['lat'], $geopoint['lng']];
 
@@ -104,9 +102,48 @@ class LSD_Main extends LSD_Base
         return apply_filters('lsd_weekdays', $labels);
     }
 
+    public static function get_post_ids(string $key, $value): array
+    {
+        $key = trim($key);
+        if ($key === '') return [];
+
+        $db = new LSD_db();
+
+        $meta_key = esc_sql($key);
+        $meta_value = maybe_serialize($value);
+        $meta_value = is_null($meta_value) ? '' : (string) $meta_value;
+        $meta_value = esc_sql($meta_value);
+
+        $query = "SELECT post_id FROM #__postmeta WHERE meta_key = '" . $meta_key . "'";
+
+        if ($meta_value === '') $query .= " AND (meta_value = '' OR meta_value IS NULL)";
+        else $query .= " AND meta_value = '" . $meta_value . "'";
+
+        $ids = $db->select($query, 'loadColumn');
+        if (!is_array($ids)) return [];
+
+        $ids = array_map('intval', $ids);
+        $ids = array_filter($ids);
+
+        return array_values(array_unique($ids));
+    }
+
     public static function get_first_day_of_week()
     {
         return get_option('start_of_week', 1);
+    }
+
+    public static function is_grecaptcha_enabled(array $settings): bool
+    {
+        // Recaptcha is enabled
+        if (
+            isset($settings['grecaptcha_status'], $settings['grecaptcha_sitekey'], $settings['grecaptcha_secretkey'])
+            && $settings['grecaptcha_status']
+            && trim($settings['grecaptcha_sitekey'])
+            && trim($settings['grecaptcha_secretkey'])
+        ) return true;
+
+        return false;
     }
 
     public static function grecaptcha_field($class = ''): string
@@ -115,13 +152,10 @@ class LSD_Main extends LSD_Base
         $settings = LSD_Options::settings();
 
         // Recaptcha is not enabled!
-        if (!isset($settings['grecaptcha_status']) || !$settings['grecaptcha_status']) return '';
+        if (!LSD_Main::is_grecaptcha_enabled($settings)) return '';
 
         // Site Key
-        $sitekey = isset($settings['grecaptcha_sitekey']) && trim($settings['grecaptcha_sitekey']) ? $settings['grecaptcha_sitekey'] : null;
-
-        // Site key is empty!
-        if (!$sitekey) return '';
+        $sitekey = $settings['grecaptcha_sitekey'];
 
         // Include JS Library
         $assets = new LSD_Assets();
@@ -136,13 +170,10 @@ class LSD_Main extends LSD_Base
         $settings = LSD_Options::settings();
 
         // Recaptcha is not enabled!
-        if (!isset($settings['grecaptcha_status']) || !$settings['grecaptcha_status']) return true;
+        if (!LSD_Main::is_grecaptcha_enabled($settings)) return true;
 
         // Secret Key
-        $secretkey = isset($settings['grecaptcha_secretkey']) && trim($settings['grecaptcha_secretkey']) ? $settings['grecaptcha_secretkey'] : null;
-
-        // Secret key is empty!
-        if (!$secretkey) return false;
+        $secretkey = $settings['grecaptcha_secretkey'];
 
         // Get the IP
         if (is_null($remote_ip))
@@ -168,7 +199,18 @@ class LSD_Main extends LSD_Base
 
     public static function download($url, $args = []): string
     {
-        return wp_remote_retrieve_body(wp_remote_get($url, $args));
+        $args = wp_parse_args($args, [
+            'sslverify' => apply_filters('lsd_http_sslverify', true, $url, $args),
+        ]);
+
+        $response = wp_remote_get($url, $args);
+        if (is_wp_error($response))
+        {
+            do_action('lsd_http_request_failed', $response, $url, $args);
+            return '';
+        }
+
+        return wp_remote_retrieve_body($response);
     }
 
     public static function assign($post_id, $user_id)
@@ -180,7 +222,7 @@ class LSD_Main extends LSD_Base
         return $db->q("UPDATE `#__posts` SET `post_author`=" . ((int) $user_id) . " WHERE `ID`=" . ((int) $post_id));
     }
 
-    public function standardize_format($date, $from, $to = 'Y-m-d')
+    public function standardize_format($date, $from, $to = 'Y-m-d'): string
     {
         if (!trim($date)) return '';
 
@@ -222,9 +264,6 @@ class LSD_Main extends LSD_Base
 
     public function is_geo_request(): bool
     {
-        $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])) : '';
-        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_search_form')) return false;
-
         $vars = array_merge($_GET, $_POST);
 
         $sf = isset($vars['sf']) && is_array($vars['sf']) ? $vars['sf'] : [];

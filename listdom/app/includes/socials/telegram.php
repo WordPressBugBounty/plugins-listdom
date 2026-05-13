@@ -16,14 +16,14 @@ class LSD_Socials_Telegram extends LSD_Socials
         $title = get_the_title($post_id);
 
         return '<a class="lsd-share-telegram" href="https://t.me/share/url?url=' . esc_attr(urlencode($url)) . '&text=' . esc_attr(urlencode($title)) . '" target="_blank" title="' . esc_attr__('Share in Telegram', 'listdom') . '">
-            <i class="lsd-icon fab fa-telegram"></i>
+            <i class="lsd-fe-icon fab fa-telegram"></i>
         </a>';
     }
 
     public function icon($url): string
     {
         return '<a class="lsd-share-telegram" href="' . esc_url($url) . '" target="_blank">
-            <i class="lsd-icon fab fa-telegram"></i>
+            <i class="lsd-fe-icon fab fa-telegram"></i>
         </a>';
     }
 }

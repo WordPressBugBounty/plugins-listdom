@@ -65,4 +65,24 @@ class LSD_IX_Mapping_Default
             'show_empty' => true,
         ]);
     }
+
+    public function status($args)
+    {
+        $options = [];
+        foreach (['publish', 'pending', 'draft'] as $status)
+        {
+            $st = get_post_status_object($status);
+            $options[$status] = $st && isset($st->label)
+                ? $st->label
+                : ucwords(str_replace('_', ' ', $status));
+        }
+
+        echo LSD_Form::select([
+            'name' => $args['name'],
+            'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
+            'class' => $args['class'] ?? '',
+            'options' => $options,
+            'value' => 'publish',
+        ]);
+    }
 }

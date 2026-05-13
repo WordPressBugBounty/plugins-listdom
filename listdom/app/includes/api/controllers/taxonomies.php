@@ -7,33 +7,33 @@ class LSD_API_Controllers_Taxonomies extends LSD_API_Controller
         $taxonomies = [
             [
                 'key' => LSD_Base::TAX_CATEGORY,
-                'singular' => esc_html__('Category', 'listdom'),
-                'plural' => esc_html__('Categories', 'listdom'),
+                'singular' => esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY)),
+                'plural' => esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY, 'plural')),
             ],
             [
                 'key' => LSD_Base::TAX_LOCATION,
-                'singular' => esc_html__('Location', 'listdom'),
-                'plural' => esc_html__('Locations', 'listdom'),
+                'singular' => esc_html(lsd_t_label(LSD_Base::TAX_LOCATION)),
+                'plural' => esc_html(lsd_t_label(LSD_Base::TAX_LOCATION, 'plural')),
             ],
             [
                 'key' => LSD_Base::TAX_TAG,
-                'singular' => esc_html__('Tag', 'listdom'),
-                'plural' => esc_html__('Tags', 'listdom'),
+                'singular' => esc_html(lsd_t_label(LSD_Base::TAX_TAG)),
+                'plural' => esc_html(lsd_t_label(LSD_Base::TAX_TAG, 'plural')),
             ],
             [
                 'key' => LSD_Base::TAX_FEATURE,
-                'singular' => esc_html__('Feature', 'listdom'),
-                'plural' => esc_html__('Features', 'listdom'),
+                'singular' => esc_html(lsd_t_label(LSD_Base::TAX_FEATURE)),
+                'plural' => esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural')),
             ],
             [
                 'key' => LSD_Base::TAX_LABEL,
-                'singular' => esc_html__('Label', 'listdom'),
-                'plural' => esc_html__('Labels', 'listdom'),
+                'singular' => esc_html(lsd_t_label(LSD_Base::TAX_LABEL)),
+                'plural' => esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural')),
             ],
             [
                 'key' => LSD_Base::TAX_ATTRIBUTE,
-                'singular' => esc_html__('Custom Field', 'listdom'),
-                'plural' => esc_html__('Custom Fields', 'listdom'),
+                'singular' => esc_html(lsd_t_label(LSD_Base::TAX_ATTRIBUTE)),
+                'plural' => esc_html(lsd_t_label(LSD_Base::TAX_ATTRIBUTE, 'plural')),
             ],
         ];
 

@@ -119,9 +119,9 @@ class LSD_PTypes_Listing extends LSD_PTypes
         unset($columns['author']);
 
         $columns['address'] = esc_html__('Address', 'listdom');
-        $columns['category'] = esc_html__('Category', 'listdom');
-        $columns['location'] = esc_html__('Locations', 'listdom');
-        $columns['label'] = esc_html__('Labels', 'listdom');
+        $columns['category'] = esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY));
+        $columns['location'] = esc_html(lsd_t_label(LSD_Base::TAX_LOCATION, 'plural'));
+        $columns['label'] = esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural'));
         $columns['author'] = $author;
         $columns['date'] = $date;
 
@@ -201,6 +201,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
         // Get Listdom Data
         $lsd = $_POST['lsd'] ?? [];
+        $raw_lsd = $lsd;
 
         // Gallery
         if (isset($lsd['_gallery']) and is_array($lsd['_gallery']))
@@ -216,8 +217,59 @@ class LSD_PTypes_Listing extends LSD_PTypes
             unset($lsd['_embeds']);
         }
 
+        // FAQs
+        if (isset($lsd['_faqs']) and is_array($lsd['_faqs']))
+        {
+            $lsd['faqs'] = $lsd['_faqs'];
+            unset($lsd['_faqs']);
+        }
+
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = LSD_Entity_Listing::restore_rich_attribute_values($lsd, $raw_lsd);
+
+        // Validate file attributes before saving.
+        if (isset($lsd['attributes']) && is_array($lsd['attributes']))
+        {
+            $file_attributes = [];
+            foreach (LSD_Main::get_attributes_details() as $attribute_detail)
+            {
+                if (($attribute_detail['field_type'] ?? '') !== 'file') continue;
+
+                $slug = $attribute_detail['slug'] ?? '';
+                if (!$slug) continue;
+
+                $file_attributes[$slug] = $attribute_detail;
+            }
+
+            if (!empty($file_attributes))
+            {
+                foreach ($lsd['attributes'] as $attribute_slug => $attribute_value)
+                {
+                    if (!isset($file_attributes[$attribute_slug])) continue;
+
+                    $attribute_name = $file_attributes[$attribute_slug]['name'] ?? '';
+                    $attribute_label = trim((string) $attribute_name) !== ''
+                        ? sanitize_text_field($attribute_name)
+                        : $attribute_slug;
+
+                    $term_id = isset($file_attributes[$attribute_slug]['id']) ? (int) $file_attributes[$attribute_slug]['id'] : 0;
+                    $validation = LSD_Entity_Listing::validate_file_attribute_value($attribute_value, $term_id, $attribute_label, true);
+
+                    if ($validation['valid'])
+                    {
+                        $lsd['attributes'][$attribute_slug] = $validation['value'] ?? '';
+                        continue;
+                    }
+
+                    $message = $validation['message'] ?? '';
+                    if ($message) LSD_Flash::add($message, 'error');
+
+                    // Keep the previous value on validation failure.
+                    $lsd['attributes'][$attribute_slug] = get_post_meta($post_id, 'lsd_attribute_' . $attribute_slug, true);
+                }
+            }
+        }
 
         // Save the Data
         $entity = new LSD_Entity_Listing($post_id);
@@ -343,10 +395,13 @@ class LSD_PTypes_Listing extends LSD_PTypes
         if ($master->post_type !== $this->PT) return;
         if ($target->post_type !== $this->PT) return;
 
-        $primary_category_id = get_post_meta($master_post_id, 'lsd_primary_category', true);
-        $target_category_id = apply_filters('wpml_object_id', $primary_category_id, LSD_Base::TAX_CATEGORY, true, $lang);
+        $primary_category = LSD_Entity_Listing::get_primary_category($master_post_id);
+        if (!$primary_category || !isset($primary_category->term_id, $primary_category->slug)) return;
 
-        update_post_meta($id, 'lsd_primary_category', $target_category_id);
+        $target_category_id = apply_filters('wpml_object_id', $primary_category->term_id, LSD_Base::TAX_CATEGORY, true, $lang);
+        $target_category = $target_category_id ? get_term($target_category_id, LSD_Base::TAX_CATEGORY) : null;
+
+        update_post_meta($id, 'lsd_primary_category', $target_category && isset($target_category->slug) ? $target_category->slug : $primary_category->slug);
     }
 
     public function wpml_pro_translation_saved($new_post_id, $fields, $job)

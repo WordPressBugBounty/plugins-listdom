@@ -18,7 +18,7 @@ if (!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
         <div class="lsd-col-<?php echo 12/$grid; ?>">
             <a href="<?php echo esc_url(get_term_link($term->term_id)); ?>">
                 <span class="lsd-title"><?php echo esc_html($term->name); ?></span>
-                <?php if (!isset($this->atts['show_count']) || $this->atts['show_count']): ?>
+                <?php if (isset($this->atts['show_count']) && $this->atts['show_count']): ?>
                     <span class="lsd-count"><?php echo sprintf(
                         /* translators: %s: Listing count. */
                         esc_html__('%s Listings', 'listdom'),
@@ -32,16 +32,14 @@ if (!in_array($grid, [1, 2, 3, 4, 6])) $grid = 3;
                 <?php foreach($children as $child): ?>
                 <li>
                     <a href="<?php echo esc_url(get_term_link($child->term_id)); ?>">
-                        <div class="lsd-title">
-                            <?php echo esc_html($child->name); ?>
-                            <?php if(isset($this->atts['show_count']) && $this->atts['show_count']): ?>
-                                <span class="lsd-count"><?php echo sprintf(
-                                    /* translators: %s: Listing count. */
-                                    esc_html__('%s Listings', 'listdom'),
-                                    $child->count
-                                ); ?></span>
-                            <?php endif; ?>
-                        </div>
+                        <span class="lsd-title"><?php echo esc_html($child->name); ?></span>
+                        <?php if(isset($this->atts['show_count']) && $this->atts['show_count']): ?>
+                            <span class="lsd-count"><?php echo sprintf(
+                                /* translators: %s: Listing count. */
+                                esc_html__('%s Listings', 'listdom'),
+                                $child->count
+                            ); ?></span>
+                        <?php endif; ?>
                     </a>
                 </li>
                 <?php endforeach; ?>

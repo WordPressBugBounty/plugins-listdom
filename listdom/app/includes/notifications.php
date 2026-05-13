@@ -5,16 +5,20 @@ class LSD_Notifications extends LSD_Base
     public function init()
     {
         // Notification Post Type
-        $PType = new LSD_PTypes_Notification();
-        $PType->init();
+        $ptype = new LSD_PTypes_Notification();
+        $ptype->init();
 
         // Dispatcher
-        $Dispatcher = new LSD_Notifications_Dispatcher();
-        $Dispatcher->init();
+        $dispatcher = new LSD_Notifications_Dispatcher();
+        $dispatcher->init();
 
         // Send Emails
-        $EmailPrepare = new LSD_Notifications_Email_Prepare();
-        $EmailPrepare->init();
+        $prepare = new LSD_Notifications_Email_Prepare();
+        $prepare->init();
+
+        // Payments Notifications
+        $payments = new LSD_Payments_Notifications();
+        $payments->init();
     }
 
     public static function get_notification_hooks()
@@ -25,6 +29,7 @@ class LSD_Notifications extends LSD_Base
             'lsd_new_listing' => esc_html__('New Listing', 'listdom'),
             'lsd_listing_status_changed' => esc_html__('Listing Status Changed', 'listdom'),
             'lsd_listing_report_abuse' => esc_html__('Abuse Report', 'listdom'),
+            'lsd_user_email_verification' => esc_html__('User Email Verification', 'listdom'),
         ];
 
         return apply_filters('lsd_notification_hooks', $hooks);
@@ -72,6 +77,11 @@ class LSD_Notifications extends LSD_Base
                 'message' => esc_html__('Sent message', 'listdom'),
                 'listing_link' => esc_html__('Link to the listing', 'listdom'),
             ],
+            'lsd_user_email_verification' => [
+                'user_login' => esc_html__('Username of the registering user', 'listdom'),
+                'user_email' => esc_html__('Email address of the registering user', 'listdom'),
+                'verification_link' => esc_html__('Email verification link', 'listdom'),
+            ],
             'general' => [
                 'date' => esc_html__('Current date while sending', 'listdom'),
                 'time' => esc_html__('Current time while sending', 'listdom'),
@@ -91,7 +101,7 @@ class LSD_Notifications extends LSD_Base
     {
         return get_posts([
             'post_type' => LSD_Base::PTYPE_NOTIFICATION,
-            'posts_per_page' => '-1',
+            'posts_per_page' => 100,
             'post_status' => 'publish',
             'meta_query' => [
                 [

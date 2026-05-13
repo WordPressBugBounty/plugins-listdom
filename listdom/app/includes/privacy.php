@@ -118,8 +118,8 @@ class LSD_Privacy extends LSD_Base
             'name' => 'lsd_privacy_consent',
             'required' => true,
             'checked' => false,
-            'class' => 'lsd-privacy-consent-checkbox',
-            'wrapper_class' => 'lsd-privacy-consent',
+            'class' => 'lsd-privacy-consent-checkbox ',
+            'wrapper_class' => 'lsd-privacy-consent ',
             'label' => '',
             'description' => '',
             'context' => '',
@@ -162,11 +162,9 @@ class LSD_Privacy extends LSD_Base
     public static function is_consent_enabled(string $context): bool
     {
         $context = sanitize_key($context);
-
         $settings = self::privacy_settings();
 
         $enabled = !empty($settings['enabled']);
-
         if ($enabled && $context !== '')
         {
             $contexts = isset($settings['contexts']) && is_array($settings['contexts']) ? $settings['contexts'] : [];
@@ -578,7 +576,8 @@ class LSD_Privacy extends LSD_Base
         if (strpos($value, $placeholder) !== false)
         {
             $link = self::privacy_policy_link();
-            $replacement = $link !== '' ? $link : esc_html__('privacy policy', 'listdom');
+            $replacement = $link !== '' ? strtolower($link) : esc_html__('privacy policy', 'listdom');
+
             return str_replace($placeholder, $replacement, $value);
         }
 
@@ -608,6 +607,7 @@ class LSD_Privacy extends LSD_Base
         $global_defaults = ['enabled' => $privacy['enabled'], 'label' => $privacy['default_label']];
         $auth = LSD_Options::auth();
         $details = LSD_Options::details_page();
+        $payments = LSD_Options::payments();
         $addons = LSD_Options::addons('pro');
 
         // This declarative array defines the data sources for each privacy context.
@@ -634,6 +634,10 @@ class LSD_Privacy extends LSD_Base
                 'fallbacks' => [
                     ['enabled' => $addons['privacy_consent']['report_enabled'] ?? null, 'label' => $addons['privacy_consent']['report_label'] ?? null],
                 ],
+            ],
+            'checkout' => [
+                'primary' => $payments,
+                'keys' => ['enabled' => 'pc_enabled', 'label' => 'pc_label'],
             ],
         ];
 

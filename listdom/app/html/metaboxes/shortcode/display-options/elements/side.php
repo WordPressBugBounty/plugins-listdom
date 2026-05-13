@@ -54,120 +54,127 @@ $optional_addons = [];
                 <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
             </div>
             <div class="lsd-elements-section">
-                    <?php if ($this->isPro()): ?>
-                        <div class="lsd-elements-subsection">
-                            <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Image', 'listdom'); ?></h4>
-                            <div class="lsd-elements-fields lsd-elements-3-column">
-                                <div class="lsd-image-row">
-                                    <div><?php echo LSD_Form::label([
-                                        'class' => 'lsd-fields-label',
-                                        'title' => esc_html__('Enable', 'listdom'),
-                                        'for' => 'lsd_display_options_skin_side_display_image',
-                                    ]); ?></div>
-                                    <div>
-                                        <?php echo LSD_Form::switcher([
-                                            'id' => 'lsd_display_options_skin_side_display_image',
-                                            'name' => 'lsd[display][side][display_image]',
-                                            'value' => $side['display_image'] ?? '1',
-                                            'toggle' => '#lsd_display_options_skin_side_image_method'
-                                        ]); ?>
-                                    </div>
+                <?php if ($this->isPro()): ?>
+                    <div class="lsd-elements-subsection">
+                        <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Image', 'listdom'); ?></h4>
+                        <div class="lsd-elements-fields lsd-elements-3-column">
+                            <div class="lsd-image-row">
+                                <div><?php echo LSD_Form::label([
+                                    'class' => 'lsd-fields-label',
+                                    'title' => esc_html__('Enable', 'listdom'),
+                                    'for' => 'lsd_display_options_skin_side_display_image',
+                                ]); ?></div>
+                                <div>
+                                    <?php echo LSD_Form::switcher([
+                                        'id' => 'lsd_display_options_skin_side_display_image',
+                                        'name' => 'lsd[display][side][display_image]',
+                                        'value' => $side['display_image'] ?? '1',
+                                        'toggle' => '#lsd_display_options_skin_side_image_method'
+                                    ]); ?>
                                 </div>
                             </div>
                         </div>
-                    <?php else: $optional_addons[] = ['pro', esc_html__('Display Image', 'listdom')]; ?>
-                    <?php endif; ?>
+                    </div>
+                <?php else: $optional_addons[] = ['pro', esc_html__('Display Image', 'listdom')]; ?>
+                <?php endif; ?>
 
-                    <div class="lsd-elements-subsection">
-                        <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Other Elements', 'listdom'); ?></h4>
-                        <div class="lsd-elements-fields">
-                            <?php if (LSD_Components::map()): ?>
-                                <div class="lsd-form-row lsd-display-options-builder-option">
-                                    <div class="lsd-col-8"><?php echo LSD_Form::label([
+                <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/partials/cta.php', [
+                    'parameters' => [
+                        'skin' => 'side',
+                        'settings' => $side,
+                    ],
+                ]); ?>
+
+                <div class="lsd-elements-subsection">
+                    <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Other Elements', 'listdom'); ?></h4>
+                    <div class="lsd-elements-fields">
+                        <?php if (LSD_Components::map()): ?>
+                            <div class="lsd-form-row lsd-display-options-builder-option">
+                                <div class="lsd-col-8"><?php echo LSD_Form::label([
+                                    'class' => 'lsd-fields-label',
+                                    'title' => esc_html__('Address', 'listdom'),
+                                    'for' => 'lsd_display_options_skin_side_display_address',
+                                ]); ?></div>
+                                <div class="lsd-col-4">
+                                    <?php echo LSD_Form::switcher([
+                                        'id' => 'lsd_display_options_skin_side_display_address',
+                                        'name' => 'lsd[display][side][display_address]',
+                                        'value' => $side['display_address'] ?? '1'
+                                    ]); ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (LSD_Components::pricing()): ?>
+                            <div class="lsd-form-row lsd-display-options-builder-option">
+                                <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
-                                        'title' => esc_html__('Address', 'listdom'),
-                                        'for' => 'lsd_display_options_skin_side_display_address',
+                                        'title' => esc_html__('Price', 'listdom'),
+                                        'for' => 'lsd_display_options_skin_side_display_price',
                                     ]); ?></div>
-                                    <div class="lsd-col-4">
-                                        <?php echo LSD_Form::switcher([
-                                            'id' => 'lsd_display_options_skin_side_display_address',
-                                            'name' => 'lsd[display][side][display_address]',
-                                            'value' => $side['display_address'] ?? '1'
-                                        ]); ?>
-                                    </div>
+                                <div class="lsd-col-4">
+                                    <?php echo LSD_Form::switcher([
+                                        'id' => 'lsd_display_options_skin_side_display_price',
+                                        'name' => 'lsd[display][side][display_price]',
+                                        'value' => $side['display_price'] ?? '1'
+                                    ]); ?>
                                 </div>
-                            <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
 
-                            <?php if (LSD_Components::pricing()): ?>
-                                <div class="lsd-form-row lsd-display-options-builder-option">
-                                    <div class="lsd-col-8"><?php echo LSD_Form::label([
-                                            'class' => 'lsd-fields-label',
-                                            'title' => esc_html__('Price', 'listdom'),
-                                            'for' => 'lsd_display_options_skin_side_display_price',
-                                        ]); ?></div>
-                                    <div class="lsd-col-4">
-                                        <?php echo LSD_Form::switcher([
-                                            'id' => 'lsd_display_options_skin_side_display_price',
-                                            'name' => 'lsd[display][side][display_price]',
-                                            'value' => $side['display_price'] ?? '1'
-                                        ]); ?>
-                                    </div>
+                        <?php if (class_exists(\LSDPACFAV\Base::class)): ?>
+                            <div class="lsd-form-row lsd-display-options-builder-option">
+                                <div class="lsd-col-8"><?php echo LSD_Form::label([
+                                        'class' => 'lsd-fields-label',
+                                        'title' => esc_html__('Favorite Icon', 'listdom'),
+                                        'for' => 'lsd_display_options_skin_side_display_favorite_icon',
+                                    ]); ?></div>
+                                <div class="lsd-col-4">
+                                    <?php echo LSD_Form::switcher([
+                                        'id' => 'lsd_display_options_skin_side_display_favorite_icon',
+                                        'name' => 'lsd[display][side][display_favorite_icon]',
+                                        'value' => $side['display_favorite_icon'] ?? '1'
+                                    ]); ?>
                                 </div>
-                            <?php endif; ?>
+                            </div>
+                        <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
+                        <?php endif; ?>
 
-                            <?php if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)): ?>
-                                <div class="lsd-form-row lsd-display-options-builder-option">
-                                    <div class="lsd-col-8"><?php echo LSD_Form::label([
-                                            'class' => 'lsd-fields-label',
-                                            'title' => esc_html__('Favorite Icon', 'listdom'),
-                                            'for' => 'lsd_display_options_skin_side_display_favorite_icon',
-                                        ]); ?></div>
-                                    <div class="lsd-col-4">
-                                        <?php echo LSD_Form::switcher([
-                                            'id' => 'lsd_display_options_skin_side_display_favorite_icon',
-                                            'name' => 'lsd[display][side][display_favorite_icon]',
-                                            'value' => $side['display_favorite_icon'] ?? '1'
-                                        ]); ?>
-                                    </div>
+                        <?php if (class_exists(\LSDPACCMP\Base::class)): ?>
+                            <div class="lsd-form-row lsd-display-options-builder-option">
+                                <div class="lsd-col-8"><?php echo LSD_Form::label([
+                                        'class' => 'lsd-fields-label',
+                                        'title' => esc_html__('Compare Icon', 'listdom'),
+                                        'for' => 'lsd_display_options_skin_side_display_compare_icon',
+                                    ]); ?></div>
+                                <div class="lsd-col-4">
+                                    <?php echo LSD_Form::switcher([
+                                        'id' => 'lsd_display_options_skin_side_display_compare_icon',
+                                        'name' => 'lsd[display][side][display_compare_icon]',
+                                        'value' => $side['display_compare_icon'] ?? '1'
+                                    ]); ?>
                                 </div>
-                            <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
-                            <?php endif; ?>
+                            </div>
+                        <?php else: $optional_addons[] = ['compare', esc_html__('Compare Icon', 'listdom')]; ?>
+                        <?php endif; ?>
 
-                            <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
-                                <div class="lsd-form-row lsd-display-options-builder-option">
-                                    <div class="lsd-col-8"><?php echo LSD_Form::label([
-                                            'class' => 'lsd-fields-label',
-                                            'title' => esc_html__('Compare Icon', 'listdom'),
-                                            'for' => 'lsd_display_options_skin_side_display_compare_icon',
-                                        ]); ?></div>
-                                    <div class="lsd-col-4">
-                                        <?php echo LSD_Form::switcher([
-                                            'id' => 'lsd_display_options_skin_side_display_compare_icon',
-                                            'name' => 'lsd[display][side][display_compare_icon]',
-                                            'value' => $side['display_compare_icon'] ?? '1'
-                                        ]); ?>
-                                    </div>
+                        <?php if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
+                            <div class="lsd-form-row lsd-display-options-builder-option">
+                                <div class="lsd-col-8"><?php echo LSD_Form::label([
+                                        'class' => 'lsd-fields-label',
+                                        'title' => esc_html__('Review Rates', 'listdom'),
+                                        'for' => 'lsd_display_options_skin_side_review_stars',
+                                    ]); ?></div>
+                                <div class="lsd-col-4">
+                                    <?php echo LSD_Form::switcher([
+                                        'id' => 'lsd_display_options_skin_side_review_stars',
+                                        'name' => 'lsd[display][side][display_review_stars]',
+                                        'value' => $side['display_review_stars'] ?? '1'
+                                    ]); ?>
                                 </div>
-                            <?php else: $optional_addons[] = ['compare', esc_html__('Compare Icon', 'listdom')]; ?>
-                            <?php endif; ?>
-
-                            <?php if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)): ?>
-                                <div class="lsd-form-row lsd-display-options-builder-option">
-                                    <div class="lsd-col-8"><?php echo LSD_Form::label([
-                                            'class' => 'lsd-fields-label',
-                                            'title' => esc_html__('Review Rates', 'listdom'),
-                                            'for' => 'lsd_display_options_skin_side_review_stars',
-                                        ]); ?></div>
-                                    <div class="lsd-col-4">
-                                        <?php echo LSD_Form::switcher([
-                                            'id' => 'lsd_display_options_skin_side_review_stars',
-                                            'name' => 'lsd[display][side][display_review_stars]',
-                                            'value' => $side['display_review_stars'] ?? '1'
-                                        ]); ?>
-                                    </div>
-                                </div>
-                            <?php else: $optional_addons[] = ['reviews', esc_html__('Reviews Rate', 'listdom')]; ?>
-                            <?php endif; ?>
+                            </div>
+                        <?php else: $optional_addons[] = ['reviews', esc_html__('Reviews Rate', 'listdom')]; ?>
+                        <?php endif; ?>
 
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
@@ -179,10 +186,31 @@ $optional_addons = [];
                                     <?php echo LSD_Form::switcher([
                                         'id' => 'lsd_display_options_skin_side_title',
                                         'name' => 'lsd[display][side][display_title]',
-                                        'value' => $side['display_title'] ?? '1'
+                                        'value' => $side['display_title'] ?? '1',
+                                        'toggle' => '#lsd_display_options_skin_side_is_claimed_wrapper'
                                     ]); ?>
                                 </div>
                             </div>
+
+                            <?php if (class_exists(\LSDPACCLM\Base::class)): ?>
+                                <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 <?php echo !isset($side['display_title']) || $side['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_side_is_claimed_wrapper">
+                                    <div class="lsd-form-row">
+                                        <div class="lsd-col-8"><?php echo LSD_Form::label([
+                                                'class' => 'lsd-fields-label',
+                                                'title' => esc_html__('Claim Status', 'listdom'),
+                                                'for' => 'lsd_display_options_skin_side_is_claimed',
+                                            ]); ?></div>
+                                        <div class="lsd-col-4">
+                                            <?php echo LSD_Form::switcher([
+                                                'id' => 'lsd_display_options_skin_side_is_claimed',
+                                                'name' => 'lsd[display][side][display_is_claimed]',
+                                                'value' => $side['display_is_claimed'] ?? '1',
+                                            ]); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php else: $optional_addons[] = ['claim', esc_html__('Claim Status', 'listdom')]; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -194,6 +222,3 @@ $optional_addons = [];
         </div>
     </div>
 </div>
-
-
-

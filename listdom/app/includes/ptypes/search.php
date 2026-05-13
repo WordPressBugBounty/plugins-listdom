@@ -207,11 +207,15 @@ class LSD_PTypes_Search extends LSD_PTypes
         $device_key = isset($_POST['device_key']) ? sanitize_text_field(wp_unslash($_POST['device_key'])) : 'fields';
 
         $builder = new LSD_Search_Builder();
-        $html = $builder->row($post_id, $device_key, [
+        $row = [
             'type' => $type,
             'buttons' => ['status' => 1],
             'clear' => ['status' => 0],
-        ], $i);
+        ];
+
+        if (class_exists(\LSDPACMA\Base::class)) $row['filters_button'] = ['status' => 0];
+
+        $html = $builder->row($post_id, $device_key, $row, $i);
 
         $this->response(['success' => 1, 'html' => $html]);
     }

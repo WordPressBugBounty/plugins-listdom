@@ -12,7 +12,7 @@ $settings = LSD_Options::settings();
                 <i class="listdom-icon lsdi-add-plus"></i>
                 <h2 class="lsd-admin-title lsd-m-0"><?php echo esc_html__('Stay Updated & Improve Listdom', 'listdom'); ?></h2>
             </div>
-            <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Add your email for updates and optionally share anonymous usage data to help us improve.' , 'listdom'); ?></p>
+            <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Add your email for updates and optionally share usage data to help us improve.' , 'listdom'); ?></p>
         </div>
     </div>
 
@@ -21,7 +21,7 @@ $settings = LSD_Options::settings();
             <div class="lsd-collect-settings">
                 <div class="lsd-form-row lsd-m-0">
                     <p class="lsd-admin-description-tiny lsd-mb-2 lsd-mt-0"><?php esc_html_e('Enter your email to get the latest features and updates.', 'listdom');?></p>
-                    <div class="lsd-col-9 lsd-p-0">
+                    <div class="lsd-col-9 lsd-p-0 lsd-pt-2">
                         <?php echo LSD_Form::email([
                             'class' => 'lsd-admin-input',
                             'id' => 'lsd_subscription_email',
@@ -46,7 +46,22 @@ $settings = LSD_Options::settings();
                             'value' => $settings['help_improve_listdom'] ?? '1',
                         ]); ?>
                     </div>
-                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Send anonymous usage data to help improve Listdom.', 'listdom'); ?></p>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Send usage data to help improve Listdom.', 'listdom'); ?></p>
+                </div>
+                <div class="lsd-form-row lsd-flex-align-items-center lsd-m-0">
+                    <div class="lsd-col-3"><?php echo LSD_Form::label([
+                        'class' => 'lsd-fields-label',
+                        'title' => esc_html__('Powered by Message', 'listdom'),
+                        'for' => 'lsd_powered_by_message',
+                    ]); ?></div>
+                    <div class="lsd-col-7">
+                        <?php echo LSD_Form::switcher([
+                            'id' => 'lsd_powered_by_message',
+                            'name' => 'lsd[powered_by_message]',
+                            'value' => $settings['powered_by_message'] ?? '0',
+                        ]); ?>
+                    </div>
+                    <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Show a small "Powered by Listdom" credit on single listing pages.', 'listdom'); ?></p>
                 </div>
             </div>
             <?php wp_nonce_field('lsd_submit_newsletter', 'lsd_submit_newsletter_nonce', false); ?>

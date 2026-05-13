@@ -11,6 +11,7 @@ class LSD_Kses extends LSD_Base
     static $allowed_attrs = [
         'data-*' => 1,
         'aria-*' => 1,
+        'role' => 1,
         'type' => 1,
         'value' => 1,
         'class' => 1,

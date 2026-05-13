@@ -12,7 +12,7 @@ if (!$this->display_slider_arrows) LSD_Assets::footer('<style>.owl-nav{display:n
     <div class="lsd-listing-image">
         <?php echo LSD_Kses::element($listing->get_cover_image([1100, 550], $this->get_listing_link_method())); ?>
 
-        <div class="lsd-listing-detail">.
+        <div class="lsd-listing-detail">
             <?php if ($this->display_labels): ?>
                 <div class="lsd-listing-labels">
                     <?php echo LSD_Kses::element($listing->get_labels()); ?>
@@ -35,6 +35,11 @@ if (!$this->display_slider_arrows) LSD_Assets::footer('<style>.owl-nav{display:n
                 <?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
             <?php endif; ?>
 
+            <?php if ($this->display_cta): ?>
+                <div class="lsd-listing-call-to-action">
+                    <?php echo $this->listing_cta($listing); ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

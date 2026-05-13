@@ -53,3 +53,19 @@ function lsd_ads(string $position): string
 
     return $ads[$position] ?? '';
 }
+
+function lsd_payment(): LSD_Payments_Helper
+{
+    return new LSD_Payments_Helper();
+}
+
+function lsd_t_label(string $taxonomy, string $form = 'singular', string $locale = ''): string
+{
+    return LSD_Labels::get($taxonomy, $form, $locale);
+}
+
+function lsd_t_label_lc(string $taxonomy, string $form = 'singular', string $locale = ''): string
+{
+    $label = LSD_Labels::get($taxonomy, $form, $locale);
+    return LSD_Labels::lowercase($label);
+}

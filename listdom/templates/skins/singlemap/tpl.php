@@ -15,7 +15,6 @@ jQuery(document).ready(function()
         sidebar: "'.($this->sidebar ? '1' : '0').'",
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
-        nonce: "' . esc_js(wp_create_nonce('lsd_search_form')) . '",
     });
 });
 </script>');
@@ -54,8 +53,10 @@ jQuery(document).ready(function()
                     'id' => $this->id,
                     'sidebar' => $this->sidebar,
                     'onclick' => $this->skin_options['mapobject_onclick'] ?? 'infowindow',
+                    'infowindow_trigger' => $this->skin_options['mapobject_infowindow_trigger'] ?? 'click',
                     'mapcontrols' => $this->mapcontrols,
                     'map_height' => $this->map_height,
+                    'mousewheel_zoom' => $this->mousewheel_zoom,
                     'atts' => $this->atts,
                     'mapsearch' => $this->mapsearch,
                     'autoGPS' => $this->autoGPS,

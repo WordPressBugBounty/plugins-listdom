@@ -358,6 +358,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             $rendered = str_replace('{content}', LSD_Kses::element($content), $rendered);
         }
 
+        // FAQs
+        if (strpos($this->pattern, '{faq}') !== false)
+        {
+            $faq = $this->faq();
+            $rendered = str_replace('{faq}', LSD_Kses::element($faq), $rendered);
+        }
+
         // Remark
         if (strpos($this->pattern, '{remark}') !== false)
         {
@@ -397,6 +404,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         {
             $share = $this->share();
             $rendered = str_replace('{share}', LSD_Kses::element($share), $rendered);
+        }
+
+        // Listing Call To Action
+        if (strpos($this->pattern, '{cta}') !== false)
+        {
+            $cta = $this->cta();
+            $rendered = str_replace('{cta}', LSD_Kses::element($cta), $rendered);
         }
 
         // Listing Tags
@@ -481,7 +495,10 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         remove_filter('the_content', [$this, 'filter_content']);
 
         // Build and Return
-        $output = (new LSD_Builders())->single($this)->build($this->style);
+        $output = (new LSD_Builders())
+            ->single($this)
+            ->listing($this->entity)
+            ->build($this->style);
 
         // Add Filter
         add_filter('the_content', [$this, 'filter_content']);
@@ -495,11 +512,37 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Style Wrapper Class
         $style = (is_numeric($this->style) ? 'builder' : $this->style);
 
-        $schema = lsd_schema()->scope()->type(null, $this->entity->get_data_category());
-        $rendered = '<div class="lsd-single-page-wrapper lsd-font-m lsd-single-' . $style . '" ' . $schema . '>' . $content . '</div>';
+        $schema = lsd_schema()->reset();
+        $meta = '';
+
+        // Reliability fallback for Google-required LocalBusiness fields
+        $meta .= $schema->meta('name', get_the_title($this->entity->id()));
+        $meta .= $schema->meta('url', get_permalink($this->entity->id()));
+
+        $image_id = get_post_thumbnail_id($this->entity->id());
+        $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'full') : '';
+        if ($image_url) $meta .= $schema->meta('image', $image_url);
+
+        $rendered = '<div class="lsd-single-page-wrapper lsd-font-m lsd-single-' . $style . '" ' . lsd_schema()->scope()->type(null, $this->entity->get_data_category()) . '>'
+            . $meta . $content . $this->powered_by_message()
+        . '</div>';
 
         // Remove remained placeholders
         return preg_replace('/{.*}/', '', apply_filters('lsd_listing_single_content', $rendered, $this));
+    }
+
+    protected function powered_by_message(): string
+    {
+        $settings = LSD_Options::settings();
+        if (empty($settings['powered_by_message'])) return '';
+
+        $message = sprintf(
+            /* translators: %s: Listdom website link. */
+            wp_kses(__('Powered by %s', 'listdom'), ['a' => ['href' => [], 'target' => [], 'rel' => []]]),
+            '<a href="' . esc_url('https://listdom.net/?utm_source=listdom&utm_medium=powered_by&utm_campaign=listing_single') . '" target="_blank" rel="noopener">' . esc_html__('Listdom', 'listdom') . '</a>'
+        );
+
+        return '<p class="lsd-single-powered-by lsd-m-0">' . $message . '</p>';
     }
 
     public function breadcrumb(): string
@@ -518,7 +561,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Breadcrumb', 'listdom');
 
         $output = '<div class="lsd-single-page-section">';
-        if ($this->details_page_options['elements']['breadcrumb']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-single-page-section-breadcrumb">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['breadcrumb']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title lsd-single-page-section-breadcrumb">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-breadcrumb" ' . $schema . '>' . $breadcrumb . '</div>';
         $output .= '</div>';
 
@@ -543,7 +586,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Address', 'listdom');
 
         $output = '<div class="lsd-single-page-section">';
-        if ($this->details_page_options['elements']['address']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-single-page-section-address ' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['address']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title lsd-single-page-section-address ' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-address" ' . $schema . '>' . $address . '</div>';
         $output .= '</div>';
 
@@ -577,7 +620,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Author Info', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-owner">';
-        if ($this->details_page_options['elements']['owner']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['owner']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-owner-box lsd-single-element lsd-single-owner">' . $owner . '</div>';
         $output .= '</div>';
 
@@ -599,7 +642,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Report Abuse', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-abuse">';
-        if ($this->details_page_options['elements']['abuse']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['abuse']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-abuse-box lsd-single-element lsd-single-abuse">' . $abuse . '</div>';
         $output .= '</div>';
 
@@ -623,7 +666,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Details', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-attributes">';
-        if ($this->details_page_options['elements']['attributes']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['attributes']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
 
         $output .= '<div class="lsd-single-attributes-box lsd-single-element lsd-single-attributes">' . $attributes . '</div>';
         $output .= '</div>';
@@ -648,7 +691,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Working Hours', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-availability">';
-        if ($this->details_page_options['elements']['availability']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['availability']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-availability-box"><div class="lsd-single-element lsd-single-availability">' . $availability . '</div></div>';
         $output .= '</div>';
 
@@ -692,7 +735,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $schema = lsd_schema()->description();
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-content">';
-        if ($this->details_page_options['elements']['content']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['content']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-content-wrapper lsd-single-element lsd-single-content" ' . $schema . '>' . $content . '</div>';
         $output .= '</div>';
 
@@ -717,7 +760,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $schema = lsd_schema()->description();
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-excerpt">';
-        if ($this->details_page_options['elements']['excerpt']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['excerpt']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-excerpt-wrapper lsd-single-element lsd-single-excerpt" ' . $schema . '>' . $excerpt . '</div>';
         $output .= '</div>';
 
@@ -741,7 +784,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $schema = lsd_schema()->scope()->type('https://schema.org/UserComments');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-remark" ' . $schema . '>';
-        if ($this->details_page_options['elements']['remark']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['remark']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-content-wrapper lsd-single-element lsd-single-remark">' . wpautop($remark) . '</div>';
         $output .= '</div>';
 
@@ -768,10 +811,10 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Heading
         $heading = isset($this->details_page_options['elements']['features']['custom_title']) && trim($this->details_page_options['elements']['features']['custom_title'])
             ? $this->details_page_options['elements']['features']['custom_title']
-            : esc_html__('Features', 'listdom');
+            : esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural'));
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-features">';
-        if ($this->details_page_options['elements']['features']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['features']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
 
         $output .= '<div class=" lsd-single-features-wrapper lsd-single-element lsd-single-features">' . $features . '</div>';
         $output .= '</div>';
@@ -814,7 +857,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         LSD_Assets::map();
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-map">';
-        if ($this->details_page_options['elements']['map']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['map']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-listing-googlemap lsd-single-element lsd-single-map">' . $map . '</div>';
         $output .= '</div>';
 
@@ -823,7 +866,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
     public function image(): string
     {
-        $featured_image = $this->entity->get_featured_image();
+        $featured_image = $this->entity->get_featured_image('full', 'url');
 
         // Don't show anything when there is no Featured Image!
         if (!trim($featured_image)) return '';
@@ -836,8 +879,8 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Listing Image', 'listdom');
 
         $output = '';
-        if ($this->details_page_options['elements']['image']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
-        $output .= '<div class="lsd-single-element lsd-single-featured-image" ' . lsd_schema()->scope()->type('https://schema.org/ImageObject') . '>' . $featured_image . '</div>';
+        if ($this->details_page_options['elements']['image']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
+        $output .= '<div class="lsd-single-element lsd-single-featured-image" ' . lsd_schema()->scope()->type('https://schema.org/ImageObject')->prop('image') . '>' . $featured_image . '</div>';
 
         return $output;
     }
@@ -865,7 +908,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Listing Gallery', 'listdom');
 
         $output = '<div class="lsd-single-gallery-box">';
-        if ($this->details_page_options['elements']['gallery']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['gallery']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-gallery">' . $gallery . '</div>';
         $output .= '</div>';
 
@@ -884,6 +927,29 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
                 <div class="lsd-single-element lsd-single-embed">' . $embeds . '</div>
             </div>
         </div>';
+    }
+
+    public function faq(): string
+    {
+        $limit = $this->details_page_options['elements']['faq']['count'] ?? 0;
+        $faqs = $this->entity->get_faqs($limit);
+
+        // Don't show anything when there is no FAQs!
+        if (!trim($faqs)) return '';
+
+        $title_alignment = !empty($this->details_page_options['elements']['faq']['title_align']) ? ' ' . $this->details_page_options['elements']['faq']['title_align'] : '';
+
+        // Heading
+        $heading = isset($this->details_page_options['elements']['faq']['custom_title']) && trim($this->details_page_options['elements']['faq']['custom_title'])
+            ? $this->details_page_options['elements']['faq']['custom_title']
+            : esc_html__('FAQs', 'listdom');
+
+        $output = '<div class="lsd-single-page-section lsd-single-page-section-faq">';
+        if ($this->details_page_options['elements']['faq']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
+        $output .= '<div class="lsd-single-element lsd-single-faq">' . $faqs . '</div>';
+        $output .= '</div>';
+
+        return $output;
     }
 
     public function featured_video(): string
@@ -918,7 +984,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Labels', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-labels">';
-        if ($this->details_page_options['elements']['labels']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['labels']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-labels">' . $labels . '</div>';
         $output .= '</div>';
 
@@ -946,7 +1012,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $schema = lsd_schema()->priceRange();
 
         $output = '';
-        if ($this->details_page_options['elements']['price']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['price']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-price" ' . $schema . '><div class="lsd-color-m-bg ' . $this->get_text_class() . '">' . $price . '</div></div>';
 
         return $output;
@@ -967,8 +1033,41 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Share', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-share">';
-        if ($this->details_page_options['elements']['share']['show_title']) $output .= '<h2 class="lsd-single-page-section-title">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['share']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-share-box lsd-single-element lsd-single-share">' . $share . '</div>';
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    public function cta(): string
+    {
+        if (!LSD_Components::cta()) return '';
+
+        $cta_element = new LSD_Element_Cta();
+        $cta_data = $cta_element->get_data($this->entity);
+        $cta_html = $this->entity->get_cta('single', [
+            'button_class' => 'lsd-general-button lsd-single-cta-button',
+        ]);
+
+        if (!trim($cta_html)) return '';
+
+        $alignment = $this->details_page_options['elements']['cta']['alignment'] ?? 'center';
+        $alignment = trim($alignment) ? $alignment : 'center';
+        $alignment_class = 'lsd-cta-align-' . sanitize_html_class($alignment);
+
+        $output = '<div class="lsd-single-page-section lsd-single-page-cta ' . $alignment_class . '">';
+
+        if (!empty($this->details_page_options['elements']['cta']['show_title']))
+        {
+            $custom_title = $this->details_page_options['elements']['cta']['custom_title'] ?? '';
+            $default_heading = trim($cta_data['title'] ?? '') ?: esc_html__('Call to Action', 'listdom');
+            $heading = trim($custom_title) ? $custom_title : $default_heading;
+
+            $output .= '<h2 class="lsd-single-page-section-title">' . esc_html($heading) . '</h2>';
+        }
+
+        $output .= '<div class="lsd-single-cta">' . LSD_Kses::element($cta_html) . '</div>';
         $output .= '</div>';
 
         return $output;
@@ -989,7 +1088,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Related', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-related">';
-        if ($this->details_page_options['elements']['related']['show_title']) $output .= '<h2 class="lsd-single-page-section-title">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['related']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-related-box lsd-single-element lsd-single-related">' . $related . '</div>';
         $output .= '</div>';
 
@@ -1010,8 +1109,8 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             ? $this->details_page_options['elements']['tags']['custom_title']
             : esc_html__('Tags', 'listdom');
 
-        $output = '<div class="lsd-single-tags-wrapper">';
-        if ($this->details_page_options['elements']['tags']['show_title']) $output .= '<div class="lsd-single-label-inline"><i class="lsd-icon fa fa-tags fa-lg" aria-hidden="true"></i> <span>' . $heading . '</span></div>';
+        $output = '<div class="lsd-single-tags-wrapper lsd-fe-icon-wrapper">';
+        if ($this->details_page_options['elements']['tags']['show_title']) $output .= '<div class="lsd-single-label-inline"><i class="lsd-fe-icon fa fa-tags fa-lg" aria-hidden="true"></i> <span>' . $heading . '</span></div>';
         $output .= '<div class="lsd-single-element lsd-single-tags">' . $tags . '</div>';
         $output .= '</div>';
 
@@ -1031,21 +1130,27 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Title Wrapper
         $output = '<div class="lsd-single-title-wrapper">';
 
-        // Title
-        $output .= '<h1 class="lsd-single-element lsd-single-title" ' . $schema . '>' . $title . '</h1>';
+        // Title (with claim icon inside <h1>)
+        $output .= '<h1 class="lsd-single-element lsd-single-title" ' . $schema . '>';
+        $output .= $title;
+
+        // Add claimed icon inside h1
+        if ($this->entity->is_claimed()) $output .= ' <span class="lsd-tooltip" data-lsd-tooltip="' . esc_attr__('Verified', 'listdom') . '"><i class="lsd-fe-icon fas fa-check-circle lsd-claimed-icon"></i></span>';
+
+        $output .= '</h1>';
 
         // Claim & Favorite Wrapper
         $output .= '<div class="lsd-single-title-claim-favorite-wrapper">';
 
-        // Claim
+        // Claim button
         if ($claim) $output .= LSD_Kses::element($this->entity->get_claim_button());
 
-        // Favorite
+        // Compare & Favorite buttons
         if ($compare) $output .= LSD_Kses::element($this->entity->get_compare_button());
         if ($favorite) $output .= LSD_Kses::element($this->entity->get_favorite_button('button'));
 
-        $output .= '</div>';
-        $output .= '</div>';
+        $output .= '</div>'; // close claim/favorite wrapper
+        $output .= '</div>'; // close title wrapper
 
         return $output;
     }
@@ -1065,7 +1170,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             : esc_html__('Contact Info', 'listdom');
 
         $output = '<div class="lsd-single-page-section lsd-single-page-section-contact">';
-        if ($this->details_page_options['elements']['contact']['show_title']) $output .= '<h2 class="lsd-single-page-section-title' . $title_alignment . '">' . $heading . '</h2>';
+        if ($this->details_page_options['elements']['contact']['show_title']) $output .= '<h2 class="lsd-single-page-section-title lsd-fe-title' . $title_alignment . '">' . $heading . '</h2>';
         $output .= '<div class="lsd-single-element lsd-single-contact-info lsd-single-contact-box">' . $contact . '</div>';
         $output .= '</div>';
 
@@ -1095,6 +1200,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             else if ($key === 'image') $content .= LSD_Kses::element($this->image());
             else if ($key === 'gallery') $content .= LSD_Kses::element($this->gallery());
             else if ($key === 'embed') $content .= LSD_Kses::rich($this->embeds());
+            else if ($key === 'faq') $content .= LSD_Kses::element($this->faq());
             else if ($key === 'video') $content .= LSD_Kses::rich($this->featured_video());
             else if ($key === 'labels') $content .= LSD_Kses::element($this->labels());
             else if ($key === 'content') $content .= LSD_Kses::element($this->content($this->filtered_content));
@@ -1109,6 +1215,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             else if ($key === 'availability') $content .= LSD_Kses::element($this->availability());
             else if ($key === 'excerpt') $content .= LSD_Kses::element($this->excerpt());
             else if ($key === 'breadcrumb') $content .= LSD_Kses::element($this->breadcrumb());
+            else if ($key === 'cta') $content .= LSD_Kses::element($this->cta());
             else $content .= '{' . $key . '}';
         }
 

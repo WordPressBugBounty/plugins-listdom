@@ -13,9 +13,16 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Auth Shortcode
         add_shortcode('listdom-auth', [$this, 'auth']);
 
+        // Email Verification Handler
+        add_action('init', [$this, 'handle_verification_request']);
+
         // Login User
         add_action('wp_ajax_lsd_login', [$this, 'signin']);
         add_action('wp_ajax_nopriv_lsd_login', [$this, 'signin']);
+
+        // Resend Verification Email
+        add_action('wp_ajax_lsd_resend_verification', [$this, 'resend_verification_email']);
+        add_action('wp_ajax_nopriv_lsd_resend_verification', [$this, 'resend_verification_email']);
 
         // Register User
         add_action('wp_ajax_lsd_register', [$this, 'signup']);
@@ -28,6 +35,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Reset Password
         add_action('wp_ajax_lsd_reset_password', [$this, 'reset_password_request']);
         add_action('wp_ajax_nopriv_lsd_reset_password', [$this, 'reset_password_request']);
+
+        // Block Unverified Users
+        add_filter('authenticate', [$this, 'block_unverified_users'], 30, 3);
 
         // Redirect After Logout
         add_action('wp_logout', [$this, 'logout_redirect']);
@@ -58,14 +68,15 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-login');
         if (trim($pre)) return $pre;
 
-        // User is Already Logged-in
-        if (is_user_logged_in()) return $this->user_profile();
 
         $redirect = $atts['redirect'] ?? '';
 
         // Role Restriction
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
-        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
+        if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
+
+        $layout = isset($atts['layout']) ? strtolower(sanitize_text_field($atts['layout'])) : 'inline';
+        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role, 'login');
 
         // Get Redirect from Request
         if (isset($_REQUEST['redirect_to']) && trim($_REQUEST['redirect_to']))
@@ -73,6 +84,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
             $requested_redirect = wp_sanitize_redirect(wp_unslash($_REQUEST['redirect_to']));
             if ($requested_redirect !== '') $redirect = wp_validate_redirect($requested_redirect, $redirect);
         }
+
+        // User is Already Logged-in
+        if (is_user_logged_in()) return $this->user_profile();
 
         ob_start();
         include lsd_template('auth/login.php');
@@ -85,12 +99,15 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-register');
         if (trim($pre)) return $pre;
 
-        // User is Already Logged-in
-        if (is_user_logged_in()) return $this->user_profile();
-
         // Role Restriction
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
-        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
+        if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
+
+        $layout = isset($atts['layout']) ? strtolower(sanitize_text_field($atts['layout'])) : 'inline';
+        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role, 'register');
+
+        // User is Already Logged-in
+        if (is_user_logged_in()) return $this->user_profile();
 
         ob_start();
         include lsd_template('auth/register.php');
@@ -102,6 +119,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-forgot-password');
         if (trim($pre)) return $pre;
+
+        $layout = isset($atts['layout']) ? strtolower(sanitize_text_field($atts['layout'])) : 'inline';
+        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, '', 'forgot-password');
 
         // User is Already Logged-in
         if (is_user_logged_in()) return $this->user_profile();
@@ -117,16 +137,126 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-auth');
         if (trim($pre)) return $pre;
 
-        // User is Already Logged-in
-        if (is_user_logged_in()) return $this->user_profile();
+        $layout = isset($atts['layout']) ? strtolower(sanitize_text_field($atts['layout'])) : 'inline';
+        $layout = $layout === 'dropdown' ? 'dropdown' : 'inline';
 
         // Role Restriction
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
-        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
+        if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
+
+        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role);
+
+        // User is Already Logged-in
+        if (is_user_logged_in()) return $this->user_profile();
 
         ob_start();
         include lsd_template('auth/auth.php');
         return ob_get_clean();
+    }
+
+    private function render_auth_dropdown($atts = [], string $role = '', string $form_type = 'auth'): string
+    {
+        $defaults = [
+            'label' => esc_html__('Sign in', 'listdom'),
+            'layout' => 'dropdown',
+            'role' => '',
+            'align' => 'right',
+            'hover' => '',
+            'role_tabs' => '',
+            'role_tabs_labels' => '',
+            'tabs_roles' => '',
+        ];
+
+        $atts = shortcode_atts($defaults, $atts, 'listdom-auth');
+
+        $button_label = sanitize_text_field($atts['label']);
+        if (!trim($button_label)) $button_label = esc_html__('Sign in', 'listdom');
+
+        $hover = in_array(strtolower((string) $atts['hover']), ['1', 'true', 'yes', 'hover', 'on'], true);
+        $align_value = strtolower((string) $atts['align']);
+        $align = in_array($align_value, ['left', 'center', 'right'], true) ? $align_value : 'right';
+
+        $role_tabs_enabled = in_array(strtolower((string) $atts['role_tabs']), ['1', 'true', 'yes', 'on'], true);
+        $role_tab_labels = $this->parse_pipe_list($atts['role_tabs_labels'] ?? '');
+        $role_tab_roles = $this->parse_pipe_list($atts['tabs_roles'] ?? '');
+        $role_tabs = $this->auth_dropdown_role_tabs($atts['role'] ?: $role, $role_tab_labels, $role_tab_roles, $role_tabs_enabled);
+
+        $id = 'lsd-auth-dropdown-' . uniqid();
+
+        $form_type = in_array($form_type, ['auth', 'login', 'register', 'forgot-password'], true) ? $form_type : 'auth';
+
+        $auth = LSD_Options::auth();
+
+        // Dashboard Page
+        $dashboard_page = LSD_Options::post_id('submission_page');
+
+        $logout_link = isset($auth['logout']['redirect']) ? get_permalink($auth['logout']['redirect']) : false;
+        $logout_redirect = $logout_link ?: home_url();
+
+        $account_link = isset($auth['account']['redirect']) ? get_permalink($auth['account']['redirect']) : false;
+        $account_redirect = $account_link ?: ($dashboard_page ? get_page_link($dashboard_page) : home_url());
+
+        ob_start();
+        include lsd_template('auth/auth-dropdown.php');
+        return ob_get_clean();
+    }
+
+    private function auth_dropdown_role_tabs(string $fallback_role = '', array $custom_labels = [], array $custom_roles = [], bool $custom_enabled = false): array
+    {
+        $tabs = [];
+        $roles = LSD_Roles::supported(true);
+
+        $fallback_role = sanitize_text_field($fallback_role);
+        if (!in_array($fallback_role, $roles, true)) $fallback_role = '';
+
+        $custom_labels = array_values(array_filter(array_map('sanitize_text_field', $custom_labels), 'strlen'));
+        $custom_roles = array_values(array_map('sanitize_text_field', $custom_roles));
+
+        if ($custom_enabled && (count($custom_labels) || count($custom_roles) > 1))
+        {
+            $tab_count = max(count($custom_labels), count($custom_roles));
+
+            for ($i = 0; $i < $tab_count; $i++)
+            {
+                $label = $custom_labels[$i] ?? '';
+                $role = $custom_roles[$i] ?? '';
+
+                if (!in_array($role, $roles, true)) $role = '';
+                if ($label === '')
+                {
+                    if ($role)
+                    {
+                        $label = ucwords(str_replace(['_', '-'], ' ', $role));
+                    }
+                    else
+                    {
+                        $label = esc_html__('Users', 'listdom');
+                    }
+                }
+
+                $tabs[] = [
+                    'label' => $label,
+                    'role' => $role ?: ($tab_count === 1 ? $fallback_role : ''),
+                ];
+            }
+
+            if ($tabs) return $tabs;
+        }
+
+        $tabs[] = [
+            'label' => esc_html__('Users', 'listdom'),
+            'role' => $fallback_role,
+        ];
+
+        return $tabs;
+    }
+
+    private function parse_pipe_list($value): array
+    {
+        if (!is_string($value)) return [];
+
+        $parts = array_map('trim', explode('|', $value));
+        return array_values(array_filter($parts, 'strlen'));
     }
 
     public function signin()
@@ -151,12 +281,12 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Redirect Url
         $redirect_to = isset($_POST['redirect_to']) && $_POST['redirect_to']
-            ? wp_validate_redirect(wp_sanitize_redirect(wp_unslash($_POST['redirect_to'])), '')
+            ? wp_validate_redirect(wp_sanitize_redirect(wp_unslash($_POST['redirect_to'])))
             : '';
 
         // Role Restriction
         $role = isset($_POST['lsd_role']) ? sanitize_text_field(wp_unslash($_POST['lsd_role'])) : '';
-        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
+        if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
 
         if ($role)
         {
@@ -174,7 +304,24 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $user = wp_signon($credentials, is_ssl());
 
         // Invalid Login
-        if (is_wp_error($user)) $this->response(['success' => 0, 'message' => esc_html__('Invalid username or password.', 'listdom')]);
+        if (is_wp_error($user))
+        {
+            $message = $user->get_error_message();
+            if (!trim($message)) $message = esc_html__('Invalid username or password.', 'listdom');
+
+            $response = [
+                'success' => 0,
+                'message' => wp_kses_post($message),
+            ];
+
+            if ($user->get_error_code() === 'lsd_email_verification_required')
+            {
+                $response['allow_resend'] = 1;
+                $response['user_login'] = $credentials['user_login'];
+            }
+
+            $this->response($response);
+        }
 
         $redirect_url = $this->role_based_redirect('login', $user, $redirect_to);
 
@@ -183,6 +330,76 @@ class LSD_Shortcodes_Auth extends LSD_Base
             'success' => 1,
             'message' => esc_html__('Login Successful.', 'listdom'),
             'redirect' => $redirect_url,
+        ]);
+    }
+
+    public function resend_verification_email()
+    {
+        if (
+            !isset($_POST['lsd_resend_verification'])
+            || !wp_verify_nonce(
+                sanitize_text_field(wp_unslash($_POST['lsd_resend_verification'])),
+                'lsd_resend_verification'
+            )
+        ) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
+
+        if (!LSD_User::requires_email_verification())
+        {
+            $this->response([
+                'success' => 1,
+                'message' => esc_html__('Email verification is not required for this site.', 'listdom'),
+                'allow_resend' => 0,
+            ]);
+        }
+
+        $user_login = isset($_POST['log']) ? sanitize_text_field(wp_unslash($_POST['log'])) : '';
+        if (!$user_login && isset($_POST['user_login'])) $user_login = sanitize_text_field(wp_unslash($_POST['user_login']));
+
+        if (!$user_login) $this->response([
+            'success' => 0,
+            'message' => esc_html__('Please enter your username or email to resend the verification email.', 'listdom'),
+            'allow_resend' => 0,
+        ]);
+
+        $user = get_user_by('login', $user_login);
+        if (!$user && is_email($user_login)) $user = get_user_by('email', sanitize_email($user_login));
+
+        if (!$user) $this->response([
+            'success' => 0,
+            'message' => esc_html__('We could not find an account with that username or email.', 'listdom'),
+            'allow_resend' => 0,
+        ]);
+
+        if (LSD_User::is_email_verified($user->ID))
+        {
+            $this->response([
+                'success' => 1,
+                'message' => esc_html__('Your email is already verified. You can sign in now.', 'listdom'),
+                'allow_resend' => 0,
+            ]);
+        }
+
+        $requested_at = get_user_meta($user->ID, 'lsd_email_verification_requested', true);
+        $requested_timestamp = $requested_at ? strtotime($requested_at) : false;
+        $throttle_seconds = 5 * MINUTE_IN_SECONDS;
+
+        if ($requested_timestamp && (current_time('timestamp') - $requested_timestamp) < $throttle_seconds)
+        {
+            $this->response([
+                'success' => 0,
+                'message' => esc_html__('A verification email was recently sent. Please check your inbox or try again in a few minutes.', 'listdom'),
+                'allow_resend' => 1,
+            ]);
+        }
+
+        LSD_User::maybe_send_verification_email($user->ID);
+
+        update_user_meta($user->ID, 'lsd_email_verification_requested', current_time('mysql'));
+
+        $this->response([
+            'success' => 1,
+            'message' => esc_html__('A new verification email has been sent. Please check your inbox.', 'listdom'),
+            'allow_resend' => 1,
         ]);
     }
 
@@ -221,7 +438,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         {
             // Check for minimum length
             if (strlen($password) < $length) $this->response(['success' => 0, 'message' => sprintf(
-                /* translators: %s: Minimum required password length. */
+            /* translators: %s: Minimum required password length. */
                 esc_html__('Password must be at-least %s characters long.', 'listdom'),
                 $length
             )]);
@@ -244,12 +461,12 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Role Restriction
         $role = isset($_POST['lsd_role']) ? sanitize_text_field(wp_unslash($_POST['lsd_role'])) : '';
-        if (!in_array($role, LSD_User::roles(true), true)) $role = '';
+        if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
 
         // Create the user
         $user_data = [
             'user_login' => $username,
-            'user_pass'  => $password,
+            'user_pass' => $password,
             'user_email' => $email,
         ];
 
@@ -268,28 +485,62 @@ class LSD_Shortcodes_Auth extends LSD_Base
             ]));
         }
 
+        LSD_User::maybe_send_verification_email($user_id);
+
+        $auto_login_enabled = isset($auth['register']['login_after_register'])
+            && $auth['register']['login_after_register']
+            && !LSD_User::requires_email_verification();
+
         // Auto Login
-        if (isset($auth['register']['login_after_register']) && $auth['register']['login_after_register'])
+        if ($auto_login_enabled)
         {
             LSD_User::login($user_id);
         }
 
         // Send success message with redirect
         $redirect_url = '';
-        if ($auth['register']['login_after_register'] == 1)
+        if ($auto_login_enabled)
         {
             $user = get_user_by('id', $user_id);
 
             $redirect_value = isset($_POST['lsd_redirect']) ? wp_sanitize_redirect(wp_unslash($_POST['lsd_redirect'])) : '';
-            $redirect_url = $this->role_based_redirect('register', $user, wp_validate_redirect($redirect_value, ''));
+            $redirect_url = $this->role_based_redirect('register', $user, wp_validate_redirect($redirect_value));
+        }
+
+        $success_message = esc_html__('Registration successful.', 'listdom');
+        if (LSD_User::requires_email_verification())
+        {
+            $success_message = esc_html__('Registration successful. Please check your email to verify your account.', 'listdom');
         }
 
         // Send success message with redirect
         $this->response([
             'success' => 1,
-            'message' => esc_html__('Registration successful.', 'listdom'),
+            'message' => $success_message,
             'redirect' => $redirect_url,
         ]);
+    }
+
+    public function handle_verification_request()
+    {
+        if (wp_doing_ajax()) return;
+
+        $user_id = isset($_GET['lsd_verify']) ? absint($_GET['lsd_verify']) : 0;
+        $token = isset($_GET['lsd_key']) ? sanitize_text_field(wp_unslash($_GET['lsd_key'])) : '';
+
+        if (!$user_id || !$token) return;
+
+        $status = LSD_User::verify_email($user_id, $token) ? '1' : '0';
+
+        $redirect = $this->get_login_url();
+        if (!$redirect) $redirect = wp_login_url();
+        if (!$redirect) $redirect = home_url('/');
+
+        $redirect = add_query_arg('lsd-verified', $status, $redirect);
+        $redirect = apply_filters('lsd_email_verification_redirect', $redirect, $status, $user_id);
+
+        wp_safe_redirect($redirect);
+        exit;
     }
 
     public function forgot_password_request()
@@ -304,16 +555,18 @@ class LSD_Shortcodes_Auth extends LSD_Base
         ) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing or invalid!', 'listdom')]);
 
         // Check required fields
-        if (!isset($_POST['user_login']) || !trim(wp_unslash($_POST['user_login']))) $this->response(['success' => 0, 'message' => esc_html__('Email is required.', 'listdom')]);
+        if (!isset($_POST['user_login']) || !trim(wp_unslash($_POST['user_login']))) $this->response(['success' => 0, 'message' => esc_html__('Username or email is required.', 'listdom')]);
 
         // Sanitize form values
-        $email = sanitize_email(wp_unslash($_POST['user_login']));
+        $login_or_email = sanitize_text_field(wp_unslash($_POST['user_login']));
+        $user = false;
 
-        // Check if the email exists
-        if (!email_exists($email)) $this->response(['success' => 0, 'message' => esc_html__('Email does not exist.', 'listdom')]);
+        $user_login = sanitize_user($login_or_email);
+        if ($user_login !== '') $user = get_user_by('login', $user_login);
+        if (!$user && is_email($login_or_email)) $user = get_user_by('email', sanitize_email($login_or_email));
 
-        // Get the user associated with the email
-        $user = get_user_by('email', $email);
+        // Check if the user exists
+        if (!$user instanceof WP_User) $this->response(['success' => 0, 'message' => esc_html__('Username or email does not exist.', 'listdom')]);
 
         if ($user && LSD_User::send_forgot_password_email($user))
         {
@@ -391,6 +644,19 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         wp_redirect(get_permalink($page));
         exit;
+    }
+
+    public function block_unverified_users($user, $username, $password)
+    {
+        if (is_wp_error($user)) return $user;
+
+        if (!$user instanceof WP_User) return $user;
+
+        if (!LSD_User::requires_email_verification()) return $user;
+
+        if (LSD_User::is_email_verified($user->ID)) return $user;
+
+        return new WP_Error('lsd_email_verification_required', LSD_User::verification_required_message());
     }
 
     public function replace_login_url(string $login_url, $redirect, $force_reauth): string

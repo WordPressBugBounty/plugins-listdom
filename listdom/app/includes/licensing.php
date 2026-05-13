@@ -4,6 +4,11 @@ use Webilia\WP\Plugin\Licensing;
 
 class LSD_Licensing extends LSD_Base
 {
+    public const STATUS_INVALID = 0;
+    public const STATUS_VALID = 1;
+    public const STATUS_TRIAL = 2;
+    public const STATUS_GRACE = 3;
+
     /**
      * Runtime cache to avoid multiple checks in a single request
      *
@@ -48,7 +53,7 @@ class LSD_Licensing extends LSD_Base
         $activation_id_option = $prefix . '_activation_id';
 
         // Validation Status
-        $valid = 0;
+        $valid = self::STATUS_INVALID;
 
         // Cached Status (transient)
         $cached = get_transient($key);
@@ -82,16 +87,16 @@ class LSD_Licensing extends LSD_Base
             );
 
             // License is valid
-            if ($licensing->isValid()) $valid = 1;
+            if ($licensing->isValid()) $valid = self::STATUS_VALID;
 
             // Check Trial
-            if (!$valid && LSD_Licensing::isTrial($prefix)) $valid = 2;
+            if ($valid === self::STATUS_INVALID && self::isTrial($prefix)) $valid = self::STATUS_TRIAL;
 
             // Grace Period
-            if (!$valid && LSD_Licensing::isGracePeriod($prefix)) $valid = 3;
+            if ($valid === self::STATUS_INVALID && self::isGracePeriod($prefix)) $valid = self::STATUS_GRACE;
 
-            // Valid
-            if ($valid === 1)
+            // Status valid
+            if ($valid === self::STATUS_VALID)
             {
                 $expiry = 10 * DAY_IN_SECONDS;
 
@@ -99,7 +104,7 @@ class LSD_Licensing extends LSD_Base
                 delete_option($prefix . '_invalidated_at');
             }
             // Trial Period
-            else if ($valid === 2) $expiry = DAY_IN_SECONDS;
+            else if ($valid === self::STATUS_TRIAL) $expiry = DAY_IN_SECONDS;
             // Invalid
             else
             {
@@ -109,7 +114,7 @@ class LSD_Licensing extends LSD_Base
                 $grace_started = add_option($prefix . '_invalidated_at', current_time('timestamp'));
 
                 // Grace Period
-                if ($grace_started) $valid = 3;
+                if ($grace_started) $valid = self::STATUS_GRACE;
             }
 
             // Persist cache in transients and options
@@ -209,12 +214,12 @@ class LSD_Licensing extends LSD_Base
         $valid = self::isValid($basename, $prefix);
 
         // Run the Callback
-        if ($valid) call_user_func($callable);
+        if ($valid !== self::STATUS_INVALID) call_user_func($callable);
 
         // Add to Listdom Notifications when
         // the license is either invalid
         // or in a trial or grace period
-        if (!$valid || in_array($valid, [2, 3]))
+        if ($valid === self::STATUS_INVALID || in_array($valid, [self::STATUS_TRIAL, self::STATUS_GRACE], true))
         {
             add_filter('lsd_license_activation_required', function (int $counter)
             {
@@ -351,57 +356,226 @@ class LSD_Licensing extends LSD_Base
     public static function getStatus(string $basename, string $prefix): array
     {
         $valid = self::isValid($basename, $prefix);
-        $trial = $valid === 2;
-        $grace = $valid === 3;
-
         $validation_status = self::validate($basename, $prefix);
         $installed_at = (int) get_option($prefix . '_installed_at', 0);
-        $installed_date = $installed_at ? lsd_date('M j, Y', $installed_at) : '';
+        $expiry_time = isset($validation_status['expiry_timestamp'])
+            ? (int) $validation_status['expiry_timestamp']
+            : (isset($validation_status['expiry']) ? (int) strtotime($validation_status['expiry']) : 0);
 
-        $expiry_time = 0;
-        if (isset($validation_status['expiry_timestamp'])) $expiry_time = (int) $validation_status['expiry_timestamp'];
-        else if (isset($validation_status['expiry'])) $expiry_time = strtotime($validation_status['expiry']);
-
-        $remaining = $expiry_time && $installed_at ? self::remainingDays($expiry_time, $installed_at) : [];
-
-        $expired = $remaining['expired'] ?? false;
-        $expiring = $remaining['expiring'] ?? false;
-        $progress = $remaining['progress'] ?? 100;
-        $days_remaining = $remaining['days_remaining'] ?? 0;
-
-        if ($grace) $progress = 0;
-
-        $valid_license = $valid === 1 && !$expiring && !$expired;
-
-        $badge = self::getBadge($valid_license, $expiring, $expired, $grace);
-        $progress_class = $valid_license ? 'lsd-success' : ($expiring || $grace ? 'lsd-warning' : 'lsd-error');
+        $remaining = ($expiry_time > 0 && $installed_at > 0)
+            ? self::remainingDays($expiry_time, $installed_at)
+            : ['progress' => 100, 'days_remaining' => 0, 'expired' => false, 'expiring' => false];
+        $has_license_key = trim((string) get_option($prefix . '_purchase_code', '')) !== '';
+        $state = self::getState($valid, $remaining);
+        $view = self::getStateViewConfig($state);
+        $remaining['progress'] = in_array($valid, [self::STATUS_INVALID, self::STATUS_GRACE], true) ? 0 : $remaining['progress'];
+        $show_valid_from = in_array($state, ['trial', 'active', 'expiring', 'expired'], true);
+        $show_status = $state !== 'trial' || isset($validation_status['status']);
+        $valid_license = $valid === self::STATUS_VALID && !$remaining['expiring'] && !$remaining['expired'];
 
         return [
             'valid' => $valid,
-            'trial' => $trial,
-            'grace' => $grace,
             'validation_status' => $validation_status,
-            'installed_at' => $installed_at,
-            'installed_date' => $installed_date,
-            'expiry_time' => $expiry_time,
-            'expired' => $expired,
-            'expiring' => $expiring,
-            'progress' => $progress,
-            'days_remaining' => $days_remaining,
+            'installed_date' => $installed_at ? lsd_date('M j, Y', $installed_at) : '',
+            'expired' => $remaining['expired'],
+            'expiring' => $remaining['expiring'],
+            'progress' => $remaining['progress'],
+            'days_remaining' => $remaining['days_remaining'],
             'valid_license' => $valid_license,
-            'badge' => $badge,
-            'progress_class' => $progress_class,
+            'has_license_key' => $has_license_key,
+            'state' => $state,
+            'badge' => $view['badge'],
+            'progress_class' => $view['progress_class'],
+            'card_class' => $view['card_class'],
+            'action' => $view['action'],
+            'show_status' => $show_status,
+            'show_valid_from' => $show_valid_from,
+            'status_text' => $state === 'inactive' ? esc_html__('Not Registered', 'listdom') : '',
+            'expiry_mode' => self::getExpiryMode($state, $expiry_time, $validation_status),
         ];
     }
 
-    public static function getBadge(bool $license, bool $expiring, bool $expired, bool $grace): array
+    public static function getMessagePayload(array $status, array $product, string $slot, string $prefix, string $shop_url): array
     {
-        if ($license) return ['class' => 'lsd-success', 'icon' => 'lsdi-checkmark-circle', 'text' => esc_html__('Active', 'listdom')];
-        if ($expiring) return ['class' => 'lsd-warning', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expiring', 'listdom')];
-        if ($expired) return ['class' => 'lsd-error', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expired', 'listdom')];
-        if ($grace) return ['class' => 'lsd-warning', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expiring', 'listdom')];
+        $state = (string) ($status['state'] ?? '');
+        $message_state = $state === 'inactive' && !empty($status['has_license_key']) ? 'expired' : $state;
+        $days_remaining = (int) ($status['days_remaining'] ?? 0);
+        $product_name = '<strong>' . esc_html((string) ($product['name'] ?? '')) . '</strong>';
+        $webilia_link = $shop_url
+            ? '<a href="' . esc_url($shop_url) . '" target="_blank"><strong>Webilia</strong></a>'
+            : '<strong>Webilia</strong>';
 
-        return ['class' => '', 'icon' => 'lsdi-key', 'text' => esc_html__('Inactive', 'listdom')];
+        switch ($slot)
+        {
+            case 'primary':
+                if ($message_state === 'expired')
+                {
+                    return [
+                        'type' => 'error',
+                        'message' => esc_html__('The license Key / Purchase Code is expired. It is required for functionality, auto update, and customer service!', 'listdom'),
+                        'cta' => [],
+                    ];
+                }
+
+                if ($message_state === 'expiring')
+                {
+                    return [
+                        'type' => 'warning',
+                        'message' => sprintf(
+                            /* translators: 1: Number of days remaining on the license. 2: Add-on name. */
+                            esc_html__("Your license will expire in %1\$s days. Please renew it to avoid any interruption in using %2\$s Addon.", 'listdom'),
+                            $days_remaining,
+                            $product_name
+                        ),
+                        'cta' => [
+                            'label' => esc_html__('Renew License', 'listdom'),
+                            'url' => $shop_url,
+                            'icon' => 'lsdi-key',
+                        ],
+                    ];
+                }
+
+                if ($message_state === 'inactive')
+                {
+                    return [
+                        'type' => 'warning',
+                        'message' => sprintf(
+                            /* translators: 1: Add-on name, 2: Vendor website HTML link. */
+                            esc_html__("To use %1\$s addon you need to activate it first. If you don't have a valid license key or yours has expired, you can obtain one from the %2\$s website.", 'listdom'),
+                            $product_name,
+                            $webilia_link
+                        ),
+                        'cta' => [
+                            'label' => esc_html__('Get License', 'listdom'),
+                            'url' => $shop_url,
+                            'icon' => 'lsdi-key',
+                        ],
+                    ];
+                }
+
+                if ($message_state === 'grace')
+                {
+                    return [
+                        'type' => 'warning',
+                        'message' => sprintf(
+                            /* translators: 1: Remaining grace period in days, 2: Add-on name. */
+                            esc_html__("There seems to be an issue verifying your license, which may be due to a connection problem between our server and yours, or because your license has expired. You are now in a 7-day grace period. If your license is expired, please renew or activate your license within the next %1\$s days to avoid any disruption in using %2\$s. If you believe this is an error, kindly check your server connection or contact Webilia support for assistance.", 'listdom'),
+                            '<strong style="color: red;">' . esc_html(self::remainingGracePeriod($prefix)) . '</strong>',
+                            $product_name
+                        ),
+                        'cta' => [
+                            'label' => esc_html__('Renew License', 'listdom'),
+                            'url' => $shop_url,
+                            'icon' => 'lsdi-key',
+                        ],
+                    ];
+                }
+
+                return ['type' => '', 'message' => '', 'cta' => []];
+            case 'trial_notice':
+                return [
+                    'type' => 'info',
+                    'message' => sprintf(
+                        /* translators: 1: Remaining trial period in days, 2: Add-on name. */
+                        esc_html__("Please activate your license promptly. You have less than %1\$s days remaining to activate %2\$s; after that, %2\$s will no longer be operational.", 'listdom'),
+                        '<strong style="color: red;">' . esc_html(self::remainingTrialPeriod($prefix)) . '</strong>',
+                        $product_name
+                    ),
+                    'cta' => [
+                        'label' => esc_html__('Get License', 'listdom'),
+                        'url' => $shop_url,
+                        'icon' => 'lsdi-key',
+                    ],
+                ];
+            case 'trial_inline':
+                return [
+                    'type' => 'info',
+                    'message' => esc_html__("License Key / Purchase Code is required for functionality, auto update, and customer service!", 'listdom'),
+                    'cta' => [],
+                ];
+            case 'expiring_notice':
+                return [
+                    'type' => 'warning',
+                    'message' => sprintf(
+                        /* translators: 1: Remaining days, 2: Add-on name. */
+                        esc_html__("Your license will expire in %1\$s days. Please renew it to avoid any interruption in using %2\$s.", 'listdom'),
+                        '<strong style="color: red;">' . esc_html($days_remaining) . '</strong>',
+                        $product_name
+                    ),
+                    'cta' => [
+                        'label' => esc_html__('Renew License', 'listdom'),
+                        'url' => $shop_url,
+                        'icon' => 'lsdi-key',
+                    ],
+                ];
+            default:
+                return ['type' => '', 'message' => '', 'cta' => []];
+        }
+    }
+
+    private static function getState(int $valid, array $remaining): string
+    {
+        if ($valid === self::STATUS_TRIAL) return 'trial';
+        if ($valid === self::STATUS_GRACE) return 'grace';
+        if (!empty($remaining['expired'])) return 'expired';
+        if (!empty($remaining['expiring'])) return 'expiring';
+        if ($valid === self::STATUS_INVALID) return 'inactive';
+
+        return 'active';
+    }
+
+    private static function getExpiryMode(string $state, int $expiry_time, array $validation_status): string
+    {
+        if ($state === 'grace') return 'error';
+        if (in_array($state, ['expiring', 'expired'], true)) return 'days_remaining';
+        if ($state === 'active' && $expiry_time > 0) return 'days_remaining';
+        if (isset($validation_status['expiry'])) return 'expiry_date';
+
+        return 'none';
+    }
+
+    private static function getStateViewConfig(string $state): array
+    {
+        $map = [
+            'inactive' => [
+                'badge' => ['class' => '', 'icon' => 'lsdi-key', 'text' => esc_html__('Inactive', 'listdom')],
+                'progress_class' => 'lsd-error',
+                'card_class' => '',
+                'action' => 'get_license',
+            ],
+            'trial' => [
+                'badge' => ['class' => '', 'icon' => 'lsdi-key', 'text' => esc_html__('Inactive', 'listdom')],
+                'progress_class' => 'lsd-warning',
+                'card_class' => '',
+                'action' => 'get_license',
+            ],
+            'grace' => [
+                'badge' => ['class' => 'lsd-grace', 'icon' => 'lsdi-time-half-pass', 'text' => esc_html__('Grace', 'listdom')],
+                'progress_class' => 'lsd-warning',
+                'card_class' => 'lsd-activation-grace',
+                'action' => 'renew',
+            ],
+            'active' => [
+                'badge' => ['class' => 'lsd-success', 'icon' => 'lsdi-checkmark-circle', 'text' => esc_html__('Active', 'listdom')],
+                'progress_class' => 'lsd-success',
+                'card_class' => 'lsd-activation-valid',
+                'action' => '',
+            ],
+            'expiring' => [
+                'badge' => ['class' => 'lsd-warning', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expiring', 'listdom')],
+                'progress_class' => 'lsd-warning',
+                'card_class' => 'lsd-activation-expiring',
+                'action' => 'renew',
+            ],
+            'expired' => [
+                'badge' => ['class' => 'lsd-error', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expired', 'listdom')],
+                'progress_class' => 'lsd-error',
+                'card_class' => 'lsd-activation-expired',
+                'action' => 'renew',
+            ],
+        ];
+
+        return $map[$state] ?? $map['inactive'];
     }
 
     /**

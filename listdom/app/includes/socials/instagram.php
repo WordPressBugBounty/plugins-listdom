@@ -13,7 +13,14 @@ class LSD_Socials_Instagram extends LSD_Socials
     public function icon($url): string
     {
         return '<a class="lsd-share-instagram" href="' . esc_url($url) . '" target="_blank">
-            <i class="lsd-icon fab fa-instagram"></i>
+            <i class="lsd-fe-icon fab fa-instagram"></i>
         </a>';
+    }
+
+    public function supports(string $section = ''): bool
+    {
+        if (in_array($section, ['archive_share', 'single_share'])) return false;
+
+        return true;
     }
 }

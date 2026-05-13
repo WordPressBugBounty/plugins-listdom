@@ -9,7 +9,13 @@ defined('ABSPATH') || die();
 $device_fields = LSD_Search_Helper::get_search_fields($post->ID, $device);
 
 // Add a default row
-if (!count($device_fields)) $device_fields[] = ['type' => 'row', 'buttons' => ['status' => 1], 'clear' => ['status' => 0]];
+if (!count($device_fields))
+{
+    $default_row = ['type' => 'row', 'buttons' => ['status' => 1], 'clear' => ['status' => 0]];
+    if (class_exists(\LSDPACMA\Base::class)) $default_row['filters_button'] = ['status' => 0];
+
+    $device_fields[] = $default_row;
+}
 
 // Devices
 $devices = get_post_meta($post->ID, 'lsd_devices', true);
@@ -42,7 +48,7 @@ $fields = $builder->getAvailableFields($device_fields);
     <?php endif; ?>
     <div id="lsd-search-sandbox-<?php echo esc_attr($device); ?>-wrapper" class="lsd-row <?php echo in_array($device, ['tablet', 'mobile']) && $inherit ? 'lsd-util-hide' : ''; ?>">
         <div class="lsd-col-9">
-            <div class="lsd-flex lsd-flex-row lsd-flex-content-start lsd-gap-4 lsd-my-3">
+            <div class="lsd-flex lsd-flex-row lsd-flex-content-start lsd-gap-4 lsd-my-3 lsd-search-device-background-box-toggle">
                 <div><?php echo LSD_Form::switcher([
                     'id' => 'lsd-devices-'.$device.'-box',
                     'name' => 'lsd[devices]['.$device.'][box]',

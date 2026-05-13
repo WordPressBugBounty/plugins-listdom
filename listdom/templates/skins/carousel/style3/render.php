@@ -14,8 +14,7 @@ $ids = $this->listings;
             <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
         <?php endif; ?>
 
-        <div class="lsd-listing-data-wrapper">
-
+        <div class="lsd-listing-data-wrapper lsd-listing-body">
             <?php if ($this->display_title): ?>
                 <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
                     <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
@@ -34,13 +33,18 @@ $ids = $this->listings;
                 <?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
             <?php endif; ?>
 
-            <?php if ($this->display_description): ?>
-                <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
+            <?php if ($this->display_description || $this->display_cta): ?>
+                <div class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
                     <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length, false, $this->content_type === 'description')); ?>
-                </p>
+
+                    <?php if ($this->display_cta): ?>
+                        <div class="lsd-listing-call-to-action">
+                            <?php echo $this->listing_cta($listing); ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
             <?php endif; ?>
         </div>
     </div>
-
 </div>
 <?php endforeach;

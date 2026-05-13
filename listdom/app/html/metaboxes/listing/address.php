@@ -33,21 +33,31 @@ $shape = LSD_Shape::get([
     'radius' => $shape_radius,
 ]);
 ?>
-<div class="lsd-metabox lsd-listing-module-address">
-
-    <div class="lsd-object-type-address">
+<div class="lsd-metabox lsd-listing-module-address <?php echo LSD_Base::get_lsd_class('subsections'); ?>">
+    <div class="lsd-object-type-address <?php echo LSD_Base::get_lsd_class('subsections'); ?>">
         <div class="lsd-form-row">
             <div class="lsd-col-12">
                 <label for="lsd_object_type_address" class="lsd-fields-label"><?php esc_html_e('Address', 'listdom'); ?></label>
-                <input type="text" name="lsd[address]" id="lsd_object_type_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($address); ?>">
+                <div class="lsd-address-field-control">
+                    <input type="text" name="lsd[address]" id="lsd_object_type_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($address); ?>">
+                    <?php if (LSD_Base::is_ssl_active()): ?>
+                        <button type="button" id="lsd_object_type_address_locate" class="lsd-address-locate-button" title="<?php echo esc_attr__('Locate me', 'listdom'); ?>" aria-label="<?php echo esc_attr__('Locate me', 'listdom'); ?>" data-error-unsupported="<?php echo esc_attr__('Geolocation is not supported by your browser.', 'listdom'); ?>" data-error-denied="<?php echo esc_attr__('Please allow location access to use this feature.', 'listdom'); ?>" data-error-failed="<?php echo esc_attr__('Unable to retrieve your location.', 'listdom'); ?>" data-gps-label="<?php echo esc_attr__('Your location', 'listdom'); ?>">
+                            <i class="lsd-fe-icon fa-solid fa-crosshairs" aria-hidden="true"></i>
+                            <span class="screen-reader-text"><?php esc_html_e('Locate me', 'listdom'); ?></span>
+                        </button>
+                    <?php endif; ?>
+                </div>
+                <div id="lsd_object_type_address_dropdown" class="lsd-address-autocomplete-dropdown lsd-address-autocomplete-popup" data-placeholder="<?php echo esc_html__('Select an address', 'listdom'); ?>" data-loading-text="<?php echo esc_attr__('Loading addresses…', 'listdom'); ?>" aria-label="<?php echo esc_html__('Select an address', 'listdom'); ?>" role="listbox" aria-hidden="true"></div>
             </div>
         </div>
-        <div class="lsd-form-row">
-            <div class="lsd-col-6">
-                <input type="text" name="lsd[latitude]" id="lsd_object_type_latitude" title="<?php esc_attr_e('Map Center Latitude', 'listdom'); ?>" placeholder="<?php esc_attr_e('Map Center Latitude', 'listdom'); ?>" value="<?php echo esc_attr($latitude); ?>">
+        <div class="lsd-2-columns-flex">
+            <div class="">
+                <label for="lsd_object_type_latitude" class="lsd-fields-label"><?php esc_html_e('Latitude', 'listdom'); ?></label>
+                <input class="lsd-admin-input" type="text" name="lsd[latitude]" id="lsd_object_type_latitude" title="<?php esc_attr_e('Map Center Latitude', 'listdom'); ?>" placeholder="<?php esc_attr_e('Map Center Latitude', 'listdom'); ?>" value="<?php echo esc_attr($latitude); ?>">
             </div>
-            <div class="lsd-col-6">
-                <input type="text" name="lsd[longitude]" id="lsd_object_type_longitude" title="<?php esc_attr_e('Map Center Longitude', 'listdom'); ?>" placeholder="<?php esc_attr_e('Map Center Longitude', 'listdom'); ?>" value="<?php echo esc_attr($longitude); ?>">
+            <div>
+                <label for="lsd_object_type_longitude" class="lsd-fields-label"><?php esc_html_e('Longitude', 'listdom'); ?></label>
+                <input class="lsd-admin-input" type="text" name="lsd[longitude]" id="lsd_object_type_longitude" title="<?php esc_attr_e('Map Center Longitude', 'listdom'); ?>" placeholder="<?php esc_attr_e('Map Center Longitude', 'listdom'); ?>" value="<?php echo esc_attr($longitude); ?>">
             </div>
         </div>
         <?php

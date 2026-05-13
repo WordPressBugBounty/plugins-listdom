@@ -1,60 +1,3 @@
-// Listdom LOADING WRAPPER
-function ListdomLoadingWrapper()
-{
-    this.wrap = jQuery('#wpwrap');
-    this.body = jQuery('body');
-    this.scrollTop = 0;
-
-    // Start Loading Style
-    this.start = () =>
-    {
-        this.scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
-        this.wrap.addClass('lsd-loading-wrapper');
-      
-        const docHeight = Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight,
-            document.body.offsetHeight,
-            document.documentElement.offsetHeight,
-            document.body.clientHeight,
-            document.documentElement.clientHeight
-        );
-
-        this.body.addClass('lsd-not-scrollable')
-        .css({
-            top: `-${this.scrollTop}px`,
-            height: docHeight + 'px',
-            overflowY: 'scroll'
-        });
-    };
-
-    // Stop Loading Style
-    this.stop = ($message, time) =>
-    {
-        // Default Time Value
-        if (typeof time === 'undefined') time = 0;
-
-        // Add Message
-        $message && this.wrap.prepend($message) && $message.removeClass('lsd-util-hide');
-
-        setTimeout(() =>
-        {
-            // Hide Message
-            $message && $message.addClass('lsd-util-hide');
-
-            // Remove Loading Style
-            this.wrap.removeClass('lsd-loading-wrapper');
-            this.body.removeClass('lsd-not-scrollable').css({
-                top: '',
-                height: '',
-                overflowY: ''
-            });
-
-            window.scrollTo(0, this.scrollTop);
-        }, time);
-    };
-}
-
 function ListdomButtonLoader($button) {
     this.$button = $button;
     this.originalHtml = $button.html();
@@ -102,6 +45,7 @@ function ListdomButtonLoader($button) {
         // HTML Elements
         const $wrapper = $(".lsd-search-fields-metabox");
         const $search_style = $('#lsd_search_form_style');
+        const $body = $('body');
         const $btn_add_row = $('#lsd_search_add_row');
         const $btn_more_options = $("#lsd_search_more_options");
         const $btn_delete_row = $('.lsd-search-row-actions-delete');
@@ -116,6 +60,86 @@ function ListdomButtonLoader($button) {
 
         // Disable More Options
         if ($device.find($(".lsd-search-more-options")).length) $btn_more_options.prop('disabled', 'disabled');
+
+        function apply_search_style_classes()
+        {
+            const style = ($search_style.val() || 'default').toString();
+
+            if (style === 'mobile_app')
+            {
+                const active_device = ($builder.data('active-device') || 'desktop').toString();
+                if (active_device !== 'desktop') show_device('desktop', false);
+            }
+
+            const clear_style_classes = function ($element)
+            {
+                const classes = ($element.attr('class') || '')
+                    .split(/\s+/)
+                    .filter((class_name) => class_name && class_name.indexOf('lsd-search-style-') !== 0);
+
+                $element.attr('class', classes.join(' '));
+            };
+
+            clear_style_classes($builder);
+            clear_style_classes($body);
+
+            $builder.addClass('lsd-search-style-' + style);
+            $body.addClass('lsd-search-style-' + style.replace(/_/g, '-'));
+
+            sync_mobile_app_method_options();
+        }
+
+        function sync_mobile_app_method_options($context)
+        {
+            const style = ($search_style.val() || 'default').toString();
+            const is_mobile_app = style === 'mobile_app';
+            const $root = ($context && $context.length) ? $context : $builder;
+
+            $root.find('.lsd-search-method').each(function ()
+            {
+                const $method = $(this);
+                const previous_method = ($method.val() || '').toString();
+                const method_options = $method.data('lsd-method-options') || $method.html();
+
+                if (!$method.data('lsd-method-options')) $method.data('lsd-method-options', method_options);
+
+                $method.html(method_options);
+
+                if (is_mobile_app)
+                {
+                    ['hierarchical', 'dropdown-multiple', 'radio'].forEach(function (method)
+                    {
+                        $method.find('option[value="' + method + '"]').remove();
+                    });
+                }
+
+                if ($method.find('option[value="' + previous_method + '"]').length)
+                {
+                    $method.val(previous_method);
+                    return;
+                }
+
+                if ($method.find('option').length) $method.prop('selectedIndex', 0).trigger('change');
+            });
+        }
+
+        function init_iconpicker($context)
+        {
+            if (typeof $.fn.fontIconPicker === 'undefined') return;
+
+            const $root = ($context && $context.length) ? $context : $builder;
+            $root.find('select.lsd-iconpicker').each(function ()
+            {
+                const $iconpicker = $(this);
+                if ($iconpicker.next('.icons-selector').length) return;
+
+                $iconpicker.fontIconPicker(
+                {
+                    emptyIcon: false,
+                    emptyIconValue: '',
+                });
+            });
+        }
 
         function sortable_listeners()
         {
@@ -142,10 +166,7 @@ function ListdomButtonLoader($button) {
         {
             $search_style.off('change').on('change', function ()
             {
-                const style = $search_style.val();
-
-                if (style === 'sidebar') $builder.addClass('lsd-search-style-sidebar');
-                else $builder.removeClass('lsd-search-style-sidebar');
+                apply_search_style_classes();
             }).trigger('change');
 
             $btn_add_row.off('click').on('click', function ()
@@ -174,17 +195,23 @@ function ListdomButtonLoader($button) {
                 delete_field($(this));
             });
 
-            $(document).on('click', '.lsd-search-field-actions-visibility', function ()
+            $(document)
+                .off('click', '.lsd-search-field-actions-visibility')
+                .on('click', '.lsd-search-field-actions-visibility', function ()
             {
                 field_visibility($(this));
             });
 
-            $(document).on('click', '.lsd-search-field-param-title-visibility', function ()
+            $(document)
+                .off('click', '.lsd-search-field-param-title-visibility')
+                .on('click', '.lsd-search-field-param-title-visibility', function ()
             {
                 field_title_visibility($(this));
             });
 
-            $(document).on('change', '.lsd-search-row-params .lsd-switch input[type=checkbox]', function ()
+            $(document)
+                .off('change', '.lsd-search-row-params .lsd-switch input[type=checkbox]')
+                .on('change', '.lsd-search-row-params .lsd-switch input[type=checkbox]', function ()
             {
                 const checked = $(this).is(':checked');
 
@@ -195,19 +222,19 @@ function ListdomButtonLoader($button) {
             $available_fields.off('mouseover').on('mouseover', 'div:not(.ui-draggable)', function ()
             {
                 $(this).draggable(
-                    {
-                        revert: "invalid"
-                    });
+                {
+                    revert: "invalid"
+                });
             });
 
             $rows.droppable(
+            {
+                accept: '.lsd-search-field',
+                drop: function (event, ui)
                 {
-                    accept: '.lsd-search-field',
-                    drop: function (event, ui)
-                    {
-                        add_field($(this), ui.draggable);
-                    }
-                });
+                    add_field($(this), ui.draggable);
+                }
+            });
 
             // Sortable
             sortable_listeners();
@@ -215,7 +242,10 @@ function ListdomButtonLoader($button) {
             $field_method.off('change').on('change', function ()
             {
                 method_changed($(this));
-            }).trigger('change');
+            });
+
+            sync_mobile_app_method_options();
+            $field_method.trigger('change');
 
             $all_terms_dropdowns.off('change').on('change', function ()
             {
@@ -229,12 +259,12 @@ function ListdomButtonLoader($button) {
             $rows.find('select[multiple=""]').each(function ()
             {
                 $(this).select2(
-                    {
-                        allowClear: $(this).attr('multiple'),
-                        placeholder: $(this).attr('placeholder'),
-                        minimumResultsForSearch: 0,
-                        shouldFocusInput: () => false,
-                    });
+                {
+                    allowClear: $(this).attr('multiple'),
+                    placeholder: $(this).attr('placeholder'),
+                    minimumResultsForSearch: 0,
+                    shouldFocusInput: () => false,
+                });
             })
 
             $page_selection.off('change').on('change', function ()
@@ -271,7 +301,9 @@ function ListdomButtonLoader($button) {
                 }
             });
 
-            $(document).on('change', '.lsd-more-options-type-toggle', function ()
+            $(document)
+                .off('change', '.lsd-more-options-type-toggle')
+                .on('change', '.lsd-more-options-type-toggle', function ()
             {
                 const $type = $(this);
                 const $target = $($type.data('for'));
@@ -332,6 +364,7 @@ function ListdomButtonLoader($button) {
                         if (response.success === 1)
                         {
                             $row.find('.lsd-search-filters').after(response.html);
+                            init_iconpicker($row);
                         }
                     },
                     error: function ()
@@ -386,7 +419,7 @@ function ListdomButtonLoader($button) {
                 });
         }
 
-        function show_device(device)
+        function show_device(device, reset_listeners = true)
         {
             // Device
             $device = $('.lsd-search-fields-device-' + device);
@@ -413,7 +446,7 @@ function ListdomButtonLoader($button) {
             if ($device.find($(".lsd-search-more-options")).length) $btn_more_options.attr('disabled', 'disabled');
             else $btn_more_options.removeAttr('disabled');
 
-            setListeners();
+            if (reset_listeners) setListeners();
         }
 
         function add_field($row, $field)
@@ -463,7 +496,11 @@ function ListdomButtonLoader($button) {
                             $field.find('.lsd-search-method').on('change', function ()
                             {
                                 method_changed($(this));
-                            }).trigger('change');
+                            });
+
+                            sync_mobile_app_method_options($field);
+                            init_iconpicker($field);
+                            $field.find('.lsd-search-method').trigger('change');
 
                             $field.find($('.lsd-search-field-all-terms select')).on('change', function ()
                             {
@@ -567,6 +604,7 @@ function ListdomButtonLoader($button) {
 
             const $field = $('#lsd_' + device_key + '_search_field_' + i + '_' + key);
             const $title_visibility = $('#lsd_' + device_key + '_' + i + '_filters_' + key + '_title_visibility');
+
             const $title_input = $field.find($('.lsd-search-field-param-title'));
             const $placeholder_input = $field.find($('.lsd-search-field-param-placeholder'));
             const title = $title_input.val();
@@ -628,6 +666,351 @@ jQuery(document).ready(function ($)
     listdom_trigger_select();
 
     /**
+     * CTA Controls
+     */
+    function listdomUpdateCtaEnable($toggle, triggered)
+    {
+        if (!$toggle || !$toggle.length) return;
+
+        const $root = $toggle.closest('[data-lsd-cta-root]');
+        if (!$root.length) return;
+
+        const enabled = $toggle.is(':checked');
+        const $settings = $root.find('[data-lsd-cta-settings]');
+        if ($settings.length) $settings.toggleClass('lsd-util-hide', !enabled);
+
+        const $modeInput = $root.find('[data-lsd-cta-mode]');
+        if (!enabled)
+        {
+            if ($modeInput.length) $modeInput.val('disabled');
+
+            const $customFields = $root.find('[data-lsd-cta-custom-fields]');
+            if ($customFields.length) $customFields.addClass('lsd-util-hide');
+
+            return;
+        }
+
+        const $modeToggle = $root.find('[data-lsd-cta-mode-toggle] input[type="checkbox"]');
+        if ($modeToggle.length)
+        {
+            const $preference = $root.find('[data-lsd-cta-mode-preference]');
+            if ($preference.length)
+            {
+                const preferred = $preference.val();
+                if (preferred === 'custom') $modeToggle.prop('checked', false);
+                else $modeToggle.prop('checked', true);
+            }
+
+            listdomUpdateCtaMode($modeToggle, triggered);
+        }
+        else if ($modeInput.length)
+        {
+            $modeInput.val('custom');
+        }
+    }
+
+    function listdomUpdateCtaMode($toggle, triggered)
+    {
+        if (!$toggle || !$toggle.length) return;
+
+        const $root = $toggle.closest('[data-lsd-cta-root]');
+        if (!$root.length) return;
+
+        const $modeInput = $root.find('[data-lsd-cta-mode]');
+        const $preference = $root.find('[data-lsd-cta-mode-preference]');
+        const $enableToggle = $root.find('[data-lsd-cta-enable-toggle] input[type="checkbox"]');
+        const enabled = !$enableToggle.length || $enableToggle.is(':checked');
+
+        const $customFields = $root.find('[data-lsd-cta-custom-fields]');
+
+        if (!enabled)
+        {
+            if ($modeInput.length) $modeInput.val('disabled');
+            if ($customFields.length) $customFields.addClass('lsd-util-hide');
+            return;
+        }
+
+        const inherit = $toggle.is(':checked');
+        const mode = inherit ? 'inherit' : 'custom';
+
+        if ($modeInput.length) $modeInput.val(mode);
+        if ($preference.length && mode !== 'disabled') $preference.val(mode);
+        if ($customFields.length) $customFields.toggleClass('lsd-util-hide', inherit);
+        if (mode === 'custom') listdomUpdateCtaTarget($root, false);
+
+        return mode;
+    }
+
+    function listdomUpdateCtaTarget($root, triggered)
+    {
+        if (!$root || !$root.length) return;
+
+        if (typeof triggered === 'undefined') triggered = false;
+
+        const $target = $root.find('[data-lsd-cta-target]');
+        if (!$target.length) return;
+
+        const value = $target.val();
+        const $fields = $root.find('[data-lsd-cta-target-field]').addClass('lsd-util-hide');
+
+        if (value === 'custom')
+        {
+            $fields.filter('[data-lsd-cta-target-field="custom"]').removeClass('lsd-util-hide');
+        }
+        else if (value === 'popup')
+        {
+            const $popupField = $fields.filter('[data-lsd-cta-target-field="popup"]').removeClass('lsd-util-hide');
+            if (triggered)
+            {
+                const $button = $popupField.find('[data-lsd-cta-open-modal]');
+                if ($button.length) $button.trigger('click');
+            }
+        }
+    }
+
+    function listdomGetCtaStorage(editorId)
+    {
+        if (!editorId) return $();
+
+        return $('[data-lsd-cta-storage="' + editorId + '"]');
+    }
+
+    function listdomGetCtaStorageValue(editorId)
+    {
+        const $storage = listdomGetCtaStorage(editorId);
+        if (!$storage.length) return null;
+
+        return $storage.val();
+    }
+
+    function listdomGetCtaEditorValue(editorId)
+    {
+        if (!editorId) return '';
+
+        let value = '';
+
+        if (typeof tinymce !== 'undefined')
+        {
+            const editor = tinymce.get(editorId);
+            if (editor)
+            {
+                value = editor.getContent();
+                if (!value) value = editor.getContent({format: 'raw'});
+            }
+        }
+
+        if (!value)
+        {
+            const $textarea = $('#' + editorId);
+            if ($textarea.length) value = $textarea.val();
+        }
+
+        return value;
+    }
+
+    function listdomSetCtaEditorValue(editorId, value)
+    {
+        if (!editorId) return;
+
+        if (typeof tinymce !== 'undefined')
+        {
+            const editor = tinymce.get(editorId);
+            if (editor) editor.setContent(value || '');
+        }
+
+        const $textarea = $('#' + editorId);
+        if ($textarea.length) $textarea.val(value || '');
+    }
+
+    function listdomSyncCtaStorage(editorId)
+    {
+        if (!editorId) return;
+
+        const $storage = listdomGetCtaStorage(editorId);
+        if (!$storage.length) return;
+
+        $storage.val(listdomGetCtaEditorValue(editorId));
+    }
+
+    function listdomInitCtaStorage(editorId)
+    {
+        if (!editorId) return;
+
+        const $storage = listdomGetCtaStorage(editorId);
+        if (!$storage.length || $storage.data('lsdCtaStorageBound')) return;
+
+        $storage.data('lsdCtaStorageBound', true);
+
+        listdomSetCtaEditorValue(editorId, $storage.val());
+
+        const bindEditorEvents = function (editor)
+        {
+            if (!editor) return;
+
+            editor.on('change', function ()
+            {
+                listdomSyncCtaStorage(editorId);
+            });
+
+            editor.on('keyup', function ()
+            {
+                listdomSyncCtaStorage(editorId);
+            });
+        };
+
+        if (typeof tinymce !== 'undefined')
+        {
+            const editor = tinymce.get(editorId);
+            if (editor) bindEditorEvents(editor);
+
+            $(document).on('tinymce-editor-init.lsdCtaStorage', function (event, editor)
+            {
+                if (editor.id === editorId) bindEditorEvents(editor);
+            });
+        }
+
+        const $textarea = $('#' + editorId);
+        if ($textarea.length)
+        {
+            $textarea.on('input.lsdCtaStorage change.lsdCtaStorage', function ()
+            {
+                listdomSyncCtaStorage(editorId);
+            });
+        }
+    }
+
+    function listdomSyncAllCtaStorages()
+    {
+        $('[data-lsd-cta-storage]').each(function ()
+        {
+            const editorId = $(this).data('lsd-cta-storage');
+            if (!editorId) return;
+
+            listdomSyncCtaStorage(editorId);
+        });
+    }
+
+    function listdomEnsureModalEditors($modal)
+    {
+        if (!$modal || !$modal.length) return;
+        if (typeof wp === 'undefined' || !wp.editor) return;
+
+        const preInit = window.tinyMCEPreInit || {};
+
+        $modal.find('.wp-editor-wrap').each(function () {
+            const $wrap = $(this);
+            const $textarea = $wrap.find('textarea.wp-editor-area');
+            const editorId = $textarea.attr('id');
+            if (!editorId) return;
+
+            if (typeof tinymce !== 'undefined' && tinymce.get(editorId)) tinymce.get(editorId).remove();
+
+            if (typeof QTags !== 'undefined' && QTags.instances && QTags.instances[editorId]) delete QTags.instances[editorId];
+
+            const $wrapParent = $wrap.parent();
+            const storageValue = listdomGetCtaStorageValue(editorId);
+            const content = storageValue !== null ? storageValue : $textarea.val();
+            $wrap.remove();
+
+            const $newTextarea = $('<textarea>', {
+                id: editorId,
+                class: 'wp-editor-area',
+                text: content,
+            });
+            $wrapParent.append($newTextarea);
+
+            const settings = {};
+            settings.tinymce = $.extend(true, {}, preInit.mceInit[editorId] || preInit.mceInit['content'] || {});
+            settings.quicktags = $.extend(true, {}, preInit.qtInit[editorId] || preInit.qtInit['content'] || {});
+
+            const initEditor = function () {
+                wp.editor.initialize(editorId, settings);
+                setTimeout(function () {
+                    const editor = tinymce.get(editorId);
+                    if (editor) {
+                        editor.show();
+                        editor.focus();
+                        window.wpActiveEditor = editorId;
+                    }
+
+                    listdomInitCtaStorage(editorId);
+                    listdomSyncCtaStorage(editorId);
+                }, 200);
+            };
+
+            if ($modal.is(':visible')) initEditor();
+            else $modal.one('shown.bs.modal', initEditor);
+        });
+    }
+
+    function listdomInitCta($root)
+    {
+        if (!$root || !$root.length) return;
+
+        const $enableToggle = $root.find('[data-lsd-cta-enable-toggle] input[type="checkbox"]');
+        if ($enableToggle.length)
+        {
+            listdomUpdateCtaEnable($enableToggle, false);
+        }
+        else
+        {
+            const $modeToggle = $root.find('[data-lsd-cta-mode-toggle] input[type="checkbox"]');
+            if ($modeToggle.length) listdomUpdateCtaMode($modeToggle, false);
+        }
+
+        listdomUpdateCtaTarget($root, false);
+    }
+
+    $(document).on('change', '[data-lsd-cta-enable-toggle] input[type="checkbox"]', function ()
+    {
+        listdomUpdateCtaEnable($(this), true);
+    });
+
+    $(document).on('change', '[data-lsd-cta-mode-toggle] input[type="checkbox"]', function ()
+    {
+        listdomUpdateCtaMode($(this), true);
+    });
+
+    $(document).on('change', '[data-lsd-cta-target]', function ()
+    {
+        const $root = $(this).closest('[data-lsd-cta-root]');
+        listdomUpdateCtaTarget($root, true);
+    });
+
+    $('[data-lsd-cta-root]').each(function ()
+    {
+        listdomInitCta($(this));
+    });
+
+    $(document).on('click', '[data-lsd-cta-open-modal]', function (e)
+    {
+        e.preventDefault();
+        const target = $(this).data('lsd-cta-open-modal');
+        if (!target || typeof ListdomModal === 'undefined') return;
+
+        const $modal = ListdomModal.open('#' + target, {
+            appendToBody: true,
+            hideClass: 'lsd-util-hide',
+        });
+        if (!$modal.length) return;
+
+        $modal.one('listdom:modal:opened', function ()
+        {
+            listdomEnsureModalEditors($(this));
+        });
+    });
+
+    $(document).on('listdom:modal:closed', '.lsd-cta-modal', function ()
+    {
+        listdomSyncAllCtaStorages();
+    });
+
+    $(document).on('submit', 'form', function ()
+    {
+        listdomSyncAllCtaStorages();
+    });
+
+    /**
      * Listdom accordion system
      */
     $('.lsd-accordion-title').on('click', function (event)
@@ -684,7 +1067,80 @@ jQuery(document).ready(function ($)
     /**
      * Sortable System
      */
-    $('.lsd-sortable').sortable();
+    const SortableStyleCopier =
+    {
+        blacklist: new Set([
+            'position','top','right','bottom','left','inset',
+            'transform','transform-origin','translate','rotate','scale',
+            'z-index',
+            'transition','transition-property','transition-duration','transition-delay','transition-timing-function',
+            'animation','animation-name','animation-duration','animation-delay','animation-timing-function',
+            'width','height','min-width','min-height','max-width','max-height',
+            'pointer-events','cursor',
+            'visibility','will-change',
+        ]),
+
+        copy(fromEl, toEl) {
+            const cs = getComputedStyle(fromEl);
+
+            for (let i = 0; i < cs.length; i++) {
+                const prop = cs[i];
+                if (this.blacklist.has(prop)) continue;
+
+                toEl.style.setProperty(
+                    prop,
+                    cs.getPropertyValue(prop),
+                    cs.getPropertyPriority(prop)
+                );
+            }
+        },
+
+        copyDeep($from, $to) {
+            const fromNodes = $from.find('*').addBack().toArray();
+            const toNodes   = $to.find('*').addBack().toArray();
+
+            const len = Math.min(fromNodes.length, toNodes.length);
+            for (let i = 0; i < len; i++) {
+                this.copy(fromNodes[i], toNodes[i]);
+            }
+        }
+    };
+
+    $('.lsd-sortable').sortable({
+        tolerance: 'pointer',
+        appendTo: 'body',
+
+        helper: function (_, $item) {
+            const $helper = $item.clone(false);
+
+            SortableStyleCopier.copyDeep($item, $helper);
+
+            $helper.css({
+                width: $item.outerWidth(),
+                height: $item.outerHeight(),
+                boxSizing: 'border-box'
+            });
+
+            return $helper;
+        }
+    });
+
+    $(document).on('click', '.lsd-display-options-table-device-tabs li', function (e)
+    {
+        e.preventDefault();
+
+        const $tab = $(this);
+        const device = $tab.data('device');
+        if (!device) return;
+
+        const $wrapper = $tab.closest('.lsd-display-options-table-devices');
+
+        $wrapper.find('.lsd-display-options-table-device-tabs li').removeClass('lsd-sub-tabs-active');
+        $tab.addClass('lsd-sub-tabs-active');
+
+        $wrapper.find('.lsd-display-options-table-device').addClass('lsd-util-hide');
+        $wrapper.find('.lsd-display-options-table-device[data-device="' + device + '"]').removeClass('lsd-util-hide');
+    });
 
     // Listdom Switcher
     $('.lsd-switch input[type=checkbox]').on('change', function ()
@@ -695,6 +1151,28 @@ jQuery(document).ready(function ($)
         $toggle.trigger('click');
     });
 
+    function lsdSyncSearchStickyOffsetVisibility()
+    {
+        const $position = $('#lsd_search_position');
+        const $sticky = $('#lsd_search_sticky');
+        const $stickyRow = $('.lsd-search-sticky-row');
+        const $offsetRow = $('.lsd-search-sticky-offset-row');
+
+        if (!$position.length || !$sticky.length || !$stickyRow.length || !$offsetRow.length) return;
+
+        const position = $position.val();
+        const isSidePosition = position === 'left' || position === 'right';
+        const isStickyEnabled = $sticky.is(':checked');
+
+        $stickyRow.toggleClass('lsd-util-hide', !isSidePosition);
+
+        if (isSidePosition && isStickyEnabled) $offsetRow.removeClass('lsd-util-hide').show();
+        else $offsetRow.addClass('lsd-util-hide').hide();
+    }
+
+    $(document).on('change', '#lsd_search_position, #lsd_search_sticky', lsdSyncSearchStickyOffsetVisibility);
+    lsdSyncSearchStickyOffsetVisibility();
+
     /**
      * Attributes Menu
      */
@@ -703,6 +1181,12 @@ jQuery(document).ready(function ($)
     {
         if ($(this).is(':checked')) $('#lsd_categories_wp').addClass('lsd-util-hide');
         else $('#lsd_categories_wp').removeClass('lsd-util-hide');
+    });
+
+    $('#lsd_all_packages').on('change', function ()
+    {
+        if ($(this).is(':checked')) $('#lsd_packages_wp').addClass('lsd-util-hide');
+        else $('#lsd_packages_wp').removeClass('lsd-util-hide');
     });
 
     // Type Dependent Fields
@@ -982,8 +1466,64 @@ jQuery(document).ready(function ($)
     /**
      * Add/Edit Shortcode
      */
+    const $shortcodeSkinSelector = $('#lsd_display_options_skin');
+    const $shortcodeForm = $('#post');
+    const $builderStyleMessage = $('#lsd_display_options_builder_message_elements');
+
+    function lsdToggleSkinFormFields(activeSkin)
+    {
+        if (!$shortcodeSkinSelector.length || !activeSkin) return;
+
+        $('.lsd-skin-content, .lsd-skin-display-options').each(function ()
+        {
+            const $container = $(this);
+            const containerSkin = $container.data('skin') || ($container.attr('id') || '').replace(/^lsd_skin_display_options_(?:map_|layout_)?/, '');
+
+            if (!containerSkin) return;
+
+            const enabled = containerSkin === activeSkin;
+            $container.find('input, select, textarea').prop('disabled', !enabled);
+        });
+    }
+
+    function lsdIsCustomBuilderStyle(style)
+    {
+        return !isNaN(parseFloat(style)) && isFinite(style);
+    }
+
+    function lsdToggleBuilderStyleState(skin)
+    {
+        if (!$shortcodeSkinSelector.length || !skin)
+        {
+            $builderStyleMessage.addClass('lsd-util-hide');
+            return;
+        }
+
+        const $styleSelector = $('#lsd_display_options_skin_' + skin + '_style');
+        const $elementsContainer = $('#lsd_skin_display_options_' + skin);
+
+        if (!$styleSelector.length || skin === 'singlemap')
+        {
+            $builderStyleMessage.addClass('lsd-util-hide');
+            return;
+        }
+
+        const isCustomStyle = lsdIsCustomBuilderStyle($styleSelector.val());
+
+        $builderStyleMessage.toggleClass('lsd-util-hide', !isCustomStyle);
+
+        $elementsContainer.find('.lsd-form-row-style-needed').each(function ()
+        {
+            const $section = $(this);
+            const $wrapper = $section.parent('.lsd-settings-fields-wrapper');
+
+            $section.toggleClass('lsd-util-hide', isCustomStyle);
+            if ($wrapper.length) $wrapper.toggleClass('lsd-util-hide', isCustomStyle);
+        });
+    }
+
     // Skin Changer
-    $('#lsd_display_options_skin').on('change', function ()
+    $shortcodeSkinSelector.on('change', function ()
     {
         const skin = $(this).val();
 
@@ -1063,14 +1603,27 @@ jQuery(document).ready(function ($)
 
         // Toggle Style Change
         $('.lsd-display-options-style-selector').trigger('change');
+
+        lsdToggleBuilderStyleState(skin);
+
+        lsdToggleSkinFormFields(skin);
     }).trigger('change');
+
+    if ($shortcodeForm.length && $shortcodeSkinSelector.length)
+    {
+        $shortcodeForm.on('submit', function ()
+        {
+            lsdToggleSkinFormFields($shortcodeSkinSelector.val());
+        });
+    }
 
     $(document).on('click', '.lsd-copy', function ()
     {
         const $button = $(this);
         const target = $button.data('target');
-        const $targetEl = $('#' + target).length
-            ? $('#' + target)
+        const $target = $('#' + target);
+        const $targetEl = $target.length
+            ? $target
             : $('.' + target);
         const buttonHTML = $button.html();
         const copiedText = $button.data('copied');
@@ -1085,8 +1638,8 @@ jQuery(document).ready(function ($)
 
         const fallbackCopy = (text) =>
         {
-            const scrollX = window.scrollX || window.pageXOffset;
-            const scrollY = window.scrollY || window.pageYOffset;
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
 
             const $textarea = $('<textarea>')
             .val(text)
@@ -1158,24 +1711,7 @@ jQuery(document).ready(function ($)
     // Style Changer
     $('.lsd-display-options-style-selector').on('change', function ()
     {
-        if (!$(this).is(':visible')) return;
-
-        const style = $(this).val();
-
-        const $message = $('.lsd-display-options-builder-skin');
-        const $options = $('.lsd-display-options-builder-option');
-
-        // Builder Style
-        if (!isNaN(parseFloat(style)) && isFinite(style))
-        {
-            $message.removeClass('lsd-util-hide');
-            $options.addClass('lsd-util-hide');
-        }
-        else
-        {
-            $message.addClass('lsd-util-hide');
-            $options.removeClass('lsd-util-hide');
-        }
+        lsdToggleBuilderStyleState($shortcodeSkinSelector.val());
     }).trigger('change');
 
     // Default Sort Option
@@ -1294,112 +1830,187 @@ jQuery(document).ready(function ($)
      * Listdom Additional Dashboard Menus
      */
     $('.lsd-settings-dashboard-menus').sortable({
-        cancel: ".lsd-custom-menu-content"
+        items: '> .lsd-dashboard-menu-item',
+        cancel: '.lsd-dashboard-menu-content',
+        tolerance: 'pointer',
+        helper: 'clone',
+        appendTo: 'body',
+        start: function (e, ui) {
+            ui.helper
+            .addClass('lsd-sort-helper')
+            .css({
+                height: ui.item.outerHeight(),
+                zIndex: 999999
+            });
+        }
     });
 
-    $('body').on('click', '.lsd-custom-menu-btn', function ()
-    {
-        const $newMenuItem = $('<li class="lsd-custom-menu-list"><p><span class="lsd-custom-menu-label">' + lsd.i18n_field_label + '</span><span class="lsd-custom-menu-actions"><i class="fas fa-trash"></i> <i class="fas fa-chevron-down"></i></span></p><div class="lsd-custom-menu-content"></div></li>');
-        $('.lsd-settings-dashboard-menus').append($newMenuItem);
+    jQuery(function ($) {
 
-        const $labelGroup = $newMenuItem.find('.lsd-custom-menu-content');
-        const $inputHiddenMenu = $('<input>', {
-            type: 'hidden',
-            name: 'lsd[dashboard_menus][]',
-            class: 'custom-menu-id'
-        });
-
-        const fields = ['Label', 'Slug', 'Icon', 'Content'];
-        const placeholders = {
-            Label: lsd.i18n_placeholder_label,
-            Slug: lsd.i18n_placeholder_slug,
-            Icon: lsd.i18n_placeholder_icon,
-            Content: ''
-        };
-        const descriptions = {
-            Label: lsd.i18n_description_label,
-            Slug: lsd.i18n_description_slug,
-            Icon: lsd.i18n_description_icon,
-            Content: lsd.i18n_description_content
-        };
-
-        fields.forEach((field) =>
+        $('body').on('click', '.lsd-custom-menu-btn', function ()
         {
-            const uniqueName = field.toLowerCase().replace(/\s+/g, '_');
-            const $fieldGroup = $('<div class="lsd-field-group"></div>');
+            const defaultIcon = 'fas fa-tachometer-alt';
+            const $newMenuItem = $('<li class="lsd-dashboard-menu-item lsd-custom-menu-list">' +
+                '<p class="lsd-flex lsd-flex-content-between">' +
+                '<span>' +
+                '<i class="lsd-icon lsd-custom-menu-icon ' + defaultIcon + '"></i>' +
+                '<span class="lsd-custom-menu-label">' + lsd.i18n_field_label + '</span>' +
+                '</span>' +
+                '<span class="lsd-menu-actions">' +
+                '<i class="fas fa-trash"></i> ' +
+                '<button type="button" class="lsd-dashboard-menu-toggle" aria-pressed="true"><i class="fas fa-check-circle"></i></button> ' +
+                '<i class="fas fa-chevron-up lsd-dashboard-menu-chevron"></i>' +
+                '</span>' +
+                '</p>' +
+                '<div class="lsd-custom-menu-content lsd-dashboard-menu-content"></div>' +
+                '</li>');
 
-            const $label = $('<label class="lsd-fields-label-tiny"></label>').text(field);
-            $fieldGroup.append($label);
+            $('.lsd-settings-dashboard-menus').append($newMenuItem);
 
-            let $inputEl;
+            const $labelGroup = $newMenuItem.find('.lsd-custom-menu-content');
+            const $inputHiddenMenu = $('<input>', {
+                type: 'hidden',
+                name: 'lsd[dashboard_menus][]',
+                class: 'custom-menu-slug'
+            });
+            const $inputMenuStatus = $('<input>', {
+                type: 'hidden',
+                name: '',
+                class: 'lsd-dashboard-menu-status',
+                'data-field': 'enabled',
+                value: '1',
+            });
 
-            if (field === 'Icon')
+            const fields = ['Label', 'Slug', 'Icon', 'Login Status', 'Content'];
+
+            const placeholders = {
+                Label: lsd.i18n_placeholder_label,
+                Slug: lsd.i18n_placeholder_slug,
+                Icon: lsd.i18n_placeholder_icon,
+                'Login Status': '',
+                Content: ''
+            };
+
+            const descriptions = {
+                Label: lsd.i18n_description_label,
+                Slug: lsd.i18n_description_slug,
+                Icon: lsd.i18n_description_icon,
+                'Login Status': 'Choose whether this custom menu requires the user to be logged in.',
+                Content: lsd.i18n_description_content
+            };
+
+            $labelGroup.append($inputMenuStatus);
+
+            fields.forEach((field) =>
             {
-                $inputEl = $('<select>', {
-                    name: '',
-                    required: true,
-                    'data-field': 'icon',
-                    class: 'lsd-iconpicker',
-                    id: 'lsd_icon'
-                });
+                let uniqueName = field.toLowerCase().replace(/\s+/g, '_');
+                if (field === 'Login Status') {
+                    uniqueName = 'login_status';
+                }
 
-                lsd.icon_options.forEach(iconOption =>
+                const $fieldGroup = $('<div class="lsd-field-group"></div>');
+
+                const $label = $('<label class="lsd-fields-label-tiny"></label>').text(field);
+                $fieldGroup.append($label);
+
+                let $inputEl;
+                if (field === 'Icon')
                 {
-                    $inputEl.append($('<option>', {
-                        value: iconOption.value,
-                        text: iconOption.label
-                    }));
-                });
-
-                setTimeout(() => {
-                    if (typeof $.fn.fontIconPicker !== 'undefined') {
-                        $inputEl.fontIconPicker({
-                            emptyIcon: false,
-                            emptyIconValue: ''
-                        });
-                    }
-                }, 0);
-            }
-            else if (field === 'Content')
-            {
-                const uniqueId = 'textarea_' + Date.now();
-                $inputEl = $('<textarea>', {
-                    name: '',
-                    id: uniqueId,
-                    'data-field': 'content',
-                });
-
-                setTimeout(() =>
-                {
-                    wp.editor.initialize(uniqueId, {
-                        tinymce: {
-                            toolbar1: 'formatselect bold italic underline bullist numlist blockquote alignleft aligncenter alignright link unlink wp_more fullscreen',
-                            plugins: 'lists paste link',
-                        },
-                        quicktags: true,
-                        mediaButtons: true,
+                    $inputEl = $('<select>', {
+                        name: '',
+                        required: true,
+                        'data-field': 'icon',
+                        class: 'lsd-iconpicker',
+                        id: 'lsd_icon'
                     });
-                }, 10);
-            }
-            else
-            {
-                $inputEl = $('<input>', {
-                    type: 'text',
-                    name: '',
-                    required: true,
-                    'data-field': uniqueName,
-                    placeholder: placeholders[field],
-                    class: 'lsd-admin-input'
-                });
-            }
 
-            $fieldGroup.append($inputEl);
-            $fieldGroup.append($('<p></p>').text(descriptions[field]).addClass('lsd-admin-description-tiny lsd-mb-0 lsd-mt-2'));
+                    lsd.icon_options.forEach(iconOption =>
+                    {
+                        $inputEl.append($('<option>', {
+                            value: iconOption.value,
+                            text: iconOption.label
+                        }));
+                    });
 
-            $labelGroup.append($fieldGroup);
+                    $inputEl.val(defaultIcon);
+
+                    setTimeout(() => {
+                        if (typeof $.fn.fontIconPicker !== 'undefined') {
+                            $inputEl.fontIconPicker({
+                                emptyIcon: false,
+                                emptyIconValue: ''
+                            });
+                        }
+                    }, 0);
+                }
+                else if (field === 'Content')
+                {
+                    const uniqueId = 'textarea_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+                    $inputEl = $('<textarea>', {
+                        name: '',
+                        id: uniqueId,
+                        'data-field': 'content'
+                    });
+
+                    setTimeout(() =>
+                    {
+                        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
+                            wp.editor.initialize(uniqueId, {
+                                tinymce: {
+                                    toolbar1: 'formatselect bold italic underline bullist numlist blockquote alignleft aligncenter alignright link unlink wp_more fullscreen',
+                                    plugins: 'lists paste link'
+                                },
+                                quicktags: true,
+                                mediaButtons: true
+                            });
+                        }
+                    }, 10);
+                }
+                else if (field === 'Login Status')
+                {
+                    // Select: required / optional, default = required
+                    $inputEl = $('<select>', {
+                        name: '',
+                        'data-field': uniqueName,
+                        class: 'lsd-admin-input'
+                    });
+
+                    $inputEl.append($('<option>', {
+                        value: 'required',
+                        text: 'Required (only logged-in users)'
+                    }));
+
+                    $inputEl.append($('<option>', {
+                        value: 'optional',
+                        text: 'Optional (visible to all users)'
+                    }));
+                }
+                else
+                {
+                    // Label / Slug
+                    $inputEl = $('<input>', {
+                        type: 'text',
+                        name: '',
+                        required: true,
+                        'data-field': uniqueName,
+                        placeholder: placeholders[field],
+                        class: 'lsd-admin-input'
+                    });
+                }
+
+                $fieldGroup.append($inputEl);
+                $fieldGroup.append(
+                    $('<p></p>')
+                    .text(descriptions[field] || '')
+                    .addClass('lsd-admin-description-tiny lsd-mb-0 lsd-mt-2')
+                );
+
+                $labelGroup.append($fieldGroup);
+            });
+
+            $newMenuItem.append($inputHiddenMenu);
         });
 
-        $newMenuItem.append($inputHiddenMenu);
     });
 
     $(document).on('input', '.lsd-custom-menu-list input[data-field="slug"]', function ()
@@ -1408,21 +2019,32 @@ jQuery(document).ready(function ($)
         const $thisList = $slugInput.closest('.lsd-custom-menu-list');
         const $inputHiddenMenu = $thisList.find('.custom-menu-slug');
         const $thisListContent = $slugInput.closest('.lsd-custom-menu-content');
-        const $inputField = $thisListContent.find('input[data-field]');
-        const $iconField = $thisListContent.find('select.lsd-iconpicker');
-        const $textField = $thisListContent.find('textarea');
+
+        const $inputField  = $thisListContent.find('input[data-field]');
+        const $iconField   = $thisListContent.find('select.lsd-iconpicker');
+        const $selectField = $thisListContent.find('select[data-field]').not('.lsd-iconpicker');
+        const $textField   = $thisListContent.find('textarea');
+
         const slugValue = $slugInput.val();
 
         const slugValueSanitize = slugValue
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-+|-+$/g, '');
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-+|-+$/g, '');
 
         $inputHiddenMenu.val(slugValueSanitize);
 
         $inputField.each(function ()
+        {
+            const $field = $(this);
+            const fieldName = $field.data('field');
+            $field.attr('name', `lsd[dashboard_menu_custom][${slugValueSanitize}][${fieldName}]`);
+        });
+
+        // For login_status select (and other selects with data-field)
+        $selectField.each(function ()
         {
             const $field = $(this);
             const fieldName = $field.data('field');
@@ -1451,6 +2073,35 @@ jQuery(document).ready(function ($)
         $thisList.find('.lsd-custom-menu-label').html($(this).val());
     });
 
+    $(document).on('input', 'input[name^="lsd[dashboard_menu_builtin]"][name$="[label]"]', function ()
+    {
+        const $input = $(this);
+        const $item = $input.closest('.lsd-dashboard-menu-item');
+        const $label = $item.find('p > span > span').first();
+
+        $label.text($input.val());
+    });
+
+    $(document).on('change', '.lsd-custom-menu-list select.lsd-iconpicker', function ()
+    {
+        const $select = $(this);
+        const $thisList = $select.closest('.lsd-custom-menu-list');
+        const $icon = $thisList.find('.lsd-custom-menu-icon');
+        const iconClass = $select.val() || '';
+
+        $icon.attr('class', 'lsd-icon lsd-custom-menu-icon ' + iconClass);
+    });
+
+    $(document).on('change', 'select.lsd-iconpicker[name^="lsd[dashboard_menu_builtin]"][name$="[icon]"]', function ()
+    {
+        const $select = $(this);
+        const $item = $select.closest('.lsd-dashboard-menu-item');
+        const $icon = $item.find('p > span > i.lsd-icon').first();
+        const iconClass = $select.val() || '';
+
+        $icon.attr('class', 'lsd-icon ' + iconClass);
+    });
+
     $(document).on('blur', '.lsd-custom-menu-list input[data-field="label"]', function ()
     {
         const $labelInput = $(this);
@@ -1465,15 +2116,52 @@ jQuery(document).ready(function ($)
         }
     });
 
+    $(document).on('click', '.lsd-dashboard-menu-toggle', function (event)
+    {
+        event.preventDefault();
+
+        const $toggle = $(this);
+        const $item = $toggle.closest('.lsd-dashboard-menu-item');
+        const $status = $item.find('.lsd-dashboard-menu-status').first();
+
+        if (!$status.length) return;
+
+        const enabled = parseInt($status.val(), 10) === 1;
+        if (enabled)
+        {
+            $status.val(0);
+            $toggle.find('i').removeClass('fa-check-circle').addClass('fa-minus-circle');
+            $toggle.attr('aria-pressed', 'false');
+            $item.addClass('lsd-dashboard-menu-item-disabled');
+        }
+        else
+        {
+            $status.val(1);
+            $toggle.find('i').removeClass('fa-minus-circle').addClass('fa-check-circle');
+            $toggle.attr('aria-pressed', 'true');
+            $item.removeClass('lsd-dashboard-menu-item-disabled');
+        }
+    });
+
     $(document).on('click', '.lsd-custom-menu-list .fa-trash', function ()
     {
         $(this).closest('.lsd-custom-menu-list').remove();
     });
 
-    $(document).on('click', '.lsd-custom-menu-list .fa-chevron-down', function ()
+    $(document).on('click', '.lsd-dashboard-menu-item .lsd-dashboard-menu-chevron', function ()
     {
-        const $thisListContent = $(this).closest('.lsd-custom-menu-list').find('.lsd-custom-menu-content');
-        $thisListContent.toggle();
+        const $chevron = $(this);
+        const $thisListContent = $chevron.closest('.lsd-dashboard-menu-item').find('.lsd-dashboard-menu-content');
+        if ($thisListContent.hasClass('lsd-util-hide'))
+        {
+            $thisListContent.removeClass('lsd-util-hide').show();
+            $chevron.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        }
+        else
+        {
+            $thisListContent.addClass('lsd-util-hide').hide();
+            $chevron.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        }
     });
 
     /**
@@ -1657,6 +2345,32 @@ jQuery(document).ready(function ($)
             }
         });
 
+        // Validate required file fields
+        $('.lsd-attribute-file[data-required="1"]:visible').each(function ()
+        {
+            const $this = $(this);
+            const $input = $(this).find('input[type=hidden]');
+            const value = $input.val();
+            const requiredMessage = $this.data('required-message') || 'Please select a file.';
+            const $placeholder = $('#' + $input.attr('id') + '_img');
+
+            if (!value)
+            {
+                isValid = false;
+                $placeholder.addClass('lsd-checkbox-error');
+
+                if ($placeholder.next('.lsd-file-error-msg').length === 0)
+                {
+                    $placeholder.after('<div class="lsd-file-error-msg lsd-alert lsd-error">' + requiredMessage + '</div>');
+                }
+            }
+            else
+            {
+                $placeholder.removeClass('lsd-checkbox-error');
+                $placeholder.next('.lsd-file-error-msg').remove();
+            }
+        });
+
         if (!isValid)
         {
             e.preventDefault();
@@ -1698,6 +2412,120 @@ jQuery(document).ready(function ($)
 jQuery(function ($)
 {
     const ACTIVE_CLASS = 'lsd-nav-tab-active';
+
+    const parseSavedState = (value) =>
+    {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value === 1;
+
+        if (typeof value === 'string')
+        {
+            const normalized = value.trim().toLowerCase();
+            return normalized === '1' || normalized === 'true';
+        }
+
+        return false;
+    };
+
+    function initToggleAwareNav($nav)
+    {
+        const controlSelector = $nav.data('lsdToggleControl');
+        if (!controlSelector) return;
+
+        const $control = $(controlSelector);
+        if (!$control.length) return;
+
+        const disableSelector = $nav.data('lsdToggleDisableTargets') || null;
+        const tooltipMessageRaw = $nav.data('disabledTooltip') || $nav.data('lsdToggleTooltip');
+        const tooltipMessage = typeof tooltipMessageRaw === 'string' ? tooltipMessageRaw : '';
+
+        const $targets = disableSelector ? $nav.find(disableSelector) : $();
+
+        $targets.each(function ()
+        {
+            const $target = $(this);
+
+            $target.data('lsdToggleOriginalTooltip', $target.attr('data-lsd-tooltip'));
+            $target.data('lsdToggleHadTooltipAttr', typeof $target.attr('data-lsd-tooltip') !== 'undefined');
+            $target.data('lsdToggleOriginalAriaDisabled', $target.attr('aria-disabled'));
+            $target.data('lsdToggleHadAriaAttr', typeof $target.attr('aria-disabled') !== 'undefined');
+            $target.data('lsdToggleOriginalTabindex', $target.attr('tabindex'));
+            $target.data('lsdToggleHadTabindexAttr', typeof $target.attr('tabindex') !== 'undefined');
+            $target.data('lsdToggleHadTooltipClass', $target.hasClass('lsd-tooltip'));
+        });
+
+        const toggleTargetsDisabledState = (disabled) =>
+        {
+            if (!$targets.length) return;
+
+            $targets.each(function ()
+            {
+                const $target = $(this);
+
+                if (disabled)
+                {
+                    $target
+                        .addClass('lsd-nav-tab-disabled')
+                        .attr('aria-disabled', 'true')
+                        .attr('tabindex', '-1');
+
+                    if (tooltipMessage)
+                    {
+                        $target.attr('data-lsd-tooltip', tooltipMessage);
+
+                        if (!$target.data('lsdToggleHadTooltipClass'))
+                        {
+                            $target.addClass('lsd-tooltip').data('lsdToggleAddedTooltipClass', true);
+                        }
+                    }
+                }
+                else
+                {
+                    $target.removeClass('lsd-nav-tab-disabled');
+
+                    if ($target.data('lsdToggleHadAriaAttr')) $target.attr('aria-disabled', $target.data('lsdToggleOriginalAriaDisabled'));
+                    else $target.removeAttr('aria-disabled');
+
+                    if ($target.data('lsdToggleHadTabindexAttr')) $target.attr('tabindex', $target.data('lsdToggleOriginalTabindex'));
+                    else $target.removeAttr('tabindex');
+
+                    if (tooltipMessage)
+                    {
+                        if ($target.data('lsdToggleHadTooltipAttr')) $target.attr('data-lsd-tooltip', $target.data('lsdToggleOriginalTooltip'));
+                        else $target.removeAttr('data-lsd-tooltip');
+                    }
+
+                    if ($target.data('lsdToggleAddedTooltipClass'))
+                    {
+                        $target.removeClass('lsd-tooltip');
+                        $target.removeData('lsdToggleAddedTooltipClass');
+                    }
+                }
+            });
+        };
+
+        const readSavedState = () => parseSavedState($nav.data('lsdToggleSaved'));
+
+        const updateNavState = () =>
+        {
+            const savedActive = readSavedState();
+            const toggleChecked = $control.is(':checkbox, :radio') ? $control.is(':checked') : Boolean($control.val());
+            const shouldShowNav = toggleChecked || savedActive;
+            const shouldDisableNav = !savedActive && toggleChecked;
+
+            $nav.toggleClass('lsd-util-hide', !shouldShowNav);
+            toggleTargetsDisabledState(shouldDisableNav);
+        };
+
+        updateNavState();
+
+        $control.on('change', updateNavState);
+    }
+
+    $('.lsd-nav-sub-tabs[data-lsd-toggle-control]').each(function ()
+    {
+        initToggleAwareNav($(this));
+    });
 
     const makeContentPanelId = (parent, child) => `lsd_panel_${parent}_${child}`;
 
@@ -1753,7 +2581,19 @@ jQuery(function ($)
     }
 
     // On subtab click
-    $('.lsd-nav-sub-tabs').on('click', '.lsd-nav-tab', function () {activateChildTab($(this));});
+    $('.lsd-nav-sub-tabs').on('click', '.lsd-nav-tab', function (event)
+    {
+        const $tab = $(this);
+
+        if ($tab.hasClass('lsd-nav-tab-disabled'))
+        {
+            event.preventDefault();
+            return;
+        }
+
+        activateChildTab($tab);
+    });
+
     // Trigger active subtab only within the active parent tab
     $('.lsd-nav-tab-wrapper > li > a.lsd-nav-tab-active')
         .closest('li')
@@ -1763,6 +2603,111 @@ jQuery(function ($)
 
 jQuery(function ($)
 {
+    const $wrapper = $('#lsd_plan_tiers');
+    if (!$wrapper.length) return;
+
+    const $btnAdd = $('#lsd_add_tier');
+
+    function ensureDefault()
+    {
+        let $default = $wrapper.find('.lsd-plan-tier-default-input[value="1"]').closest('.lsd-plan-tier');
+
+        if (!$default.length) $default = $wrapper.children('.lsd-plan-tier').first();
+
+        $wrapper.children('.lsd-plan-tier').each(function ()
+        {
+            const isDefault = $(this).is($default);
+            $(this).find('.lsd-plan-tier-star').toggleClass('fas', isDefault).toggleClass('far', !isDefault);
+            $(this).find('.lsd-plan-tier-default-input').val(isDefault ? '1' : '0');
+        });
+    }
+
+    function renumber()
+    {
+        $wrapper.children('.lsd-plan-tier').each(function (i)
+        {
+            $(this).attr('data-index', i);
+            $(this).find('[name^="lsd_tiers"]').each(function ()
+            {
+                $(this).attr('name', $(this).attr('name').replace(/lsd_tiers\[[0-9]+]/, 'lsd_tiers[' + i + ']'));
+            });
+        });
+
+        ensureDefault();
+    }
+
+    function refreshSortable()
+    {
+        $wrapper.sortable({
+            handle: '.lsd-plan-tier-sort',
+            stop: renumber
+        });
+    }
+
+    $wrapper.on('click', '.lsd-plan-tier-remove', function ()
+    {
+        $(this).closest('.lsd-plan-tier').remove();
+        renumber();
+    });
+
+    $wrapper.on('click', '.lsd-plan-tier-star', function ()
+    {
+        const $tier = $(this).closest('.lsd-plan-tier');
+        $wrapper.find('.lsd-plan-tier-default-input').val('0');
+        $tier.find('.lsd-plan-tier-default-input').val('1');
+        ensureDefault();
+    });
+
+    $wrapper.on('change', '.lsd-plan-tier-type', function ()
+    {
+        const $tier = $(this).closest('.lsd-plan-tier');
+        const $expiry = $tier.find('.lsd-plan-tier-expiry');
+        const $expiryWrapper = $tier.find('.lsd-plan-tier-expiry-wrapper');
+        const isRecurring = $(this).val() === 'recurring';
+
+        $expiry.prop('required', isRecurring);
+
+        if ($expiryWrapper.length)
+        {
+            if (isRecurring) $expiryWrapper.removeClass('lsd-util-hide');
+            else $expiryWrapper.addClass('lsd-util-hide');
+        }
+    }).trigger('change');
+
+    $wrapper.on('input', 'input[name$="[name]"]', function ()
+    {
+        const $tier = $(this).closest('.lsd-plan-tier');
+        $tier.find('.lsd-plan-tier-title').text($(this).val());
+    });
+
+    $btnAdd.on('click', function (e)
+    {
+        e.preventDefault();
+        const index = $wrapper.children('.lsd-plan-tier').length;
+
+        $.post(lsd.ajaxurl, {
+            action: 'lsd_plan_new_tier',
+            index: index,
+            _lsdnonce: $('input[name="_lsdnonce"]').val()
+        }, function (res)
+        {
+            if (res.success)
+            {
+                const $tier = $(res.html);
+                $wrapper.append($tier);
+
+                refreshSortable();
+                renumber();
+
+                const $name = $tier.find('input[name$="[name]"]');
+                $('html, body').animate({scrollTop: $tier.offset().top}, 300, () => $name.trigger('focus'));
+            }
+        }, 'json');
+    });
+
+    refreshSortable();
+    renumber();
+
     $('.lsd-switch-confirm').each(function()
     {
         const $wrapper = jQuery(this);
@@ -1786,4 +2731,1183 @@ jQuery(function ($)
             $box.addClass('lsd-util-hide');
         });
     });
+});
+
+jQuery(function ($)
+{
+    const config = window.lsdGooglePlacesAdmin || {};
+    if (!Object.keys(config).length) return;
+
+    const escapeHtml = function (value)
+    {
+        return String(value === undefined || value === null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
+    const notify = function (message, type, options)
+    {
+        if (typeof window.listdom_toastify === 'function')
+        {
+            window.listdom_toastify(message, type || 'lsd-info', options || {});
+        }
+    };
+
+    const notifyCopy = function (message, type)
+    {
+        notify(message, type, {
+            hideTime: 4800
+        });
+    };
+
+    const setFeedback = function ($element, message, type)
+    {
+        if (!$element.length) return;
+
+        $element.removeClass('lsd-alert lsd-info lsd-success lsd-warning lsd-error');
+
+        if (!message)
+        {
+            $element.html('').hide();
+            return;
+        }
+
+        $element
+            .addClass('lsd-alert')
+            .addClass(type || 'lsd-info')
+            .html(message)
+            .show();
+    };
+
+    const copyToClipboard = async function (value)
+    {
+        const text = String(value || '');
+
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function')
+        {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+
+        const $textarea = $('<textarea class="lsd-util-hide" aria-hidden="true"></textarea>').val(text).appendTo('body');
+        $textarea.trigger('focus').trigger('select');
+
+        const copied = document.execCommand && document.execCommand('copy');
+        $textarea.remove();
+
+        if (!copied) throw new Error('clipboard_unavailable');
+    };
+
+    const debounce = function (callback, wait)
+    {
+        let timer = null;
+
+        return function ()
+        {
+            const args = arguments;
+            const context = this;
+
+            window.clearTimeout(timer);
+            timer = window.setTimeout(function ()
+            {
+                callback.apply(context, args);
+            }, wait);
+        };
+    };
+
+    const initSeedingPage = function ()
+    {
+        const $page = $('#lsdaddgpl-page');
+        if (!$page.length) return;
+
+        const $map = $('#lsdaddgpl-map');
+        const $query = $('#lsdaddgpl-query');
+        const $type = $('#lsdaddgpl-type');
+        const $includeImages = $('#lsdaddgpl-include-images');
+        const $refreshOnMove = $('#lsdaddgpl-refresh-on-move');
+        const $queue = $('#lsdaddgpl-queue');
+        const $queueEmpty = $('#lsdaddgpl-queue-empty');
+        const $results = $('#lsdaddgpl-results');
+        const $draftResults = $('#lsdaddgpl-draft-results');
+        const $makeDrafts = $('#lsdaddgpl-make-drafts');
+        const state = {
+            map: null,
+            markers: [],
+            places: [],
+            queue: [],
+            request: null,
+            highlightTimer: null,
+            missingPlacesNoticeShown: false,
+            hasSearched: false
+        };
+
+        const placeRowId = function (placeId)
+        {
+            return 'lsdaddgpl-place-' + String(placeId || '').replace(/[^a-zA-Z0-9_-]/g, '');
+        };
+
+        const getPlace = function (placeId)
+        {
+            return state.places.find(function (item)
+            {
+                return item.place_id === placeId;
+            }) || null;
+        };
+
+        const renderQueue = function ()
+        {
+            if (!state.queue.length)
+            {
+                $queue.html('');
+                $queueEmpty.show();
+                return;
+            }
+
+            $queueEmpty.hide();
+
+            let html = '';
+            state.queue.forEach(function (item)
+            {
+                html += '<li class="lsdaddgpl-queue-item" data-place-id="' + escapeHtml(item.place_id) + '">';
+                html += '<div class="lsdaddgpl-queue-main">';
+                html += '<strong>' + escapeHtml(item.title) + '</strong>';
+                if (item.address) html += '<span>' + escapeHtml(item.address) + '</span>';
+                html += '<code>' + escapeHtml(item.place_id) + '</code>';
+                html += '</div>';
+                html += '<button type="button" class="button lsdaddgpl-queue-remove" data-place-id="' + escapeHtml(item.place_id) + '">' + escapeHtml(config.strings.remove || 'Remove') + '</button>';
+                html += '</li>';
+            });
+
+            $queue.html(html);
+        };
+
+        const renderPlaces = function ()
+        {
+            if (!state.places.length)
+            {
+                $results.html('<div class="lsdaddgpl-empty-state">' + escapeHtml(config.strings.noResults || 'No places found.') + '</div>');
+                return;
+            }
+
+            let html = '<div class="lsdaddgpl-business-list">';
+
+            state.places.forEach(function (place)
+            {
+                const title = place.seed_title || place.name || config.strings.untitledPlace || 'Untitled Place';
+                const inQueue = state.queue.some(function (item)
+                {
+                    return item.place_id === place.place_id;
+                });
+                const hasMedia = !!place.photo_url;
+                const rating = typeof place.rating === 'number' ? place.rating.toFixed(1) : '';
+                const reviewCount = Number(place.review_count || 0);
+
+                html += '<div class="lsdaddgpl-business-row' + (hasMedia ? '' : ' lsdaddgpl-business-row-no-media') + '" id="' + escapeHtml(placeRowId(place.place_id)) + '" data-place-id="' + escapeHtml(place.place_id) + '">';
+
+                if (hasMedia)
+                {
+                    html += '<div class="lsdaddgpl-business-media">';
+                    html += '<img src="' + escapeHtml(place.photo_url) + '" alt="' + escapeHtml(title) + '">';
+                    html += '</div>';
+                }
+                html += '<div class="lsdaddgpl-business-content">';
+                html += '<div class="lsdaddgpl-business-top-content">';
+                html += '<div class="lsdaddgpl-business-top">';
+                html += '<input type="text" class="lsdaddgpl-business-title" value="' + escapeHtml(title) + '" data-place-id="' + escapeHtml(place.place_id) + '">';
+                html += '<button type="button" class="lsd-primary-button lsdaddgpl-business-add" data-place-id="' + escapeHtml(place.place_id) + '"' + (inQueue ? ' disabled' : '') + '>' + escapeHtml(config.strings.addToQueue || 'Add') + '</button>';
+                html += '</div>';
+
+                if (place.address)
+                {
+                    html += '<div class="lsdaddgpl-business-address">' + escapeHtml(place.address) + '</div>';
+                }
+
+                html += '</div>';
+
+                html += '<div class="lsdaddgpl-business-meta">';
+                html += '<div class="lsdaddgpl-business-meta-left">';
+
+                if (rating !== '')
+                {
+                    html += '<span class="lsdaddgpl-business-rating">' + escapeHtml(rating) + '</span>';
+                }
+
+                if (reviewCount > 0)
+                {
+                    html += '<span class="lsdaddgpl-business-reviews">' + escapeHtml(reviewCount) + ' ' + escapeHtml(config.strings.reviewsLabel || 'reviews') + '</span>';
+                }
+
+                html += '</div>';
+
+                if (place.google_maps_url)
+                {
+                    html += '<a class="button button-secondary lsdaddgpl-business-link" href="' + escapeHtml(place.google_maps_url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(config.strings.viewBusiness || 'View Business') + '</a>';
+                }
+
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            });
+
+            html += '</div>';
+            $results.html(html);
+        };
+
+        const clearMarkers = function ()
+        {
+            state.markers.forEach(function (marker)
+            {
+                marker.setMap(null);
+            });
+
+            state.markers = [];
+        };
+
+        const highlightPlaceRow = function (placeId)
+        {
+            const $row = $('#' + placeRowId(placeId));
+            if (!$row.length) return;
+
+            $row.get(0).scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            $('.lsdaddgpl-business-row').removeClass('lsdaddgpl-business-row-highlight');
+            $row.addClass('lsdaddgpl-business-row-highlight');
+
+            if (state.highlightTimer) window.clearTimeout(state.highlightTimer);
+            state.highlightTimer = window.setTimeout(function ()
+            {
+                $row.removeClass('lsdaddgpl-business-row-highlight');
+            }, 2000);
+        };
+
+        const addPlaceToQueue = function (placeId)
+        {
+            const place = getPlace(placeId);
+            if (!place) return;
+
+            const exists = state.queue.some(function (item)
+            {
+                return item.place_id === place.place_id;
+            });
+
+            if (exists)
+            {
+                notify(config.strings.duplicateQueue || 'Duplicate place.', 'lsd-warning');
+                return;
+            }
+
+            if (state.queue.length >= Number(config.maxQueueSize || 20))
+            {
+                notify(config.strings.queueFull || 'Queue is full.', 'lsd-warning');
+                return;
+            }
+
+            state.queue.push({
+                place_id: place.place_id,
+                title: $.trim(place.seed_title || place.name || '') || config.strings.untitledPlace || 'Untitled Place',
+                address: place.address || ''
+            });
+
+            renderQueue();
+            renderPlaces();
+            notify(config.strings.addedToQueue || 'Added to queue.', 'lsd-success');
+        };
+
+        const renderMarkers = function ()
+        {
+            clearMarkers();
+
+            state.places.forEach(function (place)
+            {
+                if (typeof place.lat !== 'number' || typeof place.lng !== 'number') return;
+
+                const marker = new google.maps.Marker({
+                    position: {lat: place.lat, lng: place.lng},
+                    map: state.map,
+                    title: place.name || ''
+                });
+
+                marker.addListener('click', function ()
+                {
+                    highlightPlaceRow(place.place_id);
+                });
+
+                state.markers.push(marker);
+            });
+        };
+
+        const performSearch = function ()
+        {
+            if (!state.map) return;
+            state.hasSearched = true;
+
+            if (!config.hasPlacesApiKey)
+            {
+                if (!state.missingPlacesNoticeShown)
+                {
+                    notify(config.strings.missingPlacesApiKey || 'Missing Google Places API key.', 'lsd-warning');
+                    state.missingPlacesNoticeShown = true;
+                }
+
+                state.places = [];
+                renderPlaces();
+                clearMarkers();
+                return;
+            }
+
+            const bounds = state.map.getBounds();
+            if (!bounds) return;
+
+            if (state.request && typeof state.request.abort === 'function') state.request.abort();
+
+            const northEast = bounds.getNorthEast();
+            const southWest = bounds.getSouthWest();
+            const payload = {
+                query: $.trim($query.val()),
+                type: $type.val() || '',
+                include_images: $includeImages.is(':checked'),
+                bounds: {
+                    north: northEast.lat(),
+                    east: northEast.lng(),
+                    south: southWest.lat(),
+                    west: southWest.lng()
+                }
+            };
+
+            state.request = $.ajax({
+                type: 'POST',
+                url: config.ajaxUrl,
+                dataType: 'json',
+                data: {
+                    action: 'lsdaddgpl_search',
+                    _wpnonce: config.seedingNonce,
+                    payload: JSON.stringify(payload)
+                }
+            }).done(function (response)
+            {
+                if (!response || Number(response.success) !== 1)
+                {
+                    notify(response && response.message ? response.message : config.strings.searchFailed || 'Unable to load places.', 'lsd-error');
+                    state.places = [];
+                    renderPlaces();
+                    clearMarkers();
+                    return;
+                }
+
+                state.places = $.isArray(response.results) ? response.results.map(function (place)
+                {
+                    place.seed_title = place.name || '';
+                    return place;
+                }) : [];
+
+                renderPlaces();
+                renderMarkers();
+            }).fail(function (xhr, textStatus)
+            {
+                if (textStatus === 'abort') return;
+
+                notify(config.strings.searchFailed || 'Unable to load places.', 'lsd-error');
+                state.places = [];
+                renderPlaces();
+                clearMarkers();
+            });
+        };
+
+        const makeDrafts = function ()
+        {
+            if (!state.queue.length)
+            {
+                notify(config.strings.emptyQueue || 'Queue is empty.', 'lsd-warning');
+                return;
+            }
+
+            $makeDrafts.prop('disabled', true);
+
+            $.ajax({
+                type: 'POST',
+                url: config.ajaxUrl,
+                dataType: 'json',
+                data: {
+                    action: 'lsdaddgpl_make_drafts',
+                    _wpnonce: config.seedingNonce,
+                    queue: JSON.stringify(state.queue)
+                }
+            }).done(function (response)
+            {
+                if (!response || Number(response.success) !== 1)
+                {
+                    notify(response && response.message ? response.message : config.strings.draftCreationFailed || 'Unable to create drafts.', 'lsd-error');
+                    return;
+                }
+
+                let html = '';
+
+                if ($.isArray(response.created) && response.created.length)
+                {
+                    html += '<div class="lsdaddgpl-result-group"><h4>' + escapeHtml(response.message || '') + '</h4><ul>';
+                    response.created.forEach(function (item)
+                    {
+                        html += '<li><a href="' + escapeHtml(item.edit_url || '#') + '">' + escapeHtml(item.title || item.place_id) + '</a></li>';
+                    });
+                    html += '</ul></div>';
+                }
+
+                if ($.isArray(response.skipped) && response.skipped.length)
+                {
+                    html += '<div class="lsdaddgpl-result-group"><h4>' + escapeHtml(config.strings.skipped || 'Skipped') + '</h4><ul>';
+                    response.skipped.forEach(function (item)
+                    {
+                        const title = item.edit_url
+                            ? '<a href="' + escapeHtml(item.edit_url) + '">' + escapeHtml(item.title || item.place_id || '') + '</a>'
+                            : escapeHtml(item.title || item.place_id || '');
+
+                        html += '<li>' + title + (item.reason ? ' <span>' + escapeHtml(item.reason) + '</span>' : '') + '</li>';
+                    });
+                    html += '</ul></div>';
+                }
+
+                $draftResults.html(html);
+                notify(response.message || '', 'lsd-success');
+                state.queue = [];
+                renderQueue();
+                renderPlaces();
+            }).fail(function ()
+            {
+                notify(config.strings.draftCreationFailed || 'Unable to create drafts.', 'lsd-error');
+            }).always(function ()
+            {
+                $makeDrafts.prop('disabled', false);
+            });
+        };
+
+        const initMap = function ()
+        {
+            const center = {
+                lat: parseFloat($map.data('lat')) || parseFloat(config.defaultCenter && config.defaultCenter.lat) || 0,
+                lng: parseFloat($map.data('lng')) || parseFloat(config.defaultCenter && config.defaultCenter.lng) || 0
+            };
+            const zoom = parseInt($map.data('zoom'), 10) || parseInt(config.defaultCenter && config.defaultCenter.zoom, 10) || 12;
+
+            state.map = new google.maps.Map($map.get(0), {
+                center: center,
+                zoom: zoom,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                streetViewControl: false,
+                fullscreenControl: true
+            });
+
+            state.map.addListener('idle', debounce(function ()
+            {
+                if (!state.hasSearched || !$refreshOnMove.is(':checked')) return;
+                performSearch();
+            }, 500));
+        };
+
+        $query.on('keydown', function (event)
+        {
+            if (event.key !== 'Enter') return;
+
+            event.preventDefault();
+            performSearch();
+        });
+
+        $('#lsdaddgpl-search').on('click', function ()
+        {
+            performSearch();
+        });
+
+        $results.on('input', '.lsdaddgpl-business-title', function ()
+        {
+            const placeId = String($(this).data('placeId') || '');
+            const place = getPlace(placeId);
+            if (!place) return;
+
+            place.seed_title = $(this).val();
+        });
+
+        $results.on('click', '.lsdaddgpl-business-add', function ()
+        {
+            addPlaceToQueue(String($(this).data('placeId') || ''));
+        });
+
+        $queue.on('click', '.lsdaddgpl-queue-remove', function ()
+        {
+            const placeId = String($(this).data('placeId') || '');
+            state.queue = state.queue.filter(function (item)
+            {
+                return item.place_id !== placeId;
+            });
+
+            renderQueue();
+            renderPlaces();
+        });
+
+        $makeDrafts.on('click', function ()
+        {
+            makeDrafts();
+        });
+
+        renderQueue();
+        renderPlaces();
+
+        if (!config.hasMapApiKey)
+        {
+            notify(config.strings.missingMapApiKey || 'Missing Google Maps API key.', 'lsd-warning');
+            return;
+        }
+
+        if (typeof window.listdom_add_googlemaps_callbacks === 'function')
+        {
+            window.listdom_add_googlemaps_callbacks(function ()
+            {
+                initMap();
+            });
+            return;
+        }
+
+        if (window.google && window.google.maps)
+        {
+            initMap();
+            return;
+        }
+
+        let attempts = 0;
+        const timer = window.setInterval(function ()
+        {
+            attempts += 1;
+
+            if (typeof window.listdom_add_googlemaps_callbacks === 'function')
+            {
+                window.clearInterval(timer);
+                window.listdom_add_googlemaps_callbacks(function ()
+                {
+                    initMap();
+                });
+                return;
+            }
+
+            if (window.google && window.google.maps)
+            {
+                window.clearInterval(timer);
+                initMap();
+                return;
+            }
+
+            if (attempts >= 40)
+            {
+                window.clearInterval(timer);
+                notify(config.strings.mapLoadError || 'Unable to load Google Maps.', 'lsd-error');
+            }
+        }, 250);
+    };
+
+    const initSuggestionsMetabox = function ()
+    {
+        const $metabox = $('#lsdaddgpl-metabox');
+        if (!$metabox.length) return;
+
+        const $feedback = $('#lsdaddgpl-metabox-feedback');
+        const $entry = $('#lsdaddgpl-place-id-entry');
+        const $searchInput = $('#lsdaddgpl-place-search-input');
+        const $searchClear = $('#lsdaddgpl-place-search-clear');
+        const $searchResults = $('#lsdaddgpl-place-search-results');
+        const $display = $('#lsdaddgpl-place-id-display');
+        const $displayCurrent = $('#lsdaddgpl-place-id-current');
+        const $fetchButton = $('#lsdaddgpl-place-id-fetch');
+        const $changeButton = $('#lsdaddgpl-place-id-change');
+        const $suggestions = $('#lsdaddgpl-suggestions');
+        const postId = parseInt($metabox.data('postId'), 10) || parseInt(config.postId, 10) || 0;
+        const fieldMap = config.fieldMap || {};
+        const titleField = fieldMap.title || {};
+        const addressFieldMap = fieldMap.address || {};
+        const phoneField = fieldMap.phone || {};
+        const websiteField = fieldMap.website || {};
+        const openingHoursField = fieldMap.opening_hours || {};
+        const primaryTypeField = fieldMap.primary_type || {};
+        const categoriesField = fieldMap.categories || {};
+        const imageField = fieldMap.featured_image || {};
+        const coordinatesField = fieldMap.coordinates || {};
+        const priceLevelField = fieldMap.price_level || {};
+        let placeId = String($metabox.data('placeId') || '');
+        let searchRequest = null;
+
+        if (!postId || !$suggestions.length || !$searchResults.length) return;
+
+        const formatPriceLevel = function (value)
+        {
+            const map = {
+                PRICE_LEVEL_INEXPENSIVE: '$',
+                PRICE_LEVEL_MODERATE: '$$',
+                PRICE_LEVEL_EXPENSIVE: '$$$',
+                PRICE_LEVEL_VERY_EXPENSIVE: '$$$$'
+            };
+
+            return map[value] || value || '';
+        };
+
+        const readableTypes = function (types)
+        {
+            if (!$.isArray(types)) return '';
+
+            return types.map(function (item)
+            {
+                return String(item || '').replace(/_/g, ' ');
+            }).join(', ');
+        };
+
+        const applyAddressSelection = function (address, details)
+        {
+            const $addressField = $(addressFieldMap.input || '#lsd_object_type_address');
+            const $dropdown = $(addressFieldMap.dropdown || '#lsd_object_type_address_dropdown');
+            if (!$addressField.length) return false;
+
+            const label = String(address || '');
+            const item = {
+                label: label,
+                value: label
+            };
+
+            if (details && typeof details.latitude === 'number' && typeof details.longitude === 'number')
+            {
+                item.lat = details.latitude;
+                item.lon = details.longitude;
+            }
+
+            if (details && details.place_id)
+            {
+                item.placeId = details.place_id;
+            }
+
+            $addressField.val(label).trigger('input');
+
+            if ($dropdown.length && ((details && typeof details.latitude === 'number' && typeof details.longitude === 'number') || (details && details.place_id)))
+            {
+                $dropdown.trigger('lsd-autocomplete-select', [item]);
+            }
+            else
+            {
+                $addressField.trigger('change');
+            }
+
+            return true;
+        };
+
+        const rowHtml = function (label, value, actions)
+        {
+            if (!value && value !== 0) return '';
+
+            let html = '<div class="lsdaddgpl-suggestion-row">';
+            html += '<strong>' + escapeHtml(label) + '</strong>';
+            html += '<div class="lsdaddgpl-suggestion-value">' + escapeHtml(value) + '</div>';
+
+            if (actions) html += '<div class="lsdaddgpl-suggestion-actions">' + actions + '</div>';
+
+            html += '</div>';
+            return html;
+        };
+
+        const multilineRowHtml = function (label, values, actions)
+        {
+            if (!$.isArray(values) || !values.length) return '';
+
+            const lines = values.map(function (value)
+            {
+                return escapeHtml(value);
+            }).filter(function (value)
+            {
+                return value !== '';
+            });
+
+            if (!lines.length) return '';
+
+            let html = '<div class="lsdaddgpl-suggestion-row">';
+            html += '<strong>' + escapeHtml(label) + '</strong>';
+            html += '<div class="lsdaddgpl-suggestion-value">' + lines.join('<br>') + '</div>';
+
+            if (actions) html += '<div class="lsdaddgpl-suggestion-actions">' + actions + '</div>';
+
+            html += '</div>';
+            return html;
+        };
+
+        const renderSuggestions = function (details)
+        {
+            const openingHours = $.isArray(details.opening_hours) ? details.opening_hours : [];
+            const matchedCategory = details.matched_category || {};
+            const categoryActions = matchedCategory.id
+                ? '<button type="button" class="button button-small" data-apply-category="' + escapeHtml(matchedCategory.id) + '">' + escapeHtml(config.strings.applyCategory || 'Apply Category') + '</button>'
+                : '';
+            const addressCopyAttributes = [
+                'data-copy-address="1"',
+                'data-copy-value="' + escapeHtml(details.formatted_address || '') + '"',
+                'data-copy-place-id="' + escapeHtml(details.place_id || '') + '"'
+            ];
+
+            if (typeof details.latitude === 'number') addressCopyAttributes.push('data-copy-lat="' + escapeHtml(details.latitude) + '"');
+            if (typeof details.longitude === 'number') addressCopyAttributes.push('data-copy-lng="' + escapeHtml(details.longitude) + '"');
+
+            const imageActions = (details.photo_name && details.photo_url)
+                ? '<button type="button" class="button button-small" data-import-image="1" data-photo-name="' + escapeHtml(details.photo_name) + '" data-photo-url="' + escapeHtml(details.photo_url) + '" data-place-id="' + escapeHtml(details.place_id || '') + '" data-place-name="' + escapeHtml(details.place_name || '') + '">' + escapeHtml(config.strings.copyImage || 'Import Featured Image') + '</button>'
+                : '';
+
+            let html = '';
+            html += rowHtml(titleField.label || 'Place Name', details.place_name, '<button type="button" class="button button-small" data-copy-target="' + escapeHtml(titleField.target || '#title') + '" data-copy-value="' + escapeHtml(details.place_name || '') + '">' + escapeHtml(config.strings.copyToTitle || 'Copy to Title') + '</button>');
+            html += rowHtml(addressFieldMap.label || 'Formatted Address', details.formatted_address, '<button type="button" class="button button-small" ' + addressCopyAttributes.join(' ') + '>' + escapeHtml(config.strings.copyToAddress || 'Copy to Address') + '</button>');
+            html += rowHtml(phoneField.label || 'Phone Number', details.phone_number, '<button type="button" class="button button-small" data-copy-target="' + escapeHtml(phoneField.target || '#lsd_phone') + '" data-copy-value="' + escapeHtml(details.phone_number || '') + '">' + escapeHtml(config.strings.copyToPhone || 'Copy to Phone') + '</button>');
+            html += rowHtml(websiteField.label || 'Website', details.website, '<button type="button" class="button button-small" data-copy-target="' + escapeHtml(websiteField.target || '#lsd_website') + '" data-copy-value="' + escapeHtml(details.website || '') + '">' + escapeHtml(config.strings.copyToWebsite || 'Copy to Website') + '</button>');
+            html += multilineRowHtml(openingHoursField.label || 'Opening Hours', openingHours, '');
+            html += rowHtml(primaryTypeField.label || 'Primary Type', details.primary_type_label || details.primary_type, '');
+            html += rowHtml(categoriesField.label || 'Categories', matchedCategory.name ? (matchedCategory.name + ' (' + (matchedCategory.source || 'exact match') + ')') : readableTypes(details.types), categoryActions);
+            html += rowHtml(imageField.label || 'Featured Image', details.photo_url ? (config.strings.imageReady || 'Google business image is available.') : '', imageActions);
+
+            if (typeof details.latitude === 'number' && typeof details.longitude === 'number')
+            {
+                html += rowHtml(
+                    coordinatesField.label || 'Latitude / Longitude',
+                    details.latitude + ', ' + details.longitude,
+                    '<button type="button" class="button button-small" data-copy-lat="' + escapeHtml(details.latitude) + '" data-copy-lng="' + escapeHtml(details.longitude) + '">' + escapeHtml(config.strings.copyToMapFields || 'Copy to Map Fields') + '</button>'
+                );
+            }
+
+            html += rowHtml(priceLevelField.label || 'Price Level', formatPriceLevel(details.price_level), details.price_level ? '<button type="button" class="button button-small" data-copy-clipboard="1">' + escapeHtml(config.strings.copy || 'Copy') + '</button>' : '');
+
+            $suggestions.html(html);
+        };
+
+        const searchEmptyHtml = function (message)
+        {
+            return '<div class="lsdaddgpl-place-search-empty">' + escapeHtml(message) + '</div>';
+        };
+
+        const renderSearchResults = function (results, query)
+        {
+            if (query.length < 2)
+            {
+                $searchResults.html(searchEmptyHtml(config.strings.searchEmpty || 'Start typing to search Google Places.'));
+                return;
+            }
+
+            if (!$.isArray(results) || !results.length)
+            {
+                $searchResults.html(searchEmptyHtml(config.strings.searchNoMatches || 'No matching Google Places were found.'));
+                return;
+            }
+
+            let html = '<div class="lsdaddgpl-place-search-list">';
+
+            results.forEach(function (item)
+            {
+                html += '<button type="button" class="lsdaddgpl-place-search-item" data-place-id="' + escapeHtml(item.place_id || '') + '">';
+                html += '<span class="lsdaddgpl-place-search-item-icon"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>';
+                html += '<span class="lsdaddgpl-place-search-item-content">';
+                html += '<strong>' + escapeHtml(item.name || '') + '</strong>';
+
+                if (item.address)
+                {
+                    html += '<span>' + escapeHtml(item.address) + '</span>';
+                }
+
+                html += '</span>';
+                html += '</button>';
+            });
+
+            html += '</div>';
+            $searchResults.html(html);
+        };
+
+        const showPlaceIdEntry = function ()
+        {
+            $display.hide();
+            $suggestions.hide().html('');
+            $entry.show();
+            $searchInput.val('');
+            $searchClear.hide();
+            renderSearchResults([], '');
+            $searchInput.trigger('focus');
+        };
+
+        const setFetchButtonVisibility = function (visible)
+        {
+            if (!$fetchButton.length) return;
+
+            $fetchButton.toggle(!!visible);
+        };
+
+        const showSuggestionsPanel = function ()
+        {
+            $entry.hide();
+            $display.show();
+            $suggestions.show();
+        };
+
+        const updateCurrentPlaceId = function (nextPlaceId)
+        {
+            placeId = String(nextPlaceId || '');
+            $metabox.attr('data-place-id', placeId).data('placeId', placeId);
+            $displayCurrent.text(placeId);
+            setFetchButtonVisibility(!!placeId);
+        };
+
+        const saveSelectedPlace = function (nextPlaceId)
+        {
+            $.ajax({
+                type: 'POST',
+                url: config.ajaxUrl,
+                dataType: 'json',
+                data: {
+                    action: 'lsdaddgpl_save_place_id',
+                    _wpnonce: config.placeIdNonce,
+                    post_id: postId,
+                    place_id: nextPlaceId
+                }
+            }).done(function (response)
+            {
+                if (!response || Number(response.success) !== 1)
+                {
+                    setFeedback($feedback, escapeHtml(response && response.message ? response.message : (config.strings.placeIdSaveFailed || 'Unable to save the Place ID for this listing.')), 'lsd-error');
+                    return;
+                }
+
+                updateCurrentPlaceId(response.place_id || nextPlaceId);
+                setFeedback($feedback, config.strings.placeSelected || 'Place selected. Review the Google suggestions below and save the listing when ready.', 'lsd-success');
+                loadSuggestions();
+            }).fail(function ()
+            {
+                setFeedback($feedback, config.strings.placeIdSaveFailed || 'Unable to save the Place ID for this listing.', 'lsd-error');
+            });
+        };
+
+        const searchPlaces = debounce(function ()
+        {
+            const query = $.trim($searchInput.val());
+            $searchClear.toggle(query.length > 0);
+
+            if (query.length < 2)
+            {
+                if (searchRequest && typeof searchRequest.abort === 'function') searchRequest.abort();
+                renderSearchResults([], query);
+                return;
+            }
+
+            if (!config.hasPlacesApiKey)
+            {
+                setFeedback($feedback, config.strings.missingPlacesApiKey || 'Missing Google Places API key.', 'lsd-warning');
+                return;
+            }
+
+            if (searchRequest && typeof searchRequest.abort === 'function') searchRequest.abort();
+
+            searchRequest = $.ajax({
+                type: 'POST',
+                url: config.ajaxUrl,
+                dataType: 'json',
+                data: {
+                    action: 'lsdaddgpl_lookup_place',
+                    _wpnonce: config.placeIdNonce,
+                    post_id: postId,
+                    query: query
+                }
+            }).done(function (response)
+            {
+                if (!response || Number(response.success) !== 1)
+                {
+                    setFeedback($feedback, escapeHtml(response && response.message ? response.message : (config.strings.searchPlaceFailed || 'Unable to search Google Places right now.')), 'lsd-error');
+                    $searchResults.html(searchEmptyHtml(config.strings.searchPlaceFailed || 'Unable to search Google Places right now.'));
+                    return;
+                }
+
+                setFeedback($feedback, '', '');
+                renderSearchResults(response.results || [], query);
+            }).fail(function (xhr, textStatus)
+            {
+                if (textStatus === 'abort') return;
+
+                setFeedback($feedback, config.strings.searchPlaceFailed || 'Unable to search Google Places right now.', 'lsd-error');
+                $searchResults.html(searchEmptyHtml(config.strings.searchPlaceFailed || 'Unable to search Google Places right now.'));
+            });
+        }, 300);
+
+        const loadSuggestions = function ()
+        {
+            if (!placeId) return;
+
+            if (!config.hasPlacesApiKey)
+            {
+                setFeedback($feedback, config.strings.missingPlacesApiKey || 'Missing Google Places API key.', 'lsd-warning');
+                return;
+            }
+
+            setFetchButtonVisibility(false);
+            showSuggestionsPanel();
+            setFeedback($feedback, '', '');
+            $suggestions.html('<p class="lsd-admin-description">' + escapeHtml(config.strings.loadingPlaceDetails || 'Loading Google Places…') + '</p>');
+
+            $.ajax({
+                type: 'POST',
+                url: config.ajaxUrl,
+                dataType: 'json',
+                data: {
+                    action: 'lsdaddgpl_details',
+                    _wpnonce: config.detailsNonce,
+                    post_id: postId,
+                    place_id: placeId
+                }
+            }).done(function (response)
+            {
+                if (!response || Number(response.success) !== 1)
+                {
+                    setFeedback($feedback, escapeHtml(response && response.message ? response.message : (config.strings.loadSuggestionsFailed || 'Unable to load suggestions.')), 'lsd-error');
+                    $suggestions.html('');
+                    return;
+                }
+
+                setFeedback($feedback, '', '');
+                renderSuggestions(response.details || {});
+            }).fail(function ()
+            {
+                setFeedback($feedback, config.strings.loadSuggestionsFailed || 'Unable to load suggestions.', 'lsd-error');
+                $suggestions.html('');
+            });
+        };
+
+        const setFieldValue = function (selector, value)
+        {
+            const $field = $(selector);
+            if (!$field.length) return false;
+
+            $field.val(value).trigger('input').trigger('change');
+
+            if (selector === '#title' && typeof window.send_to_editor === 'undefined')
+            {
+                $('#title-prompt-text').hide();
+            }
+
+            return true;
+        };
+
+        const ensureMarkerObjectType = function ()
+        {
+            $(coordinatesField.object_type_target || '#lsd_object_type').val('marker');
+
+            const $markerToggle = $(coordinatesField.marker_toggle || '#lsd_metabox_object_type_marker');
+            if ($markerToggle.length)
+            {
+                $markerToggle.trigger('click');
+            }
+        };
+
+        const refreshFeaturedImageUi = function (response)
+        {
+            const attachmentId = Number(response && response.attachment_id ? response.attachment_id : 0);
+            const featuredImageUrl = String(response && response.featured_image_url ? response.featured_image_url : '');
+            const featuredImageHtml = String(response && response.featured_image_html ? response.featured_image_html : '');
+
+            if (attachmentId && window.wp && wp.data && typeof wp.data.dispatch === 'function')
+            {
+                const editorStore = wp.data.dispatch('core/editor');
+                if (editorStore && typeof editorStore.editPost === 'function')
+                {
+                    editorStore.editPost({
+                        featured_media: attachmentId
+                    });
+                }
+            }
+
+            if (featuredImageHtml && $('#postimagediv .inside').length)
+            {
+                $('#postimagediv .inside').html(featuredImageHtml);
+            }
+
+            if ($('#lsd_featured_image').length)
+            {
+                $('#lsd_featured_image').val(attachmentId).trigger('change');
+            }
+
+            if (featuredImageUrl && $('#lsd_dashboard_featured_image_preview').length)
+            {
+                $('#lsd_dashboard_featured_image_preview').html('<img src="' + escapeHtml(featuredImageUrl) + '" alt="">').removeClass('lsd-util-hide');
+                $('#lsd_dashboard_featured_image_placeholder').addClass('lsd-image-placeholder-has-image');
+                $('#lsd_dashboard_featured_image_placeholder .lsd-image-placeholder-empty').addClass('lsd-util-hide');
+                $('#lsd_featured_image_remove_button').removeClass('lsd-util-hide');
+            }
+        };
+
+        $suggestions.on('click', '[data-copy-address]', function ()
+        {
+            const $button = $(this);
+            const value = String($button.data('copyValue') || '');
+            const details = {
+                place_id: String($button.data('copyPlaceId') || '')
+            };
+            const lat = $button.data('copyLat');
+            const lng = $button.data('copyLng');
+
+            if (lat !== undefined && lat !== '') details.latitude = Number(lat);
+            if (lng !== undefined && lng !== '') details.longitude = Number(lng);
+
+            if (applyAddressSelection(value, details))
+            {
+                notifyCopy(config.strings.copySuccess || 'Copied.', 'lsd-success');
+            }
+        });
+
+        $suggestions.on('click', '[data-copy-target]', function ()
+        {
+            const $button = $(this);
+            const target = String($button.data('copyTarget') || '');
+            const value = String($button.data('copyValue') || '');
+
+            if (setFieldValue(target, value))
+            {
+                notifyCopy(config.strings.copySuccess || 'Copied.', 'lsd-success');
+            }
+        });
+
+        $suggestions.on('click', '[data-copy-lat]', function ()
+        {
+            const $button = $(this);
+            const lat = String($button.data('copyLat') || '');
+            const lng = String($button.data('copyLng') || '');
+
+            ensureMarkerObjectType();
+
+            const latDone = setFieldValue(coordinatesField.latitude_target || '#lsd_object_type_latitude', lat);
+            const lngDone = setFieldValue(coordinatesField.longitude_target || '#lsd_object_type_longitude', lng);
+
+            if (latDone && lngDone) notifyCopy(config.strings.copySuccess || 'Copied.', 'lsd-success');
+        });
+
+        $suggestions.on('click', '[data-apply-category]', function ()
+        {
+            const categoryId = String($(this).data('applyCategory') || '');
+            if (!setFieldValue(categoriesField.target || '#lsd_listing_category', categoryId))
+            {
+                notifyCopy(config.strings.selectCategoryFirst || 'No category match.', 'lsd-warning');
+                return;
+            }
+
+            notifyCopy(config.strings.copySuccess || 'Category applied.', 'lsd-success');
+        });
+
+        $suggestions.on('click', '[data-copy-clipboard]', async function ()
+        {
+            try
+            {
+                await copyToClipboard($(this).closest('.lsdaddgpl-suggestion-row').find('.lsdaddgpl-suggestion-value').text());
+                notifyCopy(config.strings.clipboardSuccess || 'Copied.', 'lsd-success');
+            }
+            catch (error)
+            {
+                notifyCopy(config.strings.clipboardError || 'Unable to copy.', 'lsd-warning');
+            }
+        });
+
+        $suggestions.on('click', '[data-import-image]', function ()
+        {
+            const $button = $(this);
+
+            $button.prop('disabled', true);
+
+            $.ajax({
+                type: 'POST',
+                url: config.ajaxUrl,
+                dataType: 'json',
+                data: {
+                    action: 'lsdaddgpl_import_image',
+                    _wpnonce: config.detailsNonce,
+                    post_id: postId,
+                    place_id: String($button.data('placeId') || ''),
+                    place_name: String($button.data('placeName') || ''),
+                    photo_name: String($button.data('photoName') || ''),
+                    photo_url: String($button.data('photoUrl') || '')
+                }
+            }).done(function (response)
+            {
+                if (!response || Number(response.success) !== 1)
+                {
+                    notify(response && response.message ? response.message : (config.strings.imageImportFailed || 'Unable to import the Google business image for this listing.'), 'lsd-error');
+                    return;
+                }
+
+                if (Number(response.featured_image_assigned) === 1)
+                {
+                    refreshFeaturedImageUi(response);
+                }
+
+                notify(
+                    response.message || (
+                        Number(response.featured_image_assigned) === 1
+                            ? (config.strings.imageImportSuccess || 'Featured image imported from Google and assigned to this listing.')
+                            : (config.strings.imageImportManual || 'Featured image imported from Google. Please select it manually in the Featured Image panel.')
+                    ),
+                    Number(response.featured_image_assigned) === 1 ? 'lsd-success' : 'lsd-warning'
+                );
+            }).fail(function ()
+            {
+                notify(config.strings.imageImportFailed || 'Unable to import the Google business image for this listing.', 'lsd-error');
+            }).always(function ()
+            {
+                $button.prop('disabled', false);
+            });
+        });
+
+        $searchInput.on('input', function ()
+        {
+            searchPlaces();
+        });
+
+        $searchInput.on('keydown', function (event)
+        {
+            if (event.key !== 'Enter') return;
+
+            event.preventDefault();
+        });
+
+        $searchClear.on('click', function ()
+        {
+            $searchInput.val('').trigger('focus');
+            $searchClear.hide();
+            renderSearchResults([], '');
+        });
+
+        $searchResults.on('click', '.lsdaddgpl-place-search-item', function ()
+        {
+            const nextPlaceId = String($(this).data('placeId') || '');
+            if (!nextPlaceId) return;
+
+            saveSelectedPlace(nextPlaceId);
+        });
+
+        $changeButton.on('click', function ()
+        {
+            setFeedback($feedback, '', '');
+            showPlaceIdEntry();
+        });
+
+        $fetchButton.on('click', function ()
+        {
+            setFeedback($feedback, '', '');
+            loadSuggestions();
+        });
+
+        if (!placeId)
+        {
+            showPlaceIdEntry();
+            return;
+        }
+
+        $entry.hide();
+        $display.show();
+        setFetchButtonVisibility(true);
+        $suggestions.hide().html('');
+    };
+
+    initSeedingPage();
+    initSuggestionsMetabox();
 });

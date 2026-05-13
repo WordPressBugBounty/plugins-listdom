@@ -10,7 +10,7 @@ class LSD_Element_Locations extends LSD_Element
     {
         parent::__construct();
 
-        $this->label = esc_html__('Locations', 'listdom');
+        $this->label = esc_html(lsd_t_label(LSD_Base::TAX_LOCATION, 'plural'));
         $this->has_title_settings = false;
         $this->enable_link = $args['enable_link'] ?? true;
     }

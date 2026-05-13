@@ -36,8 +36,8 @@ class LSD_Meta extends LSD_Base
                 'name' => esc_html__('Author URL', 'listdom'),
                 'get' => function ($key, $id)
                 {
+                    // Post
                     $post = get_post($id);
-                    $auth = LSD_Options::auth();
 
                     return $post && isset($post->post_author)
                         ? LSD_User::profile_link($post->post_author)
@@ -315,8 +315,7 @@ class LSD_Meta extends LSD_Base
                 'name' => esc_html__('Primary Category', 'listdom'),
                 'get' => function ($key, $id)
                 {
-                    $category_id = (int) get_post_meta($id, $key, true);
-                    $category = $category_id ? get_term($category_id) : null;
+                    $category = LSD_Entity_Listing::get_primary_category($id);
 
                     return $category && isset($category->name) ? $category->name : '';
                 },
@@ -434,14 +433,25 @@ class LSD_Meta extends LSD_Base
             $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
             if ($type === 'separator') continue;
 
-            $key = 'lsd_attribute_' . $attribute->term_id;
+            $attribute_id = (int) $attribute->term_id;
+            $attribute_slug = isset($attribute->slug) ? sanitize_title($attribute->slug) : '';
+            if ($attribute_id <= 0 || $attribute_slug === '') continue;
+
+            $key = 'lsd_attribute_' . $attribute_slug;
             $metas[$key] = [
                 'key' => $key,
                 'type' => in_array($type, [LSD_Meta::NUMBER, LSD_Meta::EMAIL, LSD_Meta::URL, LSD_Meta::TEL, LSD_Meta::IMAGE])
                     ? $type
                     : LSD_Meta::TEXT,
                 'name' => $attribute->name,
-                'get' => $callback,
+                'attribute_id' => $attribute_id,
+                'attribute_slug' => $attribute_slug,
+                'attribute_type' => $type,
+                'get' => function ($key, $id) use ($attribute_id)
+                {
+                    $attribute = new LSD_Entity_Attribute($attribute_id);
+                    return $attribute->value($id);
+                },
             ];
         }
 
@@ -452,6 +462,9 @@ class LSD_Meta extends LSD_Base
     {
         // All Meta Fields
         $all = LSD_Meta::all();
+
+        // Normalize Legacy Attribute Keys
+        $key = self::normalize_attribute_key((string) $key);
 
         // Return Meta
         return isset($all[$key]) && is_array($all[$key]) ? $all[$key] : [];
@@ -472,6 +485,8 @@ class LSD_Meta extends LSD_Base
 
     public static function value(string $key, int $post_id)
     {
+        $key = self::normalize_attribute_key($key);
+
         // Meta Field
         $meta = LSD_Meta::get($key);
 
@@ -492,5 +507,13 @@ class LSD_Meta extends LSD_Base
         }
 
         return $metas;
+    }
+
+    private static function normalize_attribute_key(string $key): string
+    {
+        if (!preg_match('/^lsd_attribute_(\d+)$/', $key, $matches)) return $key;
+
+        $slug = LSD_Main::get_attr_slug((int) $matches[1]);
+        return $slug !== '' ? 'lsd_attribute_' . $slug : $key;
     }
 }

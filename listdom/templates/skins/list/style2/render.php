@@ -11,22 +11,23 @@ $ids = $this->listings;
 
 	<?php if($this->display_image || $this->display_review_stars || $this->display_labels) : ?>
         <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
-        <?php if ($this->display_image): ?>
-            <div class="lsd-image">
-                <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
-            </div>
-        <?php endif; ?>
-        <?php if ($this->display_labels): ?>
-            <div class="lsd-listing-labels">
-                <?php echo LSD_Kses::element($listing->get_labels()); ?>
-            </div>
-        <?php endif; ?>
+            <?php if ($this->display_image): ?>
+                <div class="lsd-image">
+                    <?php echo LSD_Kses::element($listing->get_image_module($this)); ?>
+                </div>
+            <?php endif; ?>
+            <?php if ($this->display_labels): ?>
+                <div class="lsd-listing-labels">
+                    <?php echo LSD_Kses::element($listing->get_labels()); ?>
+                </div>
+            <?php endif; ?>
 
-        <?php if ($this->display_review_stars): ?>
-            <?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
-        <?php endif; ?>
-    </div>
+            <?php if ($this->display_review_stars): ?>
+                <?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
+            <?php endif; ?>
+        </div>
     <?php endif; ?>
+    <?php if ($this->has_body($listing) || $this->has_after_content_hook()): ?>
     <div class="lsd-listing-body">
         <div class="lsd-listing-title-wrapper">
             <?php if ($this->display_title): ?>
@@ -45,9 +46,9 @@ $ids = $this->listings;
         </div>
 
         <?php if ($this->display_description): ?>
-            <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
+            <div class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
                 <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length, false, $this->content_type === 'description')); ?>
-            </p>
+            </div>
         <?php endif; ?>
 
         <?php do_action('lsd_skins_after_content', $this, $listing); ?>
@@ -73,6 +74,7 @@ $ids = $this->listings;
             </div>
         <?php endif; ?>
 
+        <?php if ($this->has_bottom_bar($listing)): ?>
         <div class="lsd-listing-bottom-bar">
             <?php if ($this->display_share_buttons): ?>
                 <div class="lsd-listing-share">
@@ -86,8 +88,15 @@ $ids = $this->listings;
                 </div>
             <?php endif; ?>
         </div>
+        <?php endif; ?>
+
+        <?php if ($this->display_cta): ?>
+            <div class="lsd-listing-call-to-action">
+                <?php echo $this->listing_cta($listing); ?>
+            </div>
+        <?php endif; ?>
 
     </div>
-
+    <?php endif; ?>
 </div>
 <?php endforeach;

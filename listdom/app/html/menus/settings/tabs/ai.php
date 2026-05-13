@@ -100,10 +100,10 @@ $modules = (new LSD_AI())->modules();
                                         <div class="lsd-col-5">
                                             <?php
                                             echo LSD_Form::checkboxes([
-                                                'class' => 'lsd-mt-0',
+                                                'class' => 'lsd-my-0 lsd-ai-roles',
                                                 'name' => 'lsd[modules]['.esc_attr($key).'][access][]',
                                                 'value' => $ai['modules'][$key]['access'] ?? ['administrator'],
-                                                'options' => LSD_User::all_roles(),
+                                                'options' => LSD_Roles::all(),
                                             ]);
                                             ?>
                                         </div>

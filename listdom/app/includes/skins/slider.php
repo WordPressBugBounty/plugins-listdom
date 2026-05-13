@@ -11,6 +11,9 @@ class LSD_Skins_Slider extends LSD_Skins
 
     public function query_meta(): array
     {
-        return [['key' => '_thumbnail_id']];
+        $query = parent::query_meta();
+        $query[] = ['key' => '_thumbnail_id'];
+
+        return $query;
     }
 }

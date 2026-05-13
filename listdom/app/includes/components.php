@@ -17,6 +17,7 @@ class LSD_Components
             'visibility' => true,
             'related' => true,
             'socials' => true,
+            'cta' => true,
         ], $current);
     }
 
@@ -54,6 +55,12 @@ class LSD_Components
     {
         $components = self::get();
         return (bool) ($components['socials'] ?? true);
+    }
+
+    public static function cta(): bool
+    {
+        $components = self::get();
+        return (bool) ($components['cta'] ?? true);
     }
 }
 

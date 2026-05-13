@@ -6,7 +6,7 @@ abstract class LSD_Collections
 
     public function all()
     {
-        return get_option($this->key, []);
+        return (array) get_option($this->key, []);
     }
 
     public function get($key)

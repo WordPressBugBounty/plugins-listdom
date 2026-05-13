@@ -30,6 +30,7 @@ $ids = $this->listings;
                 </div>
             <?php endif; ?>
 
+            <?php if ($this->has_body($listing) || $this->has_after_content_hook()): ?>
             <div class="lsd-listing-body">
                 <div class="lsd-listing-title-wrapper">
                     <?php if ($this->display_title): ?>
@@ -62,6 +63,7 @@ $ids = $this->listings;
                     </div>
                 <?php endif; ?>
 
+                <?php if ($this->has_bottom_bar($listing)): ?>
                 <div class="lsd-listing-bottom-bar">
                     <?php if ($this->display_share_buttons): ?>
                     <div class="lsd-listing-share">
@@ -75,7 +77,14 @@ $ids = $this->listings;
                         </div>
                     <?php endif; ?>
                 </div>
+                <?php endif; ?>
+                <?php if ($this->display_cta): ?>
+                    <div class="lsd-listing-call-to-action">
+                        <?php echo $this->listing_cta($listing); ?>
+                    </div>
+                <?php endif; ?>
             </div>
+            <?php endif; ?>
         </div>
     </div>
 <?php endforeach;

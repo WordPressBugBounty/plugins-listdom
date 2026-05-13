@@ -29,7 +29,7 @@ if(!count($enableds)) return '';
                 <li data-orderby="<?php echo esc_attr($key); ?>" data-order="<?php echo ($this->orderby == $key ? ($this->order == 'DESC' ? 'ASC' : 'DESC') : (isset($option['sort']) ? esc_attr($option['sort']) : 'DESC')); ?>" class="<?php echo ($this->orderby == $key ? 'lsd-active' : ''); ?>">
                         <?php echo esc_html($option['name']); ?>
 			<?php if($this->orderby == $key): ?>
-			<i class="lsd-icon fas fa-sort-amount-<?php echo ($this->order == 'DESC' ? 'down' : 'up'); ?>" aria-hidden="true"></i>
+			<i class="lsd-fe-icon fas fa-sort-amount-<?php echo ($this->order == 'DESC' ? 'down' : 'up'); ?>" aria-hidden="true"></i>
 			<?php endif; ?>
 		</li>
 		<?php endforeach; ?>
@@ -37,7 +37,7 @@ if(!count($enableds)) return '';
 	<div class="lsd-sortbar-dropdown">
 		<span>
 			<?php esc_html_e('Sort By', 'listdom'); ?>
-			<i class="lsd-icon fas fa-caret-right"></i>
+			<i class="lsd-fe-icon fas fa-caret-right"></i>
 		</span>
 		<select title="<?php esc_attr_e('Sort By', 'listdom'); ?>">
 			<?php foreach($enableds as $key => $option): ?>

@@ -71,10 +71,10 @@ class LSD_Plugin_Hooks
         foreach ($blogs as $blog_id)
         {
             switch_to_blog($blog_id);
-            $this->install($blog_id);
-        }
 
-        switch_to_blog($current_blog_id);
+            try { $this->install($blog_id); }
+            finally { restore_current_blog(); }
+        }
 
         // Add WordPress flush rewrite rules in to do list
         LSD_RewriteRules::todo();
@@ -117,6 +117,9 @@ class LSD_Plugin_Hooks
 
         // Generate personalized CSS File
         LSD_Personalize::generate();
+
+        // Ensure Listdom user roles exist on every activation path.
+        LSD_Roles::add();
 
         // Save Installation Time
         add_option('lsd_installed_at', current_time('timestamp'));
@@ -208,11 +211,10 @@ class LSD_Plugin_Hooks
         foreach ($blogs as $blog_id)
         {
             switch_to_blog($blog_id);
-            self::purge($blog_id);
-        }
 
-        // Switch back to current blog
-        switch_to_blog($current_blog_id);
+            try { self::purge($blog_id); }
+            finally { restore_current_blog(); }
+        }
 
         /**
          * Refresh WordPress rewrite rules

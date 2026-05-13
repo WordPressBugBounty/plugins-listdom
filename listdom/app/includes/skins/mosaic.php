@@ -29,4 +29,22 @@ class LSD_Skins_Mosaic extends LSD_Skins
 
         return parent::output();
     }
+
+    public function has_bottom_bar(LSD_Entity_Listing $listing): bool
+    {
+        return $this->has_listing_price($listing) || $this->display_share_buttons;
+    }
+
+    public function has_body(LSD_Entity_Listing $listing): bool
+    {
+        if (is_numeric($this->style)) return true;
+
+        return $this->display_categories
+            || $this->display_title
+            || $this->display_labels
+            || $this->display_contact_info
+            || $this->has_bottom_bar($listing)
+            || $this->display_review_stars
+            || $this->display_cta;
+    }
 }

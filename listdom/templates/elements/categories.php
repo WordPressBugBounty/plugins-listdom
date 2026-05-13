@@ -12,8 +12,10 @@ if (!$this->multiple_categories)
 }
 else
 {
-    foreach ($categories as $category)
-    {
-        echo LSD_Kses::element($this->display($category));
-    }
+    echo '<div class="lsd-listing-category">';
+        foreach ($categories as $category)
+        {
+            echo LSD_Kses::element($this->display($category));
+        }
+    echo '</div>';
 }

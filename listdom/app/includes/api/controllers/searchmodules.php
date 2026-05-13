@@ -29,8 +29,8 @@ class LSD_API_Controllers_SearchModules extends LSD_API_Controller
         // Search
         $search = get_post($id);
 
-        // Not Found!
-        if (!$search || (isset($search->post_type) && $search->post_type !== LSD_Base::PTYPE_SEARCH)) return $this->response([
+        // Guard: stop early if the search module post can't be loaded.
+        if (!($search instanceof WP_Post) || $search->post_type !== LSD_Base::PTYPE_SEARCH) return $this->response([
             'data' => new WP_Error('404', esc_html__('Search module not found!', 'listdom')),
             'status' => 404,
         ]);

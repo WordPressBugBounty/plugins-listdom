@@ -11,7 +11,7 @@ class LSD_Element_Labels extends LSD_Element
     {
         parent::__construct();
 
-        $this->label = esc_html__('Labels', 'listdom');
+        $this->label = esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural'));
         $this->style = $style;
         $this->enable_link = $enable_link;
     }

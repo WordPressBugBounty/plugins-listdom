@@ -5,6 +5,7 @@ defined('ABSPATH') || die();
 /** @var LSD_PTypes_Shortcode $this */
 /** @var array $options */
 /** @var array $price_components */
+/** @var string $skin */
 
 $list = $options['list'] ?? [];
 $optional_addons = [];
@@ -36,7 +37,6 @@ $optional_addons = [];
                 <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
             </div>
             <div class="lsd-elements-section">
-
                 <?php if ($this->isPro()): ?>
                     <div class="lsd-elements-subsection">
                         <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Image', 'listdom'); ?></h4>
@@ -157,6 +157,14 @@ $optional_addons = [];
                         </div>
                     </div>
                 </div>
+
+                <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/partials/cta.php', [
+                        'parameters' => [
+                            'skin' => 'list',
+                            'settings' => $list,
+                        ],
+                    ]); ?>
+
                 <div class="lsd-elements-subsection">
                     <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Other Elements', 'listdom'); ?></h4>
                     <div class="lsd-elements-fields">
@@ -319,7 +327,7 @@ $optional_addons = [];
                                 ]); ?>
                             </div>
                         </div>
-                        <?php if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACFAV\Base::class)): ?>
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
@@ -337,7 +345,7 @@ $optional_addons = [];
                         <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
                         <?php endif; ?>
 
-                        <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACCMP\Base::class)): ?>
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
@@ -388,8 +396,8 @@ $optional_addons = [];
                                 ]); ?>
                             </div>
                         </div>
-                        <?php if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
-                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4 <?php echo !isset($list['display_title']) || $list['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_list_is_claimed_wrapper">
+                        <?php if (class_exists(\LSDPACCLM\Base::class)): ?>
+                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4 <?php echo !isset($list['display_title']) || $list['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_list_is_claimed_wrapper">
                                 <div class="lsd-form-row">
                                     <div class="lsd-col-8"><?php echo LSD_Form::label([
                                             'class' => 'lsd-fields-label',
@@ -408,7 +416,10 @@ $optional_addons = [];
                         <?php else: $optional_addons[] = ['claim', esc_html__('Claim Status', 'listdom')]; ?>
                         <?php endif; ?>
 
-
+                        <?php
+                        // Action for Third Party Plugins
+                        do_action('lsd_shortcode_display_options', $skin, $options);
+                        ?>
                     </div>
                     <?php if (count($optional_addons)): ?>
                         <div class="lsd-alert-no-my lsd-mt-5">
@@ -420,4 +431,3 @@ $optional_addons = [];
         </div>
     </div>
 </div>
-

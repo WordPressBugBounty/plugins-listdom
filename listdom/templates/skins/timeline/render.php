@@ -10,6 +10,11 @@ switch ($this->style)
         include lsd_template('skins/' . $this->skin . '/style1/render.php');
         break;
 
+    case 'style2':
+
+        include lsd_template('skins/' . $this->skin . '/style2/render.php');
+        break;
+
     case is_numeric($this->style):
 
         include lsd_template('skins/' . $this->skin . '/builder/render.php');

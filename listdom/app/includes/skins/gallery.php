@@ -29,4 +29,20 @@ class LSD_Skins_Gallery extends LSD_Skins
 
         return parent::output();
     }
+
+    public function has_bottom_bar(LSD_Entity_Listing $listing): bool
+    {
+        return $this->display_review_stars || $this->display_share_buttons;
+    }
+
+    public function has_body(LSD_Entity_Listing $listing): bool
+    {
+        return $this->display_labels
+            || $this->display_categories
+            || $this->display_favorite_icon
+            || $this->display_compare_icon
+            || $this->display_title
+            || $this->has_bottom_bar($listing)
+            || $this->display_cta;
+    }
 }

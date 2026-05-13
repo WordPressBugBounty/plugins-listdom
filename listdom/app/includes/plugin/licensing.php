@@ -93,7 +93,7 @@ class LSD_Plugin_Licensing
      */
     public function activate(string $license_key): array
     {
-        [$status, $response, $activation_id] = $this->handler->activate($license_key);
+        [$status, $response] = $this->handler->activate($license_key);
 
         if($response === Licensing::STATUS_VALID) $message = esc_html__('License key is valid and your website activated successfully!', 'listdom');
         else if($response === Licensing::STATUS_INVALID) $message = esc_html__('The license key is either invalid, expired, not meant for this product, or has reached its activation limit. Please verify the key or obtain a new one if needed.', 'listdom');
@@ -107,18 +107,6 @@ class LSD_Plugin_Licensing
     public function deactivate(string $license_key): array
     {
         $message = esc_html__("The license key has been successfully removed, and your website is now deactivated.", 'listdom');
-
-        // Envato or Legacy Key
-        if(strlen($license_key) === 36 || strpos($license_key, '-'))
-        {
-            // Delete License Key
-            delete_option($this->handler->getLicenseKeyOption());
-
-            // Delete Activation ID
-            delete_option($this->handler->getActivationIdOption());
-
-            return [true, $message];
-        }
 
         // Webilia Key
         $status = $this->handler->deactivate($license_key);

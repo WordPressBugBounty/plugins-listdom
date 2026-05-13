@@ -18,27 +18,32 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
 
     public function register()
     {
+        $singular = lsd_t_label(LSD_Base::TAX_FEATURE);
+        $plural = lsd_t_label(LSD_Base::TAX_FEATURE, 'plural');
+        $singular_lc = lsd_t_label_lc(LSD_Base::TAX_FEATURE);
+        $plural_lc = lsd_t_label_lc(LSD_Base::TAX_FEATURE, 'plural');
+
         $args = [
-            'label' => esc_html__('Features', 'listdom'),
+            'label' => $plural,
             'labels' => [
-                'name' => esc_html__('Features', 'listdom'),
-                'singular_name' => esc_html__('Feature', 'listdom'),
-                'all_items' => esc_html__('All Features', 'listdom'),
-                'edit_item' => esc_html__('Edit Feature', 'listdom'),
-                'view_item' => esc_html__('View Feature', 'listdom'),
-                'update_item' => esc_html__('Update Feature', 'listdom'),
-                'add_new_item' => esc_html__('Add New Feature', 'listdom'),
-                'new_item_name' => esc_html__('New Feature Name', 'listdom'),
-                'popular_items' => esc_html__('Popular Features', 'listdom'),
-                'search_items' => esc_html__('Search Features', 'listdom'),
-                'separate_items_with_commas' => esc_html__('Separate features with commas', 'listdom'),
-                'add_or_remove_items' => esc_html__('Add or remove features', 'listdom'),
-                'choose_from_most_used' => esc_html__('Choose from the most used features', 'listdom'),
-                'not_found' => esc_html__('No features found.', 'listdom'),
-                'back_to_items' => esc_html__('← Back to Features', 'listdom'),
-                'parent_item' => esc_html__('Parent Feature', 'listdom'),
-                'parent_item_colon' => esc_html__('Parent Feature:', 'listdom'),
-                'no_terms' => esc_html__('No Features', 'listdom'),
+                'name' => $plural,
+                'singular_name' => $singular,
+                'all_items' => sprintf(esc_html__('All %s', 'listdom'), $plural),
+                'edit_item' => sprintf(esc_html__('Edit %s', 'listdom'), $singular),
+                'view_item' => sprintf(esc_html__('View %s', 'listdom'), $singular),
+                'update_item' => sprintf(esc_html__('Update %s', 'listdom'), $singular),
+                'add_new_item' => sprintf(esc_html__('Add New %s', 'listdom'), $singular),
+                'new_item_name' => sprintf(esc_html__('New %s Name', 'listdom'), $singular),
+                'popular_items' => sprintf(esc_html__('Popular %s', 'listdom'), $plural),
+                'search_items' => sprintf(esc_html__('Search %s', 'listdom'), $plural),
+                'separate_items_with_commas' => sprintf(esc_html__('Separate %s with commas', 'listdom'), $plural_lc),
+                'add_or_remove_items' => sprintf(esc_html__('Add or remove %s', 'listdom'), $plural_lc),
+                'choose_from_most_used' => sprintf(esc_html__('Choose from the most used %s', 'listdom'), $plural_lc),
+                'not_found' => sprintf(esc_html__('No %s found.', 'listdom'), $plural_lc),
+                'back_to_items' => sprintf(esc_html__('← Back to %s', 'listdom'), $plural),
+                'parent_item' => sprintf(esc_html__('Parent %s', 'listdom'), $singular),
+                'parent_item_colon' => sprintf(esc_html__('Parent %s:', 'listdom'), $singular),
+                'no_terms' => sprintf(esc_html__('No %s', 'listdom'), $plural),
             ],
             'public' => true,
             'hierarchical' => false,

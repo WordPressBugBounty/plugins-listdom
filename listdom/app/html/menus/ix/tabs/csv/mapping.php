@@ -3,12 +3,17 @@
 defined('ABSPATH') || die();
 
 /** @var string $file */
+/** @var string $type */
 /** @var LSD_Menus_IX_CSV $this */
 
 // Main Library
 $main = new LSD_Main();
 $csv = LSD_Options::addons('csv');
 $method = $csv['method'] ?? 'load-template';
+
+$type = isset($type) ? LSD_IX::normalize_import_type($type) : 'listings';
+$type_label = LSD_IX::import_type_label($type);
+$show_hierarchical_terms = in_array($type, ['listings', 'categories', 'locations'], true);
 
 // Feed Path / URL
 $path = $main->get_upload_path().$file;
@@ -17,12 +22,15 @@ $url = $main->get_upload_url().$file;
 // Mapping Library
 $mapping = new LSD_IX_Mapping();
 $f_fields = $mapping->feed_fields($path);
+$l_fields = $mapping->fields_for_type($type);
+
+$mapping_ai = [];
 
 // Templates Library
-$template = new LSD_IX_Templates_CSV();
+$template = new LSD_IX_Templates_CSV($type);
 
 // AI
-$ai = new \LSD_AI();
+$ai = new LSD_AI();
 
 $auto_mapping = true;
 if (!$ai->has_access(LSD_AI::TASK_MAPPING))
@@ -37,8 +45,9 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
             <h3 class="lsd-admin-title lsd-m-0"><?php esc_html_e('Mapping', 'listdom'); ?></h3>
             <p class="lsd-m-0 lsd-admin-description"><?php echo sprintf(
                 /* translators: %s: Link to the imported file name. */
-                esc_html__("You're importing %s file. If you have already saved some mapping templates, you can apply them by selecting from the list or use th smart mapping.", 'listdom'),
-                '<a href="'.$url.'" target="_blank"><strong>'.$file.'</strong></a>'
+                esc_html__("You're importing %1\$s for %2\$s. If you have already saved some mapping templates, you can apply them by selecting from the list or use the smart mapping option.", 'listdom'),
+                '<a href="'.$url.'" target="_blank"><strong>'.$file.'</strong></a>',
+                esc_html($type_label)
             ); ?></p>
         </div>
         <div class="lsd-radio-toggle">
@@ -67,7 +76,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                 <button id="lsd_ix_csv_load_template_map" data-file="<?php echo esc_attr($file); ?>" type="button" class="lsd-secondary-button"><?php esc_html_e('Map', 'listdom'); ?><i class="listdom-icon lsdi-right-arrow"></i></button>
             </div>
 
-            <div class="lsd-addons-csv-method-wrapper <?php echo $method !== 'smart-mapping' ? 'lsd-util-hide' : ''; ?>" id="lsd_addons_csv_smart-mapping">
+            <div class="lsd-addons-csv-method-wrapper <?php echo !$auto_mapping || $method !== 'smart-mapping' ? 'lsd-util-hide' : ''; ?>" id="lsd_addons_csv_smart-mapping">
                 <div class="lsd-col-3">
                     <?php echo LSD_Form::label([
                         'for' => 'ix_ai_profile',
@@ -99,7 +108,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                     <tr>
                         <th><?php esc_html_e('Listdom Field', 'listdom'); ?></th>
                         <th><?php esc_html_e('Type', 'listdom'); ?></th>
-                        <th>
+                        <th class="lsd-min-w-200">
                             <div class="lsd-th-icon-wrapper">
                                 <?php esc_html_e('Mapping', 'listdom'); ?>
                                 <span class="lsd-tooltip" data-lsd-tooltip="<?php esc_attr_e('Map as many CSV fields as possible, but only map correct ones to avoid corrupted data after import.', 'listdom'); ?>">
@@ -118,7 +127,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($mapping->listdom_fields() as $key => $l_field): ?>
+                    <?php foreach ($l_fields as $key => $l_field): ?>
                     <tr class="lsd-ix-mapping-field" id="lsd_ix_mapping_field_<?php echo esc_attr($key); ?>">
                         <td class="lsd-ix-mapping-field-name-col">
                             <div class="lsd-ix-mapping-field-name lsd-admin-table-body-title">
@@ -131,7 +140,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                             <select class="lsd-admin-input" id="lsd_ix_mapping_field_<?php echo esc_attr($key); ?>_map" name="ix[mapping][<?php echo esc_attr($key); ?>][map]" title="<?php esc_attr_e('Map', 'listdom'); ?>">
                                 <option value="">-----</option>
                                 <?php foreach ($f_fields as $f_key => $f_field): ?>
-                                <option value="<?php echo esc_attr($f_key); ?>" <?php echo isset($mapping_ai[$key]) && $mapping_ai[$key] == $f_key ? 'selected' : ''; ?>><?php echo esc_html($f_field); ?></option>
+                                <option value="<?php echo esc_attr($f_key); ?>"><?php echo esc_html($f_field); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </td>
@@ -150,6 +159,33 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
         </div>
     </div>
 </div>
+
+<?php if ($show_hierarchical_terms): ?>
+<div class="lsd-settings-fields-wrapper lsd-mt-4">
+    <div class="lsd-ix-options-wrap">
+        <div class="lsd-admin-section-heading">
+            <h3 class="lsd-admin-title lsd-m-0"><?php esc_html_e('Options', 'listdom'); ?></h3>
+        </div>
+        <div class="lsd-form-row lsd-ix-option-row">
+            <div class="lsd-col-12">
+                <div class="lsd-ix-option-toggle">
+                    <?php echo LSD_Form::switcher([
+                        'id' => 'lsd_ix_csv_hierarchical_terms',
+                        'name' => 'ix[hierarchical_terms]',
+                        'value' => 0,
+                    ]); ?>
+                    <?php echo LSD_Form::label([
+                        'for' => 'lsd_ix_csv_hierarchical_terms',
+                        'title' => esc_html__('Import categories/locations as a hierarchy path', 'listdom'),
+                        'class' => 'lsd-fields-label lsd-m-0 lsd-p-0',
+                    ]); ?>
+                </div>
+                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Format: Level1, Level2, Level3 (single path only). For listing imports, all levels are assigned; for categories, the deepest level is set as the primary category.', 'listdom'); ?></p>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 <script>
 // Template Change
 jQuery('#lsd_ix_csv_load_template_map').on('click', function ()
@@ -172,7 +208,7 @@ jQuery('#lsd_ix_csv_load_template_map').on('click', function ()
     {
         type: "POST",
         url: ajaxurl,
-        data: "action=lsd_ix_csv_load_template&template=" + template + "&_wpnonce=<?php echo wp_create_nonce('lsd_ix_csv_load_template'); ?>",
+        data: "action=lsd_ix_csv_load_template&template=" + template + "&type=" + jQuery('#lsd_ix_csv_import_type').val() + "&_wpnonce=<?php echo wp_create_nonce('lsd_ix_csv_load_template'); ?>",
         dataType: "json",
         success: function (response)
         {
@@ -228,7 +264,7 @@ jQuery('#lsd_ix_csv_auto_map').on('click', function ()
     {
         type: "POST",
         url: ajaxurl,
-        data: "action=lsd_ix_csv_ai_mapping&file=" + file + "&ai_profile=" + ai_profile + "&_wpnonce=<?php echo wp_create_nonce('lsd_ix_csv_ai_mapping'); ?>",
+        data: "action=lsd_ix_csv_ai_mapping&file=" + file + "&ai_profile=" + ai_profile + "&type=" + jQuery('#lsd_ix_csv_import_type').val() + "&_wpnonce=<?php echo wp_create_nonce('lsd_ix_csv_ai_mapping'); ?>",
         dataType: "json",
         success: function (response)
         {

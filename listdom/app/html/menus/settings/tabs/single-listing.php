@@ -89,12 +89,13 @@ $sections = [
 $pro_elements = [];
 
 $optional_addons = [];
-if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::class))
+if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::class) && !class_exists(\LSDPACBRX\Base::class))
 {
     $optional_addons[] = sprintf(
-        /* translators: 1: Elementor add-on link, 2: Divi add-on link. */
-        esc_html__('Activate the Listdom %1$s or %2$s add-on to design custom single listing pages using Elementor or Divi Builders.', 'listdom'),
+        /* translators: 1: Elementor add-on link, 2: Bricks add-on link, 3: Divi add-on link. */
+        esc_html__("Activate the Listdom %1\$s, %2\$s, or %3\$s add-on to design custom single listing pages using Elementor, Bricks, or Divi builders.", 'listdom'),
         '<a href="' . LSD_Base::getAddonURL('Elementor') . '"><strong>' . esc_html__('Elementor', 'listdom') . '</strong></a>',
+        '<a href="' . LSD_Base::getAddonURL('Bricks') . '"><strong>' . esc_html__('Bricks', 'listdom') . '</strong></a>',
         '<a href="' . LSD_Base::getAddonURL('Divi') . '"><strong>' . esc_html__('Divi', 'listdom') . '</strong></a>'
     );
 }
@@ -314,7 +315,7 @@ if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::clas
                     <?php endif; ?>
 
                     <?php if (!class_exists(LSDADDSUB::class) && !class_exists(\LSDPACSUB\Base::class)): ?>
-                        <?php $optional_addons[] = $this->missAddonMessage(esc_html__('Subscription', 'listdom'), '<strong>'.esc_html__('Display Options Per Membership', 'listdom').'</strong>'); ?>
+                        <?php $optional_addons[] = $this->missAddonMessage(esc_html__('Membership', 'listdom'), '<strong>'.esc_html__('Display Options Per Membership', 'listdom').'</strong>'); ?>
                     <?php else: ?>
                         <div class="lsd-row">
                             <div class="lsd-col-3"><?php echo LSD_Form::label([

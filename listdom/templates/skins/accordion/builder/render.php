@@ -33,7 +33,7 @@ $ids = $this->listings;
                 </div>
             <?php endif; ?>
             <div class="lsd-accordion-toggle-icon" title="<?php echo esc_html__('Toggle details', 'listdom'); ?>">
-                <i class="fas fa-chevron-down accordion-arrow"></i>
+                <i class="lsd-fe-icon fas fa-chevron-down accordion-arrow"></i>
             </div>
         </div>
     </div>

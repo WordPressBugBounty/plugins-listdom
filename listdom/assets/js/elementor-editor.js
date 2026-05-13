@@ -39,7 +39,15 @@
                 return;
             }
 
-            const admin_url = (elementor.config && elementor.config.admin_url) ? elementor.config.admin_url : '/wp-admin/';
+            const admin_url = (() => {
+                const ajaxurl = (typeof window.ajaxurl === 'string') ? window.ajaxurl : '';
+                if (ajaxurl) return ajaxurl.replace(/admin-ajax\.php(?:\?.*)?$/, '');
+
+                if (elementor.config && elementor.config.admin_url) return elementor.config.admin_url;
+
+                return '/wp-admin/';
+            })();
+
             const link = `${admin_url}post.php?post=${id}&action=edit`;
 
             $button.attr('href', link).show();

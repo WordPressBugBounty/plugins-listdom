@@ -49,7 +49,7 @@ jQuery(document).ready(function()
 
 					<div class="lsd-term-circle" style="background-color: <?php echo esc_attr(LSD_Color::lighter($color, 80)); ?>;">
 						<?php if(trim($icon)): ?>
-						<div class="lsd-icon-wrapper" style="color: <?php echo esc_attr($color); ?>;"><?php echo LSD_Kses::element($icon); ?></div>
+						<div class="lsd-fe-icon-wrapper" style="color: <?php echo esc_attr($color); ?>;"><?php echo LSD_Kses::element($icon); ?></div>
 						<?php endif; ?>
 					</div>
 

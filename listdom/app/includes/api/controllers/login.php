@@ -70,6 +70,16 @@ class LSD_API_Controllers_Login extends LSD_API_Controller
             'status' => 404,
         ]);
 
+        if (
+            LSD_User::requires_email_verification()
+            && !LSD_User::is_email_verified($user->ID)
+        ) {
+            return $this->response([
+                'data' => new WP_Error('403', LSD_User::verification_required_message()),
+                'status' => 403,
+            ]);
+        }
+
         // Login
         wp_set_current_user($user->ID, $user->user_login);
         wp_set_auth_cookie($user->ID);

@@ -38,4 +38,19 @@ class LSD_Skins_Side extends LSD_Skins
 
         return parent::output();
     }
+
+    public function has_bottom_bar(LSD_Entity_Listing $listing): bool
+    {
+        return $this->display_review_stars || $this->has_listing_price($listing);
+    }
+
+    public function has_body(LSD_Entity_Listing $listing): bool
+    {
+        return $this->display_title
+            || $this->display_favorite_icon
+            || $this->display_compare_icon
+            || $this->has_listing_address($listing)
+            || $this->has_bottom_bar($listing)
+            || $this->display_cta;
+    }
 }

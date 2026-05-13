@@ -36,6 +36,13 @@ $optional_addons = [];
                 <p class="lsd-admin-description lsd-m-0"><?php echo esc_html__("You can easily customize the visibility of each element on the listing card.", 'listdom'); ?> </p>
             </div>
             <div class="lsd-elements-section">
+                <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/partials/cta.php', [
+                    'parameters' => [
+                        'skin' => 'slider',
+                        'settings' => $slider,
+                    ],
+                ]); ?>
+
                 <div class="lsd-elements-subsection">
                     <h4 class="lsd-admin-subtitle lsd-my-0"><?php echo esc_html__('Other Elements', 'listdom'); ?></h4>
                     <div class="lsd-elements-fields">
@@ -192,8 +199,8 @@ $optional_addons = [];
                                 ]); ?>
                             </div>
                         </div>
-                        <?php if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
-                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style5 <?php echo !isset($slider['display_title']) || $slider['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_slider_is_claimed_wrapper">
+                        <?php if (class_exists(\LSDPACCLM\Base::class)): ?>
+                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4 lsd-display-options-style-dependency-style5 <?php echo !isset($slider['display_title']) || $slider['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_slider_is_claimed_wrapper">
                                 <div class="lsd-form-row">
                                     <div class="lsd-col-8"><?php echo LSD_Form::label([
                                             'class' => 'lsd-fields-label',
@@ -214,6 +221,7 @@ $optional_addons = [];
                     </div>
                 </div>
             </div>
+
             <?php if (count($optional_addons)): ?>
                 <div class="lsd-alert-no-my lsd-mt-5">
                     <?php echo LSD_Base::alert(LSD_Base::optionalAddonsMessage($optional_addons),'warning'); ?>

@@ -17,26 +17,26 @@ $ids = $this->listings;
 <div>
     <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
 
-            <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
-                <?php if ($this->display_image): ?>
-                <div class="lsd-image">
-                    <?php echo LSD_Kses::element($listing->get_image_module($this, $sizes[$this->columns])); ?>
-                </div>
-                <?php endif; ?>
-
-	            <?php if ($this->display_labels): ?>
-                    <div class="lsd-listing-labels">
-			            <?php echo LSD_Kses::element($listing->get_labels()); ?>
-                    </div>
-	            <?php endif; ?>
-
-	            <?php if ($this->display_review_stars): ?>
-		            <?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
-	            <?php endif; ?>
+        <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
+            <?php if ($this->display_image): ?>
+            <div class="lsd-image">
+                <?php echo LSD_Kses::element($listing->get_image_module($this, $sizes[$this->columns])); ?>
             </div>
+            <?php endif; ?>
 
+            <?php if ($this->display_labels): ?>
+                <div class="lsd-listing-labels">
+                    <?php echo LSD_Kses::element($listing->get_labels()); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($this->display_review_stars): ?>
+                <?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($this->has_body($listing) || $this->has_after_content_hook()): ?>
         <div class="lsd-listing-body">
-
             <div class="lsd-listing-title-wrapper">
                 <?php if ($this->display_title): ?>
                     <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
@@ -67,6 +67,7 @@ $ids = $this->listings;
                 </div>
             <?php endif; ?>
 
+            <?php if ($this->has_bottom_bar($listing)): ?>
             <div class="lsd-listing-bottom-bar">
                 <?php if ($this->display_share_buttons): ?>
                     <div class="lsd-listing-share">
@@ -79,8 +80,15 @@ $ids = $this->listings;
                     </div>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
 
+            <?php if ($this->display_cta): ?>
+                <div class="lsd-listing-call-to-action">
+                    <?php echo $this->listing_cta($listing); ?>
+                </div>
+            <?php endif; ?>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php endforeach;

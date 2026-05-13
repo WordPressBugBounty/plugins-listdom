@@ -1,0 +1,19 @@
+{
+    "name": "webilia/lsdi",
+    "description": "Webilia LSDI Icons Package",
+    "authors": [
+        {
+            "name": "Webilia",
+            "email": "hello@webilia.com"
+        }
+    ],
+    "version": "1.0.0",
+    "config": {
+        "platform-check": false
+    },
+    "autoload": {
+        "psr-4": {
+            "Webilia\\LSDI\\": "app"
+        }
+    }
+}

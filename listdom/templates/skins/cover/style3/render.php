@@ -34,6 +34,12 @@ $ids = $this->listings;
             <?php if ($this->display_review_stars): ?>
                 <?php echo LSD_Kses::element($listing->get_rate_stars()); ?>
             <?php endif; ?>
+
+            <?php if ($this->display_cta): ?>
+                <div class="lsd-listing-call-to-action">
+                    <?php echo $this->listing_cta($listing); ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

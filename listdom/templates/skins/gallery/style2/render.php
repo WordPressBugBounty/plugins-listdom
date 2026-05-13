@@ -18,6 +18,7 @@ $index = 0;
                 </div>
             </div>
 
+            <?php if ($this->has_body($listing) || $this->has_after_content_hook()): ?>
             <div class="lsd-listing-body lsd-gallery-back">
                 <?php if ($this->display_labels): ?>
                     <div class="lsd-listing-labels">
@@ -52,6 +53,7 @@ $index = 0;
 
                     <?php do_action('lsd_skins_after_content', $this, $listing); ?>
 
+                    <?php if ($this->has_bottom_bar($listing)): ?>
                     <div class="lsd-listing-bottom-bar">
                         <?php if ($this->display_review_stars): ?>
                             <?php echo LSD_Kses::element($listing->get_rate_stars('stars', false)); ?>
@@ -63,8 +65,15 @@ $index = 0;
                             </div>
                         <?php endif; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
+                <?php if ($this->display_cta): ?>
+                    <div class="lsd-listing-call-to-action">
+                        <?php echo $this->listing_cta($listing); ?>
+                    </div>
+                <?php endif; ?>
             </div>
+            <?php endif; ?>
         </div>
     </div>
 <?php endforeach;

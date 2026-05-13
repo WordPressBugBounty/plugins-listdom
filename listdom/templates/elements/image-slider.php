@@ -29,7 +29,7 @@ $gallery = array_unique($gallery);
     <ul class="lsd-image-slider-slider">
         <?php foreach($gallery as $image_id): ?>
         <?php
-            $image = wp_get_attachment_image($image_id, $size, false, (string) lsd_schema()->prop('contentUrl'));
+            $image = wp_get_attachment_image($image_id, $size, false, ['itemprop' => 'image']);
             if (!$image) continue;
         ?>
         <li>
@@ -53,6 +53,6 @@ $gallery = array_unique($gallery);
         <?php endforeach; ?>
     </ul>
     <?php else: ?>
-    <div class="lsd-no-image"><i class="lsd-icon fa fa-camera fa-5x"></i></div>
+    <div class="lsd-no-image"><i class="lsd-fe-icon fa fa-camera fa-5x"></i></div>
     <?php endif; ?>
 </div>

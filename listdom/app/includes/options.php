@@ -2,20 +2,29 @@
 
 class LSD_Options extends LSD_Base
 {
+    protected static $settings_cache = [];
+
     public static function settings(): array
     {
-        return self::parse_args(
+        $blog_id = self::get_blog_id();
+        if (isset(self::$settings_cache[$blog_id]) && is_array(self::$settings_cache[$blog_id])) return self::$settings_cache[$blog_id];
+
+        self::$settings_cache[$blog_id] = self::parse_args(
             get_option('lsd_settings', []),
             self::defaults()
         );
+
+        return self::$settings_cache[$blog_id];
+    }
+
+    private static function get_blog_id(): int
+    {
+        return function_exists('get_current_blog_id') ? (int) get_current_blog_id() : 1;
     }
 
     public static function privacy(): array
     {
-        return self::parse_args(
-            get_option('lsd_settings', []),
-            self::defaults()
-        );
+        return self::settings();
     }
 
     public static function api(): array
@@ -43,6 +52,14 @@ class LSD_Options extends LSD_Base
         return self::parse_args(
             $current,
             $defaults
+        );
+    }
+  
+    public static function payments(): array
+    {
+        return self::parse_args(
+            get_option('lsd_payments', []),
+            self::defaults('payments')
         );
     }
 
@@ -107,6 +124,13 @@ class LSD_Options extends LSD_Base
                 if (isset($options['builder'][$sec]['elements']['share'])) unset($options['builder'][$sec]['elements']['share']);
         }
 
+        if (!LSD_Components::cta())
+        {
+            unset($options['elements']['cta']);
+            foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $sec)
+                if (isset($options['builder'][$sec]['elements']['cta'])) unset($options['builder'][$sec]['elements']['cta']);
+        }
+
         return $options;
     }
 
@@ -128,12 +152,12 @@ class LSD_Options extends LSD_Base
         );
     }
 
-    public static function socials()
+    public static function socials(): array
     {
         if (!LSD_Components::socials()) return [];
 
-        $socials = get_option('lsd_socials', []);
-        if (count($socials)) return $socials;
+        $socials = (array) get_option('lsd_socials', []);
+        if (!empty($socials)) return $socials;
 
         return self::parse_args(
             $socials,
@@ -145,6 +169,7 @@ class LSD_Options extends LSD_Base
     {
         $default = self::defaults('details_page_pattern');
         $pattern = get_option('lsd_details_page_pattern', '');
+        $pattern = is_string($pattern) ? $pattern : '';
 
         return trim($pattern) ? $pattern : $default;
     }
@@ -217,7 +242,7 @@ class LSD_Options extends LSD_Base
                         'key' => 'instagram',
                         'profile' => 1,
                         'archive_share' => 0,
-                        'single_share' => 1,
+                        'single_share' => 0,
                         'listing' => 1,
                     ],
                     'whatsapp' => [
@@ -269,6 +294,7 @@ class LSD_Options extends LSD_Base
                         'price' => ['enabled' => 1, 'show_title' => 0],
                         'tags' => ['enabled' => 1, 'show_title' => 1],
                         'content' => ['enabled' => 1, 'show_title' => 0],
+                        'faq' => ['enabled' => 0, 'show_title' => 1, 'count' => 0],
                         'gallery' => ['enabled' => 1, 'show_title' => 0],
                         'embed' => ['enabled' => 0, 'show_title' => 0],
                         'attributes' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0, 'show_attribute_title' => 1],
@@ -281,6 +307,15 @@ class LSD_Options extends LSD_Base
                         'map' => ['enabled' => 1, 'show_title' => 0, 'infowindow' => 0],
                         'availability' => ['enabled' => 1, 'show_title' => 1],
                         'owner' => ['enabled' => 1, 'show_title' => 0, 'pc_enabled' => 1, 'pc_label' => ''],
+                        'cta' => [
+                            'enabled' => 0,
+                            'show_title' => 0,
+                            'alignment' => 'center',
+                            'text' => '',
+                            'target' => 'details',
+                            'url' => '',
+                            'content' => '',
+                        ],
                         'share' => ['enabled' => 1, 'show_title' => 0],
                         'related' => ['enabled' => 0, 'show_title' => 0],
                         'abuse' => ['enabled' => 0, 'show_title' => 0, 'pc_enabled' => 1, 'pc_label' => ''],
@@ -291,7 +326,7 @@ class LSD_Options extends LSD_Base
 
             case 'details_page_pattern':
 
-                $defaults = '{labels}{image}{title}{categories}{price}{tags}{content}{gallery}{embed}{attributes}{features}{contact}{remark}{locations}{address}{map}{availability}{owner}{share}';
+                $defaults = '{labels}{image}{title}{categories}{price}{tags}{content}{faq}{gallery}{embed}{attributes}{features}{contact}{remark}{locations}{address}{map}{availability}{owner}{cta}{share}';
                 break;
 
             case 'mapcontrols':
@@ -316,7 +351,7 @@ class LSD_Options extends LSD_Base
                         'order' => 'DESC',
                     ],
                     'display' => 1,
-                    'sort_style' => '',
+                    'sort_style' => 'drop-down',
                     'options' => [
                         'post_date' => [
                             'status' => '1',
@@ -356,6 +391,40 @@ class LSD_Options extends LSD_Base
             case 'addons':
 
                 $defaults = [];
+                break;
+            
+            case 'payments':
+
+                $defaults = [
+                    'listdom' => 0,
+                    'gateways' => [],
+                    'checkout_page' => '',
+                    'appreciation_page' => '',
+                    'appreciation_message' => '',
+                    'appreciation_invoice_button' => '1',
+                    'agreement' => '',
+                    'pc_enabled' => 0,
+                    'pc_label' => 'I agree to the {{privacy_policy}}.',
+                    'free_checkout_comment' => '',
+                    'taxes' => [
+                        'enable' => 0,
+                        'prices_include_tax' => 0,
+                        'rate' => 0,
+                        'locations' => [],
+                        'label' => 'Tax',
+                    ],
+                    'empty' => [
+                        'logo' => '',
+                        'content' => '<p>Your cart is empty.</p>',
+                        'show_buttons' => 1,
+                    ],
+                    'invoice' => [
+                        'logo' => '',
+                        'from' => "Your Company.\nyour@email.com",
+                        'footer' => '',
+                    ],
+                ];
+
                 break;
 
             case 'api':
@@ -409,6 +478,7 @@ class LSD_Options extends LSD_Base
                         'redirect_contributor' => 0,
                         'redirect_listdom_author' => 0,
                         'redirect_listdom_publisher' => 0,
+                        'email_verification' => 0,
                         'username_label' => esc_html__('Username', 'listdom'),
                         'username_placeholder' => esc_html__('Enter your username', 'listdom'),
                         'password_label' => esc_html__('Password', 'listdom'),
@@ -456,6 +526,28 @@ class LSD_Options extends LSD_Base
                         'shortcode' => 'list',
                         'pc_enabled' => 1,
                         'pc_label' => esc_html__('I agree to the {{privacy_policy}}.', 'listdom'),
+                        'fields' => [
+                            'job_title' => 1,
+                            'bio' => 1,
+                            'profile_image' => 1,
+                            'hero_image' => 1,
+                            'email' => 1,
+                            'phone' => 1,
+                            'mobile' => 1,
+                            'website' => 1,
+                            'fax' => 1,
+                            'social' => [
+                                'facebook' => 1,
+                                'twitter' => 1,
+                                'pinterest' => 1,
+                                'linkedin' => 1,
+                                'instagram' => 1,
+                                'whatsapp' => 1,
+                                'youtube' => 1,
+                                'tiktok' => 1,
+                                'telegram' => 1,
+                            ],
+                        ],
                     ],
                 ];
                 break;
@@ -482,10 +574,18 @@ class LSD_Options extends LSD_Base
                 $defaults = [
                     'default_currency' => 'USD',
                     'currency_position' => 'before',
+                    'currency_thousand_separator' => ',',
+                    'currency_decimal_separator' => '.',
                     'timepicker_format' => 24,
                     'listing_link_status' => 1,
+                    'rss_status' => 1,
+                    'rss_include_sensitive_details' => 0,
+                    'rss_slug' => 'listdom-listings',
+                    'visibility_max_visits' => '',
                     'help_improve_listdom' => 0,
+                    'powered_by_message' => 0,
                     'address_placeholder' => '123 Main St, Unit X, City, State, Zipcode',
+                    'address_autosuggest' => 1,
                     'map_provider' => 'leaflet',
                     'map_gps_zl' => 13,
                     'map_gps_zl_current' => 7,
@@ -507,6 +607,9 @@ class LSD_Options extends LSD_Base
                     'tag_slug' => 'listing-tag',
                     'feature_slug' => 'listing-feature',
                     'label_slug' => 'listing-label',
+                    'labels' => [
+                        'locales' => [],
+                    ],
                     'advanced_slug_status' => 0,
                     'advanced_slug' => '%location%/%category%',
                     'grecaptcha_status' => 0,
@@ -528,6 +631,9 @@ class LSD_Options extends LSD_Base
                             'Listdom can load map services (Google Maps or OpenStreetMap) and Google reCAPTCHA when they are enabled. These services may receive visitor IP addresses or other usage data. Please reference their privacy documentation in your site policy.',
                         ]),
                     ],
+                    'dashboard_form_columns' => 2,
+                    'dashboard_menu_sidebar_status' => 'horizontal',
+                    'dashboard_menu_sidebar_horizontal_mode' => 'default',
                     'mailchimp_checked' => 0,
                     'mailchimp_message' => '',
                     'location_archive' => '',
@@ -539,6 +645,9 @@ class LSD_Options extends LSD_Base
                     'price_component_max' => 1,
                     'price_component_after' => 1,
                     'price_component_class' => 1,
+                    'submission_tax_listdom-category_method' => 'dropdown',
+                    'submission_tax_additional_listdom-category_method' => 'checkboxes',
+                    'submission_category_children_only' => 0,
                     'submission_tax_listdom-location_method' => 'checkboxes',
                     'submission_tax_listdom-feature_method' => 'checkboxes',
                     'submission_tax_listdom-tag_method' => 'textarea',
@@ -547,6 +656,12 @@ class LSD_Options extends LSD_Base
                     'submission_term_builder_'.LSD_Base::TAX_LABEL => 'disabled',
                     'submission_term_builder_'.LSD_Base::TAX_TAG => 'disabled',
                     'submission_term_builder_'.LSD_Base::TAX_FEATURE => 'disabled',
+                    'submission_contact_fields' => [
+                        'email' => 1,
+                        'phone' => 1,
+                        'website' => 1,
+                        'contact_address' => 1,
+                    ],
                     'submission_module' => [
                         'address' => 1,
                         'price' => 1,
@@ -554,6 +669,7 @@ class LSD_Options extends LSD_Base
                         'contact' => 1,
                         'remark' => 1,
                         'gallery' => 1,
+                        'faq' => 1,
                         'attributes' => 1,
                         'locations' => 1,
                         'tags' => 1,
@@ -561,6 +677,7 @@ class LSD_Options extends LSD_Base
                         'labels' => 1,
                         'image' => 1,
                         'embed' => 1,
+                        'cta' => 1,
                         'related' => 0,
                     ],
                     'assets' => [
@@ -573,6 +690,7 @@ class LSD_Options extends LSD_Base
                         'visibility' => 1,
                         'related' => 1,
                         'socials' => 1,
+                        'cta' => 1,
                     ],
                     'block_admin_subscriber' => 1,
                     'block_admin_contributor' => 1,
@@ -652,6 +770,53 @@ class LSD_Options extends LSD_Base
         return apply_filters('lsd_default_currency', trim($currency));
     }
 
+    public static function currency_position(): string
+    {
+        $settings = self::settings();
+        $position = isset($settings['currency_position']) && trim($settings['currency_position'])
+            ? $settings['currency_position']
+            : 'before';
+
+        return (string) apply_filters('lsd_currency_position', $position, $settings);
+    }
+
+    public static function currency_separators(string $type = 'thousand'): array
+    {
+        if ($type === 'decimal')
+        {
+            $options = [
+                ',' => esc_html__('Comma (,)', 'listdom'),
+                '.' => esc_html__('Period (.)', 'listdom'),
+                "'" => esc_html__("Apostrophe (')", 'listdom'),
+            ];
+        }
+        else
+        {
+            $options = [
+                ',' => esc_html__('Comma (,)', 'listdom'),
+                '.' => esc_html__('Period (.)', 'listdom'),
+                's' => esc_html__('Space', 'listdom'),
+                "'" => esc_html__("Apostrophe (')", 'listdom'),
+                '' => esc_html__('None', 'listdom'),
+            ];
+        }
+
+        return (array) apply_filters('lsd_currency_separators', $options, $type);
+    }
+
+    public static function currency_separator(string $type = 'thousand'): string
+    {
+        $key = $type === 'decimal' ? 'currency_decimal_separator' : 'currency_thousand_separator';
+        $default = $type === 'decimal' ? '.' : ',';
+
+        $settings = self::settings();
+
+        $separator = isset($settings[$key]) ? (string) $settings[$key] : $default;
+        if ($separator === 'none') $separator = '';
+
+        return (string) apply_filters('lsd_currency_separator', $separator, $type, $settings);
+    }
+
     public static function price_components(): array
     {
         $settings = LSD_Options::settings();
@@ -693,12 +858,18 @@ class LSD_Options extends LSD_Base
     {
         // Get current Listdom options
         $current = get_option($key, []);
-        if (is_string($current) && trim($current) === '') $current = [];
+        if (!is_array($current)) $current = [];
 
         // Merge new options with previous options
         $final = array_merge($current, $options);
 
         // Save final options
         update_option($key, $final);
+
+        if ($key === 'lsd_settings')
+        {
+            $blog_id = self::get_blog_id();
+            if (isset(self::$settings_cache[$blog_id])) unset(self::$settings_cache[$blog_id]);
+        }
     }
 }

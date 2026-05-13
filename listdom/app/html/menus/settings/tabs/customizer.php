@@ -12,9 +12,9 @@ $options = (new LSD_Customizer())->options();
 ?>
 <div class="lsd-settings-wrap lsd-settings-customizer" id="lsd_settings_display_options">
 
-    <?php if (class_exists(\LSDPACELM\Base::class) || class_exists(\LSDPACDIV\Base::class)): ?>
+    <?php if (class_exists(\LSDPACELM\Base::class) || class_exists(\LSDPACDIV\Base::class) || class_exists(\LSDPACBRX\Base::class)): ?>
     <div class="lsd-m-0">
-        <div class="lsd-alert lsd-warning">
+        <div class="lsd-alert lsd-warning lsd-m-0">
             <strong><?php esc_html_e('Heads Up!', 'listdom'); ?></strong>
             <?php echo sprintf(
                 /* translators: 1: Elementor link, 2: Bricks link, 3: Divi link. */

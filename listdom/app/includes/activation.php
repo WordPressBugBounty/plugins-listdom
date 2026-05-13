@@ -22,9 +22,6 @@ class LSD_Activation extends LSD_Base
         // List of Products
         $products = LSD_Base::products();
 
-        // Display Activation Tab?
-        if (!apply_filters('lsd_display_activation_tab', true)) return;
-
         $this->include_html_file('menus/activation/tpl.php', [
             'parameters' => [
                 'products' => $products,

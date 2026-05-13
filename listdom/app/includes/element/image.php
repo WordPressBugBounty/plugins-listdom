@@ -12,7 +12,7 @@ class LSD_Element_Image extends LSD_Element
         $this->label = esc_html__('Featured Image', 'listdom');
     }
 
-    public function get($size, $post_id = null)
+    public function get($size, $post_id = null, string $itemprop = 'image')
     {
         if (is_null($post_id))
         {

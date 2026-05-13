@@ -36,6 +36,12 @@ class LSD_Shortcodes extends LSD_Base
 
         // Profile Shortcode
         (new LSD_Shortcodes_Profile())->init();
+
+        // Checkout Shortcode
+        (new LSD_Shortcodes_Checkout())->init();
+
+        // Order Summary Shortcode
+        (new LSD_Shortcodes_OrderSummary())->init();
     }
 
     public function parse($post_id, $atts = []): array

@@ -11,6 +11,16 @@ $dashboard = new LSD_Dashboard();
 $settings = LSD_Options::settings();
 $styles = LSD_Options::styles();
 
+// Labels
+$label_locales = LSD_Labels::available_locales();
+$current_locale = LSD_Labels::current_locale();
+$label_settings = $settings['labels']['locales'] ?? [];
+$label_defaults = LSD_Labels::default_taxonomy_labels();
+$label_titles = LSD_Labels::taxonomy_titles();
+
+if (!in_array($current_locale, $label_locales, true)) array_unshift($label_locales, $current_locale);
+if (!count($label_locales)) $label_locales = [$current_locale];
+
 // Post Types & Their Taxonomies
 $post_types = LSD_Base::get_ptypes_and_tax(true);
 
@@ -303,9 +313,185 @@ $did_taxonomies = [];
                             ]); ?>
                         </div>
                     </div>
+
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Call to Action', 'listdom'),
+                                'for' => 'lsd_component_cta',
+                            ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_component_cta',
+                                'name' => 'lsd[components][cta]',
+                                'value' => $settings['components']['cta'] ?? '1',
+                            ]); ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div id="lsd_panel_advanced_translations" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'translations' ? ' lsd-tab-content-active' : ''; ?>">
+            <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Translations', 'listdom'); ?></h3>
+            <div class="lsd-settings-group-wrapper">
+                <div class="lsd-settings-fields-wrapper">
+                    <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Customize Listdom text for each locale. Leave a field empty to keep the default text.', 'listdom'); ?></p>
+
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3">
+                            <?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Locale', 'listdom'),
+                                'for' => 'lsd_labels_locale_selector',
+                            ]); ?>
+                        </div>
+                        <div class="lsd-col-5">
+                            <select id="lsd_labels_locale_selector" class="lsd-admin-input">
+                                <?php foreach ($label_locales as $locale): ?>
+                                    <option value="<?php echo esc_attr($locale); ?>" <?php echo $locale === $current_locale ? 'selected="selected"' : ''; ?>><?php echo esc_html($locale); ?></option>
+                                <?php endforeach; ?>
+                                <option value="custom"><?php esc_html_e('Custom locale', 'listdom'); ?></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="lsd-form-row lsd-labels-custom-locale-row lsd-util-hide">
+                        <div class="lsd-col-3">
+                            <?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Custom Locale Code', 'listdom'),
+                                'for' => 'lsd_labels_custom_locale',
+                            ]); ?>
+                        </div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::text([
+                                'id' => 'lsd_labels_custom_locale',
+                                'name' => 'lsd[labels][custom_locale]',
+                                'class' => 'lsd-admin-input',
+                                'value' => '',
+                                'placeholder' => 'en_US',
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny"><?php esc_html_e('Enter a locale code to save the Custom locale fields below.', 'listdom'); ?></p>
+                        </div>
+                    </div>
+
+                    <?php foreach ($label_locales as $locale): ?>
+                        <div class="lsd-labels-locale-group<?php echo $locale === $current_locale ? '' : ' lsd-util-hide'; ?>" data-locale="<?php echo esc_attr($locale); ?>">
+                            <div class="lsd-admin-section-heading">
+                                <h4 class="lsd-admin-title lsd-mt-0 lsd-mb-4"><?php echo esc_html($locale); ?></h4>
+                            </div>
+                            <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-3">
+                            <?php foreach ($label_defaults as $taxonomy => $defaults): ?>
+                                <?php
+                                $title = $label_titles[$taxonomy] ?? $taxonomy;
+                                $values = $label_settings[$locale][$taxonomy] ?? [];
+                                $singular_value = $values['singular'] ?? '';
+                                $plural_value = $values['plural'] ?? '';
+                                $default_singular = LSD_Labels::default_label($taxonomy);
+                                $default_plural = LSD_Labels::default_label($taxonomy, 'plural');
+                                ?>
+                                <div class="lsd-form-row">
+                                    <div class="lsd-col-3">
+                                        <strong><?php echo esc_html($title); ?></strong>
+                                    </div>
+                                    <div class="lsd-col-4">
+                                        <label class="lsd-fields-label-tiny lsd-pt-0" for="<?php echo esc_attr('lsd_labels_' . $locale . '_' . $taxonomy . '_singular'); ?>"><?php esc_html_e('Singular', 'listdom'); ?></label>
+                                        <?php echo LSD_Form::text([
+                                            'id' => 'lsd_labels_' . esc_attr($locale) . '_' . esc_attr($taxonomy) . '_singular',
+                                            'name' => 'lsd[labels][locales][' . esc_attr($locale) . '][' . esc_attr($taxonomy) . '][singular]',
+                                            'class' => 'lsd-admin-input',
+                                            'value' => $singular_value,
+                                            'placeholder' => $default_singular,
+                                        ]); ?>
+                                    </div>
+                                    <div class="lsd-col-4">
+                                        <label class="lsd-fields-label-tiny lsd-pt-0" for="<?php echo esc_attr('lsd_labels_' . $locale . '_' . $taxonomy . '_plural'); ?>"><?php esc_html_e('Plural', 'listdom'); ?></label>
+                                        <?php echo LSD_Form::text([
+                                            'id' => 'lsd_labels_' . esc_attr($locale) . '_' . esc_attr($taxonomy) . '_plural',
+                                            'name' => 'lsd[labels][locales][' . esc_attr($locale) . '][' . esc_attr($taxonomy) . '][plural]',
+                                            'class' => 'lsd-admin-input',
+                                            'value' => $plural_value,
+                                            'placeholder' => $default_plural,
+                                        ]); ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+
+                    <div class="lsd-labels-locale-group lsd-util-hide" data-locale="custom">
+                        <div class="lsd-admin-section-heading">
+                            <h4 class="lsd-admin-title lsd-mt-0 lsd-mb-4"><?php esc_html_e('Custom Locale', 'listdom'); ?></h4>
+                        </div>
+                        <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-3">
+                            <?php foreach ($label_defaults as $taxonomy => $defaults): ?>
+                                <?php
+                                $title = $label_titles[$taxonomy] ?? $taxonomy;
+                                $default_singular = LSD_Labels::default_label($taxonomy);
+                                $default_plural = LSD_Labels::default_label($taxonomy, 'plural');
+                                ?>
+                                <div class="lsd-form-row">
+                                    <div class="lsd-col-3">
+                                        <strong><?php echo esc_html($title); ?></strong>
+                                    </div>
+                                    <div class="lsd-col-4">
+                                        <label class="lsd-fields-label-tiny lsd-pt-0" for="<?php echo esc_attr('lsd_labels_custom_' . $taxonomy . '_singular'); ?>"><?php esc_html_e('Singular', 'listdom'); ?></label>
+                                        <?php echo LSD_Form::text([
+                                            'id' => 'lsd_labels_custom_' . esc_attr($taxonomy) . '_singular',
+                                            'name' => 'lsd[labels][custom][' . esc_attr($taxonomy) . '][singular]',
+                                            'class' => 'lsd-admin-input',
+                                            'value' => '',
+                                            'placeholder' => $default_singular,
+                                        ]); ?>
+                                    </div>
+                                    <div class="lsd-col-4">
+                                        <label class="lsd-fields-label-tiny lsd-pt-0" for="<?php echo esc_attr('lsd_labels_custom_' . $taxonomy . '_plural'); ?>"><?php esc_html_e('Plural', 'listdom'); ?></label>
+                                        <?php echo LSD_Form::text([
+                                            'id' => 'lsd_labels_custom_' . esc_attr($taxonomy) . '_plural',
+                                            'name' => 'lsd[labels][custom][' . esc_attr($taxonomy) . '][plural]',
+                                            'class' => 'lsd-admin-input',
+                                            'value' => '',
+                                            'placeholder' => $default_plural,
+                                        ]); ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function ($)
+        {
+            const selector = $('#lsd_labels_locale_selector');
+            const groups = $('.lsd-labels-locale-group');
+            const customRow = $('.lsd-labels-custom-locale-row');
+
+            const toggleGroup = function (value)
+            {
+                groups.addClass('lsd-util-hide');
+                groups.filter('[data-locale="' + value + '"]').removeClass('lsd-util-hide');
+                if (customRow.length)
+                {
+                    if (value === 'custom') customRow.removeClass('lsd-util-hide');
+                    else customRow.addClass('lsd-util-hide');
+                }
+            };
+
+            if (selector.length)
+            {
+                toggleGroup(selector.val());
+                selector.on('change', function ()
+                {
+                    toggleGroup($(this).val());
+                });
+            }
+        });
+        </script>
 
         <?php
             // Third Party Options
@@ -411,7 +597,7 @@ jQuery('#lsd_settings_form').on('submit', function (e)
     });
 });
 
-jQuery(document).ready(function ($) {
+jQuery(document).ready(function () {
 
     const $fileInput = jQuery('#lsd_settings_file');
     const $chooseBtn = jQuery('.lsd-csv-import-choose-file');

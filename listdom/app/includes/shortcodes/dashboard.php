@@ -16,6 +16,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     public $form_type;
     public $search;
     public $category;
+    public $form_columns;
+    public $sidebar_status;
+    public $sidebar_horizontal_mode;
 
     /**
      * @var WP_Query
@@ -29,6 +32,20 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Settings
         $this->settings = LSD_Options::settings();
 
+        // Form Columns
+        $form_columns = isset($this->settings['dashboard_form_columns']) ? (int) $this->settings['dashboard_form_columns'] : 2;
+        $this->form_columns = $form_columns === 1 ? 1 : 2;
+
+        // Sidebar Status
+        $sidebar_status = $this->settings['dashboard_menu_sidebar_status'] ?? 'default';
+        $allowed_sidebar_status = ['default', 'compact', 'horizontal'];
+        $this->sidebar_status = in_array($sidebar_status, $allowed_sidebar_status, true) ? $sidebar_status : 'default';
+
+        // Horizontal Sidebar Mode
+        $horizontal_mode = $this->settings['dashboard_menu_sidebar_horizontal_mode'] ?? 'default';
+        $allowed_horizontal_modes = ['default', 'dropdown', 'carousel'];
+        $this->sidebar_horizontal_mode = in_array($horizontal_mode, $allowed_horizontal_modes, true) ? $horizontal_mode : 'default';
+
         // Listdom Pro?
         $this->is_pro = $this->isPro();
 
@@ -39,6 +56,71 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $this->guest_registration = $this->is_pro && isset($this->settings['submission_guest_registration'])
             ? $this->settings['submission_guest_registration']
             : 'approval';
+    }
+
+    public function get_dashboard_wrapper(array $options = []): array
+    {
+        $options = wp_parse_args($options, [
+            'classes' => ['lsd-dashboard'],
+            'attributes' => [],
+            'sidebar_status' => $this->sidebar_status ?? 'default',
+            'sidebar_horizontal_mode' => $this->sidebar_horizontal_mode ?? 'default',
+        ]);
+
+        $sidebar_status = in_array($options['sidebar_status'], ['default', 'compact', 'horizontal'], true)
+            ? $options['sidebar_status']
+            : 'default';
+        $sidebar_horizontal_mode = in_array($options['sidebar_horizontal_mode'], ['default', 'dropdown', 'carousel'], true)
+            ? $options['sidebar_horizontal_mode']
+            : 'default';
+
+        $classes = is_array($options['classes']) ? array_values(array_filter(array_map('trim', $options['classes']))) : [];
+        if (!in_array('lsd-dashboard', $classes, true)) array_unshift($classes, 'lsd-dashboard');
+
+        if ($sidebar_status === 'horizontal')
+        {
+            $classes[] = 'lsd-dashboard-sidebar-horizontal';
+
+            $horizontal_class_map = [
+                'dropdown' => 'lsd-dashboard-sidebar-horizontal-dropdown',
+                'carousel' => 'lsd-dashboard-sidebar-horizontal-carousel',
+            ];
+
+            if (isset($horizontal_class_map[$sidebar_horizontal_mode])) $classes[] = $horizontal_class_map[$sidebar_horizontal_mode];
+        }
+        else
+        {
+            $classes[] = 'lsd-dashboard-sidebar-vertical';
+            $classes[] = $sidebar_status === 'compact' ? 'lsd-dashboard-sidebar-compact' : 'lsd-dashboard-sidebar-default';
+        }
+
+        $attributes = is_array($options['attributes']) ? $options['attributes'] : [];
+        $attributes['data-sidebar-status'] = $sidebar_status;
+        $attributes['data-horizontal-mode'] = $sidebar_horizontal_mode;
+
+        return [
+            'class' => implode(' ', array_unique($classes)),
+            'attributes' => $this->format_html_attributes($attributes),
+        ];
+    }
+
+    private function format_html_attributes(array $attributes): string
+    {
+        $result = '';
+
+        foreach ($attributes as $attribute => $value)
+        {
+            if ($value === null) continue;
+
+            $attribute = esc_attr($attribute);
+            $value = is_scalar($value) ? (string) $value : '';
+
+            $result .= $value === ''
+                ? sprintf(' %s', $attribute)
+                : sprintf(' %s="%s"', $attribute, esc_attr($value));
+        }
+
+        return $result;
     }
 
     public function init()
@@ -79,6 +161,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         add_action('wp_ajax_lsd_dashboard_profile_save', [$this, 'save_profile']);
         add_action('wp_ajax_nopriv_lsd_dashboard_profile_save', [$this, 'save_profile']);
 
+        // refresh additional categories
+        add_action('wp_ajax_lsd_refresh_additional_categories', [$this, 'ajax_refresh_additional_categories']);
+        add_action('wp_ajax_nopriv_lsd_refresh_additional_categories', [$this, 'ajax_refresh_additional_categories']);
+
         add_filter('body_class', [$this, 'listdom_dashboard_class']);
     }
 
@@ -86,11 +172,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     {
         if (!is_array($classes)) $classes = [];
 
-        $dashboard_page_id   = LSD_Options::post_id('submission_page');
-        $add_listing_page_id = LSD_Options::post_id('add_listing_page');
-        $current_page_id     = (int) get_queried_object_id();
-
-        if ($current_page_id === $dashboard_page_id || $current_page_id === $add_listing_page_id) $classes[] = 'lsd-dashboard-page';
+        if (LSD_Dashboard::is_dashboard()) $classes[] = 'lsd-dashboard-page';
 
         return $classes;
     }
@@ -115,7 +197,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $this->url = get_permalink($this->page);
 
         // Mode
-        $this->mode = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : 'manage';
+        $this->mode = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : $this->get_default_mode();
 
         // Listdom Bar
         $bar = LSD_Bar::instance();
@@ -147,12 +229,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Profile
         else if ($this->mode === 'profile') return $this->profile();
         // Other Modes
-        else return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'error'), $this);
+        else return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'warning'), $this);
     }
 
     public function manage()
     {
-        if (!get_current_user_id())
+        if (!get_current_user_id() && !$this->guest_status)
         {
             return $this->auth();
         }
@@ -226,9 +308,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function form()
     {
-        if (!get_current_user_id() && !$this->guest_status)
+        if (!get_current_user_id() && !$this->guest_status) return $this->auth();
+
+        $menu_ids = $this->menu_ids();
+        if (!isset($menu_ids[$this->mode]))
         {
-            return $this->auth();
+            return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'warning'), $this);
         }
 
         if (!LSD_Capability::can('edit_listings', 'edit_posts') && !$this->guest_status)
@@ -267,9 +352,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function profile()
     {
-        if (!get_current_user_id())
+        if (!get_current_user_id()) return $this->auth();
+
+        $menu_ids = $this->menu_ids();
+        if (!isset($menu_ids[$this->mode]))
         {
-            return $this->auth();
+            return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'warning'), $this);
         }
 
         // Dashboard
@@ -286,24 +374,19 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function redirect()
     {
-        if (!get_current_user_id() && !$this->guest_status && isset($this->settings['submission_guest_redirect']) && $this->settings['submission_guest_redirect'] && is_page())
+        if (
+            !get_current_user_id() &&
+            !$this->guest_status &&
+            isset($this->settings['submission_guest_redirect']) &&
+            $this->settings['submission_guest_redirect'] &&
+            is_page() &&
+            LSD_Dashboard::is_dashboard()
+        )
         {
-            // Dashboard Page
-            $dashboard_page = LSD_Options::post_id('submission_page');
+            $url = wp_login_url();
 
-            // Add Listing
-            $add_listing_page = LSD_Options::post_id('add_listing_page');
-
-            // Page
-            $page = get_post();
-
-            if (($dashboard_page || $add_listing_page) && in_array($page->ID, [$dashboard_page, $add_listing_page]))
-            {
-                $url = wp_login_url();
-
-                wp_redirect($url);
-                exit;
-            }
+            wp_redirect($url);
+            exit;
         }
     }
 
@@ -328,6 +411,14 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Field is required
         if (isset($this->settings['submission_fields'][$field]['required']) && $this->settings['submission_fields'][$field]['required']) $required = true;
 
+        if ($required && isset($this->settings['submission_contact_fields']) && is_array($this->settings['submission_contact_fields']))
+        {
+            $contact_fields = $this->settings['submission_contact_fields'];
+            $contact_field_keys = ['email', 'phone', 'website', 'contact_address'];
+
+            if (in_array($field, $contact_field_keys, true) && isset($contact_fields[$field]) && !$contact_fields[$field]) $required = false;
+        }
+
         // Apply Filters
         return apply_filters('lsd_dashboard_field_required', $required, $field);
     }
@@ -343,51 +434,185 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $menus = $this->menu_ids();
 
         // Current Page
-        $current = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : 'manage';
+        $current = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : $this->get_default_mode($menus);
 
-        $output = '<ul class="lsd-dashboard-menus">';
-        foreach ($menus as $key => $menu)
+        $sidebar_status = $this->sidebar_status ?? 'default';
+        $horizontal_mode = $this->sidebar_horizontal_mode ?? 'default';
+        $initial_mode = $sidebar_status === 'compact' ? 'compact' : 'default';
+
+        $output = '<div class="lsd-dashboard-menu-container" data-sidebar-status="' . esc_attr($sidebar_status) . '" data-horizontal-mode="' . esc_attr($horizontal_mode) . '">';
+
+        $menu_classes = ['lsd-dashboard-menus'];
+
+        if ($sidebar_status === 'horizontal' && $horizontal_mode === 'carousel')
+        {
+            $menu_classes[] = 'lsd-dashboard-menus-carousel';
+            $menu_classes[] = 'lsd-owl-carousel';
+        }
+
+        $output .= '<ul class="' . esc_attr(implode(' ', $menu_classes)) . '">';
+
+        $visible_menus = $menus;
+        $dropdown_menus = [];
+        $dropdown_limit = 5;
+
+        if ($sidebar_status === 'horizontal' && $horizontal_mode === 'dropdown' && count($menus) > $dropdown_limit)
+        {
+            $visible_menus = array_slice($menus, 0, $dropdown_limit, true);
+            $dropdown_menus = array_slice($menus, $dropdown_limit, null, true);
+        }
+
+        $render_menu_item = static function ($key, $menu, $current, $extra_classes = '')
         {
             $target = $menu['target'] ?? '_self';
             $icon = $menu['icon'] ?? 'fas fa-tachometer-alt';
             $id = $menu['id'] ?? 'lsd_dashboard_menus_' . $key;
+            $url = $menu['url'] ?? '#';
+            $label = $menu['label'] ?? '';
 
-            $output .= '<li id="' . esc_attr($id) . '" ' . ($current == $key ? 'class="lsd-active"' : '') . '><a href="' . esc_url($menu['url']) . '" target="' . esc_attr($target) . '"><i class="lsd-icon ' . esc_attr($icon) . '"></i>' . esc_html($menu['label']) . '</a></li>';
+            $classes = [];
+            if (trim($extra_classes) !== '') $classes[] = trim($extra_classes);
+            if ($current == $key) $classes[] = 'lsd-active';
+
+            $class_attribute = count($classes) ? ' class="' . esc_attr(implode(' ', $classes)) . '"' : '';
+
+            $item  = '<li id="' . esc_attr($id) . '"' . $class_attribute . '>';
+            $item .= '<a href="' . esc_url($url) . '" target="' . esc_attr($target) . '"><i class="lsd-fe-icon ' . esc_attr($icon) . '"></i><span class="lsd-dashboard-menu-label">' . esc_html($label) . '</span></a>';
+            $item .= '</li>';
+
+            return $item;
+        };
+
+        foreach ($visible_menus as $key => $menu)
+        {
+            $output .= $render_menu_item($key, $menu, $current);
         }
 
+        if (!empty($dropdown_menus))
+        {
+            $more_classes = 'lsd-dashboard-menu-more';
+            if (isset($dropdown_menus[$current])) $more_classes .= ' lsd-active';
+
+            $output .= '<li class="' . esc_attr($more_classes) . '">';
+            $output .= '<a class="lsd-dashboard-menu-more-trigger" aria-haspopup="true" aria-expanded="false">';
+            $output .= '<i class="lsd-fe-icon fa-solid fa-ellipsis" aria-hidden="true"></i>';
+            $output .= '<span class="screen-reader-text">' . esc_html__('Open additional dashboard links', 'listdom') . '</span>';
+            $output .= '</a>';
+            $output .= '<ul class="lsd-dashboard-menu-more-list">';
+            foreach ($dropdown_menus as $key => $menu)
+            {
+                $output .= $render_menu_item($key, $menu, $current, 'lsd-dashboard-menu-more-item');
+            }
+            $output .= '</ul>';
+            $output .= '</li>';
+        }
+
+        if ($sidebar_status === 'compact')
+        {
+            $is_expanded = $initial_mode !== 'compact';
+            $aria_expanded = $is_expanded ? 'true' : 'false';
+            $icon_class = $is_expanded ? 'fa-long-arrow-left' : 'fa-long-arrow-right';
+            $output .= '<li class="lsd-dashboard-menu-toggle">';
+            $output .= '<button type="button" class="lsd-dashboard-menu-toggle-trigger" aria-label="' . esc_attr__('Toggle dashboard menu', 'listdom') . '" aria-expanded="' . esc_attr($aria_expanded) . '" data-initial-mode="' . esc_attr($initial_mode) . '">';
+            $output .= '<i class="lsd-fe-icon fa-solid ' . esc_attr($icon_class) . '" aria-hidden="true"></i>';
+            $output .= '<span class="screen-reader-text">' . esc_html__('Toggle dashboard menu', 'listdom') . '</span>';
+            $output .= '</button>';
+            $output .= '</li>';
+        }
         $output .= '</ul>';
+
+        $output .= '</div>';
         return $output;
     }
 
-    public function menu_ids(): array
+    public function menu_ids(bool $include_disabled = false): array
     {
-        // Order Menus
+        // Menus Data
         $order_menus = $this->settings['dashboard_menus'] ?? [];
+        $statuses = $this->settings['dashboard_menu_builtin_status'] ?? [];
+        $data = $this->settings['dashboard_menu_builtin'] ?? [];
 
         // Default Menus
-        $menus = [
-            'manage' => ['label' => esc_html__('Dashboard', 'listdom'), 'id' => 'lsd_dashboard_menus_manage', 'url' => $this->url, 'icon' => 'fas fa-tachometer-alt'],
-        ];
+        $menus = [];
+        if ($include_disabled || !isset($statuses['manage']) || (int) $statuses['manage'] === 1)
+        {
+            $manage_label = $data['manage']['label'] ?? '';
+            $manage_icon = $data['manage']['icon'] ?? '';
+            $menus['manage'] = [
+                'label' => $manage_label !== '' ? $manage_label : esc_html__('Dashboard', 'listdom'),
+                'default_label' => esc_html__('Dashboard', 'listdom'),
+                'id' => 'lsd_dashboard_menus_manage',
+                'url' => $this->add_qs_var('mode', 'manage', $this->url),
+                'icon' => $manage_icon !== '' ? $manage_icon : 'fas fa-tachometer-alt',
+            ];
+        }
 
         // Add Listing Menu
-        if (LSD_Capability::can('edit_listings', 'edit_posts') || $this->guest_status) $menus['form'] = ['label' => esc_html__('Add Listing', 'listdom'), 'id' => 'lsd_dashboard_menus_form', 'url' => $this->add_qs_var('mode', 'form', $this->url), 'icon' => 'far fa-plus-square'];
+        if ((LSD_Capability::can('edit_listings', 'edit_posts') || $this->guest_status) && ($include_disabled || !isset($statuses['form']) || (int) $statuses['form'] === 1))
+        {
+            $form_label = $data['form']['label'] ?? '';
+            $form_icon = $data['form']['icon'] ?? '';
+            $menus['form'] = [
+                'label' => $form_label !== '' ? $form_label : esc_html__('Add Listing', 'listdom'),
+                'default_label' => esc_html__('Add Listing', 'listdom'),
+                'id' => 'lsd_dashboard_menus_form',
+                'url' => $this->add_qs_var('mode', 'form', $this->url),
+                'icon' => $form_icon !== '' ? $form_icon : 'far fa-plus-square',
+            ];
+        }
 
         // Profile Menu
-        if (get_current_user_id()) $menus['profile'] = ['label' => esc_html__('Profile Setting', 'listdom'), 'id' => 'lsd_dashboard_menus_profile', 'url' => $this->add_qs_var('mode', 'profile', $this->url), 'icon' => 'fas fa-user'];
+        if (get_current_user_id() && ($include_disabled || !isset($statuses['profile']) || (int) $statuses['profile'] === 1))
+        {
+            $profile_label = $data['profile']['label'] ?? '';
+            $profile_icon = $data['profile']['icon'] ?? '';
+            $menus['profile'] = [
+                'label' => $profile_label !== '' ? $profile_label : esc_html__('Profile Setting', 'listdom'),
+                'default_label' => esc_html__('Profile Setting', 'listdom'),
+                'id' => 'lsd_dashboard_menus_profile',
+                'url' => $this->add_qs_var('mode', 'profile', $this->url),
+                'icon' => $profile_icon !== '' ? $profile_icon : 'fas fa-user',
+            ];
+        }
 
         // Logout Menu
-        if (get_current_user_id()) $menus['logout'] = ['label' => esc_html__('Logout', 'listdom'), 'id' => 'lsd_dashboard_menus_logout', 'url' => wp_logout_url(), 'icon' => 'fas fa-sign-out-alt'];
+        if (get_current_user_id() && ($include_disabled || !isset($statuses['logout']) || (int) $statuses['logout'] === 1))
+        {
+            $logout_label = $data['logout']['label'] ?? '';
+            $logout_icon = $data['logout']['icon'] ?? '';
+            $menus['logout'] = [
+                'label' => $logout_label !== '' ? $logout_label : esc_html__('Logout', 'listdom'),
+                'default_label' => esc_html__('Logout', 'listdom'),
+                'id' => 'lsd_dashboard_menus_logout',
+                'url' => wp_logout_url(),
+                'icon' => $logout_icon !== '' ? $logout_icon : 'fas fa-sign-out-alt',
+            ];
+        }
 
         // Apply Filters
         $menus = apply_filters('lsd_dashboard_menus', $menus, $this);
+
+        foreach ($menus as $key => $menu)
+        {
+            if (!$include_disabled && isset($statuses[$key]) && (int) $statuses[$key] === 0)
+            {
+                unset($menus[$key]);
+                continue;
+            }
+
+            if (!isset($data[$key]) || !is_array($data[$key])) continue;
+
+            $override_label = $data[$key]['label'] ?? '';
+            $override_icon = $data[$key]['icon'] ?? '';
+
+            if ($override_label !== '') $menus[$key]['label'] = $override_label;
+            if ($override_icon !== '') $menus[$key]['icon'] = $override_icon;
+        }
 
         // Order Menus
         if (isset($order_menus) && $this->is_pro)
         {
             $ordered_menus = [];
-            if (isset($menus['manage'])) $ordered_menus['manage'] = $menus['manage'];
-            unset($menus['manage']);
-
             foreach ($order_menus as $menu_id)
             {
                 foreach ($menus as $key => $menu)
@@ -402,12 +627,25 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             }
 
             $ordered_menus = array_merge($ordered_menus, $menus);
-            if (isset($menus['logout'])) $ordered_menus['logout'] = $menus['logout'];
-
             $menus = $ordered_menus;
         }
 
         return $menus;
+    }
+
+    public function get_default_mode(array $menus = []): string
+    {
+        if (!count($menus)) $menus = $this->menu_ids();
+
+        foreach ($menus as $key => $menu)
+        {
+            if ($key === 'logout') continue;
+
+            $url = $menu['url'] ?? '';
+            if ($url !== '' && strpos($url, 'mode=') !== false) return $key;
+        }
+
+        return 'manage';
     }
 
     protected function get_form_link($listing_id = null): string
@@ -439,9 +677,26 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if ($valid !== true) $this->response(['success' => 0, 'message' => $valid]);
 
         $id = isset($_POST['id']) ? (int) sanitize_text_field($_POST['id']) : 0;
+
+        if ($id > 0)
+        {
+            $listing = get_post($id);
+
+            if (!isset($listing->ID) || $listing->post_type !== LSD_Base::PTYPE_LISTING) $this->response(['success' => 0, 'message' => esc_html__('The listing is not available!', 'listdom')]);
+            if (!current_user_can('edit_post', $id) || (get_current_user_id() !== (int) $listing->post_author && !current_user_can('edit_others_posts'))) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to edit this listing!', 'listdom')]);
+        }
+
         $lsd = $_POST['lsd'] ?? [];
+        $raw_lsd = $lsd;
         $social = $lsd['sc'] ?? []; // Social
         $tax = isset($_POST['tax_input']) && is_array($_POST['tax_input']) ? $_POST['tax_input'] : [];
+        $listing_categories = isset($lsd['listing_categories']) && is_array($lsd['listing_categories'])
+            ? array_values(array_filter(array_map('intval', $lsd['listing_categories'])))
+            : [];
+        $additional_categories = isset($lsd['additional_categories']) && is_array($lsd['additional_categories'])
+            ? array_values(array_filter(array_map('intval', $lsd['additional_categories'])))
+            : [];
+        $lsd['listing_categories'] = array_values(array_unique(array_merge($listing_categories, $additional_categories)));
 
         $consent = isset($lsd['privacy_consent']) ? sanitize_text_field($lsd['privacy_consent']) : '';
         $consent_enabled = LSD_Privacy::is_consent_enabled('dashboard');
@@ -471,11 +726,21 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             unset($lsd['_embeds']);
         }
 
+        // FAQs
+        if (isset($lsd['_faqs']) && is_array($lsd['_faqs']))
+        {
+            $lsd['faqs'] = $lsd['_faqs'];
+            unset($lsd['_faqs']);
+        }
+
         // Required Fields
         $fields = (new LSD_Dashboard())->fields();
 
         // Validate
-        $errors = [];
+        $errors = [
+            'list' => [],
+            'fields' => [],
+        ];
         foreach ($fields as $f => $field)
         {
             // Not Required
@@ -509,7 +774,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                         $daycode = $weekday['code'];
                         $day = $value[$daycode] ?? [];
                         $hours = isset($day['hours']) ? trim((string) $day['hours']) : '';
-                        $off = isset($day['off']) ? (bool) $day['off'] : false;
+                        $off = isset($day['off']) && $day['off'];
                         if ($hours === '' && !$off)
                         {
                             $valid = false;
@@ -518,16 +783,16 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                     }
                 }
 
-                if (!$valid) $errors[] = esc_html__('Please set work hours or mark off for all days!', 'listdom');
+                if (!$valid) $errors['list'][] = esc_html__('Please set work hours or mark off for all days!', 'listdom');
                 continue;
             }
 
-            if (is_array($value) && !count($value)) $errors[] = sprintf(
+            if (is_array($value) && !count($value)) $errors['list'][] = sprintf(
                 /* translators: %s: Field label. */
                 esc_html__('At-least one value for %s field is required!', 'listdom'),
                 strtolower($field['label'])
             );
-            else if (!is_array($value) && trim((string) $value) === '') $errors[] = sprintf(
+            else if (!is_array($value) && trim((string) $value) === '') $errors['list'][] = sprintf(
                 /* translators: %s: Field label. */
                 esc_html__('%s field is required!', 'listdom'),
                 $field['label']
@@ -537,10 +802,14 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Restrictions
         $restrictions = $this->get_restriction_rules();
 
+        $max_upload_size_kb = !empty($restrictions['max_upload_size'])
+            ? (int) $restrictions['max_upload_size']
+            : 0;
+
         // Maximum Gallery Images
         if (trim($restrictions['max_gallery_images']) != '' && isset($lsd['gallery']) && is_array($lsd['gallery']) && count($lsd['gallery']) > $restrictions['max_gallery_images'])
         {
-            $errors[] = sprintf(
+            $errors['list'][] = sprintf(
                 /* translators: 1: Allowed number of gallery images, 2: Number of uploaded images. */
                 esc_html__("You can only upload a maximum of %1\$s gallery images. You've uploaded %2\$s.", 'listdom'),
                 $restrictions['max_gallery_images'],
@@ -549,10 +818,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         }
 
         // Maximum Image Size
-        if (!empty($restrictions['max_upload_size']) && isset($lsd['gallery']) && is_array($lsd['gallery']))
+        if ($max_upload_size_kb && isset($lsd['gallery']) && is_array($lsd['gallery']))
         {
             // Convert the maximum image size from KB to bytes
-            $max_image_size_bytes = $restrictions['max_upload_size'] * 1024;
+            $max_image_size_bytes = $max_upload_size_kb * 1024;
 
             foreach ($lsd['gallery'] as $image_id)
             {
@@ -568,11 +837,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                     // Check if the file size exceeds the maximum allowed size
                     if ($file_size > $max_image_size_bytes)
                     {
-                        $errors[] = sprintf(
+                        $errors['list'][] = sprintf(
                             /* translators: 1: Image file name, 2: Maximum allowed size in KB, 3: Current size in KB. */
                             esc_html__("The image '%1\$s' exceeds the maximum allowed size of %2\$s KB. The image size is %3\$s KB.", 'listdom'),
                             esc_html($image_name),
-                            $restrictions['max_upload_size'],
+                            $max_upload_size_kb,
                             round($file_size / 1024) // Convert bytes to KB
                         );
                     }
@@ -580,10 +849,134 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             }
         }
 
+        // Featured image restriction
+        if ($max_upload_size_kb && $this->is_enabled('image'))
+        {
+            $featured_image_id = isset($lsd['featured_image']) ? (int) $lsd['featured_image'] : 0;
+            if ($featured_image_id)
+            {
+                $image_path = get_attached_file($featured_image_id);
+                if ($image_path && file_exists($image_path))
+                {
+                    $file_size = filesize($image_path);
+
+                    if ($file_size > $max_upload_size_kb * 1024)
+                    {
+                        $image_name = basename($image_path);
+                        $message = sprintf(
+                            /* translators: 1: Image file name, 2: Maximum allowed size in KB, 3: Current size in KB. */
+                            esc_html__("The featured image '%1\$s' exceeds the maximum allowed size of %2\$s KB. The image size is %3\$s KB.", 'listdom'),
+                            esc_html($image_name),
+                            $max_upload_size_kb,
+                            round($file_size / 1024)
+                        );
+
+                        $errors['list'][] = $message;
+                        $errors['fields']['featured_image'] = $message;
+                    }
+                }
+            }
+        }
+
+        // Custom attribute image restrictions
+        if ($max_upload_size_kb && isset($lsd['attributes']) && is_array($lsd['attributes']))
+        {
+            $attribute_details = [];
+            foreach (LSD_Main::get_attributes_details() as $attribute_detail)
+            {
+                if (($attribute_detail['field_type'] ?? '') !== 'image') continue;
+
+                $slug = $attribute_detail['slug'] ?? '';
+                if (!$slug) continue;
+
+                $attribute_details[$slug] = $attribute_detail;
+            }
+
+            if (!empty($attribute_details))
+            {
+                foreach ($lsd['attributes'] as $attribute_slug => $attribute_value)
+                {
+                    if (!isset($attribute_details[$attribute_slug])) continue;
+
+                    $image_id = (int) $attribute_value;
+                    if (!$image_id) continue;
+
+                    $image_path = get_attached_file($image_id);
+                    if (!$image_path || !file_exists($image_path)) continue;
+
+                    $file_size = filesize($image_path);
+                    if ($file_size <= $max_upload_size_kb * 1024) continue;
+
+                    $attribute_name = $attribute_details[$attribute_slug]['name'] ?? '';
+                    $attribute_label = trim((string) $attribute_name) !== ''
+                        ? sanitize_text_field($attribute_name)
+                        : $attribute_slug;
+
+                    $image_name = basename($image_path);
+                    $message = sprintf(
+                        /* translators: 1: Custom field label, 2: Image file name, 3: Maximum allowed size in KB, 4: Current size in KB. */
+                        esc_html__('The image selected for "%1$s" (%2$s) exceeds the maximum allowed size of %3$s KB. The image size is %4$s KB.', 'listdom'),
+                        esc_html($attribute_label),
+                        esc_html($image_name),
+                        $max_upload_size_kb,
+                        round($file_size / 1024)
+                    );
+
+                    $errors['list'][] = $message;
+                    if (!isset($errors['fields']['attribute_images'])) $errors['fields']['attribute_images'] = [];
+                    $errors['fields']['attribute_images'][$attribute_slug] = $message;
+                }
+            }
+        }
+
+        // Custom attribute file restrictions
+        if (isset($lsd['attributes']) && is_array($lsd['attributes']))
+        {
+            $attribute_details = [];
+            foreach (LSD_Main::get_attributes_details() as $attribute_detail)
+            {
+                if (($attribute_detail['field_type'] ?? '') !== 'file') continue;
+
+                $slug = $attribute_detail['slug'] ?? '';
+                if (!$slug) continue;
+
+                $attribute_details[$slug] = $attribute_detail;
+            }
+
+            if (!empty($attribute_details))
+            {
+                foreach ($lsd['attributes'] as $attribute_slug => $attribute_value)
+                {
+                    if (!isset($attribute_details[$attribute_slug])) continue;
+
+                    $attribute_name = $attribute_details[$attribute_slug]['name'] ?? '';
+                    $attribute_label = trim((string) $attribute_name) !== ''
+                        ? sanitize_text_field($attribute_name)
+                        : $attribute_slug;
+
+                    $term_id = isset($attribute_details[$attribute_slug]['id']) ? (int) $attribute_details[$attribute_slug]['id'] : 0;
+                    $validation = LSD_Entity_Listing::validate_file_attribute_value($attribute_value, $term_id, $attribute_label, true);
+
+                    if ($validation['valid'])
+                    {
+                        $lsd['attributes'][$attribute_slug] = $validation['value'] ?? '';
+                        continue;
+                    }
+
+                    $message = $validation['message'] ?? '';
+                    if (!$message) continue;
+
+                    $errors['list'][] = $message;
+                    if (!isset($errors['fields']['attribute_files'])) $errors['fields']['attribute_files'] = [];
+                    $errors['fields']['attribute_files'][$attribute_slug] = $message;
+                }
+            }
+        }
+
         // Description Length
         if (trim($restrictions['description_length']) != '' && strlen(trim(wp_strip_all_tags($post_content))) > $restrictions['description_length'])
         {
-            $errors[] = sprintf(
+            $errors['list'][] = sprintf(
                 /* translators: 1: Allowed character count, 2: Current character count. */
                 esc_html__("The maximum length for listing content is %1\$s characters. You've written %2\$s characters.", 'listdom'),
                 $restrictions['description_length'],
@@ -598,7 +991,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Maximum Tags
         if (trim($restrictions['max_tags']) != '' && $this->is_enabled('tags') && count($tags) > $restrictions['max_tags'])
         {
-            $errors[] = sprintf(
+            $errors['list'][] = sprintf(
                 /* translators: 1: Maximum allowed tags, 2: Current tag count. */
                 esc_html__("The maximum allowed tags is %1\$s tags. You've added %2\$s tags.", 'listdom'),
                 $restrictions['max_tags'],
@@ -607,7 +1000,17 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         }
 
         // There are some Errors
-        if (count($errors)) $this->response(['success' => 0, 'message' => '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>']);
+        if (count($errors['list']))
+        {
+            $response = [
+                'success' => 0,
+                'message' => '<ul><li>' . implode('</li><li>', $errors['list']) . '</li></ul>',
+            ];
+
+            if (!empty($errors['fields'])) $response['data'] = $errors['fields'];
+
+            $this->response($response);
+        }
 
         // Trigger Event
         do_action('lsd_dashboard_validation', $lsd, $id);
@@ -616,12 +1019,28 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $status = 'pending';
         if (current_user_can('publish_posts')) $status = 'publish';
 
+        // Forced Status by Settings
+        $forced_listing_status = $this->settings['dashboard_listing_status'] ?? '';
+        $apply_forced_status_to_guest = !empty($this->settings['dashboard_listing_status_guest']);
+        $is_guest_submission = !get_current_user_id();
+        if (
+            $id <= 0
+            && in_array($forced_listing_status, ['publish', 'pending'], true)
+            && (!$is_guest_submission || $apply_forced_status_to_guest)
+        ) $status = $forced_listing_status;
+
         // Filter Listing Status
         $status = apply_filters('lsd_default_listing_status', $status, $lsd);
         $status = apply_filters('lsd_dashboard_listing_status', $status, $lsd);
 
         // Status by Request
-        if (current_user_can('publish_posts') && isset($lsd['listing_status']) && trim($lsd['listing_status'])) $status = $lsd['listing_status'];
+        if (
+            (!$forced_listing_status || $id > 0)
+            && current_user_can('publish_posts')
+            && isset($lsd['listing_status'])
+            && trim($lsd['listing_status'])
+        )
+            $status = $lsd['listing_status'];
 
         // Create New Listing
         if ($id <= 0)
@@ -676,6 +1095,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             wp_set_post_terms($id, LSD_Taxonomies::name($labels, LSD_Base::TAX_LABEL), LSD_Base::TAX_LABEL);
         }
 
+        // Normalize Category Selections
+        $primary_category_id = isset($lsd['listing_category']) ? (int) $lsd['listing_category'] : 0;
+        $lsd['listing_categories'] = $primary_category_id
+            ? array_values(array_unique(array_merge([$primary_category_id], $lsd['listing_categories'])))
+            : array_values(array_unique($lsd['listing_categories']));
+
         // Featured Image
         if ($this->is_enabled('image'))
         {
@@ -692,10 +1117,28 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = LSD_Entity_Listing::restore_rich_attribute_values($lsd, $raw_lsd);
+        $lsd['_lsd_submission'] = 1;
 
         // Save the Data
         $entity = new LSD_Entity_Listing($id);
         $entity->save($lsd);
+
+        // Assign Author for approved guest listings
+        $guest_registration = $this->settings['submission_guest_registration'] ?? 'approval';
+        if ($status === 'publish' && $is_guest_submission && $guest_registration === 'approval')
+        {
+            $guest_email = get_post_meta($id, 'lsd_guest_email', true);
+            if (is_email($guest_email))
+            {
+                $owner_id = (int) get_post_field('post_author', $id);
+                if (!$owner_id)
+                {
+                    $fullname = (string) get_post_meta($id, 'lsd_guest_fullname', true);
+                    LSD_User::listing($id, $guest_email, '', $fullname);
+                }
+            }
+        }
 
         if ($status == 'publish') $message = sprintf(
             /* translators: %s: Link to view the published listing. */
@@ -729,36 +1172,46 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
 
+        $profile_fields = LSD_User::profile_edit_fields();
+        $current_user = get_userdata($user_id);
+        if (!($current_user instanceof WP_User)) $this->response(['success' => 0, 'message' => esc_html__('User not found!', 'listdom')]);
+
         // Save the Data
         $user_data = [
             'ID' => $user_id,
             'first_name' => $lsd['first_name'] ?? '',
             'last_name' => $lsd['last_name'] ?? '',
-            'description' => $lsd['bio'] ?? '',
-            'user_email' => $lsd['email'] ?? '',
+            'description' => !empty($profile_fields['bio']) ? ($lsd['bio'] ?? '') : $current_user->description,
+            'user_email' => !empty($profile_fields['email']) ? ($lsd['email'] ?? '') : $current_user->user_email,
         ];
 
         // Update core user fields
         wp_update_user($user_data);
 
-        $meta_keys = [
-            'lsd_job_title' => 'job_title',
-            'lsd_profile_image' => 'profile_image',
-            'lsd_hero_image' => 'hero_image',
-            'lsd_phone' => 'phone',
-            'lsd_mobile' => 'mobile',
-            'lsd_website' => 'website',
-            'lsd_fax' => 'fax',
-            'lsd_facebook' => 'facebook',
-            'lsd_twitter' => 'twitter',
-            'lsd_pinterest' => 'pinterest',
-            'lsd_linkedin' => 'linkedin',
-            'lsd_instagram' => 'instagram',
-            'lsd_whatsapp' => 'whatsapp',
-            'lsd_youtube' => 'youtube',
-            'lsd_tiktok' => 'tiktok',
-            'lsd_telegram' => 'telegram',
-        ];
+        $meta_keys = [];
+
+        if (!empty($profile_fields['profile_image'])) $meta_keys['lsd_profile_image'] = 'profile_image';
+        if (!empty($profile_fields['hero_image'])) $meta_keys['lsd_hero_image'] = 'hero_image';
+        if (!empty($profile_fields['job_title'])) $meta_keys['lsd_job_title'] = 'job_title';
+        if (!empty($profile_fields['phone'])) $meta_keys['lsd_phone'] = 'phone';
+        if (!empty($profile_fields['mobile'])) $meta_keys['lsd_mobile'] = 'mobile';
+        if (!empty($profile_fields['website'])) $meta_keys['lsd_website'] = 'website';
+        if (!empty($profile_fields['fax'])) $meta_keys['lsd_fax'] = 'fax';
+
+        $social_fields = isset($profile_fields['social']) && is_array($profile_fields['social']) ? $profile_fields['social'] : [];
+
+        foreach ($social_fields as $network => $enabled)
+        {
+            if ((int) $enabled !== 1) continue;
+
+            $network = sanitize_key($network);
+            if ($network === '') continue;
+
+            $field_name = $network;
+            if ($network === 'tiktok' && !isset($lsd[$field_name]) && isset($lsd['Tiktok'])) $field_name = 'Tiktok';
+
+            $meta_keys['lsd_' . $network] = $field_name;
+        }
 
         // Update user meta
         foreach ($meta_keys as $meta_key => $field_name)
@@ -931,12 +1384,18 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if (!function_exists('wp_handle_upload')) require_once ABSPATH . 'wp-admin/includes/file.php';
 
         $images = isset($_FILES['files']) && is_array($_FILES['files']) ? $_FILES['files'] : [];
+        $count = isset($images['name']) && is_array($images['name']) ? count($images['name']) : 0;
 
         // No images
-        if (!count($images)) $this->response(['success' => 0, 'message' => esc_html__('Please upload an image!', 'listdom')]);
+        if (!$count) $this->response(['success' => 0, 'message' => esc_html__('Please upload an image!', 'listdom')]);
 
         // Get restrictions
         $restrictions = $this->get_restriction_rules();
+        $max_gallery_images = isset($restrictions['max_gallery_images']) ? (int) $restrictions['max_gallery_images'] : 0;
+
+        $existing_ids = isset($_POST['existing_ids']) ? array_map('intval', (array) wp_unslash($_POST['existing_ids'])) : [];
+        $existing_ids = array_filter($existing_ids);
+        $existing_count = count($existing_ids);
 
         // Allowed Extensions
         $allowed = ['jpeg', 'jpg', 'png', 'webp'];
@@ -947,7 +1406,34 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $data = [];
         $errors = [];
 
-        $count = count($images['name']);
+        if ($max_gallery_images > 0)
+        {
+            $available_slots = $max_gallery_images - $existing_count;
+            if ($available_slots <= 0)
+            {
+                $this->response([
+                    'success' => 0,
+                    'message' => sprintf(
+                        /* translators: %s: Maximum number of gallery images allowed. */
+                        esc_html__('You can upload up to %s gallery images.', 'listdom'),
+                        $max_gallery_images
+                    ),
+                    'data' => [],
+                ]);
+            }
+
+            if ($count > $available_slots)
+            {
+                $errors[] = sprintf(
+                    /* translators: %s: Number of images that can still be uploaded. */
+                    esc_html__('You can only upload %s more image(s).', 'listdom'),
+                    max(0, $available_slots)
+                );
+
+                $count = $available_slots;
+            }
+        }
+
         for ($i = 0; $i < $count; $i++)
         {
             $image = [
@@ -1041,5 +1527,55 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         }
 
         return $valid;
+    }
+
+    public function ajax_refresh_additional_categories()
+    {
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_dashboard')) $this->response(['success' => 0 ,'message' => esc_html__('Security nonce is not valid!', 'listdom')]);
+
+        $post_id = isset($_POST['post_id']) ? (int) $_POST['post_id'] : 0;
+        $primary_id = isset($_POST['primary_id']) ? (int) $_POST['primary_id'] : 0;
+
+        $selected = isset($_POST['selected']) && is_array($_POST['selected']) ? array_map('intval', $_POST['selected']) : [];
+        $selected = array_values(array_filter(array_unique($selected)));
+
+        $settings = LSD_Options::settings();
+        $children_only = !empty($settings['submission_category_children_only']);
+
+        if (empty($selected) && $post_id)
+        {
+            $selected = wp_get_post_terms($post_id, LSD_Base::TAX_CATEGORY, ['fields' => 'ids']);
+            if (is_wp_error($selected)) $selected = [];
+        }
+
+        if ($children_only && !$primary_id) $this->response(['success' => 0, 'html' => '<p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2">' . esc_html__('Please select a primary category first.', 'listdom') . '</p>']);
+        if ($children_only && $primary_id)
+        {
+            $selected = array_values(array_filter($selected, function ($cat_id) use ($primary_id) {
+                $cat_id = (int) $cat_id;
+                if (!$cat_id || $cat_id === $primary_id) return false;
+
+                $ancestors = get_ancestors($cat_id, LSD_Base::TAX_CATEGORY);
+                return in_array($primary_id, $ancestors, true);
+            }));
+        }
+
+        $parent = $children_only ? $primary_id : 0;
+        $html = LSD_Dashboard_Terms::category([
+            'taxonomy' => LSD_Base::TAX_CATEGORY,
+            'key' => 'additional_' . LSD_Base::TAX_CATEGORY,
+            'parent' => $parent,
+            'level' => 0,
+            'hide_empty' => 0,
+            'orderby' => 'name',
+            'order' => 'ASC',
+            'name' => 'lsd[additional_categories]',
+            'pre' => '',
+            'post_id' => $post_id,
+            'selected' => $selected,
+        ]);
+
+        $this->response(['success' => 1,'html' => $html]);
     }
 }

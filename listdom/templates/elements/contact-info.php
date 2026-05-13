@@ -38,13 +38,13 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
         <?php if ($phone): ?>
             <li>
                 <?php if ($display_icon): ?>
-                    <strong><i class="lsd-icon fas fa-phone-alt"></i></strong>
+                    <strong><i class="lsd-fe-icon fas fa-phone-alt"></i></strong>
                 <?php endif; ?>
                 <?php if ($display_label): ?>
                     <span class="lsd-contact-info-label"><?php esc_html_e('Phone', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
                 <?php endif; ?>
-                <span <?php echo lsd_schema()->telephone(); ?>>
-                    <a href="tel:<?php echo esc_attr($phone); ?>"><?php echo esc_html($phone); ?></a>
+                <span>
+                    <a <?php echo lsd_schema()->telephone(); ?> href="tel:<?php echo esc_attr($phone); ?>"><?php echo esc_html($phone); ?></a>
                 </span>
             </li>
         <?php endif; ?>
@@ -52,7 +52,7 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
         <?php if ($email): ?>
             <li>
                 <?php if ($display_icon): ?>
-                    <strong><i class="lsd-icon fa fa-envelope"></i></strong>
+                    <strong><i class="lsd-fe-icon fa fa-envelope"></i></strong>
                 <?php endif; ?>
                 <?php if ($display_label): ?>
                     <span class="lsd-contact-info-label"><?php esc_html_e('Email', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
@@ -66,7 +66,7 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
         <?php if ($website): ?>
             <li>
                 <?php if ($display_icon): ?>
-                    <strong><i class="lsd-icon fas fa-link"></i></strong>
+                    <strong><i class="lsd-fe-icon fas fa-link"></i></strong>
                 <?php endif; ?>
                 <?php if ($display_label): ?>
                     <span class="lsd-contact-info-label"><?php esc_html_e('Website', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
@@ -81,12 +81,14 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
         <?php if ($contact_address): ?>
             <li>
                 <?php if ($display_icon): ?>
-                    <strong><i class="lsd-icon fas fa-search-location"></i></strong>
+                    <strong><i class="lsd-fe-icon fas fa-search-location"></i></strong>
                 <?php endif; ?>
                 <?php if ($display_label): ?>
                     <span class="lsd-contact-info-label"><?php esc_html_e('Address', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
                 <?php endif; ?>
-                <span <?php echo lsd_schema()->address(); ?>><?php echo esc_html($contact_address); ?></span>
+                <span <?php echo lsd_schema()->address(); ?>>
+                    <span itemprop="streetAddress"><?php echo esc_html($contact_address); ?></span>
+                </span>
             </li>
         <?php endif; ?>
 

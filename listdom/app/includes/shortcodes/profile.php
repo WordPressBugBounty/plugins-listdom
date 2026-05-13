@@ -87,16 +87,14 @@ class LSD_Shortcodes_Profile extends LSD_Base
 
     public function user_profile($user, $size = 264)
     {
-        $profile_image_id = $user['profile_image'] ?? null;
+        $user_id = isset($user['ID']) ? (int) $user['ID'] : 0;
+        $profile_image_url = $user_id ? LSD_User::get_user_image_url($user_id, 'lsd_profile_image') : '';
 
-        if ($profile_image_id)
+        if ($profile_image_url)
         {
-            $profile_image_url = wp_get_attachment_url($profile_image_id);
             return '<img src="' . esc_url($profile_image_url) . '" class="avatar avatar-'.esc_attr($size).' photo" height="'.esc_attr($size).'" width="'.esc_attr($size).'" alt="'.esc_attr__('Profile Image', 'listdom').'">';
         }
-        else
-        {
-            return LSD_User::get_user_avatar($user['email'] ?? '', $size);
-        }
+
+        return LSD_User::get_user_avatar($user['email'] ?? '', $size);
     }
 }

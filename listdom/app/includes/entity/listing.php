@@ -18,20 +18,25 @@ class LSD_Entity_Listing extends LSD_Entity
         // Edit Locked?
         if (get_post_meta($this->post->ID, 'lsd_lock_edit', true)) return;
 
+        $submission = !empty($data['_lsd_submission']);
+        if (isset($data['_lsd_submission'])) unset($data['_lsd_submission']);
+
         $category = isset($data['listing_category']) ? sanitize_text_field($data['listing_category']) : '';
         $term = $category ? get_term_by('term_id', $category, LSD_Base::TAX_CATEGORY) : null;
+        $additional_categories = isset($data['listing_categories']) && is_array($data['listing_categories'])
+            ? array_filter(array_map('intval', $data['listing_categories']))
+            : [];
 
         // Category is valid
         if (trim($category) && !empty($term) && !is_wp_error($term))
         {
-            // Append Category
-            $append = apply_filters('lsd_is_addcat_installed', false);
+            $categories = array_unique(array_merge([$term->term_id], $additional_categories));
 
             // Category Term
-            wp_set_object_terms($this->post->ID, $term->term_id, LSD_Base::TAX_CATEGORY, $append);
+            wp_set_object_terms($this->post->ID, $categories, LSD_Base::TAX_CATEGORY, false);
 
             // Primary Category Meta
-            update_post_meta($this->post->ID, 'lsd_primary_category', $term->term_id);
+            update_post_meta($this->post->ID, 'lsd_primary_category', $term->slug);
         }
         // A valid category is required!
         else if ($trigger_actions)
@@ -59,16 +64,40 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_shape_paths', isset($data['shape_paths']) ? sanitize_text_field($data['shape_paths']) : '');
         update_post_meta($this->post->ID, 'lsd_shape_radius', isset($data['shape_radius']) ? sanitize_text_field($data['shape_radius']) : '');
 
-        // Attributes
-        $attributes = $data['attributes'] ?? [];
-        update_post_meta($this->post->ID, 'lsd_attributes', $attributes);
-
         // Save attributes one by one
-        $attributes_input = $data['attributes'] ?? [];
+        $attributes_input = isset($data['attributes']) && is_array($data['attributes']) ? $data['attributes'] : [];
+        $existing_attributes = get_post_meta($this->post->ID, 'lsd_attributes', true);
+        if (!is_array($existing_attributes)) $existing_attributes = [];
+
+        $attribute_context = LSD_Taxonomies_Attribute::context([
+            'post_id' => (int) $this->post->ID,
+            'category_id' => ($term && !is_wp_error($term) && isset($term->term_id)) ? (int) $term->term_id : 0,
+            'category_slug' => ($term && !is_wp_error($term) && isset($term->slug)) ? sanitize_title($term->slug) : '',
+            'submission' => $submission,
+        ]);
+
         $attribute_types = [];
+        $attribute_editors = [];
+        $attribute_term_ids = [];
+        $attribute_labels = [];
         foreach (LSD_Main::get_attributes_details() as $attribute_detail)
         {
-            $attribute_types[$attribute_detail['slug']] = $attribute_detail['field_type'];
+            $slug = $attribute_detail['slug'] ?? '';
+            if (!$slug) continue;
+
+            $attribute_types[$slug] = $attribute_detail['field_type'] ?? '';
+            $attribute_editors[$slug] = !empty($attribute_detail['editor']);
+            $attribute_term_ids[$slug] = isset($attribute_detail['id']) ? (int) $attribute_detail['id'] : 0;
+            $attribute_labels[$slug] = $attribute_detail['name'] ?? $slug;
+
+            if (
+                !array_key_exists($slug, $attributes_input)
+                && array_key_exists($slug, $existing_attributes)
+                && !LSD_Taxonomies_Attribute::applies($attribute_term_ids[$slug], $attribute_context)
+            )
+            {
+                $attributes_input[$slug] = $existing_attributes[$slug];
+            }
         }
 
         $normalized_attributes = [];
@@ -82,7 +111,14 @@ class LSD_Entity_Listing extends LSD_Entity
             }
             else
             {
-                $normalized_value = $this->normalize_attribute_value($attribute_value, $attribute_types[$key] ?? '');
+                $normalized_value = $this->normalize_attribute_value(
+                    $attribute_value,
+                    $attribute_types[$key] ?? '',
+                    $attribute_editors[$key] ?? false,
+                    $attribute_term_ids[$key] ?? 0,
+                    $attribute_labels[$key] ?? $key,
+                    $trigger_actions
+                );
                 $normalized_attributes[$key] = $normalized_value;
                 $stored_value = $normalized_value;
             }
@@ -114,6 +150,27 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_website', isset($data['website']) ? esc_url($data['website']) : '');
         update_post_meta($this->post->ID, 'lsd_contact_address', isset($data['contact_address']) ? sanitize_text_field($data['contact_address']) : '');
 
+        $cta_text = isset($data['cta_text']) ? sanitize_text_field($data['cta_text']) : '';
+        $cta_options = ['details', 'lightbox', 'custom', 'popup'];
+
+        $cta_target = isset($data['cta_target']) ? sanitize_text_field($data['cta_target']) : 'details';
+        if (!in_array($cta_target, $cta_options, true)) $cta_target = 'details';
+        if ($cta_target === 'popup' && !LSD_Base::isPro()) $cta_target = 'details';
+
+        $cta_mode = isset($data['cta_mode']) ? sanitize_text_field($data['cta_mode']) : 'custom';
+        if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'custom';
+
+        $cta_url = isset($data['cta_url']) ? esc_url_raw($data['cta_url']) : '';
+        $cta_popup = isset($data['cta_popup']) ? wp_kses_post($data['cta_popup']) : '';
+
+        update_post_meta($this->post->ID, 'lsd_call_to_action', [
+            'mode' => $cta_mode,
+            'text' => $cta_text,
+            'target' => $cta_target,
+            'url' => $cta_url,
+            'content' => $cta_popup,
+        ]);
+
         if (!empty($data['privacy_consent']) && LSD_Privacy::is_consent_enabled('dashboard'))
         {
             $log_extra = [
@@ -144,6 +201,9 @@ class LSD_Entity_Listing extends LSD_Entity
 
         // Embeds
         update_post_meta($this->post->ID, 'lsd_embeds', isset($data['embeds']) && is_array($data['embeds']) ? $this->indexify($data['embeds']) : []);
+
+        // FAQs
+        update_post_meta($this->post->ID, 'lsd_faqs', isset($data['faqs']) && is_array($data['faqs']) ? $this->indexify($data['faqs']) : []);
 
         // Guest Data
         if (isset($data['guest_email']))
@@ -269,10 +329,10 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID, $args);
     }
 
-    public function get_featured_image($size = 'full')
+    public function get_featured_image($size = 'full', string $itemprop = 'image')
     {
         $element = new LSD_Element_Image();
-        return $element->get($size, $this->post->ID);
+        return $element->get($size, $this->post->ID, $itemprop);
     }
 
     public function get_cover_image($size = [390, 260], $link_method = 'normal', string $style = '')
@@ -311,6 +371,12 @@ class LSD_Entity_Listing extends LSD_Entity
     {
         $element = new LSD_Element_Embed();
         return $element->get($this->post->ID);
+    }
+
+    public function get_faqs($limit = 0)
+    {
+        $element = new LSD_Element_Faq();
+        return $element->get($this->post->ID, $limit);
     }
 
     public function get_featured_video()
@@ -432,6 +498,18 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID);
     }
 
+    public function get_cta(string $context = 'archive', array $args = [])
+    {
+        if (!LSD_Components::cta()) return '';
+
+        $element = new LSD_Element_Cta();
+
+        $args['context'] = $context;
+        $args['listing'] = $this;
+
+        return $element->get($this->post->ID, $args);
+    }
+
     public function get_related_listings($args = [])
     {
         if (!LSD_Components::related()) return '';
@@ -454,6 +532,7 @@ class LSD_Entity_Listing extends LSD_Entity
 
         // Marker
         $marker = '<div class="lsd-marker-container" style="background-color: ' . esc_attr($bgcolor) . '">
+            <span class="lsd-marker-inner"></span>
             ' . $icon . '
         </div>';
 
@@ -498,10 +577,13 @@ class LSD_Entity_Listing extends LSD_Entity
     public static function get_primary_category($listing_id)
     {
         // Primary Category
-        $primary_id = get_post_meta($listing_id, 'lsd_primary_category', true);
-        if ($primary_id)
+        $primary = get_post_meta($listing_id, 'lsd_primary_category', true);
+        if ($primary)
         {
-            $term = get_term($primary_id);
+            $term = get_term_by('slug', sanitize_title((string) $primary), LSD_Base::TAX_CATEGORY);
+            if ($term instanceof WP_Term) return $term;
+
+            $term = is_numeric($primary) ? get_term((int) $primary, LSD_Base::TAX_CATEGORY) : null;
             if ($term instanceof WP_Term) return $term;
         }
 
@@ -642,9 +724,205 @@ class LSD_Entity_Listing extends LSD_Entity
         else return LSD_Kses::element($this->get_title());
     }
 
-    protected function normalize_attribute_value($value, string $type): string
+    public static function normalize_file_extensions($extensions): array
+    {
+        if (is_array($extensions)) $values = $extensions;
+        else if (is_string($extensions) && trim($extensions) !== '') $values = preg_split('/[\s,]+/', $extensions);
+        else $values = [];
+
+        $normalized = [];
+        foreach ($values as $extension)
+        {
+            $extension = strtolower(trim((string) $extension));
+            $extension = ltrim($extension, '.');
+            $extension = preg_replace('/[^a-z0-9]/', '', $extension);
+
+            if ($extension === '') continue;
+            if (in_array($extension, $normalized, true)) continue;
+
+            $normalized[] = $extension;
+        }
+
+        return $normalized;
+    }
+
+    protected static function get_file_rules(int $term_id): array
+    {
+        $extensions_raw = get_term_meta($term_id, 'lsd_file_extensions', true);
+        $max_size_raw = get_term_meta($term_id, 'lsd_file_max_size', true);
+
+        $max_size = is_numeric($max_size_raw) ? (int) $max_size_raw : 0;
+        if ($max_size < 0) $max_size = 0;
+
+        return [
+            'extensions' => self::normalize_file_extensions($extensions_raw),
+            'max_size' => $max_size,
+        ];
+    }
+
+    public static function validate_file_attribute_value($value, int $term_id, string $label = '', bool $enforce_size_validation = false): array
+    {
+        if (is_array($value) || is_object($value))
+        {
+            return [
+                'valid' => false,
+                'value' => '',
+                'message' => sprintf(
+                    /* translators: %s: Custom field label. */
+                    esc_html__('The selected file for "%s" is invalid.', 'listdom'),
+                    $label !== '' ? $label : esc_html__('File', 'listdom')
+                ),
+            ];
+        }
+
+        $value = trim((string) $value);
+        if ($value === '')
+        {
+            return [
+                'valid' => true,
+                'value' => '',
+                'message' => '',
+            ];
+        }
+
+        $attachment_id = 0;
+        $file_url = '';
+        $file_path = '';
+
+        if (is_numeric($value))
+        {
+            $attachment_id = (int) $value;
+            $file_url = (string) wp_get_attachment_url($attachment_id);
+            $file_path = (string) get_attached_file($attachment_id);
+        }
+        else if (filter_var($value, FILTER_VALIDATE_URL))
+        {
+            $file_url = esc_url_raw($value);
+            $attachment_id = (int) attachment_url_to_postid($file_url);
+
+            if ($attachment_id)
+            {
+                $file_path = (string) get_attached_file($attachment_id);
+            }
+        }
+
+        if (!$attachment_id && $file_url === '')
+        {
+            return [
+                'valid' => false,
+                'value' => '',
+                'message' => sprintf(
+                    /* translators: %s: Custom field label. */
+                    esc_html__('The selected file for "%s" is invalid.', 'listdom'),
+                    $label !== '' ? $label : esc_html__('File', 'listdom')
+                ),
+            ];
+        }
+
+        $file_name = '';
+        if ($file_path !== '') $file_name = wp_basename($file_path);
+        if ($file_name === '' && $file_url !== '')
+        {
+            $path = wp_parse_url($file_url, PHP_URL_PATH);
+            if (is_string($path) && trim($path) !== '') $file_name = wp_basename($path);
+        }
+        if ($file_name === '') $file_name = $value;
+
+        $extension = '';
+        if ($file_name !== '')
+        {
+            $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+            $extension = preg_replace('/[^a-z0-9]/', '', $extension);
+        }
+
+        $file_size = 0;
+        if ($file_path !== '' && file_exists($file_path))
+        {
+            $size = filesize($file_path);
+            if ($size !== false) $file_size = (int) $size;
+        }
+
+        $rules = self::get_file_rules($term_id);
+        if (count($rules['extensions']) && (!trim($extension) || !in_array($extension, $rules['extensions'], true)))
+        {
+            return [
+                'valid' => false,
+                'value' => '',
+                'message' => sprintf(
+                    /* translators: 1: Custom field label, 2: Allowed extensions list. */
+                    esc_html__('The selected file for "%1$s" has an invalid extension. Allowed extensions are: %2$s.', 'listdom'),
+                    $label !== '' ? $label : esc_html__('File', 'listdom'),
+                    implode(', ', $rules['extensions'])
+                ),
+            ];
+        }
+
+        if ($enforce_size_validation && $rules['max_size'] > 0 && $file_size > 0 && $file_size > ($rules['max_size'] * 1024))
+        {
+            return [
+                'valid' => false,
+                'value' => '',
+                'message' => sprintf(
+                    /* translators: 1: Custom field label, 2: Maximum allowed size in KB. */
+                    esc_html__('The selected file for "%1$s" exceeds the maximum allowed size of %2$s KB.', 'listdom'),
+                    $label !== '' ? $label : esc_html__('File', 'listdom'),
+                    $rules['max_size']
+                ),
+            ];
+        }
+
+        return [
+            'valid' => true,
+            'value' => $attachment_id ? (string) $attachment_id : $file_url,
+            'message' => '',
+        ];
+    }
+
+    public static function restore_rich_attribute_values(array $data, array $raw_data): array
+    {
+        if (
+            !isset($data['attributes'], $raw_data['attributes']) ||
+            !is_array($data['attributes']) ||
+            !is_array($raw_data['attributes'])
+        ) return $data;
+
+        foreach (LSD_Main::get_attributes_details() as $attribute_detail)
+        {
+            if (($attribute_detail['field_type'] ?? '') !== 'textarea' || empty($attribute_detail['editor'])) continue;
+
+            $slug = $attribute_detail['slug'] ?? '';
+            if ($slug === '' || !array_key_exists($slug, $raw_data['attributes'])) continue;
+
+            $raw_value = $raw_data['attributes'][$slug];
+            if (is_array($raw_value) || is_object($raw_value)) continue;
+
+            $data['attributes'][$slug] = wp_unslash((string) $raw_value);
+        }
+
+        return $data;
+    }
+
+    protected function normalize_attribute_value($value, string $type, bool $editor = false, int $term_id = 0, string $label = '', bool $trigger_actions = false): string
     {
         if (is_array($value) || is_object($value)) return '';
+
+        if ($type === 'textarea')
+        {
+            if ($editor)
+            {
+                $value = wp_kses_post((string) $value);
+                if (trim(wp_strip_all_tags($value)) === '') return '';
+
+                return $value;
+            }
+
+            $value = sanitize_textarea_field((string) $value);
+            $value = trim($value);
+
+            if ($value === '') return '';
+
+            return $value;
+        }
 
         $value = sanitize_text_field((string) $value);
         $value = trim($value);
@@ -655,8 +933,8 @@ class LSD_Entity_Listing extends LSD_Entity
         {
             case 'date':
 
-                $dt = \DateTime::createFromFormat('Y-m-d', $value);
-                if ($dt instanceof \DateTime) return sanitize_text_field($dt->format('Y-m-d'));
+                $dt = DateTime::createFromFormat('Y-m-d', $value);
+                if ($dt instanceof DateTime) return sanitize_text_field($dt->format('Y-m-d'));
 
                 $timestamp = strtotime($value);
                 if ($timestamp !== false) return sanitize_text_field(lsd_date('Y-m-d', $timestamp));
@@ -667,8 +945,8 @@ class LSD_Entity_Listing extends LSD_Entity
 
                 foreach (['H:i', 'H:i:s'] as $format)
                 {
-                    $dt = \DateTime::createFromFormat($format, $value);
-                    if ($dt instanceof \DateTime) return sanitize_text_field($dt->format($format));
+                    $dt = DateTime::createFromFormat($format, $value);
+                    if ($dt instanceof DateTime) return sanitize_text_field($dt->format($format));
                 }
 
                 $timestamp = strtotime($value);
@@ -682,14 +960,25 @@ class LSD_Entity_Listing extends LSD_Entity
 
                 foreach (['Y-m-d\TH:i', 'Y-m-d\TH:i:s', 'Y-m-d H:i', 'Y-m-d H:i:s'] as $format)
                 {
-                    $dt = \DateTime::createFromFormat($format, $normalized);
-                    if ($dt instanceof \DateTime) return sanitize_text_field($dt->format('Y-m-d\TH:i'));
+                    $dt = DateTime::createFromFormat($format, $normalized);
+                    if ($dt instanceof DateTime) return sanitize_text_field($dt->format('Y-m-d\TH:i'));
                 }
 
                 $timestamp = strtotime(str_replace('T', ' ', $normalized));
                 if ($timestamp !== false) return sanitize_text_field(lsd_date('Y-m-d\TH:i', $timestamp));
 
                 break;
+
+            case 'file':
+
+                $validation = self::validate_file_attribute_value($value, $term_id, wp_strip_all_tags($label));
+                if (!$validation['valid'])
+                {
+                    if ($trigger_actions && !empty($validation['message'])) LSD_Flash::add($validation['message'], 'error');
+                    return '';
+                }
+
+                return (string) ($validation['value'] ?? '');
 
             default:
                 break;

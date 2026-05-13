@@ -30,6 +30,7 @@ $index = 0;
                 <?php endif; ?>
             </div>
 
+            <?php if ($this->has_body($listing) || $this->has_after_content_hook()): ?>
             <div class="lsd-listing-body lsd-mosaic-right-side<?php echo (($index - 3) % 4 === 0) || (($index - 4) % 4 === 0) ? ' lsd-right-side-even-rows' : '' ?>">
                 <?php if ($this->display_categories): ?>
                     <div class="lsd-listing-categories">
@@ -59,6 +60,7 @@ $index = 0;
 
                 <div class="lsd-divider"></div>
 
+                <?php if ($this->has_bottom_bar($listing)): ?>
                 <div class="lsd-listing-bottom-bar">
                     <?php if ($listing->get_price() && $this->display_price): ?>
                         <div class="lsd-listing-price" <?php echo lsd_schema()->priceRange(); ?>>
@@ -71,12 +73,20 @@ $index = 0;
                         </div>
                     <?php endif; ?>
                 </div>
+                <?php endif; ?>
 
                 <?php if ($this->display_review_stars): ?>
                     <?php echo LSD_Kses::element($listing->get_rate_stars('stars', false)); ?>
                 <?php endif; ?>
 
+                <?php if ($this->display_cta): ?>
+                    <div class="lsd-listing-call-to-action">
+                        <?php echo $this->listing_cta($listing); ?>
+                    </div>
+                <?php endif; ?>
+
             </div>
+            <?php endif; ?>
         </div>
     </div>
 <?php endforeach;

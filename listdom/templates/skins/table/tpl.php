@@ -4,17 +4,18 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Skins_Table $this */
 
+// Columns metadata
+$display = $this->get_table_columns_display();
+$fields = $display['fields'];
+$titles = $display['titles'];
+
+$columns_config = $this->get_table_columns_config();
+
+$columns_config_json = wp_json_encode($columns_config);
+if (!$columns_config_json) $columns_config_json = '{}';
+
 // Get HTML of Listings
 $listings_html = $this->listings_html();
-
-// Fields
-$fields = new LSD_Fields();
-
-$columns = isset($this->skin_options['columns']) && is_array($this->skin_options['columns']) && count($this->skin_options['columns'])
-    ? $this->skin_options['columns']
-    : $fields->get();
-
-$titles = $fields->titles($columns);
 
 // Add List Skin JS codes to footer
 $assets = new LSD_Assets();
@@ -30,7 +31,7 @@ jQuery(document).ready(function()
         atts: "' . http_build_query(['atts' => $this->atts], '', '&') . '",
         next_page: "' . $this->next_page . '",
         limit: "' . $this->limit . '",
-        nonce: "' . esc_js(wp_create_nonce('lsd_search_form')) . '",
+        columns: ' . $columns_config_json . ',
     });
 });
 </script>');
@@ -50,15 +51,22 @@ jQuery(document).ready(function()
                 <div class="lsd-h-scroll-shadow lsd-h-scroll-shadow-left"></div>
                 <div class="lsd-h-scroll-shadow lsd-h-scroll-shadow-right"></div>
                 <div class="lsd-h-scroll-shadow-content lsd-table-view-listings-wrapper">
-                    <table class="lsd-listing-table">
+                    <table class="lsd-listing-table ">
                         <thead>
                             <tr class="lsd-listing-head">
-                                <?php foreach ($titles as $key => $title): ?>
-                                    <?php if (isset($columns[$key]['enabled']) && $columns[$key]['enabled'] == '1'): ?>
-                                        <th style="width: <?php echo isset($columns[$key]['width']) && is_numeric($columns[$key]['width']) ? $columns[$key]['width'] . 'px' : '150px'; ?>">
-                                            <?php echo esc_html($title); ?>
-                                        </th>
-                                    <?php endif; ?>
+                                <?php foreach ($display['columns_union'] as $key => $column): ?>
+                                    <?php
+                                    $key_class = sanitize_html_class($key);
+                                    $enabled = isset($display['desktop_enabled'][$key]) ? (int) $display['desktop_enabled'][$key] : 0;
+                                    $width = isset($display['desktop_width'][$key]) ? (int) $display['desktop_width'][$key] : 150;
+                                    if ($width <= 0) $width = 150;
+
+                                    $classes = ['lsd-table-column', 'lsd-table-column-' . $key_class];
+                                    if (!$enabled) $classes[] = 'lsd-table-column-hidden';
+                                    ?>
+                                    <th class="<?php echo esc_attr(implode(' ', $classes)); ?>" data-column="<?php echo esc_attr($key); ?>" style="width: <?php echo esc_attr($width); ?>px;">
+                                        <?php echo esc_html($titles[$key] ?? ''); ?>
+                                    </th>
                                 <?php endforeach; ?>
                             </tr>
                         </thead>

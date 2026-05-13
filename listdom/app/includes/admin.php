@@ -11,11 +11,19 @@ class LSD_Admin extends LSD_Base
 
     public function init()
     {
+        // Listdom Reports
+        $report = new LSD_Plugin_Report();
+        $report->init();
+
         // Activation Redirect
         add_action('admin_init', [$this, 'post_activate']);
 
         // Notices
         add_action('admin_notices', ['LSD_Flash', 'show']);
+        add_action('admin_notices', [$this, 'general_settings_roles_notice']);
+        add_action('user_new_form', [$this, 'user_profile_roles_notice']);
+        add_action('edit_user_profile', [$this, 'user_profile_roles_notice']);
+        add_action('show_user_profile', [$this, 'user_profile_roles_notice']);
 
         // Database Tables
         add_action('admin_init', function ()
@@ -30,6 +38,9 @@ class LSD_Admin extends LSD_Base
         // Block Admin Access
         add_action('admin_init', [$this, 'block_admin']);
         add_filter('show_admin_bar', [$this, 'show_admin_bar']);
+
+        // Admin Body Class
+        add_filter('admin_body_class', [$this, 'admin_body_class']);
 
         // WordPress Dashboard Widget
         add_action('wp_dashboard_setup', [$this, 'dashboard_widget']);
@@ -77,6 +88,24 @@ class LSD_Admin extends LSD_Base
         return is_user_logged_in() && $this->is_admin_allowed();
     }
 
+    public function admin_body_class($classes): string
+    {
+        if (!is_admin()) return $classes;
+        if (!function_exists('get_current_screen')) return $classes;
+
+        $screen = get_current_screen();
+        if (!$screen || $screen->post_type !== LSD_Base::PTYPE_LISTING || $screen->base !== 'post') return $classes;
+
+        $action = isset($_GET['action']) ? sanitize_text_field(wp_unslash($_GET['action'])) : '';
+        $post_id = isset($_GET['post']) ? intval($_GET['post']) : 0;
+
+        if ($action !== 'edit' || $post_id <= 0) return $classes;
+        if (get_post_type($post_id) !== LSD_Base::PTYPE_LISTING) return $classes;
+
+        if (strpos($classes, 'lsd-edit-listing-page') === false) $classes .= ' lsd-edit-listing-page';
+        return $classes;
+    }
+
     private function is_admin_allowed(): bool
     {
         return !$this->is_admin_blocked();
@@ -93,6 +122,48 @@ class LSD_Admin extends LSD_Base
         }
 
         return true;
+    }
+
+    public function general_settings_roles_notice(): void
+    {
+        if (!current_user_can('manage_options')) return;
+        if (!function_exists('get_current_screen')) return;
+
+        $screen = get_current_screen();
+        if (!$screen || $screen->id !== 'options-general') return;
+
+        ?>
+        <div class="notice notice-info">
+            <p>
+                <strong><?php esc_html_e('Listdom roles:', 'listdom'); ?></strong>
+                <?php echo esc_html($this->roles_notice_description()); ?>
+            </p>
+        </div>
+        <?php
+    }
+
+    public function user_profile_roles_notice($user): void
+    {
+        if (!current_user_can('promote_users')) return;
+
+        ?>
+        <tr class="form-field">
+            <th></th>
+            <td>
+                <div class="notice notice-info">
+                    <p class="description">
+                        <strong><?php esc_html_e('Listdom roles:', 'listdom'); ?></strong>
+                        <?php echo esc_html($this->roles_notice_description()); ?>
+                    </p>
+                </div>
+            </td>
+        </tr>
+        <?php
+    }
+
+    private function roles_notice_description(): string
+    {
+        return __('Listdom adds two new WordPress roles. Listdom Authors can create listings and manage their own submissions, while Listdom Publishers can publish listings directly and manage published ones.', 'listdom');
     }
 
     public function dashboard_widget(): void
@@ -183,6 +254,7 @@ class LSD_Admin extends LSD_Base
                 'title' => $title,
                 'url' => $url,
                 'menus' => $menus,
+                'notice' => LSD_Admin::get_header_notice(),
             ],
         ]);
     }
@@ -238,6 +310,26 @@ class LSD_Admin extends LSD_Base
         ]);
     }
 
+    private static function get_header_notice(): string
+    {
+        $screen = get_current_screen();
+
+        $notice = '';
+        if (
+            $screen->post_type === LSD_Base::PTYPE_RECURRING &&
+            $screen->base === 'edit' &&
+            LSD_Base::isLite()
+        )
+        {
+            $notice = LSD_Base::alert(
+                LSD_Base::missFeatureMessage(esc_html__('Recurring Payments', 'listdom')),
+                'warning'
+            );
+        }
+
+        return apply_filters('lsd_backend_header_notice', $notice);
+    }
+
     public function post_states($states, $post)
     {
         if ($post->post_type !== 'page') return $states;
@@ -259,6 +351,7 @@ class LSD_Admin extends LSD_Base
 
         $settings = LSD_Options::settings();
         $auth = LSD_Options::auth();
+        $payments = LSD_Options::payments();
 
         $pages = [
             $settings['submission_page'] ?? 0 => esc_html__('Listdom Dashboard Page', 'listdom'),
@@ -272,6 +365,8 @@ class LSD_Admin extends LSD_Base
             $auth['forgot_password']['redirect'] ?? 0 => esc_html__('Listdom Forgot Password Redirect Page', 'listdom'),
             $auth['logout']['redirect'] ?? 0 => esc_html__('Listdom Logout Redirect Page', 'listdom'),
             $auth['account']['redirect'] ?? 0 => esc_html__('Listdom Account Redirect Page', 'listdom'),
+            $payments['checkout_page'] ?? 0 => esc_html__('Listdom Checkout Page', 'listdom'),
+            $payments['appreciation_page'] ?? 0 => esc_html__('Listdom Payment Appreciation Page', 'listdom'),
         ];
 
         // Include search form results pages

@@ -18,6 +18,7 @@ foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
     </div>
     <?php endif; ?>
 
+    <?php if ($this->has_body($listing) || $this->has_after_content_hook()): ?>
     <div class="lsd-listing-body">
         <div class="lsd-listing-title-wrapper">
             <?php if ($this->display_title): ?>
@@ -43,6 +44,7 @@ foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
 
         <?php do_action('lsd_skins_after_content', $this, $listing); ?>
 
+        <?php if ($this->has_bottom_bar($listing)): ?>
         <div class="lsd-listing-bottom-bar">
             <?php if ($this->display_review_stars): ?>
                 <?php echo LSD_Kses::element($listing->get_rate_stars('stars', false)); ?>
@@ -53,7 +55,13 @@ foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
                 </div>
             <?php endif; ?>
         </div>
+        <?php endif; ?>
+        <?php if ($this->display_cta): ?>
+            <div class="lsd-listing-call-to-action">
+                <?php echo $this->listing_cta($listing); ?>
+            </div>
+        <?php endif; ?>
     </div>
-
+    <?php endif; ?>
 </div>
 <?php endforeach;

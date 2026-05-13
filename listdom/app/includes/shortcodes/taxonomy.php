@@ -26,6 +26,9 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         // Shortcode Style
         $style = $this->atts['style'] ?? $this->default_style;
 
+        // Hierarchical only work for "simple" style
+        if ($style !== 'simple') $this->atts['hierarchical'] = 0;
+
         // The style is invalid!
         if (!in_array($style, $this->valid_styles))
         {

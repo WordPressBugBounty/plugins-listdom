@@ -28,6 +28,8 @@ class LSD_Menus_Addons extends LSD_Menus
             set_transient('lsd_addons', $addons, WEEK_IN_SECONDS);
         }
 
+        if (is_array($addons)) $addons = apply_filters('lsd_addons_catalog', $addons);
+
         // Return All Addons
         if ($all) return $addons;
 

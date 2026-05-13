@@ -2,9 +2,6 @@
 
 class LSD_Menus_Dashboard extends LSD_Menus
 {
-    /**
-     * @var string
-     */
     public $tab;
 
     public function output()

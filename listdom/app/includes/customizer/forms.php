@@ -95,16 +95,16 @@ class LSD_Customizer_Forms extends LSD_Customizer
                             'bg' => [
                                 'type' => 'color',
                                 'title' => esc_html__('Background Color', 'listdom'),
-                                'default' => '',
+                                'default' => '#fff',
                             ],
                             'padding' => [
                                 'type' => 'padding',
                                 'title' => esc_html__('Padding', 'listdom'),
                                 'default' => [
-                                    'top' => 0,
-                                    'right' => 0,
-                                    'bottom' => 0,
-                                    'left' => 0,
+                                    'top' => 10,
+                                    'right' => 10,
+                                    'bottom' => 10,
+                                    'left' => 10,
                                 ],
                             ],
                             'border' => [
@@ -204,7 +204,7 @@ class LSD_Customizer_Forms extends LSD_Customizer
                     'bottom' => 1,
                     'left' => 1,
                     'style' => 'solid',
-                    'color' => '#f4f5f7',
+                    'color' => '#D8D8D8',
                     'radius' => 10,
                 ], $defaults['border'] ?? []),
             ],

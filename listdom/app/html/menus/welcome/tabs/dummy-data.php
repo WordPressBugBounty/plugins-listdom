@@ -3,6 +3,7 @@
 defined('ABSPATH') || die();
 
 $dummy = LSD_Options::dummy();
+$settings = LSD_Options::settings();
 ?>
 <div class="lsd-welcome-step-content lsd-util-hide" id="step-3">
     <div class="lsd-welcome-content-header">

@@ -1,10 +1,23 @@
 // Requests Object for Skins
 let listdomPageHistoryCache = window.location.href;
 
+function lsdNormalizeQueryKeys(keys) {
+    if (Array.isArray(keys)) return keys.filter(key => typeof key === 'string' && key.length);
+    if (typeof keys === 'string' && keys.length) return [keys];
+
+    return [];
+}
+
+function lsdClearQueryKeys(searchParams, keys) {
+    lsdNormalizeQueryKeys(keys).forEach(function (key) {
+        searchParams.delete(key);
+    });
+}
+
 // Listdom PAGE HISTORY PLUGIN
 function ListdomPageHistory() {
-    this.push = function (url, update = true) {
-        listdomPageHistoryCache = this.apply(listdomPageHistoryCache, url);
+    this.push = function (url, update = true, clearKeys = []) {
+        listdomPageHistoryCache = this.apply(listdomPageHistoryCache, url, clearKeys);
 
         if (update) {
             try {
@@ -18,18 +31,23 @@ function ListdomPageHistory() {
         }
     };
 
-    this.apply = function (source_qs, new_qs) {
+    this.apply = function (source_qs, new_qs, clearKeys = []) {
         source_qs = decodeURI(source_qs);
         new_qs = decodeURI(new_qs);
 
         if (new_qs.substring(0, 1) === "?") new_qs = new_qs.substring(1);
-        let key_value_vars = new_qs.split("&");
-
         let url = new URL(source_qs);
-        for (let i in key_value_vars) {
-            let key_value_var = key_value_vars[i].split("=");
-            url.searchParams.set(key_value_var[0], key_value_var[1]);
-        }
+        let new_qs_sp = new URLSearchParams(new_qs);
+
+        lsdClearQueryKeys(url.searchParams, clearKeys);
+
+        new_qs_sp.forEach(function (value, key) {
+            url.searchParams.delete(key);
+        });
+
+        new_qs_sp.forEach(function (value, key) {
+            url.searchParams.append(key, value);
+        });
 
         return url.toString();
     };
@@ -44,6 +62,27 @@ function lsdShouldUpdateAddressBar(id) {
     return true;
 }
 
+function lsdResetTimelineCarousel($skin) {
+    if (typeof jQuery === 'undefined') return;
+    const $ = jQuery;
+    const $timeline = ($skin && $skin.length) ? $skin.find('.lsd-timeline-items') : $();
+
+    if (!$timeline.length) return;
+
+    const hasOwlCarousel = typeof $.fn !== 'undefined' && typeof $.fn.owlCarousel === 'function';
+    if (hasOwlCarousel && $timeline.hasClass('owl-loaded')) {
+        $timeline.trigger('destroy.owl.carousel');
+    }
+
+    $timeline.removeClass('owl-loaded owl-hidden owl-drag owl-grab');
+
+    const $stageOuter = $timeline.children('.owl-stage-outer');
+    if ($stageOuter.length) $stageOuter.children().unwrap();
+
+    const $stage = $timeline.children('.owl-stage');
+    if ($stage.length) $stage.children().unwrap();
+}
+
 // Requests Object for Skins
 let listdomRequests = {};
 
@@ -52,7 +91,7 @@ function ListdomRequest(id, settings) {
     this.id = id;
     this.settings = settings;
 
-    this.get = function (request, atts) {
+    this.get = function (request, atts, clearKeys = []) {
         // Get Cached Request
         let cached = listdomRequests[this.id];
         if (!cached) cached = "?";
@@ -64,13 +103,7 @@ function ListdomRequest(id, settings) {
 
         // Render new Request
         let newParameters = atts + "&" + request;
-        let rendered = this.apply(cached, newParameters);
-
-        if (this.settings && typeof this.settings.nonce !== "undefined" && this.settings.nonce) {
-            let params = new URLSearchParams(rendered);
-            params.set("_wpnonce", this.settings.nonce);
-            rendered = params.toString();
-        }
+        let rendered = this.apply(cached, newParameters, clearKeys);
 
         // Push to Object
         listdomRequests[this.id] = rendered;
@@ -79,12 +112,14 @@ function ListdomRequest(id, settings) {
         return rendered;
     };
 
-    this.apply = function (source_qs, new_qs) {
+    this.apply = function (source_qs, new_qs, clearKeys = []) {
         source_qs = decodeURI(source_qs);
         new_qs = decodeURI(new_qs);
 
         let source_qs_sp = new URLSearchParams(source_qs);
         let new_qs_sp = new URLSearchParams(new_qs);
+
+        lsdClearQueryKeys(source_qs_sp, clearKeys);
 
         // Remove New Keys from Source Query String
         new_qs_sp.forEach(function (value, key) {
@@ -378,10 +413,10 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
@@ -645,10 +680,10 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
@@ -803,8 +838,29 @@ function ListdomDetails(id, link, settings) {
         // List Wrapper
         const $list_wrapper = $('.lsd-list-wrapper');
 
+        let columnsConfig = settings.columns || null;
+        if (columnsConfig && typeof columnsConfig === 'string') {
+            try {
+                columnsConfig = JSON.parse(columnsConfig);
+            } catch (e) {
+                columnsConfig = null;
+            }
+        }
+
+        let currentDevice = null;
+        let resizeTimer = null;
+
         // Set the listeners
         setListeners();
+
+        applyColumns(true);
+
+        $(window).on('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                applyColumns();
+            }, 150);
+        });
 
         function setListeners() {
             // Set load more listener
@@ -909,13 +965,154 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
+            });
+        }
+
+        function detectDevice() {
+            const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            if (width <= 568) return 'mobile';
+            if (width <= 992) return 'tablet';
+            return 'desktop';
+        }
+
+        function applyColumns(force = false) {
+            if (!columnsConfig || !columnsConfig.desktop) return;
+
+            const device = detectDevice();
+            if (!force && device === currentDevice) return;
+            currentDevice = device;
+
+            const baseConfig = columnsConfig.desktop || { columns: [] };
+            const baseColumns = Array.isArray(baseConfig.columns) ? baseConfig.columns : [];
+
+            let deviceConfig = columnsConfig[device] || {};
+            const inherit = device !== 'desktop' && (typeof deviceConfig.inherit === 'undefined' || parseInt(deviceConfig.inherit));
+            if (inherit) deviceConfig = baseConfig;
+
+            const deviceColumns = Array.isArray(deviceConfig.columns) && deviceConfig.columns.length
+                ? deviceConfig.columns
+                : baseColumns;
+
+            const baseLabels = {};
+            baseColumns.forEach((col) => {
+                if (!col || !col.key) return;
+                if (typeof col.label !== 'undefined') baseLabels[col.key] = col.label;
+            });
+
+            const deviceLabels = {};
+            deviceColumns.forEach((col) => {
+                if (!col || !col.key) return;
+                if (typeof col.label !== 'undefined') deviceLabels[col.key] = col.label;
+            });
+
+            const unionKeys = [];
+            const addKeys = (columns) => {
+                columns.forEach((col) => {
+                    if (!col || !col.key) return;
+                    if (!unionKeys.includes(col.key)) unionKeys.push(col.key);
+                });
+            };
+
+            addKeys(baseColumns);
+            addKeys(deviceColumns);
+
+            const baseEnabled = {};
+            const baseWidth = {};
+            baseColumns.forEach((col) => {
+                if (!col || !col.key) return;
+                baseEnabled[col.key] = parseInt(col.enabled) ? 1 : 0;
+                if (typeof col.width !== 'undefined' && col.width !== '') {
+                    baseWidth[col.key] = parseInt(col.width, 10);
+                }
+            });
+
+            const deviceEnabled = {};
+            const deviceWidth = {};
+            deviceColumns.forEach((col) => {
+                if (!col || !col.key) return;
+                if (typeof col.enabled !== 'undefined' && col.enabled !== '') deviceEnabled[col.key] = parseInt(col.enabled) ? 1 : 0;
+                if (typeof col.width !== 'undefined' && col.width !== '') deviceWidth[col.key] = parseInt(col.width, 10);
+            });
+
+            const desiredOrder = [];
+            deviceColumns.forEach((col) => {
+                if (!col || !col.key) return;
+                if (!desiredOrder.includes(col.key)) desiredOrder.push(col.key);
+            });
+            unionKeys.forEach((key) => {
+                if (!desiredOrder.includes(key)) desiredOrder.push(key);
+            });
+
+            const $table = $("#lsd_skin" + settings.id + " .lsd-listing-table");
+            if (!$table.length) return;
+
+            const $headRow = $table.find('thead tr').first();
+            const $bodyRows = $table.find('tbody tr');
+
+            const reorderCells = ($row, selector) => {
+                const cells = {};
+                $row.find(selector).each(function () {
+                    const $cell = $(this);
+                    const key = $cell.data('column');
+                    if (!key) return;
+                    cells[key] = $cell;
+                });
+
+                desiredOrder.forEach((key) => {
+                    if (cells[key]) $row.append(cells[key]);
+                });
+            };
+
+            reorderCells($headRow, 'th');
+            $bodyRows.each(function () {
+                reorderCells($(this), 'td');
+            });
+
+            $headRow.find('th').each(function () {
+                const $cell = $(this);
+                const key = $cell.data('column');
+                if (!key) return;
+
+                if (Object.prototype.hasOwnProperty.call(deviceLabels, key)) $cell.text(deviceLabels[key]);
+                else if (Object.prototype.hasOwnProperty.call(baseLabels, key)) $cell.text(baseLabels[key]);
+            });
+
+            const updateVisibility = ($row, selector) => {
+                $row.find(selector).each(function () {
+                    const $cell = $(this);
+                    const key = $cell.data('column');
+                    if (!key) return;
+
+                    const enabled = typeof deviceEnabled[key] !== 'undefined'
+                        ? deviceEnabled[key]
+                        : (device === 'desktop'
+                            ? (baseEnabled[key] || 0)
+                            : (typeof baseEnabled[key] !== 'undefined' ? baseEnabled[key] : 0));
+
+                    if (enabled) $cell.removeClass('lsd-table-column-hidden');
+                    else $cell.addClass('lsd-table-column-hidden');
+
+                    let width = '';
+                    if (typeof deviceWidth[key] !== 'undefined') width = deviceWidth[key];
+                    else if (typeof baseWidth[key] !== 'undefined') width = baseWidth[key];
+
+                    width = parseInt(width, 10);
+                    if (!width || width <= 0) width = 150;
+
+                    $cell.css('width', width + 'px');
+                });
+            };
+
+            updateVisibility($headRow, 'th');
+            $bodyRows.each(function () {
+                updateVisibility($(this), 'td');
             });
         }
 
@@ -979,6 +1176,7 @@ function ListdomDetails(id, link, settings) {
 
                         // Trigger
                         listdom_onload();
+                        applyColumns(true);
                     }
                 },
                 error: function () {
@@ -1029,6 +1227,7 @@ function ListdomDetails(id, link, settings) {
 
                         // Trigger
                         listdom_onload();
+                        applyColumns(true);
                     }
 
                     // Loading Style
@@ -1173,18 +1372,20 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
             });
 
-            $('.lsd-accordion-body').hide();
+            $("#lsd_skin" + settings.id + " .lsd-accordion-body").hide();
 
-            $('.lsd-accordion-header').on('click', function() {
+            $(document)
+            .off('click.listdomAccordion' + settings.id, "#lsd_skin" + settings.id + ' .lsd-accordion-header')
+            .on('click.listdomAccordion' + settings.id, "#lsd_skin" + settings.id + ' .lsd-accordion-header', function() {
                 const $header = $(this);
                 const $body = $header.next('.lsd-accordion-body');
 
@@ -1193,10 +1394,8 @@ function ListdomDetails(id, link, settings) {
 
                 // Toggle current body and initialize slider when shown
                 $body.stop(true, true).slideToggle(400, function() {
-                    if ($body.is(':visible')) {
-                        if (typeof listdom_image_slider === 'function') {
-                            listdom_image_slider();
-                        }
+                    if ($body.is(':visible') && typeof listdom_image_slider === 'function') {
+                        listdom_image_slider();
                     }
                 });
 
@@ -1359,6 +1558,7 @@ function ListdomDetails(id, link, settings) {
         req.get("", settings.atts);
 
         setListeners();
+        listdom_enable_listing_container_clicks($wrapper);
 
         function setListeners() {
             if (masonry) {
@@ -1455,10 +1655,10 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
@@ -1501,6 +1701,8 @@ function ListdomDetails(id, link, settings) {
                         // Append Items
                         if (!append) $("#lsd_skin" + settings.id + " .lsd-listing-wrapper").html(response.html);
                         else $("#lsd_skin" + settings.id + " .lsd-listing-wrapper").append(response.html);
+
+                        listdom_enable_listing_container_clicks($wrapper);
 
                         // Update Pagination
                         $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper").replaceWith(response.pagination);
@@ -1572,7 +1774,7 @@ function ListdomDetails(id, link, settings) {
     };
 })(jQuery);
 
-// Listdom Accordion SKIN PLUGIN
+// Listdom Timeline SKIN PLUGIN
 (function ($) {
     $.fn.listdomTimelineSkin = function (options) {
         // Default Options
@@ -1606,21 +1808,36 @@ function ListdomDetails(id, link, settings) {
 
         // List Wrapper
         const $list_wrapper = $wrapper.find('.lsd-list-wrapper');
-        const $items_wrapper = $wrapper.find('.lsd-timeline-items');
+        let $items_wrapper = $wrapper.find('.lsd-timeline-items');
         const isHorizontal = parseInt(settings.horizontal) === 1;
         const autoplay = parseInt(settings.autoplay) === 1;
         const parsedColumns = parseInt(settings.columns, 10);
         const parsedLimit = parseInt(settings.limit, 10);
         const normalizedLimit = Math.max(1, isNaN(parsedLimit) ? 1 : parsedLimit);
         const columns = Math.max(1, isNaN(parsedColumns) ? normalizedLimit : parsedColumns);
-        const itemsPerPage = isHorizontal ? columns : normalizedLimit;
-        settings.limit = itemsPerPage;
+        settings.limit = normalizedLimit;
         const horizontalAlignment = (settings.horizontal_alignment || 'zigzag').toString().toLowerCase();
 
         // Set the listener
         setListeners();
-        initCarousel();
-        if (isHorizontal) window.requestAnimationFrame(syncHorizontalTimeline);
+        rebuildHorizontalCarousel(true);
+        if (isHorizontal) {
+            $(window).on('resize orientationchange', function () {
+                window.requestAnimationFrame(syncHorizontalTimeline);
+            });
+        }
+        listdom_image_slider();
+
+        $(window).on('lsd-search-success', function (event) {
+            const detail = event.originalEvent ? event.originalEvent.detail : event.detail;
+            if (!detail || parseInt(detail.shortcode) !== parseInt(settings.id)) return;
+
+            rebuildHorizontalCarousel(true);
+        });
+
+        $(document).on('listdom:onload', function () {
+            rebuildHorizontalCarousel();
+        });
 
         function setListeners() {
             // Load More
@@ -1721,27 +1938,44 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
             });
         }
 
-        function syncHorizontalTimeline() {
+        function setItemsWrapper() {
+            const $currentWrapper = $wrapper.find('.lsd-timeline-items');
+            if ($currentWrapper.length) $items_wrapper = $currentWrapper;
+            return $items_wrapper;
+        }
+
+        function rebuildHorizontalCarousel(forceSync = false) {
+            const $currentWrapper = setItemsWrapper();
             if (!isHorizontal || !$items_wrapper.length) return;
 
-            const $timelines = $items_wrapper.find('.lsd-timeline');
-            if (!$timelines.length) return;
+            const needsInit = !$items_wrapper.hasClass('owl-loaded');
+            if (needsInit) initCarousel();
+
+            if (!needsInit || forceSync) {
+                window.requestAnimationFrame(syncHorizontalTimeline);
+            }
+        }
+
+        function syncHorizontalTimeline() {
+            const $currentWrapper = setItemsWrapper();
+            if (!isHorizontal || !$items_wrapper.length) return;
 
             const alignmentClasses = [
                 'lsd-timeline-align-top',
                 'lsd-timeline-align-bottom',
                 'lsd-timeline-align-zigzag',
             ];
+
             $items_wrapper.removeClass(alignmentClasses.join(' '));
 
             let wrapperAlignment = 'lsd-timeline-align-zigzag';
@@ -1749,20 +1983,48 @@ function ListdomDetails(id, link, settings) {
             else if (horizontalAlignment === 'bottom') wrapperAlignment = 'lsd-timeline-align-bottom';
 
             $items_wrapper.addClass(wrapperAlignment);
+            updateHorizontalPadding();
+        }
 
-            $timelines.each(function (index) {
-                const $timeline = $(this);
-                $timeline.removeClass('lsd-timeline-top lsd-timeline-bottom lsd-timeline-left lsd-timeline-right');
+        function updateHorizontalPadding() {
+            const $currentWrapper = setItemsWrapper();
+            const $stageOuter = $items_wrapper.closest('.lsd-listing-wrapper').find('.owl-stage-outer');
+            if (!$stageOuter.length) return;
 
-                if (horizontalAlignment === 'top') $timeline.addClass('lsd-timeline-top');
-                else if (horizontalAlignment === 'bottom') $timeline.addClass('lsd-timeline-bottom');
-                else if (index % 2 === 0) $timeline.addClass('lsd-timeline-top');
-                else $timeline.addClass('lsd-timeline-bottom');
+            const measureHeight = function (selector) {
+                let maxHeight = 0;
+                $items_wrapper.find(selector).each(function () {
+                    const height = $(this).outerHeight(true);
+                    if (!isNaN(height)) maxHeight = Math.max(maxHeight, height);
+                });
+                return maxHeight;
+            };
+
+            const topHeight = measureHeight('.lsd-timeline-top');
+            const bottomHeight = measureHeight('.lsd-timeline-bottom');
+            const buffer = 80;
+
+            const topPadding = Math.ceil(topHeight + buffer);
+            const bottomPadding = Math.ceil(bottomHeight + buffer);
+
+            $stageOuter.css({
+                'padding-top': topPadding + 'px',
+                'padding-bottom': bottomPadding + 'px',
             });
         }
 
         function initCarousel() {
+            const $currentWrapper = setItemsWrapper();
             if (!isHorizontal || !$items_wrapper.length || $items_wrapper.hasClass('owl-loaded')) return;
+            if (typeof $.fn === 'undefined' || typeof $.fn.owlCarousel === 'undefined') return;
+
+            const responsive = {
+                0: { items: Math.min(columns, 1) },
+                480: { items: Math.min(columns, 2) },
+                768: { items: Math.min(columns, 2) },
+                1024: { items: Math.min(columns, 3) },
+                1280: { items: columns },
+            };
 
             $items_wrapper.owlCarousel({
                 items: columns,
@@ -1771,51 +2033,53 @@ function ListdomDetails(id, link, settings) {
                 autoplayHoverPause: true,
                 dots: true,
                 nav: false,
-                margin: 30,
+                margin: 10,
                 responsiveClass: true,
-                autoHeight: true,
-                responsive: {
-                    0: { items: 2 },
-                    640: { items: Math.min(2, columns) },
-                    1024: { items: Math.min(3, columns) },
-                    1280: { items: columns },
-                },
+                autoHeight: false,
+                responsive: responsive,
             });
 
             window.requestAnimationFrame(syncHorizontalTimeline);
         }
 
         function renderListings(html, append = true) {
-            if (!$items_wrapper.length) {
-                if (!append) $list_wrapper.html(html);
-                else $list_wrapper.append(html);
+            const $content = $(html);
+            listdom_mount_fragment_assets($content);
+            const $items = $content
+            .filter('.lsd-timeline-item')
+            .add($content.find('.lsd-timeline-item'));
 
+            setItemsWrapper();
+            const hasOwl = isHorizontal && $items_wrapper.hasClass('owl-loaded');
+
+            // Replace mode
+            if (!append) {
+                if (hasOwl) {
+                    $items_wrapper
+                    .trigger('replace.owl.carousel', [$items])
+                    .trigger('refresh.owl.carousel');
+                } else {
+                    $items_wrapper.html($items);
+                    if (isHorizontal) initCarousel();
+                }
+
+                if (isHorizontal) requestAnimationFrame(syncHorizontalTimeline);
                 listdom_onload();
                 return;
             }
 
-            const $content = $(html);
-
-            if (!append) {
-                if (isHorizontal && $items_wrapper.hasClass('owl-loaded')) {
-                    $items_wrapper.trigger('replace.owl.carousel', [$content]).trigger('refresh.owl.carousel');
-                } else {
-                    $items_wrapper.html($content);
-                    if (isHorizontal) initCarousel();
-                }
+            // Append mode
+            if (hasOwl) {
+                $items.each(function () {
+                    $items_wrapper.trigger('add.owl.carousel', [$(this)]);
+                });
+                $items_wrapper.trigger('refresh.owl.carousel');
             } else {
-                if (isHorizontal && $items_wrapper.hasClass('owl-loaded')) {
-                    $content.each(function () {
-                        $items_wrapper.trigger('add.owl.carousel', [$(this)]);
-                    });
-                    $items_wrapper.trigger('refresh.owl.carousel');
-                } else {
-                    $items_wrapper.append($content);
-                    if (isHorizontal) initCarousel();
-                }
+                $items_wrapper.append($items);
+                if (isHorizontal) initCarousel();
             }
 
-            if (isHorizontal) window.requestAnimationFrame(syncHorizontalTimeline);
+            if (isHorizontal) requestAnimationFrame(syncHorizontalTimeline);
             listdom_onload();
         }
 
@@ -1859,6 +2123,7 @@ function ListdomDetails(id, link, settings) {
                         .removeClass("lsd-load-more-loading");
                         $list_wrapper.removeClass('lsd-loading');
 
+                        console.log(response);
                         // Append Items
                         renderListings(response.html, append);
 
@@ -2072,10 +2337,10 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
@@ -2352,10 +2617,10 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
@@ -2720,10 +2985,10 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Sync
-            $('body').on('lsd-sync', function (e, {id, request}) {
+            $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
                 if (id !== parseInt(settings.id)) return;
 
-                req.get(request);
+                req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
                 loadMore(false);
@@ -2924,11 +3189,9 @@ function ListdomDetails(id, link, settings) {
                     .children("div")
                     .attr("class");
 
-                const map_container_width = $(selector).width();
                 const offset = $(selector).offset();
                 const offset_top = offset.top;
 
-                $(selector).width(map_container_width);
                 $(selector).css("height", $(window).height());
                 $(selector + " > div").css("height", $(window).height());
                 $(selector).css("top", offset_top);
@@ -3158,6 +3421,10 @@ function ListdomDetails(id, link, settings) {
 
             // Update the view
             $wrapper.data("view", view);
+
+            if (typeof listdom_image_slider === "function") {
+                listdom_image_slider();
+            }
         }
 
         function sort(orderby, order) {
@@ -3245,7 +3512,18 @@ function ListdomDetails(id, link, settings) {
         setListeners();
 
         function setListeners() {
-            $(".lsd-skin-" + settings.id + "-carousel").owlCarousel({
+            const $carousel = $(".lsd-skin-" + settings.id + "-carousel");
+
+            $carousel.on(
+                "initialized.owl.carousel changed.owl.carousel",
+                function () {
+                    if (typeof listdom_image_slider === "function") listdom_image_slider();
+                    if (typeof listdom_trigger_compare_modal === "function") listdom_trigger_compare_modal();
+                    if (typeof listdom_trigger_compare === "function") listdom_trigger_compare();
+                }
+            );
+
+            $carousel.owlCarousel({
                 items: settings.items,
                 loop: parseInt(settings.loop) === 1,
                 autoplay: settings.autoplay,
@@ -3429,7 +3707,9 @@ function ListdomDetails(id, link, settings) {
         setListeners();
 
         function bindFilterClicks() {
-            $("#lsd_skin" + settings.id + " .lsd-masonry-filters").off("click", "a").on("click", "a", function () {
+            $("#lsd_skin" + settings.id)
+            .off("click", ".lsd-masonry-filters a")
+            .on("click", ".lsd-masonry-filters a", function () {
                 let e = $(this);
                 let f = e.attr("data-filter");
 
@@ -3439,7 +3719,7 @@ function ListdomDetails(id, link, settings) {
 
                 if (e.hasClass("lsd-selected")) return false;
 
-                e.parents(".lsd-masonry-filters")
+                e.closest(".lsd-masonry-filters")
                 .find(".lsd-selected")
                 .removeClass("lsd-selected");
                 e.addClass("lsd-selected");
@@ -3514,8 +3794,25 @@ function ListdomDetails(id, link, settings) {
             bindFilterClicks();
 
             // After Search
-            $(window).on('lsd-search-success', () => {
+            $(window).on('lsd-search-success', (event) => {
+                const detail = event.originalEvent ? event.originalEvent.detail : event.detail;
+                if (!detail || parseInt(detail.shortcode) !== parseInt(settings.id)) return;
+
                 masonry.isotope('reloadItems').isotope();
+            });
+
+            $('body').on('lsd-sync', function (e, data = {}) {
+                const {id, request, clearKeys = []} = data;
+                if (parseInt(id) !== parseInt(settings.id)) return;
+
+                const requestString = typeof request === "string" ? request : "";
+                const attsString = typeof settings.atts === "string" ? settings.atts : "";
+
+                req.get(requestString, attsString, clearKeys);
+                $("#lsd_skin" + settings.id).data("next-page", 1);
+                $list_wrapper.addClass('lsd-loading');
+
+                loadMore(false);
             });
         }
 
@@ -3673,7 +3970,9 @@ function ListdomDetails(id, link, settings) {
                 mapsearch: false,
                 autoGPS: false,
                 display_infowindow: true,
+                infowindow_trigger: "click",
                 geo_request: false,
+                mousewheel_zoom: false,
                 gps_zoom: {
                     zl: 13,
                     current: 7,
@@ -3684,7 +3983,7 @@ function ListdomDetails(id, link, settings) {
             },
             options
         );
-        
+
         // Listdom Request Plugin
         let req = new ListdomRequest(settings.id, settings);
         req.get("", settings.args + (settings.args && settings.atts ? "&" : "") + settings.atts);
@@ -3699,7 +3998,9 @@ function ListdomDetails(id, link, settings) {
 
         // Disable clustering if undefined
         if (settings.clustering && typeof L.markerClusterGroup === "undefined")
+        {
             settings.clustering = false;
+        }
 
         let canvas = this;
         let DOM = canvas[0];
@@ -3707,21 +4008,22 @@ function ListdomDetails(id, link, settings) {
 
         // Map Options
         let mapOptions = {
-            scrollWheelZoom: false,
+            scrollWheelZoom: settings.mousewheel_zoom,
             dragging: !L.Browser.mobile,
         };
 
         // Restrict Bounds
-        if (
-            settings.max_bounds &&
-            settings.max_bounds.ne &&
-            settings.max_bounds.sw
-        ) {
+        if (settings.max_bounds && settings.max_bounds.ne && settings.max_bounds.sw)
+        {
             if (
                 settings.max_bounds.ne.lat !== "" &&
                 settings.max_bounds.ne.lng !== "" &&
                 settings.max_bounds.sw.lat !== "" &&
-                settings.max_bounds.sw.lng !== ""
+                settings.max_bounds.sw.lng !== "" &&
+                settings.max_bounds.ne.lat != null &&
+                settings.max_bounds.ne.lng != null &&
+                settings.max_bounds.sw.lat != null &&
+                settings.max_bounds.sw.lng != null
             ) {
                 mapOptions.maxBounds = L.latLngBounds(
                     L.latLng(settings.max_bounds.sw.lat, settings.max_bounds.sw.lng),
@@ -3745,7 +4047,7 @@ function ListdomDetails(id, link, settings) {
         if (settings.clustering) {
             clustering = L.markerClusterGroup({
                 chunkedLoading: true,
-                spiderfyOnMaxZoom: false,
+                spiderfyOnMaxZoom: true,
             });
         }
 
@@ -3782,6 +4084,8 @@ function ListdomDetails(id, link, settings) {
             className: "listdom-leaflet-popup",
         };
 
+        const infowindowTrigger = settings.infowindow_trigger === "hover" ? "hover" : "click";
+
         // Extend Shapes
         extend();
 
@@ -3804,9 +4108,9 @@ function ListdomDetails(id, link, settings) {
         if (settings.autoGPS && !settings.geo_request) autoGPS();
 
         // Sync
-        $('body').on('lsd-sync', function (e, {id, request}) {
+        $('body').on('lsd-sync', function (e, { id, request, clearKeys = [] }) {
             if (id !== parseInt(settings.id)) return;
-            mapsearch_request(request);
+            mapsearch_request(request, clearKeys);
         });
 
         function loadObjects(objects) {
@@ -3815,6 +4119,9 @@ function ListdomDetails(id, link, settings) {
 
             const $sidebar = $('#lsd_skin' + settings.id + ' .lsd-map-sidebar-listings');
             if ($sidebar.length) $sidebar.html('');
+
+            // If clustering enabled, clear previous cluster layers (safety)
+            if (settings.clustering && clustering) clustering.clearLayers();
 
             for (let i in objects) {
                 f++;
@@ -3832,17 +4139,15 @@ function ListdomDetails(id, link, settings) {
             }
 
             // Fit the map to the boundaries
-            if (
-                updateBounds &&
-                (f > 1 || (f === 1 && dataObject.type !== "marker"))
-            ) {
+            if (updateBounds && (f > 1 || (f === 1 && dataObject.type !== "marker")))
+            {
                 map.fitBounds(bounds);
             } else if (updateBounds && f === 1 && dataObject.type === "marker") {
                 map.setView([dataObject.latitude, dataObject.longitude], settings.zoom);
             }
 
             // Apply Clustering
-            if (settings.clustering) map.addLayer(clustering);
+            if (settings.clustering && clustering && !map.hasLayer(clustering)) map.addLayer(clustering);
 
             // Mobile Sidebar
             if ($sidebar.length && !$sidebar.is(':empty') && $(window).width() <= 1024) {
@@ -3889,6 +4194,41 @@ function ListdomDetails(id, link, settings) {
                 // InfoWindow
                 if (markerData.onclick === "infowindow") {
                     marker.bindPopup(markerData.infowindow, popupOptions);
+                    marker.on("popupopen", listdom_bricks_infowindow_onload);
+
+                    if (infowindowTrigger === "hover") {
+                        marker.on("mouseover", function () {
+                            marker.openPopup();
+                        });
+
+                        marker.on("mouseout", function (event) {
+                            const icon = marker.getElement();
+                            if (icon && event && event.originalEvent) {
+                                const relatedTarget = event.originalEvent.relatedTarget;
+                                if (relatedTarget && icon.contains(relatedTarget)) return;
+                            }
+
+                            const popup = marker.getPopup();
+                            if (popup && popup.getElement() && event && event.originalEvent) {
+                                const relatedTarget = event.originalEvent.relatedTarget;
+                                if (relatedTarget && popup.getElement().contains(relatedTarget)) return;
+                            }
+
+                            marker.closePopup();
+                        });
+
+                        marker.on("popupopen", function (event) {
+                            if (marker._lsdHoverPopupBound) return;
+                            marker._lsdHoverPopupBound = true;
+
+                            const popupElement = event.popup.getElement();
+                            if (!popupElement) return;
+
+                            popupElement.addEventListener("mouseleave", function () {
+                                marker.closePopup();
+                            });
+                        });
+                    }
                 }
                 // Redirect
                 else if (markerData.onclick === "redirect") {
@@ -3907,9 +4247,8 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
-            // Add to Clustering
-            if (settings.clustering) clustering.addLayer(marker);
-            // Add to Map
+            // Add to clustering or map
+            if (settings.clustering && clustering) clustering.addLayer(marker);
             else marker.addTo(map);
 
             // Extend the bounds to include each marker's position
@@ -3934,6 +4273,7 @@ function ListdomDetails(id, link, settings) {
                 // InfoWindow
                 if (shapeData.onclick === "infowindow") {
                     shape.bindPopup(shapeData.infowindow, popupOptions);
+                    shape.on("popupopen", listdom_bricks_infowindow_onload);
                 }
                 // Redirect
                 else if (shapeData.onclick === "redirect") {
@@ -3948,15 +4288,12 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
-            // Add to Clustering
-            if (settings.clustering) clustering.addLayer(shape);
-            // Add to Map
-            else {
-                shape.addTo(map);
+            // Add to clustering or map
+            if (settings.clustering && clustering) clustering.addLayer(shape);
+            else shape.addTo(map);
 
-                // Extend the bounds to include each shape's position
-                bounds.extend(shape.getBounds());
-            }
+            // Extend the bounds to include each shape's position
+            bounds.extend(shape.getBounds());
 
             // Add to Loaded Objects
             loadedObjects.push(shape);
@@ -3976,6 +4313,7 @@ function ListdomDetails(id, link, settings) {
                 // InfoWindow
                 if (shapeData.onclick === "infowindow") {
                     shape.bindPopup(shapeData.infowindow, popupOptions);
+                    shape.on("popupopen", listdom_bricks_infowindow_onload);
                 }
                 // Redirect
                 else if (shapeData.onclick === "redirect") {
@@ -3990,9 +4328,8 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
-            // Add to Clustering
-            if (settings.clustering) clustering.addLayer(shape);
-            // Add to Map
+            // Add to clustering or map
+            if (settings.clustering && clustering) clustering.addLayer(shape);
             else shape.addTo(map);
 
             // Extend the bounds to include each shape's position
@@ -4021,6 +4358,7 @@ function ListdomDetails(id, link, settings) {
                 // InfoWindow
                 if (shapeData.onclick === "infowindow") {
                     shape.bindPopup(shapeData.infowindow, popupOptions);
+                    shape.on("popupopen", listdom_bricks_infowindow_onload);
                 }
                 // Redirect
                 else if (shapeData.onclick === "redirect") {
@@ -4035,9 +4373,8 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
-            // Add to Clustering
-            if (settings.clustering) clustering.addLayer(shape);
-            // Add to Map
+            // Add to clustering or map
+            if (settings.clustering && clustering) clustering.addLayer(shape);
             else shape.addTo(map);
 
             // Extend the bounds to include each shape's position
@@ -4068,6 +4405,7 @@ function ListdomDetails(id, link, settings) {
                 // InfoWindow
                 if (shapeData.onclick === "infowindow") {
                     shape.bindPopup(shapeData.infowindow, popupOptions);
+                    shape.on("popupopen", listdom_bricks_infowindow_onload);
                 }
                 // Redirect
                 else if (shapeData.onclick === "redirect") {
@@ -4082,9 +4420,8 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
-            // Add to Clustering
-            if (settings.clustering) clustering.addLayer(shape);
-            // Add to Map
+            // Add to clustering or map
+            if (settings.clustering && clustering) clustering.addLayer(shape);
             else shape.addTo(map);
 
             // Extend the bounds to include each shape's position
@@ -4098,8 +4435,8 @@ function ListdomDetails(id, link, settings) {
             for (let i in objects) {
                 let object = objects[i];
 
-                if (settings.clustering) clustering.removeLayer(object);
-                else map.removeLayer(object);
+                if (settings.clustering && clustering && clustering.hasLayer(object)) clustering.removeLayer(object);
+                else if (map.hasLayer(object)) map.removeLayer(object);
             }
         }
 
@@ -4123,8 +4460,7 @@ function ListdomDetails(id, link, settings) {
                 getLatLng: function () {
                     return this._latlng;
                 },
-                setLatLng: function () {
-                },
+                setLatLng: function () { },
             });
 
             // Extend Polygon
@@ -4137,8 +4473,7 @@ function ListdomDetails(id, link, settings) {
                 getLatLng: function () {
                     return this._latlng;
                 },
-                setLatLng: function () {
-                },
+                setLatLng: function () { },
             });
 
             // Extend Polyline
@@ -4151,8 +4486,7 @@ function ListdomDetails(id, link, settings) {
                 getLatLng: function () {
                     return this._latlng;
                 },
-                setLatLng: function () {
-                },
+                setLatLng: function () { },
             });
         }
 
@@ -4201,18 +4535,15 @@ function ListdomDetails(id, link, settings) {
 
             // Boundary Parameters
             let request =
-                "sf[min_latitude]=" +
-                lat_min +
-                "&sf[max_latitude]=" +
-                lat_max +
-                "&sf[min_longitude]=" +
-                lng_min +
-                "&sf[max_longitude]=" +
-                lng_max;
+                "sf[min_latitude]=" + lat_min +
+                "&sf[max_latitude]=" + lat_max +
+                "&sf[min_longitude]=" + lng_min +
+                "&sf[max_longitude]=" + lng_max;
+
             mapsearch_request(request);
         }
 
-        function mapsearch_request(request) {
+        function mapsearch_request(request, clearKeys = []) {
             // Freez the Map Search
             mapsearchFreez = true;
 
@@ -4229,7 +4560,8 @@ function ListdomDetails(id, link, settings) {
             // Push to History
             new ListdomPageHistory().push(
                 "?" + request,
-                lsdShouldUpdateAddressBar(settings.id)
+                lsdShouldUpdateAddressBar(settings.id),
+                clearKeys
             );
 
             // Loading Style
@@ -4240,7 +4572,7 @@ function ListdomDetails(id, link, settings) {
 
             $.ajax({
                 url: settings.ajax_url,
-                data: "action=lsd_ajax_search&" + req.get(request, settings.args),
+                data: "action=lsd_ajax_search&" + req.get(request, settings.args, clearKeys),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -4256,9 +4588,9 @@ function ListdomDetails(id, link, settings) {
                     }, 1000);
 
                     // Update Listings
-                    $("#lsd_skin" + settings.id + " .lsd-listing-wrapper").html(
-                        response.listings
-                    );
+                    const $skin = $("#lsd_skin" + settings.id);
+                    lsdResetTimelineCarousel($skin);
+                    $skin.find('.lsd-listing-wrapper').html(response.listings);
 
                     // Update Pagination
                     if($pagination.length) $pagination.replaceWith(response.pagination);
@@ -4276,6 +4608,12 @@ function ListdomDetails(id, link, settings) {
                     // Update the Next Page
                     $("#lsd_skin" + settings.id).data('next-page', response.next_page);
 
+                    // Search Success Event
+                    response.shortcode = settings.id;
+                    window.dispatchEvent(new CustomEvent('lsd-search-success', {
+                        detail: response
+                    }));
+
                     // Trigger
                     listdom_onload();
 
@@ -4285,13 +4623,13 @@ function ListdomDetails(id, link, settings) {
                             const shortcode_id = settings.connected_shortcodes[i];
                             $('body').trigger('lsd-sync', {
                                 id: shortcode_id,
-                                request: request
+                                request: request,
+                                clearKeys: clearKeys
                             });
                         }
                     }
                 },
-                error: function () {
-                },
+                error: function () { },
             });
         }
 
@@ -4351,8 +4689,10 @@ function ListdomDetails(id, link, settings) {
                 mapsearch: false,
                 autoGPS: false,
                 display_infowindow: true,
+                infowindow_trigger: "click",
                 geo_request: false,
                 max_bounds: {},
+                mousewheel_zoom: false,
                 gps_zoom: {
                     zl: 13,
                     current: 7,
@@ -4405,7 +4745,7 @@ function ListdomDetails(id, link, settings) {
         // Google Maps Options
         let mapOptions = $.extend(
             {
-                scrollwheel: false,
+                scrollwheel: settings.mousewheel_zoom,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
                 center: center,
                 zoom: settings.zoom,
@@ -4443,6 +4783,10 @@ function ListdomDetails(id, link, settings) {
 
         // Init map
         let map = new google.maps.Map(DOM, mapOptions);
+
+        const infowindowTrigger = settings.infowindow_trigger === "hover" ? "hover" : "click";
+        let infowindowHover = false;
+        let infowindowCloseTimer = null;
 
         // Init Infowindow
         let infowindow = new InfoBox({
@@ -4491,9 +4835,9 @@ function ListdomDetails(id, link, settings) {
         if (settings.direction.status) direction();
 
         // Sync
-        $('body').on('lsd-sync', function (e, {id, request}) {
+        $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
             if (id !== parseInt(settings.id)) return;
-            mapsearch_request(request);
+            mapsearch_request(request, clearKeys);
         });
 
         function loadObjects(objects) {
@@ -4577,9 +4921,38 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Marker Info-Window
-            settings.display_infowindow && google.maps.event.addListener(marker, 'click', function () {
-                // Open InfoWindow
-                if (this.lsd_onclick === 'infowindow') {
+            if (settings.display_infowindow) {
+                const cancelInfowindowClose = function () {
+                    if (infowindowCloseTimer) {
+                        clearTimeout(infowindowCloseTimer);
+                        infowindowCloseTimer = null;
+                    }
+                };
+
+                const scheduleInfowindowClose = function () {
+                    cancelInfowindowClose();
+                    infowindowCloseTimer = setTimeout(function () {
+                        if (!infowindowHover) infowindow.close();
+                    }, 150);
+                };
+
+                const bindInfowindowHover = function () {
+                    const infoBoxElement = DOM.querySelector(".infoBox");
+                    if (!infoBoxElement || infoBoxElement._lsdHoverBound) return;
+
+                    infoBoxElement._lsdHoverBound = true;
+                    infoBoxElement.addEventListener("mouseenter", function () {
+                        infowindowHover = true;
+                        cancelInfowindowClose();
+                    });
+
+                    infoBoxElement.addEventListener("mouseleave", function () {
+                        infowindowHover = false;
+                        scheduleInfowindowClose();
+                    });
+                };
+
+                const openMarkerInfowindow = function () {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
 
@@ -4597,17 +4970,45 @@ function ListdomDetails(id, link, settings) {
                         });
 
                     infowindow.open(map, this);
-                } else if (this.lsd_onclick === 'redirect') {
-                    window.location = this.lsd_link;
-                } else if (this.lsd_onclick === 'lightbox') {
-                    // Listdom Details Plugin
-                    new ListdomDetails(
-                        this.listing_id,
-                        this.raw_link,
-                        settings
-                    ).lightbox();
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+
+                    if (infowindowTrigger === "hover") {
+                        infowindowHover = true;
+                        cancelInfowindowClose();
+                        google.maps.event.addListenerOnce(infowindow, "domready", bindInfowindowHover);
+                    }
+                };
+
+                if (marker.lsd_onclick === 'infowindow') {
+                    if (infowindowTrigger === 'hover') {
+                        google.maps.event.addListener(marker, 'mouseover', function () {
+                            infowindowHover = true;
+                            cancelInfowindowClose();
+                            openMarkerInfowindow.call(this);
+                        });
+                        google.maps.event.addListener(marker, 'mouseout', function () {
+                            infowindowHover = false;
+                            scheduleInfowindowClose();
+                        });
+                        google.maps.event.addListener(marker, 'click', openMarkerInfowindow);
+                    } else {
+                        google.maps.event.addListener(marker, 'click', openMarkerInfowindow);
+                    }
+                } else if (marker.lsd_onclick === 'redirect') {
+                    google.maps.event.addListener(marker, 'click', function () {
+                        window.location = this.lsd_link;
+                    });
+                } else if (marker.lsd_onclick === 'lightbox') {
+                    google.maps.event.addListener(marker, 'click', function () {
+                        // Listdom Details Plugin
+                        new ListdomDetails(
+                            this.listing_id,
+                            this.raw_link,
+                            settings
+                        ).lightbox();
+                    });
                 }
-            });
+            }
 
             // Extend the bounds to include each marker's position
             bounds.extend(marker.position);
@@ -4639,24 +5040,32 @@ function ListdomDetails(id, link, settings) {
             };
 
             // Shape Info-Window
-            settings.display_infowindow && google.maps.event.addListener(shape, "click", function (event) {
-                // Open InfoWindow
-                if (this.lsd_onclick === "infowindow") {
+            if (settings.display_infowindow) {
+                const openShapeInfowindow = function (event) {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
                     infowindow.setPosition(event.latLng);
                     infowindow.open(map, this);
-                } else if (this.lsd_onclick === "redirect") {
-                    window.location = this.lsd_link;
-                } else if (this.lsd_onclick === "lightbox") {
-                    // Listdom Details Plugin
-                    new ListdomDetails(
-                        this.listing_id,
-                        this.raw_link,
-                        settings
-                    ).lightbox();
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+
+                if (shape.lsd_onclick === "infowindow") {
+                    google.maps.event.addListener(shape, "click", openShapeInfowindow);
+                } else if (shape.lsd_onclick === "redirect") {
+                    google.maps.event.addListener(shape, "click", function () {
+                        window.location = this.lsd_link;
+                    });
+                } else if (shape.lsd_onclick === "lightbox") {
+                    google.maps.event.addListener(shape, "click", function () {
+                        // Listdom Details Plugin
+                        new ListdomDetails(
+                            this.listing_id,
+                            this.raw_link,
+                            settings
+                        ).lightbox();
+                    });
                 }
-            });
+            }
 
             // Extend the bounds to include each shape's position
             bounds.union(shape.getBounds());
@@ -4699,24 +5108,32 @@ function ListdomDetails(id, link, settings) {
             };
 
             // Shape Info-Window
-            settings.display_infowindow && google.maps.event.addListener(shape, "click", function (event) {
-                // Open InfoWindow
-                if (this.lsd_onclick === "infowindow") {
+            if (settings.display_infowindow) {
+                const openShapeInfowindow = function (event) {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
                     infowindow.setPosition(event.latLng);
                     infowindow.open(map, this);
-                } else if (this.lsd_onclick === "redirect") {
-                    window.location = this.lsd_link;
-                } else if (this.lsd_onclick === "lightbox") {
-                    // Listdom Details Plugin
-                    new ListdomDetails(
-                        this.listing_id,
-                        this.raw_link,
-                        settings
-                    ).lightbox();
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+
+                if (shape.lsd_onclick === "infowindow") {
+                    google.maps.event.addListener(shape, "click", openShapeInfowindow);
+                } else if (shape.lsd_onclick === "redirect") {
+                    google.maps.event.addListener(shape, "click", function () {
+                        window.location = this.lsd_link;
+                    });
+                } else if (shape.lsd_onclick === "lightbox") {
+                    google.maps.event.addListener(shape, "click", function () {
+                        // Listdom Details Plugin
+                        new ListdomDetails(
+                            this.listing_id,
+                            this.raw_link,
+                            settings
+                        ).lightbox();
+                    });
                 }
-            });
+            }
 
             // Extend the bounds to include each shape's position
             shape.getPaths().forEach(function (path) {
@@ -4744,24 +5161,32 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Shape Info-Window
-            settings.display_infowindow && google.maps.event.addListener(shape, "click", function (event) {
-                // Open InfoWindow
-                if (this.lsd_onclick === "infowindow") {
+            if (settings.display_infowindow) {
+                const openShapeInfowindow = function (event) {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
                     infowindow.setPosition(event.latLng);
                     infowindow.open(map, this);
-                } else if (this.lsd_onclick === "redirect") {
-                    window.location = this.lsd_link;
-                } else if (this.lsd_onclick === "lightbox") {
-                    // Listdom Details Plugin
-                    new ListdomDetails(
-                        this.listing_id,
-                        this.raw_link,
-                        settings
-                    ).lightbox();
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+
+                if (shape.lsd_onclick === "infowindow") {
+                    google.maps.event.addListener(shape, "click", openShapeInfowindow);
+                } else if (shape.lsd_onclick === "redirect") {
+                    google.maps.event.addListener(shape, "click", function () {
+                        window.location = this.lsd_link;
+                    });
+                } else if (shape.lsd_onclick === "lightbox") {
+                    google.maps.event.addListener(shape, "click", function () {
+                        // Listdom Details Plugin
+                        new ListdomDetails(
+                            this.listing_id,
+                            this.raw_link,
+                            settings
+                        ).lightbox();
+                    });
                 }
-            });
+            }
 
             // Extend the bounds to include each shape's position
             let path = shape.getPath();
@@ -4817,24 +5242,32 @@ function ListdomDetails(id, link, settings) {
             };
 
             // Shape Info-Window
-            settings.display_infowindow && google.maps.event.addListener(shape, "click", function (event) {
-                // Open InfoWindow
-                if (this.lsd_onclick === "infowindow") {
+            if (settings.display_infowindow) {
+                const openShapeInfowindow = function (event) {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
                     infowindow.setPosition(event.latLng);
                     infowindow.open(map, this);
-                } else if (this.lsd_onclick === "redirect") {
-                    window.location = this.lsd_link;
-                } else if (this.lsd_onclick === "lightbox") {
-                    // Listdom Details Plugin
-                    new ListdomDetails(
-                        this.listing_id,
-                        this.raw_link,
-                        settings
-                    ).lightbox();
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+
+                if (shape.lsd_onclick === "infowindow") {
+                    google.maps.event.addListener(shape, "click", openShapeInfowindow);
+                } else if (shape.lsd_onclick === "redirect") {
+                    google.maps.event.addListener(shape, "click", function () {
+                        window.location = this.lsd_link;
+                    });
+                } else if (shape.lsd_onclick === "lightbox") {
+                    google.maps.event.addListener(shape, "click", function () {
+                        // Listdom Details Plugin
+                        new ListdomDetails(
+                            this.listing_id,
+                            this.raw_link,
+                            settings
+                        ).lightbox();
+                    });
                 }
-            });
+            }
 
             // Extend the bounds to include each shape's position
             bounds.union(shape.getBounds());
@@ -5003,11 +5436,16 @@ function ListdomDetails(id, link, settings) {
 
             // Elements
             let $form = $("#lsd_direction_form" + settings.id);
+            let $message = $form.data('message');
             let $gps = $("#lsd_direction_gps" + settings.id);
             let $address = $("#lsd_direction_address" + settings.id);
             let $reset = $("#lsd_direction_reset" + settings.id);
             let $latitude = $("#lsd_direction_latitude" + settings.id);
             let $longitude = $("#lsd_direction_longitude" + settings.id);
+            let $gpsWrapper = $gps.closest('.lsd-direction-position-wrapper');
+
+            // Disable native validation so we can allow GPS-only submissions
+            $form.attr("novalidate", "novalidate");
 
             $form.on("submit", function (event) {
                 event.preventDefault();
@@ -5019,19 +5457,33 @@ function ListdomDetails(id, link, settings) {
 
                 let latitude = $latitude.val();
                 let longitude = $longitude.val();
+                let addressValue = ($address.val() || "").trim();
+                let hasCoordinates = latitude && longitude;
+                let hasAddress = addressValue.length > 0;
+
+                // Require either a typed address or coordinates from GPS
+                if (!hasAddress && !hasCoordinates) {
+                    if ($address[0] && typeof $address[0].reportValidity === "function") {
+                        $address[0].reportValidity();
+                    } else {
+                        $address.focus();
+                    }
+
+                    return;
+                }
 
                 // Start Point By Address
-                let from = $address.val();
+                let from = hasCoordinates
+                    ? new google.maps.LatLng(latitude, longitude)
+                    : addressValue;
 
-                // Start Point By Geo Position
-                if (longitude && latitude)
-                    from = new google.maps.LatLng(latitude, longitude);
 
                 // Reset The Direction
                 if (typeof directionsDisplay !== "undefined") {
                     directionsDisplay.setMap(null);
-                    start_marker.setMap(null);
-                    end_marker.setMap(null);
+
+                    if (start_marker) start_marker.setMap(null);
+                    if (end_marker) end_marker.setMap(null);
                 }
 
                 // Fade Google Maps Canvas
@@ -5049,6 +5501,17 @@ function ListdomDetails(id, link, settings) {
                         travelMode: google.maps.DirectionsTravelMode.DRIVING,
                     },
                     function (response, status) {
+                        // No result or error
+                        if (status !== google.maps.DirectionsStatus.OK || !response.routes || !response.routes.length)
+                        {
+                            listdom_toastify($message, 'lsd-warning');
+
+                            // Fade Google Maps Canvas back
+                            $(canvas).fadeTo(300, 1);
+
+                            return;
+                        }
+
                         if (status === google.maps.DirectionsStatus.OK) {
                             directionsDisplay.setDirections(response);
                             directionsDisplay.setMap(map);
@@ -5074,6 +5537,7 @@ function ListdomDetails(id, link, settings) {
 
                 // Show Reset Button
                 $reset.removeClass("lsd-util-hide");
+                $gpsWrapper.addClass("lsd-util-hide");
             });
 
             $reset.on("click", function () {
@@ -5092,16 +5556,41 @@ function ListdomDetails(id, link, settings) {
                     end_marker.setMap(null);
                 }
 
-                // Hide Reset Button
+                // Hide Reset Button and show GPS wrapper
                 $reset.addClass("lsd-util-hide");
+                $gpsWrapper.removeClass("lsd-util-hide");
+            });
+
+            $address.on("input", function() {
+                if ($address.val()) {
+                    $latitude.val("");
+                    $longitude.val("");
+                } else {
+                    $reset.addClass("lsd-util-hide");
+                    $gpsWrapper.removeClass("lsd-util-hide");
+                }
             });
 
             $gps.on("click", function () {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(function (position) {
-                        $latitude.val(position.coords.latitude);
-                        $longitude.val(position.coords.longitude);
-                        $form.submit();
+                        let lat = position.coords.latitude;
+                        let lng = position.coords.longitude;
+
+                        $latitude.val(lat);
+                        $longitude.val(lng);
+
+                        // Create Geocoder instance
+                        let geocoder = new google.maps.Geocoder();
+                        let latlng = new google.maps.LatLng(lat, lng);
+
+                        geocoder.geocode({ location: latlng }, function(results, status) {
+                            if (status === google.maps.GeocoderStatus.OK) {
+                                if (results[0]) $address.val(results[0].formatted_address);
+                            }
+
+                            $form.submit();
+                        });
                     });
                 }
             });
@@ -5555,7 +6044,7 @@ function ListdomDetails(id, link, settings) {
             mapsearch_request(request);
         }
 
-        function mapsearch_request(request) {
+        function mapsearch_request(request, clearKeys = []) {
             // Freez the Map Search
             mapsearchFreez = true;
 
@@ -5572,7 +6061,8 @@ function ListdomDetails(id, link, settings) {
             // Push to History
             new ListdomPageHistory().push(
                 "?" + request,
-                lsdShouldUpdateAddressBar(settings.id)
+                lsdShouldUpdateAddressBar(settings.id),
+                clearKeys
             );
 
             // Loading Style
@@ -5583,7 +6073,7 @@ function ListdomDetails(id, link, settings) {
 
             $.ajax({
                 url: settings.ajax_url,
-                data: "action=lsd_ajax_search&" + req.get(request, settings.args),
+                data: "action=lsd_ajax_search&" + req.get(request, settings.args, clearKeys),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -5599,9 +6089,9 @@ function ListdomDetails(id, link, settings) {
                     }, 1000);
 
                     // Update Listings
-                    $("#lsd_skin" + settings.id + " .lsd-listing-wrapper").html(
-                        response.listings
-                    );
+                    const $skin = $("#lsd_skin" + settings.id);
+                    lsdResetTimelineCarousel($skin);
+                    $skin.find('.lsd-listing-wrapper').html(response.listings);
 
                     // Update Pagination
                     if($pagination.length) $pagination.replaceWith(response.pagination);
@@ -5619,6 +6109,12 @@ function ListdomDetails(id, link, settings) {
                     // Update the Next Page
                     $("#lsd_skin" + settings.id).data('next-page', response.next_page);
 
+                    // Search Success Event
+                    response.shortcode = settings.id;
+                    window.dispatchEvent(new CustomEvent('lsd-search-success', {
+                        detail: response
+                    }));
+
                     // Trigger
                     listdom_onload();
 
@@ -5628,7 +6124,8 @@ function ListdomDetails(id, link, settings) {
                             const shortcode_id = settings.connected_shortcodes[i];
                             $('body').trigger('lsd-sync', {
                                 id: shortcode_id,
-                                request: request
+                                request: request,
+                                clearKeys: clearKeys
                             });
                         }
                     }
@@ -5717,13 +6214,71 @@ function ListdomDetails(id, link, settings) {
         let $container = $(".lsd-search-" + settings.id);
         let $form = $container.find($("form:visible"));
 
+        const isCompareModal = $container.closest('#lsdaddcmp-add-modal').length > 0;
+        if (isCompareModal && !parseInt(settings.ajax, 10)) settings.ajax = 1;
+
         setListeners();
 
         function setListeners() {
+            const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            const bindSearchInputClearButtons = function () {
+                const toggleClearButton = function ($input) {
+                    const inputId = $input.attr('id');
+                    if (!inputId) return;
+
+                    const hasValue = (($input.val() || '').toString().trim() !== '');
+                    $form.find(`.lsd-search-input-clear[data-for="${inputId}"]`).toggleClass('lsd-util-hide', !hasValue);
+                };
+
+                $form.find('.lsd-search-input-clear').off('click.lsdSearchClear').on('click.lsdSearchClear', function (e) {
+                    e.preventDefault();
+
+                    const inputId = ($(this).data('for') || '').toString();
+                    if (!inputId) return;
+
+                    const $input = $form.find(`#${inputId}`);
+                    if (!$input.length) return;
+
+                    $input.val('').trigger('change').trigger('input').focus();
+                });
+
+                $form.find('.lsd-search-input-clear-wrap input').off('input.lsdSearchClear change.lsdSearchClear').on('input.lsdSearchClear change.lsdSearchClear', function () {
+                    toggleClearButton($(this));
+                }).each(function () {
+                    toggleClearButton($(this));
+                });
+            };
+
+            const setNativeSelectState = function ($select) {
+                if ($select.prop('multiple')) return;
+
+                const value = $select.val();
+                const isEmpty = Array.isArray(value) ? value.filter(Boolean).length === 0 : !value;
+
+                $select.toggleClass('lsd-native-select-empty', isEmpty);
+            };
+
             $container
             .find('select[data-enhanced=1]')
             .each(function () {
                 const $select = $(this);
+
+                $select.off('.lsdNativeSelectFallback');
+
+                if (isiOS) {
+                    if ($select.data('select2')) $select.select2('destroy');
+
+                    $select.addClass('lsd-native-select-fallback');
+                    setNativeSelectState($select);
+                    $select.on('change.lsdNativeSelectFallback', function () {
+                        setNativeSelectState($(this));
+                    });
+                    return;
+                }
+
+                $select.removeClass('lsd-native-select-fallback lsd-native-select-empty');
+
                 $select.select2({
                     allowClear: true,
                     placeholder: $select.attr('placeholder'),
@@ -5735,11 +6290,15 @@ function ListdomDetails(id, link, settings) {
                 });
             });
 
+            initRadiusFields();
+            bindSearchInputClearButtons();
+
             // More Options
             $container
             .find($(".lsd-search-row-more-options"))
             .off("click")
             .on("click", function () {
+                const $toggle = $(this);
                 const type = $(this).data('type');
                 const width = $(this).data('width');
                 const target = $(this).data('for');
@@ -5747,27 +6306,62 @@ function ListdomDetails(id, link, settings) {
                 // Popup
                 if (type === 'popup')
                 {
-                    const $device = $(this).closest($container).find($(target));
-                    let $more = $device.find($(".lsd-search-included-in-more")).first();
+                    const popupId = $toggle.attr('data-popup-id');
+                    let $wrapper = popupId ? $("#" + popupId) : $();
 
-                    if ($more.length && $device.find(".lsd-popup-wrapper").length === 0)
+                    if (!$wrapper.length)
                     {
-                        $more.wrapAll(`<div class="lsd-popup-wrapper lsd-modal lsd-search-modal"><div class="lsd-modal-content"></div></div>`);
+                        const $search = $toggle.closest(".lsd-search");
+                        const $device = $toggle.closest($container).find($(target)).first();
+                        const $more = $device.find($(".lsd-search-included-in-more")).first();
 
-                        $device.find(".lsd-modal-content").css("width", width + "vw");
-                        $device.find(".lsd-modal-content").prepend('<a href="#" class="lsd-modal-close">&times;</a>');
+                        if ($more.length)
+                        {
+                            const uniqueId = "lsd-search-popup-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+                            const searchClasses = ($search.attr("class") || "").trim();
+                            const $popupWrapper = $("<div>", {id: uniqueId})
+                                .addClass("lsd-popup-wrapper lsd-modal lsd-search-modal");
 
-                        $more.fadeIn();
+                            if (searchClasses) $popupWrapper.addClass(searchClasses);
+
+                            $popupWrapper.append($("<div>").addClass("lsd-modal-content"));
+
+                            $more.wrapAll($popupWrapper);
+
+                            $wrapper = $("#" + uniqueId);
+                            $toggle.attr("data-popup-id", uniqueId);
+
+                            const $stackTargets = $wrapper
+                                .parents(".lsd-search-bar-sticky, .lsd-search-bar-wrapper")
+                                .add($wrapper.closest(".lsd-search"));
+
+                            $wrapper.data("lsdSearchPopupStackTargets", $stackTargets);
+                            $wrapper
+                                .off("listdom:modal:opened.lsdSearchPopup listdom:modal:closed.lsdSearchPopup")
+                                .on("listdom:modal:opened.lsdSearchPopup", function ()
+                                {
+                                    const $targets = $(this).data("lsdSearchPopupStackTargets");
+                                    if ($targets && $targets.length) $targets.addClass("lsd-search-popup-active");
+                                })
+                                .on("listdom:modal:closed.lsdSearchPopup", function ()
+                                {
+                                    const $targets = $(this).data("lsdSearchPopupStackTargets");
+                                    if ($targets && $targets.length) $targets.removeClass("lsd-search-popup-active");
+                                });
+
+                            $wrapper.find(".lsd-modal-content")
+                                .css("width", width + "vw")
+                                .prepend('<a href="#" class="lsd-modal-close">&times;</a>');
+
+                            $more.fadeIn();
+                        }
                     }
 
-                    $device.find(".lsd-popup-wrapper").first().fadeIn();
+                    const $stackTargets = $wrapper.data("lsdSearchPopupStackTargets");
+                    if ($stackTargets && $stackTargets.length) $stackTargets.addClass("lsd-search-popup-active");
 
-                    // Close Icon
-                    $(document).on('click', '.lsd-modal-close', function (e)
-                    {
-                        e.preventDefault();
-                        $(this).closest('.lsd-popup-wrapper').fadeOut();
-                    });
+                    if (typeof ListdomModal !== 'undefined') ListdomModal.open($wrapper);
+                    else $wrapper.fadeIn();
                 }
                 // Slide
                 else
@@ -6018,7 +6612,8 @@ function ListdomDetails(id, link, settings) {
                 e.preventDefault();
 
                 // Clear inputs
-                $form.find("input[type=text], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=hidden]").val("");
+                $form.find("input[type=text], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=date], input[type=time], input[type=datetime-local]").val("").trigger("input");
+                $form.find("input[type=hidden]").val("");
 
                 // Clear checkboxes and radios
                 $form.find("input[type=checkbox], input[type=radio]").prop("checked", false);
@@ -6073,6 +6668,553 @@ function ListdomDetails(id, link, settings) {
             }
         }
 
+        function getManagedQueryKeys() {
+            let keys = ['page', 'paged'];
+
+            $form.find(':input[name]').each(function () {
+                let name = $(this).attr('name');
+                if (typeof name === 'string' && name.length) keys.push(name);
+            });
+
+            return [...new Set(keys)];
+        }
+
+        function initRadiusFields() {
+            const $fields = $container.find('.lsd-radius-search-field');
+            if (!$fields.length) return;
+
+            const getRadiusDropdownController = function ($field, $address) {
+                const $popup = $field.find('.lsd-radius-search-address-popup').first();
+                const loadingText =
+                    ($popup.length && $popup.data('loading-text')) || '';
+
+                if (typeof window.lsdGetAddressDropdownController === 'function') {
+                    const controller = window.lsdGetAddressDropdownController($field, {
+                        dropdown: $popup,
+                        trigger: $address,
+                        storeKey: 'lsdRadiusDropdownController',
+                        dropdownOptions: { loadingText: loadingText },
+                    });
+
+                    if (controller) return controller;
+                }
+
+                return {
+                    $element: $popup,
+                    reset: function () { },
+                    populate: function () { },
+                    markSelected: function () { },
+                    isUpdating: function () { return false; },
+                    selectItem: function () { },
+                    hide: function () { },
+                    showLoading: function () { },
+                    show: function () { },
+                };
+            };
+
+            const getGeocoder = (function () {
+                let geocoder = null;
+                return function () {
+                    if (geocoder) return geocoder;
+                    if (
+                        typeof google === 'undefined' ||
+                        typeof google.maps === 'undefined' ||
+                        typeof google.maps.Geocoder !== 'function'
+                    ) return null;
+
+                    geocoder = new google.maps.Geocoder();
+                    return geocoder;
+                };
+            })();
+
+            const extractLatLng = function (location) {
+                if (!location) return { latitude: '', longitude: '' };
+
+                const latFn = typeof location.lat === 'function' ? location.lat : null;
+                const lngFn = typeof location.lng === 'function' ? location.lng : null;
+
+                return {
+                    latitude: latFn ? latFn.call(location) : location.lat || '',
+                    longitude: lngFn ? lngFn.call(location) : location.lng || ''
+                };
+            };
+
+            const resolveAddressFromCoordinates = function (lat, lng, provider, callback) {
+                const latNum = parseFloat(lat);
+                const lngNum = parseFloat(lng);
+
+                if (isNaN(latNum) || isNaN(lngNum)) {
+                    callback('');
+                    return;
+                }
+
+                const fallback = function () {
+                    jQuery
+                    .getJSON('https://nominatim.openstreetmap.org/reverse', {
+                        format: 'json',
+                        lat: latNum,
+                        lon: lngNum
+                    })
+                    .done(function (data) {
+                        const formatted =
+                            (data && data.display_name) ||
+                            (data && data.address && data.address.road) ||
+                            '';
+                        callback(formatted || '');
+                    })
+                    .fail(function () { callback(''); });
+                };
+
+                if (provider === 'googlemap') {
+                    const geocoder = getGeocoder();
+                    if (geocoder) {
+                        geocoder.geocode({ location: { lat: latNum, lng: lngNum } }, function (results, status) {
+                            if (status === 'OK' && results && results.length) {
+                                const result = results[0];
+                                const formatted =
+                                    result.formatted_address ||
+                                    result.formattedAddress ||
+                                    (result.name ? result.name : '');
+                                callback(formatted);
+                                return;
+                            }
+                            fallback();
+                        });
+                        return;
+                    }
+                }
+
+                fallback();
+            };
+
+            const resolveCoordinatesFromAddress = function (address, provider, callback) {
+                if (!address) {
+                    callback(null);
+                    return;
+                }
+
+                const fallback = function () {
+                    jQuery
+                    .getJSON('https://nominatim.openstreetmap.org/search', {
+                        format: 'json',
+                        limit: 1,
+                        q: address
+                    })
+                    .done(function (data) {
+                        if (Array.isArray(data) && data.length) {
+                            const item = data[0];
+                            callback({
+                                latitude: item.lat || '',
+                                longitude: item.lon || '',
+                                formatted: item.display_name || address
+                            });
+                            return;
+                        }
+                        callback(null);
+                    })
+                    .fail(function () { callback(null); });
+                };
+
+                if (provider === 'googlemap') {
+                    const geocoder = getGeocoder();
+                    if (geocoder) {
+                        geocoder.geocode({ address: address }, function (results, status) {
+                            if (status === 'OK' && results && results.length) {
+                                const result = results[0];
+                                const coordinates = extractLatLng(result.geometry && result.geometry.location);
+                                const formatted =
+                                    result.formatted_address ||
+                                    result.formattedAddress ||
+                                    (result.name ? result.name : address);
+
+                                callback({
+                                    latitude: coordinates.latitude,
+                                    longitude: coordinates.longitude,
+                                    formatted: formatted
+                                });
+                                return;
+                            }
+                            fallback();
+                        });
+                        return;
+                    }
+                }
+
+                fallback();
+            };
+
+            // ───────────────────────────────────────────────
+            // Attach these helpers globally to reuse in setupRadiusAutocomplete
+            // ───────────────────────────────────────────────
+            window.lsdRadiusShared = {
+                getRadiusDropdownController,
+                extractLatLng,
+                getGeocoder,
+                resolveAddressFromCoordinates,
+                resolveCoordinatesFromAddress,
+            };
+
+            // Initialize core field logic
+            $fields.each(function () {
+                const $field = $(this);
+                const $address = $field.find('.lsd-radius-search-address');
+                const $latitude = $field.find('.lsd-radius-search-latitude');
+                const $longitude = $field.find('.lsd-radius-search-longitude');
+                const $locate = $field.find('.lsd-radius-search-locate');
+
+                if (!$address.length) return;
+
+                const autocompleteEnabled = !!$address.data('autocomplete');
+
+                const dropdown = getRadiusDropdownController($field, $address);
+                dropdown.markSelected($address.val(), { lat: $latitude.val(), lon: $longitude.val() });
+
+                const rawProvider = ($address.data('map-provider') || '').toString().toLowerCase();
+                const provider = rawProvider === 'googlemap' ? 'googlemap' : 'leaflet';
+
+                $field.data('lsd-map-provider', provider);
+                const gpsLabel = $address.data('gps-label');
+                const messages = {
+                    unsupported: $locate.data('error-unsupported'),
+                    denied: $locate.data('error-denied'),
+                    failed: $locate.data('error-failed')
+                };
+
+                let googleServices = null;
+                let googlePredictionRequest = null;
+                let googlePlacesElement = null;
+                let applyGooglePlace = null;
+
+                const initialAddress = ($address.val() || '').toString().trim();
+                if (initialAddress && !$latitude.val() && !$longitude.val()) {
+                    resolveCoordinatesFromAddress(initialAddress, provider, function (result) {
+                        if (!result || !result.latitude || !result.longitude) return;
+
+                        $latitude.val(result.latitude);
+                        $longitude.val(result.longitude);
+                        $address.data('lsd-autocomplete-selected', true);
+
+                        if (autocompleteEnabled)
+                        {
+                            const formatted = result.formatted || initialAddress;
+                            if (formatted) $address.val(formatted);
+                        }
+
+                        dropdown.markSelected($address.val(), {
+                            lat: result.latitude,
+                            lon: result.longitude
+                        });
+                    });
+                }
+
+                const ensureGoogleServices = function () {
+                    if (typeof window.lsdAddressAutocompleteSources === 'undefined') return null;
+
+                    if (!googlePlacesElement) googlePlacesElement = document.createElement('div');
+
+                    googleServices = window.lsdAddressAutocompleteSources.ensureGoogleServices({
+                        services: googleServices || {},
+                        placesElement: googlePlacesElement
+                    }) || googleServices;
+
+                    if (googleServices) googleServices.placesElement = googlePlacesElement;
+
+                    return googleServices;
+                };
+
+                $address.off('input.lsd-radius-address').on('input.lsd-radius-address', function () {
+                    dropdown.reset();
+                    $address.data('lsd-autocomplete-selected', false);
+                    $latitude.val('');
+                    $longitude.val('');
+                });
+
+                $address.on('change', function () {
+                    if ($address.data('lsd-autocomplete-selected')) return;
+                    $latitude.val('');
+                    $longitude.val('');
+
+                    const value = $address.val();
+                    if (!value || !value.length) return;
+
+                    const requestKey = Date.now();
+                    $address.data('lsd-geocode-request', requestKey);
+
+                    resolveCoordinatesFromAddress(value, provider, function (result) {
+                        if ($address.data('lsd-geocode-request') !== requestKey) return;
+                        $address.removeData('lsd-geocode-request');
+
+                        if (!result || !result.latitude || !result.longitude) {
+                            return;
+                        }
+
+                        $latitude.val(result.latitude);
+                        $longitude.val(result.longitude);
+                        $address.data('lsd-autocomplete-selected', true);
+
+                        if (autocompleteEnabled && result.formatted)
+                        {
+                            $address.val(result.formatted);
+                        }
+
+                        dropdown.markSelected($address.val(), {
+                            lat: result.latitude,
+                            lon: result.longitude
+                        });
+
+                        $address.trigger('change');
+                    });
+                });
+
+                if (dropdown.$element.length) {
+                    dropdown.$element
+                    .off('lsd-autocomplete-select.lsd-radius-dropdown')
+                    .on('lsd-autocomplete-select.lsd-radius-dropdown', function (event, item) {
+                        if (dropdown.isUpdating()) return;
+
+                        const hasItem = item && typeof item === 'object';
+                        const optionValue = hasItem ? item.value || item.label || '' : '';
+                        const optionLabel = hasItem ? item.label || item.value || '' : '';
+
+                        if (!optionValue) {
+                            $address.val('');
+                            $latitude.val('');
+                            $longitude.val('');
+                            $address.data('lsd-autocomplete-selected', false);
+                            $address.trigger('change');
+                            return;
+                        }
+
+                        $address.val(optionLabel || optionValue);
+
+                        const optionLat = hasItem && item.lat ? item.lat : '';
+                        const optionLon = hasItem && item.lon ? item.lon : '';
+                        const optionPlaceId = hasItem && item.placeId ? item.placeId : '';
+
+                        if (optionLat) $latitude.val(optionLat);
+                        if (optionLon) $longitude.val(optionLon);
+
+                        if (optionLat && optionLon) {
+                            $address.data('lsd-autocomplete-selected', true);
+                            dropdown.markSelected(optionValue, {
+                                lat: optionLat,
+                                lon: optionLon,
+                                placeId: optionPlaceId
+                            });
+                            $address.trigger('change');
+                            return;
+                        }
+
+                        $address.data('lsd-autocomplete-selected', false);
+
+                        if (provider === 'googlemap' && optionPlaceId) {
+                            const services = ensureGoogleServices();
+                            if (
+                                services &&
+                                services.places &&
+                                typeof services.places.getDetails === 'function'
+                            ) {
+                                dropdown.hide();
+
+                                const request = {
+                                    placeId: optionPlaceId,
+                                    fields: ['geometry', 'formatted_address', 'name', 'place_id']
+                                };
+
+                                if (
+                                    typeof google !== 'undefined' &&
+                                    typeof google.maps !== 'undefined' &&
+                                    typeof google.maps.places !== 'undefined' &&
+                                    typeof google.maps.places.AutocompleteSessionToken === 'function' &&
+                                    services.sessionToken
+                                ) {
+                                    request.sessionToken = services.sessionToken;
+                                }
+
+                                const statusSource = services.statusEnum
+                                    ? services.statusEnum
+                                    : (typeof google !== 'undefined' &&
+                                        typeof google.maps !== 'undefined' &&
+                                        typeof google.maps.places !== 'undefined' &&
+                                        google.maps.places.PlacesServiceStatus)
+                                        ? google.maps.places.PlacesServiceStatus
+                                        : {};
+
+                                services.places.getDetails(request, function (result, status) {
+                                    if (status === statusSource.OK && result) {
+                                        if (typeof applyGooglePlace === 'function') {
+                                            applyGooglePlace(result);
+                                            return;
+                                        }
+                                    }
+
+                                    $address.data('lsd-autocomplete-selected', false);
+                                    dropdown.markSelected(optionValue, {placeId: optionPlaceId});
+                                    $address.trigger('change');
+                                });
+
+                                return;
+                            }
+
+                            dropdown.markSelected(optionValue, {placeId: optionPlaceId});
+                        }
+
+                        $address.trigger('change');
+                    });
+                }
+
+                if ($locate.length && typeof window.lsdBindLocateControl === 'function') {
+                    window.lsdBindLocateControl($locate, {
+                        messages: messages,
+                        expectsFinalize: true,
+                        setLoading: function (loading) {
+                            $locate.toggleClass('lsd-radius-search-locate--loading', !!loading);
+                        },
+                        showError: function (message) {
+                            if (message) showRadiusError(message, true);
+                        },
+                        onDenied: function () {
+                            $latitude.val('');
+                            $longitude.val('');
+                        },
+                        onError: function () {
+                            $latitude.val('');
+                            $longitude.val('');
+                        },
+                        onSuccess: function (lat, lng, done) {
+                            $latitude.val(lat);
+                            $longitude.val(lng);
+                            $address.data('lsd-autocomplete-selected', true);
+
+                            resolveAddressFromCoordinates(
+                                lat,
+                                lng,
+                                provider,
+                                function (resolvedAddress) {
+                                    if (resolvedAddress) $address.val(resolvedAddress);
+                                    else if (!$address.val()) $address.val(gpsLabel);
+
+                                    dropdown.markSelected($address.val(), {
+                                        lat: $latitude.val(),
+                                        lon: $longitude.val()
+                                    });
+
+                                    $address.trigger('change');
+                                    done();
+                                }
+                            );
+                        }
+                    });
+                }
+            });
+
+            setupRadiusAutocomplete($fields);
+        }
+
+        function setupRadiusAutocomplete($fields) {
+            if (!$fields.length) return;
+            if (!window.lsdAddressAutocompleteSources || !window.lsdGetAddressDropdownController) return;
+
+            $fields.each(function () {
+                const $field = $(this);
+                if ($field.data('lsd-autocomplete-initialized')) return;
+
+                const $address = $field.find('.lsd-radius-search-address');
+                const $latitude = $field.find('.lsd-radius-search-latitude');
+                const $longitude = $field.find('.lsd-radius-search-longitude');
+                if (!$address.length) return;
+
+                const autocompleteEnabled = !!$address.data('autocomplete');
+                if (!autocompleteEnabled) {
+                    $field.data('lsd-autocomplete-initialized', true);
+                    return;
+                }
+
+                const dropdown = window.lsdGetAddressDropdownController($field, {
+                    dropdown: $field.find('.lsd-radius-search-address-popup').first(),
+                    trigger: $address,
+                    storeKey: 'lsdRadiusDropdownController'
+                });
+
+                const providerRaw = ($address.data('map-provider') || '').toString().toLowerCase();
+                const hasGoogleAutocomplete = !!$address.data('autocomplete');
+                const provider = (providerRaw === 'googlemap' && hasGoogleAutocomplete) ? 'googlemap' : 'openstreetmap';
+
+                let currentRequest = null;
+
+                $address.off('input.lsd-autocomplete').on('input.lsd-autocomplete', function () {
+                    const term = $address.val();
+
+                    dropdown.reset();
+                    $address.data('lsd-autocomplete-selected', false);
+
+                    if (!term || term.length < 3) return;
+
+                    dropdown.showLoading();
+
+                    if (currentRequest && typeof currentRequest.cancel === 'function') {
+                        currentRequest.cancel();
+                    }
+
+                    currentRequest = window.lsdAddressAutocompleteSources.fetch(provider, term, { minLength: 3 });
+
+                    if (!currentRequest || !currentRequest.promise) return;
+
+                    currentRequest.promise
+                    .done(function (response) {
+                        if ($address.val() !== term) return; // ignore outdated responses
+
+                        const items = response && response.items ? response.items : [];
+                        if (!items.length) {
+                            dropdown.reset();
+                            return;
+                        }
+
+                        dropdown.populate(items);
+                    })
+                    .fail(function () {
+                        dropdown.reset();
+                    });
+                });
+
+                // Handle selection
+                dropdown.$element
+                .off('lsd-autocomplete-select.lsd-radius-dropdown')
+                .on('lsd-autocomplete-select.lsd-radius-dropdown', function (event, item) {
+                    if (!item) {
+                        $address.val('');
+                        $latitude.val('');
+                        $longitude.val('');
+                        $address.data('lsd-autocomplete-selected', false);
+                        $address.trigger('change');
+                        return;
+                    }
+
+                    $address.val(item.label || item.value || '');
+
+                    if (item.lat && item.lon) {
+                        $latitude.val(item.lat);
+                        $longitude.val(item.lon);
+                        $address.data('lsd-autocomplete-selected', true);
+                    } else {
+                        $latitude.val('');
+                        $longitude.val('');
+                        $address.data('lsd-autocomplete-selected', false);
+                    }
+
+                    $address.trigger('change');
+                });
+
+                $field.data('lsd-autocomplete-initialized', true);
+            });
+        }
+
+        function showRadiusError(message, preferNative) {
+            if (!message) return;
+
+            new ListdomToast(message, {type: 'lsd-error'});
+        }
+
         function ajax() {
             // On The Fly
             if (settings.ajax === 2) {
@@ -6088,18 +7230,32 @@ function ListdomDetails(id, link, settings) {
                 });
             }
 
+            const closeSearchPopups = function ()
+            {
+                $('.lsd-popup-wrapper').each(function ()
+                {
+                    const $popup = $(this);
+                    const $stackTargets = $popup.data("lsdSearchPopupStackTargets");
+
+                    if ($stackTargets && $stackTargets.length) $stackTargets.removeClass("lsd-search-popup-active");
+
+                    $popup.fadeOut();
+                });
+            };
+
             // On Submit
             $form.on("submit", function (e) {
                 e.preventDefault();
                 search();
 
-                $('.lsd-popup-wrapper').fadeOut();
+                closeSearchPopups();
             });
         }
 
         function search() {
             // Listdom Request Plugin
             let req = new ListdomRequest(settings.shortcode, settings);
+            let clearKeys = getManagedQueryKeys();
 
             let $skin = $("#lsd_skin" + settings.shortcode);
             let $wrapper = $("#lsd_skin" + settings.shortcode + " .lsd-listing-wrapper");
@@ -6112,7 +7268,8 @@ function ListdomDetails(id, link, settings) {
             // Push to History
             new ListdomPageHistory().push(
                 "?" + $form.serialize(),
-                lsdShouldUpdateAddressBar(settings.id)
+                lsdShouldUpdateAddressBar(settings.id),
+                clearKeys
             );
 
             // Trigger Connected Shortcodes Sync
@@ -6121,7 +7278,8 @@ function ListdomDetails(id, link, settings) {
                     const shortcode_id = settings.connected_shortcodes[i];
                     $('body').trigger('lsd-sync', {
                         id: shortcode_id,
-                        request: $form.serialize() + "&page=1"
+                        request: $form.serialize() + "&page=1",
+                        clearKeys: clearKeys
                     });
                 }
                 // Search
@@ -6130,15 +7288,31 @@ function ListdomDetails(id, link, settings) {
                     url: settings.ajax_url,
                     data:
                         "action=lsd_ajax_search&" +
-                        req.get($form.serialize() + "&page=1&view=" + $skin.data('view'), ""),
+                        req.get($form.serialize() + "&page=1&view=" + $skin.data('view'), "", clearKeys),
                     dataType: "json",
                     type: "post",
                     success: function (response) {
                         // Remove Loading Class
                         $wrapper.removeClass("lsd-loading");
 
+                        lsdResetTimelineCarousel($skin);
+
                         // Display Items
                         $wrapper.html(response.listings);
+
+                        // Masonry Filters
+                        if ($skin.hasClass("lsd-masonry-view-wrapper")) {
+                            if (typeof response.filters !== "undefined") {
+                                const $filtersWrapper = $skin.find(".lsd-masonry-filters");
+
+                                if ($filtersWrapper.length) {
+                                    if (response.filters) $filtersWrapper.replaceWith(response.filters);
+                                    else $filtersWrapper.remove();
+                                } else if (response.filters) {
+                                    $skin.find(".lsd-list-wrapper").prepend(response.filters);
+                                }
+                            }
+                        }
 
                         // Update Pagination
                         if ($pagination.length) $pagination.replaceWith(response.pagination);
@@ -6152,11 +7326,13 @@ function ListdomDetails(id, link, settings) {
 
                         // Update the Next Page
                         $wrapper.data("next-page", response.next_page);
+                        $skin.data("next-page", response.next_page);
 
                         // Map Objects
                         new ListdomMaps(settings.shortcode).load(response.objects);
 
                         // Search Success Event
+                        response.shortcode = settings.shortcode;
                         window.dispatchEvent(new CustomEvent('lsd-search-success', {
                             detail: response
                         }));
@@ -6185,6 +7361,267 @@ function ListdomDetails(id, link, settings) {
     };
 })(jQuery);
 
+(function () {
+    window.lsdDashboardApplySidebar = function ($dashboards)
+    {
+        if (typeof jQuery === 'undefined') return;
+
+        const $ = jQuery;
+        $dashboards = $dashboards && $dashboards.length ? $dashboards : $('.lsd-dashboard');
+
+        const dropdownNamespace = '.lsdDashboardDropdown';
+
+        function closeAllDropdowns()
+        {
+            $('.lsd-dashboard-menu-more.lsd-open').each(function ()
+            {
+                const $item = $(this);
+                const $trigger = $item.find('.lsd-dashboard-menu-more-trigger').first();
+
+                $item.removeClass('lsd-open');
+                if ($trigger.length) $trigger.attr('aria-expanded', 'false');
+            });
+        }
+
+        function bindDropdown($container)
+        {
+            const $dropdownItems = $container.find('.lsd-dashboard-menu-more');
+            if (!$dropdownItems.length) return;
+
+            $dropdownItems.each(function ()
+            {
+                const $item = $(this);
+                const $trigger = $item.find('.lsd-dashboard-menu-more-trigger').first();
+                const $links = $item.find('.lsd-dashboard-menu-more-list a');
+
+                if ($trigger.length)
+                {
+                    $trigger.off('click' + dropdownNamespace).on('click' + dropdownNamespace, function (event)
+                    {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        const isOpen = $item.hasClass('lsd-open');
+
+                        closeAllDropdowns();
+
+                        if (!isOpen)
+                        {
+                            $item.addClass('lsd-open');
+                            $trigger.attr('aria-expanded', 'true');
+                        }
+                    });
+
+                    if ($item.hasClass('lsd-open')) $trigger.attr('aria-expanded', 'true');
+                    else $trigger.attr('aria-expanded', 'false');
+                }
+
+                $links.off('click' + dropdownNamespace).on('click' + dropdownNamespace, function ()
+                {
+                    const $parent = $(this).closest('.lsd-dashboard-menu-more');
+                    if (!$parent.length) return;
+
+                    const $toggle = $parent.find('.lsd-dashboard-menu-more-trigger').first();
+                    $parent.removeClass('lsd-open');
+                    if ($toggle.length) $toggle.attr('aria-expanded', 'false');
+                });
+            });
+
+            $(document).off('click' + dropdownNamespace).on('click' + dropdownNamespace, function (event)
+            {
+                if ($(event.target).closest('.lsd-dashboard-menu-more').length) return;
+                closeAllDropdowns();
+            });
+
+            $(document).off('keydown' + dropdownNamespace).on('keydown' + dropdownNamespace, function (event)
+            {
+                if (event.key === 'Escape' || event.key === 'Esc') closeAllDropdowns();
+            });
+        }
+
+        function destroyDropdown($container)
+        {
+            const $dropdownItems = $container.find('.lsd-dashboard-menu-more');
+            if (!$dropdownItems.length) return;
+
+            $dropdownItems.each(function ()
+            {
+                const $item = $(this);
+                const $trigger = $item.find('.lsd-dashboard-menu-more-trigger').first();
+                const $links = $item.find('.lsd-dashboard-menu-more-list a');
+
+                $item.removeClass('lsd-open');
+                if ($trigger.length)
+                {
+                    $trigger.attr('aria-expanded', 'false');
+                    $trigger.off('click' + dropdownNamespace);
+                }
+
+                $links.off('click' + dropdownNamespace);
+            });
+        }
+
+        function initMenuCarousel($container)
+        {
+            if (typeof $.fn === 'undefined' || typeof $.fn.owlCarousel === 'undefined') return;
+
+            const $carousels = $container.find('.lsd-dashboard-menus-carousel');
+            if (!$carousels.length) return;
+
+            $carousels.each(function ()
+            {
+                const $carousel = $(this);
+                let itemCount = $carousel.data('lsdMenuCount');
+
+                if (!itemCount)
+                {
+                    itemCount = $carousel.find('> li').length;
+                    $carousel.data('lsdMenuCount', itemCount);
+                }
+
+                if (!itemCount) return;
+
+                let gap = 20;
+
+                try
+                {
+                    const computed = window.getComputedStyle(this);
+                    if (computed)
+                    {
+                        const parsed = parseFloat(computed.getPropertyValue('--listdom-gap'));
+                        if (!isNaN(parsed)) gap = parsed;
+                    }
+                }
+                catch (error)
+                {
+                    // Keep default gap value when computed styles are unavailable.
+                }
+
+                const responsive = {
+                    0: { items: Math.min(itemCount, 1) },
+                    480: { items: Math.min(itemCount, 3) },
+                    768: { items: Math.min(itemCount, 4) },
+                    1024: { items: Math.min(itemCount, 5) },
+                    1280: { items: Math.min(itemCount, 7) },
+                };
+
+                if ($carousel.hasClass('owl-loaded'))
+                {
+                    $carousel.trigger('refresh.owl.carousel');
+                    return;
+                }
+
+                $carousel.owlCarousel({
+                    items: Math.min(itemCount, 7),
+                    loop: false,
+                    autoplay: false,
+                    autoplayHoverPause: true,
+                    dots: false,
+                    nav: true,
+                    margin: gap,
+                    responsiveClass: true,
+                    responsive: responsive,
+                });
+            });
+        }
+
+        $dashboards.each(function ()
+        {
+            const $dashboard = $(this);
+            const $container = $dashboard.find('.lsd-dashboard-menu-container').first();
+            if (!$container.length) return;
+
+            const sidebarStatus = $container.data('sidebar-status') || $dashboard.data('sidebar-status') || 'default';
+            const horizontalMode = $container.data('horizontal-mode') || $dashboard.data('horizontal-mode') || 'default';
+            const $toggle = $container.find('.lsd-dashboard-menu-toggle-trigger');
+
+            function queueTransitionReady()
+            {
+                if ($dashboard.hasClass('lsd-dashboard-sidebar-transition-ready')) return;
+
+                const enable = function ()
+                {
+                    $dashboard.addClass('lsd-dashboard-sidebar-transition-ready');
+                };
+
+                if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function')
+                    window.requestAnimationFrame(() => {
+                        setTimeout(enable, 50);
+                    });
+                else setTimeout(enable, 0);
+            }
+
+            function applyState(mode)
+            {
+                const isHorizontal = mode === 'horizontal';
+                const isCompact = mode === 'compact';
+
+                $dashboard.toggleClass('lsd-dashboard-sidebar-horizontal', isHorizontal);
+                $dashboard.toggleClass('lsd-dashboard-sidebar-horizontal-carousel', isHorizontal && horizontalMode === 'carousel');
+                $dashboard.toggleClass('lsd-dashboard-sidebar-vertical', !isHorizontal);
+                $dashboard.toggleClass('lsd-dashboard-sidebar-compact', !isHorizontal && isCompact);
+                $dashboard.toggleClass('lsd-dashboard-sidebar-default', !isHorizontal && !isCompact);
+
+                $dashboard.data('sidebar-active-mode', mode);
+            }
+
+            function updateToggle(mode)
+            {
+                if (!$toggle.length) return;
+
+                const isExpanded = mode !== 'compact';
+                $toggle.attr('aria-expanded', isExpanded ? 'true' : 'false');
+
+                const $icon = $toggle.find('.lsd-fe-icon').first();
+                if ($icon.length)
+                {
+                    $icon.toggleClass('fa-long-arrow-left', isExpanded);
+                    $icon.toggleClass('fa-long-arrow-right', !isExpanded);
+                }
+            }
+
+            if (sidebarStatus === 'horizontal')
+            {
+                applyState('horizontal');
+                updateToggle('horizontal');
+                destroyDropdown($container);
+                if (horizontalMode === 'dropdown') bindDropdown($container);
+                else if (horizontalMode === 'carousel') initMenuCarousel($container);
+                queueTransitionReady();
+                return;
+            }
+
+            destroyDropdown($container);
+
+            const toggleInitialMode = $toggle.length ? ($toggle.data('initial-mode') === 'compact' ? 'compact' : 'default') : 'default';
+            let activeMode = sidebarStatus === 'compact' ? toggleInitialMode : 'default';
+            applyState(activeMode);
+            updateToggle(activeMode);
+            queueTransitionReady();
+
+            if ($toggle.length)
+            {
+                $toggle.off('click.listdomDashboard').on('click.listdomDashboard', function (event)
+                {
+                    event.preventDefault();
+                    activeMode = activeMode === 'compact' ? 'default' : 'compact';
+                    applyState(activeMode);
+                    updateToggle(activeMode);
+                    queueTransitionReady();
+                });
+            }
+        });
+    };
+
+    if (typeof jQuery !== 'undefined')
+    {
+        jQuery(function ($)
+        {
+            window.lsdDashboardApplySidebar($('.lsd-dashboard'));
+        });
+    }
+})();
+
 // Listdom DASHBOARD PLUGIN
 (function ($) {
     $.fn.listdomDashboard = function (options) {
@@ -6198,6 +7635,7 @@ function ListdomDetails(id, link, settings) {
         );
 
         let $dashboard = $("#lsd_dashboard");
+        window.lsdDashboardApplySidebar($dashboard);
         setListeners();
 
         function setListeners() {
@@ -6269,13 +7707,249 @@ function ListdomDetails(id, link, settings) {
 
         let $dashboard = $("#lsd_dashboard");
         let $form = $("#lsd_dashboard_form");
+        window.lsdDashboardApplySidebar($dashboard);
         let $featured_image_input = $("#lsd_featured_image");
         let $featured_image_upload = $("#lsd_featured_image_file");
         let $gallery_upload = $("#lsd_listing_gallery_uploader");
         let $featured_image_preview = $("#lsd_dashboard_featured_image_preview");
+        let $featured_image_container = $("#lsd_dashboard_featured_image_placeholder");
         let $featured_image_remove = $("#lsd_featured_image_remove_button");
         let $multiline_select = $(".lsd-select-multiple");
         let ajax = false;
+        const aspectRatioTolerance = 0.05;
+
+        function parseAspectRatio(value) {
+            if (!value || typeof value !== "string") return null;
+
+            const trimmed = value.trim();
+            if (!trimmed || trimmed === "none") return null;
+
+            const parts = trimmed.split(":");
+            if (parts.length !== 2) return null;
+
+            const width = parseFloat(parts[0]);
+            const height = parseFloat(parts[1]);
+
+            if (!width || !height || Number.isNaN(width) || Number.isNaN(height)) return null;
+
+            return width / height;
+        }
+
+        function isAspectRatioAllowed(width, height, ratio, tolerance) {
+            if (!ratio || !width || !height) return true;
+            const actual = width / height;
+            return Math.abs(actual - ratio) / ratio <= tolerance;
+        }
+
+        function getImageDimensions(file) {
+            return new Promise(function (resolve, reject) {
+                if (!file || !file.type || file.type.indexOf("image") !== 0) {
+                    reject(new Error("invalid_file"));
+                    return;
+                }
+
+                const image = new Image();
+                const urlCreator = window.URL || window.webkitURL;
+                const objectUrl = urlCreator ? urlCreator.createObjectURL(file) : null;
+
+                image.onload = function () {
+                    const width = image.naturalWidth || image.width;
+                    const height = image.naturalHeight || image.height;
+                    if (objectUrl && urlCreator) urlCreator.revokeObjectURL(objectUrl);
+
+                    if (!width || !height) {
+                        reject(new Error("invalid_dimensions"));
+                        return;
+                    }
+
+                    resolve({ width: width, height: height });
+                };
+
+                image.onerror = function () {
+                    if (objectUrl && urlCreator) urlCreator.revokeObjectURL(objectUrl);
+                    reject(new Error("load_error"));
+                };
+
+                if (objectUrl) image.src = objectUrl;
+                else reject(new Error("no_url"));
+            });
+        }
+
+        function fallbackGalleryPlaceholder(context) {
+            let $containers;
+
+            if (typeof context !== "undefined" && context !== null) {
+                $containers = $(context);
+
+                if ($containers.is(".lsd-listing-gallery-container")) {
+                    // Already the container
+                } else {
+                    $containers = $containers.closest(".lsd-listing-gallery-container");
+                }
+            } else {
+                $containers = $(".lsd-listing-gallery-container");
+            }
+
+            if (!$containers.length) return;
+
+            $containers.each(function () {
+                const $container = $(this);
+                const $list = $container.find(".lsd-listing-gallery");
+                const $placeholder = $container.find(".lsd-gallery-placeholder");
+                const $removeButton = $container.find(".lsd-remove-gallery-button");
+                const $addMoreButton = $container.find(".lsd-gallery-add-more-button");
+
+                if (!$list.length || !$placeholder.length) return;
+
+                const hasItems = $list.find("li").length > 0;
+
+                if (hasItems) {
+                    $list.removeClass("lsd-util-hide");
+                    $placeholder.addClass("lsd-util-hide");
+                    $removeButton.removeClass("lsd-util-hide");
+                    $addMoreButton.removeClass("lsd-util-hide");
+                } else {
+                    $list.addClass("lsd-util-hide");
+                    $placeholder.removeClass("lsd-util-hide");
+                    $removeButton.addClass("lsd-util-hide");
+                    $addMoreButton.addClass("lsd-util-hide");
+                }
+            });
+        }
+
+        if (typeof window.lsdUpdateGalleryPlaceholder !== "function") {
+            window.lsdUpdateGalleryPlaceholder = fallbackGalleryPlaceholder;
+        }
+
+        function updateGalleryPlaceholder(context) {
+            if (typeof window.lsdUpdateGalleryPlaceholder === "function") {
+                window.lsdUpdateGalleryPlaceholder(context);
+            }
+        }
+
+        function bindGalleryRemoveHandler($lists) {
+            if (!$lists || !$lists.length) return;
+
+            $lists
+                .off("click.lsdGalleryRemove", ".lsd-remove-gallery-single-button")
+                .on("click.lsdGalleryRemove", ".lsd-remove-gallery-single-button", function (event) {
+                    event.preventDefault();
+
+                    const $item = $(this).closest("li");
+                    if (!$item.length) return;
+
+                    const $list = $item.closest(".lsd-listing-gallery");
+
+                    $item.remove();
+                    updateGalleryPlaceholder($list);
+                });
+        }
+
+        updateGalleryPlaceholder();
+        bindGalleryRemoveHandler($(".lsd-listing-gallery"));
+
+        function syncDashboardEditors() {
+            if (
+                typeof window.tinymce !== "undefined" &&
+                window.tinymce &&
+                typeof window.tinymce.triggerSave === "function"
+            ) {
+                window.tinymce.triggerSave();
+                return;
+            }
+
+            if (
+                typeof window.tinyMCE !== "undefined" &&
+                window.tinyMCE &&
+                typeof window.tinyMCE.triggerSave === "function"
+            ) {
+                window.tinyMCE.triggerSave();
+            }
+        }
+
+        function clearFieldMessages() {
+            const $featuredAlert = $("#lsd_listing_featured_image_message");
+            if ($featuredAlert.length) $featuredAlert.html("");
+
+            if ($form.length) {
+                $form.find('.lsd-attribute-image').each(function () {
+                    const $wrapper = $(this);
+                    $wrapper.removeClass('lsd-attribute-error');
+                    $wrapper.find('.lsd-imagepicker-image-placeholder').removeClass('lsd-attribute-error');
+                    $wrapper.find('.lsd-attribute-image-message').html('');
+                });
+
+                $form.find('.lsd-attribute-file').each(function () {
+                    const $wrapper = $(this);
+                    $wrapper.removeClass('lsd-attribute-error');
+                    $wrapper.find('.lsd-imagepicker-image-placeholder').removeClass('lsd-attribute-error');
+                    $wrapper.find('.lsd-attribute-file-message').html('');
+                });
+            }
+        }
+
+        function applyFieldMessages(data) {
+            clearFieldMessages();
+            if (!data) return;
+
+            const $featuredAlert = $("#lsd_listing_featured_image_message");
+            if (data.featured_image && $featuredAlert.length) {
+                if (typeof listdom_alertify === 'function') $featuredAlert.html(listdom_alertify(data.featured_image, "lsd-error"));
+                else $featuredAlert.text(data.featured_image);
+
+                setTimeout(function () {
+                    $featuredAlert.html("");
+                }, 9000);
+            }
+
+            if (data.attribute_images && typeof data.attribute_images === 'object') {
+                Object.keys(data.attribute_images).forEach(function (slug) {
+                    const message = data.attribute_images[slug];
+                    const $input = $form.find('[name="lsd[attributes][' + slug + ']"]');
+                    if (!$input.length) return;
+
+                    const $wrapper = $input.closest('.lsd-attribute-image');
+                    const $placeholder = $('#' + $input.attr('id') + '_img');
+                    const $alert = $wrapper.find('.lsd-attribute-image-message');
+
+                    if ($alert.length) {
+                        if (typeof listdom_alertify === 'function') $alert.html(listdom_alertify(message, 'lsd-error'));
+                        else $alert.text(message);
+                    }
+
+                    $wrapper.addClass('lsd-attribute-error');
+                    if ($placeholder.length) $placeholder.addClass('lsd-attribute-error');
+
+                    setTimeout(function () {
+                        if ($alert.length) $alert.html('');
+                    }, 9000);
+                });
+            }
+
+            if (data.attribute_files && typeof data.attribute_files === 'object') {
+                Object.keys(data.attribute_files).forEach(function (slug) {
+                    const message = data.attribute_files[slug];
+                    const $input = $form.find('[name="lsd[attributes][' + slug + ']"]');
+                    if (!$input.length) return;
+
+                    const $wrapper = $input.closest('.lsd-attribute-file');
+                    const $placeholder = $('#' + $input.attr('id') + '_img');
+                    const $alert = $wrapper.find('.lsd-attribute-file-message');
+
+                    if ($alert.length) {
+                        if (typeof listdom_alertify === 'function') $alert.html(listdom_alertify(message, 'lsd-error'));
+                        else $alert.text(message);
+                    }
+
+                    $wrapper.addClass('lsd-attribute-error');
+                    if ($placeholder.length) $placeholder.addClass('lsd-attribute-error');
+
+                    setTimeout(function () {
+                        if ($alert.length) $alert.html('');
+                    }, 9000);
+                });
+            }
+        }
 
         setListeners();
 
@@ -6368,12 +8042,40 @@ function ListdomDetails(id, link, settings) {
                 }
             });
 
+            // Validate required file fields
+            $('.lsd-attribute-file[data-required="1"]:visible', $form).each(function () {
+                const $this = $(this);
+                const $input = $(this).find('input[type=hidden]');
+                const value = $input.val();
+                const requiredMessage = $this.data('required-message') || 'Please select a file.';
+                const $placeholder = $('#' + $input.attr('id') + '_img');
+
+                if (!value) {
+                    isValid = false;
+                    $placeholder.addClass('lsd-attribute-error');
+                    if ($placeholder.next('.lsd-attribute-error-msg').length === 0) {
+                        $placeholder.after('<div class="lsd-attribute-error-msg lsd-alert lsd-error">' + requiredMessage + '</div>');
+                    }
+                } else {
+                    $placeholder.removeClass('lsd-attribute-error');
+                    $placeholder.next('.lsd-attribute-error-msg').remove();
+                }
+            });
+
             if (!isValid) {
-                $('html, body').animate({
-                    scrollTop: $('.lsd-attribute-error:first').offset().top - 100
-                }, 300);
+                const $firstError = $('.lsd-attribute-error:visible:first');
+                if ($firstError.length) {
+                    $('html, body').animate(
+                        {
+                            scrollTop: $firstError.offset().top - 100,
+                        },
+                        300
+                    );
+                }
                 return;
             }
+
+            clearFieldMessages();
 
             // Add loading Class to the form
             $form.addClass("lsd-loading");
@@ -6381,9 +8083,8 @@ function ListdomDetails(id, link, settings) {
             // Loading Style
             $dashboard.fadeTo(200, 0.7);
 
-            // Fix WordPress editor issue
-            $("#lsd_dashboard_content-html").click();
-            $("#lsd_dashboard_content-tmce").click();
+            // Sync TinyMCE editor content without affecting scroll position
+            syncDashboardEditors();
 
             // Abort previous request
             if (ajax) ajax.abort();
@@ -6447,13 +8148,61 @@ function ListdomDetails(id, link, settings) {
             // Wrapper
             let $wrapper = $(".lsd-dashboard-featured-image");
 
+            const file = $featured_image_upload.prop("files")[0];
+            if (!file) return;
+
+            const ratioLabel = ($featured_image_upload.data("aspectRatio") || "").toString().trim();
+            const ratioValue = parseAspectRatio(ratioLabel);
+
+            const aspectMessage =
+                ($featured_image_upload.data("aspectMessage") || "").toString().trim() ||
+                (ratioLabel ? "Please upload an image with an aspect ratio close to " + ratioLabel + "." : "");
+
+            if (ratioValue) {
+                getImageDimensions(file)
+                    .then(function (dimensions) {
+                        if (
+                            !isAspectRatioAllowed(
+                                dimensions.width,
+                                dimensions.height,
+                                ratioValue,
+                                aspectRatioTolerance
+                            )
+                        ) {
+                            const message = aspectMessage || "The image does not match the required aspect ratio.";
+                            $featured_image_upload.val("");
+                            $alert.html(listdom_alertify(message, "lsd-error"));
+                            setTimeout(function () {
+                                $alert.html("");
+                            }, 9000);
+                            return;
+                        }
+
+                        featured_image_upload_request(file, $wrapper, $alert);
+                    })
+                    .catch(function () {
+                        const message = aspectMessage || "Unable to validate the image aspect ratio.";
+                        $featured_image_upload.val("");
+                        $alert.html(listdom_alertify(message, "lsd-error"));
+                        setTimeout(function () {
+                            $alert.html("");
+                        }, 9000);
+                    });
+
+                return;
+            }
+
+            featured_image_upload_request(file, $wrapper, $alert);
+        }
+
+        function featured_image_upload_request(file, $wrapper, $alert) {
             // Loading Style
             $wrapper.addClass("lsd-loading");
 
             let fd = new FormData();
             fd.append("action", "lsd_dashboard_listing_upload_featured_image");
             fd.append("_wpnonce", settings.nonce);
-            fd.append("file", $featured_image_upload.prop("files")[0]);
+            fd.append("file", file);
 
             // Empty Alert
             $alert.html("");
@@ -6470,15 +8219,25 @@ function ListdomDetails(id, link, settings) {
                 $wrapper.removeClass("lsd-loading");
 
                 if (response.success) {
+                    const $emptyState = $featured_image_container.find('.lsd-image-placeholder-empty');
+
                     $featured_image_input.val(response.data.attachment_id);
                     $featured_image_upload.val("");
-                    $featured_image_preview.html('<img src="' + response.data.url + '" alt="">');
+                    $featured_image_preview.html('<img src="' + response.data.url + '" alt="">').removeClass('lsd-util-hide');
+                    $featured_image_container.addClass('lsd-image-placeholder-has-image');
+                    $emptyState.addClass('lsd-util-hide');
                     $featured_image_remove.removeClass("lsd-util-hide");
 
                     $alert.html(listdom_alertify(response.message, "lsd-success"));
                 } else {
+                    const $emptyState = $featured_image_container.find('.lsd-image-placeholder-empty');
+
                     $featured_image_input.val('');
                     $featured_image_upload.val("");
+                    $featured_image_preview.html('').addClass('lsd-util-hide');
+                    $featured_image_container.removeClass('lsd-image-placeholder-has-image');
+                    $emptyState.removeClass('lsd-util-hide');
+                    $featured_image_remove.addClass('lsd-util-hide');
 
                     $alert.html(listdom_alertify(response.message, "lsd-error"));
                 }
@@ -6491,8 +8250,12 @@ function ListdomDetails(id, link, settings) {
         }
 
         function featured_image_remove() {
+            const $emptyState = $featured_image_container.find('.lsd-image-placeholder-empty');
+
             $featured_image_input.val("");
-            $featured_image_preview.html("");
+            $featured_image_preview.html("").addClass('lsd-util-hide');
+            $featured_image_container.removeClass('lsd-image-placeholder-has-image');
+            $emptyState.removeClass('lsd-util-hide');
             $featured_image_remove.addClass("lsd-util-hide");
         }
 
@@ -6500,9 +8263,114 @@ function ListdomDetails(id, link, settings) {
             // Alert
             let $alert = $("#lsd_listing_gallery_uploader_message");
 
-            // Wrapper
-            let $wrapper = $(".lsd-listing-gallery-container");
+            let $target = $($gallery_upload.data("for"));
+            let $wrapper = $target.closest(".lsd-listing-gallery-container");
+            if (!$wrapper.length) $wrapper = $(".lsd-listing-gallery-container");
+            let name = $gallery_upload.data("name");
+            let files = $gallery_upload.prop("files");
+            let ins = files.length;
 
+            bindGalleryRemoveHandler($target);
+
+            // Empty Alert
+            $alert.html("");
+
+            let maxImages = parseInt($gallery_upload.data("max-images"), 10);
+            if (isNaN(maxImages)) maxImages = 0;
+
+            let currentCount = $target.find("li").length;
+
+            if (maxImages > 0) {
+                let remaining = maxImages - currentCount;
+
+                if (remaining <= 0) {
+                    let message = $gallery_upload.data("max-images-message");
+                    if (!message) message = "You can upload up to " + maxImages + " gallery images.";
+                    else message = message.replace("%s", maxImages);
+
+                    $gallery_upload.val("");
+                    $alert.html(listdom_alertify(message, "lsd-error"));
+
+                    setTimeout(function () {
+                        $alert.html("");
+                    }, 60000);
+
+                    return;
+                }
+
+                if (ins > remaining) {
+                    let message = $gallery_upload.data("max-images-remaining-message");
+                    if (!message) message = "You can only upload " + remaining + " more image(s).";
+                    else message = message.replace("%s", remaining);
+
+                    $gallery_upload.val("");
+                    $alert.html(listdom_alertify(message, "lsd-error"));
+
+                    setTimeout(function () {
+                        $alert.html("");
+                    }, 60000);
+
+                    return;
+                }
+            }
+
+            const ratioLabel = ($gallery_upload.data("aspectRatio") || $wrapper.data("aspectRatio") || "")
+                .toString()
+                .trim();
+            const ratioValue = parseAspectRatio(ratioLabel);
+            const aspectMessage =
+                ($gallery_upload.data("aspectMessage") || $wrapper.data("aspectMessage") || "").toString().trim() ||
+                (ratioLabel ? "Please upload images with an aspect ratio close to " + ratioLabel + "." : "");
+
+            if (ratioValue && ins > 0) {
+                validateGalleryAspectRatio(files, ratioValue, aspectMessage, $alert, $wrapper, $target, name);
+                return;
+            }
+
+            gallery_upload_request($wrapper, $target, name, files, currentCount, $alert);
+        }
+
+        function validateGalleryAspectRatio(files, ratioValue, aspectMessage, $alert, $wrapper, $target, name) {
+            const fileList = Array.from(files);
+            let index = 0;
+
+            const checkNext = function () {
+                if (index >= fileList.length) {
+                    gallery_upload_request($wrapper, $target, name, files, $target.find("li").length, $alert);
+                    return;
+                }
+
+                const file = fileList[index];
+                index += 1;
+
+                getImageDimensions(file)
+                    .then(function (dimensions) {
+                        if (!isAspectRatioAllowed(dimensions.width, dimensions.height, ratioValue, aspectRatioTolerance)) {
+                            const message = aspectMessage || "One or more images do not match the required aspect ratio.";
+                            $gallery_upload.val("");
+                            $alert.html(listdom_alertify(message, "lsd-error"));
+                            setTimeout(function () {
+                                $alert.html("");
+                            }, 60000);
+                            return;
+                        }
+
+                        checkNext();
+                    })
+                    .catch(function () {
+                        const message = aspectMessage || "Unable to validate the image aspect ratio.";
+                        $gallery_upload.val("");
+                        $alert.html(listdom_alertify(message, "lsd-error"));
+                        setTimeout(function () {
+                            $alert.html("");
+                        }, 60000);
+                    });
+            };
+
+            checkNext();
+        }
+
+        function gallery_upload_request($wrapper, $target, name, files, currentCount, $alert) {
             // Loading Style
             $wrapper.addClass("lsd-loading");
 
@@ -6511,12 +8379,14 @@ function ListdomDetails(id, link, settings) {
             fd.append("_wpnonce", settings.nonce);
 
             // Append Images
-            let ins = $gallery_upload.prop("files").length;
-            for (let x = 0; x < ins; x++)
-                fd.append("files[]", $gallery_upload.prop("files")[x]);
+            fd.append("existing_count", currentCount);
 
-            // Empty Alert
-            $alert.html("");
+            $target.find('input[name="' + name + '"]').each(function () {
+                const id = $(this).val();
+                if (id) fd.append("existing_ids[]", id);
+            });
+
+            for (let x = 0; x < files.length; x++) fd.append("files[]", files[x]);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -6529,35 +8399,23 @@ function ListdomDetails(id, link, settings) {
                 // Loading Style
                 $wrapper.removeClass("lsd-loading");
 
-                let $target = $($gallery_upload.data("for"));
-                let name = $gallery_upload.data("name");
-                if (response.data && response.data.length > 0) {
+                const hasData = Array.isArray(response.data) && response.data.length > 0;
+
+                if (hasData) {
                     response.data.map(function (attachment) {
                         $target.append(
                             '<li data-id="' + attachment.id + '"><input type="hidden" name="' + name + '" value="' + attachment.id + '"><img src="' + attachment.url + '" alt=""><div class="lsd-gallery-actions"><i class="lsd-icon fas fa-trash-alt lsd-remove-gallery-single-button"></i> <i class="lsd-icon fas fa-arrows-alt lsd-handler"></i></div></li>'
                         );
                     });
 
-                    // Trigger Remove Button
-                    $(".lsd-remove-gallery-single-button")
-                    .off("click")
-                    .on("click", function (event) {
-                        event.preventDefault();
-                        $(this).parent().parent().remove();
-                    });
-                    // Show Alert
                     $alert.html(listdom_alertify(response.message, "lsd-success"));
                 }
 
-                // If there are errors, show them
-                if (!response.success || response.data.length === 0) {
+                if (!response.success || !hasData) {
                     $alert.html(listdom_alertify(response.message, "lsd-error"));
                 }
 
-                // Show / Hide Mass Remove Button
-                if ($target.find($("li")).length > 0)
-                    $(".lsd-remove-gallery-button").removeClass("lsd-util-hide");
-                else $(".lsd-remove-gallery-button").addClass("lsd-util-hide");
+                updateGalleryPlaceholder($target);
 
                 // Empty Alert
                 setTimeout(function () {
@@ -6565,6 +8423,202 @@ function ListdomDetails(id, link, settings) {
                 }, 60000);
             });
         }
+    };
+})(jQuery);
+
+// Listdom Dashboard Additional Categories
+(function ($) {
+    $.fn.AdditionalCategories = function(options)
+    {
+        const defaults = {post_id: '', children_only: '0', ajax_url: '', nonce: ''};
+
+        return this.each(function()
+        {
+            const $wrapper = $(this);
+            if (!$wrapper.length) return;
+
+            const settings = $.extend({}, defaults, options || {});
+            const childrenOnly = settings.children_only === '1';
+            const ajaxUrl = settings.ajax_url || '';
+            const nonce = settings.nonce || '';
+            const postId = parseInt(settings.post_id, 10) || 0;
+            const namespace = '.lsdAddCat';
+
+            const $form = $wrapper.closest('form');
+            const $target = $wrapper.find('.lsd-additional-categories');
+            const requiresPrimary = $wrapper.data('requires-primary') || '';
+
+            let request = null;
+            let refreshTimer = null;
+
+            const initSelect2 = function($elements)
+            {
+                if (!$elements || !$elements.length || typeof $.fn.select2 !== 'function') return;
+
+                $elements.each(function()
+                {
+                    const $element = $(this);
+                    const options = {width: '100%'};
+                    const placeholder = $element.data('placeholder');
+
+                    if (placeholder) options.placeholder = placeholder;
+
+                    const $dropdownParent = $element.closest('.lsd-additional-categories-wrapper');
+                    if ($dropdownParent.length) options.dropdownParent = $dropdownParent;
+
+                    $element.select2(options);
+                });
+            };
+
+            const currentPrimaryId = function()
+            {
+                const $select = $form.find('#lsd_listing_category');
+                if ($select.length)
+                {
+                    const val = parseInt($select.val(), 10);
+                    return isNaN(val) ? 0 : val;
+                }
+
+                const $checked = $form.find('input[name="lsd[listing_category][]"]:checked');
+                if ($checked.length)
+                {
+                    const val = parseInt($checked.first().val(), 10);
+                    return isNaN(val) ? 0 : val;
+                }
+
+                return 0;
+            };
+
+            const collectSelected = function()
+            {
+                const selected = [];
+                const $dropdown = $target.find('select.lsd-fd-taxonomies-dropdown');
+                if ($dropdown.length)
+                {
+                    const values = $dropdown.val();
+                    const normalized = Array.isArray(values) ? values : (typeof values === 'undefined' || values === null ? [] : [values]);
+
+                    normalized.forEach(function(value)
+                    {
+                        const id = parseInt(value, 10);
+                        if (id) selected.push(id);
+                    });
+
+                    return selected;
+                }
+
+                $target.find('input[type="checkbox"]:checked').each(function()
+                {
+                    const id = parseInt($(this).val(), 10);
+                    if (id) selected.push(id);
+                });
+
+                return selected;
+            };
+
+            const showPrimaryMessage = function()
+            {
+                if (requiresPrimary)
+                {
+                    const markup = $('<p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"></p>').text(requiresPrimary).prop('outerHTML');
+                    $target.html(markup);
+                }
+                else
+                {
+                    $target.empty();
+                }
+            };
+
+            const refresh = function()
+            {
+                if (!childrenOnly) return;
+
+                const primaryId = currentPrimaryId();
+
+                if (!primaryId)
+                {
+                    if (request) request.abort();
+                    $wrapper.removeClass('lsd-loading');
+                    showPrimaryMessage();
+                    return;
+                }
+
+                const selected = collectSelected();
+
+                if (request) request.abort();
+                if (!ajaxUrl || !nonce) return;
+
+                $wrapper.addClass('lsd-loading');
+
+                request = $.ajax({
+                    url: ajaxUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'lsd_refresh_additional_categories',
+                        nonce: nonce,
+                        post_id: postId,
+                        primary_id: primaryId,
+                        selected: selected
+                    },
+                    success: function(response)
+                    {
+                        const html = response && response.data && typeof response.data.html !== 'undefined'
+                            ? response.data.html
+                            : (response && typeof response.html !== 'undefined' ? response.html : null);
+
+                        if (html === null || typeof html === 'undefined') return;
+
+                        $target.html(html);
+                        initSelect2($target.find('.lsd-select-multiple'));
+                    },
+                    complete: function()
+                    {
+                        request = null;
+                        $wrapper.removeClass('lsd-loading');
+                    }
+                });
+            };
+
+            const scheduleRefresh = function()
+            {
+                if (refreshTimer) clearTimeout(refreshTimer);
+
+                refreshTimer = setTimeout(function()
+                {
+                    refreshTimer = null;
+                    refresh();
+                }, 0);
+            };
+
+            const bindPrimaryHandlers = function()
+            {
+                const $primarySelect = $form.find('#lsd_listing_category');
+                if ($primarySelect.length)
+                {
+                    $primarySelect
+                    .off('change' + namespace + ' select2:select' + namespace + ' select2:unselect' + namespace + ' select2:clear' + namespace)
+                    .on('change' + namespace, scheduleRefresh)
+                    .on('select2:select' + namespace + ' select2:unselect' + namespace + ' select2:clear' + namespace, scheduleRefresh);
+                }
+
+                const $primaryCheckboxes = $form.find('input[name="lsd[listing_category][]"]');
+                if ($primaryCheckboxes.length)
+                {
+                    $primaryCheckboxes.off('change' + namespace).on('change' + namespace, scheduleRefresh);
+                }
+            };
+
+            if (childrenOnly)
+            {
+                bindPrimaryHandlers();
+                if (currentPrimaryId()) refresh();
+                else showPrimaryMessage();
+            }
+
+            const instance = {refresh: refresh};
+            $wrapper.data('lsdAdditionalCategories', instance);
+        });
     };
 })(jQuery);
 
@@ -6732,16 +8786,20 @@ function ListdomDetails(id, link, settings) {
             options
         );
 
+        let $dashboard = $("#lsd_dashboard");
         let $form = $("#lsd_dashboard_profile");
+        window.lsdDashboardApplySidebar($dashboard);
         let $profile_image_input = $("#lsd_profile_image");
         let $profile_image_upload = $("#lsd_profile_image_file");
         let $profile_image_preview = $("#lsd_dashboard_profile_image_preview");
         let $profile_image_remove = $("#lsd_profile_image_remove_button");
+        let $profile_image_button = $(".lsd-choose-profile-image");
 
         let $hero_image_input = $("#lsd_hero_image");
         let $hero_image_upload = $("#lsd_hero_image_file");
         let $hero_image_preview = $("#lsd_dashboard_hero_image_preview");
         let $hero_image_remove = $("#lsd_hero_image_remove_button");
+        let $hero_image_button = $(".lsd-choose-hero-image");
 
         let ajax = false;
 
@@ -6812,6 +8870,8 @@ function ListdomDetails(id, link, settings) {
                     $form.removeClass("lsd-loading");
 
                     if (response.success === 1) {
+                        clearFieldMessages();
+
                         // Show the message
                         $message.html(listdom_alertify(response.message, "lsd-success"));
 
@@ -6835,6 +8895,7 @@ function ListdomDetails(id, link, settings) {
                     } else {
                         // Show the message
                         $message.html(listdom_alertify(response.message, "lsd-error"));
+                        applyFieldMessages(response.data || {});
                     }
                 },
                 error: function () {
@@ -6848,7 +8909,7 @@ function ListdomDetails(id, link, settings) {
             let $alert = $("#lsd_profile_image_message");
 
             // Wrapper
-            let $wrapper = $(".lsd-dashboard-profile-image");
+            let $wrapper = $(".lsd-profile-image-container");
 
             // Loading Style
             $wrapper.addClass("lsd-loading");
@@ -6877,12 +8938,15 @@ function ListdomDetails(id, link, settings) {
                     $profile_image_upload.val("");
                     $profile_image_preview.html('<img src="' + response.data.url + '" alt="">');
                     $profile_image_remove.removeClass("lsd-util-hide");
+                    $profile_image_button.addClass("lsd-util-hide");
                     $profile_image_upload.addClass("lsd-util-hide");
 
                     $alert.html(listdom_alertify(response.message, "lsd-success"));
                 } else {
                     $profile_image_input.val('');
                     $profile_image_upload.val("");
+                    $profile_image_button.removeClass("lsd-util-hide");
+                    $profile_image_upload.addClass("lsd-util-hide");
 
                     $alert.html(listdom_alertify(response.message, "lsd-error"));
                 }
@@ -6898,7 +8962,8 @@ function ListdomDetails(id, link, settings) {
             $profile_image_input.val("");
             $profile_image_preview.html("");
             $profile_image_remove.addClass("lsd-util-hide");
-            $profile_image_upload.removeClass("lsd-util-hide");
+            $profile_image_upload.addClass("lsd-util-hide");
+            $profile_image_button.removeClass("lsd-util-hide");
         }
 
         function hero_image_upload() {
@@ -6906,7 +8971,7 @@ function ListdomDetails(id, link, settings) {
             let $alert = $("#lsd_hero_image_message");
 
             // Wrapper
-            let $wrapper = $(".lsd-dashboard-hero-image");
+            let $wrapper = $(".lsd-profile-hero-image-container");
 
             // Loading Style
             $wrapper.addClass("lsd-loading");
@@ -6935,12 +9000,15 @@ function ListdomDetails(id, link, settings) {
                     $hero_image_upload.val("");
                     $hero_image_preview.html('<img src="' + response.data.url + '" alt="">');
                     $hero_image_remove.removeClass("lsd-util-hide");
+                    $hero_image_button.addClass("lsd-util-hide");
                     $hero_image_upload.addClass("lsd-util-hide");
 
                     $alert.html(listdom_alertify(response.message, "lsd-success"));
                 } else {
                     $hero_image_input.val('');
                     $hero_image_upload.val("");
+                    $hero_image_button.removeClass("lsd-util-hide");
+                    $hero_image_upload.addClass("lsd-util-hide");
 
                     $alert.html(listdom_alertify(response.message, "lsd-error"));
                 }
@@ -6956,7 +9024,8 @@ function ListdomDetails(id, link, settings) {
             $hero_image_input.val("");
             $hero_image_preview.html("");
             $hero_image_remove.addClass("lsd-util-hide");
-            $hero_image_upload.removeClass("lsd-util-hide");
+            $hero_image_upload.addClass("lsd-util-hide");
+            $hero_image_button.removeClass("lsd-util-hide");
         }
     };
 })(jQuery);
@@ -6966,65 +9035,155 @@ function ListdomDetails(id, link, settings) {
     $.fn.listdomLoginForm = function (options) {
         const settings = $.extend({
             ajax_url: 0,
+            can_resend: false,
+            username_placeholder: "",
+            password_placeholder: "",
         }, options);
 
-        let $login = $("#lsd_login_wrapper");
-        let $form = $('#lsd-login');
-        let ajax = false;
+        return this.each(function () {
+            let $form = $(this);
+            let $wrapper = $form.closest(".lsd-login-wrapper");
+            let $login = $wrapper.length ? $wrapper : $form;
+            let $message = $wrapper.find(".lsd-login-form-message");
+            let $resend = $wrapper.find(".lsd-resend-verification");
+            let $resendWrapper = $wrapper.find(".lsd-login-resend-wrapper");
+            let $userLogin = $form.find('input[name="log"]');
+            let $userPassword = $form.find('input[name="pwd"]');
+            const canResend = !!(settings.can_resend && $resend.length && $resendWrapper.length);
+            let ajax = false;
+            let resendAjax = false;
 
-        setListeners();
+            if (settings.username_placeholder && $userLogin.length) $userLogin.attr("placeholder", settings.username_placeholder);
 
-        function setListeners() {
-            $form.off("submit").on("submit", function (event) {
-                event.preventDefault();
-                login();
-            });
-        }
+            if (settings.password_placeholder && $userPassword.length) $userPassword.attr("placeholder", settings.password_placeholder);
 
-        function login() {
-            // Message
-            const $message = $("#lsd_login_form_message");
+            setListeners();
+            handleResendVisibility(false);
 
-            // Hide the Message
-            $message.html("");
+            function getMessageTarget()
+            {
+                if ($message.length) return $message;
+                const $fallback = $form.find(".lsd-login-form-message");
+                return $fallback.length ? $fallback : $login;
+            }
 
-            // Add loading Class to the form
-            $form.addClass("lsd-loading");
+            function setListeners() {
+                $form.off("submit").on("submit", function (event) {
+                    event.preventDefault();
+                    login();
+                });
 
-            // Loading Style
-            $login.fadeTo(200, 0.7);
+                if (!canResend) {
+                    $resend.prop("disabled", true);
+                    return;
+                }
 
-            // Abort previous request
-            if (ajax) ajax.abort();
+                $resend.off("click").on("click", function (event) {
+                    event.preventDefault();
+                    resendVerification();
+                });
+            }
 
-            const data = $form.serialize() + '&action=lsd_login&lsd_login=' + settings.nonce;
+            function login() {
+                // Message
+                const $messageTarget = getMessageTarget();
 
-            ajax = $.ajax({
-                type: "POST",
-                url: settings.ajax_url,
-                data: data,
-                dataType: "JSON",
-                success: function (response) {
-                    $form.removeClass("lsd-loading");
+                // Hide the Message
+                $messageTarget.html("");
 
-                    if (response.success === 1) {
-                        $message.html(listdom_alertify(response.message, "lsd-success"));
-                        if (response.redirect) {
-                            setTimeout(() => {
-                                window.location.href = response.redirect;
-                            }, 1000);
+                // Add loading Class to the form
+                $form.addClass("lsd-loading");
+
+                // Loading Style
+                $login.fadeTo(200, 0.7);
+
+                // Abort previous request
+                if (ajax) ajax.abort();
+
+                const data = $form.serialize() + '&action=lsd_login&lsd_login=' + settings.nonce;
+
+                ajax = $.ajax({
+                    type: "POST",
+                    url: settings.ajax_url,
+                    data: data,
+                    dataType: "JSON",
+                    success: function (response) {
+                        $form.removeClass("lsd-loading");
+
+                        if (response.success === 1) {
+                            $messageTarget.html(listdom_alertify(response.message, "lsd-success"));
+                            handleResendVisibility(false);
+                            if (response.redirect) {
+                                setTimeout(() => {
+                                    window.location.href = response.redirect;
+                                }, 1000);
+                            }
+                        } else {
+                            $messageTarget.html(listdom_alertify(response.message, "lsd-error"));
+                            handleResendVisibility(response.allow_resend === 1 || response.allow_resend === true, response.user_login);
                         }
-                    } else {
-                        $message.html(listdom_alertify(response.message, "lsd-error"));
-                    }
-                    $login.fadeTo(200, 1);
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    $message.html(listdom_alertify(errorThrown, "lsd-error"));
-                    $form.removeClass("lsd-loading");
-                },
-            });
-        }
+                        $login.fadeTo(200, 1);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $messageTarget.html(listdom_alertify(errorThrown, "lsd-error"));
+                        $form.removeClass("lsd-loading");
+                    },
+                });
+            }
+
+            function resendVerification() {
+                const $messageTarget = getMessageTarget();
+                const userLogin = $userLogin.val();
+
+                // Hide the Message
+                $messageTarget.html("");
+
+                $login.fadeTo(200, 0.7);
+                $resend.addClass("lsd-loading").prop("disabled", true);
+
+                // Abort previous request
+                if (resendAjax) resendAjax.abort();
+
+                const resendNonce = settings.resend_nonce ? settings.resend_nonce : $form.find('input[name="lsd_resend_verification"]').val();
+
+                resendAjax = $.ajax({
+                    type: "POST",
+                    url: settings.ajax_url,
+                    data: {
+                        action: "lsd_resend_verification",
+                        log: userLogin,
+                        lsd_resend_verification: resendNonce,
+                    },
+                    dataType: "JSON",
+                    success: function (response) {
+                        const type = response.success === 1 ? "lsd-success" : "lsd-error";
+                        $messageTarget.html(listdom_alertify(response.message, type));
+                        handleResendVisibility(response.allow_resend === 1 || response.allow_resend === true, response.user_login || userLogin);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $messageTarget.html(listdom_alertify(errorThrown, "lsd-error"));
+                    },
+                    complete: function () {
+                        $resend.removeClass("lsd-loading").prop("disabled", false);
+                        $login.fadeTo(200, 1);
+                    },
+                });
+            }
+
+            function handleResendVisibility(allow, userLogin) {
+                if (!canResend || !$resendWrapper.length) return;
+
+                if (allow) {
+                    if (userLogin) $userLogin.val(userLogin);
+                    $resendWrapper.removeClass('lsd-util-hide');
+                    $resend.prop('disabled', false);
+                    return;
+                }
+
+                $resendWrapper.addClass('lsd-util-hide');
+                $resend.prop('disabled', true);
+            }
+        });
     };
 })(jQuery);
 
@@ -7035,67 +9194,120 @@ function ListdomDetails(id, link, settings) {
             ajax_url: 0,
 
         }, options);
-        let $register = $("#lsd_register_wrapper");
-        let $form = $('#lsd-registration-form');
-        let ajax = false;
+        return this.each(function () {
+            let $form = $(this);
+            let $register = $form.closest(".lsd-register-wrapper");
+            let $message = $register.find(".lsd-register-form-message");
+            let $password = $form.find('input[name="lsd_password"]');
+            let $rulesWrapper = $register.find(".lsd-register-password-rules");
+            let $rules = $rulesWrapper.find(".lsd-register-password-rule");
+            let ajax = false;
 
-        setListeners();
+            if (!$message.length) $message = $form.find(".lsd-register-form-message");
+            if (!$rulesWrapper.length) $rulesWrapper = $form.find(".lsd-register-password-rules");
+            if (!$rules.length) $rules = $rulesWrapper.find(".lsd-register-password-rule");
 
-        function setListeners() {
-            $form.off("submit").on("submit", function (event) {
-                event.preventDefault();
-                register();
-            });
-        }
+            setListeners();
 
-        function register() {
-            // Message
-            const $message = $("#lsd_register_form_message");
+            function setListeners() {
+                $form.off("submit").on("submit", function (event) {
+                    event.preventDefault();
+                    register();
+                });
 
-            // Hide the Message
-            $message.html("");
+                if ($password.length && $rules.length) {
+                    $password.off("input.lsdPasswordRules").on("input.lsdPasswordRules", function () {
+                        updatePasswordRules();
+                    });
+                    updatePasswordRules();
+                }
+            }
 
-            // Add loading Class to the form
-            $form.addClass("lsd-loading");
+            function updatePasswordRules() {
+                if (!$password.length || !$rules.length) return;
 
-            // Loading Style
-            $register.fadeTo(200, 0.7);
+                const value = $password.val() || "";
 
-            // Abort previous request
-            if (ajax) ajax.abort();
+                $rules.each(function () {
+                    const $rule = $(this);
+                    const rule = $rule.data("rule");
+                    let isMet = false;
 
-            const data = $form.serialize() + '&action=lsd_register&lsd_register=' + settings.nonce;
-            ajax = $.ajax({
-                type: "POST",
-                url: settings.ajax_url,
-                data: data,
-                dataType: "JSON",
-                success: function (response) {
-                    // Remove the Loading Class from the Form
-                    $form.removeClass("lsd-loading");
-
-                    if (response.success === 1) {
-                        // Show the message
-                        $message.html(listdom_alertify(response.message, "lsd-success"));
-                        if (response.redirect) {
-                            setTimeout(() => {
-                                window.location.href = response.redirect;
-                            }, 1000);
+                    switch (rule) {
+                        case "length": {
+                            const minLength = parseInt($rule.data("min-length"), 10) || 0;
+                            isMet = value.length >= minLength;
+                            break;
                         }
-                    } else {
-                        // Show the message
-                        $message.html(listdom_alertify(response.message, "lsd-error"));
+
+                        case "uppercase":
+                            isMet = /[A-Z]/.test(value);
+                            break;
+
+                        case "lowercase":
+                            isMet = /[a-z]/.test(value);
+                            break;
+
+                        case "number":
+                            isMet = /\d/.test(value);
+                            break;
+
+                        case "special":
+                            isMet = /[\W_]/.test(value);
+                            break;
                     }
-                    // Loading Style
-                    $register.fadeTo(200, 1);
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    // Remove the Loading Class from the Form
-                    $message.html(listdom_alertify(errorThrown, "lsd-error"));
-                    $form.removeClass("lsd-loading");
-                },
-            });
-        }
+
+                    $rule.toggleClass("lsd-register-password-rule--met", isMet);
+                });
+            }
+
+            function register() {
+
+                // Hide the Message
+                $message.html("");
+
+                // Add loading Class to the form
+                $form.addClass("lsd-loading");
+
+                // Loading Style
+                $register.fadeTo(200, 0.7);
+
+                // Abort previous request
+                if (ajax) ajax.abort();
+
+                const data = $form.serialize() + '&action=lsd_register&lsd_register=' + settings.nonce;
+                ajax = $.ajax({
+                    type: "POST",
+                    url: settings.ajax_url,
+                    data: data,
+                    dataType: "JSON",
+                    success: function (response) {
+                        // Remove the Loading Class from the Form
+                        $form.removeClass("lsd-loading");
+
+                        if (response.success === 1) {
+                            // Show the message
+                            $message.html(listdom_alertify(response.message, "lsd-success"));
+                            if (response.redirect) {
+                                setTimeout(() => {
+                                    window.location.href = response.redirect;
+                                }, 1000);
+                            }
+                        } else {
+                            // Show the message
+                            $message.html(listdom_alertify(response.message, "lsd-error"));
+                        }
+                        // Loading Style
+                        $register.fadeTo(200, 1);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // Remove the Loading Class from the Form
+                        $message.html(listdom_alertify(errorThrown, "lsd-error"));
+                        $form.removeClass("lsd-loading");
+                    },
+                });
+            }
+        });
     };
 })(jQuery);
 
@@ -7106,65 +9318,68 @@ function ListdomDetails(id, link, settings) {
             ajax_url: 0,
 
         }, options);
-        let $register = $(".lsd-forgot-password-wrapper");
-        let $form = $('#lsd-forgot-password');
-        let ajax = false;
+        return this.each(function () {
+            let $form = $(this);
+            let $register = $form.closest(".lsd-forgot-password-wrapper");
+            let $message = $register.find(".lsd-forgot-password-form-message");
+            let ajax = false;
 
-        setListeners();
+            if (!$message.length) $message = $form.find(".lsd-forgot-password-form-message");
 
-        function setListeners() {
-            $form.off("submit").on("submit", function (event) {
-                event.preventDefault();
-                forgotPassword();
-            });
-        }
+            setListeners();
 
-        function forgotPassword() {
-            // Message
-            const $message = $("#lsd_forgot_password_form_message");
+            function setListeners() {
+                $form.off("submit").on("submit", function (event) {
+                    event.preventDefault();
+                    forgotPassword();
+                });
+            }
 
-            // Hide the Message
-            $message.html("");
+            function forgotPassword() {
 
-            // Add loading Class to the form
-            $form.addClass("lsd-loading");
+                // Hide the Message
+                $message.html("");
 
-            // Loading Style
-            $register.fadeTo(200, 0.7);
+                // Add loading Class to the form
+                $form.addClass("lsd-loading");
 
-            // Abort previous request
-            if (ajax) ajax.abort();
+                // Loading Style
+                $register.fadeTo(200, 0.7);
 
-            const data = $form.serialize() + '&action=lsd_forgot_password&lsd_forgot_password=' + settings.nonce;
-            ajax = $.ajax({
-                type: "POST",
-                url: settings.ajax_url,
-                data: data,
-                dataType: "JSON",
-                success: function (response) {
-                    // Remove the Loading Class from the Form
-                    $form.removeClass("lsd-loading");
+                // Abort previous request
+                if (ajax) ajax.abort();
 
-                    if (response.success === 1) {
-                        // Show the message
-                        $message.html(listdom_alertify(response.message, "lsd-success"));
-                        if (response.redirect) {
-                            window.location.href = response.redirect;
+                const data = $form.serialize() + '&action=lsd_forgot_password&lsd_forgot_password=' + settings.nonce;
+                ajax = $.ajax({
+                    type: "POST",
+                    url: settings.ajax_url,
+                    data: data,
+                    dataType: "JSON",
+                    success: function (response) {
+                        // Remove the Loading Class from the Form
+                        $form.removeClass("lsd-loading");
+
+                        if (response.success === 1) {
+                            // Show the message
+                            $message.html(listdom_alertify(response.message, "lsd-success"));
+                            if (response.redirect) {
+                                window.location.href = response.redirect;
+                            }
+                        } else {
+                            // Show the message
+                            $message.html(listdom_alertify(response.message, "lsd-error"));
                         }
-                    } else {
-                        // Show the message
-                        $message.html(listdom_alertify(response.message, "lsd-error"));
-                    }
-                    // Loading Style
-                    $register.fadeTo(200, 1);
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    // Remove the Loading Class from the Form
-                    $message.html(listdom_alertify(errorThrown, "lsd-error"));
-                    $form.removeClass("lsd-loading");
-                },
-            });
-        }
+                        // Loading Style
+                        $register.fadeTo(200, 1);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // Remove the Loading Class from the Form
+                        $message.html(listdom_alertify(errorThrown, "lsd-error"));
+                        $form.removeClass("lsd-loading");
+                    },
+                });
+            }
+        });
     };
 })(jQuery);
 
@@ -7175,53 +9390,56 @@ function ListdomDetails(id, link, settings) {
             ajax_url: 0,
         }, options);
 
-        let $wrapper = $(".lsd-reset-password-wrapper");
-        let $form = $('#lsd-reset-password');
-        let ajax = false;
+        return this.each(function () {
+            let $form = $(this);
+            let $wrapper = $form.closest(".lsd-reset-password-wrapper");
+            let $message = $wrapper.find(".lsd-reset-password-form-message");
+            let ajax = false;
 
-        setListeners();
+            if (!$message.length) $message = $form.find(".lsd-reset-password-form-message");
 
-        function setListeners() {
-            $form.off("submit").on("submit", function (event) {
-                event.preventDefault();
-                resetPassword();
-            });
-        }
+            setListeners();
 
-        function resetPassword() {
-            const $message = $("#lsd_reset_password_form_message");
+            function setListeners() {
+                $form.off("submit").on("submit", function (event) {
+                    event.preventDefault();
+                    resetPassword();
+                });
+            }
 
-            $message.html("");
-            $form.addClass("lsd-loading");
-            $wrapper.fadeTo(200, 0.7);
+            function resetPassword() {
+                $message.html("");
+                $form.addClass("lsd-loading");
+                $wrapper.fadeTo(200, 0.7);
 
-            if (ajax) ajax.abort();
+                if (ajax) ajax.abort();
 
-            const data = $form.serialize() + '&action=lsd_reset_password&lsd_reset_password=' + settings.nonce;
-            ajax = $.ajax({
-                type: "POST",
-                url: settings.ajax_url,
-                data: data,
-                dataType: "JSON",
-                success: function (response) {
-                    $form.removeClass("lsd-loading");
+                const data = $form.serialize() + '&action=lsd_reset_password&lsd_reset_password=' + settings.nonce;
+                ajax = $.ajax({
+                    type: "POST",
+                    url: settings.ajax_url,
+                    data: data,
+                    dataType: "JSON",
+                    success: function (response) {
+                        $form.removeClass("lsd-loading");
 
-                    if (response.success === 1) {
-                        $message.html(listdom_alertify(response.message, "lsd-success"));
-                        if (response.redirect) {
-                            window.location.href = response.redirect;
+                        if (response.success === 1) {
+                            $message.html(listdom_alertify(response.message, "lsd-success"));
+                            if (response.redirect) {
+                                window.location.href = response.redirect;
+                            }
+                        } else {
+                            $message.html(listdom_alertify(response.message, "lsd-error"));
                         }
-                    } else {
-                        $message.html(listdom_alertify(response.message, "lsd-error"));
-                    }
-                    $wrapper.fadeTo(200, 1);
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    $message.html(listdom_alertify(errorThrown, "lsd-error"));
-                    $form.removeClass("lsd-loading");
-                },
-            });
-        }
+                        $wrapper.fadeTo(200, 1);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $message.html(listdom_alertify(errorThrown, "lsd-error"));
+                        $form.removeClass("lsd-loading");
+                    },
+                });
+            }
+        });
     };
 })(jQuery);
 
@@ -7363,9 +9581,96 @@ function listdom_onload() {
     listdom_linear_gallery_modal();
     listdom_listing_link_lightbox();
     listdom_trigger_pickr();
+    listdom_bricks_onload();
 
     // Listdom Onload Event
     jQuery(document).trigger('listdom:onload');
+}
+
+function listdom_bricks_onload() {
+    if (typeof bricksRunAllFunctions !== 'function') return;
+
+    bricksRunAllFunctions();
+}
+
+function listdom_bricks_infowindow_onload() {
+    setTimeout(listdom_bricks_onload, 0);
+}
+
+function listdom_mount_fragment_assets($content) {
+    if (!$content || !$content.length || typeof document === 'undefined') return;
+
+    const trimValue = function (value) {
+        return typeof value === 'string' ? value.trim() : '';
+    };
+
+    const $assets = $content
+    .filter('style, link[rel="stylesheet"], script')
+    .add($content.find('style, link[rel="stylesheet"], script'));
+
+    $assets.each(function () {
+        const node = this;
+        const tag = (node.tagName || '').toLowerCase();
+
+        if (tag === 'style') {
+            const key = node.id
+                ? 'style-id:' + node.id
+                : 'style:' + (node.getAttribute('data-template-id') || '') + ':' + trimValue(node.textContent || '');
+
+            const alreadyMounted = Array.from(document.querySelectorAll('style[data-lsd-mounted-key]')).some(function (style) {
+                return style.getAttribute('data-lsd-mounted-key') === key;
+            });
+
+            if (!key || alreadyMounted) return;
+
+            const style = document.createElement('style');
+            if (node.id) style.id = node.id;
+            if (node.getAttribute('data-template-id')) style.setAttribute('data-template-id', node.getAttribute('data-template-id'));
+            style.setAttribute('data-lsd-mounted-key', key);
+            style.textContent = node.textContent || '';
+            document.head.appendChild(style);
+        } else if (tag === 'link') {
+            const href = node.href || node.getAttribute('href');
+            if (!href) return;
+
+            const alreadyMounted = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(function (link) {
+                return link.href === href;
+            });
+
+            if (alreadyMounted) return;
+
+            document.head.appendChild(node.cloneNode(true));
+        } else if (tag === 'script') {
+            const src = node.src || node.getAttribute('src');
+            if (src) {
+                const alreadyMounted = Array.from(document.scripts).some(function (script) {
+                    return script.src === src;
+                });
+
+                if (alreadyMounted) return;
+            }
+
+            const key = src
+                ? 'script-src:' + src
+                : 'script-inline:' + trimValue(node.textContent || '');
+
+            const alreadyMounted = Array.from(document.querySelectorAll('script[data-lsd-mounted-key]')).some(function (script) {
+                return script.getAttribute('data-lsd-mounted-key') === key;
+            });
+
+            if (!key || alreadyMounted) return;
+
+            const script = document.createElement('script');
+            Array.from(node.attributes || []).forEach(function (attribute) {
+                script.setAttribute(attribute.name, attribute.value);
+            });
+
+            script.setAttribute('data-lsd-mounted-key', key);
+            if (!src) script.text = node.textContent || '';
+
+            document.body.appendChild(script);
+        }
+    });
 }
 
 function listdom_trigger_favorites() {
@@ -7419,58 +9724,105 @@ function listdom_trigger_favorites() {
 function listdom_trigger_share_modal() {
     jQuery('.lsd-share-modal-button').on('click', function () {
         const dataId = jQuery(this).data('id');
-        const modal = jQuery(`#lsd-share-modal-${dataId}`);
+        if (!dataId || typeof ListdomModal === 'undefined') return;
 
-        if (!modal.parent().is('body')) {
-            modal.appendTo('body');
-        }
-
-        modal.css('display', 'flex').hide().fadeIn(100);
-    });
-
-    jQuery(window).on('click', function (event) {
-        if (
-            jQuery(event.target).closest('.lsd-modal-content').length === 0 &&
-            jQuery(event.target).is('.lsd-modal')
-        ) {
-            jQuery('.lsd-modal').fadeOut(100);
-        }
+        ListdomModal.open(`#lsd-share-modal-${dataId}`, { appendToBody: true });
     });
 }
 
 function listdom_trigger_message_modal() {
     jQuery('.lsd-message-modal-button').on('click', function () {
-        const modal = jQuery(`#lsd-message-modal`);
+        if (typeof ListdomModal === 'undefined') return;
 
-        modal.css('display', 'flex').hide().fadeIn(100);
+        ListdomModal.open('#lsd-message-modal');
+    });
+}
+
+function listdom_trigger_compare_modal() {
+    const detachIfClipped = (modal) => {
+        if (!modal.length || modal.data('lsdCompareDetached')) return modal;
+
+        const isClipped = modal.closest('.owl-stage-outer, .owl-carousel, [style*="overflow"]').length > 0;
+        if (!isClipped) return modal;
+
+        const placeholder = jQuery('<span class="lsd-compare-modal-placeholder" aria-hidden="true"></span>');
+        placeholder.insertBefore(modal);
+        modal
+        .data('lsdCompareDetached', true)
+        .data('lsdComparePlaceholder', placeholder)
+        .appendTo('body');
+
+        return modal;
+    };
+
+    const restoreModal = (modal) => {
+        const placeholder = modal.data('lsdComparePlaceholder');
+
+        if (placeholder && placeholder.length) {
+            placeholder.replaceWith(modal);
+            modal.removeData('lsdComparePlaceholder').removeData('lsdCompareDetached');
+        }
+
+        jQuery('[data-detached="true"]').remove();
+    };
+
+    const closeModal = (modal) => {
+        if (typeof ListdomModal !== 'undefined') {
+            ListdomModal.close(modal);
+            return;
+        }
+
+        modal.fadeOut(100, () => {
+            listdom_resume_page_scroll_if_locked();
+            restoreModal(modal);
+        });
+    };
+
+    jQuery('.lsd-compare-toggle').off('click.lsdCompareModal').on('click.lsdCompareModal', function () {
+        const dataId = jQuery(this).data('id');
+        const title = jQuery(this).data('listing-title');
+        const cover = jQuery(this).data('cover');
+        let modal = jQuery(`#lsd_compare_${dataId}`).find(`#lsd-compare-modal-${dataId}`);
+
+        if (!modal.length) modal = jQuery(`#lsd-compare-modal-${dataId}`);
+
+        if (!modal.length) return;
+
+        modal = detachIfClipped(modal);
+        if (typeof ListdomModal !== 'undefined') ListdomModal.open(modal);
+        else {
+            modal.css('display', 'flex').hide().fadeIn(100);
+            if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
+        }
+
+        jQuery('.lsd-modal-title').html(title);
+        jQuery('.lsd-modal-cover').html(cover);
+
+        modal
+        .off('listdom:modal:closed.lsdCompareModal')
+        .on('listdom:modal:closed.lsdCompareModal', function () {
+            jQuery('.lsd-compare-message').html('');
+            restoreModal(modal);
+        });
     });
 
-    jQuery(window).on('click', function (event) {
+    jQuery(window).off('click.lsdCompareModal').on('click.lsdCompareModal', function (event) {
         if (jQuery(event.target).closest('.lsd-modal-content').length === 0 && jQuery(event.target).is('.lsd-modal')) {
-            jQuery('.lsd-modal').fadeOut(100);
+            const $modal = jQuery(event.target);
+            closeModal($modal);
             jQuery('.lsd-compare-message').html('');
         }
     });
 }
 
-function listdom_trigger_compare_modal() {
-    jQuery('.lsd-compare-toggle').on('click', function () {
-        const dataId = jQuery(this).data('id');
-        const title = jQuery(this).data('listing-title');
-        const cover = jQuery(this).data('cover');
-        const modal = jQuery(`#lsd_compare_${dataId}`).find(`#lsd-compare-modal-${dataId}`);
+function listdom_resume_page_scroll_if_locked() {
+    if (document.body.style.position === 'fixed') {
+        ListdomPageScroll.start();
 
-        modal.css('display', 'flex').hide().fadeIn(100);
-        jQuery('.lsd-modal-title').html(title);
-        jQuery('.lsd-modal-cover').html(cover);
-    });
-
-    jQuery(window).on('click', function (event) {
-        if (jQuery(event.target).closest('.lsd-modal-content').length === 0 && jQuery(event.target).is('.lsd-modal')) {
-            jQuery('.lsd-modal').fadeOut(100);
-            jQuery('.lsd-compare-message').html('');
+        if (jQuery('.lsd-modal:visible').length) {
+            ListdomPageScroll.stop();
         }
-    });
+    }
 }
 
 function listdom_trigger_compare() {
@@ -7505,8 +9857,10 @@ function listdom_trigger_compare() {
                         jQuery(".lsdaddcmp-compare").replaceWith(res.content);
                         listdom_compare_add_listings();
                         listdom_trigger_compare_delete();
-                        ListdomPageScroll.start();
+                        listdom_resume_page_scroll_if_locked();
                     }
+
+                    if (!res.success) alert.html(listdom_alertify(res.message, 'lsd-error'));
                 },
 
                 error: function () {
@@ -7555,79 +9909,174 @@ function listdom_trigger_compare_delete() {
 }
 
 function listdom_compare_add_listings() {
-    const $btn = jQuery('.lsdaddcmp-add-listings');
-    if (!$btn.length) return;
 
+    const getBtn = () => jQuery('.lsdaddcmp-add-listings').first();
+
+    const getCompareWrapper = () => {
+        const $btn = getBtn();
+        if ($btn.length) {
+            const $closestCompare = $btn.closest('.lsdaddcmp-compare');
+            if ($closestCompare.length) return $closestCompare;
+
+            const $near = $btn
+            .closest('.lsdaddcmp-wrap, .lsdaddcmp-container, .lsdaddcmp-section, .lsdaddcmp')
+            .find('.lsdaddcmp-compare')
+            .first();
+
+            if ($near.length) return $near;
+        }
+
+        return jQuery('.lsdaddcmp-compare').first();
+    };
+
+    // Cache modal elements
     const $modal = jQuery('#lsdaddcmp-add-modal');
     const $container = $modal.find('.lsdaddcmp-shortcode');
 
-    const isDisabled = () => $btn.attr('aria-disabled') === 'true' || $btn.hasClass('is-disabled');
+    if (!getBtn().length) return;
 
-    const showLimitNotice = () => {
-        const message = $btn.data('limit-message');
-        if (message) listdom_toastify(message, 'lsd-warning');
+    const handleAjaxError = (xhr, textStatus, error) => {
+        if (typeof listdom_toastify === 'function') {
+            listdom_toastify('AJAX request failed: ' + error, 'lsd-error');
+        }
     };
 
-    const handleAjaxError = (error) => listdom_toastify('AJAX request failed: ' + error, 'lsd-error');
+    const isDisabled = () => {
+        const $btn = getBtn();
+        return (
+            $btn.attr('aria-disabled') === 'true' ||
+            $btn.hasClass('is-disabled')
+        );
+    };
 
-    // Sync modal IDs from the compare wrapper
+    const showLimitNotice = () => {
+        const $btn = getBtn();
+        const message =
+            $btn.data('limit-message') ||
+            $btn.data('max-items-message') ||
+            $btn.data('message');
+
+        if (message && typeof listdom_toastify === 'function') {
+            listdom_toastify(message, 'lsd-warning');
+        }
+    };
+
+    const getWrapperIds = () => {
+        const $wrapper = getCompareWrapper();
+        return $wrapper.data('ids');
+    };
+
     const syncModalIds = () => {
-        const wrapperIds = jQuery('.lsdaddcmp-compare').data('ids');
+        const wrapperIds = getWrapperIds();
         if (wrapperIds !== undefined) {
             $modal.attr('data-ids', wrapperIds);
             $modal.data('ids', wrapperIds);
         }
     };
 
-    // Load modal content via AJAX
+    const refreshAddButtonState = () => {
+        const $btn = getBtn();
+        if (!$btn.length) return;
+
+        const rawMax =
+            $btn.data('max-items') ??
+            $btn.data('max_items') ??
+            $btn.data('max') ??
+            $btn.data('limit');
+
+        const maxItems = parseInt(
+            rawMax === undefined || rawMax === null || rawMax === ''
+                ? 8
+                : rawMax,
+            10
+        );
+
+        if (isNaN(maxItems) || maxItems <= 0) return;
+
+        const ids = getWrapperIds();
+        const count = ids ? ids.toString().split(',').filter(Boolean).length : 0;
+        const isAtLimit = count >= maxItems;
+
+        $btn
+        .toggleClass('is-disabled', isAtLimit)
+        .attr('aria-disabled', isAtLimit ? 'true' : 'false');
+    };
+
     const loadModalShortcode = () => {
         syncModalIds();
+
         const ids = $modal.data('ids')?.toString() || '';
+
+        if (typeof lsd === 'undefined' || !lsd.ajaxurl) return;
+
         $container.addClass('lsd-loading');
 
         jQuery.ajax({
             url: lsd.ajaxurl,
             type: 'post',
             dataType: 'json',
-            data: { action: 'lsd_compare_modal_shortcode', ids },
+            data: {
+                action: 'lsd_compare_modal_shortcode',
+                ids
+            },
             success: (response) => {
-                if (response.success) {
+                if (response && response.success && response.content !== undefined) {
                     $container.html(response.content);
-                    listdom_onload();
-                } else if (response.message) {
+                    if (typeof listdom_onload === 'function') {
+                        listdom_onload();
+                    }
+                } else if (response && response.message && typeof listdom_toastify === 'function') {
                     listdom_toastify(response.message, 'lsd-error');
                 }
             },
-            error: (xhr, textStatus, error) => handleAjaxError(error),
-            complete: () => $container.removeClass('lsd-loading')
+            error: handleAjaxError,
+            complete: () => {
+                $container.removeClass('lsd-loading');
+            }
         });
     };
 
-    // Open modal
     const openModal = () => {
         $modal.css('display', 'flex').hide().fadeIn(100);
-        ListdomPageScroll.stop();
+
+        if (
+            typeof ListdomPageScroll !== 'undefined' &&
+            typeof ListdomPageScroll.stop === 'function'
+        ) {
+            ListdomPageScroll.stop();
+        }
+
         loadModalShortcode();
     };
 
-    // Close modal
     const closeModal = () => {
-        $modal.fadeOut(100, () => {});
-        ListdomPageScroll.start();
+        $modal.fadeOut(100);
+
+        if (
+            typeof ListdomPageScroll !== 'undefined' &&
+            typeof ListdomPageScroll.start === 'function'
+        ) {
+            ListdomPageScroll.start();
+        }
     };
 
-    // Add or remove listing from compare
     const toggleCompare = (id) => {
         if (!id) return;
+        if (typeof lsd === 'undefined' || !lsd.ajaxurl) return;
 
         jQuery.ajax({
             url: lsd.ajaxurl,
             type: 'post',
             dataType: 'json',
-            data: { action: 'lsd_compare_nonce', id },
+            data: {
+                action: 'lsd_compare_nonce',
+                id
+            },
             success: (nonceRes) => {
-                if (!nonceRes.success || !nonceRes.nonce) {
-                    if (nonceRes.message) listdom_toastify(nonceRes.message, 'lsd-error');
+                if (!nonceRes || !nonceRes.success || !nonceRes.nonce) {
+                    if (nonceRes?.message && typeof listdom_toastify === 'function') {
+                        listdom_toastify(nonceRes.message, 'lsd-error');
+                    }
                     return;
                 }
 
@@ -7637,59 +10086,92 @@ function listdom_compare_add_listings() {
                     dataType: 'json',
                     data: `action=lsd_compare&content=1&id=${id}&_wpnonce=${nonceRes.nonce}`,
                     success: (res) => {
-                        if (res.success && res.content) {
-                            jQuery('.lsdaddcmp-compare').replaceWith(res.content);
-                            listdom_compare_add_listings();
-                            listdom_trigger_compare_delete();
-                            ListdomPageScroll.start();
+                        if (res && res.success && res.content) {
+                            const $old = getCompareWrapper();
+                            if ($old.length) {
+                                $old.replaceWith(res.content);
+                            } else {
+                                jQuery('.lsdaddcmp-compare').first().replaceWith(res.content);
+                            }
+
+                            syncModalIds();
+                            refreshAddButtonState();
+
+                            if ($modal.is(':visible')) {
+                                loadModalShortcode();
+                            }
+
+                            if (typeof listdom_trigger_compare_delete === 'function') {
+                                listdom_trigger_compare_delete();
+                            }
+
+                            if (typeof listdom_resume_page_scroll_if_locked === 'function') {
+                                listdom_resume_page_scroll_if_locked();
+                            }
                         }
 
-                        if (res.message) {
-                            const type = res.success ? 'lsd-success' : 'lsd-error';
-                            listdom_toastify(res.message, type);
+                        if (res?.message && typeof listdom_toastify === 'function') {
+                            listdom_toastify(
+                                res.message,
+                                res.success ? 'lsd-success' : 'lsd-error'
+                            );
                         }
                     },
-                    error: (xhr, textStatus, error) => handleAjaxError(error)
+                    error: handleAjaxError
                 });
             },
-            error: (xhr, textStatus, error) => handleAjaxError(error)
+            error: handleAjaxError
         });
     };
 
     // Event bindings
-    $btn.off('click').on('click', (e) => {
+    jQuery(document).off('click', '.lsdaddcmp-add-listings').on('click', '.lsdaddcmp-add-listings', (e) => {
         e.preventDefault();
-        if (isDisabled()) return showLimitNotice();
+
+        if (isDisabled())
+        {
+            showLimitNotice();
+            return;
+        }
+
         openModal();
     });
 
     $modal.off('click').on('click', (e) => {
-        if (!jQuery(e.target).closest('.lsd-modal-content').length && jQuery(e.target).is('.lsd-modal')) {
+        const clickedInside = !!jQuery(e.target).closest('.lsd-modal-content').length;
+        const clickedBackdrop = jQuery(e.target).is('.lsd-modal');
+
+        if (!clickedInside && clickedBackdrop) {
             closeModal();
         }
     });
 
-    $container.off('click', '.lsd-listing').on('click', '.lsd-listing', (e) => {
+    $container
+    .off('click', '.lsd-listing')
+    .on('click', '.lsd-listing', (e) => {
         if (jQuery(e.target).closest('.lsd-compare-toggle').length) return;
 
         e.preventDefault();
         e.stopPropagation();
 
         const $listing = jQuery(e.currentTarget);
-        const $toggle = $listing.find('.lsd-compare-toggle');
+        const $toggle = $listing.find('.lsd-compare-toggle').first();
 
         if ($toggle.length) {
             $toggle.trigger('click');
             return;
         }
 
-        $listing.addClass('lsd-loading');
-
         const id = $listing.find('[data-listing-id]').data('listing-id');
         toggleCompare(id);
     });
 
-    listdom_trigger_compare();
+    if (typeof listdom_trigger_compare === 'function') {
+        listdom_trigger_compare();
+    }
+
+    refreshAddButtonState();
+    syncModalIds();
 }
 
 function lsdaddrev_trigger_feedback() {
@@ -7992,7 +10474,7 @@ function listdom_image_slider() {
 
         // Remove ready class to start hidden
         $slider.removeClass('lsd-ready');
-        
+
         var inst = $slider.lightSlider({
             item: 1,
             pager: false,
@@ -8049,15 +10531,26 @@ function listdom_trigger_pickr()
 function listdom_linear_gallery_modal() {
     jQuery('.lsd-all-photos-button').on('click', function() {
         jQuery('#lsd-gallery-modal').fadeIn();
-        jQuery('body').css('overflow', 'hidden');
+        if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
     });
 
     jQuery('.lsd-gallery-modal-close, #lsd-gallery-modal').on('click', function(e) {
         if (e.target !== this) return;
 
-        jQuery('#lsd-gallery-modal').fadeOut();
-        jQuery('body').css('overflow', '');
+        jQuery('#lsd-gallery-modal').fadeOut(() => {
+            if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.start();
+        });
     });
+}
+
+function listdom_enable_listing_container_clicks(context) {
+    const $context = context ? jQuery(context) : jQuery(document);
+
+    if (!$context || !$context.length) return;
+
+    $context
+    .find('.lsd-listing')
+    .attr('data-listdom-container-link', '1');
 }
 
 function listdom_listing_link_lightbox() {
@@ -8107,6 +10600,139 @@ function listdom_listing_link_lightbox() {
         // Bottom Panel
         else $details.bottomPanel();
     });
+
+    const containerClickAttribute = 'data-listdom-container-link';
+    const containerClickSelector = `.lsd-listing[${containerClickAttribute}]`;
+    const interactiveTargets =
+        'a, button, input, select, textarea, label, [data-listdom-lightbox], [data-listdom-panel], .lsd-listing-icons-wrapper, .lsd-listing-share';
+
+    const findPrimaryListingLink = function ($container) {
+        const selectors = [
+            'a[data-listdom-panel]',
+            'a[data-listdom-lightbox]',
+            '.lsd-listing-title a[data-listing-id]',
+            '.lsd-listing-title a[href]',
+            'a[data-listing-id]'
+        ];
+
+        for (let i = 0; i < selectors.length; i++) {
+            const $candidate = $container
+            .find(selectors[i])
+            .filter(function () {
+                return !jQuery(this).closest('.lsd-listing-icons-wrapper, .lsd-listing-share').length;
+            })
+            .first();
+
+            if ($candidate.length) return $candidate;
+        }
+
+        return null;
+    };
+
+    jQuery(document).off('click.listdomListingContainer', containerClickSelector).on('click.listdomListingContainer', containerClickSelector, function (e)
+    {
+        const $target = jQuery(e.target);
+        if ($target.closest(interactiveTargets).length) return;
+
+        const $container = jQuery(this);
+        const $link = findPrimaryListingLink($container);
+        if (!$link || !$link.length) return;
+
+        if ($link.is('[data-listdom-panel], [data-listdom-lightbox]')) {
+            e.preventDefault();
+            $link.trigger('click');
+            return;
+        }
+
+        const linkNode = $link.get(0);
+        if (!linkNode) return;
+
+        e.preventDefault();
+
+        if (typeof linkNode.click === 'function') {
+            linkNode.click();
+            return;
+        }
+
+        const href = $link.attr('href');
+        if (!href) return;
+
+        const target = $link.attr('target');
+        if (target && target !== '_self') window.open(href, target);
+        else window.location.href = href;
+    });
+
+    jQuery('[data-listdom-cta="popup"]').off('click').on('click', function (e) {
+        e.preventDefault();
+        if (typeof ListdomModal === 'undefined') return;
+
+        const target = jQuery(this).data('listdom-cta-target');
+        if (!target) return;
+
+        ListdomModal.open('#' + target, { appendToBody: true });
+    });
+}
+
+function lsdCheckoutShowProcessing()
+{
+    const $processing = jQuery('.lsd-checkout-processing');
+    if (!$processing.length) return;
+
+    jQuery('.lsd-checkout-appreciation').addClass('lsd-util-hide');
+    jQuery('.lsd-checkout-wrapper').addClass('lsd-util-hide');
+    $processing.removeClass('lsd-util-hide');
+}
+
+function lsdCheckoutHideProcessing()
+{
+    const $processing = jQuery('.lsd-checkout-processing');
+    if (!$processing.length) return;
+
+    $processing.addClass('lsd-util-hide');
+}
+
+function lsdCheckoutRestoreFromProcessing()
+{
+    const $processing = jQuery('.lsd-checkout-processing');
+    if (!$processing.length || $processing.hasClass('lsd-util-hide')) return;
+
+    $processing.addClass('lsd-util-hide');
+    jQuery('.lsd-checkout-wrapper').removeClass('lsd-util-hide');
+}
+
+function lsdCheckoutComplete(orderKey)
+{
+    lsdCheckoutHideProcessing();
+
+    jQuery('.lsd-checkout-wrapper').addClass('lsd-util-hide');
+
+    const $app = jQuery('.lsd-checkout-appreciation');
+    $app.removeClass('lsd-util-hide');
+
+    const $invoiceWrapper = $app.find('.lsd-checkout-appreciation-invoice');
+    if ($invoiceWrapper.length)
+    {
+        const base = $invoiceWrapper.data('invoiceBase') || '';
+        if (base && orderKey)
+        {
+            const sep = base.indexOf('?') !== -1 ? '&' : '?';
+            const invoiceUrl = base + sep + 'lsd-invoice=' + encodeURIComponent(orderKey);
+
+            $invoiceWrapper.find('a').attr('href', invoiceUrl);
+            $invoiceWrapper.removeClass('lsd-util-hide');
+        }
+    }
+
+    const url = $app.data('thankyou');
+    if (url)
+    {
+        setTimeout(function ()
+        {
+            const sep = url.indexOf('?') !== -1 ? '&' : '?';
+            window.location.href = url + sep + 'lsd-order=' + orderKey;
+
+        }, 3000);
+    }
 }
 
 (function ($) {
@@ -8114,6 +10740,72 @@ function listdom_listing_link_lightbox() {
     $(document).ready(function () {
         // Trigger
         listdom_onload();
+
+        // Checkout gateway tabs
+        $(document).on('click', '.lsd-checkout-tabs-nav a', function (e) {
+            e.preventDefault();
+
+            const $a = $(this);
+            const gateway = $a.data('gateway');
+            const $wrapper = $a.closest('.lsd-fe-tabs');
+            const $li = $a.parent('li');
+
+            $li.siblings().removeClass('lsd-active');
+            $li.addClass('lsd-active');
+
+            $wrapper.find('.lsd-gateway-form').addClass('lsd-util-hide');
+            $('#lsd-gateway-form-' + gateway).removeClass('lsd-util-hide');
+        });
+
+        // Checkout button
+        $(document).on('click', '.lsd-checkout-button', function (e) {
+            e.preventDefault();
+
+            const $btn = $(this);
+            const nonce = $btn.data('nonce');
+            const gateway = $btn.data('gateway');
+            const $wrapper = $btn.closest('.lsd-gateway-wrapper');
+            const message = $wrapper.find('.lsd-checkout-message').val() || '';
+            const name = $wrapper.find('.lsd-checkout-user-name').val() || '';
+            const email = $wrapper.find('.lsd-checkout-user-email').val() || '';
+
+            const consentEl = $wrapper.find('input[name="lsd_privacy_consent"]').get(0);
+
+            if (consentEl && consentEl.required)
+            {
+                if (!consentEl.checked)
+                {
+                    if (typeof consentEl.reportValidity === 'function') consentEl.reportValidity();
+                    return;
+                }
+
+                // Clear message when checked
+                consentEl.setCustomValidity('');
+            }
+
+            const consentValue = consentEl && consentEl.checked ? '1' : '';
+
+            $.ajax({
+                url: lsd.ajaxurl,
+                data: {action: 'lsd_checkout', _wpnonce: nonce, gateway: gateway, message: message, name: name, email: email, lsd_privacy_consent: consentValue},
+                dataType: 'json',
+                type: 'post',
+                success: function (res) {
+                    if (res && res.success) {
+                        lsdCheckoutComplete(res.key ? res.key : res.order_id);
+                    } else {
+                        lsdCheckoutRestoreFromProcessing();
+
+                        if (res && res.message) {
+                            $wrapper.find('.lsd-checkout-response').html(res.message);
+                        }
+                    }
+                },
+                error: function () {
+                    lsdCheckoutRestoreFromProcessing();
+                }
+            });
+        });
 
         // Profile Contact Form
         $(".lsd-profile-contact-form").on("submit", function (e) {
@@ -8972,7 +11664,7 @@ function listdom_listing_link_lightbox() {
             let rate = $star.data("rating-value");
 
             // Update Dropdown
-            $input.val(rate);
+            $input.val(rate).trigger("change");
 
             // Update Stars
             $wrapper.find($(".lsd-rate-stars a")).each(function () {
@@ -9005,21 +11697,45 @@ function listdom_listing_link_lightbox() {
         {
             const $wrapper = $(this);
             const tax = $wrapper.data('tax');
+            const $modal = jQuery(`#lsd_dashboard_new_term_${tax}`);
+
+            if ($modal.length)
+            {
+                $modal.off('listdom:modal:opened.listdomNewTax listdom:modal:closed.listdomNewTax');
+                $modal.on('listdom:modal:closed.listdomNewTax', function ()
+                {
+                    jQuery('#lsd_new_term_message_' + tax).html('');
+                });
+            }
 
             $('#lsd_show_create_taxonomy_form_' + tax).on('click', function(e)
             {
                 e.preventDefault();
-                const modal = jQuery(`#lsd_dashboard_new_term_` + tax);
+                if (!$modal.length) return;
 
-                modal.css('display', 'flex').hide().fadeIn(100);
-                jQuery('body').css('overflow', 'hidden');
-            });
+                if (typeof ListdomModal !== 'undefined')
+                {
+                    jQuery(window).off('click.listdomNewTaxFallback');
+                    ListdomModal.open($modal);
+                }
+                else
+                {
+                    $modal.css('display', 'flex').hide().fadeIn(100);
+                    if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
 
-            jQuery(window).on('click', function (event) {
-                if (jQuery(event.target).closest('.lsd-modal-content').length === 0 && jQuery(event.target).is('.lsd-modal')) {
-                    jQuery('.lsd-modal').fadeOut(100);
-                    jQuery('#lsd_new_term_message_' + tax).html('');
-                    jQuery('body').css('overflow', '');
+                    jQuery(window)
+                    .off('click.listdomNewTaxFallback')
+                    .on('click.listdomNewTaxFallback', function (event)
+                    {
+                        if (jQuery(event.target).closest('.lsd-modal-content').length === 0 && jQuery(event.target).is('.lsd-modal'))
+                        {
+                            $modal.fadeOut(100, function ()
+                            {
+                                if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.start();
+                            });
+                            jQuery('#lsd_new_term_message_' + tax).html('');
+                        }
+                    });
                 }
             });
         });

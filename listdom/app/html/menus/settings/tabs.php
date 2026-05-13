@@ -5,6 +5,13 @@ defined('ABSPATH') || die();
 /** @var LSD_Menus_Settings $this */
 
 $addon = apply_filters('lsd_is_addon_installed', false);
+
+[$toolkits_list] = $this->get_addons_default('toolkit');
+$toolkits = count($toolkits_list) > 0;
+
+$payments_engine = LSD_Payments_Engine::instance();
+$payments_engine_is_listdom = $payments_engine->listdom();
+$payments_nav_tooltip = esc_html__('Save the settings to access this menu.', 'listdom');
 ?>
 <div class="lsd-nav-wrapper">
     <ul class="lsd-nav-tab-wrapper">
@@ -25,6 +32,7 @@ $addon = apply_filters('lsd_is_addon_installed', false);
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'archive-pages' ? 'lsd-nav-tab-active' : ''; ?>" data-key="archive-pages"><?php esc_html_e('Archive Pages', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'slugs' ? 'lsd-nav-tab-active' : ''; ?>" data-key="slugs"><?php esc_html_e('Slugs', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'Google-reCAPTCHA' ? 'lsd-nav-tab-active' : ''; ?>" data-key="Google-reCAPTCHA"><?php esc_html_e('Google reCAPTCHA', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'gdpr' ? 'lsd-nav-tab-active' : ''; ?>" data-key="gdpr"><?php esc_html_e('GDPR', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'integrations' ? 'lsd-nav-tab-active' : ''; ?>" data-key="integrations"><?php esc_html_e('Integrations', 'listdom'); ?></li>
             </ul>
         </li>
@@ -50,11 +58,8 @@ $addon = apply_filters('lsd_is_addon_installed', false);
                 <?php esc_html_e('Frontend Dashboard', 'listdom'); ?>
             </a>
             <ul data-parent="frontend-dashboard" class="lsd-nav-sub-tabs lsd-tabs">
-                <li class="lsd-nav-tab <?php echo $this->tab === 'frontend-dashboard' && ($this->subtab === 'pages' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="pages"><?php esc_html_e('Pages', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'frontend-dashboard' && ($this->subtab === 'add-listing' || $this->subtab === 'general' || $this->subtab === 'guest-submission' || $this->subtab === 'fields' || $this->subtab === 'restrictions' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="add-listing"><?php esc_html_e('Add Listing', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'frontend-dashboard' && $this->subtab === 'dashboard-menus' ? 'lsd-nav-tab-active' : ''; ?>" data-key="dashboard-menus"><?php esc_html_e('Dashboard Menus', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'frontend-dashboard' && $this->subtab === 'guest-submission' ? 'lsd-nav-tab-active' : ''; ?>" data-key="guest-submission"><?php esc_html_e('Guest Submission', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'frontend-dashboard' && $this->subtab === 'fields' ? 'lsd-nav-tab-active' : ''; ?>" data-key="fields"><?php esc_html_e('Fields', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'frontend-dashboard' && $this->subtab === 'restrictions' ? 'lsd-nav-tab-active' : ''; ?>" data-key="restrictions"><?php esc_html_e('Restrictions', 'listdom'); ?></li>
             </ul>
         </li>
         <?php
@@ -74,7 +79,7 @@ $addon = apply_filters('lsd_is_addon_installed', false);
                 <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'login' ? 'lsd-nav-tab-active' : ''; ?>" data-key="login"><?php esc_html_e('Login', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'register' ? 'lsd-nav-tab-active' : ''; ?>" data-key="register"><?php esc_html_e('Register', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'forgot-password' ? 'lsd-nav-tab-active' : ''; ?>" data-key="forgot-password"><?php esc_html_e('Forgot Password', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'profile-user-directory' ? 'lsd-nav-tab-active' : ''; ?>" data-key="profile-user-directory"><?php esc_html_e('Profile & User Directory', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && ($this->subtab === 'profile-user-directory' || $this->subtab === 'public-profile' || $this->subtab === 'edit-profile' || $this->subtab === 'user-directory') ? 'lsd-nav-tab-active' : ''; ?>" data-key="profile-user-directory"><?php esc_html_e('Profile & User Directory', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'logged-in-users' ? 'lsd-nav-tab-active' : ''; ?>" data-key="logged-in-users"><?php esc_html_e('Logged In Users', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'block-admin-access' ? 'lsd-nav-tab-active' : ''; ?>" data-key="block-admin-access"><?php esc_html_e('Block Admin Access', 'listdom'); ?></li>
             </ul>
@@ -98,7 +103,28 @@ $addon = apply_filters('lsd_is_addon_installed', false);
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && ($this->subtab === 'assets-loading' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="assets-loading"><?php esc_html_e('Assets Loading', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'custom-styles' ? 'lsd-nav-tab-active' : ''; ?>" data-key="custom-styles"><?php esc_html_e('Custom Styles', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'components' ? 'lsd-nav-tab-active' : ''; ?>" data-key="components"><?php esc_html_e('Components', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'translations' ? 'lsd-nav-tab-active' : ''; ?>" data-key="translations"><?php esc_html_e('Translations', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'import-export' ? 'lsd-nav-tab-active' : ''; ?>" data-key="import-export"><?php esc_html_e('Import / Export', 'listdom'); ?></li>
+            </ul>
+        </li>
+        <li class="lsd-has-children lsd-payments-nav <?php echo $this->tab === 'payments' ? ' lsd-nav-expanded' : ''; ?>">
+            <a class="lsd-nav-tab <?php echo $this->tab === 'payments' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=payments')); ?>">
+                <i class="listdom-icon lsdi-payment lsd-m-0"></i>
+                <?php esc_html_e('Payments', 'listdom'); ?>
+            </a>
+            <ul
+                data-parent="payments"
+                class="lsd-nav-sub-tabs lsd-tabs <?php echo $payments_engine_is_listdom ? '' : 'lsd-util-hide'; ?>"
+                data-disabled-tooltip="<?php echo esc_attr($payments_nav_tooltip); ?>"
+                data-lsd-toggle-control="#lsd_payments_system"
+                data-lsd-toggle-saved="<?php echo $payments_engine_is_listdom ? '1' : '0'; ?>"
+                data-lsd-toggle-disable-targets="[data-requires-listdom='1']"
+            >
+                <li class="lsd-nav-tab <?php echo $this->tab === 'payments' && ($this->subtab === 'engine' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="engine"><?php esc_html_e('Engine', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'payments' && $this->subtab === 'options' ? 'lsd-nav-tab-active' : ''; ?>" data-key="options" data-requires-listdom="1"><?php esc_html_e('Options', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'payments' && $this->subtab === 'invoice' ? 'lsd-nav-tab-active' : ''; ?>" data-key="invoice" data-requires-listdom="1"><?php esc_html_e('Invoice', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'payments' && $this->subtab === 'taxes' ? 'lsd-nav-tab-active' : ''; ?>" data-key="taxes" data-requires-listdom="1"><?php esc_html_e('Tax', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'payments' && $this->subtab === 'gateways' ? 'lsd-nav-tab-active' : ''; ?>" data-key="gateways" data-requires-listdom="1"><?php esc_html_e('Gateways', 'listdom'); ?></li>
             </ul>
         </li>
         <li class="lsd-ai-nav">
@@ -133,6 +159,19 @@ $addon = apply_filters('lsd_is_addon_installed', false);
         </li>
         <?php endif; ?>
 
+        <?php if ($toolkits): ?>
+        <li class="lsd-has-children lsd-addons-nav <?php echo $this->tab === 'toolkits' ? ' lsd-nav-expanded' : ''; ?>">
+            <a class="lsd-nav-tab <?php echo $this->tab === 'toolkits' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=toolkits')); ?>">
+                <i class="listdom-icon lsdi-group-items lsd-m-0"></i>
+                <?php esc_html_e('Toolkits', 'listdom'); ?>
+            </a>
+
+            <ul class="lsd-nav-sub-tabs lsd-tabs" data-parent="toolkits">
+                <?php echo $this->addons_tab('toolkit'); ?>
+            </ul>
+        </li>
+        <?php endif; ?>
+
         <?php
             /**
              * For showing new tabs in settings menu by third party plugins
@@ -152,7 +191,7 @@ jQuery(document).ready(function ($)
 {
     const tabs = $('.lsd-nav-tab-wrapper a.lsd-nav-tab');
     let currentTab = $('.lsd-nav-tab-active');
-    const formSelectors = ['#lsd_settings_form', '#lsd_addons_form', '#lsd_api_form', '#lsd_ai_form', '#lsd_auth_form'];
+    const formSelectors = ['#lsd_settings_form', '#lsd_addons_form', '#lsd_toolkits_form', '#lsd_api_form', '#lsd_ai_form', '#lsd_auth_form'];
 
     // Function to check if there are unsaved changes
     const hasUnsavedChanges = () => currentTab.attr('data-saved') === 'false';
@@ -166,16 +205,16 @@ jQuery(document).ready(function ($)
         {
             e.preventDefault();
 
-            listdom_toastify("<?php echo esc_js(esc_html__("You have unsaved changes. Do you want to leave without saving? ", 'listdom')); ?>", "lsd-confirm", {
+            listdom_toastify("<?php echo esc_js(__("You have unsaved changes. Do you want to leave without saving? ", 'listdom')); ?>", "lsd-confirm", {
                 position: "lsd-center-center",
                 confirm: {
-                    confirmText: "<?php echo esc_js(esc_html__('Save & Leave', 'listdom')); ?>",
-                    cancelText:  "<?php echo esc_js(esc_html__('Leave Now', 'listdom')); ?>",
-                    onConfirm: function(toast)
+                    confirmText: "<?php echo esc_js(__('Save & Leave', 'listdom')); ?>",
+                    cancelText:  "<?php echo esc_js(__('Leave Now', 'listdom')); ?>",
+                    onConfirm: function()
                     {
                         handleFormSubmission(newTab)
                     },
-                    onCancel: function(toast)
+                    onCancel: function()
                     {
                         updateTab(newTab);
                         window.location.href = newTab.attr('href');

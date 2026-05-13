@@ -23,10 +23,26 @@ $ids = $this->listings;
                         <?php echo LSD_Kses::element($listing->get_labels()); ?>
                     </div>
                 <?php endif; ?>
+
+                <?php if ($this->display_compare_icon || $this->display_favorite_icon): ?>
+                    <div class="lsd-listing-image-icons-wrapper">
+                        <?php if ($this->display_favorite_icon): ?>
+                            <div class="lsd-listing-favorite">
+                                <?php echo LSD_Kses::element($listing->get_favorite_button()); ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($this->display_compare_icon): ?>
+                            <div class="lsd-listing-compare">
+                                <?php echo LSD_Kses::element($listing->get_compare_button()); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 
-        <div class="lsd-listing-body">
+        <?php if ($this->has_body($listing) || $this->has_after_content_hook()): ?>
+            <div class="lsd-listing-body">
             <?php if ($this->display_availability): ?>
                 <div class="lsd-listing-availability">
                     <?php echo LSD_Kses::element($listing->get_availability(true)); ?>
@@ -54,35 +70,19 @@ $ids = $this->listings;
                 <?php if ($this->display_title): ?>
                     <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
                         <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
-                        <?php if ($this->display_is_claimed): ?>
-                            <?php echo $listing->is_claimed() ? '<i class="lsd-icon fas fa-check-square" title="'.esc_attr__('Verified', 'listdom').'"></i>' : ''; ?>
-                        <?php endif; ?>
                     </h3>
-                <?php endif; ?>
-                <?php if ($this->display_compare_icon || $this->display_favorite_icon): ?>
-                    <div class="lsd-listing-image-icons-wrapper">
-                        <?php if ($this->display_favorite_icon): ?>
-                            <div class="lsd-listing-favorite">
-                                <?php echo LSD_Kses::element($listing->get_favorite_button()); ?>
-                            </div>
-                        <?php endif; ?>
-                        <?php if ($this->display_compare_icon): ?>
-                            <div class="lsd-listing-compare">
-                                <?php echo LSD_Kses::element($listing->get_compare_button()); ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
                 <?php endif; ?>
             </div>
 
             <?php if ($this->display_description): ?>
-                <p class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
+                <div class="lsd-listing-content" <?php echo lsd_schema()->description(); ?>>
                     <?php echo LSD_Kses::element($listing->get_excerpt($this->description_length, false, $this->content_type === 'description')); ?>
-                </p>
+                </div>
             <?php endif; ?>
 
             <?php do_action('lsd_skins_after_content', $this, $listing); ?>
 
+            <?php if ($this->has_bottom_bar($listing)): ?>
             <div class="lsd-listing-bottom-bar">
                 <div class="lsd-listing-rate-wrapper">
                 <?php if ($this->display_review_stars): ?>
@@ -98,8 +98,16 @@ $ids = $this->listings;
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
 
-        </div>
+            <?php if ($this->display_cta): ?>
+                <div class="lsd-listing-call-to-action">
+                    <?php echo $this->listing_cta($listing); ?>
+                </div>
+            <?php endif; ?>
+
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php endforeach;

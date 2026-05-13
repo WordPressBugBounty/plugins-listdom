@@ -15,7 +15,7 @@ $connected_shortcodes = $form['connected_shortcodes'] ?? [];
 ?>
 <div class="lsd-metabox lsd-search-form-metabox">
     <div class="lsd-alert-no-mb">
-        <p class="lsd-alert lsd-info"><?php esc_html_e('If you plan to use this search form in a shortcode, you don’t need to enable the following option. Simply select this form in your desired shortcode.', 'listdom'); ?></p>
+        <p class="lsd-alert lsd-info"><?php esc_html_e('If you intend to use this search form in a skin shortcode, you can ignore the options below. Just select this form in your desired shortcode settings.', 'listdom'); ?></p>
     </div>
     <div class="lsd-row">
         <div class="lsd-col-12">
@@ -69,7 +69,7 @@ $connected_shortcodes = $form['connected_shortcodes'] ?? [];
                     'max_items' => 4,
                     'toggle' => '.lsd-search-ajax-method',
                     'placeholder' => esc_attr__("Enter shortcode's title ...", 'listdom'),
-                    'description' => esc_html__("You can select up to 4 searchable skin shortcodes, such as List, Grid, Masonry, List + Grid, Half Map, Side By Side, etc. These shortcodes must be on the same page as the search form; otherwise, they will not be updated.", 'listdom'),
+                    'description' => esc_html__("For AJAX search, select up to 4 searchable skin shortcodes (e.g., List, Grid, Masonry, Half Map) on the same page as the search form. If none are selected, all skin shortcodes on the page will be filtered with no AJAX.", 'listdom'),
                 ]); ?>
             </div>
         </div>

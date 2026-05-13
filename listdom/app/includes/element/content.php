@@ -37,8 +37,11 @@ class LSD_Element_Content extends LSD_Element
 
         $HTML = $excerpt . ($has_more ? ' ...' : '') . ($has_more && $read_more ? ' <a href="' . get_the_permalink($post_id) . '" class="lsd-excerpt-read-more lsd-color-m-txt">[' . esc_html__('More', 'listdom') . ']</a>' : '');
 
+        $HTML = wpautop($HTML);
+        if (strpos($HTML, '<p>') !== false) $HTML = str_replace('<p>', '<p class="lsd-fe-description">', $HTML);
+
         return $this->content(
-            wpautop($HTML),
+            $HTML,
             $this,
             [
                 'post_id' => $post_id,

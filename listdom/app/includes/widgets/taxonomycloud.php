@@ -36,11 +36,11 @@ class LSD_Widgets_TaxonomyCloud extends WP_Widget
     public function form($instance)
     {
         $taxonomies = [
-            LSD_Base::TAX_TAG => esc_html__('Tags', 'listdom'),
-            LSD_Base::TAX_CATEGORY => esc_html__('Categories', 'listdom'),
-            LSD_Base::TAX_LOCATION => esc_html__('Locations', 'listdom'),
-            LSD_Base::TAX_FEATURE => esc_html__('Features', 'listdom'),
-            LSD_Base::TAX_LABEL => esc_html__('Labels', 'listdom'),
+            LSD_Base::TAX_TAG => esc_html(lsd_t_label(LSD_Base::TAX_TAG, 'plural')),
+            LSD_Base::TAX_CATEGORY => esc_html(lsd_t_label(LSD_Base::TAX_CATEGORY, 'plural')),
+            LSD_Base::TAX_LOCATION => esc_html(lsd_t_label(LSD_Base::TAX_LOCATION, 'plural')),
+            LSD_Base::TAX_FEATURE => esc_html(lsd_t_label(LSD_Base::TAX_FEATURE, 'plural')),
+            LSD_Base::TAX_LABEL => esc_html(lsd_t_label(LSD_Base::TAX_LABEL, 'plural')),
         ];
 
         echo '<p class="lsd-widget-row">

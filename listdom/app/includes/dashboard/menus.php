@@ -40,12 +40,22 @@ class LSD_Dashboard_Menus extends LSD_Shortcodes
             $slug = $menu['slug'] ?? '';
             $label = $menu['label'] ?? '';
             $icon = $menu['icon'] ?? 'fas fa-tachometer-alt';
+            $enabled = !isset($menu['enabled']) || (int) $menu['enabled'] === 1;
+
+            if (!$slug) continue;
+            if (!$enabled) continue;
+
+            $login_status = $menu['login_status'] ?? 'required';
+
+            // If login is required and user is NOT logged in, do not add this custom menu
+            if ($login_status === 'required' && !is_user_logged_in()) continue;
 
             $menus[$slug] = [
                 'label' => $label,
                 'id' => $slug,
                 'url' => $dashboard->add_qs_var('mode', $slug, $dashboard->url ?? ''),
                 'icon' => $icon,
+                'login_status' => $login_status,
             ];
         }
 
@@ -66,7 +76,16 @@ class LSD_Dashboard_Menus extends LSD_Shortcodes
     {
         foreach ($this->menus as $menu)
         {
+            $enabled = !isset($menu['enabled']) || (int) $menu['enabled'] === 1;
+            if (!$enabled) continue;
+
             if ($dashboard->mode !== ($menu['slug'] ?? '')) continue;
+
+            $login_status = $menu['login_status'] ?? 'required';
+
+            // If login required and user is NOT logged in, do not show this custom content
+            if ($login_status === 'required' && !is_user_logged_in()) return $output;
+
             $this->content = $menu['content'] ?? '';
             return $this->output($dashboard);
         }

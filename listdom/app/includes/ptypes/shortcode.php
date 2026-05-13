@@ -22,6 +22,11 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         add_action('add_meta_boxes', [$this, 'register_metaboxes'], 10, 2);
         add_action('save_post', [$this, 'save'], 10, 2);
 
+        foreach (LSD_Base::taxonomies() as $taxonomy)
+        {
+            add_action('lsd_' . $taxonomy . '_term_slug_updated', [$this, 'slug_updated'], 10, 3);
+        }
+
         // Duplicate Shortcode
         new LSD_Duplicate($this->PT);
     }
@@ -185,6 +190,17 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
                 $filter[$key] = array_diff($filter_values, $exclude[$key]);
         }
 
+        foreach (LSD_Base::taxonomies() as $tax)
+        {
+            if (isset($filter[$tax])) $filter[$tax] = LSD_Taxonomies::ids_to_slugs($tax, $filter[$tax]);
+            if (isset($exclude[$tax])) $exclude[$tax] = LSD_Taxonomies::ids_to_slugs($tax, $exclude[$tax]);
+        }
+
+        if (isset($filter['attributes']) && is_array($filter['attributes']))
+        {
+            $filter['attributes'] = LSD_Taxonomies_Attribute::normalize_filter_attributes($filter['attributes']);
+        }
+
         update_post_meta($post_id, 'lsd_filter', $filter);
         update_post_meta($post_id, 'lsd_exclude', $exclude);
 
@@ -197,12 +213,67 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         update_post_meta($post_id, 'lsd_sorts', $sorts);
     }
 
+    public function slug_updated($old_slug, $new_slug, $term): void
+    {
+        if (!is_object($term) || !isset($term->taxonomy)) return;
+
+        $taxonomy = $term->taxonomy;
+        if (!in_array($taxonomy, LSD_Base::taxonomies(), true)) return;
+
+        $shortcodes = get_posts([
+            'post_type' => LSD_Base::PTYPE_SHORTCODE,
+            'posts_per_page' => -1,
+            'post_status' => 'any',
+            'fields' => 'ids',
+        ]);
+
+        foreach ($shortcodes as $shortcode_id)
+        {
+            $filter = get_post_meta($shortcode_id, 'lsd_filter', true);
+            $exclude = get_post_meta($shortcode_id, 'lsd_exclude', true);
+
+            $filter_updated = $this->replace_taxonomy_slug($filter, $taxonomy, $old_slug, $new_slug);
+            $exclude_updated = $this->replace_taxonomy_slug($exclude, $taxonomy, $old_slug, $new_slug);
+
+            if ($filter_updated !== $filter)
+            {
+                update_post_meta($shortcode_id, 'lsd_filter', $filter_updated);
+            }
+
+            if ($exclude_updated !== $exclude)
+            {
+                update_post_meta($shortcode_id, 'lsd_exclude', $exclude_updated);
+            }
+        }
+    }
+
+    private function replace_taxonomy_slug($data, string $taxonomy, string $old_slug, string $new_slug)
+    {
+        if (!is_array($data)) return $data;
+        if (!isset($data[$taxonomy]) || !is_array($data[$taxonomy])) return $data;
+
+        $old_slug = sanitize_title($old_slug);
+        $new_slug = sanitize_title($new_slug);
+
+        $values = array_map('sanitize_title', $data[$taxonomy]);
+        $values = array_values(array_filter($values, 'strlen'));
+
+        $had_old_slug = in_array($old_slug, $values, true);
+        if (!$had_old_slug) return $data;
+
+        $updated = array_values(array_diff($values, [$old_slug]));
+        if ($new_slug !== '' && !in_array($new_slug, $updated, true)) $updated[] = $new_slug;
+
+        $data[$taxonomy] = $updated;
+        return $data;
+    }
+
     public function field_listing_link(string $skin, array $options)
     {
         $single_styles = ['' => esc_html__('Inherit From Global Options', 'listdom')] + LSD_Styles::details();
         $method = $options['listing_link'] ?? 'normal';
         ?>
-        <div class="lsd-display-options-builder-option">
+        <div class="lsd-display-options-builder-option lsd-settings-fields-sub-wrapper">
             <?php if ($this->isPro()): ?>
                 <div class="lsd-form-row">
                     <div class="lsd-col-3"><?php echo LSD_Form::label([
@@ -239,8 +310,8 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
                 </div>
             <?php else: ?>
                 <div class="lsd-form-row">
-                    <div class="lsd-col-2"></div>
-                    <div class="lsd-col-6">
+                    <div class="lsd-col-3"></div>
+                    <div class="lsd-col-7">
                         <p class="lsd-alert lsd-warning lsd-mt-0"><?php echo LSD_Base::missFeatureMessage(esc_html__('Listing Link', 'listdom')); ?></p>
                     </div>
                 </div>

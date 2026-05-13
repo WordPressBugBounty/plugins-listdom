@@ -12,7 +12,7 @@ defined('ABSPATH') || die();
         <?php echo lsd_ads('licenses-top'); ?>
         <div class="lsd-activation-wrap lsd-admin-wrapper">
             <h3 class="lsd-mt-0 lsd-admin-title"><?php echo esc_html__('All Licenses', 'listdom'); ?></h3>
-            <div class="lsd-licenses">
+            <div class="lsd-licenses lsd-mt-4">
                 <?php if (!count($products)): ?>
                     <h3 class="lsd-mt-0"><?php esc_html_e('No Premium Add-ons Activated Yet', 'listdom'); ?></h3>
                     <div class="lsd-alert lsd-info lsd-my-0"><?php esc_html_e("This is where you'll activate your paid Listdom add-ons using their license keys. Activating an add-on unlocks its premium features and extended functionality. Once you install a paid add-on, you can register its license here.", 'listdom'); ?></div>
@@ -63,9 +63,7 @@ function lsdBindLicenseForms()
                     const $panel = jQuery(`#lsd-license-card-${key}`);
                     $panel.replaceWith(response.content);
 
-                    setTimeout(function () {
-                        lsdBindLicenseForms();
-                    }, 3000)
+                    setTimeout(() => lsdBindLicenseForms(), 2000);
 
                     // New Badge
                     const new_badge = parseInt($badge.html()) - 1;
@@ -129,9 +127,7 @@ function lsdBindLicenseForms()
                     const $panel = jQuery(`#lsd-license-card-${key}`);
                     $panel.replaceWith(response.content);
 
-                    setTimeout(function () {
-                        lsdBindLicenseForms();
-                    }, 3000)
+                    setTimeout(() => lsdBindLicenseForms(), 2000);
                 }
                 else
                 {

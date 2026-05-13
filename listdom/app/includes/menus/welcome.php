@@ -2,9 +2,6 @@
 
 class LSD_Menus_Welcome extends LSD_Menus
 {
-    /**
-     * @var string
-     */
     public $tab;
 
     public function __construct()
@@ -60,8 +57,9 @@ class LSD_Menus_Welcome extends LSD_Menus
             'email' => $email,
         ]);
 
-        if (is_wp_error($response)) $this->response(['success' => 0, 'message' => $response->get_error_message()]);
-
-        $this->response(['success' => 1, 'message' => $response['message']]);
+        $this->response([
+            'success' => isset($response['success']) ? (int) $response['success'] : 0,
+            'message' => $response['message'] ?? esc_html__('Something went wrong', 'listdom')
+        ]);
     }
 }

@@ -28,6 +28,9 @@ class LSD_Compatibility extends LSD_Base
         // Body Class
         add_filter('body_class', [$this, 'body_class']);
 
+        // Detect Frontend Pages With Listdom Shortcodes
+        add_action('wp', [$this, 'page_has_listdom_shortcode']);
+
         // Init the Theme Compatibility
         add_action('init', [$this, 'theme_compatibility']);
     }
@@ -116,5 +119,31 @@ class LSD_Compatibility extends LSD_Base
 
         // Merge Classes
         return array_merge($classes, $listdom);
+    }
+
+    public function page_has_listdom_shortcode()
+    {
+        if (is_admin()) return;
+
+        $post = get_post();
+        if (!($post instanceof WP_Post)) return;
+
+        $content_sources = [];
+        $content = $post->post_content;
+        if (is_string($content) && trim($content) !== '') $content_sources[] = $content;
+
+        $elementor_data = get_post_meta($post->ID, '_elementor_data', true);
+        if (is_array($elementor_data)) $elementor_data = wp_json_encode($elementor_data);
+        if (is_string($elementor_data) && trim($elementor_data) !== '') $content_sources[] = $elementor_data;
+
+        foreach ($content_sources as $source)
+        {
+            // Check for Listdom shortcode directly here
+            if (has_shortcode($source, 'listdom') || stripos($source, '[listdom') !== false)
+            {
+                if (!in_array('listdom-fe-shortcode-page', $this->body_classes, true)) $this->body_classes[] = 'listdom-fe-shortcode-page';
+                return;
+            }
+        }
     }
 }

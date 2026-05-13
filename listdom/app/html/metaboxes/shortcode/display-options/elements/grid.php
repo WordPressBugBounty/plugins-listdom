@@ -5,6 +5,7 @@ defined('ABSPATH') || die();
 /** @var LSD_PTypes_Shortcode $this */
 /** @var array $options */
 /** @var array $price_components */
+/** @var string $skin */
 
 $grid = $options['grid'] ?? [];
 $optional_addons = [];
@@ -23,7 +24,7 @@ $optional_addons = [];
                 'options' => LSD_Styles::grid(),
                 'value' => $grid['style'] ?? 'style1',
                 'attributes' => [
-                    'data-parent' => '#lsd_skin_display_options_grid'
+                    'data-parent' => '#lsd_skin_display_options_grid, #lsd_skin_display_options_layout_grid'
                 ]
             ]); ?>
         </div>
@@ -155,6 +156,13 @@ $optional_addons = [];
                         </div>
                     </div>
                 </div>
+
+                <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/partials/cta.php', [
+                        'parameters' => [
+                            'skin' => 'grid',
+                            'settings' => $grid,
+                        ],
+                    ]); ?>
 
                 <div class="lsd-elements-subsection">
                     <h4 class="lsd-admin-subtitle lsd-m-0"><?php esc_html_e('Other Elements', 'listdom'); ?></h4>
@@ -316,8 +324,8 @@ $optional_addons = [];
                                 ]); ?>
                             </div>
                         </div>
-                        <?php if (class_exists(LSDADDCLM::class) || class_exists(\LSDPACCLM\Base::class)): ?>
-                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4 <?php echo !isset($grid['display_title']) || $grid['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_grid_is_claimed_wrapper">
+                        <?php if (class_exists(\LSDPACCLM\Base::class)): ?>
+                            <div class="lsd-display-options-style-dependency lsd-display-options-style-dependency-style1 lsd-display-options-style-dependency-style2 lsd-display-options-style-dependency-style3 lsd-display-options-style-dependency-style4 <?php echo !isset($grid['display_title']) || $grid['display_title'] ? '' : 'lsd-util-hide'; ?>" id="lsd_display_options_skin_grid_is_claimed_wrapper">
                                 <div class="lsd-form-row">
                                     <div class="lsd-col-8"><?php echo LSD_Form::label([
                                             'class' => 'lsd-fields-label',
@@ -351,7 +359,7 @@ $optional_addons = [];
                             </div>
                         </div>
 
-                        <?php if (class_exists(LSDADDFAV::class) || class_exists(\LSDPACFAV\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACFAV\Base::class)): ?>
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
@@ -368,7 +376,7 @@ $optional_addons = [];
                             </div>
                         <?php else: $optional_addons[] = ['favorite', esc_html__('Favorite Icon', 'listdom')]; ?>
                         <?php endif; ?>
-                        <?php if (class_exists(LSDADDCMP::class) || class_exists(\LSDPACCMP\Base::class)): ?>
+                        <?php if (class_exists(\LSDPACCMP\Base::class)): ?>
                             <div class="lsd-form-row lsd-display-options-builder-option">
                                 <div class="lsd-col-8"><?php echo LSD_Form::label([
                                         'class' => 'lsd-fields-label',
@@ -403,6 +411,11 @@ $optional_addons = [];
                             </div>
                         <?php else: $optional_addons[] = ['reviews', esc_html__('Reviews Rate', 'listdom')]; ?>
                         <?php endif; ?>
+
+                        <?php
+                        // Action for Third Party Plugins
+                        do_action('lsd_shortcode_display_options', $skin, $options);
+                        ?>
                     </div>
                 </div>
             </div>

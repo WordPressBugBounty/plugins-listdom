@@ -4,10 +4,20 @@ class LSD_Form extends LSD_Base
 {
     public static function label($args = [])
     {
-        if (!count($args)) return false;
+        if (!count($args)) return '';
+
+        $attributes = '';
+        if (isset($args['attributes']) && is_array($args['attributes']) && count($args['attributes']))
+        {
+            foreach ($args['attributes'] as $key => $value) $attributes .= $key . '="' . esc_attr($value) . '" ';
+        }
 
         $required = isset($args['required']) && $args['required'];
-        return '<label for="' . (isset($args['for']) ? esc_attr($args['for']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : '') . '">' . esc_html($args['title']) . ($required ? ' ' . LSD_Base::REQ_HTML : '') . '</label>';
+
+        $attributes = trim($attributes);
+        $attributes = $attributes ? ' ' . $attributes : '';
+
+        return '<label for="' . (isset($args['for']) ? esc_attr($args['for']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : '') . '"' . $attributes . '>' . esc_html($args['title'] ?? '') . ($required ? ' ' . LSD_Base::REQ_HTML : '') . '</label>';
     }
 
     public static function text($args = [])
@@ -90,7 +100,33 @@ class LSD_Form extends LSD_Base
             $options .= '<option value="" ' . ((isset($args['value']) and !is_array($args['value']) and $args['value'] == '') ? 'selected="selected"' : '') . '>' . ((isset($args['empty_label']) and trim($args['empty_label'])) ? esc_html($args['empty_label']) : '-----') . '</option>';
         }
 
-        foreach ($args['options'] as $value => $label) $options .= '<option value="' . esc_attr($value) . '" ' . ((isset($args['value']) and ((!is_array($args['value']) and trim($args['value']) != '' and $args['value'] == $value) or (is_array($args['value']) and in_array($value, $args['value'])))) ? 'selected="selected"' : '') . '>' . esc_html($label) . '</option>';
+        foreach ($args['options'] as $value => $label)
+        {
+            $option_label = $label;
+            $option_attributes = '';
+            $selected = false;
+
+            if (is_array($label))
+            {
+                $option_label = $label['label'] ?? '';
+
+                if (isset($label['attributes']) && is_array($label['attributes']) && count($label['attributes']))
+                {
+                    foreach ($label['attributes'] as $attribute_key => $attribute_value)
+                    {
+                        $option_attributes .= $attribute_key . '="' . esc_attr($attribute_value) . '" ';
+                    }
+                }
+            }
+
+            if (isset($args['value']))
+            {
+                if (is_array($args['value'])) $selected = in_array($value, $args['value']);
+                else $selected = (string) $args['value'] === (string) $value;
+            }
+
+            $options .= '<option value="' . esc_attr($value) . '" ' . ($selected ? 'selected="selected"' : '') . ' ' . trim($option_attributes) . '>' . esc_html($option_label) . '</option>';
+        }
 
         $attributes = '';
         if (isset($args['attributes']) and is_array($args['attributes']) and count($args['attributes']))
@@ -141,7 +177,7 @@ class LSD_Form extends LSD_Base
 
     public static function textarea($args = [])
     {
-        if (!count($args)) return false;
+        if (!count($args)) return '';
 
         $attributes = '';
         if (isset($args['attributes']) and is_array($args['attributes']) and count($args['attributes']))
@@ -216,12 +252,95 @@ class LSD_Form extends LSD_Base
         </div>';
     }
 
+    public static function image_placeholder_data(string $size = 'medium'): array
+    {
+        static $cache = [];
+        if (isset($cache[$size])) return $cache[$size];
+
+        $self = new self();
+        $src = $self->lsd_asset_url('img/image-placeholder.svg');
+
+        $data = [
+            'id' => 0,
+            'src' => $src,
+        ];
+
+        $cache[$size] = apply_filters('lsd_image_placeholder_data', $data, $size, 0);
+        return $cache[$size];
+    }
+
     public static function imagepicker($args)
     {
         if (!count($args)) return false;
 
-        $image_id = $args['value'] ?? '';
-        $image = $image_id ? wp_get_attachment_image($image_id, ['400', '266']) : '';
+        $multiple = isset($args['multiple']) && $args['multiple'];
+        $type = isset($args['type']) && $args['type'] === 'file' ? 'file' : 'image';
+        $use_file_input = $multiple || $type === 'file' || (isset($args['file']) && $args['file']);
+
+        if ($use_file_input)
+        {
+            $is_file = $type === 'file';
+            $empty_text = $args['empty_text'] ?? ($multiple ? ($is_file ? esc_html__('No files selected', 'listdom') : esc_html__('No images selected', 'listdom')) : ($is_file ? esc_html__('No file selected', 'listdom') : esc_html__('No image selected', 'listdom')));
+            $select_text = $args['select_text'] ?? ($multiple ? ($is_file ? esc_html__('Upload/Select files', 'listdom') : esc_html__('Upload/Select images', 'listdom')) : ($is_file ? esc_html__('Upload/Select file', 'listdom') : esc_html__('Upload/Select image', 'listdom')));
+            $add_text = $args['add_text'] ?? ($is_file ? esc_html__('Add files', 'listdom') : esc_html__('Add images', 'listdom'));
+            $remove_text = $args['remove_text'] ?? ($multiple ? ($is_file ? esc_html__('Remove files', 'listdom') : esc_html__('Remove images', 'listdom')) : ($is_file ? esc_html__('Remove file', 'listdom') : esc_html__('Remove image', 'listdom')));
+
+            $attributes = '';
+            $has_multiple_attribute = false;
+            if (isset($args['attributes']) && is_array($args['attributes']))
+            {
+                foreach ($args['attributes'] as $key => $value)
+                {
+                    if ($key === 'multiple') $has_multiple_attribute = true;
+                    $attributes .= ' ' . esc_attr($key) . '="' . esc_attr($value) . '"';
+                }
+            }
+
+            if ($multiple && !$has_multiple_attribute) $attributes .= ' multiple="multiple"';
+
+            $class = isset($args['class']) ? esc_attr($args['class']) : '';
+            $field_id = isset($args['id']) ? (string) $args['id'] : '';
+            if (trim($field_id) === '') $field_id = uniqid('lsd_imagepicker_');
+
+            $id = esc_attr($field_id);
+            $name = $args['name'] ?? '';
+            $required = isset($args['required']) && $args['required'];
+
+            $placeholder = self::image_placeholder_data('large');
+            $placeholder_src = $placeholder['src'] ?? '';
+
+            $input_class = 'lsd-imagepicker-file-input lsd-util-hide' . ($class ? ' ' . $class : '');
+            $button_class = isset($args['button_class']) ? ' ' . esc_attr($args['button_class']) : '';
+
+            $output  = '<div class="lsd-imagepicker-wrapper' . ($multiple ? ' lsd-imagepicker-multiple' : '') . '">';
+            $output .= '<div id="' . $id . '_img" class="lsd-image-placeholder lsd-imagepicker-image-placeholder lsd-mb-2" data-placeholder="' . esc_attr($placeholder_src) . '">';
+            $output .= '<div class="lsd-image-placeholder-inner">';
+            $output .= '<div class="lsd-image-placeholder-preview lsd-imagepicker-multiple-preview lsd-util-hide">';
+            $output .= '<ul class="lsd-imagepicker-multiple-list lsd-flex lsd-flex-row lsd-m-0 lsd-p-0"></ul>';
+            $output .= '</div>';
+            $output .= '<div class="lsd-image-placeholder-empty">';
+            $output .= '<p class="lsd-image-placeholder-text">' . esc_html($empty_text) . '</p>';
+            $output .= '<button type="button" class="lsd-choose-file lsd-select-image-files-button lsd-w-auto lsd-neutral-button lsd-light-button' . $button_class . '" data-for="#' . $id . '">' . esc_html($select_text) . '</button>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<input type="file" name="' . esc_attr($name) . '" id="' . $id . '" class="' . $input_class . '"' . $attributes . ($required ? ' required' : '') . '>';
+            if ($multiple)
+            {
+                $output .= '<button type="button" class="lsd-choose-file lsd-add-images-button lsd-w-auto lsd-neutral-button lsd-light-button lsd-util-hide' . $button_class . '" data-for="#' . $id . '">' . esc_html($add_text) . '</button>';
+            }
+            $output .= '<button type="button" class="lsd-choose-file lsd-remove-images-button lsd-w-auto lsd-text-button lsd-util-hide' . $button_class . '" data-for="#' . $id . '">' . esc_html($remove_text) . '</button>';
+            $output .= '</div>';
+
+            return $output;
+        }
+
+        $image_id = isset($args['value']) ? (int) $args['value'] : 0;
+        $image_html = $image_id ? wp_get_attachment_image($image_id, ['400', '266'], false, ['class' => 'lsd-image-placeholder-preview-image']) : '';
+        $has_image = trim($image_html) !== '';
+
+        $placeholder = self::image_placeholder_data('large');
+        $placeholder_src = $placeholder['src'] ?? '';
 
         $attributes = '';
         if (isset($args['attributes']) && is_array($args['attributes']))
@@ -234,27 +353,86 @@ class LSD_Form extends LSD_Base
 
         $required = isset($args['required']) && $args['required'];
 
-        $class = isset($args['class']) ? ' ' . esc_attr($args['class']) : ' button';
+        $class = isset($args['class']) ? ' ' . esc_attr($args['class']) : '';
+        $field_id = isset($args['id']) ? (string) $args['id'] : '';
+        if (trim($field_id) === '') $field_id = uniqid('lsd_imagepicker_');
 
-        return '<div>
-            <div id="' . esc_attr($args['id']) . '_img" class="lsd-imagepicker-image-placeholder lsd-mb-2">' . (trim($image) ? $image : '') . '</div>
-            <input type="hidden" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" value="' . esc_attr($image_id) . '"' . $attributes . ($required ? ' required' : '') . '>
-            <button type="button" class="lsd-choose-file lsd-select-image-button lsd-w-auto lsd-neutral-button lsd-light-button ' . ($image_id ? 'lsd-util-hide' : '') . '" id="' . esc_attr($args['id']) . '_button" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Upload/Select image', 'listdom') . '</button>
-            <button type="button" class="lsd-choose-file lsd-remove-image-button lsd-w-auto lsd-neutral-button lsd-light-button ' . ($image_id ? '' : 'lsd-util-hide') . '" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Remove image', 'listdom') . '</button>
-        </div>';
+        $id = esc_attr($field_id);
+        $button_id = $id ? $id . '_button' : uniqid('lsd_imagepicker_button_');
+
+        $output  = '<div class="lsd-imagepicker-wrapper">';
+        $output .= '<div id="' . $id . '_img" class="lsd-image-placeholder lsd-imagepicker-image-placeholder lsd-mb-2' . ($has_image ? ' lsd-image-placeholder-has-image' : '') . '" data-placeholder="' . esc_attr($placeholder_src) . '">';
+        $output .= '<div class="lsd-image-placeholder-inner">';
+        $output .= '<div class="lsd-image-placeholder-preview' . ($has_image ? '' : ' lsd-util-hide') . '">' . ($has_image ? $image_html : '') . '</div>';
+        $output .= '<div class="lsd-image-placeholder-empty' . ($has_image ? ' lsd-util-hide' : '') . '">';
+        $output .= '<p class="lsd-image-placeholder-text">' . esc_html__('No image selected', 'listdom') . '</p>';
+        $output .= '<button type="button" class="lsd-choose-file lsd-select-image-button lsd-w-auto lsd-neutral-button lsd-light-button' . ($has_image ? ' lsd-util-hide' : '') . $class . '" id="' . esc_attr($button_id) . '" data-for="#' . $id . '">' . esc_html__('Upload/Select image', 'listdom') . '</button>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<input type="hidden" name="' . esc_attr($args['name']) . '" id="' . $id . '" value="' . esc_attr($image_id) . '"' . $attributes . ($required ? ' required' : '') . '>';
+        $output .= '<button type="button" class="lsd-choose-file lsd-remove-image-button lsd-w-auto lsd-text-button' . ($has_image ? '' : ' lsd-util-hide') . $class . '" data-for="#' . $id . '">' . esc_html__('Remove image', 'listdom') . '</button>';
+        $output .= '</div>';
+
+        return $output;
     }
 
     public static function filepicker($args)
     {
         if (!count($args)) return false;
 
-        $file_id = $args['value'] ?? '';
-        $url = $file_id ? wp_get_attachment_url($file_id) : '';
+        $file_value = isset($args['value']) ? trim((string) $args['value']) : '';
+        $url = '';
+        if ($file_value !== '')
+        {
+            if (is_numeric($file_value))
+            {
+                $url = (string) wp_get_attachment_url((int) $file_value);
+            }
+            else if (filter_var($file_value, FILTER_VALIDATE_URL))
+            {
+                $url = esc_url_raw($file_value);
+            }
+        }
 
-        return '<div id="' . esc_attr($args['id']) . '_file" class="lsd-filepicker-preview">' . (trim($url) ? '<a href="' . esc_url($url) . '" target="_blank">' . $url . '</a>' : '') . '</div>
-        <input type="hidden" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" value="' . esc_attr($file_id) . '">
-        <button type="button" class="lsd-select-file-button button ' . ($file_id ? 'lsd-util-hide' : '') . '" id="' . esc_attr($args['id']) . '_button" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Upload/Select file', 'listdom') . '</button>
-        <button type="button" class="lsd-remove-file-button button ' . ($file_id ? '' : 'lsd-util-hide') . '" data-for="#' . esc_attr($args['id']) . '">' . esc_html__('Remove file', 'listdom') . '</button>';
+        $file_name = '';
+        if ($url !== '')
+        {
+            $path = wp_parse_url($url, PHP_URL_PATH);
+            if (is_string($path) && trim($path) !== '') $file_name = wp_basename($path);
+        }
+        if ($file_name === '') $file_name = $url;
+
+        $has_file = trim($url) !== '';
+
+        $field_id = isset($args['id']) ? (string) $args['id'] : '';
+        if (trim($field_id) === '') $field_id = uniqid('lsd_filepicker_');
+        $id = esc_attr($field_id);
+
+        $class = isset($args['class']) ? ' ' . esc_attr($args['class']) : '';
+        $required = isset($args['required']) && $args['required'];
+        $placeholder = self::image_placeholder_data('large');
+        $placeholder_src = $placeholder['src'] ?? '';
+
+        $output  = '<div class="lsd-filepicker-wrapper lsd-imagepicker-wrapper">';
+        $output .= '<div id="' . $id . '_img" class="lsd-image-placeholder lsd-imagepicker-image-placeholder lsd-mb-2' . ($has_file ? ' lsd-image-placeholder-has-image' : '') . '" data-placeholder="' . esc_attr($placeholder_src) . '">';
+        $output .= '<div class="lsd-image-placeholder-inner">';
+        $output .= '<div class="lsd-image-placeholder-preview' . ($has_file ? '' : ' lsd-util-hide') . '">';
+        $output .= '<div id="' . $id . '_file" class="lsd-filepicker-preview">';
+        $output .= $has_file ? '<a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . esc_html($file_name) . '</a>' : '';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<div class="lsd-image-placeholder-empty' . ($has_file ? ' lsd-util-hide' : '') . '">';
+        $output .= '<p class="lsd-image-placeholder-text">' . esc_html__('No file selected', 'listdom') . '</p>';
+        $output .= '<button type="button" class="lsd-choose-file lsd-select-file-button lsd-w-auto lsd-neutral-button lsd-light-button' . ($has_file ? ' lsd-util-hide' : '') . $class . '" id="' . $id . '_button" data-for="#' . $id . '">' . esc_html__('Upload/Select file', 'listdom') . '</button>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<input type="hidden" name="' . esc_attr($args['name']) . '" id="' . $id . '" value="' . esc_attr($file_value) . '"' . ($required ? ' required' : '') . '>';
+        $output .= '<button type="button" class="lsd-choose-file lsd-remove-file-button lsd-w-auto lsd-text-button' . ($has_file ? '' : ' lsd-util-hide') . $class . '" data-for="#' . $id . '">' . esc_html__('Remove file', 'listdom') . '</button>';
+        $output .= '</div>';
+
+        return $output;
     }
 
     public static function mapstyle($args)
@@ -304,7 +482,7 @@ class LSD_Form extends LSD_Base
             $query['meta_query'] = [
                 [
                     'key' => 'lsd_skin',
-                    'value' => ['list', 'grid', 'halfmap', 'listgrid', 'masonry', 'singlemap', 'table', 'side', 'mosaic', 'accordion', 'timeline'],
+                    'value' => LSD_Skins::get_listable_skins(),
                     'compare' => 'IN',
                 ],
             ];
@@ -453,6 +631,7 @@ class LSD_Form extends LSD_Base
         if (!count($args)) return false;
 
         $options = '';
+        $form_style = isset($args['form_style']) ? sanitize_key((string) $args['form_style']) : '';
 
         $query = ['post_type' => LSD_Base::PTYPE_SEARCH, 'posts_per_page' => '-1'];
         $searches = get_posts($query);
@@ -463,7 +642,18 @@ class LSD_Form extends LSD_Base
             $options .= '<option value="" ' . ((isset($args['value']) and esc_attr($args['value']) == '') ? 'selected="selected"' : '') . '>' . ((isset($args['empty_label']) and trim($args['empty_label'])) ? esc_html($args['empty_label']) : '-----') . '</option>';
         }
 
-        foreach ($searches as $search) $options .= '<option value="' . esc_attr($search->ID) . '" ' . ((isset($args['value']) and $args['value'] == $search->ID) ? 'selected="selected"' : '') . '>' . esc_html($search->post_title) . '</option>';
+        foreach ($searches as $search)
+        {
+            if ($form_style)
+            {
+                $form = get_post_meta($search->ID, 'lsd_form', true);
+                $style = is_array($form) && isset($form['style']) ? sanitize_key((string) $form['style']) : 'default';
+
+                if ($style !== $form_style) continue;
+            }
+
+            $options .= '<option value="' . esc_attr($search->ID) . '" ' . ((isset($args['value']) and $args['value'] == $search->ID) ? 'selected="selected"' : '') . '>' . esc_html($search->post_title) . '</option>';
+        }
 
         return '<select name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : 'lsd-search') . '">
             ' . $options . '                       
@@ -546,7 +736,7 @@ class LSD_Form extends LSD_Base
         $output = '<div class="lsd-rate">';
 
         $output .= '<div class="lsd-rate-stars">';
-        for ($i = 1; $i <= $stars; $i++) $output .= '<a href="#" data-rating-value="' . esc_attr($i) . '" data-rating-text="' . esc_attr($i) . '" class="' . ($value >= $i ? 'lsd-rate-selected' : '') . '"><i class="lsd-icon ' . ($value >= $i ? 'fas fa-star' : 'far fa-star') . '"></i></a>';
+        for ($i = 1; $i <= $stars; $i++) $output .= '<a href="#" data-rating-value="' . esc_attr($i) . '" data-rating-text="' . esc_attr($i) . '" class="' . ($value >= $i ? 'lsd-rate-selected' : '') . '"><i class="lsd-fe-icon ' . ($value >= $i ? 'fas fa-star' : 'far fa-star') . '"></i></a>';
         $output .= '</div>';
 
         $output .= '<input type="hidden" name="' . esc_attr($args['name']) . '" value="' . esc_attr($value) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="lsd-rate-input ' . (isset($args['class']) ? esc_attr($args['class']) : '') . '">';
@@ -569,6 +759,8 @@ class LSD_Form extends LSD_Base
         $nonce = wp_create_nonce('lsd_autosuggest');
 
         $source = isset($args['source']) && trim($args['source']) ? $args['source'] : '';
+        $is_searchable_source = $source && substr($source, -11) === '-searchable';
+        $post_type = $is_searchable_source ? substr($source, 0, -11) : $source;
         $toggle = isset($args['toggle']) && trim($args['toggle']) ? $args['toggle'] : '';
         $values = isset($args['values']) && is_array($args['values']) ? $args['values'] : [];
 
@@ -591,7 +783,11 @@ class LSD_Form extends LSD_Base
             else
             {
                 $post = get_post($value);
-                if ($post instanceof WP_Post) $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $post->ID . '" data-lsd-tooltip="' . esc_attr__('Click twice to delete', 'listdom') . '">' . $post->post_title . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($post->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $post->ID . '"></span>';
+                if (!$post instanceof WP_Post) continue;
+
+                if ($post_type && $post->post_type !== $post_type) continue;
+
+                $current .= '<span class="lsd-tooltip lsd-autosuggest-items-' . $post->ID . '" data-lsd-tooltip="' . esc_attr__('Click twice to delete', 'listdom') . '">' . esc_html($post->post_title) . ' <i class="lsd-icon far fa-trash-alt" data-value="' . esc_attr($post->ID) . '" data-confirm="0"></i><input type="hidden" name="' . $name . '[]" value="' . $post->ID . '"></span>';
             }
         }
 
@@ -635,7 +831,7 @@ class LSD_Form extends LSD_Base
         $output = '<div class="lsd-row lsd-timepicker">';
 
         // Hour
-        $output .= '<div class="lsd-col-6"><select name="' . esc_attr($args['name']) . '[hour]" title="' . esc_attr__('Hour', 'listdom') . '">';
+        $output .= '<div class="lsd-col-6"><select class="lsd-admin-input" name="' . esc_attr($args['name']) . '[hour]" title="' . esc_attr__('Hour', 'listdom') . '">';
 
         for ($h = 0; $h <= 23; $h++)
         {
@@ -644,22 +840,22 @@ class LSD_Form extends LSD_Base
             {
                 if ($h === 0) $label = sprintf(
                     /* translators: %d: Hour formatted for 12-hour clock. */
-                    esc_html__('%1$d AM', 'listdom'),
+                    esc_html__("%1\$d AM", 'listdom'),
                     12
                 );
                 else if ($h >= 1 && $h <= 11) $label = sprintf(
                     /* translators: %d: Hour formatted for 12-hour clock. */
-                    esc_html__('%1$d AM', 'listdom'),
+                    esc_html__("%1\$d AM", 'listdom'),
                     $h
                 );
                 else if ($h === 12) $label = sprintf(
                     /* translators: %d: Hour formatted for 12-hour clock. */
-                    esc_html__('%1$d PM', 'listdom'),
+                    esc_html__("%1\$d PM", 'listdom'),
                     12
                 );
                 else if ($h >= 13) $label = sprintf(
                     /* translators: %d: Hour formatted for 12-hour clock. */
-                    esc_html__('%1$d PM', 'listdom'),
+                    esc_html__("%1\$d PM", 'listdom'),
                     ($h - 12)
                 );
             }
@@ -670,7 +866,7 @@ class LSD_Form extends LSD_Base
         $output .= '</select></div>';
 
         // Minute
-        $output .= '<div class="lsd-col-6"><select name="' . esc_attr($args['name']) . '[minute]" title="' . esc_attr__('Minute', 'listdom') . '">';
+        $output .= '<div class="lsd-col-6"><select class="lsd-admin-input" name="' . esc_attr($args['name']) . '[minute]" title="' . esc_attr__('Minute', 'listdom') . '">';
 
         for ($m = 0; $m <= 11; $m++)
         {
@@ -1059,8 +1255,8 @@ class LSD_Form extends LSD_Base
         $include = isset($args['include']) && is_array($args['include']) ? $args['include'] : [];
         $value = isset($args['value']) && is_array($args['value']) ? $args['value'] : [];
 
-        $row1 = ''
-            . (!$include || in_array('family', $include) ? '<div class="lsd-typography-family-wrapper lsd-flex-2">
+        $row1 =
+            (!$include || in_array('family', $include) ? '<div class="lsd-typography-family-wrapper lsd-flex-2">
                 '.LSD_Form::label([
                     'class' => 'lsd-fields-label-tiny',
                     'title' => esc_html__('Font Family', 'listdom'),
@@ -1121,8 +1317,8 @@ class LSD_Form extends LSD_Base
                 ]).'
             </div>' : '' );
 
-        $row2 = ''
-            . (!$include || in_array('size', $include) ? '<div class="lsd-typography-size-wrapper lsd-flex-1">'.
+        $row2 =
+            (!$include || in_array('size', $include) ? '<div class="lsd-typography-size-wrapper lsd-flex-1">'.
                 LSD_Form::label([
                     'class' => 'lsd-fields-label-tiny',
                     'title' => esc_html__('Size', 'listdom'),

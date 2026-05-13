@@ -13,6 +13,9 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
         // Search Module
         $search = get_post($id);
 
+        // Guard: return an empty payload if the search module cannot be retrieved.
+        if (!($search instanceof WP_Post)) return [];
+
         // Meta Values
         $metas = $resource->get_post_meta($id);
 
@@ -51,6 +54,9 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                             break;
 
                         case 'text':
+                        case 'date':
+                        case 'time':
+                        case 'datetime':
 
                             (strpos($f['key'], 'acf_email_') === 0) ? $acf_key = substr($f['key'], strlen('acf_email_')) : ((strpos($f['key'], 'acf_text_') === 0) ? $acf_key = substr($f['key'], strlen('acf_text_')) : $acf_key = '');
                             $keys = (strpos($f['key'], 'acf-') !== false)
@@ -131,6 +137,12 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                             $keys = ['sf-att-' . $f['key'] . '-lk'];
                             break;
+
+                        case 'review_rate':
+
+                            $keys = ['sf-att-' . $f['key'] . '-grq'];
+                            $values = [0, 1, 2, 3, 4];
+                            break;
                     }
 
                     $f['key'] = $keys;
@@ -146,6 +158,8 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
             if (isset($row['filters'])) $fields[$r]['filters'] = $filters;
             if (isset($row['buttons'])) $fields[$r]['buttons'] = $row['buttons'];
+            if (isset($row['clear'])) $fields[$r]['clear'] = $row['clear'];
+            if (class_exists(\LSDPACMA\Base::class) && isset($row['filters_button'])) $fields[$r]['filters_button'] = $row['filters_button'];
         }
 
         return apply_filters('lsd_api_resource_searchmodule', [
