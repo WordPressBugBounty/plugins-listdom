@@ -22,6 +22,7 @@ $video = isset($elements['video']['enabled']) && $elements['video']['enabled'] ?
 $price = isset($elements['price']['enabled']) && $elements['price']['enabled'] ? $this->price() : '';
 $address = isset($elements['address']['enabled']) && $elements['address']['enabled'] ? $this->address() : '';
 $breadcrumb = isset($elements['breadcrumb']['enabled']) && $elements['breadcrumb']['enabled'] ? $this->breadcrumb() : '';
+$backbutton = isset($elements['backbutton']['enabled']) && $elements['backbutton']['enabled'] ? $this->backbutton() : '';
 $locations = isset($elements['locations']['enabled']) && $elements['locations']['enabled'] ? $this->locations() : '';
 $share = isset($elements['share']['enabled']) && $elements['share']['enabled'] ? $this->share() : '';
 $related = isset($elements['related']['enabled']) && $elements['related']['enabled'] ? $this->related() : '';
@@ -39,6 +40,11 @@ $claim = $this->entity->get_claim_button();
 $rate_summary = $this->entity->get_rate_stars('summary');
 $cta = isset($elements['cta']['enabled']) && $elements['cta']['enabled'] ? $this->cta() : '';
 ?>
+<div class="lsd-row">
+    <div class="lsd-col-12">
+        <?php if ($backbutton) echo LSD_Kses::element($backbutton); ?>
+    </div>
+</div>
 <div class="lsd-row">
     <div class="lsd-col-12">
         <?php if ($breadcrumb) echo LSD_Kses::element($breadcrumb); ?>

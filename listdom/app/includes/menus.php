@@ -8,7 +8,7 @@ class LSD_Menus extends LSD_Base
     protected LSD_Menus_Addons $addons;
     protected LSD_Menus_Welcome $welcome;
     protected LSD_Activation $licenses;
-    public $tab;
+    public string $tab;
 
     public function init()
     {

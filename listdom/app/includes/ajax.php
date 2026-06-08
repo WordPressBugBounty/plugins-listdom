@@ -71,6 +71,7 @@ class LSD_Ajax extends LSD_Base
             [
                 'sidebar' => class_exists(LSDPACAM\Base::class),
                 'onclick' => $args['onclick'] ?? 'infowindow',
+                'listing_link_method' => $args['listing_link_method'] ?? $SKO->get_listing_link_method(),
             ]
         );
 

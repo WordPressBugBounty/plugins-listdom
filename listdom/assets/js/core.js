@@ -1,4 +1,254 @@
 /**
+ * Listdom Flatpickr
+ */
+(function ($, window)
+{
+    'use strict';
+
+    if (typeof window.lsdInitFlatpickr === 'function') return;
+
+    const dateFormats = {
+        'yyyy-mm-dd': 'Y-m-d',
+        'dd-mm-yyyy': 'd-m-Y',
+        'yyyy/mm/dd': 'Y/m/d',
+        'dd/mm/yyyy': 'd/m/Y',
+        'yyyy.mm.dd': 'Y.m.d',
+        'dd.mm.yyyy': 'd.m.Y'
+    };
+
+    const getSettings = function ()
+    {
+        return typeof window.lsd === 'object' && window.lsd ? window.lsd : {};
+    };
+
+    const isEnabled = function ()
+    {
+        const settings = getSettings();
+
+        return parseInt(settings.advanced_datetimepicker || 0, 10) === 1 && typeof window.flatpickr === 'function';
+    };
+
+    const getDateAltFormat = function ()
+    {
+        const settings = getSettings();
+
+        return dateFormats[settings.datepicker_format] || dateFormats['yyyy-mm-dd'];
+    };
+
+    const is24Hour = function ()
+    {
+        return parseInt(getSettings().timepicker_format || 24, 10) !== 12;
+    };
+
+    const getTimeAltFormat = function ()
+    {
+        return is24Hour() ? 'H:i' : 'h:i K';
+    };
+
+    const applyPlaceholder = function (instance, placeholder)
+    {
+        if (!instance || !instance.altInput || !placeholder) return;
+        instance.altInput.setAttribute('placeholder', placeholder);
+    };
+
+    const syncRequiredState = function (instance)
+    {
+        if (!instance || !instance.input || !instance.altInput) return;
+
+        const isRequired = instance.input.required;
+
+        instance.altInput.required = isRequired;
+
+        if (isRequired)
+        {
+            instance.altInput.setAttribute('aria-required', 'true');
+        }
+        else
+        {
+            instance.altInput.removeAttribute('aria-required');
+        }
+    };
+
+    const cleanupFlatpickrMonthSelect = function (instance)
+    {
+        if (!instance || !instance.calendarContainer) return;
+
+        const $currentMonth = $(instance.calendarContainer).find('.flatpickr-current-month');
+        if (!$currentMonth.length) return;
+
+        $currentMonth.find('select').each(function ()
+        {
+            const $select = $(this);
+
+            if ($select.data('select2')) $select.select2('destroy');
+            $select.removeClass('select2-hidden-accessible');
+            $select.removeAttr('data-select2-id');
+            $select.next('.select2-container').remove();
+        });
+    };
+
+    const getAltInputClass = function ($input)
+    {
+        const classes = ['lsd-advanced-picker-alt'];
+
+        if ($input.hasClass('lsd-admin-input')) classes.push('lsd-admin-input');
+
+        return classes.join(' ');
+    };
+
+    const syncClearButton = function (input)
+    {
+        const inputId = input && input.id ? input.id : '';
+        if (!inputId) return;
+
+        const $button = $(input).closest('.lsd-search-input-clear-wrap').find('.lsd-search-input-clear[data-for="' + inputId + '"]');
+        if (!$button.length) return;
+
+        const hasValue = ((input.value || '').toString().trim() !== '');
+        $button.toggleClass('lsd-util-hide', !hasValue);
+    };
+
+    const syncInputState = function (instance)
+    {
+        if (!instance || !instance.input) return;
+
+        const input = instance.input;
+        syncClearButton(input);
+
+        $(input).trigger('input').trigger('change');
+    };
+
+    const createConfig = function (type, placeholder)
+    {
+        const config = {
+            altInput: true,
+            allowInput: false,
+            disableMobile: true,
+            minuteIncrement: 1,
+            onReady: function (_, __, instance)
+            {
+                applyPlaceholder(instance, placeholder);
+                syncRequiredState(instance);
+                cleanupFlatpickrMonthSelect(instance);
+                instance.config.positionElement = instance.altInput || instance.input;
+                syncClearButton(instance.input);
+            },
+            onOpen: function (_, __, instance)
+            {
+                syncRequiredState(instance);
+                cleanupFlatpickrMonthSelect(instance);
+                instance.config.positionElement = instance.altInput || instance.input;
+            },
+            onChange: function (_, __, instance)
+            {
+                syncInputState(instance);
+            },
+            onValueUpdate: function (_, __, instance)
+            {
+                syncInputState(instance);
+            }
+        };
+
+        if (type === 'date')
+        {
+            config.dateFormat = 'Y-m-d';
+            config.altFormat = getDateAltFormat();
+        }
+        else if (type === 'time')
+        {
+            config.enableTime = true;
+            config.noCalendar = true;
+            config.dateFormat = 'H:i';
+            config.altFormat = getTimeAltFormat();
+            config.time_24hr = is24Hour();
+        }
+        else if (type === 'datetime-local')
+        {
+            config.enableTime = true;
+            config.dateFormat = 'Y-m-d\\TH:i';
+            config.altFormat = getDateAltFormat() + ' ' + getTimeAltFormat();
+            config.time_24hr = is24Hour();
+        }
+        else
+        {
+            return null;
+        }
+
+        return config;
+    };
+
+    const isInsideModal = function ($input)
+    {
+        return $input.closest('.lsd-modal-content, .lsd-modal').length > 0;
+    };
+
+    const getAppendTarget = function ($input)
+    {
+        if (isInsideModal($input))
+        {
+            const $modal = $input.closest('.lsd-modal');
+            if ($modal.length) return $modal.get(0);
+        }
+
+        const $target = $input.closest('.lsd-modal-content, .lsd-modal');
+        return $target.length ? $target.get(0) : null;
+    };
+
+    const isDeferredSearchPopupInput = function ($input)
+    {
+        return $input.closest('.lsd-search-included-in-more').length > 0 && !isInsideModal($input);
+    };
+
+    const isTemplateInput = function ($input)
+    {
+        return $input.closest('[id$="_template"], template').length > 0;
+    };
+
+    const initInput = function (input)
+    {
+        const $input = $(input);
+        const originalType = ($input.attr('data-lsd-flatpickr-type') || $input.attr('type') || '').toLowerCase();
+
+        if (!['date', 'time', 'datetime-local'].includes(originalType)) return;
+        if (!$input.hasClass('lsd-advanced-picker') || input._flatpickr) return;
+        if (isDeferredSearchPopupInput($input)) return;
+        if (isTemplateInput($input)) return;
+
+        $input.attr('data-lsd-flatpickr-type', originalType);
+        $input.attr('type', 'text');
+
+        const config = createConfig(originalType, $input.attr('placeholder') || '');
+        if (!config) return;
+
+        const wpStartOfWeek = window.lsd?.startOfWeek ?? 0;
+
+        config.locale = config.locale || {};
+        config.locale.firstDayOfWeek = wpStartOfWeek;
+
+        const appendTarget = getAppendTarget($input);
+        if (appendTarget) config.appendTo = appendTarget;
+
+        config.altInputClass = getAltInputClass($input);
+        config.prevArrow = '<span class="lsd-flatpickr-nav" aria-hidden="true">&#8249;</span>';
+        config.nextArrow = '<span class="lsd-flatpickr-nav" aria-hidden="true">&#8250;</span>';
+
+        const instance = window.flatpickr(input, config);
+        if (instance) instance.config.positionElement = instance.altInput || input;
+    };
+
+    window.lsdInitFlatpickr = function (context)
+    {
+        if (!isEnabled()) return;
+
+        const root = context && context.jquery ? context[0] : (context || document);
+        if (!root || typeof root.querySelectorAll !== 'function') return;
+
+        const inputs = root.querySelectorAll('input.lsd-advanced-picker, input.lsd-advanced-picker[data-lsd-flatpickr-type]');
+        Array.prototype.forEach.call(inputs, initInput);
+    };
+})(jQuery, window);
+
+/**
  * Address Autocomplete Dropdown
  */
 (function($)
@@ -2289,8 +2539,28 @@ function listdom_trigger_toggle()
         const target = $toggle.data('for');
         const target2 = $toggle.data('for2');
         const all = $toggle.data('all');
+        const isRadio = $toggle.is('input[type="radio"]');
+        const isCheckbox = $toggle.is('input[type="checkbox"]');
 
-        const status = jQuery(target).is(':visible') ? 'show' : 'hide';
+        if (isRadio)
+        {
+            if (all) jQuery(all).not(target).addClass('lsd-util-hide').hide();
+
+            jQuery(target).removeClass('lsd-util-hide').show();
+            if (target2) jQuery(target2).addClass('lsd-util-hide').hide();
+
+            $toggle.data('triggered', 1);
+            setTimeout(function()
+            {
+                $toggle.data('triggered', 0);
+            }, 200);
+
+            return;
+        }
+
+        const status = isCheckbox
+            ? ($toggle.is(':checked') ? 'hide' : 'show')
+            : (jQuery(target).is(':visible') ? 'show' : 'hide');
 
         // Hide All Elements if defined
         if(all) jQuery(all).hide();
@@ -2624,200 +2894,178 @@ function listdom_alertify(alert, type)
     return '<div class="lsd-alert '+type+'">'+alert+'</div>';
 }
 
-class ListdomToast {
-    constructor(alert, options = {}) {
-        this.alert = alert;
-        this.type = options.type || 'lsd-natural';
-        this.position = options.position || 'lsd-bottom-right';
-        this.icon = options.icon || null;
-        this.hideTime = typeof options.hideTime === 'number' ? options.hideTime : 8000;
-        this.progress = options.progress !== false;
-        this.showClose = options.showClose !== false;
-        this.confirm = options.confirm || null;
-
-        this.container = this.getContainer();
-        this.toast = this.createToast();
-        this.messageEl = this.toast.find('.lsd-toast-message');
-        this.autoHideTimer = null;
-
-        this.appendToast();
-
-        // don’t auto-hide if it's confirmation
-        if (!this.confirm) this.initAutoHide();
-
-        this.bindEvents();
-    }
-
-    getContainer()
-    {
-        let container = jQuery('.lsd-toast-container.' + this.position);
-        if (!container.length) container = jQuery('<div class="lsd-toast-container ' + this.position + '"></div>').appendTo('body');
-
-        return container;
-    }
-
-    createToast()
-    {
-        const toast = jQuery('<div class="lsd-toast ' + this.type + '"></div>');
-
-        const defaultIcons = {
-            'lsd-error': '<i class="fa fa-times-circle"></i>',
-            'lsd-warning': '<i class="fa fa-exclamation-triangle"></i>',
-            'lsd-info': '<i class="fa fa-info-circle"></i>',
-            'lsd-success': '<i class="fa fa-check-circle"></i>',
-            'lsd-natural': '<i class="fa fa-bell"></i>',
-            'lsd-in-progress': '<i class="lsd-loader"></i>',
-            'lsd-confirm': '<i class="listdom-icon lsdi-question"></i>',
-        };
-
-        const finalIcon = this.icon || defaultIcons[this.type] || '';
-        if (finalIcon)
-        {
-            if (finalIcon.indexOf('<') === -1) toast.append('<span class="lsd-toast-icon"><i class="' + finalIcon + '"></i></span>');
-            else toast.append('<span class="lsd-toast-icon">' + finalIcon + '</span>');
-        }
-
-        toast.append('<span class="lsd-toast-message">' + this.alert + '</span>');
-
-        // Confirmation buttons
-        if (this.confirm)
-        {
-            this.overlay = jQuery('<div class="lsd-toast-overlay"></div>');
-            jQuery('body').append(this.overlay);
-
-            this.overlay.on('click', (e) => {
-                if (e.target === this.overlay[0]) {
-                    if (typeof this.confirm.onCloseOverlay === 'function') {
-                        this.confirm.onCloseOverlay(this);
-                    }
-                    this.remove();
-                }
-            });
-
-            const btnWrap = jQuery('<div class="lsd-toast-actions"></div>');
-
-            // Default to Confirm / Cancel, but allow override
-            const confirmLabel = this.confirm.confirmText;
-            const cancelLabel  = this.confirm.cancelText;
-
-            const confirmBtn = jQuery('<button class="lsd-secondary-button">' + confirmLabel + '</button>');
-            const cancelBtn  = jQuery('<button class="lsd-secondary-button">' + cancelLabel  + '</button>');
-
-            confirmBtn.on('click', () => {
-                if (typeof this.confirm.onConfirm === 'function') this.confirm.onConfirm(this);
-                this.remove();
-            });
-
-            cancelBtn.on('click', () => {
-                if (typeof this.confirm.onCancel === 'function') this.confirm.onCancel(this);
-                this.remove();
-            });
-
-            btnWrap.append(confirmBtn, cancelBtn);
-            toast.append(btnWrap);
-
-            // disable progress + auto-hide
-            this.progress = false;
-            this.hideTime = 0;
-        }
-
-        if (this.showClose && !this.confirm)
-        {
-            const closeBtn = jQuery('<span class="lsd-toast-close">&times;</span>');
-            closeBtn.on('click', () => this.remove());
-            toast.append(closeBtn);
-        }
-
-        if (this.progress && this.hideTime > 0)
-        {
-            toast.addClass('lsd-has-progress');
-            toast.css('--lsd-progress-time', this.hideTime + 'ms');
-            setTimeout(() => toast.addClass('lsd-progress-run'), 50);
-        }
-
-        return toast;
-    }
-
-    appendToast()
-    {
-        this.container.append(this.toast);
-    }
-
-    initAutoHide()
-    {
-        if (this.hideTime > 0) this.autoHideTimer = setTimeout(() => this.remove(), this.hideTime);
-    }
-
-    bindEvents()
-    {
-        if (!this.confirm)
-        {
-            this.toast.on('mouseenter', () => this.pause());
-            this.toast.on('mouseleave', () => this.resume());
-        }
-    }
-
-    pause()
-    {
-        this.toast.addClass('lsd-paused');
-        if (this.autoHideTimer) clearTimeout(this.autoHideTimer);
-        const computed = getComputedStyle(this.toast[0], '::after');
-        const width = computed.getPropertyValue('width');
-        this.toast[0].style.setProperty('--lsd-paused-width', width);
-    }
-
-    resume()
-    {
-        this.toast.removeClass('lsd-paused');
-        if (this.hideTime > 0)
-        {
-            this.toast.css('--lsd-progress-time', this.hideTime + 'ms');
-            this.toast.addClass('lsd-progress-run');
-            this.autoHideTimer = setTimeout(() => this.remove(), this.hideTime);
-        }
-    }
-
-    update(newMessage, newType)
-    {
-        this.messageEl.html(newMessage);
-        if (newType)
-        {
-            this.toast.removeClass('lsd-error lsd-warning lsd-info lsd-success lsd-natural lsd-in-progress lsd-confirm');
-            this.toast.addClass(newType);
-        }
-    }
-
-    remove()
-    {
-        this.toast.addClass('lsd-toast-remove');
-        setTimeout(() =>
-        {
-            this.toast.remove();
-            if (this.overlay) this.overlay.remove();
-            if (!this.container.children().length) this.container.remove();
-        }, 300);
-    }
-}
-
 const ListdomPageScroll = {
-    scrollPosition: 0,
+    isLocked: false,
+    lockedClass: 'lsd-modal-scroll-locked',
+    blockedKeys: ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '],
+    touchStartX: null,
+    touchStartY: null,
+
+    getScrollableModalContainers(target) {
+        const modalContent = target.closest('.lsd-modal-content');
+        if (!modalContent) return [];
+
+        const containers = [];
+        let node = target;
+
+        while (node)
+        {
+            if (node instanceof HTMLElement)
+            {
+                const styles = window.getComputedStyle(node);
+                const canScrollY = ['auto', 'scroll'].includes(styles.overflowY) && node.scrollHeight > node.clientHeight;
+                const canScrollX = ['auto', 'scroll'].includes(styles.overflowX) && node.scrollWidth > node.clientWidth;
+
+                if (canScrollY || canScrollX) containers.push(node);
+            }
+
+            if (node === modalContent) break;
+            node = node.parentElement;
+        }
+
+        return containers;
+    },
+
+    canScrollContainer(container, event) {
+        if (!container) return false;
+
+        const deltaY = typeof event.deltaY === 'number' ? event.deltaY : 0;
+        const deltaX = typeof event.deltaX === 'number' ? event.deltaX : 0;
+
+        const canScrollDown = deltaY > 0 && container.scrollTop + container.clientHeight < container.scrollHeight;
+        const canScrollUp = deltaY < 0 && container.scrollTop > 0;
+        const canScrollRight = deltaX > 0 && container.scrollLeft + container.clientWidth < container.scrollWidth;
+        const canScrollLeft = deltaX < 0 && container.scrollLeft > 0;
+
+        if (deltaY !== 0) return canScrollDown || canScrollUp;
+        if (deltaX !== 0) return canScrollRight || canScrollLeft;
+
+        return false;
+    },
+
+    getModalScrollEventTarget(target, event) {
+        const containers = target ? ListdomPageScroll.getScrollableModalContainers(target) : [];
+
+        for (let i = 0; i < containers.length; i++)
+        {
+            if (ListdomPageScroll.canScrollContainer(containers[i], event)) return containers[i];
+        }
+
+        return null;
+    },
+
+    getKeyScrollEvent(event) {
+        switch (event.key)
+        {
+            case 'ArrowUp':
+            case 'PageUp':
+                return {deltaY: -1, deltaX: 0};
+            case 'ArrowDown':
+            case 'PageDown':
+                return {deltaY: 1, deltaX: 0};
+            case 'Home':
+                return {deltaY: -1, deltaX: 0};
+            case 'End':
+                return {deltaY: 1, deltaX: 0};
+            case ' ':
+                return {deltaY: event.shiftKey ? -1 : 1, deltaX: 0};
+            default:
+                return null;
+        }
+    },
+
+    preventWheelScroll(event) {
+        const target = event.target instanceof Element ? event.target : null;
+        const scrollableContainer = target ? ListdomPageScroll.getModalScrollEventTarget(target, event) : null;
+
+        if (scrollableContainer) return;
+
+        event.preventDefault();
+    },
+
+    recordTouchStart(event) {
+        const touch = event.touches && event.touches[0];
+        if (!touch) return;
+
+        ListdomPageScroll.touchStartX = touch.clientX;
+        ListdomPageScroll.touchStartY = touch.clientY;
+    },
+
+    preventTouchScroll(event) {
+        const touch = event.touches && event.touches[0];
+        const target = event.target instanceof Element ? event.target : null;
+
+        if (touch && target)
+        {
+            const startX = ListdomPageScroll.touchStartX;
+            const startY = ListdomPageScroll.touchStartY;
+
+            if (startX !== null && startY !== null)
+            {
+                const simulatedEvent = {
+                    deltaX: startX - touch.clientX,
+                    deltaY: startY - touch.clientY,
+                };
+
+                if (ListdomPageScroll.getModalScrollEventTarget(target, simulatedEvent))
+                {
+                    ListdomPageScroll.touchStartX = touch.clientX;
+                    ListdomPageScroll.touchStartY = touch.clientY;
+                    return;
+                }
+            }
+        }
+
+        event.preventDefault();
+    },
+
+    preventKeyScroll(event) {
+        if (!ListdomPageScroll.blockedKeys.includes(event.key)) return;
+
+        const target = event.target instanceof Element ? event.target : null;
+        const tagName = (target && target.tagName ? target.tagName : '').toLowerCase();
+        const isInteractive =
+            (target && target.isContentEditable) ||
+            ['input', 'textarea', 'select', 'button'].includes(tagName) ||
+            (target && target.closest('button, [role="button"]'));
+
+        if (isInteractive) return;
+        if (target)
+        {
+            const scrollEvent = ListdomPageScroll.getKeyScrollEvent(event);
+            if (scrollEvent && ListdomPageScroll.getModalScrollEventTarget(target, scrollEvent)) return;
+        }
+
+        event.preventDefault();
+    },
 
     stop() {
-        this.scrollPosition = window.scrollY;
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${this.scrollPosition}px`;
-        document.body.style.left = '0';
-        document.body.style.right = '0';
-        document.body.style.overflowY = 'scroll';
+        if (this.isLocked) return;
+
+        document.documentElement.classList.add(this.lockedClass);
+        document.body.classList.add(this.lockedClass);
+        document.addEventListener('touchstart', this.recordTouchStart, {passive: true});
+        document.addEventListener('wheel', this.preventWheelScroll, {passive: false});
+        document.addEventListener('touchmove', this.preventTouchScroll, {passive: false});
+        document.addEventListener('keydown', this.preventKeyScroll, {passive: false});
+
+        this.isLocked = true;
     },
 
     start() {
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.left = '';
-        document.body.style.right = '';
-        document.body.style.overflowY = '';
-        window.scrollTo(0, this.scrollPosition);
+        if (!this.isLocked) return;
+
+        document.documentElement.classList.remove(this.lockedClass);
+        document.body.classList.remove(this.lockedClass);
+        document.removeEventListener('touchstart', this.recordTouchStart, {passive: true});
+        document.removeEventListener('wheel', this.preventWheelScroll, {passive: false});
+        document.removeEventListener('touchmove', this.preventTouchScroll, {passive: false});
+        document.removeEventListener('keydown', this.preventKeyScroll, {passive: false});
+
+        this.touchStartX = null;
+        this.touchStartY = null;
+
+        this.isLocked = false;
     }
 };
 

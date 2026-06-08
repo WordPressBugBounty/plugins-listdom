@@ -41,10 +41,16 @@ class LSD_Query extends LSD_Base
         else if ($id == 'price') $field = 'lsd_price';
         else if ($id == 'class') $field = 'lsd_price_class';
         else if ($id == 'rate') $field = 'lsd_rate';
+        else if (strpos($id, 'revf-') === 0)
+        {
+            if (!class_exists(\LSDPACREV\Reviews::class)) return false;
+
+            $field = \LSDPACREV\Reviews::review_field_meta_key(substr($id, 5));
+        }
         else if ($id == 'acf_fields') $field = 'acf_fields';
         else $field = 'lsd_attribute_' . LSD_Main::get_attr_slug($id);
 
-        if ($id === 'rate' && is_numeric($value) && (float) $value <= 0) return false;
+        if (($id === 'rate' || strpos($id, 'revf-') === 0) && is_numeric($value) && (float) $value <= 0) return false;
 
         $query = [];
         switch ($type)

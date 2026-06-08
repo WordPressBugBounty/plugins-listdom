@@ -3,7 +3,6 @@
 class LSD_Entity_Listing extends LSD_Entity
 {
     public $post;
-    public $schema;
 
     public function __construct($post = null)
     {
@@ -33,7 +32,7 @@ class LSD_Entity_Listing extends LSD_Entity
             $categories = array_unique(array_merge([$term->term_id], $additional_categories));
 
             // Category Term
-            wp_set_object_terms($this->post->ID, $categories, LSD_Base::TAX_CATEGORY, false);
+            wp_set_object_terms($this->post->ID, $categories, LSD_Base::TAX_CATEGORY);
 
             // Primary Category Meta
             update_post_meta($this->post->ID, 'lsd_primary_category', $term->slug);
@@ -70,8 +69,8 @@ class LSD_Entity_Listing extends LSD_Entity
         if (!is_array($existing_attributes)) $existing_attributes = [];
 
         $attribute_context = LSD_Taxonomies_Attribute::context([
-            'post_id' => (int) $this->post->ID,
-            'category_id' => ($term && !is_wp_error($term) && isset($term->term_id)) ? (int) $term->term_id : 0,
+            'post_id' => $this->post->ID,
+            'category_id' => ($term && !is_wp_error($term) && isset($term->term_id)) ? $term->term_id : 0,
             'category_slug' => ($term && !is_wp_error($term) && isset($term->slug)) ? sanitize_title($term->slug) : '',
             'submission' => $submission,
         ]);
@@ -317,10 +316,10 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID);
     }
 
-    public function get_attributes($show_icons = false, $show_attribute_title = true)
+    public function get_attributes($show_icons = false, $show_attribute_title = true, $show_separator = false)
     {
         $element = new LSD_Element_Attributes();
-        return $element->get($this->post->ID, $show_icons, $show_attribute_title);
+        return $element->get($this->post->ID, $show_icons, $show_attribute_title, $show_separator);
     }
 
     public function get_map($args = [])
@@ -706,11 +705,12 @@ class LSD_Entity_Listing extends LSD_Entity
     public function get_title_tag(string $method = 'normal', string $style = ''): string
     {
         // Link is Enabled
-        if (in_array($method, ['normal', 'blank', 'lightbox', 'right-panel', 'left-panel', 'bottom-panel']))
+        if (in_array($method, ['normal', 'blank', 'map', 'lightbox', 'right-panel', 'left-panel', 'bottom-panel']))
         {
             return '<a
                 data-listing-id="' . esc_attr($this->id()) . '"
                 data-listdom-style="' . $style . '"
+                ' . ($method === 'map' ? 'data-listdom-map' : '') . '
                 href="' . esc_url(get_the_permalink($this->id())) . '"
                 ' . ($method === 'blank' ? 'target="_blank"' : '') . '
                 ' . ($method === 'lightbox' ? 'data-listdom-lightbox' : '') . '
@@ -798,7 +798,7 @@ class LSD_Entity_Listing extends LSD_Entity
         else if (filter_var($value, FILTER_VALIDATE_URL))
         {
             $file_url = esc_url_raw($value);
-            $attachment_id = (int) attachment_url_to_postid($file_url);
+            $attachment_id = attachment_url_to_postid($file_url);
 
             if ($attachment_id)
             {
@@ -839,7 +839,7 @@ class LSD_Entity_Listing extends LSD_Entity
         if ($file_path !== '' && file_exists($file_path))
         {
             $size = filesize($file_path);
-            if ($size !== false) $file_size = (int) $size;
+            if ($size !== false) $file_size = $size;
         }
 
         $rules = self::get_file_rules($term_id);
@@ -971,7 +971,7 @@ class LSD_Entity_Listing extends LSD_Entity
 
             case 'file':
 
-                $validation = self::validate_file_attribute_value($value, $term_id, wp_strip_all_tags($label));
+                $validation = self::validate_file_attribute_value($value, $term_id, wp_strip_all_tags($label), true);
                 if (!$validation['valid'])
                 {
                     if ($trigger_actions && !empty($validation['message'])) LSD_Flash::add($validation['message'], 'error');

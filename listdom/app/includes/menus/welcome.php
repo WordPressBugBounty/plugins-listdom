@@ -2,8 +2,6 @@
 
 class LSD_Menus_Welcome extends LSD_Menus
 {
-    public $tab;
-
     public function __construct()
     {
         // Initialize the Menu

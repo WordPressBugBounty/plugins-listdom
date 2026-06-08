@@ -2,10 +2,7 @@
 
 class LSD_API_Controller extends LSD_API
 {
-    /**
-     * @var LSD_API_Validation
-     */
-    protected $validate;
+    protected LSD_API_Validation $validate;
 
     public function __construct()
     {

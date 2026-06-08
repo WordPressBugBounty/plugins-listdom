@@ -78,6 +78,12 @@ class LSD_Form extends LSD_Base
     {
         if (!count($args)) return false;
 
+        $class = isset($args['class']) ? (string) $args['class'] : '';
+        if (in_array($type, ['date', 'time', 'datetime-local'], true) && strpos(' ' . $class . ' ', ' lsd-advanced-picker ') === false)
+        {
+            $class = trim($class . ' lsd-advanced-picker');
+        }
+
         $attributes = '';
         if (isset($args['attributes']) && is_array($args['attributes']) && count($args['attributes']))
         {
@@ -85,7 +91,7 @@ class LSD_Form extends LSD_Base
         }
 
         $required = isset($args['required']) && $args['required'];
-        return '<input type="' . esc_attr($type) . '" name="' . (isset($args['name']) ? esc_attr($args['name']) : '') . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : '') . '" value="' . (isset($args['value']) ? esc_attr($args['value']) : '') . '" placeholder="' . (isset($args['placeholder']) ? esc_attr($args['placeholder']) : '') . '" ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '>';
+        return '<input type="' . esc_attr($type) . '" name="' . (isset($args['name']) ? esc_attr($args['name']) : '') . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . esc_attr($class) . '" value="' . (isset($args['value']) ? esc_attr($args['value']) : '') . '" placeholder="' . (isset($args['placeholder']) ? esc_attr($args['placeholder']) : '') . '" ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '>';
     }
 
     public static function select($args = [])
@@ -156,7 +162,18 @@ class LSD_Form extends LSD_Base
         $required = isset($args['required']) && $args['required'];
 
         $checkboxes = '';
-        foreach ($args['options'] as $value => $label) $checkboxes .= '<li><label><input name="' . (isset($args['name']) ? esc_attr($args['name']) : '') . '" type="checkbox" value="' . esc_attr($value) . '" ' . ((isset($args['value']) and is_array($args['value']) and in_array($value, $args['value'])) ? 'checked="checked"' : '') . ' ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '> ' . esc_html($label) . '</label></li>';
+        foreach ($args['options'] as $value => $label)
+        {
+            if (is_array($label))
+            {
+                $label_html = isset($label['html']) && is_string($label['html']) && trim($label['html']) !== ''
+                    ? wp_kses_post($label['html'])
+                    : esc_html($label['label'] ?? '');
+            }
+            else $label_html = esc_html($label);
+
+            $checkboxes .= '<li><label><input name="' . (isset($args['name']) ? esc_attr($args['name']) : '') . '" type="checkbox" value="' . esc_attr($value) . '" ' . ((isset($args['value']) and is_array($args['value']) and in_array($value, $args['value'])) ? 'checked="checked"' : '') . ' ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '> ' . $label_html . '</label></li>';
+        }
 
         return '<ul class="' . (isset($args['class']) ? esc_attr($args['class']) : '') . '">' . $checkboxes . '</ul>';
     }
@@ -1020,6 +1037,13 @@ class LSD_Form extends LSD_Base
 
         // AI Profiles
         $args['options'] = $profiles;
+
+        if (!count($profiles))
+        {
+            $args['show_empty'] = true;
+            $args['empty_label'] = esc_html__('No AI profiles available', 'listdom');
+            $args['attributes'] = ['disabled' => 'disabled'];
+        }
 
         // Dropdown Field
         return self::select($args);

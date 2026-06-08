@@ -231,9 +231,10 @@ class LSD_Search_Helper extends LSD_Base
 
         $show_label = !array_key_exists('show_label', $args) || (bool) $args['show_label'];
         $output = $show_label ? '<label for="' . esc_attr($id) . '">' . esc_html($title) . '</label>' : '';
+        $class = $input_type !== 'text' ? 'lsd-advanced-picker' : '';
 
         if ($is_clearable) $output .= '<div class="lsd-search-input-clear-wrap">';
-        $output .= '<input type="' . esc_attr($input_type) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($current) . '">';
+        $output .= '<input type="' . esc_attr($input_type) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" class="' . esc_attr($class) . '" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($current) . '">';
 
         if ($is_clearable)
         {

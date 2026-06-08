@@ -2,7 +2,7 @@
 
 class LSD_Options extends LSD_Base
 {
-    protected static $settings_cache = [];
+    protected static array $settings_cache = [];
 
     public static function settings(): array
     {
@@ -19,7 +19,7 @@ class LSD_Options extends LSD_Base
 
     private static function get_blog_id(): int
     {
-        return function_exists('get_current_blog_id') ? (int) get_current_blog_id() : 1;
+        return function_exists('get_current_blog_id') ? get_current_blog_id() : 1;
     }
 
     public static function privacy(): array
@@ -297,13 +297,21 @@ class LSD_Options extends LSD_Base
                         'faq' => ['enabled' => 0, 'show_title' => 1, 'count' => 0],
                         'gallery' => ['enabled' => 1, 'show_title' => 0],
                         'embed' => ['enabled' => 0, 'show_title' => 0],
-                        'attributes' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0, 'show_attribute_title' => 1],
+                        'attributes' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0, 'show_attribute_title' => 1, 'show_separator' => 0],
                         'features' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0],
                         'contact' => ['enabled' => 1, 'show_title' => 1],
                         'remark' => ['enabled' => 1, 'show_title' => 0],
                         'locations' => ['enabled' => 1, 'show_title' => 0],
                         'address' => ['enabled' => 1, 'show_title' => 0],
                         'breadcrumb' => ['enabled' => 0, 'show_title' => 0, 'icon' => 1, 'taxonomy' => LSD_Base::TAX_CATEGORY],
+                        'backbutton' => [
+                            'enabled' => 0,
+                            'show_title' => 0,
+                            'target' => 'search',
+                            'page' => '',
+                            'fallback_page' => '',
+                            'label' => 'Back',
+                        ],
                         'map' => ['enabled' => 1, 'show_title' => 0, 'infowindow' => 0],
                         'availability' => ['enabled' => 1, 'show_title' => 1],
                         'owner' => ['enabled' => 1, 'show_title' => 0, 'pc_enabled' => 1, 'pc_label' => ''],
@@ -326,7 +334,7 @@ class LSD_Options extends LSD_Base
 
             case 'details_page_pattern':
 
-                $defaults = '{labels}{image}{title}{categories}{price}{tags}{content}{faq}{gallery}{embed}{attributes}{features}{contact}{remark}{locations}{address}{map}{availability}{owner}{cta}{share}';
+                $defaults = '{labels}{image}{title}{categories}{price}{tags}{content}{gallery}{attributes}{features}{contact}{remark}{locations}{address}{map}{availability}{owner}{share}';
                 break;
 
             case 'mapcontrols':
@@ -447,6 +455,12 @@ class LSD_Options extends LSD_Base
                         'working_hours' => ['access' => ['administrator']],
                         'content_generation' => ['access' => ['administrator']],
                         'auto_mapping' => ['access' => ['administrator']],
+                    ],
+                    'semantic_search' => [
+                        'enabled' => 0,
+                        'profile_id' => '',
+                        'min_score' => 0.45,
+                        'attributes' => [],
                     ],
                 ];
                 break;
@@ -576,6 +590,7 @@ class LSD_Options extends LSD_Base
                     'currency_position' => 'before',
                     'currency_thousand_separator' => ',',
                     'currency_decimal_separator' => '.',
+                    'advanced_datetimepicker' => 0,
                     'timepicker_format' => 24,
                     'listing_link_status' => 1,
                     'rss_status' => 1,

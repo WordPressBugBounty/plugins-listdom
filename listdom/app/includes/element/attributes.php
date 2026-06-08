@@ -12,7 +12,7 @@ class LSD_Element_Attributes extends LSD_Element
         $this->label = esc_html(lsd_t_label(LSD_Base::TAX_ATTRIBUTE, 'plural'));
     }
 
-    public function get($post_id = null, $show_icons = 0, $show_attribute_title = 1)
+    public function get($post_id = null, $show_icons = 0, $show_attribute_title = 1, $show_separator = 0)
     {
         if (is_null($post_id))
         {
@@ -31,6 +31,7 @@ class LSD_Element_Attributes extends LSD_Element
                 'post_id' => $post_id,
                 'show_icons' => $show_icons,
                 'show_attribute_title' => $show_attribute_title,
+                'show_separator' => $show_separator,
             ]
         );
     }
@@ -49,6 +50,13 @@ class LSD_Element_Attributes extends LSD_Element
             <select class="lsd-admin-input" name="lsd[elements][' . esc_attr($this->key) . '][show_attribute_title]" id="lsd_elements_' . esc_attr($this->key) . '_show_attribute_title">
                 <option value="1" ' . (isset($data['show_attribute_title']) && $data['show_attribute_title'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
                 <option value="0" ' . (isset($data['show_attribute_title']) && $data['show_attribute_title'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
+            </select>
+        </div>
+        <div>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_show_separator">' . esc_html__('Show Separator', 'listdom') . '</label>
+            <select class="lsd-admin-input" name="lsd[elements][' . esc_attr($this->key) . '][show_separator]" id="lsd_elements_' . esc_attr($this->key) . '_show_separator">
+                <option value="0" ' . (isset($data['show_separator']) && $data['show_separator'] == 0 ? 'selected="selected"' : '') . '>' . esc_html__('No', 'listdom') . '</option>
+                <option value="1" ' . (isset($data['show_separator']) && $data['show_separator'] == 1 ? 'selected="selected"' : '') . '>' . esc_html__('Yes', 'listdom') . '</option>
             </select>
         </div>';
     }

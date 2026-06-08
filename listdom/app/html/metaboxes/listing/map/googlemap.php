@@ -505,81 +505,97 @@ jQuery(document).ready(function($)
             finalizeAddressFromCoordinates(latValue, lonValue);
         });
 
+        const hasDrawingManager = !!(
+            google.maps.drawing
+            && typeof google.maps.drawing.DrawingManager === 'function'
+        );
+        let drawingManager = null;
+
         // Drawing Tools
-        const drawingManager = new google.maps.drawing.DrawingManager(
+        if(hasDrawingManager)
         {
-            drawingMode: google.maps.drawing.OverlayType.MARKER,
-            drawingControl: true,
-            drawingControlOptions: {
-                position: google.maps.ControlPosition.TOP_CENTER,
-                drawingModes: ['circle', 'polygon', 'polyline', 'rectangle']
-            },
-            circleOptions:
+            try
             {
-                fillColor: fill_color,
-                fillOpacity: fill_opacity,
-                strokeOpacity: stroke_opacity,
-                strokeColor: stroke_color,
-                strokeWeight: stroke_weight,
-                clickable: false,
-                editable: true
-            },
-            polygonOptions:
-            {
-                fillColor: fill_color,
-                fillOpacity: fill_opacity,
-                strokeOpacity: stroke_opacity,
-                strokeColor: stroke_color,
-                strokeWeight: stroke_weight,
-                editable: true,
-            },
-            polylineOptions:
-            {
-                strokeOpacity: stroke_opacity,
-                strokeColor: stroke_color,
-                strokeWeight: stroke_weight,
-                editable: true
-            },
-            rectangleOptions:
-            {
-                fillColor: fill_color,
-                fillOpacity: fill_opacity,
-                strokeOpacity: stroke_opacity,
-                strokeColor: stroke_color,
-                strokeWeight: stroke_weight,
-                editable: true,
+                drawingManager = new google.maps.drawing.DrawingManager(
+                {
+                    drawingMode: null,
+                    drawingControl: true,
+                    drawingControlOptions: {
+                        position: google.maps.ControlPosition.TOP_CENTER,
+                        drawingModes: ['circle', 'polygon', 'polyline', 'rectangle']
+                    },
+                    circleOptions:
+                    {
+                        fillColor: fill_color,
+                        fillOpacity: fill_opacity,
+                        strokeOpacity: stroke_opacity,
+                        strokeColor: stroke_color,
+                        strokeWeight: stroke_weight,
+                        clickable: false,
+                        editable: true
+                    },
+                    polygonOptions:
+                    {
+                        fillColor: fill_color,
+                        fillOpacity: fill_opacity,
+                        strokeOpacity: stroke_opacity,
+                        strokeColor: stroke_color,
+                        strokeWeight: stroke_weight,
+                        editable: true,
+                    },
+                    polylineOptions:
+                    {
+                        strokeOpacity: stroke_opacity,
+                        strokeColor: stroke_color,
+                        strokeWeight: stroke_weight,
+                        editable: true
+                    },
+                    rectangleOptions:
+                    {
+                        fillColor: fill_color,
+                        fillOpacity: fill_opacity,
+                        strokeOpacity: stroke_opacity,
+                        strokeColor: stroke_color,
+                        strokeWeight: stroke_weight,
+                        editable: true,
+                    }
+                });
+
+                drawingManager.setMap(map);
+                drawingManager.setOptions({drawingMode: null});
             }
-        });
+            catch (error)
+            {
+                drawingManager = null;
+            }
 
-        drawingManager.setMap(map);
-        drawingManager.setOptions({drawingMode: null});
+            /**
+             * Drawing Event Listeners
+             * Overlay Complete
+             */
+            if(drawingManager) google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event)
+            {
+                overlay = event.overlay;
+                drawingManager.setOptions({drawingMode: null});
 
-        /**
-         * Drawing Event Listeners
-         * Overlay Complete
-         */
-        google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event)
-        {
-            overlay = event.overlay;
-            drawingManager.setOptions({drawingMode: null});
+                // Set the boundaries
+                lsd_set_boundaries(overlay, event.type);
 
-            // Set the boundaries
-            lsd_set_boundaries(overlay, event.type);
+                // Delete Overlays
+                for(let i = 0; i < overlaysArray.length; i++) overlaysArray[i].setMap(null);
+                overlaysArray = [];
 
-            // Delete Overlays
-            for(let i = 0; i < overlaysArray.length; i++) overlaysArray[i].setMap(null);
-            overlaysArray = [];
+                // Push to array
+                overlaysArray.push(overlay);
 
-            // Push to array
-            overlaysArray.push(overlay);
+                // Set the listeners
+                lsd_set_listeners(overlay, event.type);
 
-            // Set the listeners
-            lsd_set_listeners(overlay, event.type);
-
-            // Extend Map Bounds
-            lsd_extend_map_bounds(overlay, event.type);
-            map.fitBounds(bounds);
-        });
+                // Extend Map Bounds
+                lsd_extend_map_bounds(overlay, event.type);
+                map.fitBounds(bounds);
+            });
+        }
 
         /**
          * Draw previous shape if any
@@ -601,10 +617,10 @@ jQuery(document).ready(function($)
         overlaysArray.push(overlay);
 
         // Set the listeners
-        lsd_set_listeners(overlay, google.maps.drawing.OverlayType.POLYLINE);
+        lsd_set_listeners(overlay, 'polyline');
 
         // Extend Map Bounds
-        lsd_extend_map_bounds(overlay, google.maps.drawing.OverlayType.POLYLINE);
+        lsd_extend_map_bounds(overlay, 'polyline');
         <?php elseif(isset($shape['type']) and $shape['type'] == 'rectangle'): ?>
         overlay = new google.maps.Rectangle(
         {
@@ -626,10 +642,10 @@ jQuery(document).ready(function($)
         overlaysArray.push(overlay);
 
         // Set the listeners
-        lsd_set_listeners(overlay, google.maps.drawing.OverlayType.RECTANGLE);
+        lsd_set_listeners(overlay, 'rectangle');
 
         // Extend Map Bounds
-        lsd_extend_map_bounds(overlay, google.maps.drawing.OverlayType.RECTANGLE);
+        lsd_extend_map_bounds(overlay, 'rectangle');
         <?php elseif(isset($shape['type']) and $shape['type'] == 'polygon'): ?>
         overlay = new google.maps.Polygon(
         {
@@ -646,10 +662,10 @@ jQuery(document).ready(function($)
         overlaysArray.push(overlay);
 
         // Set the listeners
-        lsd_set_listeners(overlay, google.maps.drawing.OverlayType.POLYGON);
+        lsd_set_listeners(overlay, 'polygon');
 
         // Extend Map Bounds
-        lsd_extend_map_bounds(overlay, google.maps.drawing.OverlayType.POLYGON);
+        lsd_extend_map_bounds(overlay, 'polygon');
         <?php elseif(isset($shape['type']) and $shape['type'] == 'circle'): ?>
         overlay = new google.maps.Circle(
         {
@@ -668,10 +684,10 @@ jQuery(document).ready(function($)
         overlaysArray.push(overlay);
 
         // Set the listeners
-        lsd_set_listeners(overlay, google.maps.drawing.OverlayType.CIRCLE);
+        lsd_set_listeners(overlay, 'circle');
 
         // Extend Map Bounds
-        lsd_extend_map_bounds(overlay, google.maps.drawing.OverlayType.CIRCLE);
+        lsd_extend_map_bounds(overlay, 'circle');
         <?php endif; ?>
 
         map.fitBounds(bounds);
@@ -683,7 +699,7 @@ jQuery(document).ready(function($)
         // Object Type is marker so hide drawing tools
         if(object_type === 'marker')
         {
-            drawingManager.setMap(null);
+            if(drawingManager) drawingManager.setMap(null);
             if(typeof overlay !== 'undefined' && typeof overlay.setMap === 'function') overlay.setMap(null);
         }
 
@@ -704,7 +720,7 @@ jQuery(document).ready(function($)
             $('#lsd_object_type').val('marker');
 
             marker.setMap(map);
-            drawingManager.setMap(null);
+            if(drawingManager) drawingManager.setMap(null);
             if(typeof overlay !== 'undefined' && typeof overlay.setMap === 'function') overlay.setMap(null);
         });
 
@@ -714,7 +730,7 @@ jQuery(document).ready(function($)
             $('#lsd_object_type').val('shape');
 
             marker.setMap(null);
-            drawingManager.setMap(map);
+            if(drawingManager) drawingManager.setMap(map);
             if(typeof overlay !== 'undefined' && typeof overlay.setMap === 'function') overlay.setMap(map);
         });
     });
@@ -725,7 +741,7 @@ function lsd_set_boundaries(overlay, type)
     let paths = [];
     let radius;
 
-    if(type === google.maps.drawing.OverlayType.POLYGON)
+    if(type === 'polygon')
     {
         overlay.getPaths().forEach(function(path)
         {
@@ -736,14 +752,14 @@ function lsd_set_boundaries(overlay, type)
             }
         });
     }
-    else if(type === google.maps.drawing.OverlayType.POLYLINE)
+    else if(type === 'polyline')
     {
         overlay.getPath().forEach(function(path)
         {
             paths.push(new google.maps.LatLng(path.lat(), path.lng()));
         });
     }
-    else if(type === google.maps.drawing.OverlayType.RECTANGLE)
+    else if(type === 'rectangle')
     {
         const ne = overlay.getBounds().getNorthEast();
         const sw = overlay.getBounds().getSouthWest();
@@ -751,7 +767,7 @@ function lsd_set_boundaries(overlay, type)
         paths.push(new google.maps.LatLng(ne.lat(), ne.lng()));
         paths.push(new google.maps.LatLng(sw.lat(), sw.lng()));
     }
-    else if(type === google.maps.drawing.OverlayType.CIRCLE)
+    else if(type === 'circle')
     {
         paths.push(new google.maps.LatLng(overlay.getCenter().lat(), overlay.getCenter().lng()));
         radius = overlay.getRadius();
@@ -765,7 +781,7 @@ function lsd_set_boundaries(overlay, type)
 function lsd_set_listeners(overlay, type)
 {
     // POLYGON
-    if(type === google.maps.drawing.OverlayType.POLYGON)
+    if(type === 'polygon')
     {
         overlay.getPaths().forEach(function(path)
         {
@@ -786,7 +802,7 @@ function lsd_set_listeners(overlay, type)
         });
     }
     // POLYLINE
-    else if(type === google.maps.drawing.OverlayType.POLYLINE)
+    else if(type === 'polyline')
     {
         google.maps.event.addListener(overlay.getPath(), 'insert_at', function()
         {
@@ -804,7 +820,7 @@ function lsd_set_listeners(overlay, type)
         });
     }
     // RECTANGLE
-    else if(type === google.maps.drawing.OverlayType.RECTANGLE)
+    else if(type === 'rectangle')
     {
         google.maps.event.addListener(overlay, 'bounds_changed', function()
         {
@@ -812,7 +828,7 @@ function lsd_set_listeners(overlay, type)
         });
     }
     // CIRCLE
-    else if(type === google.maps.drawing.OverlayType.CIRCLE)
+    else if(type === 'circle')
     {
         google.maps.event.addListener(overlay, 'radius_changed', function()
         {
@@ -829,7 +845,7 @@ function lsd_set_listeners(overlay, type)
 function lsd_extend_map_bounds(overlay, type)
 {
     // POLYGON
-    if(type === google.maps.drawing.OverlayType.POLYGON)
+    if(type === 'polygon')
     {
         overlay.getPaths().forEach(function(path)
         {
@@ -838,7 +854,7 @@ function lsd_extend_map_bounds(overlay, type)
         });
     }
     // POLYLINE
-    else if(type === google.maps.drawing.OverlayType.POLYLINE)
+    else if(type === 'polyline')
     {
         const path = overlay.getPath();
 
@@ -862,12 +878,12 @@ function lsd_extend_map_bounds(overlay, type)
         bounds.extend(new google.maps.LatLng(blat, blng));
     }
     // RECTANGLE
-    else if(type === google.maps.drawing.OverlayType.RECTANGLE)
+    else if(type === 'rectangle')
     {
         bounds.union(overlay.getBounds());
     }
     // CIRCLE
-    else if(type === google.maps.drawing.OverlayType.CIRCLE)
+    else if(type === 'circle')
     {
         bounds.union(overlay.getBounds());
     }

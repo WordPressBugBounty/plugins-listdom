@@ -2,7 +2,7 @@
 
 abstract class LSD_AI_Models_Base
 {
-    private $api_key;
+    private string $api_key;
 
     public function __construct(string $api_key)
     {

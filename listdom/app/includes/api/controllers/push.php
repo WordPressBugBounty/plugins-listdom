@@ -146,14 +146,24 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
 
                 $term = wp_create_term($name, LSD_Base::TAX_ATTRIBUTE);
 
-                $term_id = is_array($term) && isset($term['term_id']) ? $term['term_id'] : null;
+                $term_id = null;
+                $created_term = false;
+                if (is_array($term) && isset($term['term_id']))
+                {
+                    $term_id = (int) $term['term_id'];
+                    $created_term = true;
+                }
+                else if (is_wp_error($term) && $term->get_error_code() === 'term_exists') $term_id = (int) $term->get_error_data();
                 if (!$term_id) continue;
 
+                $attribute_term = get_term($term_id, LSD_Base::TAX_ATTRIBUTE);
+                if (!$attribute_term || is_wp_error($attribute_term) || !isset($attribute_term->slug) || !$attribute_term->slug) continue;
+
                 $value = $attr['value'] ?? '';
-                $attributes[$term_id] = $value;
+                $attributes[$attribute_term->slug] = $value;
 
                 $meta = $attr['meta'] ?? [];
-                if (is_array($meta) && count($meta))
+                if ($created_term && is_array($meta) && count($meta))
                 {
                     foreach ($meta as $k => $v)
                     {

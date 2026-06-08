@@ -163,6 +163,14 @@ function ListdomMaps(id) {
 
         map.load(objects);
     };
+
+    this.openListing = function (listingId) {
+        let map = this.get();
+
+        if (!map || typeof map.openListing !== "function") return false;
+
+        return map.openListing(listingId);
+    };
 }
 
 // Listdom DETAILS PLUGIN
@@ -4091,6 +4099,8 @@ function ListdomDetails(id, link, settings) {
 
         // Loaded Objects
         let loadedObjects = [];
+        let loadedObjectsById = {};
+        let openListingTimer = null;
 
         // Bounds
         let bounds = L.latLngBounds();
@@ -4190,6 +4200,10 @@ function ListdomDetails(id, link, settings) {
                 icon: icon,
             });
 
+            marker.listing_id = markerData.id;
+            marker.is_marker = true;
+            marker.lsd_infowindow = markerData.infowindow;
+
             if (settings.display_infowindow) {
                 // InfoWindow
                 if (markerData.onclick === "infowindow") {
@@ -4255,7 +4269,7 @@ function ListdomDetails(id, link, settings) {
             bounds.extend([markerData.latitude, markerData.longitude]);
 
             // Add to Loaded Objects
-            loadedObjects.push(marker);
+            registerLoadedObject(marker);
         }
 
         function loadCircle(shapeData) {
@@ -4269,6 +4283,10 @@ function ListdomDetails(id, link, settings) {
                 radius: shapeData.radius,
             });
 
+            shape.listing_id = shapeData.id;
+            shape.is_marker = false;
+            shape.lsd_infowindow = shapeData.infowindow;
+
             if (settings.display_infowindow) {
                 // InfoWindow
                 if (shapeData.onclick === "infowindow") {
@@ -4296,7 +4314,7 @@ function ListdomDetails(id, link, settings) {
             bounds.extend(shape.getBounds());
 
             // Add to Loaded Objects
-            loadedObjects.push(shape);
+            registerLoadedObject(shape);
         }
 
         function loadPolygon(shapeData) {
@@ -4309,6 +4327,10 @@ function ListdomDetails(id, link, settings) {
                 fillOpacity: shapeData.fill_opacity,
             });
 
+            shape.listing_id = shapeData.id;
+            shape.is_marker = false;
+            shape.lsd_infowindow = shapeData.infowindow;
+
             if (settings.display_infowindow) {
                 // InfoWindow
                 if (shapeData.onclick === "infowindow") {
@@ -4336,7 +4358,7 @@ function ListdomDetails(id, link, settings) {
             bounds.extend(shape.getBounds());
 
             // Add to Loaded Objects
-            loadedObjects.push(shape);
+            registerLoadedObject(shape);
         }
 
         function loadPolyline(shapeData) {
@@ -4354,6 +4376,10 @@ function ListdomDetails(id, link, settings) {
                 smoothFactor: 1,
             });
 
+            shape.listing_id = shapeData.id;
+            shape.is_marker = false;
+            shape.lsd_infowindow = shapeData.infowindow;
+
             if (settings.display_infowindow) {
                 // InfoWindow
                 if (shapeData.onclick === "infowindow") {
@@ -4381,7 +4407,7 @@ function ListdomDetails(id, link, settings) {
             bounds.extend(shape.getBounds());
 
             // Add to Loaded Objects
-            loadedObjects.push(shape);
+            registerLoadedObject(shape);
         }
 
         function loadRectangle(shapeData) {
@@ -4401,6 +4427,10 @@ function ListdomDetails(id, link, settings) {
                 fillOpacity: shapeData.fill_opacity,
             });
 
+            shape.listing_id = shapeData.id;
+            shape.is_marker = false;
+            shape.lsd_infowindow = shapeData.infowindow;
+
             if (settings.display_infowindow) {
                 // InfoWindow
                 if (shapeData.onclick === "infowindow") {
@@ -4428,7 +4458,7 @@ function ListdomDetails(id, link, settings) {
             bounds.extend(shape.getBounds());
 
             // Add to Loaded Objects
-            loadedObjects.push(shape);
+            registerLoadedObject(shape);
         }
 
         function removeObjects(objects) {
@@ -4444,9 +4474,88 @@ function ListdomDetails(id, link, settings) {
             // Remove Existing Objects
             removeObjects(loadedObjects);
             loadedObjects = [];
+            loadedObjectsById = {};
 
             // Add New Objects
             loadObjects(objects);
+        }
+
+        function registerLoadedObject(object) {
+            loadedObjects.push(object);
+
+            if (typeof object.listing_id !== "undefined") {
+                loadedObjectsById[String(object.listing_id)] = object;
+            }
+        }
+
+        function freezeMapsearchTemporarily() {
+            mapsearchFreez = true;
+
+            if (openListingTimer) clearTimeout(openListingTimer);
+            openListingTimer = setTimeout(function () {
+                mapsearchFreez = false;
+            }, 2000);
+        }
+
+        function isolateMarker(object) {
+            if (!object || !object.is_marker || !object.getLatLng || typeof object.getLatLng !== "function") return;
+
+            const latLng = object.getLatLng();
+            const maxZoom = typeof map.getMaxZoom === "function" && map.getMaxZoom() ? map.getMaxZoom() : 18;
+            let zoom = typeof map.getZoom === "function" ? map.getZoom() : 0;
+
+            while (zoom < maxZoom) {
+                const visibleMarkers = loadedObjects.filter(function (item) {
+                    return item && item.is_marker && item.getLatLng && map.getBounds().contains(item.getLatLng());
+                }).length;
+
+                if (visibleMarkers <= 1) break;
+
+                zoom += 1;
+                map.setView(latLng, zoom, {
+                    animate: false,
+                });
+            }
+        }
+
+        function openObjectPopup(object) {
+            if (!object || !object.lsd_infowindow) return false;
+
+            freezeMapsearchTemporarily();
+
+            if (!object.getPopup || !object.getPopup()) {
+                object.bindPopup(object.lsd_infowindow, popupOptions);
+                object.on("popupopen", listdom_bricks_infowindow_onload);
+            }
+
+            if (object.getBounds && typeof object.getBounds === "function") {
+                map.fitBounds(object.getBounds());
+            } else if (object.getLatLng && typeof object.getLatLng === "function") {
+                const latLng = object.getLatLng();
+                const targetZoom = parseInt(settings.zoom, 10);
+
+                if (!isNaN(targetZoom) && map.getZoom() < targetZoom) map.setView(latLng, targetZoom);
+                else map.panTo(latLng);
+            }
+
+            if (settings.clustering && clustering && typeof clustering.zoomToShowLayer === "function") {
+                clustering.zoomToShowLayer(object, function () {
+                    if (object.getLatLng && typeof object.getLatLng === "function") {
+                        const latLng = object.getLatLng();
+                        const targetZoom = parseInt(settings.zoom, 10);
+
+                        if (!isNaN(targetZoom) && map.getZoom() < targetZoom) map.setView(latLng, targetZoom);
+                    }
+
+                    isolateMarker(object);
+                    object.openPopup();
+                });
+            } else {
+                isolateMarker(object);
+                object.openPopup();
+            }
+
+            return true;
         }
 
         function extend() {
@@ -4657,8 +4766,15 @@ function ListdomDetails(id, link, settings) {
 
         return {
             id: settings.id,
+            element: DOM,
             load: function (objects) {
                 reloadObjects(objects);
+            },
+            openListing: function (listingId) {
+                const object = loadedObjectsById[String(listingId)];
+                if (!object) return false;
+
+                return openObjectPopup(object);
             },
         };
     };
@@ -4795,6 +4911,8 @@ function ListdomDetails(id, link, settings) {
 
         // Loaded Objects
         let loadedObjects = [];
+        let loadedObjectsById = {};
+        let openListingTimer = null;
         let markerCluster;
 
         // Load Layers
@@ -4826,7 +4944,7 @@ function ListdomDetails(id, link, settings) {
         if (settings.autoGPS && !settings.geo_request) autoGPS();
 
         // Init Draw Search
-        if (settings.mapcontrols.draw) drawsearch();
+        if (settings.mapcontrols.draw && hasGoogleDrawing()) drawsearch();
 
         // Init Google Places
         if (settings.gplaces) gplaces();
@@ -4920,6 +5038,9 @@ function ListdomDetails(id, link, settings) {
                 shadow: "none",
             });
 
+            marker.lsd_infowindow = markerData.infowindow;
+            marker.is_marker = true;
+
             // Marker Info-Window
             if (settings.display_infowindow) {
                 const cancelInfowindowClose = function () {
@@ -5010,11 +5131,34 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
+            if (markerData.infowindow) {
+                marker._lsdOpenInfowindow = function () {
+                    infowindow.close();
+                    infowindow.setContent(marker.infowindow);
+
+                    if (typeof marker.lsd.y_offset !== 'undefined') {
+                        infowindow.setOptions({
+                            pixelOffset: new google.maps.Size(
+                                marker.lsd.x_offset,
+                                marker.lsd.y_offset
+                            ),
+                        });
+                    } else {
+                        infowindow.setOptions({
+                            pixelOffset: new google.maps.Size(0, -35),
+                        });
+                    }
+
+                    infowindow.open(map, marker);
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+            }
+
             // Extend the bounds to include each marker's position
             bounds.extend(marker.position);
 
             // Add to Loaded Objects
-            loadedObjects.push(marker);
+            registerLoadedObject(marker);
         }
 
         function loadCircle(shapeData) {
@@ -5035,6 +5179,9 @@ function ListdomDetails(id, link, settings) {
                 listing_id: shapeData.id,
             });
 
+            shape.lsd_infowindow = shapeData.infowindow;
+            shape.is_marker = false;
+
             shape.getPosition = function () {
                 return shape.getCenter();
             };
@@ -5044,10 +5191,11 @@ function ListdomDetails(id, link, settings) {
                 const openShapeInfowindow = function (event) {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
-                    infowindow.setPosition(event.latLng);
+                    infowindow.setPosition(event && event.latLng ? event.latLng : this.getPosition());
                     infowindow.open(map, this);
                     google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
                 };
+
 
                 if (shape.lsd_onclick === "infowindow") {
                     google.maps.event.addListener(shape, "click", openShapeInfowindow);
@@ -5067,11 +5215,21 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
+            if (shapeData.infowindow) {
+                shape._lsdOpenInfowindow = function () {
+                    infowindow.close();
+                    infowindow.setContent(shape.infowindow);
+                    infowindow.setPosition(shape.getPosition());
+                    infowindow.open(map, shape);
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+            }
+
             // Extend the bounds to include each shape's position
             bounds.union(shape.getBounds());
 
             // Add to Loaded Objects
-            loadedObjects.push(shape);
+            registerLoadedObject(shape);
         }
 
         function loadPolygon(shapeData) {
@@ -5090,6 +5248,9 @@ function ListdomDetails(id, link, settings) {
                 raw_link: shapeData.raw,
                 listing_id: shapeData.id,
             });
+
+            shape.lsd_infowindow = shapeData.infowindow;
+            shape.is_marker = false;
 
             let lastPath;
             let lastCenter;
@@ -5112,10 +5273,11 @@ function ListdomDetails(id, link, settings) {
                 const openShapeInfowindow = function (event) {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
-                    infowindow.setPosition(event.latLng);
+                    infowindow.setPosition(event && event.latLng ? event.latLng : this.getPosition());
                     infowindow.open(map, this);
                     google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
                 };
+
 
                 if (shape.lsd_onclick === "infowindow") {
                     google.maps.event.addListener(shape, "click", openShapeInfowindow);
@@ -5135,6 +5297,16 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
+            if (shapeData.infowindow) {
+                shape._lsdOpenInfowindow = function () {
+                    infowindow.close();
+                    infowindow.setContent(shape.infowindow);
+                    infowindow.setPosition(shape.getPosition());
+                    infowindow.open(map, shape);
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+            }
+
             // Extend the bounds to include each shape's position
             shape.getPaths().forEach(function (path) {
                 let points = path.getArray();
@@ -5142,7 +5314,7 @@ function ListdomDetails(id, link, settings) {
             });
 
             // Add to Loaded Objects
-            loadedObjects.push(shape);
+            registerLoadedObject(shape);
         }
 
         function loadPolyline(shapeData) {
@@ -5160,15 +5332,19 @@ function ListdomDetails(id, link, settings) {
                 listing_id: shapeData.id,
             });
 
+            shape.lsd_infowindow = shapeData.infowindow;
+            shape.is_marker = false;
+
             // Shape Info-Window
             if (settings.display_infowindow) {
                 const openShapeInfowindow = function (event) {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
-                    infowindow.setPosition(event.latLng);
+                    infowindow.setPosition(event && event.latLng ? event.latLng : this.getPosition());
                     infowindow.open(map, this);
                     google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
                 };
+
 
                 if (shape.lsd_onclick === "infowindow") {
                     google.maps.event.addListener(shape, "click", openShapeInfowindow);
@@ -5211,8 +5387,18 @@ function ListdomDetails(id, link, settings) {
                 return new google.maps.LatLng((slat + blat) / 2, (slng + blng) / 2);
             };
 
+            if (shapeData.infowindow) {
+                shape._lsdOpenInfowindow = function () {
+                    infowindow.close();
+                    infowindow.setContent(shape.infowindow);
+                    infowindow.setPosition(shape.getPosition());
+                    infowindow.open(map, shape);
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+            }
+
             // Add to Loaded Objects
-            loadedObjects.push(shape);
+            registerLoadedObject(shape);
         }
 
         function loadRectangle(shapeData) {
@@ -5237,6 +5423,9 @@ function ListdomDetails(id, link, settings) {
                 listing_id: shapeData.id,
             });
 
+            shape.lsd_infowindow = shapeData.infowindow;
+            shape.is_marker = false;
+
             shape.getPosition = function () {
                 return shape.getBounds().getCenter();
             };
@@ -5246,10 +5435,11 @@ function ListdomDetails(id, link, settings) {
                 const openShapeInfowindow = function (event) {
                     infowindow.close();
                     infowindow.setContent(this.infowindow);
-                    infowindow.setPosition(event.latLng);
+                    infowindow.setPosition(event && event.latLng ? event.latLng : this.getPosition());
                     infowindow.open(map, this);
                     google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
                 };
+
 
                 if (shape.lsd_onclick === "infowindow") {
                     google.maps.event.addListener(shape, "click", openShapeInfowindow);
@@ -5269,11 +5459,21 @@ function ListdomDetails(id, link, settings) {
                 }
             }
 
+            if (shapeData.infowindow) {
+                shape._lsdOpenInfowindow = function () {
+                    infowindow.close();
+                    infowindow.setContent(shape.infowindow);
+                    infowindow.setPosition(shape.getPosition());
+                    infowindow.open(map, shape);
+                    google.maps.event.addListenerOnce(infowindow, "domready", listdom_bricks_infowindow_onload);
+                };
+            }
+
             // Extend the bounds to include each shape's position
             bounds.union(shape.getBounds());
 
             // Add to Loaded Objects
-            loadedObjects.push(shape);
+            registerLoadedObject(shape);
         }
 
         function removeObjects(objects) {
@@ -5287,6 +5487,7 @@ function ListdomDetails(id, link, settings) {
             // Remove Existing Objects
             removeObjects(loadedObjects);
             loadedObjects = [];
+            loadedObjectsById = {};
 
             // Empty Bounds
             bounds = new google.maps.LatLngBounds();
@@ -5300,6 +5501,75 @@ function ListdomDetails(id, link, settings) {
                 markerCluster.addMarkers(loadedObjects, false);
                 markerCluster.redraw();
             }
+        }
+
+        function registerLoadedObject(object) {
+            loadedObjects.push(object);
+
+            if (typeof object.listing_id !== "undefined") {
+                loadedObjectsById[String(object.listing_id)] = object;
+            }
+        }
+
+        function freezeMapsearchTemporarily() {
+            mapsearchFreez = true;
+
+            if (openListingTimer) clearTimeout(openListingTimer);
+            openListingTimer = setTimeout(function () {
+                mapsearchFreez = false;
+            }, 2000);
+        }
+
+        function isolateMarker(object, callback) {
+            if (!object || !object.is_marker || !object.position) {
+                callback();
+                return;
+            }
+
+            const bounds = map.getBounds();
+            const zoom = typeof map.getZoom === "function" ? map.getZoom() : 0;
+            const maxZoom = typeof map.maxZoom === "number" ? map.maxZoom : 21;
+
+            if (!bounds) {
+                callback();
+                return;
+            }
+
+            const visibleMarkers = loadedObjects.filter(function (item) {
+                return item && item.is_marker && item.position && bounds.contains(item.position);
+            }).length;
+
+            if (visibleMarkers <= 1 || zoom >= maxZoom) {
+                callback();
+                return;
+            }
+
+            google.maps.event.addListenerOnce(map, "idle", function () {
+                isolateMarker(object, callback);
+            });
+
+            map.setZoom(zoom + 1);
+        }
+
+        function openListingInfowindow(object) {
+            if (!object || typeof object._lsdOpenInfowindow !== "function") return false;
+
+            freezeMapsearchTemporarily();
+
+            const position = typeof object.getPosition === "function" ? object.getPosition() : null;
+            const targetZoom = parseInt(settings.zoom, 10);
+
+            if (position) {
+                if (!isNaN(targetZoom) && map.getZoom() < targetZoom) map.setZoom(targetZoom);
+                map.panTo(position);
+            }
+
+            google.maps.event.addListenerOnce(map, "idle", function () {
+                isolateMarker(object, function () {
+                    object._lsdOpenInfowindow();
+                });
+            });
+            return true;
         }
 
         function getMapControlPosition(lsdPosition) {
@@ -5722,49 +5992,65 @@ function ListdomDetails(id, link, settings) {
         let loadedOverlays = [];
         let drawing = false;
 
+        function hasGoogleDrawing() {
+            return (
+                typeof google !== "undefined" &&
+                typeof google.maps !== "undefined" &&
+                typeof google.maps.drawing !== "undefined" &&
+                typeof google.maps.drawing.DrawingManager === "function"
+            );
+        }
+
         function drawsearch() {
-            let drawManager = new google.maps.drawing.DrawingManager({
-                drawingControl: true,
-                drawingControlOptions: {
-                    position: getMapControlPosition(settings.mapcontrols.draw),
-                    drawingModes: [
-                        google.maps.drawing.OverlayType.POLYGON,
-                        google.maps.drawing.OverlayType.CIRCLE,
-                        google.maps.drawing.OverlayType.RECTANGLE,
-                    ],
-                },
-                polygonOptions: {
-                    strokeColor: settings.stroke_color,
-                    strokeOpacity: settings.stroke_opacity,
-                    strokeWeight: settings.stroke_weight,
-                    editable: true,
-                    draggable: false,
-                    fillColor: settings.fill_color,
-                    fillOpacity: settings.fill_opacity,
-                    clickable: false,
-                },
-                rectangleOptions: {
-                    strokeColor: settings.stroke_color,
-                    strokeOpacity: settings.stroke_opacity,
-                    strokeWeight: settings.stroke_weight,
-                    editable: true,
-                    draggable: false,
-                    fillColor: settings.fill_color,
-                    fillOpacity: settings.fill_opacity,
-                    clickable: false,
-                },
-                circleOptions: {
-                    strokeColor: settings.stroke_color,
-                    strokeOpacity: settings.stroke_opacity,
-                    strokeWeight: settings.stroke_weight,
-                    editable: true,
-                    draggable: false,
-                    fillColor: settings.fill_color,
-                    fillOpacity: settings.fill_opacity,
-                    clickable: false,
-                },
-                map: map,
-            });
+            if (!hasGoogleDrawing()) return;
+
+            let drawManager;
+            try {
+                drawManager = new google.maps.drawing.DrawingManager({
+                    drawingControl: true,
+                    drawingControlOptions: {
+                        position: getMapControlPosition(settings.mapcontrols.draw),
+                        drawingModes: [
+                            "polygon",
+                            "circle",
+                            "rectangle",
+                        ],
+                    },
+                    polygonOptions: {
+                        strokeColor: settings.stroke_color,
+                        strokeOpacity: settings.stroke_opacity,
+                        strokeWeight: settings.stroke_weight,
+                        editable: true,
+                        draggable: false,
+                        fillColor: settings.fill_color,
+                        fillOpacity: settings.fill_opacity,
+                        clickable: false,
+                    },
+                    rectangleOptions: {
+                        strokeColor: settings.stroke_color,
+                        strokeOpacity: settings.stroke_opacity,
+                        strokeWeight: settings.stroke_weight,
+                        editable: true,
+                        draggable: false,
+                        fillColor: settings.fill_color,
+                        fillOpacity: settings.fill_opacity,
+                        clickable: false,
+                    },
+                    circleOptions: {
+                        strokeColor: settings.stroke_color,
+                        strokeOpacity: settings.stroke_opacity,
+                        strokeWeight: settings.stroke_weight,
+                        editable: true,
+                        draggable: false,
+                        fillColor: settings.fill_color,
+                        fillOpacity: settings.fill_opacity,
+                        clickable: false,
+                    },
+                    map: map,
+                });
+            } catch (error) {
+                return;
+            }
 
             google.maps.event.addListener(
                 drawManager,
@@ -5811,7 +6097,7 @@ function ListdomDetails(id, link, settings) {
 
         function drawsearch_set_overlay_listeners(type, overlay) {
             // POLYGON
-            if (type === google.maps.drawing.OverlayType.POLYGON) {
+            if (type === "polygon") {
                 overlay.getPaths().forEach(function (path) {
                     google.maps.event.addListener(path, "insert_at", function () {
                         // Set Draw Flag
@@ -5848,7 +6134,7 @@ function ListdomDetails(id, link, settings) {
                 });
             }
             // Circle
-            else if (type === google.maps.drawing.OverlayType.CIRCLE) {
+            else if (type === "circle") {
                 google.maps.event.addListener(overlay, "radius_changed", function () {
                     // Set Draw Flag
                     drawing = true;
@@ -5872,7 +6158,7 @@ function ListdomDetails(id, link, settings) {
                 });
             }
             // Rectangle
-            else if (type === google.maps.drawing.OverlayType.RECTANGLE) {
+            else if (type === "rectangle") {
                 google.maps.event.addListener(overlay, "bounds_changed", function () {
                     // Set Draw Flag
                     drawing = true;
@@ -5890,14 +6176,14 @@ function ListdomDetails(id, link, settings) {
             bounds = new google.maps.LatLngBounds();
             let mapsearch_freez = true;
 
-            if (type === google.maps.drawing.OverlayType.POLYGON) {
+            if (type === "polygon") {
                 overlay.getPaths().forEach(function (path) {
                     let points = path.getArray();
                     for (let b in points) bounds.extend(points[b]);
                 });
-            } else if (type === google.maps.drawing.OverlayType.CIRCLE) {
+            } else if (type === "circle") {
                 bounds.union(overlay.getBounds());
-            } else if (type === google.maps.drawing.OverlayType.RECTANGLE) {
+            } else if (type === "rectangle") {
                 bounds.union(overlay.getBounds());
             }
 
@@ -5913,7 +6199,7 @@ function ListdomDetails(id, link, settings) {
         function drawsearch_boundary(type, overlay) {
             let request;
 
-            if (type === google.maps.drawing.OverlayType.POLYGON) {
+            if (type === "polygon") {
                 let paths = [];
 
                 overlay.getPaths().forEach(function (path) {
@@ -5927,7 +6213,7 @@ function ListdomDetails(id, link, settings) {
 
                 // Boundary Parameters
                 request = "sf[shape]=polygon&sf[polygon]=" + paths.toString();
-            } else if (type === google.maps.drawing.OverlayType.CIRCLE) {
+            } else if (type === "circle") {
                 let radius = overlay.getRadius();
                 let center = overlay.getCenter();
 
@@ -5942,7 +6228,7 @@ function ListdomDetails(id, link, settings) {
                     longitude +
                     "&sf[circle_radius]=" +
                     radius;
-            } else if (type === google.maps.drawing.OverlayType.RECTANGLE) {
+            } else if (type === "rectangle") {
                 // Calculating Bounds
                 let bounds = overlay.getBounds();
                 let ne = bounds.getNorthEast();
@@ -6179,6 +6465,7 @@ function ListdomDetails(id, link, settings) {
 
         return {
             id: settings.id,
+            element: DOM,
             load: function (objects) {
                 // Freez the Map Search
                 mapsearchFreez = true;
@@ -6189,6 +6476,12 @@ function ListdomDetails(id, link, settings) {
                 setTimeout(function () {
                     mapsearchFreez = false;
                 }, 1000);
+            },
+            openListing: function (listingId) {
+                const object = loadedObjectsById[String(listingId)];
+                if (!object) return false;
+
+                return openListingInfowindow(object);
             },
         };
     };
@@ -6240,7 +6533,24 @@ function ListdomDetails(id, link, settings) {
                     const $input = $form.find(`#${inputId}`);
                     if (!$input.length) return;
 
-                    $input.val('').trigger('change').trigger('input').focus();
+                    const input = $input.get(0);
+
+                    if (input && input._flatpickr)
+                    {
+                        const instance = input._flatpickr;
+
+                        instance.clear();
+                        instance.close();
+
+                        input.value = '';
+                        if (instance.altInput) instance.altInput.value = '';
+
+                        $(input).trigger('input').trigger('change');
+                    }
+                    else
+                    {
+                        $input.val('').trigger('change').trigger('input').focus();
+                    }
                 });
 
                 $form.find('.lsd-search-input-clear-wrap input').off('input.lsdSearchClear change.lsdSearchClear').on('input.lsdSearchClear change.lsdSearchClear', function () {
@@ -6352,6 +6662,8 @@ function ListdomDetails(id, link, settings) {
                             $wrapper.find(".lsd-modal-content")
                                 .css("width", width + "vw")
                                 .prepend('<a href="#" class="lsd-modal-close">&times;</a>');
+
+                            if (typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr($wrapper);
 
                             $more.fadeIn();
                         }
@@ -6613,7 +6925,7 @@ function ListdomDetails(id, link, settings) {
 
                 // Clear inputs
                 $form.find("input[type=text], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=date], input[type=time], input[type=datetime-local]").val("").trigger("input");
-                $form.find("input[type=hidden]").val("");
+                $form.find('input[type=hidden]:not([data-lsd-persistent="1"])').val("");
 
                 // Clear checkboxes and radios
                 $form.find("input[type=checkbox], input[type=radio]").prop("checked", false);
@@ -9564,6 +9876,20 @@ function ListdomDetails(id, link, settings) {
 })(jQuery);
 
 function listdom_onload() {
+    if (typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr(document);
+
+    jQuery(document).off('click.lsdBookableFlatpickr', '.lsd-add-bookable-button').on('click.lsdBookableFlatpickr', '.lsd-add-bookable-button', function ()
+    {
+        const target = jQuery(this).data('for');
+        if (!target) return;
+
+        setTimeout(function ()
+        {
+            const $target = jQuery(target);
+            if ($target.length && typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr($target);
+        }, 0);
+    });
+
     listdom_trigger_favorites();
     listdom_trigger_compare_modal();
     listdom_trigger_message_modal();
@@ -9739,10 +10065,41 @@ function listdom_trigger_message_modal() {
 }
 
 function listdom_trigger_compare_modal() {
+
+    // Elementor Skins widgets ancestor handling
+    const hasConstrainedAncestor = (modal) =>
+    {
+        const constrainedAncestor = modal.parents().filter(function () {
+            const styles = window.getComputedStyle(this);
+            const overflowX = styles.overflowX;
+            const overflowY = styles.overflowY;
+            const transform = styles.transform;
+            const perspective = styles.perspective;
+            const filter = styles.filter;
+            const backdropFilter = styles.backdropFilter;
+            const contain = styles.contain;
+
+            const clipsOverflow = ['hidden', 'clip', 'auto', 'scroll'].includes(overflowX) || ['hidden', 'clip', 'auto', 'scroll'].includes(overflowY);
+            const createsStackingContext =
+                (transform && transform !== 'none') ||
+                (perspective && perspective !== 'none') ||
+                (filter && filter !== 'none') ||
+                (backdropFilter && backdropFilter !== 'none') ||
+                (contain && contain !== 'none');
+
+            return clipsOverflow || createsStackingContext;
+        }).first();
+
+        return constrainedAncestor.length > 0;
+    };
+
     const detachIfClipped = (modal) => {
         if (!modal.length || modal.data('lsdCompareDetached')) return modal;
 
-        const isClipped = modal.closest('.owl-stage-outer, .owl-carousel, [style*="overflow"]').length > 0;
+        const isClipped =
+            modal.closest('.owl-stage-outer, .owl-carousel').length > 0 ||
+            hasConstrainedAncestor(modal);
+
         if (!isClipped) return modal;
 
         const placeholder = jQuery('<span class="lsd-compare-modal-placeholder" aria-hidden="true"></span>');
@@ -9789,7 +10146,9 @@ function listdom_trigger_compare_modal() {
         if (!modal.length) return;
 
         modal = detachIfClipped(modal);
-        if (typeof ListdomModal !== 'undefined') ListdomModal.open(modal);
+        if (typeof ListdomModal !== 'undefined') {
+            ListdomModal.open(modal, {appendToBody: !!modal.data('lsdCompareDetached')});
+        }
         else {
             modal.css('display', 'flex').hide().fadeIn(100);
             if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
@@ -9816,7 +10175,15 @@ function listdom_trigger_compare_modal() {
 }
 
 function listdom_resume_page_scroll_if_locked() {
-    if (document.body.style.position === 'fixed') {
+    const isLocked =
+        typeof ListdomPageScroll !== 'undefined' &&
+        (
+            ListdomPageScroll.isLocked ||
+            document.body.classList.contains(ListdomPageScroll.lockedClass) ||
+            document.documentElement.classList.contains(ListdomPageScroll.lockedClass)
+        );
+
+    if (isLocked) {
         ListdomPageScroll.start();
 
         if (jQuery('.lsd-modal:visible').length) {
@@ -10554,6 +10921,83 @@ function listdom_enable_listing_container_clicks(context) {
 }
 
 function listdom_listing_link_lightbox() {
+    const findListingMap = function ($link) {
+        const $skin = $link.closest('[id^="lsd_skin"]');
+
+        if ($skin.length) {
+            const skinId = parseInt(($skin.attr('id') || '').replace('lsd_skin', ''), 10);
+
+            if (!isNaN(skinId)) {
+                const linkedMap = new ListdomMaps(skinId);
+                if (linkedMap.get()) return linkedMap;
+            }
+        }
+
+        const mapIds = Object.keys(listdomSkinMaps || {});
+        for (let i = 0; i < mapIds.length; i++) {
+            const listingMap = new ListdomMaps(mapIds[i]);
+            if (listingMap.get()) return listingMap;
+        }
+
+        return null;
+    };
+
+    const scrollToMapIfNeeded = function (listingMap, callback) {
+        const mapInstance = listingMap ? listingMap.get() : null;
+        const element = mapInstance && mapInstance.element ? mapInstance.element : null;
+        const $element = element ? jQuery(element) : jQuery();
+
+        if (!$element.length) {
+            callback();
+            return;
+        }
+
+        const domElement = $element.get(0);
+        if (!domElement) {
+            callback();
+            return;
+        }
+
+        const rect = domElement.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+        const topOffset = 120;
+        const isVisible = rect.top >= topOffset && rect.bottom <= viewportHeight;
+
+        if (isVisible) {
+            callback();
+            return;
+        }
+
+        jQuery('html, body').stop(true).animate(
+            {
+                scrollTop: Math.max(($element.offset()?.top || 0) - topOffset, 0),
+            },
+            300,
+            callback
+        );
+    };
+
+    jQuery(document)
+    .off("click.listdomMapLink", "a[data-listdom-map]")
+    .on("click.listdomMapLink", "a[data-listdom-map]", function (e) {
+        e.preventDefault();
+
+        const $a = jQuery(this);
+        const listing_id = parseInt($a.data('listing-id'), 10);
+        const listingMap = findListingMap($a);
+        const href = $a.attr('href');
+
+        if (!listingMap) {
+            if (href) window.location.href = href;
+            return;
+        }
+
+        scrollToMapIfNeeded(listingMap, function () {
+            if (listingMap.openListing(listing_id)) return;
+            if (href) window.location.href = href;
+        });
+    });
+
     // Lightbox
     jQuery("a[data-listdom-lightbox]").off("click").on("click", function (e) {
         e.preventDefault();

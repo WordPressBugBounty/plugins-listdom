@@ -2,7 +2,7 @@
 
 class LSD_Menus_Settings extends LSD_Menus
 {
-    public $subtab;
+    public string $subtab;
 
     public function __construct()
     {
@@ -50,8 +50,46 @@ class LSD_Menus_Settings extends LSD_Menus
         if ($this->tab === 'advanced') return 'assets-loading';
         if ($this->tab === 'single-listing') return 'style-elements';
         if ($this->tab === 'payments') return 'engine';
+        if ($this->tab === 'ai') return 'profiles';
 
         return 'general';
+    }
+
+    public function get_ai_module_panels(): array
+    {
+        $modules = (new LSD_AI())->modules();
+
+        $descriptions = [
+            LSD_AI::TASK_AVAILABILITY => esc_html__('Working Hours uses AI to turn a natural-language schedule into structured opening hours for each weekday. In the listing editor, click the AI button in the Working Hours box, describe the schedule, and Listdom fills the weekly fields for you.', 'listdom'),
+            LSD_AI::TASK_CONTENT => esc_html__('Content Generation helps you draft listing text with AI. In the editor, choose an AI profile, enter a short prompt such as the tone or topic you want, and Listdom inserts generated content into the description field.', 'listdom'),
+            LSD_AI::TASK_MAPPING => esc_html__('Auto Mapping uses AI during CSV and Excel imports to match incoming columns to the correct Listdom fields. After choosing an AI profile in the importer, Listdom reviews the file headers and suggests the mapping automatically.', 'listdom'),
+        ];
+
+        $subtabs = [
+            LSD_AI::TASK_AVAILABILITY => 'working-hours',
+            LSD_AI::TASK_CONTENT => 'content-generation',
+            LSD_AI::TASK_MAPPING => 'auto-mapping',
+        ];
+
+        $panels = [];
+        foreach ($modules as $key => $label)
+        {
+            $subtab = $subtabs[$key] ?? sanitize_title((string) $key);
+            if ($subtab === '') $subtab = 'module-' . sanitize_title((string) $label);
+            if ($subtab === '') continue;
+
+            $panels[$subtab] = [
+                'module' => (string) $key,
+                'title' => $label,
+                'description' => $descriptions[$key] ?? sprintf(
+                    /* translators: %s: AI feature name. */
+                    esc_html__('%s is controlled by AI module access settings. Use this page to choose which user roles can use the feature anywhere it appears in Listdom or its addons.', 'listdom'),
+                    $label
+                ),
+            ];
+        }
+
+        return $panels;
     }
 
 

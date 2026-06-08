@@ -23,7 +23,8 @@
         "yoast/phpunit-polyfills": "^1.0"
     },
     "require": {
-        "webilia/lsdi": "@dev",
+        "webilia/icons": "@dev",
+        "webilia/toast": "@dev",
         "webilia/wp": "^1.0",
         "webilia/listdom-p-visibility": "@dev",
         "stripe/stripe-php": "^17.6"

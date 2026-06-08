@@ -2,13 +2,7 @@
 
 class LSD_id
 {
-    /**
-     * The single instance of the class.
-     *
-     * @var LSD_id
-     * @since 1.0.0
-     */
-    protected static $instance = null;
+    protected static ?LSD_id $instance = null;
 
     /**
      * All IDs that are loaded

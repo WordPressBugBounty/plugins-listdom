@@ -229,21 +229,8 @@ class LSD_Fields extends LSD_Base
 
                 if (in_array($type, ['tab', 'accordion', 'message'])) break;
 
-                if ($type == 'group')
-                {
-                    $group = get_field_object($field['key'], $listing_id);
-                    if (isset($group['sub_fields']) && is_array($group['sub_fields']) && count($group['sub_fields']))
-                    {
-                        foreach ($group['sub_fields'] as $sub_field)
-                        {
-                            $sub_field_label = $sub_field['label'] ?? '';
-                            $sub_field_value = $group['value'][$sub_field['name']] ?? '';
-
-                            if ($sub_field_label && $sub_field_value) $output .= '<h6>' . esc_html($sub_field_label) . ':</h6> <span>' . $sub_field_value . '</span>';
-                        }
-                    }
-                }
-                else $output = self::acf(get_field_object($field['key'], $listing_id), $listing_id);
+                $output = self::acf(get_field_object($field['key'], $listing_id), $listing_id);
+                if (!is_string($output)) $output = is_scalar($output) ? (string) $output : '';
                 break;
         }
 
@@ -316,49 +303,220 @@ class LSD_Fields extends LSD_Base
 
     public static function acf($field, $listing_id)
     {
+        if (!is_array($field)) return '';
+
         $type = $field['type'] ?? null;
         $label = $field['label'] ?? null;
+        $value = $field['value'] ?? null;
 
         if ($type === 'image')
         {
-            if (is_array($field['value']))
+            if (is_array($value))
             {
-                $title = isset($field['value']['title']) && trim($field['value']['title']) ? $field['value']['title'] : $label;
-                return '<a href="' . esc_url($field['value']['url']) . '"><img src="' . esc_url($field['value']['sizes']['thumbnail']) . '" alt="' . esc_attr($title) . '"></a>';
+                $title = isset($value['title']) && trim($value['title']) ? $value['title'] : $label;
+                $thumbnail = $value['sizes']['thumbnail'] ?? ($value['url'] ?? '');
+                $url = $value['url'] ?? '';
+
+                if ($thumbnail && $url) return '<a href="' . esc_url($url) . '"><img src="' . esc_url($thumbnail) . '" alt="' . esc_attr($title) . '"></a>';
+                else if ($thumbnail) return '<img src="' . esc_url($thumbnail) . '" alt="' . esc_attr($title) . '">';
+
+                return '';
             }
-            else if (is_numeric($field['value']))
+            else if (is_numeric($value))
             {
-                $image = wp_get_attachment_image_url($field['value']);
+                $image = wp_get_attachment_image_url($value);
                 return $image ? '<img src="' . esc_url($image) . '" alt="">' : '';
             }
 
-            return '<img src="' . esc_url($field['value']) . '" alt="">';
+            return $value ? '<img src="' . esc_url($value) . '" alt="">' : '';
         }
-        else if ($type === 'checkbox' && is_array($field['value']))
+        else if ($type === 'gallery' && is_array($value))
         {
-            return implode(', ', $field['value']);
+            $output = '';
+
+            foreach ($value as $image)
+            {
+                $rendered = self::acf([
+                    'type' => 'image',
+                    'label' => $label,
+                    'value' => $image,
+                ], $listing_id);
+
+                if (trim($rendered) !== '') $output .= '<span class="lsd-acf-gallery-item">' . $rendered . '</span>';
+            }
+
+            return $output ? '<div class="lsd-acf-gallery">' . $output . '</div>' : '';
         }
-        else if ($type === 'file' && is_array($field['value']))
+        else if ($type === 'checkbox' && is_array($value))
         {
-            $title = isset($field['value']['title']) && trim($field['value']['title']) ? $field['value']['title'] : esc_url($field['value']['url']);
-            return '<a href="' . esc_url($field['value']['url']) . '">' . esc_html($title) . '</a>';
+            $items = [];
+
+            foreach ($value as $item)
+            {
+                $rendered = self::acf_choice_value($item);
+                if ($rendered !== '') $items[] = $rendered;
+            }
+
+            return implode(', ', $items);
         }
-        else if ($type === 'post_object')
+        else if (in_array($type, ['select', 'radio', 'button_group'], true) && is_array($value))
         {
-            $ID = is_object($field['value']) ? $field['value']->ID : $field['value'];
-            return '<a href="' . get_permalink($ID) . '">' . get_the_title($ID) . '</a>';
+            if (self::acf_is_choice_array($value))
+            {
+                return self::acf_choice_value($value);
+            }
+
+            $items = [];
+
+            foreach ($value as $item)
+            {
+                $rendered = self::acf_choice_value($item);
+                if ($rendered !== '') $items[] = $rendered;
+            }
+
+            return implode(', ', $items);
         }
-        else if ($type === 'user' && is_array($field['value']))
+        else if ($type === 'file' && is_array($value))
         {
-            return $field['value']['display_name'];
+            $url = $value['url'] ?? '';
+            if (!$url) return '';
+
+            $title = isset($value['title']) && trim($value['title']) ? $value['title'] : $url;
+            return '<a href="' . esc_url($url) . '">' . esc_html($title) . '</a>';
         }
-        else if ($type === 'google_map' && is_array($field['value']))
+        else if ($type === 'link' && is_array($value))
         {
-            return $field['value']['lat'] . ', ' . $field['value']['lng'];
+            $url = $value['url'] ?? '';
+            if (!$url) return '';
+
+            $title = isset($value['title']) && trim($value['title']) ? $value['title'] : $url;
+            return '<a href="' . esc_url($url) . '">' . esc_html($title) . '</a>';
         }
-        else if ($type === 'select' && is_array($field['value']))
+        else if (in_array($type, ['post_object', 'page_link', 'relationship'], true))
         {
-            return implode(', ', $field['value']);
+            if (is_array($value))
+            {
+                $items = [];
+
+                foreach ($value as $item)
+                {
+                    $rendered = self::acf_linked_post_value($item);
+                    if ($rendered) $items[] = $rendered;
+                }
+
+                return implode(', ', $items);
+            }
+
+            return self::acf_linked_post_value($value);
+        }
+        else if ($type === 'taxonomy')
+        {
+            if (is_array($value))
+            {
+                $items = [];
+
+                foreach ($value as $term)
+                {
+                    $rendered = self::acf_term_value($term);
+                    if ($rendered) $items[] = $rendered;
+                }
+
+                return implode(', ', $items);
+            }
+
+            return self::acf_term_value($value);
+        }
+        else if ($type === 'user')
+        {
+            if (is_array($value) && isset($value['display_name'])) return $value['display_name'];
+            else if (is_array($value))
+            {
+                $items = [];
+
+                foreach ($value as $user)
+                {
+                    $rendered = self::acf_user_value($user);
+                    if ($rendered) $items[] = $rendered;
+                }
+
+                return implode(', ', $items);
+            }
+
+            return self::acf_user_value($value);
+        }
+        else if ($type === 'google_map' && is_array($value))
+        {
+            $parts = [];
+
+            if (isset($value['address']) && trim($value['address']) !== '') $parts[] = $value['address'];
+            else
+            {
+                $lat = $value['lat'] ?? null;
+                $lng = $value['lng'] ?? null;
+
+                if ($lat !== null && $lng !== null) $parts[] = $lat . ', ' . $lng;
+            }
+
+            return implode(' ', $parts);
+        }
+        else if ($type === 'group')
+        {
+            return is_array($value)
+                ? self::acf_compound_rows($field['sub_fields'] ?? [], $value, $listing_id)
+                : '';
+        }
+        else if ($type === 'repeater')
+        {
+            return is_array($value)
+                ? self::acf_repeater_rows($field['sub_fields'] ?? [], $value, $listing_id, $label)
+                : '';
+        }
+        else if ($type === 'flexible_content' && is_array($value))
+        {
+            $output = '';
+
+            foreach ($value as $index => $row)
+            {
+                if (!is_array($row)) continue;
+
+                $layout_name = $row['acf_fc_layout'] ?? '';
+                $layout = null;
+
+                if (isset($field['layouts']) && is_array($field['layouts']))
+                {
+                    foreach ($field['layouts'] as $candidate)
+                    {
+                        if (($candidate['name'] ?? '') === $layout_name)
+                        {
+                            $layout = $candidate;
+                            break;
+                        }
+                    }
+                }
+
+                $sub_fields = $layout['sub_fields'] ?? [];
+                $rendered = self::acf_compound_rows($sub_fields, $row, $listing_id);
+
+                if (trim($rendered) === '') continue;
+
+                $layout_label = $layout['label'] ?? sprintf(esc_html__('Row %d', 'listdom'), $index + 1);
+                $output .= '<div class="lsd-acf-flexible-layout"><h6>' . esc_html($layout_label) . '</h6>' . $rendered . '</div>';
+            }
+
+            return $output ? '<div class="lsd-acf-flexible-content">' . $output . '</div>' : '';
+        }
+        else if ($type === 'clone')
+        {
+            if (isset($field['sub_fields']) && is_array($field['sub_fields']) && is_array($value))
+            {
+                return self::acf_compound_rows($field['sub_fields'], $value, $listing_id);
+            }
+
+            return '';
+        }
+        else if (in_array($type, ['gallery', 'flexible_content'], true))
+        {
+            return '';
         }
         else if ($type === 'icon_picker')
         {
@@ -367,14 +525,145 @@ class LSD_Fields extends LSD_Base
             if (filter_var($icon, FILTER_VALIDATE_URL)) return '<img alt="" src="'.esc_url($icon).'">';
             else return '<span class="dashicons '.sanitize_html_class($icon).'"></span>';
         }
-        else if (!is_array($field['value']))
+        else if ($type === 'true_false')
         {
-            $value = trim($field['value']) ? $field['value'] : '';
+            return $value ? esc_html__('Yes', 'listdom') : esc_html__('No', 'listdom');
+        }
+        else if (!is_array($value))
+        {
+            $value = trim((string) $value) ? $value : '';
             if (trim($value) === '') $value = get_post_meta($listing_id, $field['name'], true);
 
             return $value;
         }
 
-        return '';
+        return self::acf_fallback_value($value);
+    }
+
+    protected static function acf_compound_rows(array $sub_fields, array $values, $listing_id)
+    {
+        $output = '';
+
+        foreach ($sub_fields as $sub_field)
+        {
+            $type = $sub_field['type'] ?? '';
+            $name = $sub_field['name'] ?? '';
+            $sub_label = $sub_field['label'] ?? '';
+
+            if (in_array($type, ['tab', 'accordion', 'message'], true) || !$name) continue;
+
+            $sub_field['value'] = $values[$name] ?? null;
+            $rendered = self::acf($sub_field, $listing_id);
+
+            if (trim($rendered) === '') continue;
+
+            $output .= '<div class="lsd-acf-sub-field lsd-acf-sub-field-' . sanitize_html_class($type) . '">';
+            if ($sub_label) $output .= '<span class="lsd-attr-key">' . esc_html($sub_label) . ': </span>';
+            $output .= '<span class="lsd-attr-value">' . esc_html($rendered) . '</span>';
+            $output .= '</div>';
+        }
+
+        return $output ? '<div class="lsd-acf-compound">' . $output . '</div>' : '';
+    }
+
+    protected static function acf_repeater_rows(array $sub_fields, array $rows, $listing_id, $label = '')
+    {
+        if (!count($rows)) return '';
+
+        $output = '';
+
+        foreach ($rows as $index => $row)
+        {
+            if (!is_array($row)) continue;
+
+            $rendered = self::acf_compound_rows($sub_fields, $row, $listing_id);
+            if (trim($rendered) === '') continue;
+
+            $row_label = sprintf(esc_html__('Row %d', 'listdom'), $index + 1);
+            $output .= '<div class="lsd-acf-repeater-row"><h6>' . esc_html($row_label) . '</h6>' . $rendered . '</div>';
+        }
+
+        return $output ? '<div class="lsd-acf-repeater">' . $output . '</div>' : '';
+    }
+
+    protected static function acf_linked_post_value($value)
+    {
+        if (is_string($value) && filter_var($value, FILTER_VALIDATE_URL))
+        {
+            return '<a href="' . esc_url($value) . '">' . esc_html($value) . '</a>';
+        }
+
+        $ID = is_object($value) ? ($value->ID ?? 0) : $value;
+        $ID = absint($ID);
+
+        if (!$ID) return '';
+
+        return '<a href="' . esc_url(get_permalink($ID)) . '">' . esc_html(get_the_title($ID)) . '</a>';
+    }
+
+    protected static function acf_term_value($value)
+    {
+        if (is_object($value) && isset($value->name)) return $value->name;
+
+        $term = get_term($value);
+        return $term && !is_wp_error($term) ? $term->name : '';
+    }
+
+    protected static function acf_user_value($value)
+    {
+        if (is_object($value) && isset($value->display_name)) return $value->display_name;
+
+        $user = get_user_by('id', absint($value));
+        return $user ? $user->display_name : '';
+    }
+
+    protected static function acf_fallback_value($value)
+    {
+        if (is_scalar($value))
+        {
+            $value = (string) $value;
+            return trim($value) !== '' ? esc_html($value) : '';
+        }
+
+        if (!is_array($value) || !count($value)) return '';
+
+        $items = [];
+
+        foreach ($value as $item)
+        {
+            $rendered = self::acf_fallback_value($item);
+            if ($rendered !== '') $items[] = $rendered;
+        }
+
+        return count($items) ? implode(', ', $items) : '';
+    }
+
+    protected static function acf_choice_value($value)
+    {
+        if (is_scalar($value))
+        {
+            $value = (string) $value;
+            return trim($value) !== '' ? esc_html($value) : '';
+        }
+
+        if (!is_array($value)) return '';
+
+        if (isset($value['label']) && trim((string) $value['label']) !== '')
+        {
+            return esc_html($value['label']);
+        }
+
+        if (isset($value['value']) && !is_array($value['value']))
+        {
+            $choice = (string) $value['value'];
+            return trim($choice) !== '' ? esc_html($choice) : '';
+        }
+
+        return self::acf_fallback_value($value);
+    }
+
+    protected static function acf_is_choice_array(array $value): bool
+    {
+        return array_key_exists('label', $value) || array_key_exists('value', $value);
     }
 }

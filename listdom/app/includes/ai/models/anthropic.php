@@ -3,10 +3,11 @@
 abstract class LSD_AI_Models_Anthropic extends LSD_AI_Models_Base
 {
     use LSD_AI_Tasks_Mapping;
+    use LSD_AI_Tasks_Structured_Search;
     use LSD_AI_Tasks_Availability;
     use LSD_AI_Tasks_Content;
 
-    private $url = 'https://api.anthropic.com/v1/messages';
+    private string $url = 'https://api.anthropic.com/v1/messages';
 
     private function request(string $prompt, float $temperature = 0.2, string $system = ''): array
     {
@@ -61,5 +62,15 @@ abstract class LSD_AI_Models_Anthropic extends LSD_AI_Models_Base
     protected function string(array $response): string
     {
         return $response['content'][0]['text'] ?? '';
+    }
+
+    public function supports_embeddings(): bool
+    {
+        return false;
+    }
+
+    public function embedding(string $text, string $task = 'document'): array
+    {
+        return [];
     }
 }

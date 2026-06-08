@@ -218,11 +218,20 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
                 // Manual Width
                 $col_class = isset($filter['width']) && $filter['width'] ? 'lsd-col-span-' . ((int) $filter['width']) : $this->col_filter;
+                $extra_classes = [];
+
+                if (
+                    ($filter['key'] ?? '') === 's'
+                    && (($filter['method'] ?? 'text-input') === 'ai-search')
+                    && class_exists(\LSDPACAPS\AI::class)
+                    && (new \LSDPACAPS\AI())->search_enabled()
+                    && (!isset($filter['ai_fancy_style']) || (int) $filter['ai_fancy_style'] === 1)
+                ) $extra_classes[] = 'lsd-search-filter-ai-fancy';
 
                 $field = $this->filter($filter);
                 if (!$field) continue;
 
-                $row .= '<div class="lsd-search-filter ' . sanitize_html_class($col_class) . ' ' . sanitize_html_class(!$visibility ? 'lsd-search-field-hidden' : '') . '">';
+                $row .= '<div class="lsd-search-filter ' . sanitize_html_class($col_class) . ' ' . sanitize_html_class(!$visibility ? 'lsd-search-field-hidden' : '') . ' ' . esc_attr(implode(' ', $extra_classes)) . '">';
                 $row .= $field;
                 $row .= '</div>';
             }
@@ -274,17 +283,17 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $buttons .= '<div class="lsd-search-' . $type . ' lsd-col-span-' . esc_attr($width) . '">';
 
         // Shortcode Input
-        if (!empty($this->form['page']) && !empty($this->form['shortcode'])) $buttons .= '<input type="hidden" name="sf-shortcode" value="' . esc_attr($this->form['shortcode']) . '">';
+        if (!empty($this->form['page']) && !empty($this->form['shortcode'])) $buttons .= '<input type="hidden" name="sf-shortcode" value="' . esc_attr($this->form['shortcode']) . '" data-lsd-persistent="1">';
 
         // Page ID for plain permalinks
         if (get_option('permalink_structure') === '')
         {
             $page_id = !empty($this->form['page']) ? (int) $this->form['page'] : get_queried_object_id();
-            if ($page_id) $buttons .= '<input type="hidden" name="page_id" value="' . esc_attr($page_id) . '">';
+            if ($page_id) $buttons .= '<input type="hidden" name="page_id" value="' . esc_attr($page_id) . '" data-lsd-persistent="1">';
         }
 
         // Language Input
-        if ($lang = $this->current('lang')) $buttons .= '<input type="hidden" name="lang" value="' . esc_attr($lang) . '">';
+        if ($lang = $this->current('lang')) $buttons .= '<input type="hidden" name="lang" value="' . esc_attr($lang) . '" data-lsd-persistent="1">';
 
         // Submit / Reset Buttons
         $buttons .= '<div class="lsd-search-' . $type . '-submit">';
@@ -448,6 +457,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
     {
         $key = $filter['key'] ?? '';
         $title = $filter['title'] ?? '';
+        $method = $filter['method'] ?? 'text-input';
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
         $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $this->unique . '_' . $key;
@@ -456,8 +466,20 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $default = $filter['default_value'] ?? '';
         $current = $this->current($name, $default);
 
+        $is_ai_mode = $method === 'ai-search' && class_exists(\LSDPACAPS\AI::class) && (new \LSDPACAPS\AI())->search_enabled();
+        $fancy_style = !isset($filter['ai_fancy_style']) || (int) $filter['ai_fancy_style'] === 1;
+
+        $wrapper_classes = ['lsd-search-input-clear-wrap'];
+        $input_classes = [];
+
+        if ($is_ai_mode) $wrapper_classes[] = 'lsd-search-ai-mode';
+        if ($is_ai_mode && $fancy_style) $input_classes[] = 'lsd-search-ai-fancy-input';
+
         $output = $this->label($filter, $id, $title)['label'];
-        $output .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($current) . '">';
+        $output .= '<div class="' . esc_attr(implode(' ', $wrapper_classes)) . '">';
+        if ($is_ai_mode) $output .= '<input type="hidden" name="sf-ai" value="1" data-lsd-persistent="1">';
+        $output .= '<input type="text" class="' . esc_attr(implode(' ', $input_classes)) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($current) . '">';
+        $output .= '</div>';
 
         return $output;
     }

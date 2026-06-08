@@ -72,7 +72,7 @@ class LSD_Customizer_Forms extends LSD_Customizer
                 'divisions' => [
                     'normal' => [
                         'title' => esc_html__('Normal', 'listdom'),
-                        'fields' => $this->fields(['typography' => ['size' => 12, 'line_height' => 26]], ['input_bg_color', 'text', 'placeholder', 'border', 'typography']),
+                        'fields' => $this->fields(['typography' => ['size' => 12, 'line_height' => 26, 'align' => 'left']], ['input_bg_color', 'text', 'placeholder', 'border', 'typography']),
                     ],
                     'hover' => [
                         'title' => esc_html__('Hover / Focus', 'listdom'),

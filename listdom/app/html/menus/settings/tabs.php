@@ -12,6 +12,7 @@ $toolkits = count($toolkits_list) > 0;
 $payments_engine = LSD_Payments_Engine::instance();
 $payments_engine_is_listdom = $payments_engine->listdom();
 $payments_nav_tooltip = esc_html__('Save the settings to access this menu.', 'listdom');
+$ai_module_panels = $this->get_ai_module_panels();
 ?>
 <div class="lsd-nav-wrapper">
     <ul class="lsd-nav-tab-wrapper">
@@ -127,11 +128,18 @@ $payments_nav_tooltip = esc_html__('Save the settings to access this menu.', 'li
                 <li class="lsd-nav-tab <?php echo $this->tab === 'payments' && $this->subtab === 'gateways' ? 'lsd-nav-tab-active' : ''; ?>" data-key="gateways" data-requires-listdom="1"><?php esc_html_e('Gateways', 'listdom'); ?></li>
             </ul>
         </li>
-        <li class="lsd-ai-nav">
+        <li class="lsd-has-children lsd-ai-nav <?php echo $this->tab === 'ai' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'ai' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=ai')); ?>">
                 <i class="listdom-icon lsdi-stars lsd-m-0"></i>
                 <?php esc_html_e('AI', 'listdom'); ?>
             </a>
+            <ul data-parent="ai" class="lsd-nav-sub-tabs lsd-tabs">
+                <li class="lsd-nav-tab <?php echo $this->tab === 'ai' && ($this->subtab === 'profiles' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="profiles"><?php esc_html_e('Profiles', 'listdom'); ?></li>
+                <?php foreach ($ai_module_panels as $subtab => $panel): ?>
+                    <li class="lsd-nav-tab <?php echo $this->tab === 'ai' && $this->subtab === $subtab ? 'lsd-nav-tab-active' : ''; ?>" data-key="<?php echo esc_attr($subtab); ?>"><?php echo esc_html($panel['title']); ?></li>
+                <?php endforeach; ?>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'ai' && $this->subtab === 'semantic-search' ? 'lsd-nav-tab-active' : ''; ?>" data-key="semantic-search"><?php esc_html_e('Semantic Search', 'listdom'); ?></li>
+            </ul>
         </li>
         <li class="lsd-api-nav">
             <a class="lsd-nav-tab <?php echo $this->tab === 'api' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=api')); ?>">

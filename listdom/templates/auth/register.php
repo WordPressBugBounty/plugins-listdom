@@ -20,6 +20,7 @@ $register_privacy_field = LSD_Privacy::consent_field([
     'wrapper_class' => 'lsd-register-privacy-consent-field',
     'context' => 'register',
 ]);
+$role_signature = trim($role) ? $this->role_signature('register', $role) : '';
 
 $assets = new LSD_Assets();
 $assets->footer('<script>
@@ -162,12 +163,17 @@ jQuery(document).ready(function()
             ]);
         }
 
-        if (trim($role))
+        if (trim($role) && $role_signature)
         {
             echo LSD_Form::hidden([
                 'name' => 'lsd_role',
                 'id' => 'lsd_role',
                 'value' => $role,
+            ]);
+            echo LSD_Form::hidden([
+                'name' => 'lsd_role_signature',
+                'id' => 'lsd_role_signature',
+                'value' => $role_signature,
             ]);
         }
         ?>

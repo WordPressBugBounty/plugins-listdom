@@ -239,13 +239,13 @@ function ListdomButtonLoader($button) {
             // Sortable
             sortable_listeners();
 
-            $field_method.off('change').on('change', function ()
+            $field_method.off('change').on('change', function (event, options)
             {
-                method_changed($(this));
+                method_changed($(this), options || {});
             });
 
             sync_mobile_app_method_options();
-            $field_method.trigger('change');
+            $field_method.trigger('change', {initial: true});
 
             $all_terms_dropdowns.off('change').on('change', function ()
             {
@@ -630,10 +630,27 @@ function ListdomButtonLoader($button) {
             }
         }
 
-        function method_changed($method)
+        function method_changed($method, options = {})
         {
             const $field = $method.closest('.lsd-search-field');
-            const method = $method.val();
+            const aiMethod = ($method.data('ai-method') || 'ai-search').toString();
+            const fallbackMethod = ($method.data('ai-fallback') || 'text-input').toString();
+            const hasAiProfiles = parseInt($method.data('has-ai-profiles'), 10) === 1;
+
+            if (($method.val() || '').toString() === aiMethod && !hasAiProfiles)
+            {
+                const message = ($method.data('ai-warning') || '').toString();
+
+                if (message && !options.initial)
+                {
+                    if (typeof window.listdom_toastify === 'function') window.listdom_toastify(message, 'lsd-warning');
+                    else window.alert(message);
+                }
+
+                $method.val(fallbackMethod);
+            }
+
+            const method = ($method.val() || '').toString();
 
             // Hide All Dependant Fields
             $field.find('.lsd-search-method-dependant').hide();
@@ -1063,6 +1080,23 @@ jQuery(document).ready(function ($)
      * Listdom Color Picker
      */
     if (typeof $.fn.wpColorPicker !== 'undefined') $('.lsd-colorpicker').wpColorPicker();
+
+    /**
+     * Listdom Flatpickr
+     */
+    if (typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr(document);
+
+    $(document).off('click.lsdBookableFlatpickr', '.lsd-add-bookable-button').on('click.lsdBookableFlatpickr', '.lsd-add-bookable-button', function ()
+    {
+        const target = $(this).data('for');
+        if (!target) return;
+
+        setTimeout(function ()
+        {
+            const $target = $(target);
+            if ($target.length && typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr($target);
+        }, 0);
+    });
 
     /**
      * Sortable System
@@ -1522,6 +1556,36 @@ jQuery(document).ready(function ($)
         });
     }
 
+    function lsdUpdateListingLinkOptions(skin)
+    {
+        if (!skin) return;
+
+        const $listingLink = $('#lsd_display_options_skin_' + skin + '_listing_link');
+        if (!$listingLink.length) return;
+
+        const mapOptionLabel = $listingLink.data('lsdMapOptionLabel') || 'Show on the map';
+        const $mapProvider = $('#lsd_display_options_skin_' + skin + '_map_provider');
+        const unsupportedSkins = ['side', 'table', 'masonry', 'carousel', 'cover', 'slider'];
+        const mapSupported = unsupportedSkins.indexOf(skin) === -1 && $mapProvider.length && $mapProvider.val() && $mapProvider.val() !== '0';
+        const hasMapOption = $listingLink.find('option[value="map"]').length > 0;
+
+        if (mapSupported && !hasMapOption)
+        {
+            const $insertBefore = $listingLink.find('option[value="lightbox"]').first();
+            const $option = $('<option></option>').val('map').text(mapOptionLabel);
+
+            if ($insertBefore.length) $option.insertBefore($insertBefore);
+            else $listingLink.append($option);
+        }
+        else if (!mapSupported && hasMapOption)
+        {
+            if ($listingLink.val() === 'map') $listingLink.val('normal');
+            $listingLink.find('option[value="map"]').remove();
+        }
+
+        $listingLink.trigger('change');
+    }
+
     // Skin Changer
     $shortcodeSkinSelector.on('change', function ()
     {
@@ -1600,6 +1664,8 @@ jQuery(document).ready(function ($)
 
         // Toggle Map Control Options
         $('#lsd_display_options_skin_list_map_provider,#lsd_display_options_skin_grid_map_provider,#lsd_display_options_skin_accordion_map_provider,#lsd_display_options_skin_mosaic_map_provider,#lsd_display_options_skin_timeline_map_provider,#lsd_display_options_skin_listgrid_map_provider,#lsd_display_options_skin_halfmap_map_provider,#lsd_display_options_skin_singlemap_map_provider,#lsd_display_options_skin_gallery_map_provider').trigger('change');
+
+        lsdUpdateListingLinkOptions(skin);
 
         // Toggle Style Change
         $('.lsd-display-options-style-selector').trigger('change');
@@ -1706,6 +1772,8 @@ jQuery(document).ready(function ($)
             $map_control_options.show();
             $map_control_tab.show();
         }
+
+        lsdUpdateListingLinkOptions(skin);
     }).trigger('change');
 
     // Style Changer

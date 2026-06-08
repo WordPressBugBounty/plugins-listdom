@@ -2,7 +2,7 @@
 
 class LSD_Entity extends LSD_Base
 {
-    public $settings;
+    public array $settings;
 
     public function __construct()
     {

@@ -259,6 +259,35 @@ class LSD_Shortcodes_Auth extends LSD_Base
         return array_values(array_filter($parts, 'strlen'));
     }
 
+    public function role_signature(string $context, string $role): string
+    {
+        $role = $this->sanitize_supported_role($role);
+        if ($role === '') return '';
+
+        return wp_create_nonce($this->role_signature_action($context, $role));
+    }
+
+    private function sanitize_supported_role($role): string
+    {
+        $role = is_string($role) ? sanitize_text_field($role) : '';
+        if (!in_array($role, LSD_Roles::supported(true), true)) return '';
+
+        return $role;
+    }
+
+    private function verify_role_signature(string $context, string $role, string $signature): bool
+    {
+        $role = $this->sanitize_supported_role($role);
+        if ($role === '' || $signature === '') return false;
+
+        return (bool) wp_verify_nonce($signature, $this->role_signature_action($context, $role));
+    }
+
+    private function role_signature_action(string $context, string $role): string
+    {
+        return 'lsd_' . sanitize_key($context) . '_role_' . $role;
+    }
+
     public function signin()
     {
         // Check for nonce
@@ -286,7 +315,8 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Role Restriction
         $role = isset($_POST['lsd_role']) ? sanitize_text_field(wp_unslash($_POST['lsd_role'])) : '';
-        if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
+        $role_signature = isset($_POST['lsd_role_signature']) ? sanitize_text_field(wp_unslash($_POST['lsd_role_signature'])) : '';
+        $role = $this->verify_role_signature('login', $role, $role_signature) ? $this->sanitize_supported_role($role) : '';
 
         if ($role)
         {
@@ -461,7 +491,8 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         // Role Restriction
         $role = isset($_POST['lsd_role']) ? sanitize_text_field(wp_unslash($_POST['lsd_role'])) : '';
-        if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
+        $role_signature = isset($_POST['lsd_role_signature']) ? sanitize_text_field(wp_unslash($_POST['lsd_role_signature'])) : '';
+        $role = $this->verify_role_signature('register', $role, $role_signature) ? $this->sanitize_supported_role($role) : '';
 
         // Create the user
         $user_data = [

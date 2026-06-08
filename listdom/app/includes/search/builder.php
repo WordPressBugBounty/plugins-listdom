@@ -2,10 +2,7 @@
 
 class LSD_Search_Builder extends LSD_Base
 {
-    /**
-     * @var LSD_Search_Helper
-     */
-    public $helper;
+    public LSD_Search_Helper $helper;
 
     public function __construct()
     {

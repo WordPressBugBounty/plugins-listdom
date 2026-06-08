@@ -2,13 +2,9 @@
 
 class LSD_API extends LSD_Base
 {
-    public $namespace = 'listdom/v1';
-    public $version = '1';
-
-    /**
-     * @var LSD_db
-     */
-    protected $db;
+    public string $namespace = 'listdom/v1';
+    public string $version = '1';
+    protected LSD_db $db;
 
     public function __construct()
     {

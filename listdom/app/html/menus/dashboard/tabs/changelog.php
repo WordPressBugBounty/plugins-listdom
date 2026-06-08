@@ -3,6 +3,19 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v5.6.0 <span>June 7th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added AI-powered search with structured and semantic options, model settings, and connector approval notices.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added a Back Button element for single listing pages.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added new single listing controls for attribute visibility, listing links, and timeline skin output in connected shortcodes.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added week-start options for date pickers and improved date fields in search forms.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added an image-centered taxonomy shortcode style.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved map and direction button behavior, including refreshed cluster icons and cleaner Google map interactions.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Refined frontend and backend UI details for search fields, modals, tooltips, badges, icons, and listing inputs.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved AI search reliability with better caching, duplicate job prevention, and semantic search interface polish.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed import, API, and listing save reliability issues, including attribute slugs, metadata overwrite protection, and file size enforcement.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed duplicate notifications, frontend auth role handling, and safer listing data handling.', 'listdom'); ?></li>
+    </ul>
     <h2>v5.5.0 <span>May 12th, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Updated Italian translations for Listdom and its addons.', 'listdom'); ?></li>

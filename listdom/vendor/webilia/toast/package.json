@@ -1,0 +1,13 @@
+{
+  "name": "webilia-toast",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "grunt": "^1.6.1",
+    "grunt-contrib-cssmin": "^4.0.0",
+    "grunt-contrib-sass": "^2.0.0",
+    "grunt-contrib-uglify": "^5.2.2",
+    "grunt-contrib-watch": "^1.1.0",
+    "sass": "^1.93.2"
+  }
+}

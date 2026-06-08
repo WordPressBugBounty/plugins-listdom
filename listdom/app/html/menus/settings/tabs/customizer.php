@@ -30,7 +30,7 @@ $options = (new LSD_Customizer())->options();
     <div class="lsd-title-reset-section">
         <div class="lsd-flex lsd-gap-3">
             <h3 id="lsd_customizer_tab_title" class="lsd-m-0 lsd-admin-title"></h3>
-            <div class="lsd-tooltip lsd-tooltip-right lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
+            <div class="lsd-tooltip lsd-tooltip-top lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
                 <i class="lsdi lsdi-reset"></i>
             </div>
         </div>
@@ -87,7 +87,7 @@ $options = (new LSD_Customizer())->options();
                                                         <?php if (isset($group['title']) && trim($group['title'])): ?>
                                                             <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html($group['title']); ?></h3>
                                                         <?php endif; ?>
-                                                            <div class="lsd-tooltip lsd-tooltip-right lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-category="<?php echo esc_attr($ck.'.'.$sk.'.'.$gk); ?>" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
+                                                            <div class="lsd-tooltip lsd-tooltip-top lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-category="<?php echo esc_attr($ck.'.'.$sk.'.'.$gk); ?>" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
                                                                 <i class="lsdi lsdi-reset"></i>
                                                             </div>
                                                         </div>

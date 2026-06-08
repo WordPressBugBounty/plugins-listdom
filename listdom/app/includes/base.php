@@ -21,7 +21,7 @@ class LSD_Base
     const STATUS_HOLD = 'hold';
     const STATUS_OFFLINE = 'offline';
     const EP_LISTING = 701;
-    const DB_VERSION = 2;
+    const DB_VERSION = 3;
     const REQ_HTML = '<span class="lsd-required">*</span>';
     const WELCOME_SLUG = 'listdom-welcome';
 
@@ -443,7 +443,7 @@ class LSD_Base
                 $parameter = substr($parameter, 7);
                 $sf['circle'][$parameter] = sanitize_text_field($value);
             }
-            else if (in_array($parameter, ['s', 'shortcode']))
+            else if (in_array($parameter, ['s', 'shortcode', 'ai']))
             {
                 $sf[$parameter] = sanitize_text_field(urldecode($value));
             }
@@ -1363,6 +1363,7 @@ class LSD_Base
         return [
             'normal' => esc_html__('Same Window', 'listdom'),
             'blank' => esc_html__('New Window', 'listdom'),
+            'map' => esc_html__('Show on the map', 'listdom'),
             'lightbox' => esc_html__('Open in Lightbox', 'listdom'),
             'right-panel' => esc_html__('Right Panel', 'listdom'),
             'left-panel' => esc_html__('Left Panel', 'listdom'),

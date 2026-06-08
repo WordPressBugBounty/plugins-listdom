@@ -1688,6 +1688,35 @@
             "install-path": "../voku/portable-ascii"
         },
         {
+            "name": "webilia/icons",
+            "version": "1.0.0",
+            "version_normalized": "1.0.0.0",
+            "dist": {
+                "type": "path",
+                "url": "../../packages/webilia/icons",
+                "reference": "c231a9a67d3442f39cee75b24702dd28806b000f"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webilia\\Icons\\": "app"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Webilia",
+                    "email": "hello@webilia.com"
+                }
+            ],
+            "description": "Webilia Icons Package",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webilia/icons"
+        },
+        {
             "name": "webilia/listdom-p-visibility",
             "version": "1.0.0",
             "version_normalized": "1.0.0.0",
@@ -1717,19 +1746,19 @@
             "install-path": "../webilia/listdom-p-visibility"
         },
         {
-            "name": "webilia/lsdi",
+            "name": "webilia/toast",
             "version": "1.0.0",
             "version_normalized": "1.0.0.0",
             "dist": {
                 "type": "path",
-                "url": "../../packages/webilia/lsdi",
-                "reference": "a0efbad8189ae095372612e239b164e9514ea844"
+                "url": "../../packages/webilia/toast",
+                "reference": "76d409a07f2660e92328b420830de275c884b55d"
             },
             "type": "library",
             "installation-source": "dist",
             "autoload": {
                 "psr-4": {
-                    "Webilia\\LSDI\\": "app"
+                    "Webilia\\Toast\\": "app"
                 }
             },
             "authors": [
@@ -1738,12 +1767,12 @@
                     "email": "hello@webilia.com"
                 }
             ],
-            "description": "Webilia LSDI Icons Package",
+            "description": "Webilia Toast Package",
             "transport-options": {
                 "symlink": true,
                 "relative": true
             },
-            "install-path": "../webilia/lsdi"
+            "install-path": "../webilia/toast"
         },
         {
             "name": "webilia/wp",

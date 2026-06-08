@@ -703,17 +703,17 @@ class LSD_Taxonomies_Attribute extends LSD_Taxonomies
 
             case 'type':
 
-                $content = get_term_meta($term_id, 'lsd_field_type', true);
+                $content = esc_html((string) get_term_meta($term_id, 'lsd_field_type', true));
                 break;
 
             case 'values':
 
-                $content = get_term_meta($term_id, 'lsd_values', true);
+                $content = esc_html((string) get_term_meta($term_id, 'lsd_values', true));
                 break;
 
             case 'index':
 
-                $content = get_term_meta($term_id, 'lsd_index', true);
+                $content = esc_html((string) get_term_meta($term_id, 'lsd_index', true));
                 break;
 
             default:

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit526f21c44d532773ab759390533b040d
+class ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -24,7 +24,8 @@ class ComposerStaticInit526f21c44d532773ab759390533b040d
         'W' => 
         array (
             'Webilia\\WP\\' => 11,
-            'Webilia\\LSDI\\' => 13,
+            'Webilia\\Toast\\' => 14,
+            'Webilia\\Icons\\' => 14,
         ),
         'S' => 
         array (
@@ -80,9 +81,13 @@ class ComposerStaticInit526f21c44d532773ab759390533b040d
         array (
             0 => __DIR__ . '/..' . '/webilia/wp/src',
         ),
-        'Webilia\\LSDI\\' => 
+        'Webilia\\Toast\\' => 
         array (
-            0 => __DIR__ . '/..' . '/webilia/lsdi/app',
+            0 => __DIR__ . '/..' . '/webilia/toast/app',
+        ),
+        'Webilia\\Icons\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webilia/icons/app',
         ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
@@ -1105,8 +1110,10 @@ class ComposerStaticInit526f21c44d532773ab759390533b040d
         'Symfony\\Polyfill\\Php80\\PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/PhpToken.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
-        'Webilia\\LSDI\\Base' => __DIR__ . '/..' . '/webilia/lsdi/app/Base.php',
-        'Webilia\\LSDI\\Boot' => __DIR__ . '/..' . '/webilia/lsdi/app/Boot.php',
+        'Webilia\\Icons\\Base' => __DIR__ . '/..' . '/webilia/icons/app/Base.php',
+        'Webilia\\Icons\\Boot' => __DIR__ . '/..' . '/webilia/icons/app/Boot.php',
+        'Webilia\\Toast\\Base' => __DIR__ . '/..' . '/webilia/toast/app/Base.php',
+        'Webilia\\Toast\\Boot' => __DIR__ . '/..' . '/webilia/toast/app/Boot.php',
         'Webilia\\WP\\Ads' => __DIR__ . '/..' . '/webilia/wp/src/Ads.php',
         'Webilia\\WP\\Color' => __DIR__ . '/..' . '/webilia/wp/src/Color.php',
         'Webilia\\WP\\Date' => __DIR__ . '/..' . '/webilia/wp/src/Date.php',
@@ -1165,9 +1172,9 @@ class ComposerStaticInit526f21c44d532773ab759390533b040d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit526f21c44d532773ab759390533b040d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit526f21c44d532773ab759390533b040d::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit526f21c44d532773ab759390533b040d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79::$classMap;
 
         }, null, ClassLoader::class);
     }

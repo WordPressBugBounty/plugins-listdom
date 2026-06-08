@@ -64,6 +64,7 @@ class LSD_Builders extends LSD_Base
         // Payload
         LSD_Payload::set('single', $this->single);
         LSD_Payload::set('listing', $this->listing);
+        LSD_Payload::set('builder_layout_id', (int) $template_id);
 
         // Set Current Post
         if ($this->listing) LSD_LifeCycle::post($this->listing->id());
@@ -75,6 +76,7 @@ class LSD_Builders extends LSD_Base
 
         // Back to Original Post
         if ($this->listing) LSD_LifeCycle::reset();
+        LSD_Payload::remove('builder_layout_id');
 
         return $output;
     }
@@ -84,6 +86,7 @@ class LSD_Builders extends LSD_Base
         // Payload
         LSD_Payload::set('single', $this->single);
         LSD_Payload::set('listing', $this->listing);
+        LSD_Payload::set('builder_layout_id', (int) $template_id);
 
         // Set Current Post
         if ($this->listing) LSD_LifeCycle::post($this->listing->id());
@@ -94,6 +97,7 @@ class LSD_Builders extends LSD_Base
 
         // Back to Original Post
         if ($this->listing) LSD_LifeCycle::reset();
+        LSD_Payload::remove('builder_layout_id');
 
         return $output;
     }
@@ -102,6 +106,7 @@ class LSD_Builders extends LSD_Base
     {
         LSD_Payload::set('single', $this->single);
         LSD_Payload::set('listing', $this->listing);
+        LSD_Payload::set('builder_layout_id', (int) $template_id);
 
         $builder = (new \LSDPACBRX\Builder())->single($this->single);
         if ($this->listing) $builder->listing($this->listing);
@@ -113,6 +118,7 @@ class LSD_Builders extends LSD_Base
 
         // Back to Original Post
         if ($this->listing) LSD_LifeCycle::reset();
+        LSD_Payload::remove('builder_layout_id');
 
         return $output;
     }

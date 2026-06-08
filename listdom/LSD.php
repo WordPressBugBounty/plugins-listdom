@@ -4,20 +4,8 @@ defined('ABSPATH') || die();
 
 final class Listdom
 {
-    /**
-     * Listdom version.
-     *
-     * @var string
-     */
-    public $version = '5.5.0';
-
-    /**
-     * The single instance of the class.
-     *
-     * @var Listdom
-     * @since 1.0.0
-     */
-    protected static $instance = null;
+    public string $version = '5.6.0';
+    protected static ?Listdom $instance = null;
 
     /**
      * Main Listdom Instance.
@@ -238,6 +226,10 @@ final class Listdom
         // Jobs Manager
         $jobs = new LSD_Jobs();
         $jobs->init();
+
+        // Semantic AI
+        $semantic = new LSD_AI_Semantic();
+        $semantic->init();
 
         // Listdom Bar
         $bar = LSD_Bar::instance();

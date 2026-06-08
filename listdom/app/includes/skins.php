@@ -341,12 +341,12 @@ class LSD_Skins extends LSD_Base
 
     protected function has_listing_price(LSD_Entity_Listing $listing): bool
     {
-        return $this->display_price && (bool) $listing->get_price();
+        return $this->display_price && $listing->get_price();
     }
 
     protected function has_listing_address(LSD_Entity_Listing $listing): bool
     {
-        return $this->display_address && (bool) $listing->get_address();
+        return $this->display_address && $listing->get_address();
     }
 
     public function has_bottom_bar(LSD_Entity_Listing $listing): bool
@@ -1183,6 +1183,7 @@ class LSD_Skins extends LSD_Base
             'halfmap' => esc_html__('Half Map / Split View', 'listdom'),
             'table' => esc_html__('Table View', 'listdom'),
             'masonry' => esc_html__('Masonry View', 'listdom'),
+            'timeline' => esc_html__('Timeline View', 'listdom'),
         ]);
 
         if (!LSD_Components::map()) unset($skins['singlemap'], $skins['halfmap']);
@@ -1320,9 +1321,15 @@ class LSD_Skins extends LSD_Base
 
     public function get_listing_link_method()
     {
-        return $this->isPro() && isset($this->skin_options['listing_link']) && trim($this->skin_options['listing_link'])
+        $method = $this->isPro() && isset($this->skin_options['listing_link']) && trim($this->skin_options['listing_link'])
             ? $this->skin_options['listing_link']
             : 'normal';
+
+        if ($method === 'map' && (!$this->map_component || !$this->map_provider || !self::is_mappable($this->skin))) {
+            return 'normal';
+        }
+
+        return $method;
     }
 
     public function get_single_listing_style()
@@ -1346,6 +1353,7 @@ class LSD_Skins extends LSD_Base
             'mapstyle' => $this->skin_options['mapstyle'] ?? '',
             'id' => $this->id,
             'onclick' => $this->skin_options['mapobject_onclick'] ?? 'infowindow',
+            'listing_link_method' => $this->get_listing_link_method(),
             'infowindow_trigger' => $this->skin_options['mapobject_infowindow_trigger'] ?? 'click',
             'mapcontrols' => $this->mapcontrols,
             'map_height' => $this->map_height,

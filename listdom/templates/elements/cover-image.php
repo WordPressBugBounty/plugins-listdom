@@ -17,10 +17,11 @@ $image = get_the_post_thumbnail($post_id, $size, ['itemprop' => 'image']);
 // No Image
 $no_image = '<img alt="' . esc_attr__('No Image', 'listdom') . '" src="' . esc_url($assets->lsd_asset_url('/img/no-image.jpg')) . '">';
 ?>
-<?php if (in_array($link_method, ['normal', 'blank', 'lightbox', 'left-panel', 'right-panel', 'bottom-panel'])): ?>
+<?php if (in_array($link_method, ['normal', 'blank', 'map', 'lightbox', 'left-panel', 'right-panel', 'bottom-panel'])): ?>
 <a
     data-listing-id="<?php echo esc_attr($post_id); ?>"
     data-listdom-style="<?php echo esc_attr($style); ?>"
+    <?php echo $link_method === 'map' ? 'data-listdom-map' : ''; ?>
     <?php echo $link_method === 'lightbox' ? 'data-listdom-lightbox' : ''; ?>
     <?php echo $link_method === 'left-panel' ? 'data-listdom-panel="left"' : ''; ?>
     <?php echo $link_method === 'right-panel' ? 'data-listdom-panel="right"' : ''; ?>

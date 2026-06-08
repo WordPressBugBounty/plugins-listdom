@@ -33,10 +33,11 @@ $gallery = array_unique($gallery);
             if (!$image) continue;
         ?>
         <li>
-            <?php if (in_array($link_method, ['normal', 'blank', 'lightbox', 'left-panel', 'right-panel', 'bottom-panel'])): ?>
+            <?php if (in_array($link_method, ['normal', 'blank', 'map', 'lightbox', 'left-panel', 'right-panel', 'bottom-panel'])): ?>
             <a
                 data-listing-id="<?php echo esc_attr($post_id); ?>"
                 data-listdom-style="<?php echo esc_attr($style); ?>"
+                <?php echo $link_method === 'map' ? 'data-listdom-map' : ''; ?>
                 <?php echo $link_method === 'lightbox' ? 'data-listdom-lightbox' : ''; ?>
                 <?php echo $link_method === 'left-panel' ? 'data-listdom-panel="left"' : ''; ?>
                 <?php echo $link_method === 'right-panel' ? 'data-listdom-panel="right"' : ''; ?>

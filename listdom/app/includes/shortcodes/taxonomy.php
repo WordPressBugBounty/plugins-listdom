@@ -61,6 +61,10 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
                 $output = $this->image();
                 break;
 
+            case 'image-center';
+                $output = $this->image_center();
+                break;
+
             case 'simple';
                 $output = $this->simple();
                 break;
@@ -127,6 +131,14 @@ class LSD_Shortcodes_Taxonomy extends LSD_Shortcodes
         // Generate output
         ob_start();
         include lsd_template('taxonomy-shortcodes/image.php');
+        return LSD_Kses::element(ob_get_clean());
+    }
+
+    public function image_center(): string
+    {
+        // Generate output
+        ob_start();
+        include lsd_template('taxonomy-shortcodes/image-center.php');
         return LSD_Kses::element(ob_get_clean());
     }
 

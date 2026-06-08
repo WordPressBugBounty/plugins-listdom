@@ -2,16 +2,10 @@
 
 class LSD_Plugin_Hooks
 {
-    /**
-     * The single instance of the class.
-     *
-     * @var LSD_Plugin_Hooks
-     * @since 1.0.0
-     */
-    protected static $instance = null;
+    protected static ?LSD_Plugin_Hooks $instance = null;
 
-    protected $main;
-    protected $db;
+    protected LSD_Main $main;
+    protected LSD_db $db;
 
     /**
      * Listdom Plugin Hooks Instance.
@@ -157,6 +151,29 @@ class LSD_Plugin_Hooks
             `updated_at` datetime DEFAULT NULL,
             PRIMARY KEY (id),
             KEY `run_at` (`run_at`)
+        ) $charset_collate;";
+
+        dbDelta($sql);
+
+        $table_name = $wpdb->prefix . 'lsd_ai_embeddings';
+        $sql = "CREATE TABLE `$table_name` (
+            `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            `object_type` varchar(20) NOT NULL DEFAULT 'listing',
+            `object_id` bigint(20) unsigned NOT NULL,
+            `usage` varchar(50) NOT NULL DEFAULT 'semantic-search',
+            `profile_id` varchar(100) NOT NULL DEFAULT '',
+            `model` varchar(100) NOT NULL DEFAULT '',
+            `config_hash` char(32) NOT NULL DEFAULT '',
+            `content_hash` char(32) NOT NULL DEFAULT '',
+            `document` longtext NULL,
+            `embedding` longtext NULL,
+            `dimensions` smallint(5) unsigned NOT NULL DEFAULT '0',
+            `indexed_at` datetime NULL,
+            `updated_at` datetime NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `object_usage_profile` (`object_type`, `object_id`, `usage`, `profile_id`),
+            KEY `usage_config` (`usage`, `config_hash`),
+            KEY `object_type_object_id` (`object_type`, `object_id`)
         ) $charset_collate;";
 
         dbDelta($sql);

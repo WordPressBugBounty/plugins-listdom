@@ -6,7 +6,7 @@ class LSD_AI extends LSD_Base
     const TASK_CONTENT = 'content';
     const TASK_MAPPING = 'mapping';
 
-    private $settings;
+    private array $settings;
 
     public function __construct()
     {
@@ -51,6 +51,15 @@ class LSD_AI extends LSD_Base
 
         // Default Provider
         return new LSD_AI_Models_GPT41Nano($key);
+    }
+
+    public function profile_supports_embeddings(string $id): bool
+    {
+        $profile = $this->get_profile($id);
+        if (!count($profile)) return false;
+
+        $model = $profile['model'] ?? LSD_AI_Models::def();
+        return LSD_AI_Models::embedding_capable($model);
     }
 
     public function get_profile(string $id): array
@@ -106,5 +115,75 @@ class LSD_AI extends LSD_Base
             self::TASK_CONTENT => esc_html__('Content Generation', 'listdom'),
             self::TASK_MAPPING => esc_html__('Auto Mapping', 'listdom'),
         ]);
+    }
+
+    public function connector_approval_notice(): array
+    {
+        $page = $this->connector_approvals_page();
+        if ($page === '') return [
+            'show' => false,
+            'url' => '',
+        ];
+
+        $connectors = $this->configured_connectors();
+        if (!count($connectors)) return [
+            'show' => false,
+            'url' => '',
+        ];
+
+        $approvals = get_option('wpai_connector_approvals', []);
+        $approvals = is_array($approvals) ? $approvals : [];
+
+        $plugin_approvals = $approvals[LSD_BASENAME] ?? [];
+        $plugin_approvals = is_array($plugin_approvals) ? $plugin_approvals : [];
+
+        foreach ($connectors as $connector)
+        {
+            if (!empty($plugin_approvals[$connector])) continue;
+
+            return [
+                'show' => true,
+                'url' => admin_url('tools.php?page=' . rawurlencode($page)),
+            ];
+        }
+
+        return [
+            'show' => false,
+            'url' => '',
+        ];
+    }
+
+    private function configured_connectors(): array
+    {
+        $configured = [];
+
+        foreach ([
+            'anthropic' => 'connectors_ai_anthropic_api_key',
+            'google' => 'connectors_ai_google_api_key',
+            'openai' => 'connectors_ai_openai_api_key',
+        ] as $connector => $option)
+        {
+            if (trim((string) get_option($option, '')) === '') continue;
+            $configured[] = $connector;
+        }
+
+        return $configured;
+    }
+
+    private function connector_approvals_page(): string
+    {
+        global $submenu;
+
+        if (!isset($submenu['tools.php']) || !is_array($submenu['tools.php'])) return '';
+
+        foreach ($submenu['tools.php'] as $item)
+        {
+            $page = isset($item[2]) ? (string) $item[2] : '';
+            if ($page === '' || strpos($page, 'connector-approval') === false) continue;
+
+            return $page;
+        }
+
+        return '';
     }
 }

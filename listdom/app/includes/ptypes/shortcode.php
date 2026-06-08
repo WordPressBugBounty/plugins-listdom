@@ -272,6 +272,13 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
     {
         $single_styles = ['' => esc_html__('Inherit From Global Options', 'listdom')] + LSD_Styles::details();
         $method = $options['listing_link'] ?? 'normal';
+        $link_methods = LSD_Base::get_listing_link_methods();
+        $map_supported = LSD_Components::map()
+            && LSD_Skins::is_mappable($skin)
+            && !empty($options['map_provider']);
+
+        if (!$map_supported) unset($link_methods['map']);
+        if (!isset($link_methods[$method])) $method = 'normal';
         ?>
         <div class="lsd-display-options-builder-option lsd-settings-fields-sub-wrapper">
             <?php if ($this->isPro()): ?>
@@ -286,8 +293,11 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
                             'id' => 'lsd_display_options_skin_' . $skin . '_listing_link',
                             'name' => 'lsd[display][' . $skin . '][listing_link]',
                             'value' => $method,
-                            'options' => LSD_Base::get_listing_link_methods(),
+                            'options' => $link_methods,
                             'class' => 'lsd-do-listing-link lsd-admin-input',
+                            'attributes' => [
+                                'data-lsd-map-option-label' => esc_attr__('Show on the map', 'listdom'),
+                            ],
                         ]); ?>
                         <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e("Link to single listing page.", 'listdom'); ?></p>
                     </div>

@@ -48,6 +48,189 @@ class LSD_Upgrade extends LSD_Base
         LSD_Personalize::generate();
     }
 
+    private function default_notifications(): array
+    {
+        return [
+            'lsd_contact_owner' => [
+                'status' => 'publish',
+                'title' => 'New Contact By #name#!',
+                'content' => 'Hi,
+
+        Following contact received for #listing_link#.
+        
+        Name: #name#
+        Email: #email#
+        Phone: #phone#
+        Message: #message#
+        
+        Regards,
+        #site_name#',
+            ],
+            'lsd_new_listing' => [
+                'status' => 'draft',
+                'title' => 'New Listing Added!',
+                'content' => 'Hi,
+
+        Following listing gets added.
+        #listing_link#
+        
+        Title: #listing_title#
+        Status: #listing_status#
+        Date: #listing_date#
+        Owner Name: #owner_name#
+        Owner Email: #owner_email#
+        
+        You can manage it using #admin_link# link.
+        
+        Regards,
+        #site_name#',
+            ],
+            'lsd_listing_status_changed' => [
+                'status' => 'draft',
+                'title' => 'Listing Status Changed!',
+                'content' => 'Hi,
+
+        Status of #listing_title# changed at #datetime#.
+        
+        Previous Status: #previous_status#
+        New Status: #listing_status#
+        
+        Regards,
+        #site_name#',
+            ],
+            'lsd_listing_report_abuse' => [
+                'status' => 'publish',
+                'title' => 'Abuse Report',
+                'content' => 'Hi,
+
+        Following abuse report received for #listing_link#.
+        
+        Name: #name#
+        Email: #email#
+        Phone: #phone#
+        Message: #message#
+        
+        Regards,
+        #site_name#',
+            ],
+            'lsd_profile_contact' => [
+                'status' => 'publish',
+                'title' => 'Profile Contact By #name#!',
+                'content' => 'Hi,
+
+        You have received a new contact request from your profile page at #profile_link#
+        
+        Name: #name#
+        Email: #email#
+        Phone: #phone#
+        Message: #message#
+        
+        Regards,
+        #site_name#',
+            ],
+            'lsd_payments_order_completed' => [
+                'status' => 'publish',
+                'title' => 'Order Completed!',
+                'content' => 'Hi #customer_name#,
+
+                Your order #order_id# has been completed.
+
+                Total: #order_total#
+
+                Invoice: #order_invoice_url#
+
+                Regards,
+                #site_name#',
+            ],
+            'lsd_payments_order_canceled' => [
+                'status' => 'publish',
+                'title' => 'Order Canceled!',
+                'content' => 'Hi #customer_name#,
+
+                Your order #order_id# has been canceled.
+
+                Total: #order_total#
+
+                Regards,
+                #site_name#',
+            ],
+            'lsd_payments_order_refunded' => [
+                'status' => 'publish',
+                'title' => 'Order Refunded!',
+                'content' => 'Hi #customer_name#,
+
+                Your order #order_id# has been refunded.
+
+                Total: #order_total#
+
+                Regards,
+                #site_name#',
+            ],
+            'lsd_payments_order_new_receiver' => [
+                'status' => 'publish',
+                'title' => 'New Order Received!',
+                'content' => 'Hi Admin,
+
+                A new order #order_id# has been received.
+
+                #order_admin_link#
+
+                Total: #order_total#
+                Customer Name: #customer_name#
+                Customer Email: #customer_email#
+
+                Regards,
+                #site_name#',
+            ],
+            'lsd_payments_order_new_payer' => [
+                'status' => 'publish',
+                'title' => 'Order Received!',
+                'content' => 'Hi #customer_name#,
+
+                Your order #order_id# has been received.
+
+                Total: #order_total#
+
+                Regards,
+                #site_name#',
+            ],
+        ];
+    }
+
+    private function seed_notification(string $hook)
+    {
+        $notifications = $this->default_notifications();
+        if (!isset($notifications[$hook])) return;
+
+        $existing = get_posts([
+            'post_type' => LSD_Base::PTYPE_NOTIFICATION,
+            'posts_per_page' => 1,
+            'post_status' => 'any',
+            'fields' => 'ids',
+            'meta_key' => 'lsd_hook',
+            'meta_value' => $hook,
+        ]);
+
+        if (is_array($existing) && count($existing)) return;
+
+        $notification = $notifications[$hook];
+        $post_id = wp_insert_post([
+            'post_type' => LSD_Base::PTYPE_NOTIFICATION,
+            'post_status' => $notification['status'],
+            'post_title' => $notification['title'],
+            'post_content' => '',
+        ]);
+
+        if (!$post_id || is_wp_error($post_id)) return;
+
+        update_post_meta($post_id, 'lsd_hook', $hook);
+        update_post_meta($post_id, 'lsd_original_to', 1);
+        update_post_meta($post_id, 'lsd_to', '');
+        update_post_meta($post_id, 'lsd_cc', '');
+        update_post_meta($post_id, 'lsd_bcc', '');
+        update_post_meta($post_id, 'lsd_content', $notification['content']);
+    }
+
     private function socials()
     {
         $socials = LSD_Options::parse_args(
@@ -68,59 +251,8 @@ class LSD_Upgrade extends LSD_Base
 
     private function v121()
     {
-        // Contact Notification
-        $post_id = wp_insert_post([
-            'post_type' => LSD_Base::PTYPE_NOTIFICATION,
-            'post_status' => 'publish',
-            'post_title' => 'New Contact By #name#!',
-            'post_content' => '',
-        ]);
-
-        update_post_meta($post_id, 'lsd_hook', 'lsd_contact_owner');
-        update_post_meta($post_id, 'lsd_original_to', 1);
-        update_post_meta($post_id, 'lsd_to', '');
-        update_post_meta($post_id, 'lsd_cc', '');
-        update_post_meta($post_id, 'lsd_bcc', '');
-        update_post_meta($post_id, 'lsd_content', 'Hi,
-
-        Following contact received for #listing_link#.
-        
-        Name: #name#
-        Email: #email#
-        Phone: #phone#
-        Message: #message#
-        
-        Regards,
-        #site_name#');
-
-        // New Listing Notification
-        $post_id = wp_insert_post([
-            'post_type' => LSD_Base::PTYPE_NOTIFICATION,
-            'post_status' => 'draft',
-            'post_title' => 'New Listing Added!',
-            'post_content' => '',
-        ]);
-
-        update_post_meta($post_id, 'lsd_hook', 'lsd_new_listing');
-        update_post_meta($post_id, 'lsd_original_to', 1);
-        update_post_meta($post_id, 'lsd_to', '');
-        update_post_meta($post_id, 'lsd_cc', '');
-        update_post_meta($post_id, 'lsd_bcc', '');
-        update_post_meta($post_id, 'lsd_content', 'Hi,
-
-        Following listing gets added.
-        #listing_link#
-        
-        Title: #listing_title#
-        Status: #listing_status#
-        Date: #listing_date#
-        Owner Name: #owner_name#
-        Owner Email: #owner_email#
-        
-        You can manage it using #admin_link# link.
-        
-        Regards,
-        #site_name#');
+        $this->seed_notification('lsd_contact_owner');
+        $this->seed_notification('lsd_new_listing');
     }
 
     private function v170()
@@ -519,53 +651,8 @@ class LSD_Upgrade extends LSD_Base
 
     private function v200()
     {
-        // Listing Status Notification
-        $post_id = wp_insert_post([
-            'post_type' => LSD_Base::PTYPE_NOTIFICATION,
-            'post_status' => 'draft',
-            'post_title' => 'Listing Status Changed!',
-            'post_content' => '',
-        ]);
-
-        update_post_meta($post_id, 'lsd_hook', 'lsd_listing_status_changed');
-        update_post_meta($post_id, 'lsd_original_to', 1);
-        update_post_meta($post_id, 'lsd_to', '');
-        update_post_meta($post_id, 'lsd_cc', '');
-        update_post_meta($post_id, 'lsd_bcc', '');
-        update_post_meta($post_id, 'lsd_content', 'Hi,
-
-        Status of #listing_title# changed at #datetime#.
-        
-        Previous Status: #previous_status#
-        New Status: #listing_status#
-        
-        Regards,
-        #site_name#');
-
-        // Report Abuse Notification
-        $post_id = wp_insert_post([
-            'post_type' => LSD_Base::PTYPE_NOTIFICATION,
-            'post_status' => 'publish',
-            'post_title' => 'Abuse Report',
-            'post_content' => '',
-        ]);
-
-        update_post_meta($post_id, 'lsd_hook', 'lsd_listing_report_abuse');
-        update_post_meta($post_id, 'lsd_original_to', 1);
-        update_post_meta($post_id, 'lsd_to', '');
-        update_post_meta($post_id, 'lsd_cc', '');
-        update_post_meta($post_id, 'lsd_bcc', '');
-        update_post_meta($post_id, 'lsd_content', 'Hi,
-
-        Following abuse report received for #listing_link#.
-        
-        Name: #name#
-        Email: #email#
-        Phone: #phone#
-        Message: #message#
-        
-        Regards,
-        #site_name#');
+        $this->seed_notification('lsd_listing_status_changed');
+        $this->seed_notification('lsd_listing_report_abuse');
     }
 
     private function v220()
@@ -638,30 +725,7 @@ class LSD_Upgrade extends LSD_Base
 
     private function v410()
     {
-        // Contact Notification
-        $post_id = wp_insert_post([
-            'post_type' => LSD_Base::PTYPE_NOTIFICATION,
-            'post_status' => 'publish',
-            'post_title' => 'Profile Contact By #name#!',
-            'post_content' => '',
-        ]);
-
-        update_post_meta($post_id, 'lsd_hook', 'lsd_profile_contact');
-        update_post_meta($post_id, 'lsd_original_to', 1);
-        update_post_meta($post_id, 'lsd_to', '');
-        update_post_meta($post_id, 'lsd_cc', '');
-        update_post_meta($post_id, 'lsd_bcc', '');
-        update_post_meta($post_id, 'lsd_content', 'Hi,
-
-        You have received a new contact request from your profile page at #profile_link#
-        
-        Name: #name#
-        Email: #email#
-        Phone: #phone#
-        Message: #message#
-        
-        Regards,
-        #site_name#');
+        $this->seed_notification('lsd_profile_contact');
     }
 
     private function v450()
@@ -704,86 +768,11 @@ class LSD_Upgrade extends LSD_Base
 
     private function v480()
     {
-        $notifications = [
-            'completed' => [
-                'title' => 'Order Completed!',
-                'content' => 'Hi #customer_name#,
-
-                Your order #order_id# has been completed.
-
-                Total: #order_total#
-
-                Invoice: #order_invoice_url#
-
-                Regards,
-                #site_name#',
-            ],
-            'canceled' => [
-                'title' => 'Order Canceled!',
-                'content' => 'Hi #customer_name#,
-
-                Your order #order_id# has been canceled.
-
-                Total: #order_total#
-
-                Regards,
-                #site_name#',
-            ],
-            'refunded' => [
-                'title' => 'Order Refunded!',
-                'content' => 'Hi #customer_name#,
-
-                Your order #order_id# has been refunded.
-
-                Total: #order_total#
-
-                Regards,
-                #site_name#',
-            ],
-            'new_receiver' => [
-                'title' => 'New Order Received!',
-                'content' => 'Hi Admin,
-
-                A new order #order_id# has been received.
-
-                #order_admin_link#
-
-                Total: #order_total#
-                Customer Name: #customer_name#
-                Customer Email: #customer_email#
-
-                Regards,
-                #site_name#',
-            ],
-            'new_payer' => [
-                'title' => 'Order Received!',
-                'content' => 'Hi #customer_name#,
-
-                Your order #order_id# has been received.
-
-                Total: #order_total#
-
-                Regards,
-                #site_name#',
-            ],
-        ];
-
-        foreach ($notifications as $event => $data)
-        {
-            $post_id = wp_insert_post([
-                'post_type' => LSD_Base::PTYPE_NOTIFICATION,
-                'post_status' => 'publish',
-                'post_title' => $data['title'],
-                'post_content' => '',
-            ]);
-
-            update_post_meta($post_id, 'lsd_hook', 'lsd_payments_order_' . $event);
-            update_post_meta($post_id, 'lsd_original_to', 1);
-            update_post_meta($post_id, 'lsd_to', '');
-            update_post_meta($post_id, 'lsd_cc', '');
-            update_post_meta($post_id, 'lsd_bcc', '');
-            update_post_meta($post_id, 'lsd_content', $data['content']);
-        }
+        $this->seed_notification('lsd_payments_order_completed');
+        $this->seed_notification('lsd_payments_order_canceled');
+        $this->seed_notification('lsd_payments_order_refunded');
+        $this->seed_notification('lsd_payments_order_new_receiver');
+        $this->seed_notification('lsd_payments_order_new_payer');
     }
 
     private function v521()

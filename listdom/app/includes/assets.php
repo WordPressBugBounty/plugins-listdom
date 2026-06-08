@@ -2,12 +2,8 @@
 
 class LSD_Assets extends LSD_Base
 {
-    /**
-     * @static
-     * @var array
-     */
-    public static $params = [];
-    public $settings = [];
+    public static array $params = [];
+    public array $settings = [];
 
     public function __construct()
     {
@@ -64,8 +60,19 @@ class LSD_Assets extends LSD_Base
         // Check to see if we should include the assets or not
         if (!$this->should_include()) return;
 
+        $frontend_dependencies = ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'];
+
+        if ($this->advanced_datetimepicker_enabled())
+        {
+            $this->flatpickr();
+            $frontend_dependencies[] = 'lsd-flatpickr';
+        }
+
+        // Listdom Toast
+        $this->toast();
+
         // Include Listdom frontend script file
-        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'], $this->version(), true);
+        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), $frontend_dependencies, $this->version(), true);
 
         // Localize Vars
         $this->localize();
@@ -103,8 +110,8 @@ class LSD_Assets extends LSD_Base
         // Include no-ui-slider
         $this->nouislider();
 
-        // Listdom Icon
-        $this->lsdi();
+        // Webilia Icons
+        $this->icons();
     }
 
     public function admin()
@@ -112,14 +119,25 @@ class LSD_Assets extends LSD_Base
         // Include Listdom backend CSS file for WordPress
         wp_enqueue_style('lsd-wp-backend', $this->lsd_asset_url('css/wp-backend.min.css'), [], $this->version());
 
-        // Listdom Icon
-        $this->lsdi();
+        // Listdom Toast
+        $this->toast();
+
+        // Webilia Icons
+        $this->icons();
 
         // Check to see if we should include the assets or not
         if (!$this->should_include('backend')) return;
 
+        $backend_dependencies = ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-autocomplete'];
+
+        if ($this->advanced_datetimepicker_enabled())
+        {
+            $this->flatpickr();
+            $backend_dependencies[] = 'lsd-flatpickr';
+        }
+
         // Include Listdom backend script file
-        wp_enqueue_script('lsd-backend', $this->lsd_asset_url('js/backend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-autocomplete'], $this->version(), true);
+        wp_enqueue_script('lsd-backend', $this->lsd_asset_url('js/backend.min.js'), $backend_dependencies, $this->version(), true);
 
         $icon_options = [];
         $fonts = LSD_Icons::get();
@@ -128,6 +146,9 @@ class LSD_Assets extends LSD_Base
         // Localize Vars
         wp_localize_script('lsd-backend', 'lsd', [
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'advanced_datetimepicker' => $this->advanced_datetimepicker_enabled() ? 1 : 0,
+            'startOfWeek' => (int) get_option('start_of_week', 0),
+            'datepicker_format' => (isset($this->settings['datepicker_format']) && trim((string) $this->settings['datepicker_format']) ? $this->settings['datepicker_format'] : 'yyyy-mm-dd'),
             'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
             'i18n_field_search' => esc_html__('Add the “More Options” fields in the row below', 'listdom'),
             'i18n_field_delete' => esc_html__('Click twice to delete', 'listdom'),
@@ -228,6 +249,12 @@ class LSD_Assets extends LSD_Base
         wp_enqueue_style('pickr', $this->lsd_asset_url('packages/pickr/pickr.min.css'), [], LSD_Assets::version());
     }
 
+    public function flatpickr(): void
+    {
+        wp_enqueue_script('lsd-flatpickr', $this->lsd_asset_url('packages/flatpickr/flatpickr.min.js'), [], LSD_Assets::version(), true);
+        wp_enqueue_style('lsd-flatpickr', $this->lsd_asset_url('packages/flatpickr/flatpickr.min.css'), [], LSD_Assets::version());
+    }
+
     public static function lightslider()
     {
         $base = new LSD_Base();
@@ -295,10 +322,16 @@ class LSD_Assets extends LSD_Base
         wp_enqueue_style('date-range-picker', $this->lsd_asset_url('packages/date-range-picker/drp.min.css'), ['lsd-frontend'], LSD_Assets::version());
     }
 
-    public function lsdi()
+    public function icons()
     {
-        (new \Webilia\LSDI\Boot(plugins_url('vendor/webilia/lsdi', LSD_ABSPATH . '/listdom.php')))
-            ->enqueue('lsdi', [], LSD_Assets::version());
+        (new \Webilia\Icons\Boot(plugins_url('vendor/webilia/icons', LSD_ABSPATH . '/listdom.php')))
+            ->enqueue('webilia-icons', [], LSD_Assets::version());
+    }
+
+    public function toast(): void
+    {
+        (new \Webilia\Toast\Boot(plugins_url('vendor/webilia/toast', LSD_ABSPATH . '/listdom.php')))
+            ->enqueue('webilia-toast', ['jquery'], LSD_Assets::version());
     }
 
     public static function api()
@@ -329,8 +362,19 @@ class LSD_Assets extends LSD_Base
 
     protected function bricks(): void
     {
+        $frontend_dependencies = ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'];
+
+        if ($this->advanced_datetimepicker_enabled())
+        {
+            $this->flatpickr();
+            $frontend_dependencies[] = 'lsd-flatpickr';
+        }
+
+        // Listdom Toast
+        $this->toast();
+
         // Frontend Assets
-        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'], $this->version(), true);
+        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), $frontend_dependencies, $this->version(), true);
         $this->localize();
 
         wp_enqueue_style('lsd-frontend', $this->lsd_asset_url('css/frontend.min.css'), [], $this->version());
@@ -338,7 +382,7 @@ class LSD_Assets extends LSD_Base
         if (is_rtl()) wp_enqueue_style('lsd-frontend-rtl', $this->lsd_asset_url('css/frontend-rtl.min.css'), ['lsd-frontend'], $this->version());
 
         $this->fontawesome();
-        $this->lsdi();
+        $this->icons();
 
         $this->isotope();
         $this->googlemaps();
@@ -352,8 +396,16 @@ class LSD_Assets extends LSD_Base
     {
         wp_localize_script('lsd-frontend', 'lsd', [
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'advanced_datetimepicker' => $this->advanced_datetimepicker_enabled() ? 1 : 0,
+            'startOfWeek' => (int) get_option('start_of_week', 0),
+            'datepicker_format' => (isset($this->settings['datepicker_format']) && trim((string) $this->settings['datepicker_format']) ? $this->settings['datepicker_format'] : 'yyyy-mm-dd'),
             'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
         ]);
+    }
+
+    protected function advanced_datetimepicker_enabled(): bool
+    {
+        return isset($this->settings['advanced_datetimepicker']) && (int) $this->settings['advanced_datetimepicker'] === 1;
     }
 
     public static function leaflet($draw = false): bool
@@ -455,8 +507,12 @@ class LSD_Assets extends LSD_Base
         if (is_admin()) $dependencies[] = 'lsd-backend';
         else $dependencies[] = 'lsd-frontend';
 
+        // Keep the drawing library available for draw-search controls on Google maps shortcodes.
+        // Google removed DrawingManager from Maps JS API 3.65+, so pin to 3.64 until draw search is migrated.
+        $libraries = ['places', 'drawing'];
+
         // Enqueue the API
-        wp_enqueue_script('googlemaps', '//maps.googleapis.com/maps/api/js?loading=async&libraries=places,drawing&callback=listdom_googlemaps_callback' . (isset($settings['googlemaps_api_key']) && trim($settings['googlemaps_api_key']) ? '&key=' . urlencode($settings['googlemaps_api_key']) : ''), $dependencies);
+        wp_enqueue_script('googlemaps', '//maps.googleapis.com/maps/api/js?v=3.64&loading=async&libraries=' . implode(',', $libraries) . '&callback=listdom_googlemaps_callback' . (isset($settings['googlemaps_api_key']) && trim($settings['googlemaps_api_key']) ? '&key=' . urlencode($settings['googlemaps_api_key']) : ''), $dependencies);
 
         return true;
     }

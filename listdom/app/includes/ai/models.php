@@ -35,4 +35,16 @@ class LSD_AI_Models extends LSD_Base
     {
         return self::OPENAI_GPT_41_NANO;
     }
+
+    public static function embedding_capable(string $model): bool
+    {
+        return in_array($model, [
+            self::OPENAI_GPT_41_NANO,
+            self::OPENAI_GPT_4O_MINI,
+            self::OPENAI_GPT_5_MINI,
+            self::OPENAI_GPT_5_NANO,
+            self::GOOGLE_GEMINI_25_FLASH,
+            self::GOOGLE_GEMINI_25_FLASH_LITE,
+        ], true);
+    }
 }

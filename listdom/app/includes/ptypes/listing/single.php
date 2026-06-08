@@ -274,6 +274,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             $rendered = str_replace('{breadcrumb}', LSD_Kses::element($breadcrumb), $rendered);
         }
 
+        // Back Button
+        if (strpos($this->pattern, '{backbutton}') !== false)
+        {
+            $backbutton = $this->backbutton();
+            $rendered = str_replace('{backbutton}', LSD_Kses::element($backbutton), $rendered);
+        }
+
         // Listing Labels
         if (strpos($this->pattern, '{labels}') !== false)
         {
@@ -568,6 +575,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         return $output;
     }
 
+    public function backbutton(): string
+    {
+        $element = new LSD_Element_Backbutton();
+
+        return $element->get($this->entity->id());
+    }
+
     public function address(): string
     {
         $address = $this->entity->get_address(false);
@@ -653,7 +667,8 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
     {
         $show_icons = $this->details_page_options['elements']['attributes']['show_icons'] ?? 0;
         $show_attribute_title = $this->details_page_options['elements']['attributes']['show_attribute_title'] ?? 1;
-        $attributes = $this->entity->get_attributes($show_icons, $show_attribute_title);
+        $show_separator = $this->details_page_options['elements']['attributes']['show_separator'] ?? 0;
+        $attributes = $this->entity->get_attributes($show_icons, $show_attribute_title, $show_separator);
 
         // Don't show anything when there is no attribute!
         if (!trim($attributes)) return '';
@@ -1214,6 +1229,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             else if ($key === 'abuse') $content .= LSD_Kses::form($this->abuse());
             else if ($key === 'availability') $content .= LSD_Kses::element($this->availability());
             else if ($key === 'excerpt') $content .= LSD_Kses::element($this->excerpt());
+            else if ($key === 'backbutton') $content .= LSD_Kses::element($this->backbutton());
             else if ($key === 'breadcrumb') $content .= LSD_Kses::element($this->breadcrumb());
             else if ($key === 'cta') $content .= LSD_Kses::element($this->cta());
             else $content .= '{' . $key . '}';

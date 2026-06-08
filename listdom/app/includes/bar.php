@@ -2,13 +2,7 @@
 
 class LSD_Bar extends LSD_Base
 {
-    /**
-     * The single instance of the class.
-     *
-     * @var LSD_Bar
-     * @since 1.0.0
-     */
-    protected static $instance = null;
+    protected static ?LSD_Bar $instance = null;
 
     /**
      * All Listdom stuff that are loaded

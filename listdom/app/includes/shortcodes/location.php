@@ -6,7 +6,7 @@ class LSD_Shortcodes_Location extends LSD_Shortcodes_Taxonomy
     protected $TX = LSD_Base::TAX_LOCATION;
 
     // Valid Styles
-    protected $valid_styles = ['image', 'simple', 'clean'];
+    protected $valid_styles = ['image', 'image-center', 'simple', 'clean'];
 
     public function init()
     {

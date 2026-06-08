@@ -76,6 +76,21 @@ $grecaptcha_status = isset($settings['grecaptcha_status'], $settings['grecaptcha
                             ]); ?>
                         </div>
                     </div>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Advanced Date & Time Picker', 'listdom'),
+                            'for' => 'lsd_settings_advanced_datetimepicker',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_settings_advanced_datetimepicker',
+                                'name' => 'lsd[advanced_datetimepicker]',
+                                'value' => $settings['advanced_datetimepicker'] ?? '0',
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Enable Flatpickr for Listdom date, time, and date-time inputs.', 'listdom'); ?></p>
+                        </div>
+                    </div>
                 </div>
                 <div class="lsd-settings-fields-wrapper">
                     <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Currency', 'listdom'); ?></h3>

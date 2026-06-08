@@ -797,6 +797,9 @@
   text-align: right;
 }
 
+.lsd-taxonomy-shortcode-wrapper.lsd-taxonomy-shortcode-image-center.lsd-taxonomy-shortcode-image-center .lsd-ts-image-wrapper .lsd-ts-image > a .lsd-content {
+  text-align: right;
+}
 .lsd-taxonomy-shortcode-wrapper.lsd-taxonomy-shortcode-clean.lsd-taxonomy-shortcode-clean .lsd-row > div a > div {
   float: right;
 }

@@ -2,7 +2,11 @@
 
 class LSD_Jobs extends LSD_Base
 {
-    protected $db;
+    public const STATUS_QUEUED = 'queued';
+    public const STATUS_ALREADY_PENDING = 'already_pending';
+    public const STATUS_FAILED = 'failed';
+
+    protected LSD_db $db;
 
     public function __construct()
     {
@@ -64,7 +68,7 @@ class LSD_Jobs extends LSD_Base
         $limit = (int) apply_filters('lsd_jobs_chunk_limit', $limit);
 
         // Max Runs
-        $max_runs = (int) apply_filters('lsd_jobs_max_runs', $max_runs);
+        $max_runs = $this->max_runs($max_runs);
 
         $now = lsd_date('Y-m-d H:i:s');
         return $this->db->select(
@@ -85,6 +89,22 @@ class LSD_Jobs extends LSD_Base
         );
     }
 
+    public function add_once($type, array $data = [], ?string $sub_type = null, int $priority = 1, ?string $run_at = null)
+    {
+        $existing = $this->pending($type, $data, $sub_type);
+        if ($existing > 0) return [
+            'job_id' => $existing,
+            'status' => self::STATUS_ALREADY_PENDING,
+        ];
+
+        $job_id = $this->add($type, $data, $sub_type, $priority, $run_at);
+
+        return [
+            'job_id' => (int) $job_id,
+            'status' => $job_id ? self::STATUS_QUEUED : self::STATUS_FAILED,
+        ];
+    }
+
     public function update(int $job_id, array $data = [])
     {
         $now = lsd_date('Y-m-d H:i:s');
@@ -100,9 +120,25 @@ class LSD_Jobs extends LSD_Base
         return $this->db->q("DELETE FROM `#__lsd_jobs` WHERE `id`='" . esc_sql($job_id) . "'", 'DELETE');
     }
 
+    protected function pending($type, array $data = [], ?string $sub_type = null): int
+    {
+        return (int) $this->db->select($this->db->prepare(
+            "SELECT `id` FROM `#__lsd_jobs` WHERE `type`=%s AND `sub_type`=%s AND `data`=%s AND `runs`<%d LIMIT 1",
+            $type,
+            (string) $sub_type,
+            maybe_serialize($data),
+            $this->max_runs()
+        ), 'loadResult');
+    }
+
     protected function ran(int $job_id)
     {
         $now = lsd_date('Y-m-d H:i:s');
         return $this->db->q("UPDATE `#__lsd_jobs` SET `runs`=`runs`+1, `updated_at`='$now' WHERE `id`='" . esc_sql($job_id) . "'");
+    }
+
+    protected function max_runs(int $max_runs = 100): int
+    {
+        return (int) apply_filters('lsd_jobs_max_runs', $max_runs);
     }
 }

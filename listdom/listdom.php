@@ -3,12 +3,12 @@
  * Plugin Name: Listdom
  * Plugin URI: https://listdom.net
  * Description: Listdom is a powerful yet easy-to-use tool for listing anything on your website. It offers modern, responsive skins such as List, Grid, Map, and Masonry to showcase your content beautifully.
- * Version: 5.5.0
+ * Version: 5.6.0
  * Author: Webilia
  * Author URI: https://webilia.com/
  * Requires at least: 4.2
  * Requires PHP: 7.4
- * Tested up to: 6.9
+ * Tested up to: 7.0
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *

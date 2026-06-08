@@ -79,6 +79,49 @@ class LSD_db extends LSD_Base
     }
 
     /**
+     * Prepares a database query.
+     * @param string $query
+     * @param mixed ...$args
+     * @return string
+     */
+    public function prepare(string $query, ...$args): string
+    {
+        $query = $this->_prefix($query);
+        $database = $this->get_DBO();
+
+        if (count($args) === 1 && is_array($args[0]))
+        {
+            return $database->prepare($query, $args[0]);
+        }
+
+        return $database->prepare($query, ...$args);
+    }
+
+    /**
+     * Replaces a row in a database table.
+     * @param string $table
+     * @param array $data
+     * @param array $format
+     * @return int|false
+     */
+    public function replace(string $table, array $data, array $format = [])
+    {
+        return $this->get_DBO()->replace($this->_prefix($table), $data, $format);
+    }
+
+    /**
+     * Deletes rows from a database table.
+     * @param string $table
+     * @param array $where
+     * @param array $where_format
+     * @return int|false
+     */
+    public function delete(string $table, array $where, array $where_format = [])
+    {
+        return $this->get_DBO()->delete($this->_prefix($table), $where, $where_format);
+    }
+
+    /**
      * Get a record from Database
      * @param string|array $selects
      * @param string $table

@@ -6,7 +6,7 @@ class LSD_Payments_Engine extends LSD_Base
     const WC = 'woocommerce';
 
     private $payments;
-    protected static $instance = null;
+    protected static ?LSD_Payments_Engine $instance = null;
 
     public static function instance(): LSD_Payments_Engine
     {

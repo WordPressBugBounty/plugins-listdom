@@ -2,7 +2,7 @@
 
 class LSD_Labels extends LSD_Base
 {
-    protected static $instance = null;
+    protected static ?LSD_Labels $instance = null;
 
     public static function instance(): LSD_Labels
     {

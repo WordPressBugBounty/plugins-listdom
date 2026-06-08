@@ -6,7 +6,7 @@ class LSD_Shortcodes_Category extends LSD_Shortcodes_Taxonomy
     protected $TX = LSD_Base::TAX_CATEGORY;
 
     // Valid Styles
-    protected $valid_styles = ['image', 'simple', 'clean', 'carousel'];
+    protected $valid_styles = ['image', 'image-center', 'simple', 'clean', 'carousel'];
 
     public function init()
     {

@@ -86,15 +86,13 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                 </div>
                 <div class="lsd-flex lsd-flex-col lsd-gap-1">
                     <div class="lsd-col-12 lsd-flex lsd-flex-items-center lsd-gap-3">
-                        <?php if ($auto_mapping): ?>
-                            <div class="lsd-col-9">
-                                <?php echo LSD_Form::ai_profiles([
-                                    'id' => 'ix_ai_profile',
-                                        'class' => 'lsd-admin-input',
-                                    'name' => 'ix[ai_profile]',
-                                ]); ?>
-                            </div>
-                        <?php endif; ?>
+                        <div class="lsd-col-9">
+                            <?php echo LSD_Form::ai_profiles([
+                                'id' => 'ix_ai_profile',
+                                'class' => 'lsd-admin-input',
+                                'name' => 'ix[ai_profile]',
+                            ]); ?>
+                        </div>
                         <button id="lsd_ix_csv_auto_map" data-file="<?php echo esc_attr($file); ?>" type="button" class="lsd-secondary-button"><?php esc_html_e('Map', 'listdom'); ?><i class="listdom-icon lsdi-right-arrow"></i></button>
                     </div>
                     <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('You can use the auto-map feature powered by AI. You need to configure your AI models first in Listdom settings.', 'listdom');?></p>

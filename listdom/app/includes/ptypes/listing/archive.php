@@ -20,6 +20,7 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
 
         // Marker onclick method
         $onclick = isset($args['onclick']) ? sanitize_text_field($args['onclick']) : 'infowindow';
+        $listing_link_method = isset($args['listing_link_method']) ? sanitize_text_field($args['listing_link_method']) : 'normal';
 
         // Sidebar
         $sidebar = isset($args['sidebar']) && $args['sidebar'];
@@ -68,7 +69,9 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
             }
 
             $object['id'] = $post_id;
-            $object['infowindow'] = $onclick === 'infowindow' ? $entity->get_infowindow() : null;
+            $object['infowindow'] = ($onclick === 'infowindow' || $listing_link_method === 'map')
+                ? $entity->get_infowindow()
+                : null;
             $object['card'] = $sidebar ? $entity->get_map_card() : null;
             $object['latitude'] = (float) get_post_meta($post_id, 'lsd_latitude', true);
             $object['longitude'] = (float) get_post_meta($post_id, 'lsd_longitude', true);

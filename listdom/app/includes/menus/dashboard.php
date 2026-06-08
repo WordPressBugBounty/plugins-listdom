@@ -2,8 +2,6 @@
 
 class LSD_Menus_Dashboard extends LSD_Menus
 {
-    public $tab;
-
     public function output()
     {
         // Get the current tab

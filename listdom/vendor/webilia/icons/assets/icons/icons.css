@@ -1,0 +1,147 @@
+@font-face {
+  font-family: 'webilia-icons';
+  src: url('fonts/icons.eot?56589723');
+  src: url('fonts/icons.eot?56589723#iefix') format('embedded-opentype'),
+       url('fonts/icons.woff2?56589723') format('woff2'),
+       url('fonts/icons.woff?56589723') format('woff'),
+       url('fonts/icons.ttf?56589723') format('truetype'),
+       url('fonts/icons.svg?56589723#webilia-icons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'webilia-icons';
+    src: url('fonts/icons.svg?56589723#webilia-icons') format('svg');
+  }
+}
+*/
+[class^="lsdi"]:before, [class*=" lsdi"]:before {
+  font-family: "webilia-icons" !important;
+  font-style: normal;
+  font-weight: normal;
+  speak: never;
+
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.lsdi-listdom-logo:before { content: '\e800'; }
+.lsdi-list-view:before { content: '\e801'; }
+.lsdi-loading:before { content: '\e802'; }
+.lsdi-locate:before { content: '\e803'; }
+.lsdi-location:before { content: '\e804'; }
+.lsdi-login-method:before { content: '\e805'; }
+.lsdi-map-marker:before { content: '\e806'; }
+.lsdi-map-pinpoint:before { content: '\e807'; }
+.lsdi-menu-square:before { content: '\e808'; }
+.lsdi-menu-square-selected:before { content: '\e809'; }
+.lsdi-message-preview-01:before { content: '\e80a'; }
+.lsdi-mobile:before { content: '\e80b'; }
+.lsdi-move:before { content: '\e80c'; }
+.lsdi-move-left:before { content: '\e80d'; }
+.lsdi-payment:before { content: '\e80e'; }
+.lsdi-paypal:before { content: '\e80f'; }
+.lsdi-pencil-edit:before { content: '\e810'; }
+.lsdi-plug-01:before { content: '\e811'; }
+.lsdi-property-edit:before { content: '\e812'; }
+.lsdi-puzzle:before { content: '\e813'; }
+.lsdi-question:before { content: '\e814'; }
+.lsdi-reset:before { content: '\e815'; }
+.lsdi-responsive:before { content: '\e816'; }
+.lsdi-right-arrow:before { content: '\e817'; }
+.lsdi-sad-dizzy:before { content: '\e818'; }
+.lsdi-screen:before { content: '\e819'; }
+.lsdi-search:before { content: '\e81a'; }
+.lsdi-search-area:before { content: '\e81b'; }
+.lsdi-search-magnifier:before { content: '\e81c'; }
+.lsdi-second-bracket-square:before { content: '\e81d'; }
+.lsdi-settings-02:before { content: '\e81e'; }
+.lsdi-sort-by-up:before { content: '\e81f'; }
+.lsdi-stars:before { content: '\e820'; }
+.lsdi-stripe:before { content: '\e821'; }
+.lsdi-structure-check:before { content: '\e822'; }
+.lsdi-tablet:before { content: '\e823'; }
+.lsdi-tag:before { content: '\e824'; }
+.lsdi-three-dots:before { content: '\e825'; }
+.lsdi-three-dots-vertical:before { content: '\e826'; }
+.lsdi-time-half-pass:before { content: '\e827'; }
+.lsdi-title:before { content: '\e828'; }
+.lsdi-toggle-on:before { content: '\e829'; }
+.lsdi-transition-top:before { content: '\e82a'; }
+.lsdi-type-cursor:before { content: '\e82b'; }
+.lsdi-up-arrow-s:before { content: '\e82c'; }
+.lsdi-user-circle:before { content: '\e82d'; }
+.lsdi-waving-hand:before { content: '\e82e'; }
+.lsdi-wizard:before { content: '\e82f'; }
+.lsdi-account:before { content: '\e830'; }
+.lsdi-add-plus:before { content: '\e831'; }
+.lsdi-add-plus-circle:before { content: '\e832'; }
+.lsdi-add-plus-s:before { content: '\e833'; }
+.lsdi-advanced:before { content: '\e834'; }
+.lsdi-ai-search:before { content: '\e835'; }
+.lsdi-alert:before { content: '\e836'; }
+.lsdi-api:before { content: '\e837'; }
+.lsdi-bank:before { content: '\e838'; }
+.lsdi-card:before { content: '\e839'; }
+.lsdi-card-exchang:before { content: '\e83a'; }
+.lsdi-checkmark-circle:before { content: '\e83b'; }
+.lsdi-checkmark-circle-fill:before { content: '\e83c'; }
+.lsdi-copy:before { content: '\e83d'; }
+.lsdi-cross:before { content: '\e83e'; }
+.lsdi-csv:before { content: '\e83f'; }
+.lsdi-cursor-pointer-01:before { content: '\e840'; }
+.lsdi-customizer:before { content: '\e841'; }
+.lsdi-dashboard-circle-edit:before { content: '\e842'; }
+.lsdi-dash-circle-fill:before { content: '\e843'; }
+.lsdi-dash-s:before { content: '\e844'; }
+.lsdi-database:before { content: '\e845'; }
+.lsdi-down-arrow-s:before { content: '\e846'; }
+.lsdi-excel:before { content: '\e847'; }
+.lsdi-eye:before { content: '\e848'; }
+.lsdi-file-01:before { content: '\e849'; }
+.lsdi-file-download:before { content: '\e84a'; }
+.lsdi-file-edit-pencil:before { content: '\e84b'; }
+.lsdi-file-import-export:before { content: '\e84c'; }
+.lsdi-file-script:before { content: '\e84d'; }
+.lsdi-file-upload:before { content: '\e84e'; }
+.lsdi-first-aid-kit:before { content: '\e84f'; }
+.lsdi-floppy-disk:before { content: '\e850'; }
+.lsdi-footer:before { content: '\e851'; }
+.lsdi-frontend-dashboard:before { content: '\e852'; }
+.lsdi-general:before { content: '\e853'; }
+.lsdi-google-places:before { content: '\e854'; }
+.lsdi-group-items:before { content: '\e855'; }
+.lsdi-header:before { content: '\e856'; }
+.lsdi-key:before { content: '\e857'; }
+.lsdi-label-important:before { content: '\e858'; }
+.lsdi-layout:before { content: '\e859'; }
+.lsdi-link-square:before { content: '\e85a'; }

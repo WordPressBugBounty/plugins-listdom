@@ -213,7 +213,8 @@ MarkerClusterer.prototype.MARKER_CLUSTER_IMAGE_EXTENSION_ = 'png';
 MarkerClusterer.prototype.extend = function(obj1, obj2) {
   return (function(object) {
     for (var property in object.prototype) {
-      this.prototype[property] = object.prototype[property];
+      // Keep ClusterIcon.remove so stale cluster DOM is cleaned up on Google Maps.
+      if (property !== 'remove') this.prototype[property] = object.prototype[property];
     }
     return this;
   }).apply(obj1, [obj2]);
@@ -1154,6 +1155,7 @@ ClusterIcon.prototype.show = function() {
  */
 ClusterIcon.prototype.remove = function() {
   this.setMap(null);
+  this.onRemove();
 };
 
 

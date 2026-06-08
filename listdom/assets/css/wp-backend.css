@@ -216,202 +216,6 @@
   margin-bottom: 0;
 }
 
-.lsd-toast-container {
-  position: fixed;
-  z-index: 999999;
-  pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-  flex-direction: column;
-  gap: 8px;
-  width: 50%;
-}
-.lsd-toast-container.lsd-top-right {
-  top: 20px;
-  right: 20px;
-}
-.lsd-toast-container.lsd-top-left {
-  top: 20px;
-  left: 20px;
-}
-.lsd-toast-container.lsd-bottom-right {
-  bottom: 20px;
-  right: 20px;
-}
-.lsd-toast-container.lsd-bottom-left {
-  bottom: 20px;
-  left: 20px;
-}
-.lsd-toast-container.lsd-top-center {
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  align-items: center;
-}
-.lsd-toast-container.lsd-bottom-center {
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  align-items: center;
-}
-.lsd-toast-container.lsd-center-center {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  align-items: center;
-  justify-content: center;
-}
-
-@keyframes lsd-toast-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes lsd-toast-fade-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-}
-@keyframes lsd-progress-anim {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0;
-  }
-}
-.lsd-toast {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  color: #333;
-  line-height: 23px;
-  border-radius: 10px;
-  padding: 16px 30px;
-  font-size: 16px;
-  pointer-events: auto;
-  overflow: hidden;
-  animation: lsd-toast-slide-in 0.35s ease forwards;
-}
-.lsd-toast.lsd-toast-remove {
-  animation: lsd-toast-fade-out 0.3s ease forwards;
-}
-.lsd-toast .lsd-toast-icon {
-  display: inline-flex;
-  align-items: center;
-  width: 18px;
-  height: 18px;
-  font-size: 18px;
-}
-.lsd-toast .lsd-toast-close {
-  margin-left: auto;
-  cursor: pointer;
-  font-size: 18px;
-  padding-left: 10px;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-  pointer-events: auto;
-}
-.lsd-toast .lsd-toast-close:hover {
-  opacity: 1;
-}
-.lsd-toast.lsd-has-progress::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 2px;
-  width: 100%;
-  background-color: var(--lsd-progress-color, currentColor);
-  animation: lsd-progress-anim var(--lsd-progress-time, 5000ms) linear forwards;
-  animation-play-state: running;
-}
-.lsd-toast.lsd-paused::after {
-  animation-play-state: paused !important;
-}
-.lsd-toast.lsd-confirm {
-  background-color: white;
-  color: #4a4a4a;
-  border-bottom: 2px solid #d6d6d6;
-  --lsd-progress-color: #d6d6d6;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  gap: 15px;
-}
-.lsd-toast.lsd-confirm .lsd-toast-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.lsd-toast.lsd-confirm .lsd-toast-icon {
-  width: 40px;
-  height: 40px;
-  font-size: 40px;
-}
-.lsd-toast.lsd-confirm .lsd-toast-icon i {
-  width: 40px;
-  height: 40px;
-  font-size: 40px;
-}
-.lsd-toast.lsd-error {
-  background-color: #fdecea;
-  color: #a94442;
-  --lsd-progress-color: #f44336;
-}
-.lsd-toast.lsd-warning {
-  background-color: #fffbe6;
-  color: #856404;
-  --lsd-progress-color: #ffc107;
-}
-.lsd-toast.lsd-info {
-  background-color: #e7f3fe;
-  color: #1e4b7a;
-  --lsd-progress-color: #2196f3;
-}
-.lsd-toast.lsd-success {
-  background-color: #e6f4ea;
-  color: #256029;
-  --lsd-progress-color: #2e7d32;
-}
-.lsd-toast.lsd-natural {
-  background-color: #f7f7f9;
-  color: #4a4a4a;
-  --lsd-progress-color: #d6d6d6;
-}
-.lsd-toast.lsd-in-progress {
-  background-color: #e1f5fe;
-  color: #0277bd;
-  --lsd-progress-color: #0288d1;
-}
-
-.lsd-toast-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 999998;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .lsd-badge {
   display: flex;
   align-items: center;
@@ -426,10 +230,12 @@
   border-radius: 8px;
 }
 .lsd-badge i {
-  width: 16px;
   height: 16px;
   font-size: 16px;
   line-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .lsd-badge.lsd-error {
   color: var(--lsd-error-badge, #BD0003);
@@ -1061,14 +867,17 @@ ul.lsd-boxed-list li label .lsd-inline-checkbox {
   color: #fff;
   padding: 8px 12px;
   border-radius: 5px;
-  white-space: pre-line;
+  white-space: normal;
   opacity: 0;
   visibility: hidden;
   font-size: 12px;
   line-height: 18px;
   transition: opacity 0.3s ease;
   z-index: 10;
-  min-width: 150px;
+  width: max-content;
+  max-width: min(210px, calc(100vw - 32px));
+  overflow-wrap: break-word;
+  text-align: center;
 }
 .lsd-tooltip:after {
   content: "";
@@ -1446,12 +1255,12 @@ form button[type="submit"].lsd-primary-button {
   font-size: 14px;
   font-weight: 400;
   text-align: center;
-  text-decoration: none;
+  text-decoration: none !important;
   line-height: 1.4em;
   border-radius: 8px !important;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out;
-  color: #ffffff;
+  color: #ffffff !important;
   outline: none;
   box-shadow: none;
   border: none;
@@ -1707,7 +1516,7 @@ form button[type="submit"].lsd-text-button {
   font-size: 14px;
   color: var(--text-button-normal-text-color, #8241FF) !important;
   gap: 12px;
-  text-decoration: none;
+  text-decoration: none !important;
   justify-content: center;
   flex-direction: row;
   white-space: nowrap;
@@ -1732,6 +1541,7 @@ form button[type="submit"].lsd-text-button i {
   width: 18px;
   height: 18px;
   font-size: 18px;
+  line-height: 18px;
   color: #8241FF;
   transition: all 0.2s ease-in-out;
 }
@@ -2613,10 +2423,12 @@ input[type='file'].lsd-admin-input::file-selector-button:hover {
 }
 
 .listdom-icon {
-  width: 16px;
   height: 16px;
   font-size: 16px;
   line-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .lsd-copy {

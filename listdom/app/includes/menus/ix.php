@@ -2,7 +2,7 @@
 
 class LSD_Menus_IX extends LSD_Menus
 {
-    public $subtab;
+    public string $subtab;
 
     public function __construct()
     {

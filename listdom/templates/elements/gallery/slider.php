@@ -59,9 +59,10 @@ jQuery(document).on("listdom:onload", () => {
                 if (!$thumb || !$full) continue;
         ?>
             <div class="lsd-gallery-item">
-                <?php if (!$lightbox && in_array($link_method, ['normal', 'blank', 'lightbox', 'left-panel', 'right-panel', 'bottom-panel'])): ?>
+                <?php if (!$lightbox && in_array($link_method, ['normal', 'blank', 'map', 'lightbox', 'left-panel', 'right-panel', 'bottom-panel'])): ?>
                     <a
                         data-listing-id="<?php echo esc_attr($post_id); ?>"
+                        <?php echo $link_method === 'map' ? 'data-listdom-map' : ''; ?>
                         <?php echo $link_method === 'lightbox' ? 'data-listdom-lightbox' : ''; ?>
                         <?php echo $link_method === 'left-panel' ? 'data-listdom-panel="left"' : ''; ?>
                         <?php echo $link_method === 'right-panel' ? 'data-listdom-panel="right"' : ''; ?>

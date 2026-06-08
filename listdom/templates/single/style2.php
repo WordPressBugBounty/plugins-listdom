@@ -23,6 +23,7 @@ $video = isset($elements['video']['enabled']) && $elements['video']['enabled'] ?
 $price = isset($elements['price']['enabled']) && $elements['price']['enabled'] ? $this->price() : '';
 $address = isset($elements['address']['enabled']) && $elements['address']['enabled'] ? $this->address() : '';
 $breadcrumb = isset($elements['breadcrumb']['enabled']) && $elements['breadcrumb']['enabled'] ? $this->breadcrumb() : '';
+$backbutton = isset($elements['backbutton']['enabled']) && $elements['backbutton']['enabled'] ? $this->backbutton() : '';
 $locations = isset($elements['locations']['enabled']) && $elements['locations']['enabled'] ? $this->locations() : '';
 $share = isset($elements['share']['enabled']) && $elements['share']['enabled'] ? $this->share() : '';
 $related = isset($elements['related']['enabled']) && $elements['related']['enabled'] ? $this->related() : '';
@@ -44,6 +45,7 @@ $cta = isset($elements['cta']['enabled']) && $elements['cta']['enabled'] ? $this
 
         <?php if ($breadcrumb) echo LSD_Kses::element($breadcrumb); ?>
         <div class="listdom-single-top">
+            <?php if ($backbutton) echo LSD_Kses::element($backbutton); ?>
             <?php if ($categories) echo LSD_Kses::element($categories); ?>
 
             <div class="listdom-single-title-wrapper">

@@ -10,6 +10,7 @@ if (is_user_logged_in()) return '';
 
 $instance_id = uniqid('lsd-login-');
 $auth        = LSD_Options::auth();
+$role_signature = trim($role) ? $this->role_signature('login', $role) : '';
 
 if (!trim($redirect))
 {
@@ -94,11 +95,21 @@ jQuery(document).ready(function()
 
             <?php LSD_Form::nonce('lsd_login', 'lsd_login'); ?>
             <?php if (LSD_User::requires_email_verification()) LSD_Form::nonce('lsd_resend_verification', 'lsd_resend_verification'); ?>
-            <?php if (trim($role)) echo LSD_Form::hidden([
-                    'name'  => 'lsd_role',
-                    'id'    => 'lsd_role',
+            <?php
+            if (trim($role) && $role_signature)
+            {
+                echo LSD_Form::hidden([
+                    'name' => 'lsd_role',
+                    'id' => 'lsd_role',
                     'value' => $role,
-                ]); ?>
+                ]);
+                echo LSD_Form::hidden([
+                    'name' => 'lsd_role_signature',
+                    'id' => 'lsd_role_signature',
+                    'value' => $role_signature,
+                ]);
+            }
+            ?>
         </div>
     </form>
 </div>
