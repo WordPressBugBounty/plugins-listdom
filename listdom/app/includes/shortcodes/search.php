@@ -228,6 +228,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
                     && (!isset($filter['ai_fancy_style']) || (int) $filter['ai_fancy_style'] === 1)
                 ) $extra_classes[] = 'lsd-search-filter-ai-fancy';
 
+                if (($filter['method'] ?? '') === 'buttons') $extra_classes[] = 'lsd-search-filter-has-buttons';
+
                 $field = $this->filter($filter);
                 if (!$field) continue;
 
@@ -497,7 +499,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
             $render .= '<li class="lsd-col-span-' . esc_attr($items_per_row) . '"' . (isset($term['children']) && $term['children'] ? ' class="children"' : '') . '>';
 
-            if ($render_type === 'checkboxes') $render .= '<label class="lsd-search-checkbox-label"><input type="checkbox" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" value="' . esc_attr($key) . '" ' . (in_array($key, $current) ? 'checked="checked"' : '') . '>' . esc_html($term["name"]) . '</label>';
+            $term_label = $term['label'] ?? $term['name'];
+            if ($render_type === 'checkboxes') $render .= '<label class="lsd-search-checkbox-label"><input type="checkbox" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" value="' . esc_attr($key) . '" ' . (in_array($key, $current) ? 'checked="checked"' : '') . '>' . esc_html($term_label) . '</label>';
             if (isset($term['children']) && $term['children'])
             {
                 if ($items_per_row == 12)
@@ -510,7 +513,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
                     {
                         $render .= '<li class="lsd-col-span-' . esc_attr($items_per_row) . '">';
 
-                        if ($render_type === 'checkboxes') $render .= '<label class="lsd-search-checkbox-label"><input type="checkbox" class="' . esc_attr($child_key) . '" name="' . esc_attr($name) . '[]" value="' . esc_attr($child_key) . '" ' . (in_array($child_key, $current) ? 'checked="checked"' : '') . '>' . esc_html($child_term["name"]) . '</label>';
+                        $child_label = $child_term['label'] ?? $child_term['name'];
+                        if ($render_type === 'checkboxes') $render .= '<label class="lsd-search-checkbox-label"><input type="checkbox" class="' . esc_attr($child_key) . '" name="' . esc_attr($name) . '[]" value="' . esc_attr($child_key) . '" ' . (in_array($child_key, $current) ? 'checked="checked"' : '') . '>' . esc_html($child_label) . '</label>';
 
                         $render .= '</li>';
                     }
@@ -544,7 +548,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         if ($method !== 'text-input')
         {
-            if (in_array($method, ['dropdown-multiple', 'checkboxes'], true))
+            if (in_array($method, ['dropdown-multiple', 'checkboxes'], true) || ($method === 'buttons' && !empty($filter['buttons_multiple'])))
             {
                 $default_values = $this->taxonomy_default_values($key, $default_values);
             }
@@ -608,6 +612,54 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
                 $output .= '<label class="lsd-search-radio-label lsd-col-span-' . esc_attr($items_per_row) . '"><input type="radio" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" value="' . esc_attr($key) . '" ' . ($current == $key ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
             }
+            $output .= '</div>';
+        }
+        else if ($method === 'buttons')
+        {
+            $multiple = !empty($filter['buttons_multiple']);
+
+            if ($multiple)
+            {
+                $current = $this->current($name, $default_values);
+                if (!is_array($current)) $current = $default_values;
+
+                // Required for AJAX search to send an empty value when nothing is selected.
+                $output .= '<input type="hidden" name="' . esc_attr($name) . '[]" value="">';
+            }
+            else
+            {
+                $current = $this->current($name, $default);
+                if (trim((string) $default) && !is_numeric($default)) $current = $this->helper->get_term_id($key, $default);
+            }
+
+            $terms = $this->helper->get_terms($filter);
+
+            $output .= '<div class="lsd-search-method-buttons lsd-search-taxonomy-buttons lsd-grid-container">';
+
+            foreach ($terms as $term_id => $term)
+            {
+                if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$term_id])) continue;
+
+                $input_id = $id . '_button_' . sanitize_title((string) $term_id);
+
+                if ($multiple)
+                {
+                    $checked = in_array((string) $term_id, array_map('strval', $current), true) ? 'checked="checked"' : '';
+                    $output .= '<label class="lsd-search-button-option lsd-col-span-' . esc_attr($items_per_row) . '" for="' . esc_attr($input_id) . '">';
+                    $output .= '<span>' . esc_html($term) . '</span>';
+                    $output .= '<input type="checkbox" class="lsd-search-button-input ' . esc_attr($key) . '" name="' . esc_attr($name) . '[]" id="' . esc_attr($input_id) . '" value="' . esc_attr($term_id) . '" ' . $checked . '>';
+                    $output .= '</label>';
+                }
+                else
+                {
+                    $checked = ((string) $current === (string) $term_id) ? 'checked="checked"' : '';
+                    $output .= '<label class="lsd-search-button-option lsd-col-span-' . esc_attr($items_per_row) . '" for="' . esc_attr($input_id) . '">';
+                    $output .= '<span>' . esc_html($term) . '</span>';
+                    $output .= '<input type="radio" class="lsd-search-button-input ' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($input_id) . '" value="' . esc_attr($term_id) . '" ' . $checked . '>';
+                    $output .= '</label>';
+                }
+            }
+
             $output .= '</div>';
         }
         else if ($method === 'hierarchical' && $this->isPro())
@@ -718,6 +770,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $placeholder = isset($filter['placeholder']) && trim($filter['placeholder']) ? $filter['placeholder'] : $title;
 
         $all_terms = $filter['all_terms'] ?? 1;
+        $items_per_row = $filter['items_per_row'] ?? 12;
         $predefined_terms = isset($filter['terms']) && is_array($filter['terms']) ? $filter['terms'] : [];
 
         $id = 'lsd_search_' . $this->device_key . '_' . $this->id . '_' . $this->unique . '_' . $key;
@@ -793,6 +846,60 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
                 if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$key])) continue;
                 $output .= '<label class="lsd-search-checkbox-label"><input type="radio" name="' . esc_attr($name) . '" value="' . esc_attr($term) . '" ' . ($term == $current ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
             }
+        }
+        else if ($method === 'buttons')
+        {
+            $multiple = !empty($filter['buttons_multiple']);
+
+            if ($multiple)
+            {
+                $name = 'sf-' . $this->helper->standardize_key($key) . '-in';
+                $current = $this->current($name, $default_values);
+                if (!is_array($current)) $current = $default_values;
+
+                // Required for AJAX search to work when no option is selected.
+                $output .= '<input type="hidden" name="' . esc_attr($name) . '[]" value="">';
+            }
+            else
+            {
+                $name = 'sf-' . $this->helper->standardize_key($key) . '-eq';
+                $current = $this->current($name, $default);
+            }
+
+            $terms = $this->helper->get_terms($filter, true);
+
+            $output .= '<div class="lsd-search-method-buttons lsd-search-attribute-buttons lsd-grid-container">';
+
+            $term_index = 0;
+
+            foreach ($terms as $term_key => $term)
+            {
+                if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$term_key])) continue;
+
+                $input_id = $id . '_button_' . sanitize_title((string) $term) . '_' . $term_index;
+                $term_index++;
+
+                if ($multiple)
+                {
+                    $checked = in_array((string) $term, array_map('strval', $current), true) ? 'checked="checked"' : '';
+
+                    $output .= '<label class="lsd-search-button-option lsd-fe-light-button lsd-col-span-' . esc_attr($items_per_row) . '" for="' . esc_attr($input_id) . '">';
+                    $output .= '<span>' . esc_html($term) . '</span>';
+                    $output .= '<input type="checkbox" class="lsd-search-button-input" name="' . esc_attr($name) . '[]" id="' . esc_attr($input_id) . '" value="' . esc_attr($term) . '" ' . $checked . '>';
+                    $output .= '</label>';
+                }
+                else
+                {
+                    $checked = ((string) $current === (string) $term) ? 'checked="checked"' : '';
+
+                    $output .= '<label class="lsd-search-button-option lsd-fe-light-button lsd-col-span-' . esc_attr($items_per_row) . '" for="' . esc_attr($input_id) . '">';
+                    $output .= '<span>' . esc_html($term) . '</span>';
+                    $output .= '<input type="radio" class="lsd-search-button-input" name="' . esc_attr($name) . '" id="' . esc_attr($input_id) . '" value="' . esc_attr($term) . '" ' . $checked . '>';
+                    $output .= '</label>';
+                }
+            }
+
+            $output .= '</div>';
         }
 
         return trim($output) ? $label['label'] . $output : '';
@@ -1173,6 +1280,11 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $key = $filter['key'] ?? '';
         $method = $filter['method'] ?? 'dropdown';
         $dropdown_style = $filter['dropdown_style'] ?? 'enhanced';
+        $buttons_multiple = !empty($filter['buttons_multiple']);
+
+        // ACF dropdown fields do not support button rendering. Keep existing saved
+        // filters usable by falling back to the closest supported choice.
+        if ($method === 'buttons') $method = $buttons_multiple ? 'checkboxes' : 'radio';
 
         $key = str_replace('acf_true_false_', '', $key);
         $key = str_replace('acf_select_', '', $key);

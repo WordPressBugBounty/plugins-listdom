@@ -9,7 +9,7 @@ $settings = LSD_Options::settings();
     <div class="lsd-welcome-content-header">
         <div class="lsd-admin-section-heading">
             <div class="lsd-admin-title-icon">
-                <i class="listdom-icon lsdi-add-plus"></i>
+                <i class="webilia-icon wbli-add-plus"></i>
                 <h2 class="lsd-admin-title lsd-m-0"><?php echo esc_html__('Stay Updated & Improve Listdom', 'listdom'); ?></h2>
             </div>
             <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Add your email for updates and optionally share usage data to help us improve.' , 'listdom'); ?></p>
@@ -29,7 +29,7 @@ $settings = LSD_Options::settings();
                         ]); ?>
                     </div>
                     <div class="lsd-col-3">
-                        <button id="lsd_submit_newsletter" type="button" class="lsd-secondary-button"><?php esc_html_e('Submit', 'listdom'); ?><i class="listdom-icon lsdi-right-arrow"></i></button>
+                        <button id="lsd_submit_newsletter" type="button" class="lsd-secondary-button"><?php esc_html_e('Submit', 'listdom'); ?><i class="webilia-icon wbli-right-arrow"></i></button>
                     </div>
                 </div>
 
@@ -73,7 +73,7 @@ $settings = LSD_Options::settings();
         <button class="lsd-skip-step lsd-text-button"><?php echo esc_html__('Skip', 'listdom'); ?></button>
         <button type="submit" class="lsd-step-link lsd-primary-button" id="lsd_settings_collect_data_button">
             <?php echo esc_html__('Continue', 'listdom'); ?>
-            <i class="listdom-icon lsdi-right-arrow"></i>
+            <i class="webilia-icon wbli-right-arrow"></i>
         </button>
     </div>
 </div>

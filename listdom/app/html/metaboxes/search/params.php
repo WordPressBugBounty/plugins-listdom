@@ -36,12 +36,14 @@ $radius_display = $data['radius_display'] ?? 0;
 $radius_locate = $data['radius_locate'] ?? 0;
 $autocomplete_dropdown = $data['autocomplete_dropdown'] ?? 1;
 $hide_empty = $data['hide_empty'] ?? 1;
+$show_count = $data['show_count'] ?? 0;
 $dropdown_style = $data['dropdown_style'] ?? 'enhanced';
 $display_all_terms = $data['all_terms'] ?? 1;
 $ai_fancy_style = !isset($data['ai_fancy_style']) || (int) $data['ai_fancy_style'] === 1 ? 1 : 0;
 $terms = isset($data['terms']) && is_array($data['terms']) ? $data['terms'] : [];
 $width = $data['width'] ?? '3';
 $items_per_row = $data['items_per_row'] ?? '12';
+$buttons_multiple = $data['buttons_multiple'] ?? 0;
 
 $min = $data['min'] ?? ($field['min'] ?? 0);
 $max = $data['max'] ?? ($field['max'] ?? 100);
@@ -122,6 +124,24 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
                 </select>
             </div>
 
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-buttons">
+                <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_buttons_multiple">
+                    <?php esc_html_e('Multiple Selection', 'listdom'); ?>
+                </label>
+                <select
+                    id="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_buttons_multiple"
+                    class="widefat"
+                    name="lsd[<?php echo esc_attr($device_key); ?>][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][buttons_multiple]"
+                >
+                    <option value="0" <?php echo !$buttons_multiple ? 'selected' : ''; ?>>
+                        <?php esc_html_e('No, allow only one option', 'listdom'); ?>
+                    </option>
+                    <option value="1" <?php echo $buttons_multiple ? 'selected' : ''; ?>>
+                        <?php esc_html_e('Yes, allow multiple options', 'listdom'); ?>
+                    </option>
+                </select>
+            </div>
+
             <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-ai-search<?php echo !$ai_method_available ? ' lsd-util-hide' : ''; ?>">
                 <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_ai_fancy_style">
                     <?php esc_html_e('Fancy Style', 'listdom'); ?>
@@ -156,6 +176,16 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
             </div>
             <?php endif; ?>
 
+            <?php if ($type === 'taxonomy'): ?>
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-hierarchical lsd-search-method-checkboxes lsd-search-method-radio">
+                <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_show_count"><?php esc_html_e('Show Listing Count', 'listdom'); ?></label>
+                <select id="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_show_count" class="widefat" name="lsd[<?php echo esc_attr($device_key); ?>][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][show_count]" title="<?php esc_attr_e('Append the published listing count to each term label.', 'listdom'); ?>">
+                    <option value="1" <?php echo $show_count == 1 ? 'selected' : ''; ?>><?php echo esc_html__('Yes', 'listdom'); ?></option>
+                    <option value="0" <?php echo $show_count == 0 ? 'selected' : ''; ?>><?php echo esc_html__('No', 'listdom'); ?></option>
+                </select>
+            </div>
+            <?php endif; ?>
+
             <div class="lsd-search-field-param lsd-search-dropdown-style-param lsd-search-method-dependant lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-hierarchical lsd-search-method-dropdown-plus">
                 <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_dropdown_style"><?php esc_html_e('Dropdown Style', 'listdom'); ?></label>
                 <select id="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_dropdown_style" class="widefat" name="lsd[<?php echo esc_attr($device_key); ?>][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][dropdown_style]">
@@ -180,14 +210,21 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
                     {
                         $default_value_label = esc_html__('Default Address', 'listdom');
                     }
+
+                    $single_default_classes = 'lsd-search-field-param lsd-search-method-dependant lsd-search-method-text-input lsd-search-method-ai-search lsd-search-method-date-input lsd-search-method-time-input lsd-search-method-datetime-input lsd-search-method-number-input lsd-search-method-dropdown lsd-search-method-dropdown-plus lsd-search-method-mm-input lsd-search-method-hierarchical lsd-search-method-range lsd-search-method-acf_range lsd-search-method-radius lsd-search-method-radius-dropdown lsd-search-method-date-range-picker lsd-search-method-radio lsd-search-method-buttons lsd-search-buttons-single-default';
+
+                    if (in_array($method, ['dropdown-multiple', 'checkboxes'], true)|| ($method === 'buttons' && $buttons_multiple)) $single_default_classes .= ' lsd-util-hide';
+
+                    $multiple_default_classes = 'lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown-multiple lsd-search-method-checkboxes lsd-search-method-buttons lsd-search-buttons-multiple-default';
+
+                    if (!in_array($method, ['dropdown-multiple', 'checkboxes'], true) && !($method === 'buttons' && $buttons_multiple)) $multiple_default_classes .= ' lsd-util-hide';
                 ?>
-                <?php if (!in_array($method, ['dropdown-multiple', 'checkboxes'], true)): ?>
-                    <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-text-input lsd-search-method-ai-search lsd-search-method-date-input lsd-search-method-time-input lsd-search-method-datetime-input lsd-search-method-number-input lsd-search-method-dropdown lsd-search-method-dropdown-plus lsd-search-method-mm-input lsd-search-method-hierarchical lsd-search-method-range lsd-search-method-acf_range lsd-search-method-radius lsd-search-method-radius-dropdown lsd-search-method-date-range-picker lsd-search-method-radio">
-                        <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_value"><?php echo $default_value_label; ?></label>
-                        <input class="widefat" id="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_value" type="text" name="lsd[<?php echo esc_attr($device_key); ?>][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][default_value]" value="<?php echo esc_attr($default_value); ?>" placeholder="<?php esc_attr_e('Optional', 'listdom'); ?>">
-                    </div>
-                <?php endif; ?>
-                <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-dropdown-multiple lsd-search-method-checkboxes">
+                <div class="<?php echo esc_attr($single_default_classes); ?>">
+                    <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_value"><?php echo $default_value_label; ?></label>
+                    <input class="widefat" id="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_value" type="text" name="lsd[<?php echo esc_attr($device_key); ?>][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][default_value]" value="<?php echo esc_attr($default_value); ?>" placeholder="<?php esc_attr_e('Optional', 'listdom'); ?>">
+                </div>
+
+                <div class="<?php echo esc_attr($multiple_default_classes); ?>">
                     <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_values"><?php esc_html_e('Default Values', 'listdom'); ?></label>
                     <input class="widefat" id="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_default_values" type="text" name="lsd[<?php echo esc_attr($device_key); ?>][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][default_values]" value="<?php echo esc_attr($default_values); ?>" placeholder="<?php esc_attr_e('Separate with commas', 'listdom'); ?>">
                 </div>
@@ -264,8 +301,8 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
                 </select>
             </div>
 
-            <?php if ($type === 'taxonomy' || $type === 'checkbox' || $type === 'radio'): ?>
-            <div class="lsd-search-method-dependant lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-hierarchical lsd-search-method-checkboxes lsd-search-method-radio">
+            <?php if ($type === 'taxonomy' || $type === 'checkbox' || $type === 'radio' || $type === 'buttons'): ?>
+            <div class="lsd-search-method-dependant lsd-search-method-dropdown lsd-search-method-dropdown-multiple lsd-search-method-hierarchical lsd-search-method-checkboxes lsd-search-method-radio lsd-search-method-buttons">
                 <div class="lsd-search-field-param lsd-search-field-all-terms">
                     <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_all_terms"><?php esc_html_e('Terms Method', 'listdom'); ?></label>
                     <select class="widefat" name="lsd[<?php echo esc_attr($device_key); ?>][<?php echo esc_attr($i); ?>][filters][<?php echo esc_attr($key); ?>][all_terms]" title="<?php esc_attr_e('You can display certain rms if you like.', 'listdom'); ?>">
@@ -306,7 +343,7 @@ $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($d
             </div>
             <?php endif; ?>
 
-            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-checkboxes lsd-search-method-radio">
+            <div class="lsd-search-field-param lsd-search-method-dependant lsd-search-method-checkboxes lsd-search-method-radio lsd-search-method-buttons">
                 <div class="lsd-search-field-param">
                     <label for="lsd_<?php echo esc_attr($device_key); ?>_<?php echo esc_attr($i); ?>_filters_<?php echo esc_attr($key); ?>_items_per_row"><?php esc_html_e('Columns', 'listdom'); ?></label>
                     <?php echo LSD_Form::select([

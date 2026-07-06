@@ -21,6 +21,13 @@ $ids = $this->listings;
             if ($width <= 0) $width = 150;
 
             $classes = ['lsd-listing-' . $key_class, 'lsd-table-column', 'lsd-table-column-' . $key_class];
+            $legacy_key = LSD_Skins_Table::legacy_column_key($column);
+            if ($legacy_key !== '')
+            {
+                $legacy_key_class = sanitize_html_class($legacy_key);
+                $classes[] = 'lsd-listing-' . $legacy_key_class;
+                $classes[] = 'lsd-table-column-' . $legacy_key_class;
+            }
             if (!$enabled) $classes[] = 'lsd-table-column-hidden';
             ?>
             <td class="<?php echo esc_attr(implode(' ', $classes)); ?>" data-column="<?php echo esc_attr($key); ?>" style="width: <?php echo esc_attr($width); ?>px;" <?php echo $fields->schema($key); ?>>

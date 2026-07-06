@@ -30,7 +30,7 @@ if (!is_array($ava)) $ava = [];
                                 <textarea class="lsd-d-block lsd-admin-input" title="" id="lsd_ava_ai_text" rows="5" maxlength="200" placeholder="<?php esc_attr_e('e.g. Mon-Fri 9 AM - 5 PM, Sat off', 'listdom'); ?>"></textarea>
                             </div>
                             <div>
-                                <button type="button" class="<?php echo is_admin() ? 'lsd-primary-button': 'lsd-general-button'; ?>" id="lsd_ava_ai_generate"><i class="listdom-icon lsdi-stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?></button>
+                                <button type="button" class="<?php echo is_admin() ? 'lsd-primary-button': 'lsd-general-button'; ?>" id="lsd_ava_ai_generate"><i class="webilia-icon wbli-stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?></button>
                             </div>
                         </div>
                     </div>

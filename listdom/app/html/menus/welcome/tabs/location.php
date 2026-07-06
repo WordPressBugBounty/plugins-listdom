@@ -14,7 +14,7 @@ LSD_Assets::map();
     <div class="lsd-welcome-content-header">
         <div class="lsd-admin-section-heading">
             <div class="lsd-admin-title-icon">
-                <i class="listdom-icon lsdi-map-pinpoint"></i>
+                <i class="webilia-icon wbli-map-pinpoint"></i>
                 <h2 class="lsd-admin-title lsd-m-0"><?php echo esc_html__('Location Setting', 'listdom'); ?></h2>
             </div>
             <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Set the default address of your directory. Type the address or use the GPS button to set your current location.' , 'listdom'); ?></p>
@@ -91,7 +91,7 @@ LSD_Assets::map();
         <button class="lsd-skip-step lsd-text-button"><?php echo esc_html__('Skip', 'listdom'); ?></button>
         <button class="lsd-step-link lsd-primary-button" id="lsd_settings_location_save_button">
             <?php echo esc_html__('Next', 'listdom'); ?>
-            <i class="listdom-icon lsdi-right-arrow"></i>
+            <i class="webilia-icon wbli-right-arrow"></i>
         </button>
     </div>
 </div>

@@ -19,7 +19,7 @@
   }
 }
 */
-[class^="lsdi"]:before, [class*=" lsdi"]:before {
+[class^="wbli"]:before, [class*=" wbli"]:before {
   font-family: "webilia-icons" !important;
   font-style: normal;
   font-weight: normal;
@@ -27,8 +27,6 @@
 
   display: inline-block;
   text-decoration: inherit;
-  width: 1em;
-  margin-right: .2em;
   text-align: center;
   /* opacity: .8; */
 
@@ -38,10 +36,6 @@
 
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
-
-  /* Animation center compensation - margins should be symmetric */
-  /* remove if not needed */
-  margin-left: .2em;
 
   /* you can be more comfortable with increased icons size */
   /* font-size: 120%; */
@@ -54,94 +48,103 @@
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
-.lsdi-listdom-logo:before { content: '\e800'; }
-.lsdi-list-view:before { content: '\e801'; }
-.lsdi-loading:before { content: '\e802'; }
-.lsdi-locate:before { content: '\e803'; }
-.lsdi-location:before { content: '\e804'; }
-.lsdi-login-method:before { content: '\e805'; }
-.lsdi-map-marker:before { content: '\e806'; }
-.lsdi-map-pinpoint:before { content: '\e807'; }
-.lsdi-menu-square:before { content: '\e808'; }
-.lsdi-menu-square-selected:before { content: '\e809'; }
-.lsdi-message-preview-01:before { content: '\e80a'; }
-.lsdi-mobile:before { content: '\e80b'; }
-.lsdi-move:before { content: '\e80c'; }
-.lsdi-move-left:before { content: '\e80d'; }
-.lsdi-payment:before { content: '\e80e'; }
-.lsdi-paypal:before { content: '\e80f'; }
-.lsdi-pencil-edit:before { content: '\e810'; }
-.lsdi-plug-01:before { content: '\e811'; }
-.lsdi-property-edit:before { content: '\e812'; }
-.lsdi-puzzle:before { content: '\e813'; }
-.lsdi-question:before { content: '\e814'; }
-.lsdi-reset:before { content: '\e815'; }
-.lsdi-responsive:before { content: '\e816'; }
-.lsdi-right-arrow:before { content: '\e817'; }
-.lsdi-sad-dizzy:before { content: '\e818'; }
-.lsdi-screen:before { content: '\e819'; }
-.lsdi-search:before { content: '\e81a'; }
-.lsdi-search-area:before { content: '\e81b'; }
-.lsdi-search-magnifier:before { content: '\e81c'; }
-.lsdi-second-bracket-square:before { content: '\e81d'; }
-.lsdi-settings-02:before { content: '\e81e'; }
-.lsdi-sort-by-up:before { content: '\e81f'; }
-.lsdi-stars:before { content: '\e820'; }
-.lsdi-stripe:before { content: '\e821'; }
-.lsdi-structure-check:before { content: '\e822'; }
-.lsdi-tablet:before { content: '\e823'; }
-.lsdi-tag:before { content: '\e824'; }
-.lsdi-three-dots:before { content: '\e825'; }
-.lsdi-three-dots-vertical:before { content: '\e826'; }
-.lsdi-time-half-pass:before { content: '\e827'; }
-.lsdi-title:before { content: '\e828'; }
-.lsdi-toggle-on:before { content: '\e829'; }
-.lsdi-transition-top:before { content: '\e82a'; }
-.lsdi-type-cursor:before { content: '\e82b'; }
-.lsdi-up-arrow-s:before { content: '\e82c'; }
-.lsdi-user-circle:before { content: '\e82d'; }
-.lsdi-waving-hand:before { content: '\e82e'; }
-.lsdi-wizard:before { content: '\e82f'; }
-.lsdi-account:before { content: '\e830'; }
-.lsdi-add-plus:before { content: '\e831'; }
-.lsdi-add-plus-circle:before { content: '\e832'; }
-.lsdi-add-plus-s:before { content: '\e833'; }
-.lsdi-advanced:before { content: '\e834'; }
-.lsdi-ai-search:before { content: '\e835'; }
-.lsdi-alert:before { content: '\e836'; }
-.lsdi-api:before { content: '\e837'; }
-.lsdi-bank:before { content: '\e838'; }
-.lsdi-card:before { content: '\e839'; }
-.lsdi-card-exchang:before { content: '\e83a'; }
-.lsdi-checkmark-circle:before { content: '\e83b'; }
-.lsdi-checkmark-circle-fill:before { content: '\e83c'; }
-.lsdi-copy:before { content: '\e83d'; }
-.lsdi-cross:before { content: '\e83e'; }
-.lsdi-csv:before { content: '\e83f'; }
-.lsdi-cursor-pointer-01:before { content: '\e840'; }
-.lsdi-customizer:before { content: '\e841'; }
-.lsdi-dashboard-circle-edit:before { content: '\e842'; }
-.lsdi-dash-circle-fill:before { content: '\e843'; }
-.lsdi-dash-s:before { content: '\e844'; }
-.lsdi-database:before { content: '\e845'; }
-.lsdi-down-arrow-s:before { content: '\e846'; }
-.lsdi-excel:before { content: '\e847'; }
-.lsdi-eye:before { content: '\e848'; }
-.lsdi-file-01:before { content: '\e849'; }
-.lsdi-file-download:before { content: '\e84a'; }
-.lsdi-file-edit-pencil:before { content: '\e84b'; }
-.lsdi-file-import-export:before { content: '\e84c'; }
-.lsdi-file-script:before { content: '\e84d'; }
-.lsdi-file-upload:before { content: '\e84e'; }
-.lsdi-first-aid-kit:before { content: '\e84f'; }
-.lsdi-floppy-disk:before { content: '\e850'; }
-.lsdi-footer:before { content: '\e851'; }
-.lsdi-frontend-dashboard:before { content: '\e852'; }
-.lsdi-general:before { content: '\e853'; }
-.lsdi-google-places:before { content: '\e854'; }
-.lsdi-group-items:before { content: '\e855'; }
-.lsdi-header:before { content: '\e856'; }
-.lsdi-key:before { content: '\e857'; }
-.lsdi-label-important:before { content: '\e858'; }
-.lsdi-layout:before { content: '\e859'; }
-.lsdi-link-square:before { content: '\e85a'; }
+.webilia-icon {
+  height: 16px;
+  font-size: 16px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wbli-listdom-logo:before { content: '\e800'; }
+.wbli-list-view:before { content: '\e801'; }
+.wbli-loading:before { content: '\e802'; }
+.wbli-locate:before { content: '\e803'; }
+.wbli-location:before { content: '\e804'; }
+.wbli-login-method:before { content: '\e805'; }
+.wbli-map-marker:before { content: '\e806'; }
+.wbli-map-pinpoint:before { content: '\e807'; }
+.wbli-menu-square:before { content: '\e808'; }
+.wbli-menu-square-selected:before { content: '\e809'; }
+.wbli-message-preview-01:before { content: '\e80a'; }
+.wbli-mobile:before { content: '\e80b'; }
+.wbli-move:before { content: '\e80c'; }
+.wbli-move-left:before { content: '\e80d'; }
+.wbli-payment:before { content: '\e80e'; }
+.wbli-paypal:before { content: '\e80f'; }
+.wbli-pencil-edit:before { content: '\e810'; }
+.wbli-plug-01:before { content: '\e811'; }
+.wbli-property-edit:before { content: '\e812'; }
+.wbli-puzzle:before { content: '\e813'; }
+.wbli-question:before { content: '\e814'; }
+.wbli-reset:before { content: '\e815'; }
+.wbli-responsive:before { content: '\e816'; }
+.wbli-right-arrow:before { content: '\e817'; }
+.wbli-sad-dizzy:before { content: '\e818'; }
+.wbli-screen:before { content: '\e819'; }
+.wbli-search:before { content: '\e81a'; }
+.wbli-search-area:before { content: '\e81b'; }
+.wbli-search-magnifier:before { content: '\e81c'; }
+.wbli-second-bracket-square:before { content: '\e81d'; }
+.wbli-settings-02:before { content: '\e81e'; }
+.wbli-sort-by-up:before { content: '\e81f'; }
+.wbli-stars:before { content: '\e820'; }
+.wbli-stripe:before { content: '\e821'; }
+.wbli-structure-check:before { content: '\e822'; }
+.wbli-tablet:before { content: '\e823'; }
+.wbli-tag:before { content: '\e824'; }
+.wbli-three-dots:before { content: '\e825'; }
+.wbli-three-dots-vertical:before { content: '\e826'; }
+.wbli-time-half-pass:before { content: '\e827'; }
+.wbli-title:before { content: '\e828'; }
+.wbli-toggle-on:before { content: '\e829'; }
+.wbli-transition-top:before { content: '\e82a'; }
+.wbli-type-cursor:before { content: '\e82b'; }
+.wbli-up-arrow-s:before { content: '\e82c'; }
+.wbli-user-circle:before { content: '\e82d'; }
+.wbli-waving-hand:before { content: '\e82e'; }
+.wbli-wizard:before { content: '\e82f'; }
+.wbli-account:before { content: '\e830'; }
+.wbli-add-plus:before { content: '\e831'; }
+.wbli-add-plus-circle:before { content: '\e832'; }
+.wbli-add-plus-s:before { content: '\e833'; }
+.wbli-advanced:before { content: '\e834'; }
+.wbli-ai-search:before { content: '\e835'; }
+.wbli-alert:before { content: '\e836'; }
+.wbli-api:before { content: '\e837'; }
+.wbli-bank:before { content: '\e838'; }
+.wbli-card:before { content: '\e839'; }
+.wbli-card-exchang:before { content: '\e83a'; }
+.wbli-checkmark-circle:before { content: '\e83b'; }
+.wbli-checkmark-circle-fill:before { content: '\e83c'; }
+.wbli-copy:before { content: '\e83d'; }
+.wbli-cross:before { content: '\e83e'; }
+.wbli-csv:before { content: '\e83f'; }
+.wbli-cursor-pointer-01:before { content: '\e840'; }
+.wbli-customizer:before { content: '\e841'; }
+.wbli-dashboard-circle-edit:before { content: '\e842'; }
+.wbli-dash-circle-fill:before { content: '\e843'; }
+.wbli-dash-s:before { content: '\e844'; }
+.wbli-database:before { content: '\e845'; }
+.wbli-down-arrow-s:before { content: '\e846'; }
+.wbli-excel:before { content: '\e847'; }
+.wbli-eye:before { content: '\e848'; }
+.wbli-file-01:before { content: '\e849'; }
+.wbli-file-download:before { content: '\e84a'; }
+.wbli-file-edit-pencil:before { content: '\e84b'; }
+.wbli-file-import-export:before { content: '\e84c'; }
+.wbli-file-script:before { content: '\e84d'; }
+.wbli-file-upload:before { content: '\e84e'; }
+.wbli-first-aid-kit:before { content: '\e84f'; }
+.wbli-floppy-disk:before { content: '\e850'; }
+.wbli-footer:before { content: '\e851'; }
+.wbli-frontend-dashboard:before { content: '\e852'; }
+.wbli-general:before { content: '\e853'; }
+.wbli-google-places:before { content: '\e854'; }
+.wbli-group-items:before { content: '\e855'; }
+.wbli-header:before { content: '\e856'; }
+.wbli-key:before { content: '\e857'; }
+.wbli-label-important:before { content: '\e858'; }
+.wbli-layout:before { content: '\e859'; }
+.wbli-link-square:before { content: '\e85a'; }

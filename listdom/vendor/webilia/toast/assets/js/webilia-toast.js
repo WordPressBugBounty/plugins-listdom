@@ -2,9 +2,9 @@
 {
     'use strict';
 
-    if (typeof window.ListdomToast === 'function') return;
+    if (typeof window.WebiliaToast === 'function') return;
 
-    class ListdomToast {
+    class WebiliaToast {
         constructor(alert, options = {}) {
             this.alert = alert;
             this.type = options.type || 'lsd-natural';
@@ -46,7 +46,7 @@
                 'lsd-success': '<i class="fa fa-check-circle"></i>',
                 'lsd-natural': '<i class="fa fa-bell"></i>',
                 'lsd-in-progress': '<i class="lsd-loader"></i>',
-                'lsd-confirm': '<i class="listdom-icon lsdi-question"></i>',
+                'lsd-confirm': '<i class="webilia-icon wbli-question"></i>',
             };
 
             const finalIcon = this.icon || defaultIcons[this.type] || '';
@@ -184,6 +184,6 @@
         }
     }
 
-    window.ListdomToast = ListdomToast;
+    window.WebiliaToast = WebiliaToast;
 
 })(jQuery, window);

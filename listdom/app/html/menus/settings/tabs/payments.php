@@ -505,7 +505,7 @@ $tax_settings = $payments['taxes'] ?? [];
 				<?php LSD_Form::nonce('lsd_payments_form'); ?>
                 <button type="submit" id="lsd_payments_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='lsdi lsdi-checkmark-circle'></i>
+                    <i class='wbli wbli-checkmark-circle'></i>
                 </button>
 			</div>
         </div>

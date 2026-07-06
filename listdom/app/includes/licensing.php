@@ -430,7 +430,7 @@ class LSD_Licensing extends LSD_Base
                         'cta' => [
                             'label' => esc_html__('Renew License', 'listdom'),
                             'url' => $shop_url,
-                            'icon' => 'lsdi-key',
+                            'icon' => 'wbli-key',
                         ],
                     ];
                 }
@@ -448,7 +448,7 @@ class LSD_Licensing extends LSD_Base
                         'cta' => [
                             'label' => esc_html__('Get License', 'listdom'),
                             'url' => $shop_url,
-                            'icon' => 'lsdi-key',
+                            'icon' => 'wbli-key',
                         ],
                     ];
                 }
@@ -466,7 +466,7 @@ class LSD_Licensing extends LSD_Base
                         'cta' => [
                             'label' => esc_html__('Renew License', 'listdom'),
                             'url' => $shop_url,
-                            'icon' => 'lsdi-key',
+                            'icon' => 'wbli-key',
                         ],
                     ];
                 }
@@ -484,7 +484,7 @@ class LSD_Licensing extends LSD_Base
                     'cta' => [
                         'label' => esc_html__('Get License', 'listdom'),
                         'url' => $shop_url,
-                        'icon' => 'lsdi-key',
+                        'icon' => 'wbli-key',
                     ],
                 ];
             case 'trial_inline':
@@ -505,7 +505,7 @@ class LSD_Licensing extends LSD_Base
                     'cta' => [
                         'label' => esc_html__('Renew License', 'listdom'),
                         'url' => $shop_url,
-                        'icon' => 'lsdi-key',
+                        'icon' => 'wbli-key',
                     ],
                 ];
             default:
@@ -538,37 +538,37 @@ class LSD_Licensing extends LSD_Base
     {
         $map = [
             'inactive' => [
-                'badge' => ['class' => '', 'icon' => 'lsdi-key', 'text' => esc_html__('Inactive', 'listdom')],
+                'badge' => ['class' => '', 'icon' => 'wbli-key', 'text' => esc_html__('Inactive', 'listdom')],
                 'progress_class' => 'lsd-error',
                 'card_class' => '',
                 'action' => 'get_license',
             ],
             'trial' => [
-                'badge' => ['class' => '', 'icon' => 'lsdi-key', 'text' => esc_html__('Inactive', 'listdom')],
+                'badge' => ['class' => '', 'icon' => 'wbli-key', 'text' => esc_html__('Inactive', 'listdom')],
                 'progress_class' => 'lsd-warning',
                 'card_class' => '',
                 'action' => 'get_license',
             ],
             'grace' => [
-                'badge' => ['class' => 'lsd-grace', 'icon' => 'lsdi-time-half-pass', 'text' => esc_html__('Grace', 'listdom')],
+                'badge' => ['class' => 'lsd-grace', 'icon' => 'wbli-time-half-pass', 'text' => esc_html__('Grace', 'listdom')],
                 'progress_class' => 'lsd-warning',
                 'card_class' => 'lsd-activation-grace',
                 'action' => 'renew',
             ],
             'active' => [
-                'badge' => ['class' => 'lsd-success', 'icon' => 'lsdi-checkmark-circle', 'text' => esc_html__('Active', 'listdom')],
+                'badge' => ['class' => 'lsd-success', 'icon' => 'wbli-checkmark-circle', 'text' => esc_html__('Active', 'listdom')],
                 'progress_class' => 'lsd-success',
                 'card_class' => 'lsd-activation-valid',
                 'action' => '',
             ],
             'expiring' => [
-                'badge' => ['class' => 'lsd-warning', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expiring', 'listdom')],
+                'badge' => ['class' => 'lsd-warning', 'icon' => 'wbli-alert', 'text' => esc_html__('Expiring', 'listdom')],
                 'progress_class' => 'lsd-warning',
                 'card_class' => 'lsd-activation-expiring',
                 'action' => 'renew',
             ],
             'expired' => [
-                'badge' => ['class' => 'lsd-error', 'icon' => 'lsdi-alert', 'text' => esc_html__('Expired', 'listdom')],
+                'badge' => ['class' => 'lsd-error', 'icon' => 'wbli-alert', 'text' => esc_html__('Expired', 'listdom')],
                 'progress_class' => 'lsd-error',
                 'card_class' => 'lsd-activation-expired',
                 'action' => 'renew',

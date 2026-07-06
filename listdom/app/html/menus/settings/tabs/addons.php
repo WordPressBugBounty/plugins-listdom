@@ -16,7 +16,7 @@ defined('ABSPATH') || die();
                 <?php LSD_Form::nonce('lsd_addons_form'); ?>
                 <button type="submit" id="lsd_addons_save_button" class="lsd-primary-button lsd-addons-save-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='lsdi lsdi-checkmark-circle'></i>
+                    <i class='wbli wbli-checkmark-circle'></i>
                 </button>
             </div>
         </div>

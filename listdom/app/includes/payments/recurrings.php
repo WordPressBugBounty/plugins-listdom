@@ -6,6 +6,14 @@ class LSD_Payments_Recurrings extends LSD_Base
     const STATUS_CANCEL = 'lsd-recurring-cancel';
     const STATUS_REFUNDED = 'lsd-recurring-refunded';
 
+    protected static array $direct_gateway_meta_keys = [
+        'stripe_customer_id',
+        'stripe_subscription_id',
+        'stripe_price_id',
+        'stripe_payment_method_id',
+        'stripe_setup_intent_id',
+    ];
+
     public static function add(array $args = []): int
     {
         $status = isset($args['status']) ? sanitize_key($args['status']) : self::STATUS_ACTIVE;
@@ -35,10 +43,50 @@ class LSD_Payments_Recurrings extends LSD_Base
         if (isset($args['total'])) update_post_meta($recurring_id, 'lsd_total', (float) $args['total']);
         if (isset($args['currency'])) update_post_meta($recurring_id, 'lsd_currency', sanitize_text_field($args['currency']));
 
-        if ($first_order_id > 0) LSD_Payments_Orders::set_recurring_number($first_order_id, (int) $recurring_id, 1);
+        if ($first_order_id > 0)
+        {
+            self::link_first_order($first_order_id, (int) $recurring_id, $args);
+        }
+
         if (isset($args['gateway_meta']) && is_array($args['gateway_meta'])) self::update_gateway_meta($recurring_id, $args['gateway_meta'], false);
 
         return (int) $recurring_id;
+    }
+
+    protected static function link_first_order(int $first_order_id, int $recurring_id, array $args = []): void
+    {
+        if ($first_order_id < 1 || $recurring_id < 1) return;
+
+        $force_single_link = !empty($args['force_single_order_link']);
+        $skip_single_link = !empty($args['skip_single_order_link']);
+        $recurring_items = isset($args['items']) && is_array($args['items']) ? $args['items'] : [];
+        $order = LSD_Payments_Orders::get($first_order_id);
+        $order_items = $order instanceof LSD_Payments_Order ? $order->get_items() : [];
+        $is_multi_item_initial_order = count($order_items) > 1 && count($recurring_items) === 1;
+
+        if (method_exists('LSD_Payments_Orders', 'add_recurring_id'))
+        {
+            LSD_Payments_Orders::add_recurring_id($first_order_id, $recurring_id);
+        }
+        else
+        {
+            $ids = get_post_meta($first_order_id, 'lsd_recurring_ids', true);
+            $ids = is_array($ids) ? array_values(array_unique(array_filter(array_map('intval', $ids)))) : [];
+            if (!in_array($recurring_id, $ids, true)) $ids[] = $recurring_id;
+            update_post_meta($first_order_id, 'lsd_recurring_ids', $ids);
+        }
+
+        // For a normal single-recurring order, preserve legacy behavior and mark the first
+        // order as recurring payment number 1. For multi-recurring initial checkout orders,
+        // do not overwrite lsd_recurring_id with only one of the recurring records.
+        if (!$skip_single_link && ($force_single_link || !$is_multi_item_initial_order))
+        {
+            LSD_Payments_Orders::set_recurring_number($first_order_id, $recurring_id, 1);
+        }
+        else if ($is_multi_item_initial_order)
+        {
+            delete_post_meta($first_order_id, 'lsd_recurring_id');
+        }
     }
 
     protected static function sanitize_gateway_meta(array $meta): array
@@ -95,7 +143,26 @@ class LSD_Payments_Recurrings extends LSD_Base
         if ($updated) update_post_meta($recurring_id, 'lsd_gateway_meta', $updated);
         else delete_post_meta($recurring_id, 'lsd_gateway_meta');
 
+        self::sync_direct_gateway_meta($recurring_id, $updated);
+
         return true;
+    }
+
+    protected static function sync_direct_gateway_meta(int $recurring_id, array $meta): void
+    {
+        if ($recurring_id < 1) return;
+
+        foreach (self::$direct_gateway_meta_keys as $key)
+        {
+            if (isset($meta[$key]) && is_scalar($meta[$key]) && trim((string) $meta[$key]) !== '')
+            {
+                update_post_meta($recurring_id, 'lsd_' . $key, sanitize_text_field((string) $meta[$key]));
+            }
+            else
+            {
+                delete_post_meta($recurring_id, 'lsd_' . $key);
+            }
+        }
     }
 
     public static function find_by_gateway_meta(string $gateway, string $meta_key, string $meta_value): ?LSD_Payments_Recurring
@@ -105,6 +172,36 @@ class LSD_Payments_Recurrings extends LSD_Base
         $meta_value = sanitize_text_field($meta_value);
 
         if ($gateway === '' || $meta_key === '' || $meta_value === '') return null;
+
+        $direct_meta_key = 'lsd_' . $meta_key;
+        if (in_array($meta_key, self::$direct_gateway_meta_keys, true))
+        {
+            $direct_ids = get_posts([
+                'post_type' => LSD_Base::PTYPE_RECURRING,
+                'post_status' => 'any',
+                'numberposts' => 1,
+                'fields' => 'ids',
+                'suppress_filters' => true,
+                'meta_query' => [
+                    [
+                        'key' => 'lsd_gateway',
+                        'value' => $gateway,
+                        'compare' => '=',
+                    ],
+                    [
+                        'key' => $direct_meta_key,
+                        'value' => $meta_value,
+                        'compare' => '=',
+                    ],
+                ],
+            ]);
+
+            if ($direct_ids)
+            {
+                $recurring = self::get((int) $direct_ids[0]);
+                if ($recurring instanceof LSD_Payments_Recurring) return $recurring;
+            }
+        }
 
         $recurring_ids = get_posts([
             'post_type' => LSD_Base::PTYPE_RECURRING,
@@ -141,18 +238,41 @@ class LSD_Payments_Recurrings extends LSD_Base
         return null;
     }
 
+    public static function find_by_stripe_subscription_id(string $subscription_id): ?LSD_Payments_Recurring
+    {
+        return self::find_by_gateway_meta('stripe', 'stripe_subscription_id', $subscription_id);
+    }
+
+    public static function find_all_by_first_order_id(int $order_id): array
+    {
+        if ($order_id < 1) return [];
+
+        $recurring_ids = get_posts([
+            'post_type' => LSD_Base::PTYPE_RECURRING,
+            'post_status' => 'any',
+            'numberposts' => -1,
+            'fields' => 'ids',
+            'suppress_filters' => true,
+            'meta_key' => 'lsd_first_order_id',
+            'meta_value' => $order_id,
+        ]);
+
+        $recurrings = [];
+        foreach ($recurring_ids as $recurring_id)
+        {
+            $recurring = self::get((int) $recurring_id);
+            if ($recurring instanceof LSD_Payments_Recurring) $recurrings[] = $recurring;
+        }
+
+        return $recurrings;
+    }
+
     public static function find_by_first_order_id(int $order_id): ?LSD_Payments_Recurring
     {
         if (!$order_id) return null;
 
-        $recurring_id = LSD_Main::get_post_id_by_meta('lsd_first_order_id', $order_id);
-        if ($recurring_id)
-        {
-            $recurring = self::get($recurring_id);
-            if ($recurring instanceof LSD_Payments_Recurring) return $recurring;
-        }
-
-        return null;
+        $recurrings = self::find_all_by_first_order_id($order_id);
+        return $recurrings[0] ?? null;
     }
 
     protected static function generate_title(array $args): string
@@ -235,10 +355,22 @@ class LSD_Payments_Recurrings extends LSD_Base
 
     public static function get(int $id): ?LSD_Payments_Recurring
     {
-        $post = get_post($id);
-        if (!$post || $post->post_type !== LSD_Base::PTYPE_RECURRING) return null;
+        $post = self::get_entity_post($id, LSD_Base::PTYPE_RECURRING);
+        if (!$post instanceof WP_Post) return null;
 
         return new LSD_Payments_Recurring($id);
+    }
+
+    public static function by_user(int $user_id, int $limit = -1): array
+    {
+        $recurrings = [];
+        foreach (self::get_user_post_ids_by_meta('lsd_user_id', $user_id, $limit) as $recurring_id)
+        {
+            $recurring = self::get((int) $recurring_id);
+            if ($recurring instanceof LSD_Payments_Recurring) $recurrings[] = $recurring;
+        }
+
+        return $recurrings;
     }
 
     protected static function set_status(int $recurring_id, string $status): bool

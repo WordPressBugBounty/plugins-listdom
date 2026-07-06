@@ -1274,7 +1274,7 @@ $social_handler = new LSD_Socials();
                 <?php LSD_Form::nonce('lsd_auth_form'); ?>
                 <button type="submit" id="lsd_auth_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='lsdi lsdi-checkmark-circle'></i>
+                    <i class='wbli wbli-checkmark-circle'></i>
                 </button>
             </div>
         </div>

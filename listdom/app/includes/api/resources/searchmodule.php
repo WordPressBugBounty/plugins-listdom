@@ -34,21 +34,27 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                 foreach ($row['filters'] as $k => $f)
                 {
                     $method = $f['method'] ?? 'dropdown';
+                    $field_key = $f['key'] ?? '';
+                    $buttons_multiple = !empty($f['buttons_multiple']);
+
+                    // ACF dropdown fields do not support button rendering. Keep
+                    // saved filters aligned with the frontend fallback.
+                    if ($helper->get_type_by_key($field_key) === 'acf_dropdown' && $method === 'buttons') $method = $buttons_multiple ? 'checkboxes' : 'radio';
 
                     // Filter Params
-                    $keys = ['sf-' . $f['key']];
+                    $keys = ['sf-' . $field_key];
                     $values = [];
 
-                    $type = $helper->get_type_by_key($f['key']);
+                    $type = $helper->get_type_by_key($field_key);
                     switch ($type)
                     {
                         case 'taxonomy':
 
-                            if ($method === 'dropdown-multiple' || $method === 'checkboxes') $keys = ['sf-' . $f['key'] . '[]'];
+                            if ($method === 'dropdown-multiple' || $method === 'checkboxes' || ($method === 'buttons' && $buttons_multiple)) $keys = ['sf-' . $field_key . '[]'];
 
                             $controller = new LSD_API_Controllers_Taxonomies();
 
-                            $terms = $controller->hierarchy($f['key'], 0, $f['hide_empty'] ?? null);
+                            $terms = $controller->hierarchy($field_key, 0, $f['hide_empty'] ?? null);
                             $values = LSD_API_Resources_Taxonomy::collection($terms);
 
                             break;
@@ -58,22 +64,22 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                         case 'time':
                         case 'datetime':
 
-                            (strpos($f['key'], 'acf_email_') === 0) ? $acf_key = substr($f['key'], strlen('acf_email_')) : ((strpos($f['key'], 'acf_text_') === 0) ? $acf_key = substr($f['key'], strlen('acf_text_')) : $acf_key = '');
-                            $keys = (strpos($f['key'], 'acf-') !== false)
+                            (strpos($field_key, 'acf_email_') === 0) ? $acf_key = substr($field_key, strlen('acf_email_')) : ((strpos($field_key, 'acf_text_') === 0) ? $acf_key = substr($field_key, strlen('acf_text_')) : $acf_key = '');
+                            $keys = (strpos($field_key, 'acf-') !== false)
                                 ? ['sf-acf-' . $acf_key . '-atx']
-                                : ['sf-' . $f['key'] . '-lk'];
+                                : ['sf-' . $field_key . '-lk'];
 
                             break;
 
                         case 'number':
 
-                            $keys = ['sf-' . $f['key'] . '-eq'];
-                            if ($method === 'dropdown-plus') $keys = ['sf-' . $f['key'] . '-grq'];
+                            $keys = ['sf-' . $field_key . '-eq'];
+                            if ($method === 'dropdown-plus') $keys = ['sf-' . $field_key . '-grq'];
                             else if ($method === 'range')
                             {
                                 $keys = [
-                                    'sf-att-' . $f['key'] . '-grb-min',
-                                    'sf-att-' . $f['key'] . '-grb-max',
+                                    'sf-att-' . $field_key . '-grb-min',
+                                    'sf-att-' . $field_key . '-grb-max',
                                 ];
                             }
 
@@ -82,9 +88,11 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                             break;
 
                         case 'dropdown':
+                        case 'checkbox':
+                        case 'radio':
 
-                            $keys = ['sf-' . $f['key'] . '-eq'];
-                            if ($method === 'dropdown-multiple' || $method === 'checkboxes') $keys = ['sf-' . $f['key'] . '-in[]'];
+                            $keys = ['sf-' . $field_key . '-eq'];
+                            if ($method === 'dropdown-multiple' || $method === 'checkboxes' || ($method === 'buttons' && $buttons_multiple)) $keys = ['sf-' . $field_key . '-in[]'];
 
                             $values = $helper->get_terms($f, true);
 
@@ -93,10 +101,10 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                         case 'acf_dropdown':
 
                             $acf_key = '';
-                            if (strpos($f['key'], 'acf_select_') === 0) $acf_key = substr($f['key'], strlen('acf_select_'));
-                            else if (strpos($f['key'], 'acf_radio_') === 0) $acf_key = substr($f['key'], strlen('acf_radio_'));
-                            else if (strpos($f['key'], 'acf_checkbox_') === 0) $acf_key = substr($f['key'], strlen('acf_checkbox_'));
-                            else if (strpos($f['key'], 'acf_true_false_') === 0) $acf_key = substr($f['key'], strlen('acf_true_false_'));
+                            if (strpos($field_key, 'acf_select_') === 0) $acf_key = substr($field_key, strlen('acf_select_'));
+                            else if (strpos($field_key, 'acf_radio_') === 0) $acf_key = substr($field_key, strlen('acf_radio_'));
+                            else if (strpos($field_key, 'acf_checkbox_') === 0) $acf_key = substr($field_key, strlen('acf_checkbox_'));
+                            else if (strpos($field_key, 'acf_true_false_') === 0) $acf_key = substr($field_key, strlen('acf_true_false_'));
 
                             $keys = ['sf-acf-' . $acf_key . '-dra'];
                             if ($method === 'dropdown-multiple' || $method === 'checkboxes') $keys = ['sf-acf-' . $acf_key . '-drm[]'];
@@ -107,7 +115,7 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                         case 'acf_range':
 
-                            (strpos($f['key'], 'acf_range_') === 0) ? $acf_key = substr($f['key'], strlen('acf_range_')) : $acf_key = '';
+                            (strpos($field_key, 'acf_range_') === 0) ? $acf_key = substr($field_key, strlen('acf_range_')) : $acf_key = '';
 
                             $keys[] = [
                                 'sf-acf-' . $acf_key . '_min',
@@ -120,12 +128,12 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                             if (!LSD_Components::pricing()) continue 2;
 
-                            if ($method === 'dropdown-plus') $keys = ['sf-att-' . $f['key'] . '-grq'];
+                            if ($method === 'dropdown-plus') $keys = ['sf-att-' . $field_key . '-grq'];
                             else if ($method === 'mm-input' || $method === 'range')
                             {
                                 $keys = [
-                                    'sf-att-' . $f['key'] . '-bt-min',
-                                    'sf-att-' . $f['key'] . '-bt-max',
+                                    'sf-att-' . $field_key . '-bt-min',
+                                    'sf-att-' . $field_key . '-bt-max',
                                 ];
                             }
 
@@ -135,16 +143,17 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                             if (!LSD_Components::map()) continue 2;
 
-                            $keys = ['sf-att-' . $f['key'] . '-lk'];
+                            $keys = ['sf-att-' . $field_key . '-lk'];
                             break;
 
                         case 'review_rate':
 
-                            $keys = ['sf-att-' . $f['key'] . '-grq'];
+                            $keys = ['sf-att-' . $field_key . '-grq'];
                             $values = [0, 1, 2, 3, 4];
                             break;
                     }
 
+                    $f['request'] = LSD_API_SearchRequest::resolve($f, $type, $method, (int) $id, $values);
                     $f['key'] = $keys;
                     $f['values'] = $values;
 

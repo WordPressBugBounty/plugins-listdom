@@ -35,11 +35,11 @@ defined('ABSPATH') || die();
             <div class="lsd-get-start-section">
                 <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_LISTING)); ?>" target="_blank">
                     <span><?php esc_html_e('Publish a Listing', 'listdom'); ?></span>
-                    <i class="listdom-icon lsdi-right-arrow"></i>
+                    <i class="webilia-icon wbli-right-arrow"></i>
                 </a>
                 <a class="lsd-text-button" href="<?php echo esc_url(LSD_Base::getListdomWelcomeWizardUrl()); ?>">
                     <span><?php esc_html_e('Start Welcome Wizard', 'listdom'); ?></span>
-                    <i class="listdom-icon lsdi-wizard"></i>
+                    <i class="webilia-icon wbli-wizard"></i>
                 </a>
             </div>
         </div>
@@ -64,37 +64,37 @@ defined('ABSPATH') || die();
             <ul>
                 <li>
                     <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-list-view"></i>
+                        <i class="webilia-icon wbli-list-view"></i>
                         <?php esc_html_e('Create a Listing', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_CATEGORY . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-menu-square"></i>
+                        <i class="webilia-icon wbli-menu-square"></i>
                         <?php esc_html_e('Add a Category', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_LOCATION . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-location"></i>
+                        <i class="webilia-icon wbli-location"></i>
                         <?php esc_html_e('Add a Location', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_FEATURE . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-add-plus"></i>
+                        <i class="webilia-icon wbli-add-plus"></i>
                         <?php esc_html_e('Add a Feature', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_LABEL . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-label-important"></i>
+                        <i class="webilia-icon wbli-label-important"></i>
                         <?php esc_html_e('Add a Label', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=' . LSD_Base::TAX_TAG . '&post_type=' . LSD_Base::PTYPE_LISTING)); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-tag"></i>
+                        <i class="webilia-icon wbli-tag"></i>
                         <?php esc_html_e('Add a Tag', 'listdom'); ?>
                     </a>
                 </li>
@@ -109,31 +109,31 @@ defined('ABSPATH') || die();
             <ul>
                 <li>
                     <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_SEARCH)); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-search-area"></i>
+                        <i class="webilia-icon wbli-search-area"></i>
                         <?php esc_html_e('Create a Search & Filter Form', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_SHORTCODE)); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-second-bracket-square"></i>
+                        <i class="webilia-icon wbli-second-bracket-square"></i>
                         <?php esc_html_e('Create a Skin Shortcode', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-login-method"></i>
+                        <i class="webilia-icon wbli-login-method"></i>
                         <?php esc_html_e('Authentication Page', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard')); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-frontend-dashboard"></i>
+                        <i class="webilia-icon wbli-frontend-dashboard"></i>
                         <?php esc_html_e('Frontend Dashboard', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth&subtab=profile')); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-user-circle"></i>
+                        <i class="webilia-icon wbli-user-circle"></i>
                         <?php esc_html_e('Author Profile', 'listdom'); ?>
                     </a>
                 </li>
@@ -147,25 +147,25 @@ defined('ABSPATH') || die();
             <ul>
                 <li>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=single-listing')); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-pencil-edit"></i>
+                        <i class="webilia-icon wbli-pencil-edit"></i>
                         <?php esc_html_e('Single Listing Styles', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=single-listing')); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-file-edit-pencil"></i>
+                        <i class="webilia-icon wbli-file-edit-pencil"></i>
                         <?php esc_html_e('Single Listing Customizer', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=forms')); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-ai-search"></i>
+                        <i class="webilia-icon wbli-ai-search"></i>
                         <?php esc_html_e('Search Forms Customizer', 'listdom'); ?>
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer&subtab=skins')); ?>" class="lsd-text-button">
-                        <i class="listdom-icon lsdi-property-edit"></i>
+                        <i class="webilia-icon wbli-property-edit"></i>
                         <?php esc_html_e('Skins Customizer', 'listdom'); ?>
                     </a>
                 </li>
@@ -183,7 +183,7 @@ defined('ABSPATH') || die();
                 </div>
                 <a class="lsd-primary-button" href="<?php echo esc_url(LSD_Base::getMobileApp()); ?>" target="_blank">
                     <span><?php esc_html_e('Show Me the Features', 'listdom'); ?></span>
-                    <i class="listdom-icon lsdi-right-arrow"></i>
+                    <i class="webilia-icon wbli-right-arrow"></i>
                 </a>
             </div>
         </div>
@@ -198,7 +198,7 @@ defined('ABSPATH') || die();
                     <p class="lsd-m-0"><?php esc_html_e('Discover everything in Listdom’s documentation', 'listdom'); ?></p>
                     <a class="lsd-neutral-button" href="<?php echo esc_url(LSD_Base::getListdomDocsURL()); ?>" target="_blank">
                         <span><?php esc_html_e('Documentation', 'listdom'); ?></span>
-                        <i class="listdom-icon lsdi-right-arrow"></i>
+                        <i class="webilia-icon wbli-right-arrow"></i>
                     </a>
                 </div>
             </div>
@@ -209,7 +209,7 @@ defined('ABSPATH') || die();
                     <p class="lsd-m-0"><?php esc_html_e('Visit our support center for help with Listdom.', 'listdom'); ?></p>
                     <a class="lsd-neutral-button" href="<?php echo esc_url(LSD_Base::getSupportURL()); ?>" target="_blank">
                         <span><?php esc_html_e('Support', 'listdom'); ?></span>
-                        <i class="listdom-icon lsdi-right-arrow"></i>
+                        <i class="webilia-icon wbli-right-arrow"></i>
                     </a>
                 </div>
             </div>
@@ -235,7 +235,7 @@ defined('ABSPATH') || die();
 
             <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('update.php?action=install-plugin&plugin=addons-for-elementor-builder&_wpnonce=' . wp_create_nonce('install-plugin_addons-for-elementor-builder'))); ?>" title="<?php echo esc_attr__('Install Vertex Addons for Elementor', 'listdom'); ?>">
                 <span><?php echo esc_html__('Install For Free', 'listdom'); ?></span>
-                <i class="listdom-icon lsdi-right-arrow"></i>
+                <i class="webilia-icon wbli-right-arrow"></i>
             </a>
         </div>
     </div>

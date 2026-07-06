@@ -104,6 +104,7 @@ if ($intent_client_secret)
                     name: 'lsdStripeName',
                     email: 'lsdStripeEmail',
                     consent: 'lsdStripeConsent',
+                    pendingOrder: 'lsdStripePendingOrder',
                 };
 
                 const failureMessage = '<?php echo esc_js(esc_html__('We could not verify your payment. Please try again.', 'listdom')); ?>';
@@ -168,6 +169,49 @@ if ($intent_client_secret)
                         storage.removeItem(storageKeys.name);
                         storage.removeItem(storageKeys.email);
                         storage.removeItem(storageKeys.consent);
+                    }
+                    catch (err)
+                    {
+                    }
+                };
+
+                const getPendingOrder = function ()
+                {
+                    if (!storage) return null;
+
+                    const value = storage.getItem(storageKeys.pendingOrder);
+                    if (!value) return null;
+
+                    try
+                    {
+                        return JSON.parse(value);
+                    }
+                    catch (err)
+                    {
+                        return null;
+                    }
+                };
+
+                const savePendingOrder = function (order)
+                {
+                    if (!storage) return;
+
+                    try
+                    {
+                        storage.setItem(storageKeys.pendingOrder, JSON.stringify(order || {}));
+                    }
+                    catch (err)
+                    {
+                    }
+                };
+
+                const clearPendingOrder = function ()
+                {
+                    if (!storage) return;
+
+                    try
+                    {
+                        storage.removeItem(storageKeys.pendingOrder);
                     }
                     catch (err)
                     {
@@ -247,9 +291,14 @@ if ($intent_client_secret)
                         {
                             if (res && res.success)
                             {
+                                clearPendingOrder();
                                 clearStoredCustomer();
                                 $btn.removeClass('lsd-loading');
                                 lsdCheckoutComplete(res.key ? res.key : res.order_id);
+                            }
+                            else if (res && res.data && res.data.action_required && res.data.payment_intent_client_secret)
+                            {
+                                handlePendingAction(res);
                             }
                             else if (res && res.message)
                             {
@@ -272,6 +321,109 @@ if ($intent_client_secret)
                     });
                 };
 
+                const finalizePendingOrder = function (order, paymentIntentId)
+                {
+                    if (!order || !order.order_id || !order.order_key)
+                    {
+                        $alert.text(failureMessage).removeClass('lsd-util-hide').addClass('lsd-error');
+                        lsdCheckoutRestoreFromProcessing();
+                        $btn.prop('disabled', false).removeClass('lsd-loading');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: lsd.ajaxurl,
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            action: 'lsd_checkout',
+                            _wpnonce: '<?php echo esc_js($nonce); ?>',
+                            order_id: order.order_id,
+                            order_key: order.order_key,
+                            payment_intent: paymentIntentId || '',
+                        },
+                        success: function (res)
+                        {
+                            if (res && res.success)
+                            {
+                                clearPendingOrder();
+                                clearStoredCustomer();
+                                $btn.removeClass('lsd-loading');
+                                lsdCheckoutComplete(res.key ? res.key : res.order_id);
+                                return;
+                            }
+
+                            if (res && res.data && res.data.action_required && res.data.payment_intent_client_secret)
+                            {
+                                handlePendingAction(res);
+                                return;
+                            }
+
+                            const message = res && res.message ? res.message : failureMessage;
+                            $alert.text(message).removeClass('lsd-util-hide').addClass('lsd-error');
+                            lsdCheckoutRestoreFromProcessing();
+                            $btn.prop('disabled', false).removeClass('lsd-loading');
+                        },
+                        error: function (xhr, status, error)
+                        {
+                            const message = error || failureMessage;
+                            $alert.text(message).removeClass('lsd-util-hide').addClass('lsd-error');
+                            lsdCheckoutRestoreFromProcessing();
+                            $btn.prop('disabled', false).removeClass('lsd-loading');
+                        }
+                    });
+                };
+
+                const handlePendingAction = async function (res)
+                {
+                    const data = res && res.data ? res.data : {};
+                    const clientSecret = data.payment_intent_client_secret || '';
+                    const orderId = res.order_id || data.order_id || 0;
+                    const orderKey = res.key || data.key || '';
+
+                    if (!clientSecret || !orderId || !orderKey)
+                    {
+                        const message = res && res.message ? res.message : failureMessage;
+                        $alert.text(message).removeClass('lsd-util-hide').addClass('lsd-error');
+                        lsdCheckoutRestoreFromProcessing();
+                        $btn.prop('disabled', false).removeClass('lsd-loading');
+                        return;
+                    }
+
+                    savePendingOrder({
+                        order_id: orderId,
+                        order_key: orderKey,
+                    });
+
+                    try
+                    {
+                        const result = await stripe.confirmCardPayment(clientSecret, {
+                            return_url: window.location.href,
+                        });
+
+                        if (result.error)
+                        {
+                            const message = result.error.message ? result.error.message : failureMessage;
+                            $alert.text(message).removeClass('lsd-util-hide').addClass('lsd-error');
+                            lsdCheckoutRestoreFromProcessing();
+                            $btn.prop('disabled', false).removeClass('lsd-loading');
+                            return;
+                        }
+
+                        if (result.paymentIntent && ['succeeded', 'processing'].includes(result.paymentIntent.status))
+                        {
+                            finalizePendingOrder(getPendingOrder(), result.paymentIntent.id);
+                        }
+                    }
+                    catch (err)
+                    {
+                        const message = err && err.message ? err.message : failureMessage;
+                        $alert.text(message).removeClass('lsd-util-hide').addClass('lsd-error');
+                        lsdCheckoutRestoreFromProcessing();
+                        $btn.prop('disabled', false).removeClass('lsd-loading');
+                    }
+                };
+
                 const handleStripeReturn = async function ()
                 {
                     if (typeof URLSearchParams === 'undefined') return;
@@ -279,7 +431,8 @@ if ($intent_client_secret)
                     const params = new URLSearchParams(window.location.search);
                     const paymentClientSecret = params.get('payment_intent_client_secret');
                     const setupClientSecret = params.get('setup_intent_client_secret');
-                    const hasClientSecret = intentMode === 'setup' ? setupClientSecret : paymentClientSecret;
+                    const pendingOrder = getPendingOrder();
+                    const hasClientSecret = paymentClientSecret || (intentMode === 'setup' ? setupClientSecret : '');
                     if (!hasClientSecret) return;
 
                     lsdCheckoutShowProcessing();
@@ -290,6 +443,33 @@ if ($intent_client_secret)
 
                     try
                     {
+                        if (pendingOrder && paymentClientSecret)
+                        {
+                            const result = await stripe.retrievePaymentIntent(paymentClientSecret);
+                            const paymentIntent = result.paymentIntent;
+
+                            if (paymentIntent && ['succeeded', 'processing'].includes(paymentIntent.status))
+                            {
+                                finalizePendingOrder(pendingOrder, paymentIntent.id);
+                                return;
+                            }
+
+                            let pendingMessage = failureMessage;
+                            if (paymentIntent && paymentIntent.last_payment_error && paymentIntent.last_payment_error.message)
+                            {
+                                pendingMessage = paymentIntent.last_payment_error.message;
+                            }
+                            else if (result.error && result.error.message)
+                            {
+                                pendingMessage = result.error.message;
+                            }
+
+                            $alert.text(pendingMessage).removeClass('lsd-util-hide').addClass('lsd-error');
+                            lsdCheckoutRestoreFromProcessing();
+                            $btn.prop('disabled', false).removeClass('lsd-loading');
+                            return;
+                        }
+
                         if (intentMode === 'setup')
                         {
                             const result = await stripe.retrieveSetupIntent(setupClientSecret);

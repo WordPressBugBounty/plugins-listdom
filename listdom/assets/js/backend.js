@@ -1,22 +1,3 @@
-function ListdomButtonLoader($button) {
-    this.$button = $button;
-    this.originalHtml = $button.html();
-
-    // Start Loading Style
-    this.start = (loadingText) => {
-        this.$button
-        .html(loadingText + ' <i class="lsd-loader"></i>')
-        .attr('disabled', 'disabled');
-    };
-
-    // Stop Loading Style
-    this.stop = () => {
-        this.$button
-        .html(this.originalHtml)
-        .removeAttr('disabled');
-    };
-}
-
 // Listdom Search Builder PLUGIN
 (function ($)
 {
@@ -242,6 +223,13 @@ function ListdomButtonLoader($button) {
             $field_method.off('change').on('change', function (event, options)
             {
                 method_changed($(this), options || {});
+            });
+
+            $(document)
+                .off('change', '.lsd-search-field select[name$="[buttons_multiple]"]')
+                .on('change', '.lsd-search-field select[name$="[buttons_multiple]"]', function ()
+            {
+                sync_button_default_inputs($(this).closest('.lsd-search-field'));
             });
 
             sync_mobile_app_method_options();
@@ -501,6 +489,7 @@ function ListdomButtonLoader($button) {
                             sync_mobile_app_method_options($field);
                             init_iconpicker($field);
                             $field.find('.lsd-search-method').trigger('change');
+                            sync_button_default_inputs($field);
 
                             $field.find($('.lsd-search-field-all-terms select')).on('change', function ()
                             {
@@ -657,6 +646,36 @@ function ListdomButtonLoader($button) {
 
             // Show Related Fields
             $field.find('.lsd-search-method-' + method).show();
+
+            sync_button_default_inputs($field);
+        }
+
+        function sync_button_default_inputs($field)
+        {
+            const $single = $field.find('.lsd-search-buttons-single-default');
+            const $multiple = $field.find('.lsd-search-buttons-multiple-default');
+            if (!$single.length && !$multiple.length) return;
+
+            const method = ($field.find('.lsd-search-method').val() || '').toString();
+            if (method !== 'buttons')
+            {
+                $single.removeClass('lsd-util-hide');
+                $multiple.removeClass('lsd-util-hide');
+                return;
+            }
+
+            const isMultiple = parseInt($field.find('select[name$="[buttons_multiple]"]').val(), 10) === 1;
+
+            if (isMultiple)
+            {
+                $single.addClass('lsd-util-hide').hide();
+                $multiple.removeClass('lsd-util-hide').show();
+            }
+            else
+            {
+                $multiple.addClass('lsd-util-hide').hide();
+                $single.removeClass('lsd-util-hide').show();
+            }
         }
 
         function need_confirm($element)
@@ -2850,25 +2869,6 @@ jQuery(function ($)
             .show();
     };
 
-    const copyToClipboard = async function (value)
-    {
-        const text = String(value || '');
-
-        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function')
-        {
-            await navigator.clipboard.writeText(text);
-            return;
-        }
-
-        const $textarea = $('<textarea class="lsd-util-hide" aria-hidden="true"></textarea>').val(text).appendTo('body');
-        $textarea.trigger('focus').trigger('select');
-
-        const copied = document.execCommand && document.execCommand('copy');
-        $textarea.remove();
-
-        if (!copied) throw new Error('clipboard_unavailable');
-    };
-
     const debounce = function (callback, wait)
     {
         let timer = null;
@@ -2894,7 +2894,6 @@ jQuery(function ($)
         const $map = $('#lsdaddgpl-map');
         const $query = $('#lsdaddgpl-query');
         const $type = $('#lsdaddgpl-type');
-        const $includeImages = $('#lsdaddgpl-include-images');
         const $refreshOnMove = $('#lsdaddgpl-refresh-on-move');
         const $queue = $('#lsdaddgpl-queue');
         const $queueEmpty = $('#lsdaddgpl-queue-empty');
@@ -2969,18 +2968,10 @@ jQuery(function ($)
                 {
                     return item.place_id === place.place_id;
                 });
-                const hasMedia = !!place.photo_url;
-                const rating = typeof place.rating === 'number' ? place.rating.toFixed(1) : '';
-                const reviewCount = Number(place.review_count || 0);
+                const primaryType = place.primary_type_label || place.primary_type || '';
 
-                html += '<div class="lsdaddgpl-business-row' + (hasMedia ? '' : ' lsdaddgpl-business-row-no-media') + '" id="' + escapeHtml(placeRowId(place.place_id)) + '" data-place-id="' + escapeHtml(place.place_id) + '">';
+                html += '<div class="lsdaddgpl-business-row lsdaddgpl-business-row-no-media" id="' + escapeHtml(placeRowId(place.place_id)) + '" data-place-id="' + escapeHtml(place.place_id) + '">';
 
-                if (hasMedia)
-                {
-                    html += '<div class="lsdaddgpl-business-media">';
-                    html += '<img src="' + escapeHtml(place.photo_url) + '" alt="' + escapeHtml(title) + '">';
-                    html += '</div>';
-                }
                 html += '<div class="lsdaddgpl-business-content">';
                 html += '<div class="lsdaddgpl-business-top-content">';
                 html += '<div class="lsdaddgpl-business-top">';
@@ -2993,26 +2984,9 @@ jQuery(function ($)
                     html += '<div class="lsdaddgpl-business-address">' + escapeHtml(place.address) + '</div>';
                 }
 
-                html += '</div>';
-
-                html += '<div class="lsdaddgpl-business-meta">';
-                html += '<div class="lsdaddgpl-business-meta-left">';
-
-                if (rating !== '')
+                if (primaryType)
                 {
-                    html += '<span class="lsdaddgpl-business-rating">' + escapeHtml(rating) + '</span>';
-                }
-
-                if (reviewCount > 0)
-                {
-                    html += '<span class="lsdaddgpl-business-reviews">' + escapeHtml(reviewCount) + ' ' + escapeHtml(config.strings.reviewsLabel || 'reviews') + '</span>';
-                }
-
-                html += '</div>';
-
-                if (place.google_maps_url)
-                {
-                    html += '<a class="button button-secondary lsdaddgpl-business-link" href="' + escapeHtml(place.google_maps_url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(config.strings.viewBusiness || 'View Business') + '</a>';
+                    html += '<div class="lsdaddgpl-business-address">' + escapeHtml(primaryType) + '</div>';
                 }
 
                 html += '</div>';
@@ -3139,7 +3113,6 @@ jQuery(function ($)
             const payload = {
                 query: $.trim($query.val()),
                 type: $type.val() || '',
-                include_images: $includeImages.is(':checked'),
                 bounds: {
                     north: northEast.lat(),
                     east: northEast.lng(),
@@ -3399,9 +3372,7 @@ jQuery(function ($)
         const openingHoursField = fieldMap.opening_hours || {};
         const primaryTypeField = fieldMap.primary_type || {};
         const categoriesField = fieldMap.categories || {};
-        const imageField = fieldMap.featured_image || {};
         const coordinatesField = fieldMap.coordinates || {};
-        const priceLevelField = fieldMap.price_level || {};
         let placeId = String($metabox.data('placeId') || '');
         let searchRequest = null;
 
@@ -3520,11 +3491,7 @@ jQuery(function ($)
             if (typeof details.latitude === 'number') addressCopyAttributes.push('data-copy-lat="' + escapeHtml(details.latitude) + '"');
             if (typeof details.longitude === 'number') addressCopyAttributes.push('data-copy-lng="' + escapeHtml(details.longitude) + '"');
 
-            const imageActions = (details.photo_name && details.photo_url)
-                ? '<button type="button" class="button button-small" data-import-image="1" data-photo-name="' + escapeHtml(details.photo_name) + '" data-photo-url="' + escapeHtml(details.photo_url) + '" data-place-id="' + escapeHtml(details.place_id || '') + '" data-place-name="' + escapeHtml(details.place_name || '') + '">' + escapeHtml(config.strings.copyImage || 'Import Featured Image') + '</button>'
-                : '';
-
-            let html = '';
+            let html = '<p class="lsd-admin-description-tiny lsd-my-0">' + escapeHtml(config.strings.reviewDisclaimer || 'Review before copying. Saved values become native Listdom content.') + '</p>';
             html += rowHtml(titleField.label || 'Place Name', details.place_name, '<button type="button" class="button button-small" data-copy-target="' + escapeHtml(titleField.target || '#title') + '" data-copy-value="' + escapeHtml(details.place_name || '') + '">' + escapeHtml(config.strings.copyToTitle || 'Copy to Title') + '</button>');
             html += rowHtml(addressFieldMap.label || 'Formatted Address', details.formatted_address, '<button type="button" class="button button-small" ' + addressCopyAttributes.join(' ') + '>' + escapeHtml(config.strings.copyToAddress || 'Copy to Address') + '</button>');
             html += rowHtml(phoneField.label || 'Phone Number', details.phone_number, '<button type="button" class="button button-small" data-copy-target="' + escapeHtml(phoneField.target || '#lsd_phone') + '" data-copy-value="' + escapeHtml(details.phone_number || '') + '">' + escapeHtml(config.strings.copyToPhone || 'Copy to Phone') + '</button>');
@@ -3532,7 +3499,6 @@ jQuery(function ($)
             html += multilineRowHtml(openingHoursField.label || 'Opening Hours', openingHours, '');
             html += rowHtml(primaryTypeField.label || 'Primary Type', details.primary_type_label || details.primary_type, '');
             html += rowHtml(categoriesField.label || 'Categories', matchedCategory.name ? (matchedCategory.name + ' (' + (matchedCategory.source || 'exact match') + ')') : readableTypes(details.types), categoryActions);
-            html += rowHtml(imageField.label || 'Featured Image', details.photo_url ? (config.strings.imageReady || 'Google business image is available.') : '', imageActions);
 
             if (typeof details.latitude === 'number' && typeof details.longitude === 'number')
             {
@@ -3543,7 +3509,7 @@ jQuery(function ($)
                 );
             }
 
-            html += rowHtml(priceLevelField.label || 'Price Level', formatPriceLevel(details.price_level), details.price_level ? '<button type="button" class="button button-small" data-copy-clipboard="1">' + escapeHtml(config.strings.copy || 'Copy') + '</button>' : '');
+            html += rowHtml(config.strings.priceLevelLabel || 'Price Level', formatPriceLevel(details.price_level), '');
 
             $suggestions.html(html);
         };
@@ -3770,42 +3736,6 @@ jQuery(function ($)
             }
         };
 
-        const refreshFeaturedImageUi = function (response)
-        {
-            const attachmentId = Number(response && response.attachment_id ? response.attachment_id : 0);
-            const featuredImageUrl = String(response && response.featured_image_url ? response.featured_image_url : '');
-            const featuredImageHtml = String(response && response.featured_image_html ? response.featured_image_html : '');
-
-            if (attachmentId && window.wp && wp.data && typeof wp.data.dispatch === 'function')
-            {
-                const editorStore = wp.data.dispatch('core/editor');
-                if (editorStore && typeof editorStore.editPost === 'function')
-                {
-                    editorStore.editPost({
-                        featured_media: attachmentId
-                    });
-                }
-            }
-
-            if (featuredImageHtml && $('#postimagediv .inside').length)
-            {
-                $('#postimagediv .inside').html(featuredImageHtml);
-            }
-
-            if ($('#lsd_featured_image').length)
-            {
-                $('#lsd_featured_image').val(attachmentId).trigger('change');
-            }
-
-            if (featuredImageUrl && $('#lsd_dashboard_featured_image_preview').length)
-            {
-                $('#lsd_dashboard_featured_image_preview').html('<img src="' + escapeHtml(featuredImageUrl) + '" alt="">').removeClass('lsd-util-hide');
-                $('#lsd_dashboard_featured_image_placeholder').addClass('lsd-image-placeholder-has-image');
-                $('#lsd_dashboard_featured_image_placeholder .lsd-image-placeholder-empty').addClass('lsd-util-hide');
-                $('#lsd_featured_image_remove_button').removeClass('lsd-util-hide');
-            }
-        };
-
         $suggestions.on('click', '[data-copy-address]', function ()
         {
             const $button = $(this);
@@ -3861,68 +3791,6 @@ jQuery(function ($)
             }
 
             notifyCopy(config.strings.copySuccess || 'Category applied.', 'lsd-success');
-        });
-
-        $suggestions.on('click', '[data-copy-clipboard]', async function ()
-        {
-            try
-            {
-                await copyToClipboard($(this).closest('.lsdaddgpl-suggestion-row').find('.lsdaddgpl-suggestion-value').text());
-                notifyCopy(config.strings.clipboardSuccess || 'Copied.', 'lsd-success');
-            }
-            catch (error)
-            {
-                notifyCopy(config.strings.clipboardError || 'Unable to copy.', 'lsd-warning');
-            }
-        });
-
-        $suggestions.on('click', '[data-import-image]', function ()
-        {
-            const $button = $(this);
-
-            $button.prop('disabled', true);
-
-            $.ajax({
-                type: 'POST',
-                url: config.ajaxUrl,
-                dataType: 'json',
-                data: {
-                    action: 'lsdaddgpl_import_image',
-                    _wpnonce: config.detailsNonce,
-                    post_id: postId,
-                    place_id: String($button.data('placeId') || ''),
-                    place_name: String($button.data('placeName') || ''),
-                    photo_name: String($button.data('photoName') || ''),
-                    photo_url: String($button.data('photoUrl') || '')
-                }
-            }).done(function (response)
-            {
-                if (!response || Number(response.success) !== 1)
-                {
-                    notify(response && response.message ? response.message : (config.strings.imageImportFailed || 'Unable to import the Google business image for this listing.'), 'lsd-error');
-                    return;
-                }
-
-                if (Number(response.featured_image_assigned) === 1)
-                {
-                    refreshFeaturedImageUi(response);
-                }
-
-                notify(
-                    response.message || (
-                        Number(response.featured_image_assigned) === 1
-                            ? (config.strings.imageImportSuccess || 'Featured image imported from Google and assigned to this listing.')
-                            : (config.strings.imageImportManual || 'Featured image imported from Google. Please select it manually in the Featured Image panel.')
-                    ),
-                    Number(response.featured_image_assigned) === 1 ? 'lsd-success' : 'lsd-warning'
-                );
-            }).fail(function ()
-            {
-                notify(config.strings.imageImportFailed || 'Unable to import the Google business image for this listing.', 'lsd-error');
-            }).always(function ()
-            {
-                $button.prop('disabled', false);
-            });
         });
 
         $searchInput.on('input', function ()

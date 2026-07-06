@@ -17,9 +17,16 @@ class LSD_Base
     const TAX_ATTRIBUTE = 'listdom-attribute';
     const TAX_LABEL = 'listdom-label';
     const TAX_TAX = 'listdom-tax';
-    const STATUS_EXPIRED = 'expired';
-    const STATUS_HOLD = 'hold';
+    const STATUS_TRASH = 'trash';
+    const STATUS_INACTIVE = 'inactive';
+    const STATUS_DENIED = 'denied';
     const STATUS_OFFLINE = 'offline';
+    const STATUS_HOLD = 'hold';
+    const STATUS_EXPIRED = 'expired';
+    const STATUS_SCHEDULED = 'future';
+    const STATUS_DRAFT = 'draft';
+    const STATUS_PENDING = 'pending';
+    const STATUS_PUBLISHED = 'publish';
     const EP_LISTING = 701;
     const DB_VERSION = 3;
     const REQ_HTML = '<span class="lsd-required">*</span>';
@@ -61,6 +68,45 @@ class LSD_Base
         // Print the output
         echo trim($output);
         return '';
+    }
+
+    public static function get_submission_dashboard_url(string $fallback = ''): string
+    {
+        $dashboard_page_id = LSD_Options::post_id('submission_page');
+        $dashboard_url = $dashboard_page_id ? get_permalink($dashboard_page_id) : '';
+
+        if (is_string($dashboard_url) && trim($dashboard_url) !== '') return $dashboard_url;
+
+        return $fallback;
+    }
+
+    protected static function get_entity_post(int $id, string $post_type): ?WP_Post
+    {
+        if ($id < 1 || $post_type === '') return null;
+
+        $post = get_post($id);
+        if (!$post || $post->post_type !== $post_type || $post->post_status === self::STATUS_TRASH) return null;
+
+        return $post;
+    }
+
+    protected static function get_user_post_ids_by_meta(string $meta_key, int $user_id, int $limit = -1): array
+    {
+        if ($meta_key === '' || $user_id < 1) return [];
+
+        $post_ids = LSD_Main::get_post_ids($meta_key, $user_id);
+        if (!$post_ids) return [];
+
+        usort($post_ids, static function (int $a, int $b): int
+        {
+            $time_a = (int) get_post_time('U', true, $a);
+            $time_b = (int) get_post_time('U', true, $b);
+
+            if ($time_a === $time_b) return $b <=> $a;
+            return $time_b <=> $time_a;
+        });
+
+        return $limit > 0 ? array_slice($post_ids, 0, $limit) : $post_ids;
     }
 
     public function get_listdom_path(): string

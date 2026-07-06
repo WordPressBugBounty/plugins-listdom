@@ -73,7 +73,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                         'show_empty' => true,
                     ]); ?>
                 </div>
-                <button id="lsd_ix_csv_load_template_map" data-file="<?php echo esc_attr($file); ?>" type="button" class="lsd-secondary-button"><?php esc_html_e('Map', 'listdom'); ?><i class="listdom-icon lsdi-right-arrow"></i></button>
+                <button id="lsd_ix_csv_load_template_map" data-file="<?php echo esc_attr($file); ?>" type="button" class="lsd-secondary-button"><?php esc_html_e('Map', 'listdom'); ?><i class="webilia-icon wbli-right-arrow"></i></button>
             </div>
 
             <div class="lsd-addons-csv-method-wrapper <?php echo !$auto_mapping || $method !== 'smart-mapping' ? 'lsd-util-hide' : ''; ?>" id="lsd_addons_csv_smart-mapping">
@@ -93,7 +93,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                                 'name' => 'ix[ai_profile]',
                             ]); ?>
                         </div>
-                        <button id="lsd_ix_csv_auto_map" data-file="<?php echo esc_attr($file); ?>" type="button" class="lsd-secondary-button"><?php esc_html_e('Map', 'listdom'); ?><i class="listdom-icon lsdi-right-arrow"></i></button>
+                        <button id="lsd_ix_csv_auto_map" data-file="<?php echo esc_attr($file); ?>" type="button" class="lsd-secondary-button"><?php esc_html_e('Map', 'listdom'); ?><i class="webilia-icon wbli-right-arrow"></i></button>
                     </div>
                     <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('You can use the auto-map feature powered by AI. You need to configure your AI models first in Listdom settings.', 'listdom');?></p>
                 </div>

@@ -198,6 +198,62 @@ class LSD_Shortcodes_Checkout extends LSD_Base
             wp_send_json(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom')]);
         }
 
+        $resume_order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
+        if ($resume_order_id > 0)
+        {
+            $order = LSD_Payments_Orders::get($resume_order_id);
+            if (!$order) wp_send_json(['success' => 0, 'message' => esc_html__('Order not found!', 'listdom')]);
+
+            $order_key = sanitize_text_field((string) ($_POST['order_key'] ?? ''));
+            if ($order_key === '' || $order->get_key() !== $order_key)
+            {
+                wp_send_json(['success' => 0, 'message' => esc_html__('Order verification failed!', 'listdom')]);
+            }
+
+            $gateway_key = sanitize_text_field((string) ($order->get_gateway() ?? ''));
+            $gateway = LSD_Payments::gateway($gateway_key);
+
+            if (!$gateway || !method_exists($gateway, 'finalize_pending_order'))
+            {
+                wp_send_json(['success' => 0, 'message' => esc_html__('This payment does not support checkout resumption.', 'listdom')]);
+            }
+
+            $completion = $gateway->finalize_pending_order($resume_order_id, [
+                'payment_intent' => sanitize_text_field((string) ($_POST['payment_intent'] ?? '')),
+                'request' => $_POST,
+            ]);
+
+            if (is_wp_error($completion))
+            {
+                $data = $completion->get_error_data();
+                if (is_array($data) && !empty($data['action_required']))
+                {
+                    LSD_Payments_Orders::on_hold($resume_order_id);
+                    wp_send_json([
+                        'success' => 0,
+                        'message' => $completion->get_error_message(),
+                        'data' => $data,
+                        'order_id' => $resume_order_id,
+                        'key' => $order->get_key(),
+                    ]);
+                }
+
+                LSD_Payments_Orders::failed($resume_order_id);
+                wp_send_json(['success' => 0, 'message' => $completion->get_error_message()]);
+            }
+
+            if ($gateway->auto_complete()) LSD_Payments_Orders::completed($resume_order_id);
+
+            $cart = new LSD_Cart();
+            $cart->clear();
+
+            wp_send_json([
+                'success' => 1,
+                'order_id' => $resume_order_id,
+                'key' => $order->get_key(),
+            ]);
+        }
+
         $gateway_key = sanitize_text_field($_POST['gateway'] ?? '');
         $message = sanitize_textarea_field($_POST['message'] ?? '');
         $name = sanitize_text_field($_POST['name'] ?? '');
@@ -292,6 +348,19 @@ class LSD_Shortcodes_Checkout extends LSD_Base
 
         if (is_wp_error($completion))
         {
+            $data = $completion->get_error_data();
+            if (is_array($data) && !empty($data['action_required']))
+            {
+                LSD_Payments_Orders::on_hold($order_id);
+                wp_send_json([
+                    'success' => 0,
+                    'message' => $completion->get_error_message(),
+                    'data' => $data,
+                    'order_id' => $order_id,
+                    'key' => $order_key,
+                ]);
+            }
+
             LSD_Payments_Orders::failed($order_id);
             wp_send_json(['success' => 0, 'message' => $completion->get_error_message()]);
         }

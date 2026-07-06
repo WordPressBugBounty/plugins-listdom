@@ -2,12 +2,15 @@
 
 class LSD_Payments extends LSD_Base
 {
+    const STATUS_APPROVE = 'publish';
+
     const STATUS_PENDING = 'pending';
     const STATUS_ON_HOLD = 'on-hold';
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELED = 'canceled';
     const STATUS_FAILED = 'failed';
     const STATUS_DRAFT = 'draft';
+    const STATUS_TRASH = 'trash';
     const STATUS_REFUNDED = 'refunded';
 
     public function init()

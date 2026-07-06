@@ -74,56 +74,20 @@ class LSD_Taxonomies extends LSD_Base
         // We're in an embed post
         if (is_embed()) return $template;
 
-        // Listdom Settings
-        $settings = LSD_Options::settings();
+        $queried = get_queried_object();
+        if (!isset($queried->taxonomy, $queried->term_id)) return $template;
 
-        // Listdom Location
-        if (is_tax(LSD_Base::TAX_LOCATION) && isset($settings['location_archive']) && trim($settings['location_archive']))
-        {
-            $file = 'taxonomy-' . LSD_Base::TAX_LOCATION . '.php';
-            $template = locate_template($file);
+        $taxonomy = $queried->taxonomy;
+        if (!in_array($taxonomy, $this->taxonomies(), true)) return $template;
+        if ($this->archive_shortcode($taxonomy, (int) $queried->term_id) <= 0) return $template;
 
-            // Listdom Template
-            if ($template === '') $template = lsd_template($file);
-        }
-        // Listdom Category
-        else if (is_tax(LSD_Base::TAX_CATEGORY) && isset($settings['category_archive']) && trim($settings['category_archive']))
-        {
-            $file = 'taxonomy-' . LSD_Base::TAX_CATEGORY . '.php';
-            $template = locate_template($file);
+        $file = 'taxonomy-' . $taxonomy . '.php';
+        $located_template = locate_template($file);
 
-            // Listdom Template
-            if ($template === '') $template = lsd_template($file);
-        }
-        // Listdom Feature
-        else if (is_tax(LSD_Base::TAX_FEATURE) && isset($settings['feature_archive']) && trim($settings['feature_archive']))
-        {
-            $file = 'taxonomy-' . LSD_Base::TAX_FEATURE . '.php';
-            $template = locate_template($file);
+        // Listdom Template
+        if ($located_template === '') return lsd_template($file);
 
-            // Listdom Template
-            if ($template === '') $template = lsd_template($file);
-        }
-        // Listdom Tag
-        else if (is_tax(LSD_Base::TAX_TAG) && isset($settings['tag_archive']) && trim($settings['tag_archive']))
-        {
-            $file = 'taxonomy-' . LSD_Base::TAX_TAG . '.php';
-            $template = locate_template($file);
-
-            // Listdom Template
-            if ($template === '') $template = lsd_template($file);
-        }
-        // Listdom Label
-        else if (is_tax(LSD_Base::TAX_LABEL) && isset($settings['label_archive']) && trim($settings['label_archive']))
-        {
-            $file = 'taxonomy-' . LSD_Base::TAX_LABEL . '.php';
-            $template = locate_template($file);
-
-            // Listdom Template
-            if ($template === '') $template = lsd_template($file);
-        }
-
-        return $template;
+        return $located_template;
     }
 
     /**
@@ -141,20 +105,102 @@ class LSD_Taxonomies extends LSD_Base
         if (!in_array($q->taxonomy, $this->taxonomies())) return;
 
         // Listdom Settings
-        $settings = LSD_Options::settings();
-
-        $shortcode_id = (int) $settings['label_archive'];
-        if ($q->taxonomy === LSD_Base::TAX_LOCATION) $shortcode_id = (int) $settings['location_archive'];
-        else if ($q->taxonomy === LSD_Base::TAX_FEATURE) $shortcode_id = (int) $settings['feature_archive'];
-        else if ($q->taxonomy === LSD_Base::TAX_CATEGORY) $shortcode_id = (int) $settings['category_archive'];
-        else if ($q->taxonomy === LSD_Base::TAX_TAG) $shortcode_id = (int) $settings['tag_archive'];
-
         $LSD = new LSD_Shortcodes_Listdom();
-        echo LSD_Kses::full($LSD->output([
-            'id' => $shortcode_id,
-        ], [
+        $shortcode_id = $this->archive_shortcode($q->taxonomy, (int) $q->term_id);
+
+        $atts = [];
+        if ($shortcode_id > 0) $atts['id'] = $shortcode_id;
+
+        echo LSD_Kses::full($LSD->output($atts, [
             'lsd_filter' => [],
         ]));
+    }
+
+    protected function archive_shortcode($taxonomy, int $term_id = 0): int
+    {
+        if ($term_id > 0 && LSD_Base::isPro())
+        {
+            $term_shortcode = (int) get_term_meta($term_id, 'lsd_archive_shortcode', true);
+            if ($term_shortcode > 0) return $term_shortcode;
+        }
+
+        $setting_key = $this->archive_setting_key($taxonomy);
+        if ($setting_key === '') return 0;
+
+        $settings = LSD_Options::settings();
+        return isset($settings[$setting_key]) ? (int) $settings[$setting_key] : 0;
+    }
+
+    protected function archive_setting_key($taxonomy): string
+    {
+        if ($taxonomy === LSD_Base::TAX_LOCATION) return 'location_archive';
+        if ($taxonomy === LSD_Base::TAX_CATEGORY) return 'category_archive';
+        if ($taxonomy === LSD_Base::TAX_TAG) return 'tag_archive';
+        if ($taxonomy === LSD_Base::TAX_FEATURE) return 'feature_archive';
+        if ($taxonomy === LSD_Base::TAX_LABEL) return 'label_archive';
+
+        return '';
+    }
+
+    protected function archive_shortcode_add_field(): void
+    {
+        ?>
+        <div class="form-field">
+            <h3><?php esc_html_e('Archive Shortcode Settings', 'listdom'); ?></h3>
+            <div class="lsd-border lsd-border-radius lsd-p-4 lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-4 width-95-percent">
+                <div>
+                    <label for="lsd_archive_shortcode"><?php esc_html_e('Archive Shortcode', 'listdom'); ?></label>
+                    <?php if ($this->isPro()): ?>
+                        <?php echo LSD_Form::shortcodes([
+                            'id' => 'lsd_archive_shortcode',
+                            'name' => 'lsd_archive_shortcode',
+                            'value' => '',
+                            'only_archive_skins' => '1',
+                            'show_empty' => '1',
+                            'empty_label' => esc_html__('Inherit from global archive settings', 'listdom'),
+                        ]); ?>
+                        <p class="description"><?php esc_html_e('Select a shortcode to override the archive design for this term. This has priority over Settings > General > Archives.', 'listdom'); ?></p>
+                    <?php else: ?>
+                        <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Archive Shortcode', 'listdom')), 'warning'); ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    protected function archive_shortcode_edit_field($term): void
+    {
+        ?>
+        <tr class="form-field">
+            <th scope="row">
+                <label for="lsd_archive_shortcode"><?php esc_html_e('Archive Shortcode', 'listdom'); ?></label>
+            </th>
+            <td>
+                <?php if ($this->isPro()): ?>
+                    <?php echo LSD_Form::shortcodes([
+                        'id' => 'lsd_archive_shortcode',
+                        'name' => 'lsd_archive_shortcode',
+                        'value' => get_term_meta($term->term_id, 'lsd_archive_shortcode', true),
+                        'only_archive_skins' => '1',
+                        'show_empty' => '1',
+                        'empty_label' => esc_html__('Inherit from global archive settings', 'listdom'),
+                    ]); ?>
+                    <p class="description"><?php esc_html_e('Select a shortcode to override the archive design for this term. This has priority over Settings > General > Archives.', 'listdom'); ?></p>
+                <?php else: ?>
+                    <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Archive Shortcode', 'listdom')), 'warning'); ?>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <?php
+    }
+
+    protected function save_archive_shortcode($term_id): void
+    {
+        if (!$this->isPro()) return;
+
+        $shortcode = isset($_POST['lsd_archive_shortcode']) ? (int) sanitize_text_field(wp_unslash($_POST['lsd_archive_shortcode'])) : 0;
+        update_term_meta($term_id, 'lsd_archive_shortcode', $shortcode);
     }
 
     public static function id($term, $taxonomy)

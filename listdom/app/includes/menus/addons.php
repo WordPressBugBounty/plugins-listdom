@@ -82,8 +82,8 @@ class LSD_Menus_Addons extends LSD_Menus
     public function get_badge(string $status): array
     {
         return $status === 'installed'
-            ? ['class' => 'lsd-success', 'icon' => 'lsdi-checkmark-circle', 'text' => esc_html__('Installed', 'listdom')]
-            : ['class' => '', 'icon' => 'lsdi-alert', 'text' => esc_html__('Not Installed', 'listdom')];
+            ? ['class' => 'lsd-success', 'icon' => 'wbli-checkmark-circle', 'text' => esc_html__('Installed', 'listdom')]
+            : ['class' => '', 'icon' => 'wbli-alert', 'text' => esc_html__('Not Installed', 'listdom')];
     }
 
     public function get_grouped_addons(): array

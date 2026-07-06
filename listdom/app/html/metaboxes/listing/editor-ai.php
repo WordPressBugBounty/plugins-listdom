@@ -18,7 +18,7 @@ defined('ABSPATH') || die();
             </div>
             <div>
                 <button type="button" class="<?php echo is_admin() ? 'lsd-primary-button': 'lsd-general-button'; ?> lsd_ai_content_generate" data-editor-id="<?php echo esc_attr($uid); ?>">
-                    <i class="listdom-icon lsdi-stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?>
+                    <i class="webilia-icon wbli-stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?>
                 </button>
             </div>
         </div>

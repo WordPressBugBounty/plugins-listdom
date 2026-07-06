@@ -3,6 +3,17 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v5.7.0 <span>July 4th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added a new Frontend Dashboard payments area with order, subscription, billing, invoice, and Stripe payment flows.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added action-driven setup and demo blueprints to make directory setup, dummy data, categories, custom fields, and search forms easier to prepare.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added taxonomy count display options in search forms.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added search button controls for search fields and API search requests.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved booking and membership experiences with richer dashboard views, availability handling, matched bookable cards, and subscription comparisons.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved Table skin portability by using attribute slugs for custom field columns across imports and demos.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved admin and frontend interface consistency with cleaner Listdom and Listdomer class naming.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed frontend AJAX sorting and search sanitization to prevent unsafe meta type queries.', 'listdom'); ?></li>
+    </ul>
     <h2>v5.6.0 <span>June 7th, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Added AI-powered search with structured and semantic options, model settings, and connector approval notices.', 'listdom'); ?></li>

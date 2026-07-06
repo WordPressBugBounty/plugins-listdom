@@ -143,7 +143,7 @@ class LSD_Payments_Order extends LSD_Base
 
     public function get_meta_value(string $key, string $value): string
     {
-        if (in_array($key, ['lsd_listing_id', 'lsd_package_id', 'lsd_claim_id']))
+        if (in_array($key, ['lsd_listing_id', 'lsd_package_id', 'lsd_claim_id'], true))
         {
             $post = get_post($value);
             if ($post instanceof WP_Post)
@@ -153,8 +153,14 @@ class LSD_Payments_Order extends LSD_Base
 
                 if ($pt && !$pt->public)
                 {
-                    $url = get_edit_post_link($post);
-                    if (!current_user_can('edit_post', $post)) $title = $value;
+                    if (!current_user_can('edit_post', $post->ID))
+                    {
+                        return '#' . (int) $post->ID;
+                    }
+
+                    // Build the admin edit URL directly to avoid third-party edit_post
+                    // capability filters firing while we only need a reference link.
+                    $url = $this->get_edit_post_link((int) $post->ID);
                 }
                 else $url = get_permalink($post);
 
@@ -184,6 +190,33 @@ class LSD_Payments_Order extends LSD_Base
     {
         $location = get_post_meta($this->get_id(), 'lsd_tax_location', true);
         return is_array($location) ? $location : [];
+    }
+
+    public function get_billing_details(): array
+    {
+        $details = get_post_meta($this->get_id(), 'lsd_billing_details', true);
+        if (is_array($details) && $details) return $details;
+
+        $user_id = $this->get_user_id();
+        $location = $this->get_tax_location();
+
+        $details = [
+            'name' => $this->get_name(),
+            'email' => $this->get_email(),
+            'phone' => $user_id ? (string) get_user_meta($user_id, 'billing_phone', true) : '',
+            'company_name' => $user_id ? (string) get_user_meta($user_id, 'billing_company', true) : '',
+            'tax_vat_id' => $user_id ? (string) get_user_meta($user_id, 'billing_tax_vat_id', true) : '',
+            'country' => isset($location['country']) ? (string) $location['country'] : '',
+            'state' => isset($location['state']) ? (string) $location['state'] : '',
+            'address' => $user_id ? (string) get_user_meta($user_id, 'billing_address_1', true) : '',
+            'city' => $user_id ? (string) get_user_meta($user_id, 'billing_city', true) : '',
+            'postal_code' => $user_id ? (string) get_user_meta($user_id, 'billing_postcode', true) : '',
+        ];
+
+        return array_filter($details, static function ($value): bool
+        {
+            return $value !== '';
+        });
     }
 
     public function prices_include_tax(): bool

@@ -15,7 +15,7 @@ defined('ABSPATH') || die();
             <div class="lsd-ask-review-buttons lsd-flex lsd-flex-row lsd-gap-3 lsd-mt-3 lsd-flex-items-center">
                 <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('update.php?action=install-theme&theme=listdomer&_wpnonce='.wp_create_nonce('install-theme_listdomer'))); ?>" target="_blank">
                     <span><?php echo esc_html__('YES, Install Listdomer Theme', 'listdom'); ?></span>
-                    <i class="listdom-icon lsdi-right-arrow"></i>
+                    <i class="webilia-icon wbli-right-arrow"></i>
                 </a>
                 <a class="lsd-text-button" href="<?php echo esc_url(add_query_arg('lsd-listdomer', 'later')); ?>"><?php echo esc_html__('Maybe, Later', 'listdom'); ?></a>
                 <a class="lsd-text-button" href="<?php echo esc_url(add_query_arg('lsd-listdomer', 'done')); ?>"><?php echo esc_html__('No, Thanks', 'listdom'); ?></a>

@@ -78,7 +78,7 @@ $expiring_notice_payload = LSD_Licensing::getMessagePayload($status, $product, '
                     <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>"
                        target="_blank">
                         <?php esc_html_e('Renew License', 'listdom'); ?>
-                        <i class="listdom-icon lsdi-key"></i>
+                        <i class="webilia-icon wbli-key"></i>
                     </a>
                 </div>
             <?php elseif ($status['action'] === 'get_license'): ?>
@@ -86,7 +86,7 @@ $expiring_notice_payload = LSD_Licensing::getMessagePayload($status, $product, '
                     <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>"
                        target="_blank">
                         <?php esc_html_e('Get License', 'listdom'); ?>
-                        <i class="listdom-icon lsdi-key"></i>
+                        <i class="webilia-icon wbli-key"></i>
                     </a>
                 </div>
             <?php endif; ?>
@@ -109,7 +109,7 @@ $expiring_notice_payload = LSD_Licensing::getMessagePayload($status, $product, '
                 </div>
                 <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>" target="_blank">
                     <?php esc_html_e('Get License', 'listdom'); ?>
-                    <i class="listdom-icon lsdi-key"></i>
+                    <i class="webilia-icon wbli-key"></i>
                 </a>
             </div>
         <?php endif; ?>
@@ -180,14 +180,14 @@ $expiring_notice_payload = LSD_Licensing::getMessagePayload($status, $product, '
                     <a data-copied="<?php echo esc_html__('Copied!', 'listdom'); ?>"
                        class="lsd-copy lsd-w-auto"
                        data-target="lsd-license-code-<?php echo esc_attr($key); ?>">
-                        <i class="listdom-icon lsdi-copy"></i>
+                        <i class="webilia-icon wbli-copy"></i>
                     </a>
                 </div>
             </div>
             <a class="lsd-neutral-button lsd-w-auto" href="<?php echo esc_url($this->getManageLicensesURL()); ?>"
                target="_blank">
                 <?php esc_html_e('Manage Licenses', 'listdom'); ?>
-                <i class="listdom-icon lsdi-link-square"></i>
+                <i class="webilia-icon wbli-link-square"></i>
             </a>
         </div>
     <div class="lsd-w-full lsd-deactivation">

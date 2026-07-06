@@ -99,7 +99,7 @@ $export_url = add_query_arg('lsd-type', 'listings', $export_base);
                         ]); ?>
                         <button type="submit" id="lsd_ix_csv_import_submit" class="lsd-primary-button">
                             <?php esc_html_e('Import', 'listdom'); ?>
-                            <i class="listdom-icon lsdi-checkmark-circle"></i>
+                            <i class="webilia-icon wbli-checkmark-circle"></i>
                         </button>
                     </div>
                 </div>
@@ -178,7 +178,7 @@ $export_url = add_query_arg('lsd-type', 'listings', $export_base);
                                 <?php LSD_Form::nonce('lsdaddcsv_auto_add'); ?>
                                 <button class="lsd-primary-button" type="submit">
                                     <?php esc_html_e('Add Import Job', 'listdom'); ?>
-                                    <i class="listdom-icon lsdi-checkmark-circle"></i>
+                                    <i class="webilia-icon wbli-checkmark-circle"></i>
                                 </button>
                             </div>
                         </div>

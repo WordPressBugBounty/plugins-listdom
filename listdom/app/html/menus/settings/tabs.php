@@ -18,7 +18,7 @@ $ai_module_panels = $this->get_ai_module_panels();
     <ul class="lsd-nav-tab-wrapper">
         <li class="lsd-has-children lsd-general-nav <?php echo $this->tab === 'general' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'general' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=general')); ?>">
-                <i class="listdom-icon lsdi-menu-square lsd-m-0"></i>
+                <i class="webilia-icon wbli-menu-square lsd-m-0"></i>
                 <?php esc_html_e('General', 'listdom'); ?>
             </a>
             <ul class="lsd-nav-sub-tabs" data-parent="general" hidden>
@@ -39,7 +39,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-customizer-nav <?php echo $this->tab === 'customizer' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'customizer' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer')); ?>">
-                <i class="listdom-icon lsdi-customizer lsd-m-0"></i>
+                <i class="webilia-icon wbli-customizer lsd-m-0"></i>
                 <?php esc_html_e('Customizer', 'listdom'); ?>
             </a>
             <ul data-parent="customizer" class="lsd-nav-sub-tabs lsd-tabs">
@@ -55,7 +55,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-frontend-dashboard-nav <?php echo $this->tab === 'frontend-dashboard' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'frontend-dashboard' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard')); ?>">
-                <i class="listdom-icon lsdi-frontend-dashboard lsd-m-0"></i>
+                <i class="webilia-icon wbli-frontend-dashboard lsd-m-0"></i>
                 <?php esc_html_e('Frontend Dashboard', 'listdom'); ?>
             </a>
             <ul data-parent="frontend-dashboard" class="lsd-nav-sub-tabs lsd-tabs">
@@ -72,7 +72,7 @@ $ai_module_panels = $this->get_ai_module_panels();
 
         <li class="lsd-has-children lsd-users-nav <?php echo $this->tab === 'auth' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'auth' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>">
-                <i class="listdom-icon lsdi-user-circle lsd-m-0"></i>
+                <i class="webilia-icon wbli-user-circle lsd-m-0"></i>
                 <?php esc_html_e('Users', 'listdom'); ?>
             </a>
             <ul data-parent="auth" class="lsd-nav-sub-tabs lsd-tabs">
@@ -87,7 +87,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-single-listing-nav <?php echo $this->tab === 'single-listing' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'single-listing' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=single-listing')); ?>">
-                <i class="listdom-icon lsdi-list-view lsd-m-0"></i>
+                <i class="webilia-icon wbli-list-view lsd-m-0"></i>
                 <?php esc_html_e('Single Listing', 'listdom'); ?>
             </a>
             <ul data-parent="single-listing" class="lsd-nav-sub-tabs lsd-tabs">
@@ -97,7 +97,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-advanced-nav <?php echo $this->tab === 'advanced' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'advanced' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=advanced')); ?>">
-                <i class="listdom-icon lsdi-advanced lsd-m-0"></i>
+                <i class="webilia-icon wbli-advanced lsd-m-0"></i>
                 <?php esc_html_e('Advanced', 'listdom'); ?>
             </a>
             <ul data-parent="advanced" class="lsd-nav-sub-tabs lsd-tabs">
@@ -110,7 +110,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-payments-nav <?php echo $this->tab === 'payments' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'payments' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=payments')); ?>">
-                <i class="listdom-icon lsdi-payment lsd-m-0"></i>
+                <i class="webilia-icon wbli-payment lsd-m-0"></i>
                 <?php esc_html_e('Payments', 'listdom'); ?>
             </a>
             <ul
@@ -130,7 +130,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-ai-nav <?php echo $this->tab === 'ai' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'ai' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=ai')); ?>">
-                <i class="listdom-icon lsdi-stars lsd-m-0"></i>
+                <i class="webilia-icon wbli-stars lsd-m-0"></i>
                 <?php esc_html_e('AI', 'listdom'); ?>
             </a>
             <ul data-parent="ai" class="lsd-nav-sub-tabs lsd-tabs">
@@ -143,7 +143,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-api-nav">
             <a class="lsd-nav-tab <?php echo $this->tab === 'api' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=api')); ?>">
-                <i class="listdom-icon lsdi-api lsd-m-0"></i>
+                <i class="webilia-icon wbli-api lsd-m-0"></i>
                 <?php esc_html_e('API', 'listdom'); ?>
             </a>
         </li>
@@ -157,7 +157,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         <?php if ($addon): ?>
         <li class="lsd-has-children lsd-addons-nav <?php echo $this->tab === 'addons' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'addons' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=addons')); ?>">
-                <i class="listdom-icon lsdi-add-plus-circle lsd-m-0"></i>
+                <i class="webilia-icon wbli-add-plus-circle lsd-m-0"></i>
                 <?php esc_html_e('Addons', 'listdom'); ?>
             </a>
 
@@ -170,7 +170,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         <?php if ($toolkits): ?>
         <li class="lsd-has-children lsd-addons-nav <?php echo $this->tab === 'toolkits' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'toolkits' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=toolkits')); ?>">
-                <i class="listdom-icon lsdi-group-items lsd-m-0"></i>
+                <i class="webilia-icon wbli-group-items lsd-m-0"></i>
                 <?php esc_html_e('Toolkits', 'listdom'); ?>
             </a>
 

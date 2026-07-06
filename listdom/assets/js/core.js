@@ -1867,6 +1867,139 @@
                 .addClass('lsd-listing-bookables-'+type);
         });
 
+        /**
+         * Booking -- Select Bookable Item
+         */
+        $(document).on('click', '.lsd-booking-bookable-item', function(e)
+        {
+            const $target = $(e.target);
+
+            // Prevent toggling when clicking fields, links, buttons, labels, or price toggle.
+            if($target.closest('input, button, a, select, textarea, label, .lsd-toggle').length) return;
+
+            const $bookable = $(this);
+
+            // Event mode: toggle ticket count between 0 and 1.
+            const $ticketInput = $bookable.find('.lsd-booking-bookable-ticket-count').first();
+
+            if($ticketInput.length && !$ticketInput.is(':disabled'))
+            {
+                e.preventDefault();
+
+                const currentValue = parseInt($ticketInput.val(), 10) || 0;
+                const max = parseInt($ticketInput.attr('max'), 10);
+
+                let newValue = currentValue > 0 ? 0 : 1;
+
+                if(!isNaN(max)) newValue = Math.min(newValue, max);
+
+                $ticketInput
+                .val(newValue)
+                .trigger('input')
+                .trigger('change');
+
+                return;
+            }
+
+            // General / property mode: toggle the real checkbox.
+            const $checkbox = $bookable.find('input[type="checkbox"][name="booking[items][]"]').first();
+
+            if(!$checkbox.length || $checkbox.is(':disabled')) return;
+
+            $checkbox
+            .prop('checked', !$checkbox.prop('checked'))
+            .trigger('change');
+        });
+
+        /**
+         * Booking -- Event Visual Checkbox State
+         */
+        $(document).on('input change', '.lsd-booking-bookable-ticket-count', function()
+        {
+            const $input = $(this);
+            const count = parseInt($input.val(), 10) || 0;
+            const $bookable = $input.closest('.lsd-booking-bookable-item');
+            const $checkbox = $bookable.find('.lsd-booking-bookable-visual-checkbox').first();
+
+            const selected = count > 0;
+
+            $checkbox.prop('checked', selected);
+            $bookable.toggleClass('lsd-booking-bookable-selected', selected);
+        });
+
+        /**
+         * Booking -- Bookable Selected State
+         */
+        $(document).on('change', '.lsd-booking-bookable-item input[type="checkbox"][name="booking[items][]"]', function()
+        {
+            const $checkbox = $(this);
+
+            $checkbox
+            .closest('.lsd-booking-bookable-item')
+            .toggleClass('lsd-booking-bookable-selected', $checkbox.is(':checked'));
+        });
+
+        /**
+         * Booking -- Empty Bookable Notify
+         */
+        $(document).on('submit', '.lsd-booking-empty-notify-form', function(e)
+        {
+            e.preventDefault();
+
+            const $form = $(this);
+            const $alert = $form.closest('.lsd-booking-empty-state').find('.lsd-booking-empty-notify-alert');
+            const $button = $form.find('button[type="submit"]');
+
+            const loading = new ListdomButtonLoader($button);
+            loading.start($button.text());
+
+            $.ajax({
+                url: (typeof lsd !== 'undefined' && lsd.ajaxurl) ? lsd.ajaxurl : ajaxurl,
+                type: 'POST',
+                dataType: 'json',
+                data: $form.serialize(),
+
+                beforeSend: function()
+                {
+                    $alert
+                    .removeClass('lsd-alert lsd-success lsd-error')
+                    .empty();
+                },
+
+                success: function(response)
+                {
+                    if(response.success) $alert.html(listdom_alertify(response.message, "lsd-success"));
+                    else $alert.html(listdom_alertify(response.message, "lsd-error"));
+
+                    if(response.success) $form[0].reset();
+                },
+
+                error: function(xhr)
+                {
+                    let message = "An error occurred while sending the notification request.";
+
+                    if(xhr.responseJSON)
+                    {
+                        if(xhr.responseJSON.message)
+                        {
+                            message = xhr.responseJSON.message;
+                        }
+                        else if(xhr.responseJSON.data && xhr.responseJSON.data.message)
+                        {
+                            message = xhr.responseJSON.data.message;
+                        }
+                    }
+
+                    $alert.html(listdom_alertify(message, "lsd-error"));
+                },
+
+                complete: function()
+                {
+                    loading.stop();
+                }
+            });
+        });
+
         listdom_trigger_bookable_remove();
         listdom_trigger_bookable_advanced();
         listdom_trigger_bookable_prices();
@@ -2589,12 +2722,20 @@ function listdom_trigger_select()
 {
     jQuery('.lsd-trigger-select-options').off('change').on('change', function()
     {
-        const $selectedOption = jQuery(this).find('option:selected');
+        const $select = jQuery(this);
+        const $selectedOption = $select.find('option:selected');
         const show = $selectedOption.data('lsd-show');
         const hide = $selectedOption.data('lsd-hide');
 
         if (show) jQuery(show).removeClass('lsd-util-hide').show();
         if (hide) jQuery(hide).addClass('lsd-util-hide').hide();
+
+        if ($select.attr('id') === 'lsd_addons_booking_payment_mode')
+        {
+            const mode = $select.val();
+            jQuery('#lsd_addons_booking_payment').val(mode === 'none' ? 0 : 1);
+            jQuery('#lsd_addons_booking_partial_payment').val(mode === 'partial' ? 1 : 0);
+        }
     });
 }
 
@@ -2894,6 +3035,55 @@ function listdom_alertify(alert, type)
     return '<div class="lsd-alert '+type+'">'+alert+'</div>';
 }
 
+function ListdomButtonLoader($button) {
+    this.$button = $button;
+    this.originalHtml = $button.html();
+
+    this.iconSelector = 'i, .lsd-icon, .lsd-fe-icon, .lsdi, .wbli, svg';
+
+    this.iconPosition = (() => {
+        const $temp = jQuery('<div>').html(this.originalHtml);
+
+        const nodes = $temp.contents().filter(function () {
+            return this.nodeType === 1 || jQuery.trim(this.textContent || '').length;
+        });
+
+        if (!nodes.length) return 'right';
+
+        const firstNode = nodes[0];
+        const lastNode = nodes[nodes.length - 1];
+
+        const isIcon = (node) => {
+            if (node.nodeType !== 1) return false;
+
+            const $node = jQuery(node);
+
+            return $node.is(this.iconSelector) || $node.find(this.iconSelector).length;
+        };
+
+        if (isIcon(firstNode)) return 'left';
+        if (isIcon(lastNode)) return 'right';
+
+        return 'right';
+    })();
+
+    // Start Loading Style
+    this.start = (loadingText) => {
+        const loader = '<i class="lsd-loader"></i>';
+
+        this.$button
+        .html(this.iconPosition === 'left' ? loader + ' ' + loadingText : loadingText + ' ' + loader)
+        .attr('disabled', 'disabled');
+    };
+
+    // Stop Loading Style
+    this.stop = () => {
+        this.$button
+        .html(this.originalHtml)
+        .removeAttr('disabled');
+    };
+}
+
 const ListdomPageScroll = {
     isLocked: false,
     lockedClass: 'lsd-modal-scroll-locked',
@@ -3073,13 +3263,13 @@ window.ListdomPageScroll = ListdomPageScroll;
 
 function listdom_toastify(alert, type, options = {})
 {
-    if (options.update instanceof ListdomToast)
+    if (options.update instanceof WebiliaToast)
     {
         options.update.update(alert, type);
         return options.update;
     }
 
-    return new ListdomToast(alert, {
+    return new WebiliaToast(alert, {
         type: type,
         position: options.position,
         icon: options.icon,
@@ -3111,9 +3301,9 @@ function listdom_toastify(alert, type, options = {})
             return;
         }
 
-        if (typeof window.ListdomToast === 'function')
+        if (typeof window.WebiliaToast === 'function')
         {
-            new window.ListdomToast(message, {type: 'lsd-error'});
+            new window.WebiliaToast(message, {type: 'lsd-error'});
             return;
         }
 

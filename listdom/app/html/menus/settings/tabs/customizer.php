@@ -31,7 +31,7 @@ $options = (new LSD_Customizer())->options();
         <div class="lsd-flex lsd-gap-3">
             <h3 id="lsd_customizer_tab_title" class="lsd-m-0 lsd-admin-title"></h3>
             <div class="lsd-tooltip lsd-tooltip-top lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
-                <i class="lsdi lsdi-reset"></i>
+                <i class="wbli wbli-reset"></i>
             </div>
         </div>
         <form id="lsd_settings_reset" class="lsd-flex lsd-flex-row lsd-flex-items-stretch lsd-flex-content-end lsd-gap-3 lsd-p-0">
@@ -88,7 +88,7 @@ $options = (new LSD_Customizer())->options();
                                                             <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html($group['title']); ?></h3>
                                                         <?php endif; ?>
                                                             <div class="lsd-tooltip lsd-tooltip-top lsd-cursor-pointer lsd-customizer-reset-category" data-confirm="0" data-category="<?php echo esc_attr($ck.'.'.$sk.'.'.$gk); ?>" data-nonce="<?php echo wp_create_nonce('lsd_settings_form'); ?>" data-lsd-tooltip="<?php esc_attr_e('Click twice to reset section', 'listdom'); ?>">
-                                                                <i class="lsdi lsdi-reset"></i>
+                                                                <i class="wbli wbli-reset"></i>
                                                             </div>
                                                         </div>
                                                         <?php if (isset($group['sub_title']) && trim($group['sub_title'])): ?>
@@ -182,7 +182,7 @@ $options = (new LSD_Customizer())->options();
                 <?php LSD_Form::nonce('lsd_settings_form'); ?>
                 <button type="submit" id="lsd_settings_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='lsdi lsdi-checkmark-circle'></i>
+                    <i class='wbli wbli-checkmark-circle'></i>
                 </button>
             </div>
         </div>

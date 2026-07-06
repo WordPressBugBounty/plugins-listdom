@@ -88,6 +88,28 @@ abstract class LSD_Payments_Gateway extends LSD_Base
         return true;
     }
 
+    /**
+     * Allow gateways to disable recurring auto-renewal at the provider level.
+     *
+     * @param LSD_Payments_Recurring $recurring
+     * @return true|WP_Error
+     */
+    public function disable_autorenew(LSD_Payments_Recurring $recurring)
+    {
+        return true;
+    }
+
+    /**
+     * Allow gateways to reactivate recurring auto-renewal at the provider level.
+     *
+     * @param LSD_Payments_Recurring $recurring
+     * @return true|WP_Error
+     */
+    public function activate_autorenew(LSD_Payments_Recurring $recurring)
+    {
+        return true;
+    }
+
     public function form_checkout(): string
     {
         $path = lsd_template('payments/gateway-forms/' . $this->key() . '.php');

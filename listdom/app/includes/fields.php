@@ -2,6 +2,38 @@
 
 class LSD_Fields extends LSD_Base
 {
+    public const ATTRIBUTE_KEY_PREFIX = 'attr-';
+
+    public static function attribute_key($slug): string
+    {
+        $slug = sanitize_title((string) $slug);
+        return $slug === '' ? '' : self::ATTRIBUTE_KEY_PREFIX . $slug;
+    }
+
+    public static function attribute_slug_from_key($key): string
+    {
+        $key = (string) $key;
+
+        if (strpos($key, self::ATTRIBUTE_KEY_PREFIX) !== 0) return '';
+
+        return sanitize_title(substr($key, strlen(self::ATTRIBUTE_KEY_PREFIX)));
+    }
+
+    public static function attribute_id_from_key($key): int
+    {
+        if (is_numeric($key))
+        {
+            $term = get_term((int) $key, LSD_Base::TAX_ATTRIBUTE);
+            return $term && !is_wp_error($term) && isset($term->term_id) ? (int) $term->term_id : 0;
+        }
+
+        $slug = self::attribute_slug_from_key($key);
+        if ($slug === '') return 0;
+
+        $term = get_term_by('slug', $slug, LSD_Base::TAX_ATTRIBUTE);
+        return $term && !is_wp_error($term) && isset($term->term_id) ? (int) $term->term_id : 0;
+    }
+
     public function titles(array $fields = []): array
     {
         if (empty($fields)) $fields = $this->get();
@@ -71,7 +103,17 @@ class LSD_Fields extends LSD_Base
                 $type = get_term_meta($attribute->term_id, 'lsd_field_type', true);
                 if ($type == 'separator') continue;
 
-                $fields[$attribute->term_id] = ['label' => $attribute->name, 'enabled' => 0];
+                $slug = isset($attribute->slug) ? sanitize_title($attribute->slug) : '';
+                $key = self::attribute_key($slug);
+                if ($key === '') continue;
+
+                $fields[$key] = [
+                    'label' => $attribute->name,
+                    'enabled' => 0,
+                    'attribute_id' => (int) $attribute->term_id,
+                    'attribute_slug' => $slug,
+                    'legacy_key' => (string) $attribute->term_id,
+                ];
             }
         }
 
@@ -105,6 +147,13 @@ class LSD_Fields extends LSD_Base
     public function content($key, LSD_Entity_Listing $listing, $skin)
     {
         $output = '';
+        $attribute_id = self::attribute_id_from_key($key);
+
+        if ($attribute_id > 0)
+        {
+            $att = new LSD_Entity_Attribute($attribute_id);
+            return LSD_Kses::element($att->render($att->value($listing->id())));
+        }
 
         switch ($key)
         {
@@ -208,11 +257,6 @@ class LSD_Fields extends LSD_Base
                 $output = LSD_Kses::element($listing->get_map());
                 break;
 
-            case is_numeric($key):
-                $att = new LSD_Entity_Attribute($key);
-                $output = LSD_Kses::element($att->render($att->value($listing->id())));
-                break;
-
             case substr($key, 0, 3) === 'sn_':
                 $key_without_prefix = substr($key, 3);
                 $value = $listing->get_meta('lsd_' . $key_without_prefix);
@@ -240,6 +284,10 @@ class LSD_Fields extends LSD_Base
     public function schema($key)
     {
         $output = '';
+        $attribute_id = self::attribute_id_from_key($key);
+
+        if ($attribute_id > 0) return LSD_Entity_Attribute::schema($attribute_id);
+
         switch ($key)
         {
             case 'title':
@@ -265,10 +313,6 @@ class LSD_Fields extends LSD_Base
             case 'excerpt':
             case 'description':
                 $output = lsd_schema()->description();
-                break;
-
-            case is_numeric($key):
-                $output = LSD_Entity_Attribute::schema($key);
                 break;
 
             default:

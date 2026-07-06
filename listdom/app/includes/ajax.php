@@ -214,6 +214,7 @@ class LSD_Ajax extends LSD_Base
 
         $hide_empty = isset($request['hide_empty']) ? absint($request['hide_empty']) : 0;
         $parent = isset($request['parent']) ? absint($request['parent']) : 0;
+        $show_count = isset($request['show_count']) ? absint($request['show_count']) : 0;
 
         $terms = get_terms([
             'taxonomy' => $taxonomy,
@@ -233,12 +234,13 @@ class LSD_Ajax extends LSD_Base
             ]);
         }
 
+        $helper = new LSD_Search_Helper();
         $items = [];
         foreach ($terms as $term)
         {
             $items[] = [
                 'id' => $term->term_id,
-                'name' => $term->name,
+                'name' => $helper->taxonomy_term_label($term, ['show_count' => $show_count]),
                 'parent' => $term->parent,
             ];
         }

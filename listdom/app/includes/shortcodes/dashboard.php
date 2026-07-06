@@ -648,7 +648,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         return 'manage';
     }
 
-    protected function get_form_link($listing_id = null): string
+    public function get_form_link($listing_id = null): string
     {
         $url = $this->add_qs_var('mode', 'form', $this->url);
 
@@ -656,6 +656,22 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if ($listing_id) $url = $this->add_qs_var('id', $listing_id, $url);
 
         return $url;
+    }
+
+    public function empty(array $args = []): void
+    {
+        $action = $args['action'] ?? null;
+        $quick_actions = $args['quick_actions'] ?? null;
+
+        $empty_state = [
+            'title' => isset($args['title']) ? (string) $args['title'] : esc_html__('Nothing here yet', 'listdom'),
+            'description' => isset($args['description']) ? (string) $args['description'] : esc_html__('There is no data to show right now.', 'listdom'),
+            'image' => isset($args['image']) && trim((string) $args['image']) !== '' ? (string) $args['image'] : 'img/dashboard/no-listings.svg',
+            'action' => is_array($action) ? $action : [],
+            'quick_actions' => is_array($quick_actions) ? $quick_actions : [],
+        ];
+
+        include lsd_template('dashboard/empty.php');
     }
 
     public function save()
@@ -1577,5 +1593,196 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         ]);
 
         $this->response(['success' => 1,'html' => $html]);
+    }
+
+    public function get_listing_statuses_data(): array
+    {
+        return [
+            LSD_Base::STATUS_TRASH => [
+                'label' => esc_html__('Trash', 'listdom'),
+                'icon' => 'fa-solid fa-trash-alt',
+                'class' => 'lsd-dashboard-status-trash',
+            ],
+            LSD_Base::STATUS_INACTIVE => [
+                'label' => esc_html__('Inactive', 'listdom'),
+                'icon' => 'fa-regular fa-circle-stop',
+                'class' => 'lsd-dashboard-status-inactive',
+            ],
+            LSD_Base::STATUS_DENIED => [
+                'label' => esc_html__('Denied', 'listdom'),
+                'icon' => 'fa-regular fa-times-circle',
+                'class' => 'lsd-dashboard-status-denied',
+            ],
+            LSD_Base::STATUS_OFFLINE => [
+                'label' => esc_html__('Offline', 'listdom'),
+                'icon' => 'fa-solid fa-eye-slash',
+                'class' => 'lsd-dashboard-status-offline',
+            ],
+            LSD_Base::STATUS_HOLD => [
+                'label' => esc_html__('On Hold', 'listdom'),
+                'icon' => 'fa-regular fa-circle-pause',
+                'class' => 'lsd-dashboard-status-hold',
+            ],
+            LSD_Base::STATUS_EXPIRED => [
+                'label' => esc_html__('Expired', 'listdom'),
+                'icon' => 'fa-solid fa-cancel',
+                'class' => 'lsd-dashboard-status-expired',
+            ],
+            LSD_Base::STATUS_SCHEDULED => [
+                'label' => esc_html__('Scheduled', 'listdom'),
+                'icon' => 'fa-solid fa-clock-rotate-left',
+                'class' => 'lsd-dashboard-status-scheduled',
+            ],
+            LSD_Base::STATUS_DRAFT => [
+                'label' => esc_html__('Draft', 'listdom'),
+                'icon' => 'fa-regular fa-file-alt',
+                'class' => 'lsd-dashboard-status-draft',
+            ],
+            LSD_Base::STATUS_PENDING => [
+                'label' => esc_html__('Pending Review', 'listdom'),
+                'icon' => 'fa-solid fa-search',
+                'class' => 'lsd-dashboard-status-pending',
+            ],
+            LSD_Base::STATUS_PUBLISHED => [
+                'label' => esc_html__('Published', 'listdom'),
+                'icon' => 'fa-regular fa-circle-check',
+                'class' => 'lsd-dashboard-status-published',
+            ],
+        ];
+    }
+
+    public function get_listing_status_data(string $status): array
+    {
+        $statuses = $this->get_listing_statuses_data();
+
+        return $statuses[$status] ?? [
+            'label' => esc_html__('Unknown', 'listdom'),
+            'icon' => 'far fa-file-alt',
+            'class' => 'lsd-dashboard-status-unknown',
+        ];
+    }
+
+    public function get_listing_primary_category_name(WP_Post $listing): string
+    {
+        $category = LSD_Entity_Listing::get_primary_category($listing->ID);
+        if ($category instanceof WP_Term && isset($category->name) && trim((string) $category->name) !== '')
+        {
+            return (string) $category->name;
+        }
+
+        $terms = get_the_terms($listing->ID, LSD_Base::TAX_CATEGORY);
+        if (is_array($terms))
+        {
+            foreach ($terms as $term)
+            {
+                if ($term instanceof WP_Term && trim((string) $term->name) !== '')
+                {
+                    return (string) $term->name;
+                }
+            }
+        }
+
+        return '';
+    }
+
+    public function get_listing_package_name(WP_Post $listing): string
+    {
+        $package_id = (int) get_post_meta($listing->ID, 'lsd_package', true);
+
+        if ($package_id < 1)
+        {
+            $subscription_id = (int) get_post_meta($listing->ID, 'lsd_subscription', true);
+            if ($subscription_id > 0)
+            {
+                $package_id = (int) get_post_meta($subscription_id, 'lsd_package', true);
+            }
+        }
+
+        if ($package_id < 1) return '';
+
+        if (class_exists('\LSDPACSUB\Package'))
+        {
+            $package = new \LSDPACSUB\Package($package_id);
+            $title = trim($package->title());
+
+            if ($title !== '') return $title;
+        }
+
+        $package = get_post($package_id);
+        return $package instanceof WP_Post ? (string) $package->post_title : '';
+    }
+
+    public function get_listing_updated_label(WP_Post $listing): string
+    {
+        $modified_timestamp = (int) get_post_modified_time('U', true, $listing);
+        if ($modified_timestamp < 1) return '';
+
+        $now = (int) current_time('timestamp', true);
+        if ($now < $modified_timestamp) $now = $modified_timestamp;
+
+        return sprintf(
+            esc_html__('Updated %s ago', 'listdom'),
+            human_time_diff($modified_timestamp, $now)
+        );
+    }
+
+    public function get_listing_detail_parts(WP_Post $listing): array
+    {
+        return array_values(array_filter([
+            $this->get_listing_primary_category_name($listing),
+            $this->get_listing_package_name($listing),
+            $this->get_listing_updated_label($listing),
+        ]));
+    }
+
+    public function get_listing_badges(WP_Post $listing): array
+    {
+        $badges = [];
+
+        if ((int) apply_filters('lsd_is_claimed', 0, $listing->ID) > 0 && class_exists('\LSDPACCLM\Base'))
+        {
+            $badges[] = [
+                'label' => esc_html__('Claimed', 'listdom'),
+                'class' => 'lsd-grace',
+            ];
+        }
+
+        if (taxonomy_exists(LSD_Base::TAX_LABEL) && class_exists('\LSDPACLBL\Base'))
+        {
+            $labels = wp_get_post_terms((int) $listing->ID, LSD_Base::TAX_LABEL, ['fields' => 'all']);
+
+            if (!is_wp_error($labels) && is_array($labels))
+            {
+                $has_labelized_badge = false;
+
+                foreach ($labels as $label)
+                {
+                    if (!$label instanceof WP_Term) continue;
+
+                    if (!metadata_exists('post', (int) $listing->ID, 'lsd_labelize_time_' . (int) $label->term_id)) continue;
+
+                    $has_labelized_badge = true;
+                    break;
+                }
+
+                if ($has_labelized_badge)
+                {
+                    $badges[] = [
+                        'label' => esc_html__('Labelized', 'listdom'),
+                        'class' => 'lsd-labelize',
+                    ];
+                }
+            }
+        }
+
+        if (metadata_exists('post', $listing->ID, 'lsd_topup') && class_exists('\LSDPACTUP\Topup'))
+        {
+            $badges[] = [
+                'label' => esc_html__('Top-Uped', 'listdom'),
+                'class' => 'lsd-success',
+            ];
+        }
+
+        return $badges;
     }
 }

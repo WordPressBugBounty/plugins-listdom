@@ -291,33 +291,19 @@ class LSD_Dummy extends LSD_Base
             $first_search_id = 0;
             foreach ($searches as $search)
             {
-                // Search Exists
-                if (post_exists($search['title'], 'listdom'))
-                {
-                    $search_post = LSD_Base::get_post_by_title($search['title'], LSD_Base::PTYPE_SEARCH);
-
-                    $is_trashed = LSD_Base::is_post($search_post->ID, 'trash');
-                    if ($is_trashed)
-                    {
-                        LSD_Base::untrash_post($search_post->ID);
-                        LSD_Base::update_post_status($search_post->ID);
-                    }
-
-                    if (!$first_search_id) $first_search_id = $search_post->ID;
-                    continue;
-                }
-
-                $post_id = wp_insert_post([
-                    'post_title' => $search['title'],
-                    'post_content' => 'listdom',
-                    'post_type' => LSD_Base::PTYPE_SEARCH,
-                    'post_status' => 'publish',
+                $result = LSD_Actions::instance()->execute('create_search_form', [
+                    'title' => $search['title'],
+                    'fields' => $search['meta']['lsd_fields'] ?? [],
+                    'tablet' => $search['meta']['lsd_tablet'] ?? [],
+                    'mobile' => $search['meta']['lsd_mobile'] ?? [],
+                    'devices' => $search['meta']['lsd_devices'] ?? [],
+                    'form' => $search['meta']['lsd_form'] ?? [],
+                    'overwrite_existing' => true,
                 ]);
 
-                if (!is_wp_error($post_id))
+                if (!empty($result['success']) && !empty($result['data']['post_id']))
                 {
-                    if (!$first_search_id) $first_search_id = $post_id;
-                    foreach ($search['meta'] as $key => $value) update_post_meta($post_id, $key, $value);
+                    if (!$first_search_id) $first_search_id = (int) $result['data']['post_id'];
                 }
             }
 
@@ -1055,30 +1041,10 @@ class LSD_Dummy extends LSD_Base
      */
     public static function page(string $title, string $content)
     {
-        // Check if page exists
-        $page = LSD_Base::get_post_by_title($title, 'page');
-        if ($page)
-        {
-            $is_trashed = self::is_post($page->ID, 'trash');
-            if ($is_trashed)
-            {
-                self::untrash_post($page->ID);
-                self::update_post_status($page->ID);
-            }
-            else
-            {
-                wp_update_post(['ID' => $page->ID, 'post_content' => $content]);
-            }
-        }
-        else
-        {
-            // Create page if it doesn't exist
-            wp_insert_post([
-                'post_title' => $title,
-                'post_content' => $content,
-                'post_type' => 'page',
-                'post_status' => 'publish',
-            ]);
-        }
+        LSD_Actions::instance()->execute('create_directory_page', [
+            'title' => $title,
+            'content' => $content,
+            'overwrite_existing' => true,
+        ]);
     }
 }

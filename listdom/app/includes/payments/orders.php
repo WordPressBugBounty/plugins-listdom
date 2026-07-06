@@ -5,6 +5,9 @@ class LSD_Payments_Orders extends LSD_Base
     public static function add(array $args = []): int
     {
         $recurring_id = isset($args['recurring_id']) ? (int) $args['recurring_id'] : 0;
+        $recurring_ids = isset($args['recurring_ids']) && is_array($args['recurring_ids'])
+            ? array_values(array_unique(array_filter(array_map('intval', $args['recurring_ids']))))
+            : [];
         $payment_number = $recurring_id ? self::get_next_recurring_number($recurring_id) : 0;
 
         $title = $args['title'] ?? wp_date('Y-m-d H:i:s');
@@ -42,13 +45,28 @@ class LSD_Payments_Orders extends LSD_Base
             update_post_meta($order_id, 'lsd_tax_location', $location);
         }
 
+        $billing_details = self::prepare_billing_details($args);
+        if ($billing_details) update_post_meta($order_id, 'lsd_billing_details', $billing_details);
+
         if (isset($args['tax_prices_include']))
         {
             update_post_meta($order_id, 'lsd_tax_prices_include', (int) $args['tax_prices_include'] ? 1 : 0);
         }
 
-        // Recurring ID
-        update_post_meta($order_id, 'lsd_recurring_id', $recurring_id);
+        if ($recurring_ids)
+        {
+            update_post_meta($order_id, 'lsd_recurring_ids', $recurring_ids);
+
+            if (count($recurring_ids) === 1 && !$recurring_id)
+            {
+                $recurring_id = (int) $recurring_ids[0];
+            }
+        }
+
+        if ($recurring_id > 0)
+        {
+            update_post_meta($order_id, 'lsd_recurring_id', $recurring_id);
+        }
 
         if ($payment_number > 0) self::set_recurring_number($order_id, $recurring_id, $payment_number);
 
@@ -64,8 +82,8 @@ class LSD_Payments_Orders extends LSD_Base
 
     public static function get(int $id): ?LSD_Payments_Order
     {
-        $post = get_post($id);
-        if (!$post || $post->post_type !== LSD_Base::PTYPE_ORDER) return null;
+        $post = self::get_entity_post($id, LSD_Base::PTYPE_ORDER);
+        if (!$post instanceof WP_Post) return null;
 
         return new LSD_Payments_Order($id);
     }
@@ -76,6 +94,99 @@ class LSD_Payments_Orders extends LSD_Base
         if (!$id) return null;
 
         return self::get($id);
+    }
+
+    public static function by_user(int $user_id, int $limit = -1): array
+    {
+        $orders = [];
+        foreach (self::get_user_post_ids_by_meta('lsd_user_id', $user_id, $limit) as $order_id)
+        {
+            $order = self::get((int) $order_id);
+            if ($order instanceof LSD_Payments_Order) $orders[] = $order;
+        }
+
+        return $orders;
+    }
+
+    public static function get_recurring_ids(int $order_id): array
+    {
+        if ($order_id < 1) return [];
+
+        $ids = get_post_meta($order_id, 'lsd_recurring_ids', true);
+        if (is_array($ids))
+        {
+            $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+            if ($ids) return $ids;
+        }
+
+        $single = (int) get_post_meta($order_id, 'lsd_recurring_id', true);
+        return $single > 0 ? [$single] : [];
+    }
+
+    public static function add_recurring_id(int $order_id, int $recurring_id): array
+    {
+        if ($order_id < 1 || $recurring_id < 1) return self::get_recurring_ids($order_id);
+
+        $ids = self::get_recurring_ids($order_id);
+        if (!in_array($recurring_id, $ids, true)) $ids[] = $recurring_id;
+
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        update_post_meta($order_id, 'lsd_recurring_ids', $ids);
+
+        if (count($ids) === 1)
+        {
+            update_post_meta($order_id, 'lsd_recurring_id', $ids[0]);
+        }
+        else
+        {
+            delete_post_meta($order_id, 'lsd_recurring_id');
+        }
+
+        return $ids;
+    }
+
+    protected static function prepare_billing_details(array $args): array
+    {
+        $billing = isset($args['billing_details']) && is_array($args['billing_details']) ? $args['billing_details'] : [];
+        $user_id = isset($args['user_id']) ? (int) $args['user_id'] : 0;
+        $tax_location = isset($args['tax_location']) && is_array($args['tax_location']) ? $args['tax_location'] : [];
+
+        $details = [
+            'name' => isset($billing['name']) ? sanitize_text_field((string) $billing['name']) : '',
+            'email' => isset($billing['email']) ? sanitize_email((string) $billing['email']) : '',
+            'phone' => isset($billing['phone']) ? sanitize_text_field((string) $billing['phone']) : '',
+            'company_name' => isset($billing['company_name']) ? sanitize_text_field((string) $billing['company_name']) : '',
+            'tax_vat_id' => isset($billing['tax_vat_id']) ? sanitize_text_field((string) $billing['tax_vat_id']) : '',
+            'country' => isset($billing['country']) ? sanitize_text_field((string) $billing['country']) : '',
+            'state' => isset($billing['state']) ? sanitize_text_field((string) $billing['state']) : '',
+            'address' => isset($billing['address']) ? sanitize_text_field((string) $billing['address']) : '',
+            'city' => isset($billing['city']) ? sanitize_text_field((string) $billing['city']) : '',
+            'postal_code' => isset($billing['postal_code']) ? sanitize_text_field((string) $billing['postal_code']) : '',
+        ];
+
+        if ($user_id > 0)
+        {
+            if ($details['name'] === '') $details['name'] = (string) get_user_meta($user_id, 'billing_name', true);
+            if ($details['email'] === '') $details['email'] = (string) get_user_meta($user_id, 'billing_email', true);
+            if ($details['phone'] === '') $details['phone'] = (string) get_user_meta($user_id, 'billing_phone', true);
+            if ($details['company_name'] === '') $details['company_name'] = (string) get_user_meta($user_id, 'billing_company', true);
+            if ($details['tax_vat_id'] === '') $details['tax_vat_id'] = (string) get_user_meta($user_id, 'billing_tax_vat_id', true);
+            if ($details['country'] === '') $details['country'] = (string) get_user_meta($user_id, 'billing_country', true);
+            if ($details['state'] === '') $details['state'] = (string) get_user_meta($user_id, 'billing_state', true);
+            if ($details['address'] === '') $details['address'] = (string) get_user_meta($user_id, 'billing_address_1', true);
+            if ($details['city'] === '') $details['city'] = (string) get_user_meta($user_id, 'billing_city', true);
+            if ($details['postal_code'] === '') $details['postal_code'] = (string) get_user_meta($user_id, 'billing_postcode', true);
+        }
+
+        if ($details['name'] === '' && isset($args['name'])) $details['name'] = sanitize_text_field((string) $args['name']);
+        if ($details['email'] === '' && isset($args['email'])) $details['email'] = sanitize_email((string) $args['email']);
+        if ($details['country'] === '' && isset($tax_location['country'])) $details['country'] = sanitize_text_field((string) $tax_location['country']);
+        if ($details['state'] === '' && isset($tax_location['state'])) $details['state'] = sanitize_text_field((string) $tax_location['state']);
+
+        return array_filter($details, static function ($value): bool
+        {
+            return $value !== '';
+        });
     }
 
     protected static function get_next_recurring_number(int $recurring_id): int

@@ -160,6 +160,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
             ]); ?>
             <p class="description"><?php esc_html_e("The image used for category views/shortcodes.", 'listdom'); ?></p>
         </div>
+        <?php $this->archive_shortcode_add_field(); ?>
         <div class="form-field">
             <?php if (!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
             <?php else: ?>
@@ -239,6 +240,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
                 <p class="description"><?php esc_html_e("The image used for category views/shortcodes.", 'listdom'); ?></p>
             </td>
         </tr>
+        <?php $this->archive_shortcode_edit_field($term); ?>
         <?php if ($this->isPro()): ?>
         <tr class="form-field">
             <th scope="row">
@@ -279,6 +281,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         update_term_meta($term_id, 'lsd_color', $color);
         update_term_meta($term_id, 'lsd_image', $image);
         update_term_meta($term_id, 'lsd_disabled_icon', $disable);
+        $this->save_archive_shortcode($term_id);
         update_term_meta($term_id, 'lsd_schema', $schema);
 
         return true;

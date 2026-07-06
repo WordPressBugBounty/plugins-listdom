@@ -76,6 +76,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
                 'value' => '',
             ]); ?>
         </div>
+        <?php $this->archive_shortcode_add_field(); ?>
         <?php
         wp_nonce_field('lsd_save_location_meta', 'lsd_location_meta_nonce');
     }
@@ -96,6 +97,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
                 ]); ?>
             </td>
         </tr>
+        <?php $this->archive_shortcode_edit_field($term); ?>
         <?php
         wp_nonce_field('lsd_save_location_meta', 'lsd_location_meta_nonce');
     }
@@ -113,6 +115,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
 
         $image = sanitize_text_field(wp_unslash($_POST['lsd_image']));
         update_term_meta($term_id, 'lsd_image', $image);
+        $this->save_archive_shortcode($term_id);
 
         return true;
     }

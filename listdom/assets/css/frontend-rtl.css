@@ -111,9 +111,6 @@
   margin-left: 10px;
   margin-right: unset;
 }
-.lsd-single-page-wrapper.single-listdom-listing .lsd-single-page-wrapper.lsd-single-style2 .lsd-single-page-section-booking .lsd-booking-bookables .lsd-booking-bookables-items > ul .lsd-price-details ul li .lsd-price {
-  float: left;
-}
 .lsd-single-page-wrapper.single-listdom-listing .lsd-single-page-wrapper.lsd-single-style2 .lsd-single-page-section-discussion .lsd-discussion .lsd-tabs-wrapper ul.lsd-tabs li {
   margin-right: unset;
   margin-left: 10px;
@@ -957,14 +954,19 @@
 .lsd-dashboard-subscriptions-wrapper ul.lsd-subscription-packages > li .lsd-package-checkout-form {
   text-align: left;
 }
+.lsd-dashboard-subscriptions-wrapper ul.lsd-subscription-packages > li .lsd-package-checkout-form .lsd-button-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.lsd-dashboard-subscriptions-wrapper ul.lsd-subscription-packages > li .lsd-package-checkout-form .lsd-button-wrapper button.lsd-light-button {
+  width: 100%;
+}
 .lsd-dashboard-subscriptions-wrapper ul.lsd-subscription-packages > li .lsd-dashboard-subscription-select {
   text-align: left;
 }
 .lsd-dashboard-subscriptions-wrapper ul.lsd-subscription-packages > li ul.lsd-package-details li i, .lsd-dashboard-subscriptions-wrapper ul.lsd-subscription-packages > li ul.lsd-subscription-details li i {
   text-align: right;
-}
-.lsd-dashboard-subscriptions-wrapper ul.lsd-subscription-packages > li .lsd-dashboard-subscription-price {
-  text-align: left;
 }
 
 div.lsd-discussion div.lsd-tabs-wrapper ul.lsd-tabs {

@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 final class Listdom
 {
-    public string $version = '5.6.0';
+    public string $version = '5.7.0';
     protected static ?Listdom $instance = null;
 
     /**
@@ -196,6 +196,12 @@ final class Listdom
         // Dashboard
         $dashboard = new LSD_Dashboard();
         $dashboard->init();
+
+        // Internal Actions
+        LSD_Actions::instance()->init();
+
+        // Directory Blueprints
+        LSD_Blueprints::instance()->init();
 
         // Upgrade
         $upgrade = new LSD_Upgrade();

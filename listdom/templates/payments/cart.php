@@ -20,6 +20,9 @@ defined('ABSPATH') || die();
 
             $plan = new LSD_Payments_Plan($plan_id, $tier_id);
             $tiers = $plan->get_tiers();
+            $selected_tier = $plan->get_tier();
+            $selected_price = $selected_tier ? $selected_tier->get_selected_price_html() : $plan->get_price_html();
+            $recurring_notice = $selected_tier ? $selected_tier->get_recurring_notice_html() : '';
 
             $remove_url = wp_nonce_url(
                 add_query_arg('lsd_cart_remove', $id, $main->current_url()),
@@ -33,19 +36,25 @@ defined('ABSPATH') || die();
                     <?php if (count($tiers) > 1): ?>
                         <div class="lsd-checkout-tier">
                             <select class="lsd-fe-input" title="" name="lsd_cart_tier[<?php echo esc_attr($id); ?>]" onchange="this.form.submit()">
-                                <?php foreach ($tiers as $tier): ?>
-                                    <option value="<?php echo esc_attr($tier->get_id()); ?>" <?php echo $tier->get_id() === $tier_id ? 'selected="selected"' : ''; ?>>
-                                        <?php echo esc_html($tier->get_name()); ?> (<?php echo esc_html(wp_strip_all_tags($tier->get_price_frequency_html())); ?>)
+                                <?php foreach ($tiers as $tier_option): ?>
+                                    <option value="<?php echo esc_attr($tier_option->get_id()); ?>" <?php echo $tier_option->get_id() === $tier_id ? 'selected="selected"' : ''; ?>>
+                                        <?php echo esc_html($tier_option->get_name()); ?> (<?php echo esc_html(wp_strip_all_tags($tier_option->get_price_frequency_html())); ?>)
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($recurring_notice): ?>
+                        <div class="lsd-checkout-tier-recurring lsd-fe-description">
+                            <?php echo esc_html($recurring_notice); ?>
                         </div>
                     <?php endif; ?>
                 </div>
 
                 <div class="lsd-cart-item-end">
                     <div class="lsd-cart-item-price lsd-fe-title">
-                        <?php echo LSD_Kses::element($plan->get_price_html()); ?>
+                        <?php echo LSD_Kses::element($selected_price); ?>
                     </div>
 
                     <div class="lsd-cart-item-remove">

@@ -379,7 +379,7 @@ if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::clas
 				<?php LSD_Form::nonce('lsd_settings_form'); ?>
                 <button type="submit" id="lsd_settings_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='lsdi lsdi-checkmark-circle'></i>
+                    <i class='wbli wbli-checkmark-circle'></i>
                 </button>
 			</div>
         </div>

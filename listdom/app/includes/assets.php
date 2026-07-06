@@ -666,6 +666,7 @@ class LSD_Assets extends LSD_Base
             {
                 foreach ([
                     'listdom-settings',
+                    'listdom-blueprints',
                     'listdom-ix',
                     LSD_Base::WELCOME_SLUG,
                     'listdom-addons',

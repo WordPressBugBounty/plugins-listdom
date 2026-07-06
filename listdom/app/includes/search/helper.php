@@ -116,7 +116,13 @@ class LSD_Search_Helper extends LSD_Base
             ]);
 
             $terms = [];
-            foreach ($results as $result) $terms[$result->term_id] = $hierarchy ? ['name' => $result->name, 'parent' => $result->parent] : $result->name;
+            foreach ($results as $result)
+            {
+                $label = $this->taxonomy_term_label($result, $filter);
+                $terms[$result->term_id] = $hierarchy
+                    ? ['name' => $result->name, 'label' => $label, 'parent' => $result->parent]
+                    : $label;
+            }
 
             return $hierarchy ? $this->get_terms_hierarchy($terms) : $terms;
         }
@@ -163,6 +169,94 @@ class LSD_Search_Helper extends LSD_Base
         }
 
         return [];
+    }
+
+    public function taxonomy_term_label(WP_Term $term, array $filter = []): string
+    {
+        $label = $term->name;
+
+        if (!empty($filter['show_count'])) $label .= ' (' . number_format_i18n($this->taxonomy_term_count($term)) . ')';
+
+        return $label;
+    }
+
+    public function taxonomy_term_count(WP_Term $term): int
+    {
+        $count = (int) $term->count;
+        $taxonomy = get_taxonomy($term->taxonomy);
+
+        if (!$taxonomy || !$taxonomy->hierarchical) return $count;
+
+        static $cache = [];
+
+        if (!isset($cache[$term->taxonomy]))
+        {
+            $terms = get_terms([
+                'taxonomy' => $term->taxonomy,
+                'hide_empty' => false,
+                'orderby' => 'none',
+            ]);
+
+            if (is_wp_error($terms) || !is_array($terms)) return $count;
+
+            global $wpdb;
+
+            $children_map = [];
+            foreach ($terms as $taxonomy_term)
+            {
+                $term_id = (int) $taxonomy_term->term_id;
+                $children_map[(int) $taxonomy_term->parent][] = $term_id;
+            }
+
+            $relationships = $wpdb->get_results($wpdb->prepare(
+                "SELECT tt.term_id, tr.object_id
+                 FROM {$wpdb->term_relationships} AS tr
+                 INNER JOIN {$wpdb->term_taxonomy} AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
+                 INNER JOIN {$wpdb->posts} AS p ON p.ID = tr.object_id
+                 WHERE tt.taxonomy = %s
+                   AND p.post_type = %s
+                   AND p.post_status = 'publish'",
+                $term->taxonomy,
+                LSD_Base::PTYPE_LISTING
+            ));
+
+            $direct_object_ids = [];
+            if (is_array($relationships))
+            {
+                foreach ($relationships as $relationship)
+                {
+                    $term_id = (int) $relationship->term_id;
+                    $object_id = (int) $relationship->object_id;
+
+                    if (!isset($direct_object_ids[$term_id])) $direct_object_ids[$term_id] = [];
+                    $direct_object_ids[$term_id][$object_id] = true;
+                }
+            }
+
+            $resolved_counts = [];
+            $resolved_object_ids = [];
+            $sum_counts = static function (int $term_id) use (&$sum_counts, &$resolved_counts, &$resolved_object_ids, $direct_object_ids, $children_map): int
+            {
+                if (isset($resolved_counts[$term_id])) return $resolved_counts[$term_id];
+
+                $object_ids = $direct_object_ids[$term_id] ?? [];
+                foreach (($children_map[$term_id] ?? []) as $child_id)
+                {
+                    $sum_counts((int) $child_id);
+                    $object_ids += $resolved_object_ids[(int) $child_id] ?? [];
+                }
+
+                $resolved_object_ids[$term_id] = $object_ids;
+                $resolved_counts[$term_id] = count($object_ids);
+                return $resolved_counts[$term_id];
+            };
+
+            foreach ($terms as $taxonomy_term) $sum_counts((int) $taxonomy_term->term_id);
+
+            $cache[$term->taxonomy] = $resolved_counts;
+        }
+
+        return $cache[$term->taxonomy][$term->term_id] ?? $count;
     }
 
     public function get_term_id($taxonomy, $name)
@@ -402,7 +496,8 @@ class LSD_Search_Helper extends LSD_Base
             // Term is not in the predefined terms
             if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$term->term_id])) continue;
 
-            $output .= '<option class="level-' . esc_attr($level) . '" value="' . esc_attr($term->term_id) . '" ' . ($current == $term->term_id ? 'selected="selected"' : '') . '>' . esc_html(($prefix . (trim($prefix) ? ' ' : '') . $term->name)) . '</option>';
+            $label = $this->taxonomy_term_label($term, $filter);
+            $output .= '<option class="level-' . esc_attr($level) . '" value="' . esc_attr($term->term_id) . '" ' . ($current == $term->term_id ? 'selected="selected"' : '') . '>' . esc_html($prefix . (trim($prefix) ? ' ' : '') . $label) . '</option>';
 
             $children = get_term_children($term->term_id, $key);
             if (is_array($children) && count($children))
@@ -466,7 +561,7 @@ class LSD_Search_Helper extends LSD_Base
             $hierarchy[$level][] = $term;
         }
 
-        $output = '<div class="lsd-hierarchical-dropdowns" id="' . esc_attr($id) . '_wrapper" data-for="' . esc_attr($key) . '" data-id="' . esc_attr($id) . '" data-max-levels="' . esc_attr($max_levels) . '" data-name="' . esc_attr($name) . '" data-hide-empty="' . esc_attr($hide_empty) . '" data-level-status="' . esc_attr($level_status) . '">';
+        $output = '<div class="lsd-hierarchical-dropdowns" id="' . esc_attr($id) . '_wrapper" data-for="' . esc_attr($key) . '" data-id="' . esc_attr($id) . '" data-max-levels="' . esc_attr($max_levels) . '" data-name="' . esc_attr($name) . '" data-hide-empty="' . esc_attr($hide_empty) . '" data-show-count="' . esc_attr(!empty($filter['show_count']) ? 1 : 0) . '" data-level-status="' . esc_attr($level_status) . '">';
         for ($l = 1; $l <= $max_levels; $l++)
         {
             $level_terms = isset($hierarchy[$l]) && is_array($hierarchy[$l]) ? $hierarchy[$l] : [];
@@ -475,7 +570,10 @@ class LSD_Search_Helper extends LSD_Base
             $output .= '<select class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" id="' . esc_attr($id . '_' . $l) . '" placeholder="' . esc_attr($placeholder) . '" data-level="' . esc_attr($l) . '" data-enhanced="' . ($dropdown_style === 'enhanced' ? 1 : 0) . '">';
             $output .= '<option value="">' . esc_html($placeholder) . '</option>';
 
-            foreach ($level_terms as $level_term) $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id || in_array($level_term->term_id, $current_parents, true)) ? 'selected="selected"' : '') . '>' . esc_html($level_term->name) . '</option>';
+            foreach ($level_terms as $level_term)
+            {
+                $output .= '<option class="lsd-option lsd-parent-' . esc_attr($level_term->parent) . '" value="' . esc_attr($level_term->term_id) . '" ' . (($current == $level_term->term_id || in_array($level_term->term_id, $current_parents, true)) ? 'selected="selected"' : '') . '>' . esc_html($this->taxonomy_term_label($level_term, $filter)) . '</option>';
+            }
             $output .= '</select>';
 
             if ($l < $max_levels && $level_status === 'all') $output .= '<div class="lsd-divider"></div>';

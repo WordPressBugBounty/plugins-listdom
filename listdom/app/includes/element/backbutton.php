@@ -125,7 +125,9 @@ class LSD_Element_Backbutton extends LSD_Element
             else $fallback_page = $data['page'];
         }
 
-        $label = $data['label'] ?? esc_html__('Back', 'listdom');
+        $label = isset($data['label']) && trim($data['label'])
+            ? $data['label']
+            : esc_html__('Back', 'listdom');
 
         $selected_page_class = $target === 'page' ? '' : 'lsd-util-hide';
         $fallback_page_class = $target === 'default' ? '' : 'lsd-util-hide';

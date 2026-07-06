@@ -293,7 +293,7 @@ $semantic_attributes = $semantic->attribute_options();
                 <?php LSD_Form::nonce('lsd_ai_form'); ?>
                 <button type="submit" id="lsd_ai_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='lsdi lsdi-checkmark-circle'></i>
+                    <i class='wbli wbli-checkmark-circle'></i>
                 </button>
             </div>
         </div>

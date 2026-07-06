@@ -53,7 +53,7 @@ $export_url = wp_nonce_url(
                     <?php LSD_Form::nonce('lsd_ix_listdom_import'); ?>
                     <button type="submit" id="lsd_ix_listdom_import_submit" class="lsd-primary-button lsd-util-hide">
                         <?php esc_html_e('Import', 'listdom'); ?>
-                        <i class="listdom-icon lsdi-checkmark-circle"></i>
+                        <i class="webilia-icon wbli-checkmark-circle"></i>
                     </button>
 
                 </div>

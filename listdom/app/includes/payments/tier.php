@@ -70,6 +70,17 @@ class LSD_Payments_Tier extends LSD_Base
         return $this->render_price($price, LSD_Options::currency());
     }
 
+    public function get_frequency_label(): string
+    {
+        $days = $this->get_frequency_days();
+        if ($days)
+        {
+            return sprintf(_n('%d Day', '%d Days', $days, 'listdom'), $days);
+        }
+
+        return esc_html__('One time', 'listdom');
+    }
+
     public function get_frequency_html(): string
     {
         $days = $this->get_frequency_days();
@@ -81,6 +92,27 @@ class LSD_Payments_Tier extends LSD_Base
     public function get_price_frequency_html(): string
     {
         return $this->get_price_html() . ' / ' . $this->get_frequency_html();
+    }
+
+    public function get_selected_price_html(): string
+    {
+        if ($this->is_recurring())
+        {
+            return $this->get_price_html() . '/' . esc_html($this->get_frequency_label());
+        }
+
+        return $this->get_price_html();
+    }
+
+    public function get_recurring_notice_html(): string
+    {
+        if (!$this->is_recurring()) return '';
+
+        return sprintf(
+            esc_html__('Charged %1$s each %2$s until canceled', 'listdom'),
+            wp_strip_all_tags($this->get_price_html()),
+            strtolower($this->get_frequency_label())
+        );
     }
 
     public function get_frequency_days(): int

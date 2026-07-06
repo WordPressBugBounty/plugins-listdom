@@ -7,6 +7,10 @@ class LSD_Dashboard extends LSD_Base
         // Dashboard Shortcode
         $dashboard = new LSD_Shortcodes_Dashboard();
         $dashboard->init();
+
+        // Payments and Billing Dashboard
+        $payments = new LSD_Dashboard_Payments();
+        $payments->init();
     }
 
     public function modules()

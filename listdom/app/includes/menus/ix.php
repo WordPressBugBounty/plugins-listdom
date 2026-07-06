@@ -12,6 +12,8 @@ class LSD_Menus_IX extends LSD_Menus
 
     public function init()
     {
+        new LSD_Menus_Blueprints();
+
         // Export
         add_action('init', [$this, 'export'], 100);
 
@@ -31,6 +33,7 @@ class LSD_Menus_IX extends LSD_Menus
         // Get the current tab
         $this->tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : 'csv';
         $this->subtab = isset($_GET['subtab']) ? sanitize_text_field(wp_unslash($_GET['subtab'])) : 'import';
+        if ($this->tab === 'dummy-data' && !in_array($this->subtab, ['dummy-data', 'blueprint'], true)) $this->subtab = 'dummy-data';
 
         // Generate output
         $this->include_html_file('menus/ix/tpl.php');

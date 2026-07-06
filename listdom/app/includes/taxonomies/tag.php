@@ -5,6 +5,10 @@ class LSD_Taxonomies_Tag extends LSD_Taxonomies
     public function init()
     {
         add_action('init', [$this, 'register']);
+        add_action(LSD_Base::TAX_TAG . '_add_form_fields', [$this, 'add_form']);
+        add_action(LSD_Base::TAX_TAG . '_edit_form_fields', [$this, 'edit_form']);
+        add_action('created_' . LSD_Base::TAX_TAG, [$this, 'save_metadata']);
+        add_action('edited_' . LSD_Base::TAX_TAG, [$this, 'save_metadata']);
     }
 
     public function register()
@@ -51,5 +55,30 @@ class LSD_Taxonomies_Tag extends LSD_Taxonomies
         );
 
         register_taxonomy_for_object_type(LSD_Base::TAX_TAG, LSD_Base::PTYPE_LISTING);
+    }
+
+    public function add_form()
+    {
+        $this->archive_shortcode_add_field();
+        wp_nonce_field('lsd_save_tag_meta', 'lsd_tag_meta_nonce');
+    }
+
+    public function edit_form($term)
+    {
+        $this->archive_shortcode_edit_field($term);
+        wp_nonce_field('lsd_save_tag_meta', 'lsd_tag_meta_nonce');
+    }
+
+    public function save_metadata($term_id): bool
+    {
+        $nonce = isset($_POST['lsd_tag_meta_nonce']) ? sanitize_text_field(wp_unslash($_POST['lsd_tag_meta_nonce'])) : '';
+        if (!$nonce || !wp_verify_nonce($nonce, 'lsd_save_tag_meta')) return false;
+
+        $taxonomy = get_taxonomy(LSD_Base::TAX_TAG);
+        if (!$taxonomy || !current_user_can($taxonomy->cap->edit_terms)) return false;
+
+        $this->save_archive_shortcode($term_id);
+
+        return true;
     }
 }

@@ -641,7 +641,15 @@ class LSD_Skins extends LSD_Base
 
             $this->sort_meta_key = $meta_key;
             $this->sort_meta_orderby = $orderby_type;
-            $this->sort_meta_type = isset($option['meta_type']) && trim($option['meta_type']) ? $option['meta_type'] : null;
+            $this->sort_meta_type = null;
+
+            if (isset($option['meta_type']) && trim((string) $option['meta_type']))
+            {
+                $meta_type = strtoupper(trim((string) $option['meta_type']));
+
+                // Only allow the cast types the plugin actually uses for sortable date fields.
+                if (in_array($meta_type, ['DATE', 'DATETIME', 'TIME'], true)) $this->sort_meta_type = $meta_type;
+            }
 
             unset($args['meta_key'], $args['meta_type']);
             $args['orderby'] = 'post_date';
@@ -821,16 +829,15 @@ class LSD_Skins extends LSD_Base
 
         if ($meta_type && trim($meta_type))
         {
-            $sanitized_type = strtoupper(preg_replace('/[^A-Z0-9_(), ]/', '', $meta_type));
-            if ($sanitized_type)
+            if (in_array($meta_type, ['DATE', 'DATETIME', 'TIME'], true))
             {
-                if ($sanitized_type === 'DATETIME')
+                if ($meta_type === 'DATETIME')
                 {
                     $value_expression = "CAST(REPLACE($alias.meta_value, 'T', ' ') AS DATETIME)";
                 }
                 else
                 {
-                    $value_expression = "CAST($alias.meta_value AS $sanitized_type)";
+                    $value_expression = "CAST($alias.meta_value AS $meta_type)";
                 }
             }
         }
@@ -968,10 +975,10 @@ class LSD_Skins extends LSD_Base
     public function filter()
     {
         // Get attributes
-        $atts = $_POST['atts'] ?? [];
+        $atts = isset($_POST['atts']) && is_array($_POST['atts']) ? wp_unslash($_POST['atts']) : [];
 
         // Sanitization
-        array_walk_recursive($atts, 'sanitize_text_field');
+        $atts = LSD_Sanitize::deep($atts);
 
         // Start the skin
         $this->start($atts);

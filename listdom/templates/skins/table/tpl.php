@@ -62,6 +62,8 @@ jQuery(document).ready(function()
                                     if ($width <= 0) $width = 150;
 
                                     $classes = ['lsd-table-column', 'lsd-table-column-' . $key_class];
+                                    $legacy_key = LSD_Skins_Table::legacy_column_key($column);
+                                    if ($legacy_key !== '') $classes[] = 'lsd-table-column-' . sanitize_html_class($legacy_key);
                                     if (!$enabled) $classes[] = 'lsd-table-column-hidden';
                                     ?>
                                     <th class="<?php echo esc_attr(implode(' ', $classes)); ?>" data-column="<?php echo esc_attr($key); ?>" style="width: <?php echo esc_attr($width); ?>px;">

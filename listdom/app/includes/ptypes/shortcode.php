@@ -170,6 +170,7 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
 
         // Display Options
         $display = $lsd['display'] ?? [];
+        if (is_array($display)) $display = LSD_Skins_Table::normalize_display_options($display);
         update_post_meta($post_id, 'lsd_display', $display);
 
         // Search Options
@@ -231,9 +232,13 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         {
             $filter = get_post_meta($shortcode_id, 'lsd_filter', true);
             $exclude = get_post_meta($shortcode_id, 'lsd_exclude', true);
+            $display = get_post_meta($shortcode_id, 'lsd_display', true);
 
             $filter_updated = $this->replace_taxonomy_slug($filter, $taxonomy, $old_slug, $new_slug);
             $exclude_updated = $this->replace_taxonomy_slug($exclude, $taxonomy, $old_slug, $new_slug);
+            $display_updated = $taxonomy === LSD_Base::TAX_ATTRIBUTE && is_array($display)
+                ? LSD_Skins_Table::replace_attribute_slug_in_display($display, $old_slug, $new_slug, (int) ($term->term_id ?? 0))
+                : $display;
 
             if ($filter_updated !== $filter)
             {
@@ -243,6 +248,11 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
             if ($exclude_updated !== $exclude)
             {
                 update_post_meta($shortcode_id, 'lsd_exclude', $exclude_updated);
+            }
+
+            if ($display_updated !== $display)
+            {
+                update_post_meta($shortcode_id, 'lsd_display', $display_updated);
             }
         }
     }

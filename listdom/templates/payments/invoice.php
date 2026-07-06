@@ -9,6 +9,7 @@ defined('ABSPATH') || die();
 /** @var string $customer_name */
 /** @var string $customer_email */
 /** @var string $customer_message */
+/** @var array $billing_details */
 /** @var array $items */
 /** @var array $fees */
 /** @var string $currency */
@@ -29,6 +30,24 @@ defined('ABSPATH') || die();
 
 $invoice_from_lines = array_filter(array_map('trim', explode("\n", $invoice_from)));
 $invoice_footer_content = trim($invoice_footer) === '' ? '' : $invoice_footer;
+$tax_helper = new LSD_Payments_Tax();
+$billing_countries = $tax_helper->get_countries();
+$billing_states = $tax_helper->get_states_list();
+$billing_country_code = isset($billing_details['country']) ? (string) $billing_details['country'] : '';
+$billing_state_code = isset($billing_details['state']) ? (string) $billing_details['state'] : '';
+$billing_country = $billing_country_code !== '' ? (string) ($billing_countries[$billing_country_code] ?? $billing_country_code) : '';
+$billing_state = $billing_state_code !== '' ? (string) ($billing_states[$billing_country_code][$billing_state_code] ?? $billing_state_code) : '';
+$billing_name = trim((string) ($billing_details['name'] ?? ''));
+$billing_email = trim((string) ($billing_details['email'] ?? ''));
+$billing_phone = trim((string) ($billing_details['phone'] ?? ''));
+$billing_company_name = trim((string) ($billing_details['company_name'] ?? ''));
+$billing_tax_vat_id = trim((string) ($billing_details['tax_vat_id'] ?? ''));
+$billing_address_parts = array_filter([
+    trim((string) ($billing_details['city'] ?? '')),
+    trim((string) ($billing_details['address'] ?? '')),
+    trim((string) ($billing_details['postal_code'] ?? '')),
+]);
+$billing_address_line = $billing_address_parts ? implode(' - ', $billing_address_parts) : esc_html__('N/A', 'listdom');
 ?>
 <div class="lsd-payments-invoice-wrapper">
     <div class="lsd-print-hide">
@@ -84,18 +103,45 @@ $invoice_footer_content = trim($invoice_footer) === '' ? '' : $invoice_footer;
                     <i class="lsd-fe-icon fa-solid fa-chalkboard-user"></i>
                     <h3 class="lsd-fe-title"><?php esc_html_e('Bill To', 'listdom'); ?></h3>
                 </div>
-                <?php if (trim($customer_name) || trim($customer_email)): ?>
-                    <ul>
-                        <?php if (trim($customer_name)): ?>
-                            <li class="lsd-payments-invoice-bill-name lsd-fe-description"><?php echo esc_html($customer_name); ?></li>
-                        <?php endif; ?>
-                        <?php if (trim($customer_email)): ?>
-                            <li class="lsd-payments-invoice-bill-email lsd-fe-description"><?php echo esc_html($customer_email); ?></li>
-                        <?php endif; ?>
-                    </ul>
-                <?php else: ?>
-                    <p><?php esc_html_e('Customer details are not available.', 'listdom'); ?></p>
-                <?php endif; ?>
+                <ul>
+                    <li class="lsd-payments-invoice-bill-name lsd-fe-title"><?php echo esc_html($billing_name !== '' ? $billing_name : esc_html__('N/A', 'listdom')); ?></li>
+                    <li class="lsd-payments-invoice-bill-detail lsd-fe-description"><?php echo esc_html($billing_address_line); ?></li>
+                    <li class="lsd-payments-invoice-bill-email lsd-fe-description">
+                        <?php
+                        printf(
+                            esc_html__('Email: %s', 'listdom'),
+                            '<span class="lsd-dashboard-payments-order-detail-field-value">' . esc_html($billing_email !== '' ? $billing_email : esc_html__('N/A', 'listdom')) . '</span>'
+                        );
+                        ?>
+                    </li>
+
+                    <li class="lsd-payments-invoice-bill-detail lsd-fe-description">
+                        <?php
+                        printf(
+                            esc_html__('Phone: %s', 'listdom'),
+                            '<span class="lsd-dashboard-payments-order-detail-field-value">' . esc_html($billing_phone !== '' ? $billing_phone : esc_html__('N/A', 'listdom')) . '</span>'
+                        );
+                        ?>
+                    </li>
+
+                    <li class="lsd-payments-invoice-bill-detail lsd-fe-description">
+                        <?php
+                        printf(
+                            esc_html__('Company Name: %s', 'listdom'),
+                            '<span class="lsd-dashboard-payments-order-detail-field-value">' . esc_html($billing_company_name !== '' ? $billing_company_name : esc_html__('N/A', 'listdom')) . '</span>'
+                        );
+                        ?>
+                    </li>
+
+                    <li class="lsd-payments-invoice-bill-detail lsd-fe-description">
+                        <?php
+                        printf(
+                            esc_html__('Tax/VAT ID: %s', 'listdom'),
+                            '<span class="lsd-dashboard-payments-order-detail-field-value">' . esc_html($billing_tax_vat_id !== '' ? $billing_tax_vat_id : esc_html__('N/A', 'listdom')) . '</span>'
+                        );
+                        ?>
+                    </li>
+                </ul>
             </div>
         </div>
 

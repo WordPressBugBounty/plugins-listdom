@@ -70,6 +70,7 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
                 'value' => '#1d7ed3',
             ]); ?>
         </div>
+        <?php $this->archive_shortcode_add_field(); ?>
         <?php
         wp_nonce_field('lsd_save_label_meta', 'lsd_label_meta_nonce');
     }
@@ -91,6 +92,7 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
                 ]); ?>
             </td>
         </tr>
+        <?php $this->archive_shortcode_edit_field($term); ?>
         <?php
         wp_nonce_field('lsd_save_label_meta', 'lsd_label_meta_nonce');
     }
@@ -108,6 +110,7 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
 
         $color = sanitize_text_field(wp_unslash($_POST['lsd_color']));
         update_term_meta($term_id, 'lsd_color', $color);
+        $this->save_archive_shortcode($term_id);
     }
 
     public function get_terms()

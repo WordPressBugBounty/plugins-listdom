@@ -43,6 +43,7 @@ class LSD_Upgrade extends LSD_Base
         if (version_compare($version, '5.3.0', '<')) $this->v530();
         if (version_compare($version, '5.3.1', '<')) $this->v531();
         if (version_compare($version, '5.4.0', '<')) $this->v540();
+        if (version_compare($version, '5.7.0', '<')) $this->v570();
 
         // Regenerate personalized CSS after any update
         LSD_Personalize::generate();
@@ -1047,6 +1048,11 @@ class LSD_Upgrade extends LSD_Base
         }
     }
 
+    private function v570()
+    {
+        $this->shortcode_table_columns();
+    }
+
     private function primary_categories()
     {
         $listing_ids = get_posts([
@@ -1143,6 +1149,31 @@ class LSD_Upgrade extends LSD_Base
 
             $filter['attributes'] = $normalized;
             update_post_meta($shortcode_id, 'lsd_filter', $filter);
+        }
+    }
+
+    private function shortcode_table_columns()
+    {
+        if (!taxonomy_exists(LSD_Base::TAX_ATTRIBUTE)) return;
+
+        $shortcode_ids = get_posts([
+            'post_type' => LSD_Base::PTYPE_SHORTCODE,
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'inherit', 'trash'],
+        ]);
+
+        if (!is_array($shortcode_ids) || !count($shortcode_ids)) return;
+
+        foreach ($shortcode_ids as $shortcode_id)
+        {
+            $display = get_post_meta($shortcode_id, 'lsd_display', true);
+            if (!is_array($display) || !isset($display['table']) || !is_array($display['table'])) continue;
+
+            $normalized = LSD_Skins_Table::normalize_display_options($display);
+            if ($normalized === $display) continue;
+
+            update_post_meta($shortcode_id, 'lsd_display', $normalized);
         }
     }
 

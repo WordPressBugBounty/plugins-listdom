@@ -168,6 +168,7 @@ class LSD_Search_Builder extends LSD_Base
                 'dropdown-multiple' => esc_html__('Dropdown (Multiple Selection)', 'listdom'),
                 'checkboxes' => esc_html__('Checkboxes', 'listdom'),
                 'radio' => esc_html__('Radio Buttons', 'listdom'),
+                'buttons' => esc_html__('Buttons', 'listdom'),
                 'text-input' => esc_html__('Text Input', 'listdom'),
             ],
             'textsearch' => [
@@ -207,6 +208,7 @@ class LSD_Search_Builder extends LSD_Base
                 'dropdown-multiple' => esc_html__('Dropdown (Multiple Selection)', 'listdom'),
                 'text-input' => esc_html__('Text Input', 'listdom'),
                 'checkboxes' => esc_html__('Checkboxes', 'listdom'),
+                'buttons' => esc_html__('Buttons', 'listdom'),
                 'radio' => esc_html__('Radio Buttons', 'listdom'),
             ],
             'checkbox' => [
@@ -214,6 +216,7 @@ class LSD_Search_Builder extends LSD_Base
                 'dropdown-multiple' => esc_html__('Dropdown (Multiple Selection)', 'listdom'),
                 'text-input' => esc_html__('Text Input', 'listdom'),
                 'checkboxes' => esc_html__('Checkboxes', 'listdom'),
+                'buttons' => esc_html__('Buttons', 'listdom'),
                 'radio' => esc_html__('Radio Buttons', 'listdom'),
             ],
             'radio' => [
@@ -221,6 +224,7 @@ class LSD_Search_Builder extends LSD_Base
                 'dropdown-multiple' => esc_html__('Dropdown (Multiple Selection)', 'listdom'),
                 'text-input' => esc_html__('Text Input', 'listdom'),
                 'checkboxes' => esc_html__('Checkboxes', 'listdom'),
+                'buttons' => esc_html__('Buttons', 'listdom'),
                 'radio' => esc_html__('Radio Buttons', 'listdom'),
             ],
             'address' => [

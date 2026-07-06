@@ -8,7 +8,7 @@ defined('ABSPATH') || die();
     <ul class="lsd-nav-tab-wrapper">
         <li class="lsd-has-children lsd-csv-nav <?php echo $this->tab === 'csv' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'csv' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=csv')); ?>">
-                <i class="listdom-icon lsdi-csv lsd-m-0"></i>
+                <i class="webilia-icon wbli-csv lsd-m-0"></i>
                 <?php esc_html_e('CSV', 'listdom'); ?>
             </a>
             <ul class="lsd-nav-sub-tabs" data-parent="csv" <?php echo $this->tab === 'csv' ? '' : 'hidden'; ?>>
@@ -20,7 +20,7 @@ defined('ABSPATH') || die();
         </li>
         <li class="lsd-has-children lsd-excel-nav <?php echo $this->tab === 'excel' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'excel' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=excel')); ?>">
-                <i class="listdom-icon lsdi-excel lsd-m-0"></i>
+                <i class="webilia-icon wbli-excel lsd-m-0"></i>
                 <?php esc_html_e('Excel', 'listdom'); ?>
             </a>
             <ul class="lsd-nav-sub-tabs" data-parent="excel" <?php echo $this->tab === 'excel' ? '': 'hidden'; ?>>
@@ -31,7 +31,7 @@ defined('ABSPATH') || die();
         </li>
         <li class="lsd-has-children lsd-json-nav <?php echo $this->tab === 'json' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'json' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=json')); ?>">
-                <i class="listdom-icon lsdi-file-script lsd-m-0"></i>
+                <i class="webilia-icon wbli-file-script lsd-m-0"></i>
                 <?php esc_html_e('JSON', 'listdom'); ?>
             </a>
             <ul class="lsd-nav-sub-tabs" data-parent="json" <?php echo $this->tab === 'json' ? '': 'hidden'; ?>>
@@ -40,8 +40,8 @@ defined('ABSPATH') || die();
             </ul>
         </li>
         <li class="lsd-dummy-date-nav">
-            <a class="lsd-nav-tab <?php echo $this->tab === 'dummy-data' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=dummy-data')); ?>">
-                <i class="listdom-icon lsdi-database lsd-m-0"></i>
+            <a class="lsd-nav-tab <?php echo $this->tab === 'dummy-data' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=dummy-data&subtab=dummy-data')); ?>">
+                <i class="webilia-icon wbli-database lsd-m-0"></i>
                 <?php esc_html_e('Dummy Data', 'listdom'); ?>
             </a>
         </li>

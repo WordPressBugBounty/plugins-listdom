@@ -20,12 +20,12 @@ defined('ABSPATH') || die();
         <?php echo lsd_ads('header-links-start'); ?>
 
         <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-addons')); ?>" class="lsd-text-button lsd-header-addons-button">
-            <i class="listdom-icon lsdi-add-plus-circle"></i>
+            <i class="webilia-icon wbli-add-plus-circle"></i>
             <span><?php echo esc_html__('Addons', 'listdom'); ?></span>
         </a>
 
         <a href="<?php echo esc_url(LSD_Base::getAccountURL()); ?>" target="_blank" class="lsd-text-button">
-            <i class="listdom-icon lsdi-user-circle"></i>
+            <i class="webilia-icon wbli-user-circle"></i>
             <span><?php echo esc_html(sprintf(__('My %s Account', 'listdom'), LSD_Branding::name())); ?></span>
         </a>
 

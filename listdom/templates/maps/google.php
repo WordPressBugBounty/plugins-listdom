@@ -124,7 +124,7 @@ jQuery(document).ready(function()
 			<div class="lsd-row">
 				<div class="lsd-col-9 lsd-direction-address-wrapper">
 					<input class="lsd-direction-address" type="text" placeholder="<?php esc_attr_e('Address from ...', 'listdom') ?>" title="<?php esc_attr_e('Address from ...', 'listdom') ?>" id="lsd_direction_address<?php echo esc_attr($id); ?>" required>
-					<span class="lsd-direction-reset lsd-util-hide" id="lsd_direction_reset<?php echo esc_attr($id); ?>"><i class="lsd-fe-icon lsdi-cross"></i></span>
+					<span class="lsd-direction-reset lsd-util-hide" id="lsd_direction_reset<?php echo esc_attr($id); ?>"><i class="lsd-fe-icon wbli-cross"></i></span>
 					<div class="lsd-direction-position-wrapper">
 						<input type="hidden" id="lsd_direction_latitude<?php echo esc_attr($id); ?>">
 						<input type="hidden" id="lsd_direction_longitude<?php echo esc_attr($id); ?>">

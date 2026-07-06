@@ -9,7 +9,7 @@ $settings = LSD_Options::settings();
     <div class="lsd-welcome-content-header">
         <div class="lsd-admin-section-heading">
             <div class="lsd-admin-title-icon">
-                <i class="listdom-icon lsdi-database"></i>
+                <i class="webilia-icon wbli-database"></i>
                 <h2 class="lsd-admin-title lsd-m-0"><?php echo esc_html__('Import Dummy Data', 'listdom'); ?></h2>
             </div>
             <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Boost your directory building by importing pre-made listings and start modifying them.' , 'listdom'); ?></p>
@@ -142,7 +142,7 @@ $settings = LSD_Options::settings();
         <button class="lsd-skip-step lsd-text-button"><?php echo esc_html__('Skip', 'listdom'); ?></button>
         <button type="submit" class="lsd-step-link lsd-primary-button" id="lsd_dummy_data_save_button">
             <?php echo esc_html__('Import', 'listdom'); ?>
-            <i class="listdom-icon lsdi-right-arrow"></i>
+            <i class="webilia-icon wbli-right-arrow"></i>
         </button>
     </div>
 

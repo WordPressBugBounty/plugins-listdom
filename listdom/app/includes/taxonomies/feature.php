@@ -74,6 +74,7 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
             ]); ?>
             <p class="description"><?php esc_html_e("The icon will show on the website frontend next to the feature.", 'listdom'); ?></p>
         </div>
+        <?php $this->archive_shortcode_add_field(); ?>
         <?php if (!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
         <?php else: ?>
             <div class="form-field">
@@ -107,6 +108,7 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
                 <p class="description"><?php esc_html_e("The icon will show on the website frontend next to the feature.", 'listdom'); ?></p>
             </td>
         </tr>
+        <?php $this->archive_shortcode_edit_field($term); ?>
         <?php if ($this->isPro()): ?>
         <tr class="form-field">
             <th scope="row">
@@ -141,6 +143,7 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
         $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? sanitize_text_field(wp_unslash($_POST['lsd_itemprop'])) : '';
 
         update_term_meta($term_id, 'lsd_icon', $icon);
+        $this->save_archive_shortcode($term_id);
         update_term_meta($term_id, 'lsd_itemprop', $itemprop);
     }
 

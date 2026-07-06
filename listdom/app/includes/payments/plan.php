@@ -103,6 +103,9 @@ class LSD_Payments_Plan extends LSD_Base
      */
     public function get_tiers(): array
     {
+        // Invalid Plan
+        if (!$this->plan || $this->plan->post_type !== LSD_Base::PTYPE_PLAN) return [];
+
         // Tiers
         $t = get_post_meta($this->plan->ID, 'lsd_tiers', true);
         if (!is_array($t)) $t = [];

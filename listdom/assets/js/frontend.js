@@ -6603,6 +6603,66 @@ function ListdomDetails(id, link, settings) {
             initRadiusFields();
             bindSearchInputClearButtons();
 
+            const refreshSearchButtonFields = function ($scope) {
+                $scope.find('.lsd-search-button-option').each(function () {
+                    const $option = $(this);
+                    const $input = $option.find('.lsd-search-button-input');
+
+                    $option.toggleClass('lsd-search-button-selected', $input.is(':checked'));
+                });
+            };
+
+            refreshSearchButtonFields($form);
+
+            $form
+            .off('pointerdown.lsdSearchButtons mousedown.lsdSearchButtons', '.lsd-search-button-option')
+            .on('pointerdown.lsdSearchButtons mousedown.lsdSearchButtons', '.lsd-search-button-option', function () {
+                const $option = $(this);
+                const $input = $option.find('.lsd-search-button-input[type="radio"]');
+
+                if (!$input.length) return;
+
+                $input.data('lsdWasChecked', $input.is(':checked'));
+            })
+
+            .off('click.lsdSearchButtonsToggle', '.lsd-search-button-option')
+            .on('click.lsdSearchButtonsToggle', '.lsd-search-button-option', function (event) {
+                const $option = $(this);
+                const $input = $option.find('.lsd-search-button-input[type="radio"]');
+
+                if (!$input.length) return;
+
+                if ($input.data('lsdWasChecked') === true) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const name = $input.attr('name');
+
+                    $input
+                    .prop('checked', false)
+                    .data('lsdWasChecked', false)
+                    .trigger('change');
+
+                    // Reset the state for the whole radio group
+                    if (name) {
+                        $form
+                        .find('.lsd-search-button-input[type="radio"][name="' + name + '"]')
+                        .not($input)
+                        .data('lsdWasChecked', false);
+                    }
+
+                    return false;
+                }
+            })
+
+            .off('change.lsdSearchButtons', '.lsd-search-button-input')
+            .on('change.lsdSearchButtons', '.lsd-search-button-input', function () {
+                const $input = $(this);
+                const $wrapper = $input.closest('.lsd-search-method-buttons');
+
+                refreshSearchButtonFields($wrapper);
+            });
+
             // More Options
             $container
             .find($(".lsd-search-row-more-options"))
@@ -6766,6 +6826,7 @@ function ListdomDetails(id, link, settings) {
                 let taxonomy = $wrapper.data("for");
                 let hide_empty = $wrapper.data("hide-empty");
                 let max_levels = $wrapper.data("max-levels");
+                let show_count = $wrapper.data("show-count");
                 let level_status = $wrapper.data("level-status");
 
                 $wrapper.find("select, .select2").each(function () {
@@ -6820,6 +6881,8 @@ function ListdomDetails(id, link, settings) {
                                     value +
                                     "&hide_empty=" +
                                     hide_empty +
+                                    "&show_count=" +
+                                    show_count +
                                     "&_wpnonce=" +
                                     settings.nonce,
                                 dataType: "json",
@@ -6929,6 +6992,7 @@ function ListdomDetails(id, link, settings) {
 
                 // Clear checkboxes and radios
                 $form.find("input[type=checkbox], input[type=radio]").prop("checked", false);
+                refreshSearchButtonFields($form);
 
                 // Reset Select2
                 $form.find("select").each(function () {
@@ -7524,7 +7588,7 @@ function ListdomDetails(id, link, settings) {
         function showRadiusError(message, preferNative) {
             if (!message) return;
 
-            new ListdomToast(message, {type: 'lsd-error'});
+            new WebiliaToast(message, {type: 'lsd-error'});
         }
 
         function ajax() {
@@ -7934,6 +7998,252 @@ function ListdomDetails(id, link, settings) {
     }
 })();
 
+window.lsdDashboardInitLoadMoreTables = function (context)
+{
+    if (typeof jQuery === 'undefined') return;
+
+    const $ = jQuery;
+    const $context = context && context.length ? context : $(document);
+
+    $context.find('.lsd-dashboard-load-more-table').each(function ()
+    {
+        const $table = $(this);
+        if ($table.data('lsdLoadMoreReady')) return;
+
+        const contextKey = ($table.data('loadMoreContext') || '').toString();
+        const dashboardUrl = ($table.data('dashboardUrl') || '').toString();
+        const nonce = ($table.data('loadMoreNonce') || '').toString();
+        const filterStatus = ($table.data('loadMoreStatus') || '').toString();
+        const filterSearch = ($table.data('loadMoreSearch') || '').toString();
+        const moreLabel = ($table.data('loadMoreLabel') || 'Load More').toString();
+        let nextPage = parseInt($table.data('loadMoreNextPage'), 10);
+        let hasMore = parseInt($table.data('loadMoreHasMore'), 10) === 1;
+
+        if (!contextKey || !nonce || !hasMore || Number.isNaN(nextPage) || nextPage < 2) return;
+
+        const $wrapper = $('<div class="lsd-dashboard-load-more-actions"></div>');
+        const $button = $('<button type="button" class="lsd-light-button lsd-dashboard-load-more-button"></button>');
+
+        $button.append('<span class="lsd-load-more-title"></span><span class="lsd-load-more-spinner"><i class="fas fa-spinner fa-spin"></i></span>');
+
+        $wrapper.append($button);
+        $table.after($wrapper);
+
+        const render = function ()
+        {
+            $button.find('.lsd-load-more-title').text(moreLabel);
+            $button.removeClass('lsd-load-more-loading').prop('disabled', false).attr('aria-busy', 'false');
+            $wrapper.toggle(hasMore);
+        };
+
+        $button.on('click', function ()
+        {
+            if (!hasMore || $button.prop('disabled')) return;
+
+            $button.addClass('lsd-load-more-loading').prop('disabled', true).attr('aria-busy', 'true');
+            $table.addClass('lsd-loading');
+
+            $.ajax({
+                url: lsd.ajaxurl,
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    action: 'lsd_dashboard_payments_load_more',
+                    _wpnonce: nonce,
+                    context: contextKey,
+                    page: nextPage,
+                    dashboard_url: dashboardUrl,
+                    subscriptions_status: filterStatus,
+                    subscriptions_search: filterSearch,
+                    orders_status: filterStatus,
+                    orders_search: filterSearch
+                },
+                success: function (response)
+                {
+                    if (!response || parseInt(response.success, 10) !== 1)
+                    {
+                        hasMore = false;
+                        render();
+                        return;
+                    }
+
+                    if (response.html)
+                    {
+                        $table.find('tbody').append(response.html);
+                    }
+
+                    nextPage = parseInt(response.next_page, 10);
+                    hasMore = parseInt(response.has_more, 10) === 1 && !Number.isNaN(nextPage) && nextPage > 1;
+
+                    render();
+                },
+                error: function ()
+                {
+                    $button.removeClass('lsd-load-more-loading').prop('disabled', false).attr('aria-busy', 'false');
+                },
+                complete: function ()
+                {
+                    $table.removeClass('lsd-loading');
+                }
+            });
+        });
+
+        $table.data('lsdLoadMoreReady', true);
+        render();
+    });
+};
+
+if (typeof jQuery !== 'undefined')
+{
+    jQuery(function ($)
+    {
+        window.lsdDashboardInitLoadMoreTables($(document));
+    });
+}
+
+window.lsdDashboardInitPaymentActions = function (context)
+{
+    if (typeof jQuery === 'undefined') return;
+
+    const $ = jQuery;
+    const $context = context && context.length ? context : $(document);
+    const escapeHtml = function (value)
+    {
+        return $('<div></div>').text((value || '').toString()).html();
+    };
+
+    const handleAutoRenewAction = function ($button, actionName, requiresConfirm)
+    {
+        const recurringId = parseInt($button.data('recurringId'), 10) || 0;
+        const nonce = ($button.data('nonce') || '').toString();
+        const dashboardUrl = ($button.data('dashboardUrl') || '').toString();
+        const errorMessage = ($button.data('errorMessage') || '').toString();
+        const $message = $button.closest('.lsd-fe-box-white').find('.lsd-dashboard-payments-subscription-progress-message');
+
+        if (!recurringId || !nonce) return;
+
+        const loading = new ListdomButtonLoader($button);
+
+        loading.start($button.text());
+
+        $message.html('');
+        $message.removeClass('lsd-util-hide');
+
+        $.ajax({
+            url: lsd.ajaxurl,
+            type: 'post',
+            dataType: 'json',
+            data: {
+                action: actionName,
+                _wpnonce: nonce,
+                recurring_id: recurringId,
+                dashboard_url: dashboardUrl
+            },
+            success: function (response)
+            {
+                const success = response && parseInt(response.success, 10) === 1;
+                const message = response && response.message ? response.message : '';
+
+                if (message)
+                {
+                    if (typeof listdom_alertify === 'function')
+                    {
+                        $message.html(listdom_alertify(message, success ? 'lsd-success' : 'lsd-error'));
+                    }
+                    else
+                    {
+                        $message.text(message);
+                    }
+                }
+
+                if (success)
+                {
+                    window.setTimeout(function ()
+                    {
+                        window.location.href = response && response.redirect ? response.redirect : window.location.href;
+                    }, 500);
+                }
+            },
+            error: function ()
+            {
+                if (typeof listdom_alertify === 'function')
+                {
+                    $message.html(listdom_alertify(errorMessage, 'lsd-error'));
+                }
+                else
+                {
+                    $message.text(errorMessage);
+                }
+            },
+            complete: function ()
+            {
+                loading.stop();
+                $button.removeClass('lsd-need-confirm');
+            }
+        });
+    };
+
+    $context
+    .find('.lsd-dashboard-payments-disable-autorenew')
+    .off('click.lsdDisableAutoRenew')
+    .on('click.lsdDisableAutoRenew', function (event)
+    {
+        event.preventDefault();
+
+        const $button = $(this);
+        const confirmTitle = ($button.data('confirmTitle') || '').toString();
+        const confirmDescription = ($button.data('confirmDescription') || '').toString();
+        const confirmApproveLabel = ($button.data('confirmApproveLabel') || 'Yes').toString();
+        const confirmCancelLabel = ($button.data('confirmCancelLabel') || 'No').toString();
+
+        if (typeof WebiliaToast === 'function')
+        {
+            new WebiliaToast(
+                '<div class="lsd-dashboard-payments-disable-autorenew-toast">' +
+                    '<h4 class="lsd-fe-title">' + escapeHtml(confirmTitle) + '</h4>' +
+                    '<p class="lsd-fe-description">' + escapeHtml(confirmDescription) + '</p>' +
+                '</div>',
+                {
+                    type: 'lsd-confirm',
+                    icon: '<i class="lsd-fe-icon fa-solid fa-info-circle"></i>',
+                    position: 'lsd-center-center',
+                    confirm: {
+                        confirmText: confirmApproveLabel,
+                        cancelText: confirmCancelLabel,
+                        confirmClass: 'lsd-light-button',
+                        cancelClass: 'lsd-general-button',
+                        confirmFirst: false,
+                        onConfirm: function () {
+                            handleAutoRenewAction($button, 'lsd_dashboard_payments_disable_autorenew', true);
+                        }
+                    }
+                }
+            );
+
+            return;
+        }
+
+        handleAutoRenewAction($button, 'lsd_dashboard_payments_disable_autorenew', true);
+    });
+
+    $context
+    .find('.lsd-dashboard-payments-activate-autorenew')
+    .off('click.lsdActivateAutoRenew')
+    .on('click.lsdActivateAutoRenew', function (event)
+    {
+        event.preventDefault();
+        handleAutoRenewAction($(this), 'lsd_dashboard_payments_activate_autorenew', false);
+    });
+};
+
+if (typeof jQuery !== 'undefined')
+{
+    jQuery(function ($)
+    {
+        window.lsdDashboardInitPaymentActions($(document));
+    });
+}
+
 // Listdom DASHBOARD PLUGIN
 (function ($) {
     $.fn.listdomDashboard = function (options) {
@@ -7952,7 +8262,7 @@ function ListdomDetails(id, link, settings) {
 
         function setListeners() {
             $dashboard
-            .find($(".lsd-dashboard-delete"))
+            .find($(".lsd-dashboard-action-delete"))
             .off("click")
             .on("click", function () {
                 remove($(this));
@@ -10650,10 +10960,12 @@ function lsdaddbok_trigger_booking_form() {
         let $form = jQuery(this);
         let $module = $form.parent().parent();
         let $alert = $module.find(jQuery(".lsd-booking-form-alert"));
+        let $button = $module.find(jQuery(".lsd-booking-submit-wrapper .lsd-general-button"));
         let data = $form.serialize();
 
-        // Loading Style
-        $module.addClass("lsd-loading");
+        const loading = new ListdomButtonLoader($button);
+
+        loading.start($button.text());
 
         // Empty Alert
         $alert.html("");
@@ -10665,11 +10977,11 @@ function lsdaddbok_trigger_booking_form() {
             dataType: "json",
             success: function (response) {
                 // Loading Style
-                $module.removeClass("lsd-loading");
+                loading.stop();
 
-                if (response.success) {
-                    // Hide Form
-                    $form.slideUp();
+                if (response.success)
+                {
+                    $button.attr('disabled', 'disabled');
 
                     // Show Alert
                     $alert.html(
@@ -10691,75 +11003,161 @@ function lsdaddbok_trigger_booking_form() {
                 }
             },
             error: function () {
-                // Loading Style
-                $module.removeClass("lsd-loading");
+                loading.stop();
             },
         });
     });
 }
 
 function lsdaddbok_trigger_booking_manage_actions() {
-    // Manage Bookings
-    jQuery(".lsd-bookings-manage-actions li")
-    .off("click")
-    .on("click", function () {
+    // Open Action Modal or Run Direct Action
+    jQuery(document)
+    .off("click.lsdaddbokBookingManageAction", ".lsd-bookings-manage-actions .lsd-actions-menu-item")
+    .on("click.lsdaddbokBookingManageAction", ".lsd-bookings-manage-actions .lsd-actions-menu-item", function (e) {
         let $button = jQuery(this);
+        let method = ($button.attr("data-method") || "").trim();
+        let modalSelector = $button.attr("data-action-modal");
 
-        let id = $button.data("id");
-        let method = $button.data("method");
-        let nonce = $button.data("nonce");
+        // Real links such as view details / invoice / book again should use normal navigation.
+        if (!method) return;
 
-        if (method === "trash" || method === "reject" || method === "cancel") {
-            let confirm = $button.data("confirm");
-            if (confirm === 0) {
-                $button.data("confirm", 1);
-                $button.addClass("lsd-need-confirm");
+        e.preventDefault();
+        e.stopPropagation();
 
-                setTimeout(function () {
-                    $button.data("confirm", 0);
-                    $button.removeClass("lsd-need-confirm");
-                }, 5000);
+        if (modalSelector) {
+            let $modal = jQuery(modalSelector);
+            let $menu = $button.closest(".lsd-actions-menu");
 
-                return;
+            $menu.trigger("lsd:actions-menu:open");
+
+            if ($modal.length && typeof window.ListdomModal !== "undefined") {
+                window.ListdomModal.open($modal, {
+                    appendToBody: true,
+                });
             }
+
+            return;
         }
 
-        let $booking = jQuery("#lsd_bm_" + id);
-        let $status = $booking.find(jQuery(".lsd-bookings-status-wrapper"));
-        let $actions = $booking.find(jQuery(".lsd-bookings-manage-actions"));
+        lsdaddbok_run_booking_manage_action($button);
+    });
 
-        // Loading Style
-        $booking.addClass("lsd-loading");
+    // Confirm Action
+    jQuery(document)
+    .off("click.lsdaddbokBookingManageConfirm", ".lsdaddbok-action-confirm-submit")
+    .on("click.lsdaddbokBookingManageConfirm", ".lsdaddbok-action-confirm-submit", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-        jQuery.ajax({
-            url: lsd.ajaxurl,
-            data: {
-                action: "lsdaddbok_bm", // Booking Manage
-                id: id,
-                method: method,
-                _wpnonce: nonce,
-            },
-            type: "post",
-            dataType: "json",
-            success: function (response) {
-                // Loading Style
-                $booking.removeClass("lsd-loading");
+        lsdaddbok_run_booking_manage_action(jQuery(this));
+    });
 
-                if (response.success) {
-                    $status.html(response.new.status);
-                    $actions.html(response.new.actions);
+    // Change PIC
+    jQuery(document)
+    .off("click.lsdaddbokBookingManagePIC", ".lsdaddbok-change-pic-submit")
+    .on("click.lsdaddbokBookingManagePIC", ".lsdaddbok-change-pic-submit", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-                    setTimeout(function () {
-                        lsdaddbok_trigger_booking_manage_actions();
-                    }, 500);
-                }
-            },
-            error: function () {
-                // Loading Style
-                $booking.removeClass("lsd-loading");
-            },
+        let $button = jQuery(this);
+        let $modal = $button.closest(".lsd-modal");
+        let pic = parseInt($modal.find(".lsdaddbok-change-pic-select").val(), 10) || 0;
+
+        lsdaddbok_run_booking_manage_action($button, {
+            pic: pic,
         });
     });
+
+    // Cancel Modal
+    jQuery(document)
+    .off("click.lsdaddbokBookingManageCancel", ".lsdaddbok-action-confirm-cancel")
+    .on("click.lsdaddbokBookingManageCancel", ".lsdaddbok-action-confirm-cancel", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        lsdaddbok_close_booking_action_modal(jQuery(this).closest(".lsd-modal"));
+    });
+}
+
+function lsdaddbok_run_booking_manage_action($button, extraData) {
+    let id = $button.data("id");
+    let method = $button.data("method");
+    let nonce = $button.data("nonce");
+
+    let $modal = $button.closest(".lsd-modal");
+    let $menu = jQuery("#lsd_bm_" + id).find(".lsd-actions-menu").first();
+
+    $menu.trigger("lsd:actions-menu:lock");
+
+    // Loading Style
+    const loading = new ListdomButtonLoader($button);
+    loading.start($button.text());
+
+    let data = {
+        action: "lsdaddbok_bm",
+        id: id,
+        method: method,
+        _wpnonce: nonce,
+    };
+
+    if (extraData && typeof extraData === "object") {
+        data = jQuery.extend(data, extraData);
+    }
+
+    const showError = function (message) {
+        if (!message) return;
+
+        if ($modal.length) {
+            let $message = $modal.find(".lsdaddbok-action-response");
+
+            if (!$message.length) {
+                $message = jQuery('<div class="lsdaddbok-action-response"></div>');
+                $modal.find(".lsdaddbok-action-confirm").first().prepend($message);
+            }
+
+            $message.html(listdom_alertify(message, "lsd-error"));
+            return;
+        }
+
+        if (typeof listdom_toastify === "function") {
+            listdom_toastify(message, "lsd-error");
+        }
+    };
+
+    jQuery.ajax({
+        url: lsd.ajaxurl,
+        data: data,
+        type: "post",
+        dataType: "json",
+        success: function (response) {
+            loading.stop();
+
+            if (response.success) {
+                window.location.reload();
+                return;
+            }
+
+            $menu.trigger("lsd:actions-menu:unlock");
+            showError(response.message || "");
+        },
+        error: function () {
+            loading.stop();
+
+            $menu.trigger("lsd:actions-menu:unlock");
+            showError("Something went wrong. Please try again.");
+        },
+    });
+}
+
+function lsdaddbok_close_booking_action_modal($modal) {
+    if (!$modal.length) return;
+
+    if (typeof window.ListdomModal !== "undefined") {
+        window.ListdomModal.close($modal);
+        return;
+    }
+
+    $modal.fadeOut(100);
 }
 
 function lsdaddjob_trigger_application_manage_actions() {
@@ -11179,6 +11577,393 @@ function lsdCheckoutComplete(orderKey)
     }
 }
 
+// Listdom Actions Menu
+(function ($)
+{
+    const menuSelector = '.lsd-actions-menu';
+    const toggleSelector = '.lsd-actions-menu-toggle';
+    const dropdownSelector = '.lsd-actions-menu-dropdown';
+    const modalSelector = [
+        '.lsd-modal',
+        '.lsd-modal-backdrop',
+        '.lsd-modal-content',
+        '.select2-container',
+        '.select2-dropdown',
+        '.select2-results',
+        '.select2-search',
+        '.select2-selection'
+    ].join(', ');
+
+    const openClass = 'is-open';
+    const openTopClass = 'is-open-top';
+    const openBottomClass = 'is-open-bottom';
+    const loadingClass = 'is-loading';
+
+    setListeners();
+
+    function setListeners() {
+        // Toggle Menu
+        $(document)
+        .off('click.lsdDashboardActionsMenu', toggleSelector)
+        .on('click.lsdDashboardActionsMenu', toggleSelector, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            let $menu = $(this).closest(menuSelector);
+
+            if ($menu.hasClass(loadingClass)) return;
+
+            toggleMenu($menu);
+        });
+
+        // Force Open Menu
+        $(document)
+        .off('lsd:actions-menu:open')
+        .on('lsd:actions-menu:open', menuSelector, function () {
+            openMenu($(this));
+        });
+
+        // Lock Menu
+        $(document)
+        .off('lsd:actions-menu:lock')
+        .on('lsd:actions-menu:lock', menuSelector, function () {
+            let $menu = $(this);
+
+            $menu.addClass(loadingClass);
+            openMenu($menu);
+        });
+
+        // Unlock Menu
+        $(document)
+        .off('lsd:actions-menu:unlock')
+        .on('lsd:actions-menu:unlock', menuSelector, function () {
+            $(this).removeClass(loadingClass);
+        });
+
+        // Close When Clicking Outside
+        $(document)
+        .off('click.lsdDashboardActionsMenuClose')
+        .on('click.lsdDashboardActionsMenuClose', function (e) {
+            if (shouldIgnoreOutsideClick(e)) return;
+
+            closeMenus();
+        });
+
+        // Close With Escape
+        $(document)
+        .off('keydown.lsdDashboardActionsMenu')
+        .on('keydown.lsdDashboardActionsMenu', function (e) {
+            if (e.key === 'Escape') closeMenus();
+        });
+
+        // Recalculate Open Direction On Resize / Scroll
+        $(window)
+        .off('resize.lsdDashboardActionsMenu scroll.lsdDashboardActionsMenu')
+        .on('resize.lsdDashboardActionsMenu scroll.lsdDashboardActionsMenu', function () {
+            $(menuSelector + '.' + openClass).each(function () {
+                setMenuDirection($(this));
+            });
+        });
+    }
+
+    function shouldIgnoreOutsideClick(e) {
+        let $target = $(e.target);
+
+        if ($target.closest(menuSelector).length) return true;
+        if ($target.closest(modalSelector).length) return true;
+
+        // Do not close any menu while one is loading.
+        if ($(menuSelector + '.' + loadingClass).length) return true;
+
+        return false;
+    }
+
+    function toggleMenu($menu) {
+        if (!$menu.length) return;
+
+        let isOpen = $menu.hasClass(openClass);
+
+        closeMenus($menu);
+
+        if (isOpen) {
+            closeMenu($menu);
+            return;
+        }
+
+        openMenu($menu);
+    }
+
+    function openMenu($menu) {
+        if (!$menu.length) return;
+
+        $menu.addClass(openClass);
+        setMenuDirection($menu);
+    }
+
+    function closeMenu($menu) {
+        if ($menu.hasClass(loadingClass)) return;
+
+        $menu
+        .removeClass(openClass)
+        .removeClass(openTopClass)
+        .removeClass(openBottomClass);
+    }
+
+    function closeMenus($except) {
+        let $menus = $(menuSelector + '.' + openClass).not('.' + loadingClass);
+
+        if ($except && $except.length) {
+            $menus.not($except).each(function () {
+                closeMenu($(this));
+            });
+
+            return;
+        }
+
+        $menus.each(function () {
+            closeMenu($(this));
+        });
+    }
+
+    function setMenuDirection($menu) {
+        let $dropdown = $menu.find(dropdownSelector).first();
+        let $toggle = $menu.find(toggleSelector).first();
+
+        if (!$dropdown.length || !$toggle.length) return;
+
+        $menu
+        .removeClass(openTopClass)
+        .removeClass(openBottomClass);
+
+        let viewportHeight = $(window).height();
+        let toggleRect = $toggle[0].getBoundingClientRect();
+
+        // Temporarily force bottom position to measure real dropdown height.
+        $menu.addClass(openBottomClass);
+
+        let dropdownHeight = $dropdown.outerHeight() || 0;
+        let spacing = 8;
+
+        let spaceBelow = viewportHeight - toggleRect.bottom;
+        let spaceAbove = toggleRect.top;
+
+        $menu.removeClass(openBottomClass);
+
+        if (spaceBelow < dropdownHeight + spacing && spaceAbove > spaceBelow) {
+            $menu.addClass(openTopClass);
+        } else {
+            $menu.addClass(openBottomClass);
+        }
+    }
+})(jQuery);
+
+(function($)
+{
+    'use strict';
+
+    const ListdomBookingHeldTimer = {
+        init: function()
+        {
+            this.$timers = $('[data-lsd-held-expires-at]');
+
+            if(!this.$timers.length) return;
+
+            this.tick();
+
+            setInterval(function()
+            {
+                ListdomBookingHeldTimer.tick();
+            }, 1000);
+        },
+
+        tick: function()
+        {
+            const now = Math.floor(Date.now() / 1000);
+
+            this.$timers.each(function()
+            {
+                const $timer = $(this);
+                const expiresAt = parseInt($timer.attr('data-lsd-held-expires-at'), 10) || 0;
+                const $timerElement = $timer.find('.lsd-booking-held-timer');
+
+                if(!$timerElement.length || !expiresAt) return;
+
+                const remaining = expiresAt - now;
+
+                if(remaining <= 0)
+                {
+                    $timerElement.text(ListdomBookingHeldTimer.expiredText());
+                    $timer.addClass('lsd-booking-availability-held-expired');
+                    return;
+                }
+
+                $timerElement.text(ListdomBookingHeldTimer.formatTime(remaining));
+            });
+        },
+
+        formatTime: function(seconds)
+        {
+            seconds = Math.max(0, parseInt(seconds, 10) || 0);
+
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const remainingSeconds = seconds % 60;
+
+            return [
+                String(hours).padStart(2, '0'),
+                String(minutes).padStart(2, '0'),
+                String(remainingSeconds).padStart(2, '0')
+            ].join(':');
+        },
+
+        expiredText: function()
+        {
+            if(typeof lsdaddbok !== 'undefined' && lsdaddbok.expired)
+            {
+                return lsdaddbok.expired;
+            }
+
+            return 'Expired';
+        }
+    };
+
+    $(function()
+    {
+        ListdomBookingHeldTimer.init();
+    });
+
+})(jQuery);
+
+// Listdom Subscription Switch
+(function ($) {
+    const hiddenClass = 'lsd-util-hide';
+
+    setListeners();
+
+    function setListeners() {
+        // Open Switch Modal
+        $(document)
+        .off('click.lsdAddSubSwitchOpen', '.lsdaddsub-switch-open')
+        .on('click.lsdAddSubSwitchOpen', '.lsdaddsub-switch-open', function (e) {
+            e.preventDefault();
+
+            openSwitchModal($(this));
+        });
+
+        // Cancel Switch
+        $(document)
+        .off('click.lsdAddSubSwitchCancel', '.lsdaddsub-switch-cancel')
+        .on('click.lsdAddSubSwitchCancel', '.lsdaddsub-switch-cancel', function (e) {
+            e.preventDefault();
+
+            cancelSwitch($(this));
+        });
+
+        // Save Switch
+        $(document)
+        .off('click.lsdAddSubSwitchSave', '.lsdaddsub-switch-save')
+        .on('click.lsdAddSubSwitchSave', '.lsdaddsub-switch-save', function (e) {
+            e.preventDefault();
+
+            saveSwitch($(this));
+        });
+    }
+
+    function openSwitchModal($button) {
+        let modalSelector = $button.data('modal');
+        let $modal = $(modalSelector);
+        let $listingActions = $button.closest('.lsd-dashboard-listing-actions');
+
+        if ($modal.length && $listingActions.length && !$modal.parent().is($listingActions)) {
+            $listingActions.append($modal);
+        }
+
+        ListdomModal.open(modalSelector, {
+            appendToBody: false
+        });
+    }
+
+    function cancelSwitch($button) {
+        let $modal = $button.closest('.lsd-modal');
+        let $dropdown = $modal.find('.lsdaddsub-switch');
+
+        resetSwitchDropdown($dropdown);
+        clearSwitchMessage($modal.find('.lsdaddsub-switch-message'));
+
+        ListdomModal.close($modal);
+    }
+
+    function saveSwitch($button) {
+        let $modal = $button.closest('.lsd-modal');
+        let $dropdown = $modal.find('.lsdaddsub-switch');
+
+        let listing_id = $dropdown.data('listing');
+        let original_subscription_id = $dropdown.data('original-subscription');
+        let subscription_id = $dropdown.val();
+        let nonce = $dropdown.data('nonce');
+
+        let $message = $('#lsdaddsub_switch_message_' + listing_id);
+        $message.removeClass(hiddenClass);
+
+        const loading = new ListdomButtonLoader($button);
+        loading.start($button.text());
+
+        $.ajax({
+            url: lsd.ajaxurl,
+            data:
+                'id=' +
+                listing_id +
+                '&subscription=' +
+                subscription_id +
+                '&_wpnonce=' +
+                nonce +
+                '&action=lsdaddsub_switch',
+            dataType: 'json',
+            type: 'post',
+            success: function (response) {
+                if (response.success) {
+                    switchSuccess(response, $modal, $dropdown, $message, subscription_id);
+                } else {
+                    switchError(response, $dropdown, $message, original_subscription_id);
+                }
+            },
+            error: function () {
+            },
+            complete: function () {
+                loading.stop();
+            }
+        });
+    }
+
+    function switchSuccess(response, $modal, $dropdown, $message, subscription_id) {
+        $dropdown.data('original-subscription', subscription_id);
+        $message.html(response.message);
+
+        setTimeout(function () {
+            ListdomModal.close($modal);
+            clearSwitchMessage($message);
+        }, 2000);
+    }
+
+    function switchError(response, $dropdown, $message, original_subscription_id) {
+        $message.html(listdom_alertify(response.message, 'lsd-error'));
+
+        if (original_subscription_id) {
+            $dropdown.val(original_subscription_id);
+        }
+    }
+
+    function resetSwitchDropdown($dropdown) {
+        let originalSubscriptionId = $dropdown.data('original-subscription');
+
+        $dropdown.val(originalSubscriptionId);
+    }
+
+    function clearSwitchMessage($message) {
+        $message.html('').addClass(hiddenClass);
+    }
+})(jQuery);
+
 (function ($) {
     // Document is Ready!
     $(document).ready(function () {
@@ -11199,6 +11984,23 @@ function lsdCheckoutComplete(orderKey)
 
             $wrapper.find('.lsd-gateway-form').addClass('lsd-util-hide');
             $('#lsd-gateway-form-' + gateway).removeClass('lsd-util-hide');
+        });
+
+        $(document).on('click', '.lsd-membership-active-package-tabs .lsd-fe-tabs-nav a', function (e) {
+            e.preventDefault();
+            
+            const $a = $(this);
+            const $li = $a.parent('li');
+            const tab = $li.data('tab');
+            const $wrapper = $a.closest('.lsd-membership-active-package-tabs');
+
+            if (!tab || !$wrapper.length) return;
+
+            $li.siblings().removeClass('lsd-active');
+            $li.addClass('lsd-active');
+
+            $wrapper.find('.lsd-tab-content').removeClass('lsd-tab-content-active');
+            $wrapper.find('.lsd-tab-content[data-tab-content="' + tab + '"]').addClass('lsd-tab-content-active');
         });
 
         // Checkout button
@@ -11676,22 +12478,27 @@ function lsdCheckoutComplete(orderKey)
         });
 
         // Subscription Checkout Form
-        $(".lsd-package-checkout-form").on("submit", function (e) {
+        $(document).on("submit", ".lsd-package-checkout-form", function (e) {
             e.preventDefault();
 
             let id = $(this).data("id");
             let data = $(this).serialize();
 
             // Elements
-            let $form = $("#lsd_package_checkout_form_" + id);
+            let $form = $(this);
             let $button = $form.find("button");
-            let $wrapper = $("#lsd_dashboard_packages");
+            let $wrapper = $form.closest("#lsd_dashboard_packages");
+            let $message = $form.find(".lsd-dashboard-subscription-purchase-message");
 
-            // Loading Style
-            $wrapper.addClass("lsd-loading");
+            if (!$wrapper.length) {
+                $wrapper = $form;
+            }
 
-            // Disable the Button
-            $button.prop("disabled", "disabled");
+            $message.html("");
+
+            const loading = new ListdomButtonLoader($button);
+
+            loading.start($button.text());
 
             $.ajax({
                 url: lsd.ajaxurl,
@@ -11699,93 +12506,26 @@ function lsdCheckoutComplete(orderKey)
                 dataType: "json",
                 type: "post",
                 success: function (response) {
-                    // Loading Style
-                    $wrapper.removeClass("lsd-loading");
 
-                    // Enable the Button
-                    $button.removeProp("disabled");
+                    loading.stop();
 
                     if (response.success) {
                         // Redirect to Payment Page
-                        if (response.data.next) {
+                        if (response.data && response.data.next) {
                             setTimeout(function () {
                                 window.location.replace(response.data.next);
                             }, 100);
                         }
                     } else {
+                        if (response.message) {
+                            $message.html(listdom_alertify(response.message, "lsd-error"));
+                        }
                     }
                 },
                 error: function () {
-                    // Loading Style
-                    $wrapper.removeClass("lsd-loading");
+                    loading.stop();
 
-                    // Enable the Button
-                    $button.removeProp("disabled");
-                },
-            });
-        });
-
-        // Subscription Switch
-        $(".lsdaddsub-switch").on("change", function (e) {
-            e.preventDefault();
-
-            // Elements
-            let $dropdown = $(this);
-            let $wrapper = $dropdown.parent().parent().parent().parent();
-
-            let listing_id = $dropdown.data("listing");
-            let original_subscription_id = $dropdown.data("original-subscription");
-            let subscription_id = $dropdown.val();
-            let nonce = $dropdown.data("nonce");
-
-            // Message
-            let $message = $("#lsdaddsub_switch_message_" + listing_id);
-
-            // Loading Style
-            $wrapper.addClass("lsd-loading");
-
-            // Remove Message
-            $message.html("");
-
-            $.ajax({
-                url: lsd.ajaxurl,
-                data:
-                    "id=" +
-                    listing_id +
-                    "&subscription=" +
-                    subscription_id +
-                    "&_wpnonce=" +
-                    nonce +
-                    "&action=lsdaddsub_switch",
-                dataType: "json",
-                type: "post",
-                success: function (response) {
-                    // Loading Style
-                    $wrapper.removeClass("lsd-loading");
-
-                    // Show Message
-                    $message.html(response.message);
-
-                    if (response.success) {
-                        // Update Original Subscription
-                        $dropdown.data("original-subscription", subscription_id);
-                    } else {
-                        // Show Message
-                        $message.html(listdom_alertify(response.message, "lsd-error"));
-
-                        // Original Subscription
-                        if (original_subscription_id)
-                            $dropdown.val(original_subscription_id);
-                    }
-
-                    // Remove Message
-                    setTimeout(function () {
-                        $message.html("");
-                    }, 5000);
-                },
-                error: function () {
-                    // Loading Style
-                    $wrapper.removeClass("lsd-loading");
+                    $message.html(listdom_alertify("Unable to start checkout right now.", "lsd-error"));
                 },
             });
         });
@@ -11964,11 +12704,13 @@ function lsdCheckoutComplete(orderKey)
             e.preventDefault();
 
             let $form = $(this);
+            let $button = $form.find('.lsd-booking-inquiry-submit');
             let $module = $form.parent();
             let data = $form.serialize();
 
             // Loading Style
-            $module.addClass("lsd-loading");
+            const loading = new ListdomButtonLoader($button);
+            loading.start($button.text());
 
             $.ajax({
                 url: lsd.ajaxurl,
@@ -11977,7 +12719,7 @@ function lsdCheckoutComplete(orderKey)
                 dataType: "json",
                 success: function (response) {
                     // Loading Style
-                    $module.removeClass("lsd-loading");
+                    loading.stop();
 
                     if (response.success) {
                         // Update HTML
@@ -12002,7 +12744,7 @@ function lsdCheckoutComplete(orderKey)
                 },
                 error: function () {
                     // Loading Style
-                    $module.removeClass("lsd-loading");
+                    loading.stop();
                 },
             });
         });

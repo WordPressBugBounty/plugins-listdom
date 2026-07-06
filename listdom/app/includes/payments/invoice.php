@@ -57,6 +57,7 @@ class LSD_Payments_Invoice extends LSD_Base
         $customer_name = $order->get_name();
         $customer_email = $order->get_email();
         $customer_message = $order->get_message();
+        $billing_details = $order->get_billing_details();
 
         $items = $order->get_items();
         $fees = $order->get_fees();

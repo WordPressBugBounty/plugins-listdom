@@ -202,7 +202,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         return $output;
     }
 
-    public function get($content, string $style = null)
+    public function get($content, ?string $style = null)
     {
         global $post;
 

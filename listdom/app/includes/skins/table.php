@@ -102,6 +102,175 @@ class LSD_Skins_Table extends LSD_Skins
         return $this->table_columns_config;
     }
 
+    public static function normalize_column_key($key, array $fields_data): string
+    {
+        $key = trim((string) $key);
+        if ($key === '') return '';
+
+        if (isset($fields_data[$key])) return $key;
+
+        if (is_numeric($key))
+        {
+            $slug = LSD_Taxonomies::to_slug(LSD_Base::TAX_ATTRIBUTE, $key);
+            $attribute_key = LSD_Fields::attribute_key($slug);
+
+            return $attribute_key !== '' && isset($fields_data[$attribute_key]) ? $attribute_key : '';
+        }
+
+        $attribute_slug = LSD_Fields::attribute_slug_from_key($key);
+        if ($attribute_slug !== '')
+        {
+            $attribute_key = LSD_Fields::attribute_key($attribute_slug);
+            return isset($fields_data[$attribute_key]) ? $attribute_key : '';
+        }
+
+        $slug = sanitize_title($key);
+        if ($slug === '') return '';
+
+        // Built-in and addon table columns keep priority over same-slug attributes.
+        if (isset($fields_data[$slug])) return $slug;
+
+        $attribute_key = LSD_Fields::attribute_key($slug);
+        return isset($fields_data[$attribute_key]) ? $attribute_key : '';
+    }
+
+    public static function normalize_table_columns($columns, array $fields_data): array
+    {
+        $columns = is_array($columns) ? $columns : [];
+
+        $normalized = [];
+        foreach ($columns as $key => $column)
+        {
+            if (is_array($column) && isset($column['key']))
+            {
+                $key = $column['key'];
+                unset($column['key']);
+            }
+
+            $normalized_key = self::normalize_column_key($key, $fields_data);
+            if ($normalized_key === '') continue;
+
+            $column = is_array($column) ? $column : [];
+            $is_canonical = (string) $key === $normalized_key;
+
+            if (!isset($normalized[$normalized_key]))
+            {
+                $normalized[$normalized_key] = $column;
+                continue;
+            }
+
+            $normalized[$normalized_key] = $is_canonical
+                ? array_merge($normalized[$normalized_key], $column)
+                : array_merge($column, $normalized[$normalized_key]);
+        }
+
+        return $normalized;
+    }
+
+    public static function normalize_table_options(array $table, array $fields_data = []): array
+    {
+        if (!count($fields_data)) $fields_data = (new LSD_Fields())->get();
+
+        if (isset($table['columns']))
+        {
+            $table['columns'] = self::normalize_table_columns($table['columns'], $fields_data);
+        }
+
+        if (isset($table['devices']) && is_array($table['devices']))
+        {
+            foreach (['tablet', 'mobile'] as $device)
+            {
+                if (!isset($table['devices'][$device]['columns'])) continue;
+
+                $table['devices'][$device]['columns'] = self::normalize_table_columns(
+                    $table['devices'][$device]['columns'],
+                    $fields_data
+                );
+            }
+        }
+
+        return $table;
+    }
+
+    public static function normalize_display_options(array $display): array
+    {
+        if (!isset($display['table']) || !is_array($display['table'])) return $display;
+
+        $display['table'] = self::normalize_table_options($display['table']);
+        return $display;
+    }
+
+    public static function replace_attribute_slug_in_display(array $display, string $old_slug, string $new_slug, int $term_id = 0): array
+    {
+        if (!isset($display['table']) || !is_array($display['table'])) return $display;
+
+        $display['table'] = self::replace_attribute_slug_in_table($display['table'], $old_slug, $new_slug, $term_id);
+        return self::normalize_display_options($display);
+    }
+
+    protected static function replace_attribute_slug_in_table(array $table, string $old_slug, string $new_slug, int $term_id = 0): array
+    {
+        $old_key = LSD_Fields::attribute_key($old_slug);
+        $new_key = LSD_Fields::attribute_key($new_slug);
+        if ($old_key === '' || $new_key === '') return $table;
+
+        if (isset($table['columns']))
+        {
+            $table['columns'] = self::replace_attribute_slug_in_columns($table['columns'], $term_id, $old_key, $new_key);
+        }
+
+        if (isset($table['devices']) && is_array($table['devices']))
+        {
+            foreach (['tablet', 'mobile'] as $device)
+            {
+                if (!isset($table['devices'][$device]['columns'])) continue;
+
+                $table['devices'][$device]['columns'] = self::replace_attribute_slug_in_columns(
+                    $table['devices'][$device]['columns'],
+                    $term_id,
+                    $old_key,
+                    $new_key
+                );
+            }
+        }
+
+        return $table;
+    }
+
+    protected static function replace_attribute_slug_in_columns($columns, int $term_id, string $old_key, string $new_key): array
+    {
+        $columns = is_array($columns) ? $columns : [];
+        $legacy_key = $term_id > 0 ? (string) $term_id : '';
+
+        $updated = [];
+        foreach ($columns as $key => $column)
+        {
+            $column = is_array($column) ? $column : [];
+            $normalized_key = (string) $key;
+            $is_canonical_new = $normalized_key === $new_key;
+
+            if ($normalized_key === $old_key || ($legacy_key !== '' && $normalized_key === $legacy_key)) $normalized_key = $new_key;
+
+            if (!isset($updated[$normalized_key]))
+            {
+                $updated[$normalized_key] = $column;
+                continue;
+            }
+
+            $updated[$normalized_key] = $is_canonical_new
+                ? array_merge($updated[$normalized_key], $column)
+                : array_merge($column, $updated[$normalized_key]);
+        }
+
+        return $updated;
+    }
+
+    public static function legacy_column_key(array $column): string
+    {
+        $legacy_key = isset($column['legacy_key']) ? (string) $column['legacy_key'] : '';
+        return is_numeric($legacy_key) ? $legacy_key : '';
+    }
+
     protected function get_table_device_settings(array $fields_data): array
     {
         $devices = isset($this->skin_options['devices']) && is_array($this->skin_options['devices'])
@@ -141,7 +310,7 @@ class LSD_Skins_Table extends LSD_Skins
 
     public function normalize_device_columns($columns, array $fields_data): array
     {
-        $columns = is_array($columns) ? $columns : [];
+        $columns = self::normalize_table_columns($columns, $fields_data);
 
         $normalized = [];
         foreach ($columns as $key => $column)

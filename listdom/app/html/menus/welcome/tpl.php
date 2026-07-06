@@ -40,7 +40,7 @@ $assets = new LSD_Assets();
     <!-- Close Button -->
     <div class="lsd-close-button">
         <a href="<?php echo admin_url('/admin.php?page=listdom'); ?>" class="lsd-close-wizard-button">
-            <i class="listdom-icon lsdi-cross"></i>
+            <i class="webilia-icon wbli-cross"></i>
         </a>
     </div>
 </div>
