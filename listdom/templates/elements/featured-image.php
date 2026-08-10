@@ -8,7 +8,7 @@ defined('ABSPATH') || die();
 
 $schema = [];
 if (!isset($itemprop)) $itemprop = 'image';
-if (trim($itemprop)) $schema['itemprop'] = $itemprop;
+if (trim($itemprop) && !LSD_Schema::suppressing_markup()) $schema['itemprop'] = $itemprop;
 
 // Listing Image
 $image = get_the_post_thumbnail($post_id, $size, $schema);

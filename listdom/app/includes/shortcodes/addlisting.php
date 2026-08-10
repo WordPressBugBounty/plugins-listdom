@@ -29,28 +29,13 @@ class LSD_Shortcodes_AddListing extends LSD_Shortcodes_Dashboard
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-add-listing');
         if (trim($pre)) return $pre;
 
-        // Include WordPress Media
-        LSD_Assets::media();
-
-        // Shortcode attributes
-        $this->atts = is_array($atts) ? $atts : [];
-
-        // Add Listing URL
-        global $post;
-        $this->page = $post;
-
-        // Add Listing URL
-        $this->url = get_permalink($this->page);
+        $this->bootstrap_shortcode_context($atts, true);
 
         // Mode
         $this->mode = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : 'form';
 
         // Form Type
         $this->form_type = true;
-
-        // Payload
-        LSD_Payload::set('dashboard', $this);
-        LSD_Payload::set('add_listing', $this);
 
         // Form
         if ($this->mode === 'form') return $this->add_listing();

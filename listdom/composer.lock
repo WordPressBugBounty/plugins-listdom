@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "61c9f2c5a80baa523134560ada6d9a79",
+    "content-hash": "1c7c234a3a40f2b1437086939c2120fd",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -1698,21 +1698,22 @@
         },
         {
             "name": "webilia/wp",
-            "version": "1.0.21",
+            "version": "1.0.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webilia/wp.git",
-                "reference": "9e78d30fea0187834b9dfee393b4a73f7591f814"
+                "reference": "f9c112c60d3856637e5d9ccaa44106929e7c13aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webilia/wp/zipball/9e78d30fea0187834b9dfee393b4a73f7591f814",
-                "reference": "9e78d30fea0187834b9dfee393b4a73f7591f814",
+                "url": "https://api.github.com/repos/webilia/wp/zipball/f9c112c60d3856637e5d9ccaa44106929e7c13aa",
+                "reference": "f9c112c60d3856637e5d9ccaa44106929e7c13aa",
                 "shasum": ""
             },
             "require": {
                 "jenssegers/blade": "^1.4",
-                "nesbot/carbon": "^2.62"
+                "nesbot/carbon": "^2.62",
+                "php": ">=7.4"
             },
             "require-dev": {
                 "phpstan/phpstan": "^1.7",
@@ -1742,9 +1743,9 @@
             "description": "A handy set of libraries for WordPress developments.",
             "support": {
                 "issues": "https://github.com/webilia/wp/issues",
-                "source": "https://github.com/webilia/wp/tree/v1.0.21"
+                "source": "https://github.com/webilia/wp/tree/v1.0.23"
             },
-            "time": "2025-11-16T23:47:08+00:00"
+            "time": "2026-07-19T18:35:23+00:00"
         }
     ],
     "packages-dev": [

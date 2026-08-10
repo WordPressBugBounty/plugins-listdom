@@ -146,12 +146,14 @@ class LSD_Assets extends LSD_Base
         // Localize Vars
         wp_localize_script('lsd-backend', 'lsd', [
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'announcements_nonce' => wp_create_nonce('lsd_announcements'),
             'advanced_datetimepicker' => $this->advanced_datetimepicker_enabled() ? 1 : 0,
             'startOfWeek' => (int) get_option('start_of_week', 0),
             'datepicker_format' => (isset($this->settings['datepicker_format']) && trim((string) $this->settings['datepicker_format']) ? $this->settings['datepicker_format'] : 'yyyy-mm-dd'),
             'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
             'i18n_field_search' => esc_html__('Add the “More Options” fields in the row below', 'listdom'),
             'i18n_field_delete' => esc_html__('Click twice to delete', 'listdom'),
+            'i18n_announcements_dismiss_failed' => esc_html__('Announcement could not be dismissed.', 'listdom'),
             'i18n_field_label' => esc_html__('Label', 'listdom'),
             'i18n_placeholder_label' => esc_html__('Enter the menu name', 'listdom'),
             'i18n_placeholder_slug' => esc_html__('Enter the menu Slug', 'listdom'),
@@ -181,8 +183,27 @@ class LSD_Assets extends LSD_Base
         // Include Select2
         $this->select2();
 
+        // Template Builder assets
+        if ($this->is_template_builder_screen()) $this->template_builder();
+
         // Include Assets
         do_action('lsd_admin_assets');
+    }
+
+    protected function is_template_builder_screen($screen = null): bool
+    {
+        if (!$screen && function_exists('get_current_screen')) $screen = get_current_screen();
+        return ($screen && $screen->post_type === LSD_Base::PTYPE_TEMPLATE && in_array($screen->base, ['post', 'edit'], true));
+    }
+
+    protected function template_builder()
+    {
+        $template_builder_version = @filemtime($this->lsd_asset_path('js/template-builder.js')) ?: LSD_Assets::version();
+
+        $this->iconpicker();
+
+        wp_enqueue_script('lsd-nicescroll', $this->lsd_asset_url('packages/nicescroll/jquery.nicescroll.min.js'), ['jquery'], $this->version(), true);
+        wp_enqueue_script('lsd-template', $this->lsd_asset_url('js/template-builder.js'), ['jquery', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'lsd-backend', 'lsd-nicescroll'], $template_builder_version, true);
     }
 
     public function CSS()
@@ -605,6 +626,8 @@ class LSD_Assets extends LSD_Base
         // Always return true for frontend
         if ($client === 'frontend')
         {
+            if (apply_filters('lsd_force_include_frontend_assets', false, $client)) return true;
+
             // If global settings is on return true
             if (!isset($this->settings['assets']['load']) || $this->settings['assets']['load']) return true;
 
@@ -651,6 +674,8 @@ class LSD_Assets extends LSD_Base
             // Current Screen
             $screen = get_current_screen();
 
+            if (isset($_GET['lsd_checklist_focus']) && sanitize_text_field(wp_unslash($_GET['lsd_checklist_focus'])) === '1') return true;
+
             $base = $screen->base;
             $post_type = $screen->post_type;
             $taxonomy = $screen->taxonomy;
@@ -670,6 +695,7 @@ class LSD_Assets extends LSD_Base
                     'listdom-ix',
                     LSD_Base::WELCOME_SLUG,
                     'listdom-addons',
+                    'listdom-launch-checklist',
                     'listdom-licenses',
                     'toplevel_page_listdom',
                     'widgets',

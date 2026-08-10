@@ -3,6 +3,8 @@
 defined('ABSPATH') || die();
 
 /** @var string $role */
+/** @var string $redirect */
+/** @var bool $explicit_redirect */
 
 // User is Already Logged-in
 if (is_user_logged_in()) return '';
@@ -30,7 +32,11 @@ $auth = LSD_Options::auth();
     <div class="lsd-auth-form-container">
         <?php if (!$auth['auth']['hide_login_form']) : ?>
             <div id="<?php echo esc_attr('lsd-login-form-' . $instance_id); ?>" class="lsd-auth-form-content">
-                <?php echo do_shortcode('[listdom-login role="' . esc_attr($role) . '"]'); ?>
+                <?php echo $this->login([
+                    'role' => $role,
+                    'redirect' => $redirect,
+                    'explicit_redirect' => $explicit_redirect,
+                ]); ?>
                 <?php if (in_array($auth['auth']['switch_style'], ['links', 'both'])): ?>
                     <div class="lsd-auth-switcher-links">
                         <?php if (!$auth['auth']['hide_register_form']) : ?>
@@ -46,7 +52,11 @@ $auth = LSD_Options::auth();
 
         <?php if (!$auth['auth']['hide_register_form']) : ?>
             <div id="<?php echo esc_attr('lsd-register-form-' . $instance_id); ?>" class="lsd-auth-form-content">
-                <?php echo do_shortcode('[listdom-register role="' . esc_attr($role) . '"]'); ?>
+                <?php echo $this->register([
+                    'role' => $role,
+                    'redirect' => $redirect,
+                    'explicit_redirect' => $explicit_redirect,
+                ]); ?>
                 <?php if (in_array($auth['auth']['switch_style'], ['links', 'both'])): ?>
                     <div class="lsd-auth-switcher-links">
                         <?php if (!$auth['auth']['hide_login_form']) : ?>

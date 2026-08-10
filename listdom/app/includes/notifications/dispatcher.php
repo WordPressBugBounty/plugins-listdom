@@ -85,6 +85,22 @@ class LSD_Notifications_Dispatcher extends LSD_Notifications
         $this->response(['success' => 1, 'message' => esc_html__("Your message sent successfully.", 'listdom')]);
     }
 
+    protected function resolve_listing_consent_enabled(int $post_id, string $consent_context): bool
+    {
+        $enabled = LSD_Privacy::is_consent_enabled($consent_context);
+        $override = isset($_POST['lsd_privacy_consent_enabled']) ? absint(wp_unslash($_POST['lsd_privacy_consent_enabled'])) : null;
+        $override_nonce = isset($_POST['lsd_privacy_consent_enabled_nonce']) ? sanitize_text_field(wp_unslash($_POST['lsd_privacy_consent_enabled_nonce'])) : '';
+
+        if ($post_id <= 0 || $override === null || $override_nonce === '') return $enabled;
+
+        $override_value = $override === 1 ? '1' : '0';
+        $action = 'lsd_privacy_consent_' . $post_id . '_' . sanitize_key($consent_context) . '_' . $override_value;
+
+        if (wp_verify_nonce($override_nonce, $action)) $enabled = $override === 1;
+
+        return $enabled;
+    }
+
     public function listing($hook, $nonce_action)
     {
         $name = isset($_POST['lsd_name']) ? sanitize_text_field(wp_unslash($_POST['lsd_name'])) : '';
@@ -107,7 +123,7 @@ class LSD_Notifications_Dispatcher extends LSD_Notifications
 
         $consent = isset($_POST['lsd_privacy_consent']) ? sanitize_text_field(wp_unslash($_POST['lsd_privacy_consent'])) : '';
         $consent_context = $hook === 'lsd_listing_report_abuse' ? 'report' : 'contact';
-        $listing_consent_enabled = LSD_Privacy::is_consent_enabled($consent_context);
+        $listing_consent_enabled = $this->resolve_listing_consent_enabled($post_id, $consent_context);
         if ($listing_consent_enabled && $consent !== '1') $this->response(['success' => 0, 'message' => LSD_Privacy::consent_required_text()]);
 
         // Email is not valid

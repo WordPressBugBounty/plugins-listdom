@@ -124,6 +124,14 @@
   display: none !important;
 }
 
+.lsd-util-blurred {
+  filter: blur(6px);
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
 .lsd-separator {
   border-bottom: 2px solid #eeeeee;
   font-size: 18px;
@@ -933,7 +941,7 @@ ul.lsd-boxed-list li label .lsd-inline-checkbox {
   font-size: 12px;
   line-height: 18px;
   transition: opacity 0.3s ease;
-  z-index: 10;
+  z-index: 10010;
   width: max-content;
   max-width: min(210px, calc(100vw - 32px));
   overflow-wrap: break-word;
@@ -1604,6 +1612,9 @@ form button[type="submit"].lsd-text-button i {
   line-height: 18px;
   color: #8241FF;
   transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 button.lsd-text-button:hover,
 button[type="button"].lsd-text-button:hover,
@@ -1651,10 +1662,65 @@ form button[type="submit"].lsd-text-button:disabled {
   color: #35117980;
 }
 
+.lsd-admin-pagination-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 12px;
+  white-space: nowrap;
+  width: max-content;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1.4em;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out;
+  color: #8241FF;
+  outline: none;
+  box-shadow: none;
+}
+.lsd-admin-pagination-button i {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  color: #8241FF;
+  transition: color 0.2s ease-in-out;
+}
+.lsd-admin-pagination-button:hover {
+  background: var(--text-button-active-bg-color, #e8e4f2);
+  color: var(--text-button-active-text-color, #351179);
+}
+.lsd-admin-pagination-button:hover i {
+  color: #8241FF;
+}
+.lsd-admin-pagination-button:active {
+  background: var(--text-button-active-bg-color, #e8e4f2);
+  color: var(--text-button-active-text-color, #351179);
+}
+.lsd-admin-pagination-button:active i {
+  color: #8241FF;
+}
+.lsd-admin-pagination-button.current {
+  background: var(--text-button-active-bg-color, #e8e4f2);
+  color: var(--text-button-active-text-color, #351179);
+}
+.lsd-admin-pagination-button.current i {
+  color: #8241FF;
+}
+.lsd-admin-pagination-button:disabled {
+  background: var(--lsd-secondary-button-disabled-bg, #D1B9FF80);
+  color: #3511794D;
+}
+
 .toplevel_page_listdom #wpcontent,
 body[class*="_page_listdom-ix"] #wpcontent,
 body[class*="_page_listdom-settings"] #wpcontent,
 body[class*="_page_listdom-addons"] #wpcontent,
+body[class*="_page_listdom-launch-checklist"] #wpcontent,
 body[class*="_page_listdom-licenses"] #wpcontent {
   padding: 0;
 }
@@ -1662,6 +1728,7 @@ body[class*="_page_listdom-licenses"] #wpcontent {
 body[class*="_page_listdom-ix"] .wrap,
 body[class*="_page_listdom-settings"] .wrap,
 body[class*="_page_listdom-addons"] .wrap,
+body[class*="_page_listdom-launch-checklist"] .wrap,
 body[class*="_page_listdom-licenses"] .wrap {
   margin: 0 !important;
 }
@@ -1669,6 +1736,7 @@ body[class*="_page_listdom-licenses"] .wrap {
 body[class*="_page_listdom-ix"] .notice,
 body[class*="_page_listdom-settings"] .notice,
 body[class*="_page_listdom-addons"] .notice,
+body[class*="_page_listdom-launch-checklist"] .notice,
 body[class*="_page_listdom-licenses"] .notice {
   display: none !important;
 }
@@ -1722,6 +1790,16 @@ body[class*="_page_listdom-licenses"] .notice {
   font-size: 16px;
   line-height: 1.4em;
   color: #000;
+  margin: 0;
+}
+
+.lsd-admin-subtitle-tiny {
+  font-family: Inter, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.4em;
+  color: var(--lsd-neutral-color-500, #838383);
+  margin: 0;
 }
 
 .lsd-admin-description {
@@ -2603,6 +2681,10 @@ input[type='file'].lsd-admin-input::file-selector-button:hover {
 
 .lsd-flex-align-items-stretch {
   align-items: stretch;
+}
+
+.lsd-flex-justify-end {
+  justify-self: flex-end;
 }
 
 .lsd-gap-0 {

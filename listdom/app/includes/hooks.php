@@ -121,6 +121,13 @@ class LSD_Hooks extends LSD_Base
             if (isset($sf['children']) && trim($sf['children'])) $atts['lsd_filter']['inquiry']['children'] = $sf['children'];
         }
 
+        // Booking Search
+        if (isset($sf['booking']) && is_array($sf['booking']) && count($sf['booking']))
+        {
+            $existing_booking_filters = isset($atts['lsd_filter']['booking']) && is_array($atts['lsd_filter']['booking']) ? $atts['lsd_filter']['booking'] : [];
+            $atts['lsd_filter']['booking'] = array_replace_recursive($existing_booking_filters, $sf['booking']);
+        }
+
         // ACF Fields
         foreach ($sf as $key => $value)
         {

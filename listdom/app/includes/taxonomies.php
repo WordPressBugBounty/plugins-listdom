@@ -116,23 +116,50 @@ class LSD_Taxonomies extends LSD_Base
         ]));
     }
 
-    protected function archive_shortcode($taxonomy, int $term_id = 0): int
+    /**
+     * Resolve the archive shortcode ID for a taxonomy or term.
+     * @param string $taxonomy
+     * @param int $term_id
+     * @return int
+     */
+    public static function archive_shortcode_id(string $taxonomy, int $term_id = 0): int
     {
+        // Term Override
         if ($term_id > 0 && LSD_Base::isPro())
         {
-            $term_shortcode = (int) get_term_meta($term_id, 'lsd_archive_shortcode', true);
+            $term_shortcode = get_term_meta($term_id, 'lsd_archive_shortcode', true);
+            $term_shortcode = is_scalar($term_shortcode) ? absint($term_shortcode) : 0;
             if ($term_shortcode > 0) return $term_shortcode;
         }
 
-        $setting_key = $this->archive_setting_key($taxonomy);
+        // Global Archive Setting
+        $setting_key = self::archive_setting_key($taxonomy);
         if ($setting_key === '') return 0;
 
         $settings = LSD_Options::settings();
-        return isset($settings[$setting_key]) ? (int) $settings[$setting_key] : 0;
+        return isset($settings[$setting_key]) && is_scalar($settings[$setting_key]) ? absint($settings[$setting_key]) : 0;
     }
 
-    protected function archive_setting_key($taxonomy): string
+    /**
+     * Resolve the archive shortcode ID for this taxonomy instance.
+     * @param mixed $taxonomy
+     * @param int $term_id
+     * @return int
+     */
+    protected function archive_shortcode($taxonomy, int $term_id = 0): int
     {
+        // Archive Shortcode
+        return self::archive_shortcode_id((string) $taxonomy, $term_id);
+    }
+
+    /**
+     * Get the global archive setting key for a taxonomy.
+     * @param string $taxonomy
+     * @return string
+     */
+    protected static function archive_setting_key(string $taxonomy): string
+    {
+        // Taxonomy Key
         if ($taxonomy === LSD_Base::TAX_LOCATION) return 'location_archive';
         if ($taxonomy === LSD_Base::TAX_CATEGORY) return 'category_archive';
         if ($taxonomy === LSD_Base::TAX_TAG) return 'tag_archive';
@@ -199,8 +226,21 @@ class LSD_Taxonomies extends LSD_Base
     {
         if (!$this->isPro()) return;
 
-        $shortcode = isset($_POST['lsd_archive_shortcode']) ? (int) sanitize_text_field(wp_unslash($_POST['lsd_archive_shortcode'])) : 0;
+        $shortcode = absint($this->posted_scalar('lsd_archive_shortcode'));
         update_term_meta($term_id, 'lsd_archive_shortcode', $shortcode);
+    }
+
+    /**
+     * Read a scalar posted value.
+     * @param string $key
+     * @return string
+     */
+    protected function posted_scalar(string $key): string
+    {
+        // Posted Value
+        if (!isset($_POST[$key]) || !is_scalar($_POST[$key])) return '';
+
+        return sanitize_text_field(wp_unslash($_POST[$key]));
     }
 
     public static function id($term, $taxonomy)

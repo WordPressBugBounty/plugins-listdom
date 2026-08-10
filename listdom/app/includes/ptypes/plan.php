@@ -91,9 +91,12 @@ class LSD_PTypes_Plan extends LSD_PTypes
 
                 $name = sanitize_text_field($tier['name'] ?? '');
                 $price = isset($tier['price']) ? floatval($tier['price']) : 0;
+                $duration = isset($tier['duration']) && trim($tier['duration']) !== '' ? (int) $tier['duration'] : '';
                 $expiry = isset($tier['expiry']) && trim($tier['expiry']) !== '' ? (int) $tier['expiry'] : '';
                 $type = $tier['type'] === 'recurring' ? 'recurring' : 'one_time';
                 $is_default = isset($tier['default']) && (int) $tier['default'];
+
+                if ($duration !== '' && $duration < 1) $duration = '';
 
                 if ($type === 'recurring')
                 {
@@ -107,6 +110,7 @@ class LSD_PTypes_Plan extends LSD_PTypes
                     'id' => $id,
                     'name' => $name,
                     'price' => $price,
+                    'duration' => $duration,
                     'expiry' => $expiry,
                     'type' => $type,
                     'default' => 0,

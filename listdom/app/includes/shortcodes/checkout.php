@@ -35,6 +35,22 @@ class LSD_Shortcodes_Checkout extends LSD_Base
             exit;
         }
 
+        $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
+        if (isset($_GET['lsd_cart_remove_fee'], $_GET['_wpnonce']) && wp_verify_nonce($nonce, 'lsd_cart_action'))
+        {
+            $cart = new LSD_Cart();
+            $cart->remove_fee(sanitize_text_field(wp_unslash($_GET['lsd_cart_remove_fee'])));
+
+            $main = new LSD_Main();
+            wp_safe_redirect(remove_query_arg([
+                'lsd_cart_remove_fee',
+                '_wpnonce',
+                'lsd-coupon',
+                'lsd-coupon-error',
+            ], $main->current_url()));
+            exit;
+        }
+
         $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
         if (isset($_POST['lsd_cart_tier'], $_POST['_wpnonce']) && is_array($_POST['lsd_cart_tier']) && wp_verify_nonce($nonce, 'lsd_cart_action'))
         {
@@ -185,6 +201,7 @@ class LSD_Shortcodes_Checkout extends LSD_Base
         $free = new LSD_Payments_Gateways_Free();
 
         $requires_payment = $total > 0;
+        $checkout_auth = $this->auth_requirement($items);
 
         ob_start();
         include lsd_template($tpl);
@@ -208,6 +225,12 @@ class LSD_Shortcodes_Checkout extends LSD_Base
             if ($order_key === '' || $order->get_key() !== $order_key)
             {
                 wp_send_json(['success' => 0, 'message' => esc_html__('Order verification failed!', 'listdom')]);
+            }
+
+            $checkout_validation_error = apply_filters('lsd_payments_checkout_validation_error', '', $order->get_items(), $_POST, $resume_order_id);
+            if (is_string($checkout_validation_error) && trim($checkout_validation_error) !== '')
+            {
+                wp_send_json(['success' => 0, 'message' => $checkout_validation_error]);
             }
 
             $gateway_key = sanitize_text_field((string) ($order->get_gateway() ?? ''));
@@ -242,7 +265,8 @@ class LSD_Shortcodes_Checkout extends LSD_Base
                 wp_send_json(['success' => 0, 'message' => $completion->get_error_message()]);
             }
 
-            if ($gateway->auto_complete()) LSD_Payments_Orders::completed($resume_order_id);
+            $should_auto_complete = (bool) apply_filters('lsd_payments_should_auto_complete_order', $gateway->auto_complete(), $resume_order_id, $gateway, $order->get_items());
+            if ($should_auto_complete) LSD_Payments_Orders::completed($resume_order_id);
 
             $cart = new LSD_Cart();
             $cart->clear();
@@ -256,14 +280,21 @@ class LSD_Shortcodes_Checkout extends LSD_Base
 
         $gateway_key = sanitize_text_field($_POST['gateway'] ?? '');
         $message = sanitize_textarea_field($_POST['message'] ?? '');
-        $name = sanitize_text_field($_POST['name'] ?? '');
-        $email = sanitize_email($_POST['email'] ?? '');
+        $name = sanitize_text_field(wp_unslash($_POST['name'] ?? ''));
+        $email = sanitize_email(wp_unslash($_POST['email'] ?? ''));
 
-        if (is_user_logged_in())
+        $logged_in = is_user_logged_in();
+        if ($logged_in)
         {
             $user = wp_get_current_user();
             $name = $user->display_name;
             $email = $user->user_email;
+        }
+        else
+        {
+            if (!trim($name)) $this->response(['success' => 0, 'message' => esc_html__('Please insert your name!', 'listdom')]);
+            if (!trim($email)) $this->response(['success' => 0, 'message' => esc_html__('Please insert your email!', 'listdom')]);
+            if (!is_email($email)) $this->response(['success' => 0, 'message' => esc_html__('Invalid email!', 'listdom')]);
         }
 
         $consent = isset($_POST['lsd_privacy_consent']) ? sanitize_text_field(wp_unslash($_POST['lsd_privacy_consent'])) : '';
@@ -275,6 +306,12 @@ class LSD_Shortcodes_Checkout extends LSD_Base
 
         $cart = new LSD_Cart();
         $items = $cart->get_items();
+        $checkout_validation_error = apply_filters('lsd_payments_checkout_validation_error', '', $items, $_POST, 0);
+        if (is_string($checkout_validation_error) && trim($checkout_validation_error) !== '')
+        {
+            wp_send_json(['success' => 0, 'message' => $checkout_validation_error]);
+        }
+
         $fees = $cart->get_fees();
         $coupon = $cart->get_coupon();
         $totals = $cart->get_totals();
@@ -366,7 +403,8 @@ class LSD_Shortcodes_Checkout extends LSD_Base
         }
 
         // Complete Order
-        if ($gateway->auto_complete()) LSD_Payments_Orders::completed($order_id);
+        $should_auto_complete = (bool) apply_filters('lsd_payments_should_auto_complete_order', $gateway->auto_complete(), $order_id, $gateway, $items);
+        if ($should_auto_complete) LSD_Payments_Orders::completed($order_id);
 
         // Empty Cart
         $cart->clear();
@@ -375,6 +413,50 @@ class LSD_Shortcodes_Checkout extends LSD_Base
             'success' => 1,
             'order_id' => $order_id,
             'key' => $order_key,
+        ]);
+    }
+
+    protected function auth_requirement(array $items): array
+    {
+        $requirement = apply_filters('lsd_payments_checkout_auth_requirement', [
+            'required' => false,
+            'message' => '',
+            'auth_html' => '',
+        ], $items);
+
+        if (!is_array($requirement)) $requirement = [];
+
+        $required = !is_user_logged_in() && !empty($requirement['required']);
+        $message = isset($requirement['message']) ? trim((string) $requirement['message']) : '';
+        $auth_html = isset($requirement['auth_html']) ? (string) $requirement['auth_html'] : '';
+
+        if ($required && $message === '')
+        {
+            $message = esc_html__('Please log in or register to continue checkout.', 'listdom');
+        }
+
+        if ($required && trim($auth_html) === '')
+        {
+            $auth_html = $this->auth_form();
+        }
+
+        return [
+            'required' => $required,
+            'message' => $message,
+            'auth_html' => $auth_html,
+        ];
+    }
+
+    protected function auth_form(): string
+    {
+        if (is_user_logged_in() || !class_exists('LSD_Shortcodes_Auth')) return '';
+
+        $main = new LSD_Main();
+        $auth = new LSD_Shortcodes_Auth();
+
+        return $auth->auth([
+            'redirect' => $main->current_url(),
+            'explicit_redirect' => 1,
         ]);
     }
 
@@ -434,18 +516,33 @@ class LSD_Shortcodes_Checkout extends LSD_Base
 
             $show_appreciation_invoice_button = (int) ($payments['appreciation_invoice_button'] ?? 1) === 1;
             $appreciation_invoice_base = $show_appreciation_invoice_button ? home_url('/') : '';
+            $dashboard_url = '';
 
             $appreciation_message = trim($payments['appreciation_message'] ?? '');
             if (!$appreciation_message) $appreciation_message = esc_html__('Thank you for your purchase.', 'listdom');
 
             $page_id = (int) ($payments['appreciation_page'] ?? 0);
             $thank_you = $page_id ? get_permalink($page_id) : '';
+            $thank_you = apply_filters('lsd_payments_checkout_thankyou_url', $thank_you, (new LSD_Cart())->get_items(), $payments);
+
+            if (is_user_logged_in())
+            {
+                $settings = LSD_Options::settings();
+                $dashboard_page_id = isset($settings['submission_page']) && $settings['submission_page'] ? (int) $settings['submission_page'] : 0;
+                $dashboard_page_url = $dashboard_page_id ? get_permalink($dashboard_page_id) : '';
+
+                if (is_string($dashboard_page_url) && trim($dashboard_page_url) !== '')
+                {
+                    $dashboard_url = add_query_arg(['mode' => 'manage'], $dashboard_page_url);
+                }
+            }
 
             $this->thankyou_data = [
                 'appreciation_message' => $appreciation_message,
                 'thank_you' => $thank_you,
                 'show_appreciation_invoice_button' => $show_appreciation_invoice_button,
                 'appreciation_invoice_base' => $appreciation_invoice_base,
+                'dashboard_url' => $dashboard_url,
             ];
         }
 
@@ -455,6 +552,7 @@ class LSD_Shortcodes_Checkout extends LSD_Base
         $thank_you = $this->thankyou_data['thank_you'];
         $show_appreciation_invoice_button = $this->thankyou_data['show_appreciation_invoice_button'];
         $appreciation_invoice_base = $this->thankyou_data['appreciation_invoice_base'];
+        $dashboard_url = $this->thankyou_data['dashboard_url'];
 
         ob_start();
         include lsd_template('payments/thankyou.php');

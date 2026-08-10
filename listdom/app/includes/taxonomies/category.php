@@ -275,14 +275,13 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         $color = isset($_POST['lsd_color']) ? sanitize_text_field(wp_unslash($_POST['lsd_color'])) : '';
         $image = isset($_POST['lsd_image']) ? sanitize_text_field(wp_unslash($_POST['lsd_image'])) : '';
         $disable = isset($_POST['lsd_disabled_icon']) ? (int) sanitize_text_field(wp_unslash($_POST['lsd_disabled_icon'])) : 0;
-        $schema = isset($_POST['lsd_schema']) && trim($_POST['lsd_schema']) ? sanitize_text_field(wp_unslash($_POST['lsd_schema'])) : 'https://schema.org/LocalBusiness';
 
         update_term_meta($term_id, 'lsd_icon', $icon);
         update_term_meta($term_id, 'lsd_color', $color);
         update_term_meta($term_id, 'lsd_image', $image);
         update_term_meta($term_id, 'lsd_disabled_icon', $disable);
         $this->save_archive_shortcode($term_id);
-        update_term_meta($term_id, 'lsd_schema', $schema);
+        if (isset($_POST['lsd_schema'])) update_term_meta($term_id, 'lsd_schema', $this->posted_scalar('lsd_schema'));
 
         return true;
     }

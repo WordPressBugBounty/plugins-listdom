@@ -66,6 +66,16 @@ class LSD_Bar extends LSD_Base
 
             $type = esc_html__('Shortcode', 'listdom');
 
+            // Template Builder
+            if ($post->post_type === LSD_Base::PTYPE_TEMPLATE)
+            {
+                $template_type = sanitize_key((string) get_post_meta($id, '_lsd_template_type', true));
+
+                if ($template_type === 'listing_card') $type = esc_html__('Listing Card', 'listdom');
+                else if ($template_type === 'info_window') $type = esc_html__('Info Window', 'listdom');
+                else $type = esc_html__('Single Listing', 'listdom');
+            }
+
             // Elementor
             if (class_exists(LSDPACELM\Base::class) && $post->post_type === LSDPACELM\Base::PTYPE_DETAILS)
             {

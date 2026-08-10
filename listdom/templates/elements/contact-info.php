@@ -79,6 +79,7 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
         <?php endif; ?>
 
         <?php if ($contact_address): ?>
+            <?php $street_address_schema = trim((string) lsd_schema()->prop('streetAddress')); ?>
             <li>
                 <?php if ($display_icon): ?>
                     <strong><i class="lsd-fe-icon fas fa-search-location"></i></strong>
@@ -87,7 +88,7 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
                     <span class="lsd-contact-info-label"><?php esc_html_e('Address', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
                 <?php endif; ?>
                 <span <?php echo lsd_schema()->address(); ?>>
-                    <span itemprop="streetAddress"><?php echo esc_html($contact_address); ?></span>
+                    <span<?php echo $street_address_schema !== '' ? ' ' . $street_address_schema : ''; ?>><?php echo esc_html($contact_address); ?></span>
                 </span>
             </li>
         <?php endif; ?>

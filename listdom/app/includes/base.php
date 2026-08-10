@@ -4,6 +4,7 @@ class LSD_Base
 {
     const PTYPE_LISTING = 'listdom-listing';
     const PTYPE_SHORTCODE = 'listdom-shortcode';
+    const PTYPE_TEMPLATE = 'listdom-template';
     const PTYPE_SEARCH = 'listdom-search';
     const PTYPE_NOTIFICATION = 'listdom-notification';
     const PTYPE_ORDER = 'listdom-order';
@@ -355,6 +356,21 @@ class LSD_Base
                 'order' => 'DESC',
                 'orderby' => 'meta_value_num',
             ],
+            'lsd_categories' => [
+                'status' => 0,
+                'name' => esc_html__('Categories', 'listdom'),
+                'order' => 'ASC',
+            ],
+            'lsd_locations' => [
+                'status' => 0,
+                'name' => esc_html__('Locations', 'listdom'),
+                'order' => 'ASC',
+            ],
+            'lsd_distance' => [
+                'status' => 0,
+                'name' => esc_html__('Distance', 'listdom'),
+                'order' => 'ASC',
+            ],
         ];
 
         if (!LSD_Components::pricing()) unset($options['lsd_price']);
@@ -514,6 +530,75 @@ class LSD_Base
                     isset($ex[1]) ? $main->standardize_format($ex[1], $format) : '',
                 ];
             }
+            else if ($parameter === 'booking_date' && trim((string) $value) !== '')
+            {
+                $ex = explode(' - ', sanitize_text_field($value));
+
+                $main = new LSD_Main();
+                $settings = LSD_Options::settings();
+                $format = isset($settings['datepicker_format']) && trim($settings['datepicker_format']) ? $settings['datepicker_format'] : 'yyyy-mm-dd';
+
+                if (!isset($sf['booking'])) $sf['booking'] = [];
+
+                $sf['booking']['date_mode'] = 'range';
+                $sf['booking']['date_start'] = isset($ex[0]) ? $main->standardize_format($ex[0], $format) : '';
+                $sf['booking']['date_end'] = isset($ex[1]) ? $main->standardize_format($ex[1], $format) : '';
+            }
+            else if (strpos($parameter, 'booking_') === 0)
+            {
+                if (!isset($sf['booking'])) $sf['booking'] = [];
+
+                if ($parameter === 'booking_setup-eq') $sf['booking']['setup'] = sanitize_text_field($value);
+                else if ($parameter === 'booking_setup-in') $sf['booking']['setup'] = is_array($value) ? $value : [sanitize_text_field($value)];
+                else if ($parameter === 'booking_availability-eq') $sf['booking']['availability'] = sanitize_text_field($value);
+                else if ($parameter === 'booking_availability-in') $sf['booking']['availability'] = is_array($value) ? $value : [sanitize_text_field($value)];
+                else if (strpos($parameter, 'booking_price-bt-') === 0)
+                {
+                    $suffix = substr($parameter, strlen('booking_price-bt-'));
+                    $sf['booking']['price_mode'] = 'min';
+                    $sf['booking']['price_' . $suffix] = sanitize_text_field($value);
+                }
+                else if (preg_match('/^(booking_(?:guests|capacity|available_slots|price))-(bt|grb|min|max|grq|eq)(?:-(min|max))?$/', $parameter, $matches))
+                {
+                    $field = $matches[1];
+                    $operator = $matches[2];
+                    $suffix = $matches[3] ?? '';
+
+                    if ($field === 'booking_price')
+                    {
+                        if (!isset($sf['booking']['price_mode']) || !$sf['booking']['price_mode']) $sf['booking']['price_mode'] = 'min';
+
+                        if ($operator === 'grq' || $operator === 'eq') $sf['booking']['price_min'] = sanitize_text_field($value);
+                        else if (in_array($operator, ['bt', 'grb'], true))
+                        {
+                            if ($suffix === 'min') $sf['booking']['price_min'] = sanitize_text_field($value);
+                            else if ($suffix === 'max') $sf['booking']['price_max'] = sanitize_text_field($value);
+                        }
+                    }
+                    else
+                    {
+                        if (!isset($sf['booking']['capacity_mode']) || !$sf['booking']['capacity_mode'])
+                        {
+                            $sf['booking']['capacity_mode'] = str_replace('booking_', '', $field);
+                        }
+
+                        if ($operator === 'grq' || $operator === 'eq')
+                        {
+                            $sf['booking']['capacity_min'] = sanitize_text_field($value);
+                            if ($operator === 'eq') $sf['booking']['capacity_max'] = sanitize_text_field($value);
+                        }
+                        else if (in_array($operator, ['bt', 'grb'], true))
+                        {
+                            if ($suffix === 'min') $sf['booking']['capacity_min'] = sanitize_text_field($value);
+                            else if ($suffix === 'max') $sf['booking']['capacity_max'] = sanitize_text_field($value);
+                        }
+                    }
+                }
+                else
+                {
+                    $sf['booking'][$parameter] = is_array($value) ? $value : sanitize_text_field($value);
+                }
+            }
             else
             {
                 if (in_array($parameter, ['label', 'location', 'tag', 'category', 'feature'])) $parameter = 'listdom-' . $parameter;
@@ -591,6 +676,7 @@ class LSD_Base
         return [
             LSD_Base::PTYPE_LISTING,
             LSD_Base::PTYPE_SHORTCODE,
+            LSD_Base::PTYPE_TEMPLATE,
             LSD_Base::PTYPE_SEARCH,
             LSD_Base::PTYPE_NOTIFICATION,
         ];
@@ -863,16 +949,13 @@ class LSD_Base
 
     public function current_url(): string
     {
-        // get $_SERVER
         $server = wp_unslash($_SERVER);
         if (!is_array($server)) $server = [];
 
-        // Check protocol
         $https = isset($server['HTTPS']) && is_string($server['HTTPS']) ? sanitize_text_field($server['HTTPS']) : '';
         $is_https = in_array(strtolower($https), ['on', '1'], true);
         $scheme = $is_https ? 'https' : 'http';
 
-        // Get domain
         if (isset($server['HTTP_HOST']) && is_string($server['HTTP_HOST'])) $site_domain = sanitize_text_field($server['HTTP_HOST']);
         else if (isset($server['SERVER_NAME']) && is_string($server['SERVER_NAME'])) $site_domain = sanitize_text_field($server['SERVER_NAME']);
         else $site_domain = '';
@@ -882,8 +965,41 @@ class LSD_Base
 
         if ($site_domain === '') return home_url($request_uri, $scheme);
 
-        // Return full URL
         return $scheme . '://' . $site_domain . $request_uri;
+    }
+
+    public function canonical_current_url(): string
+    {
+        $server = wp_unslash($_SERVER);
+        if (!is_array($server)) $server = [];
+
+        $request_uri = isset($server['REQUEST_URI']) && is_string($server['REQUEST_URI']) ? $server['REQUEST_URI'] : '';
+        $parts = wp_parse_url($request_uri);
+
+        $request_path = isset($parts['path']) && is_string($parts['path']) ? $parts['path'] : '/';
+        $request_path = '/' . ltrim($request_path, '/');
+
+        $home = home_url('/');
+        $home_parts = wp_parse_url($home);
+        $home_path = isset($home_parts['path']) && is_string($home_parts['path']) ? rtrim($home_parts['path'], '/') : '';
+
+        if ($home_path !== '' && strpos($request_path, $home_path . '/') === 0)
+        {
+            $request_path = substr($request_path, strlen($home_path));
+        }
+        else if ($home_path !== '' && $request_path === $home_path)
+        {
+            $request_path = '/';
+        }
+
+        $url = home_url($request_path);
+
+        if (isset($parts['query']) && is_string($parts['query']) && $parts['query'] !== '')
+        {
+            $url .= '?' . $parts['query'];
+        }
+
+        return esc_url_raw($url);
     }
 
     public function remove_qs_var($key, $url = '')
@@ -1467,10 +1583,8 @@ class LSD_Base
         ];
     }
 
-    public function iframe($body)
+    public function iframe($body, string $class = 'lsd-iframe-page')
     {
-        $class = 'lsd-iframe-page';
-
         // Generate output
         ob_start();
         include lsd_template('iframe.php');

@@ -8,6 +8,11 @@ class LSD_Flash extends LSD_Base
         if (!in_array($class, $classes)) $class = 'info';
 
         $flash_messages = maybe_unserialize(get_option('lsd_flash_messages', []));
+        if (!is_array($flash_messages)) $flash_messages = [];
+
+        if (!isset($flash_messages[$class]) || !is_array($flash_messages[$class])) $flash_messages[$class] = [];
+        if (in_array($message, $flash_messages[$class], true)) return;
+
         $flash_messages[$class][] = $message;
 
         update_option('lsd_flash_messages', $flash_messages);

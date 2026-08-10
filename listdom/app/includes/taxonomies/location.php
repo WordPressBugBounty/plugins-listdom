@@ -76,6 +76,17 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
                 'value' => '',
             ]); ?>
         </div>
+        <?php if ($this->isPro()): ?>
+        <div class="form-field">
+            <label for="lsd_schema"><?php esc_html_e('Schema Type', 'listdom'); ?></label>
+            <?php echo LSD_Form::text([
+                'name' => 'lsd_schema',
+                'id' => 'lsd_schema',
+                'placeholder' => 'Place',
+            ]); ?>
+            <p class="description"><?php esc_html_e("Schema Type (https://schema.org/)", 'listdom'); ?></p>
+        </div>
+        <?php endif; ?>
         <?php $this->archive_shortcode_add_field(); ?>
         <?php
         wp_nonce_field('lsd_save_location_meta', 'lsd_location_meta_nonce');
@@ -84,6 +95,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
     public function edit_form($term)
     {
         $image = get_term_meta($term->term_id, 'lsd_image', true);
+        $schema = get_term_meta($term->term_id, 'lsd_schema', true);
         ?>
         <tr class="form-field">
             <th scope="row">
@@ -97,6 +109,22 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
                 ]); ?>
             </td>
         </tr>
+        <?php if ($this->isPro()): ?>
+        <tr class="form-field">
+            <th scope="row">
+                <label for="lsd_schema"><?php esc_html_e('Schema Type', 'listdom'); ?></label>
+            </th>
+            <td>
+                <?php echo LSD_Form::text([
+                    'name' => 'lsd_schema',
+                    'id' => 'lsd_schema',
+                    'value' => $schema,
+                    'placeholder' => 'Place',
+                ]); ?>
+                <p class="description"><?php esc_html_e("Schema Type (https://schema.org/)", 'listdom'); ?></p>
+            </td>
+        </tr>
+        <?php endif; ?>
         <?php $this->archive_shortcode_edit_field($term); ?>
         <?php
         wp_nonce_field('lsd_save_location_meta', 'lsd_location_meta_nonce');
@@ -115,6 +143,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
 
         $image = sanitize_text_field(wp_unslash($_POST['lsd_image']));
         update_term_meta($term_id, 'lsd_image', $image);
+        if (isset($_POST['lsd_schema'])) update_term_meta($term_id, 'lsd_schema', $this->posted_scalar('lsd_schema'));
         $this->save_archive_shortcode($term_id);
 
         return true;

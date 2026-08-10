@@ -41,7 +41,8 @@ function lsdBindLicenseForms()
         // DOM Elements
         const $alert = jQuery(`#${key}_activation_alert`);
         const $button = jQuery(`#${key}_activation_button`);
-        const $badge = jQuery('.lsd-wrap .update-plugins .update-count');
+        const $licenseBadge = jQuery('#toplevel_page_listdom .wp-submenu a[href="admin.php?page=listdom-licenses"] .update-count');
+        const $mainBadge = jQuery('#toplevel_page_listdom > a .update-count');
 
         // Remove Existing Alert
         $alert.removeClass('lsd-error lsd-success lsd-alert').html('');
@@ -65,12 +66,17 @@ function lsdBindLicenseForms()
 
                     setTimeout(() => lsdBindLicenseForms(), 2000);
 
-                    // New Badge
-                    const new_badge = parseInt($badge.html()) - 1;
+                    const reduceBadge = function($badge)
+                    {
+                        const count = parseInt($badge.html(), 10);
+                        if (isNaN(count)) return;
 
-                    // Update Badges
-                    if(new_badge > 0) jQuery('.update-plugins .update-count').html(new_badge);
-                    else jQuery('.update-plugins').remove();
+                        if (count > 1) $badge.html(count - 1);
+                        else $badge.closest('.update-plugins').remove();
+                    };
+
+                    reduceBadge($licenseBadge);
+                    reduceBadge($mainBadge);
                 }
                 else
                 {

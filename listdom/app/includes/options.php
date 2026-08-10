@@ -3,6 +3,7 @@
 class LSD_Options extends LSD_Base
 {
     protected static array $settings_cache = [];
+    protected const AI_VISIBILITY_INTRODUCED_VERSION = '5.7.0';
 
     public static function settings(): array
     {
@@ -20,6 +21,28 @@ class LSD_Options extends LSD_Base
     private static function get_blog_id(): int
     {
         return function_exists('get_current_blog_id') ? get_current_blog_id() : 1;
+    }
+
+    /**
+     * Keep upgraded installs opted out of new AI visibility defaults until configured.
+     * @return array
+     */
+    protected static function legacy_ai_visibility_defaults(): array
+    {
+        $defaults = LSD_AI_Visibility::defaults();
+
+        $version = get_option('lsd_version', '0');
+        if (is_scalar($version) && version_compare(trim((string) $version), self::AI_VISIBILITY_INTRODUCED_VERSION, '>=')) return $defaults;
+
+        $defaults['structured_data'] = 0;
+        $defaults['llms_txt'] = 0;
+        $defaults['robots_txt'] = 0;
+        $defaults['html_links'] = 0;
+        $defaults['include_verified_status'] = 0;
+        $defaults['include_reviews'] = 0;
+        $defaults['include_booking_summary'] = 0;
+
+        return $defaults;
     }
 
     public static function privacy(): array
@@ -297,7 +320,7 @@ class LSD_Options extends LSD_Base
                         'faq' => ['enabled' => 0, 'show_title' => 1, 'count' => 0],
                         'gallery' => ['enabled' => 1, 'show_title' => 0],
                         'embed' => ['enabled' => 0, 'show_title' => 0],
-                        'attributes' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0, 'show_attribute_title' => 1, 'show_separator' => 0],
+                        'attributes' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0, 'show_attribute_title' => 1, 'show_separator' => 0, 'layout' => 'column'],
                         'features' => ['enabled' => 1, 'show_title' => 1, 'show_icons' => 0],
                         'contact' => ['enabled' => 1, 'show_title' => 1],
                         'remark' => ['enabled' => 1, 'show_title' => 0],
@@ -712,6 +735,7 @@ class LSD_Options extends LSD_Base
                     'block_admin_listdom_author' => 1,
                     'block_admin_listdom_publisher' => 1,
                     'ai_driver' => LSD_AI_Models::OPENAI_GPT_41_NANO,
+                    'ai_visibility' => self::legacy_ai_visibility_defaults(),
                 ];
         }
 
@@ -875,6 +899,12 @@ class LSD_Options extends LSD_Base
         $current = get_option($key, []);
         if (!is_array($current)) $current = [];
 
+        if ($key === 'lsd_settings' && isset($options['ai_visibility']) && is_array($options['ai_visibility']))
+        {
+            $current_ai_visibility = isset($current['ai_visibility']) && is_array($current['ai_visibility']) ? $current['ai_visibility'] : [];
+            $options['ai_visibility'] = self::merge_nested($current_ai_visibility, $options['ai_visibility']);
+        }
+
         // Merge new options with previous options
         $final = array_merge($current, $options);
 
@@ -886,5 +916,23 @@ class LSD_Options extends LSD_Base
             $blog_id = self::get_blog_id();
             if (isset(self::$settings_cache[$blog_id])) unset(self::$settings_cache[$blog_id]);
         }
+    }
+
+    /**
+     * Merge nested option arrays without replacing sibling values.
+     * @param array $current
+     * @param array $updates
+     * @return array
+     */
+    protected static function merge_nested(array $current, array $updates): array
+    {
+        // Updates
+        foreach ($updates as $key => $value)
+        {
+            if (is_array($value) && isset($current[$key]) && is_array($current[$key])) $current[$key] = self::merge_nested($current[$key], $value);
+            else $current[$key] = $value;
+        }
+
+        return $current;
     }
 }

@@ -72,11 +72,12 @@ class LSD_Integrations_BE extends LSD_Integrations
             wp_enqueue_script(
                 'lsd-blockeditor',
                 $this->lsd_asset_url('js/blockeditor.min.js'),
-                ['wp-blocks', 'wp-element'],
+                ['wp-blocks', 'wp-block-editor', 'wp-element'],
                 LSD_Assets::version()
             );
 
             register_block_type('listdom/shortcodes', [
+                'api_version' => 3,
                 'editor_script' => 'lsd-blockeditor',
             ]);
 

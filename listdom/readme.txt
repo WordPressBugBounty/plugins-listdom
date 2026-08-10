@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.2
 Requires PHP: 7.4
 Tested up to: 7.0
-Stable tag: 5.7.0
+Stable tag: 5.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,9 +13,9 @@ Build any WordPress directory or classifieds site with AI. 80+ skins, search bui
 
 == Description ==
 
-Listdom by Webilia is an AI-powered, free WordPress directory plugin that helps you start quickly while keeping layouts flexible without extra developer support. It works as a listing tool for WordPress sites that start as store locators and grow into broader directories.
+Listdom is a directory system builder for WordPress, built for real directory projects rather than just listing cards.
 
-Listdom builds a detailed business directory so your website becomes a central hub of information without forcing you to cram every classifieds ads detail in one place. With user-friendly tools, classified listings stay manageable even if you’re not tech-savvy, and the frontend dashboard keeps listings organized.
+Create business directories, real estate portals, service directories, local guides, and classified listing websites with structured listings, maps, search and filters, frontend submissions, dashboards, monetization options, layouts, and add-ons.
 
 == Fast Listdom Review ==
 Here are the key features of Listdom and how to use them with your WordPress directory plugin or classifieds ads setup:
@@ -111,12 +111,15 @@ Listdom Free includes the core directory features needed to launch a searchable 
 *   Hidden values and fields
 *   Search form shortcode
 *   Flexible field display options, including widths, hidden fields, popup, and responsive forms
+*   Optional listing counts beside taxonomy choices
+*   Per-field search buttons for more intentional filter updates
 *   Search clear button
 
 **👉 AI Tools**
 
 *   Several AI providers support including: OpenAI, Claude, and Gemini
 *   Multiple AI profiles for different directory tasks
+*   Structured and semantic AI search for natural-language listing discovery
 *   CSV import auto mapping, with support for compatible import add-ons
 *   Text generation
 *   Work hours generation
@@ -165,6 +168,7 @@ Listdom Free includes the core directory features needed to launch a searchable 
 **👉 Monetization and Payments**
 
 *   Built-in payment system used by paid addons, with tax handling, invoices, pricing tiers, and checkout flows.
+*   Frontend payment views for compatible order, subscription, billing, invoice, and Stripe workflows.
 *   Global and region-based tax options for directory monetization workflows.
 
 **👉 Advanced Management and Security**
@@ -435,6 +439,15 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 
 == Changelog ==
 
+= 5.8.0 =
+* Added a Template Builder for creating reusable listing layouts.
+* Added a guided Health Checklist to help configure a new directory site.
+* Added repeatable field mappings for CSV and Excel imports, including FAQ data and supported add-on content.
+* Added sorting controls for shortcode results and a Table layout for custom fields.
+* Added AI Visibility tools for structured listing discovery and indexing.
+* Improved WordPress block editor compatibility with Block API version 3.
+* Fixed password-reset redirection, profile image uploads, responsive frontend layouts, and admin bar conflicts.
+
 = 5.7.0 =
 * Added a new Frontend Dashboard payments area with order, subscription, billing, invoice, and Stripe payment flows.
 * Added action-driven setup and demo blueprints to make directory setup, dummy data, categories, custom fields, and search forms easier to prepare.
@@ -526,9 +539,6 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Fixed several issues in the Listdom payment engine.
 * Resolved multiple interface issues in both the Listdom backend and frontend.
 
-= 5.0.1 =
-* Fixed an issue in "Locate Me" feature.
-
 = 5.0.0 =
 * Added new, modern styles for the listing editor in both the backend and frontend.
 * Introduced a fully configurable RSS feature for displaying listings.
@@ -549,18 +559,12 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Enhanced the UI and responsiveness of pagination and sort bar components.
 * Resolved multiple interface issues in both the Listdom backend and frontend.
 
-= 4.8.1 =
-* Addressed some background issues.
-
 = 4.8.0 =
 * [Pro] Added a Timeline skin.
 * Added comprehensive GDPR compliance.
 * Improved various parts of the plugin based on WordPress team feedback.
 * Fixed an issue with the standalone add listing form.
 * Fixed several interface issues in the Listdom backend and frontend.
-
-= 4.7.1 =
-* Fixed some interface issues in the Listdom backend and frontend.
 
 = 4.7.0 =
 * [Pro] Added a new Gallery skin.
@@ -585,9 +589,6 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Enhanced the look and feel of Listdom skins.
 * Disabled scroll wheel zoom on Leaflet maps.
 * Fixed various issues in the frontend dashboard.
-
-= 4.5.1 =
-* Fixed some issues related to the search module.
 
 = 4.5.0 =
 * Added OpenStreetMap integration to Listdom Core.
@@ -637,12 +638,6 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Improved responsiveness of search forms and range slider fields on the frontend.
 * Enhanced dropdown field usability in the frontend dashboard.
 * Fixed various UI issues in the table skin.
-
-= 4.1.2 =
-* Enhanced the settings importer / exporter.
-
-= 4.1.1 =
-* Fixed a couple of minor issues.
 
 = 4.1.0 =
 * Added public profile functionality.
@@ -695,10 +690,6 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Fixed search-related issues on archive pages.
 * Fixed an issue where multiple search widgets with More Options caused conflicts on the same page.
 * Resolved various AJAX search issues in Table and Masonry skins.
-
-= 3.8.1 =
-* Fixed an issue with settings import functionality.
-* Resolved a problem with the Frontend Dashboard.
 
 = 3.8.0 =
 * [PRO] Added an option to use Listdom authentication pages instead of WordPress default pages.
@@ -802,12 +793,6 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Fixed various UI issues.
 * Resolved some issues in search and filter widgets.
 
-= 3.3.2 =
-* Fixed some visual issues.
-
-= 3.3.1 =
-* Fixed some issues.
-
 = 3.3.0 =
 * Added listing author role for ease of user management in frontend submission.
 * [PRO] Added lightbox option to listing link methods.
@@ -837,19 +822,6 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Fixed some issues in single listing page.
 * Fixed an issue in assigning guest user to listing.
 * Fixed some issues in image slider mode of listing image.
-
-= 3.0.4 =
-* Improved the server requirements.
-
-= 3.0.3 =
-* Fixed some PHP issues in certain conditions.
-
-= 3.0.2 =
-* Improved the image gallery slider.
-* Fixed some issues.
-
-= 3.0.1 =
-* Fixed some UI issues.
 
 = 3.0.0 =
 * Rebranded to Webilia.
@@ -964,9 +936,6 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Improved the listdom icons.
 * Fixed some issues.
 
-= 1.6.3 =
-* Fixed some UI issues related to icons.
-
 = 1.6.2 =
 * [ADDON] Released Rate & Review addon!
 * [PRO] Added radius search in search module.
@@ -1052,9 +1021,6 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 = 1.0.2 =
 * [PRO] Improved design of GPS icon in the map module.
 * Fixed some tiny issues.
-
-= 1.0.1 =
-* [PRO] Improved activation and update process!
 
 = 1.0.0 =
 * Initial version released with lots of features.

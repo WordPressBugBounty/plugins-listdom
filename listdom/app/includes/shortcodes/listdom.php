@@ -9,6 +9,8 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 
     public function output($atts = [], $override = [])
     {
+        if ($this->is_block_editor()) return $this->shortcode_placeholder('listdom', $atts);
+
         $shortcode_id = isset($atts['id']) ? (int) $atts['id'] : 0;
 
         // Listdom Bar
@@ -26,8 +28,18 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 
     public function skin($skin, $atts)
     {
+        $ai_visibility = class_exists('LSD_AI_Visibility') ? LSD_AI_Visibility::instance() : null;
+
         // Get Skin Object
         $SKO = $this->SKO($skin);
+
+        $shortcode_id = isset($atts['id']) ? absint($atts['id']) : 0;
+        static $inline_shortcode_sequence = 0;
+        if ($shortcode_id <= 0)
+        {
+            $inline_shortcode_sequence++;
+            $SKO->collection_schema_fragment_id = 'inline-' . $inline_shortcode_sequence;
+        }
 
         // Start the skin
         $SKO->start($atts);
@@ -41,8 +53,36 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 
         // Fetch the listings
         $SKO->fetch();
+        $suppress_legacy_schema = $ai_visibility instanceof LSD_AI_Visibility
+            && $ai_visibility->schema_service()->replaces_shortcode_collection_schema($SKO);
 
-        return $SKO->output();
+        if ($suppress_legacy_schema)
+        {
+            LSD_Schema::suppress_markup();
+            LSD_Schema::suppress_default_listing_scope();
+            LSD_Schema::suppress_default_listing_properties();
+        }
+
+        try
+        {
+            $output = $SKO->output();
+        }
+        finally
+        {
+            if ($suppress_legacy_schema)
+            {
+                LSD_Schema::restore_default_listing_properties();
+                LSD_Schema::restore_default_listing_scope();
+                LSD_Schema::restore_markup();
+            }
+        }
+
+        if ($ai_visibility instanceof LSD_AI_Visibility)
+        {
+            $output .= $ai_visibility->schema_service()->shortcode_collection_markup($SKO);
+        }
+
+        return $output;
     }
 
     public function widget($shortcode_id)

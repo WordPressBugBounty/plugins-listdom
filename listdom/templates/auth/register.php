@@ -4,6 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var string $redirect */
 /** @var string $role */
+/** @var bool $explicit_redirect */
 
 // User is Already Logged-in
 if (is_user_logged_in()) return '';
@@ -12,8 +13,11 @@ $instance_id = uniqid('lsd-register-');
 
 $auth = LSD_Options::auth();
 
-$register_redirect_link = isset($auth['register']['redirect']) ? get_permalink($auth['register']['redirect']) : false;
-$redirect = $register_redirect_link ?: home_url();
+if (!trim($redirect))
+{
+    $redirect = $this->page_url($auth['register']['redirect'] ?? 0);
+    if (!trim($redirect)) $redirect = home_url();
+}
 
 $register_privacy_field = LSD_Privacy::consent_field([
     'id' => 'lsd_register_privacy_consent_' . $instance_id,
@@ -161,6 +165,15 @@ jQuery(document).ready(function()
                 'id' => 'lsd_redirect',
                 'value' => $redirect,
             ]);
+
+            if ($explicit_redirect)
+            {
+                echo LSD_Form::hidden([
+                    'name' => 'lsd_explicit_redirect',
+                    'id' => 'lsd_explicit_redirect',
+                    'value' => '1',
+                ]);
+            }
         }
 
         if (trim($role) && $role_signature)

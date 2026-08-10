@@ -4,6 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var string $redirect */
 /** @var string $role */
+/** @var bool $explicit_redirect */
 
 // User is Already Logged-in
 if (is_user_logged_in()) return '';
@@ -14,9 +15,8 @@ $role_signature = trim($role) ? $this->role_signature('login', $role) : '';
 
 if (!trim($redirect))
 {
-    $redirect = !empty($auth['login']['redirect'])
-        ? get_permalink($auth['login']['redirect'])
-        : home_url();
+    $redirect = $this->page_url($auth['login']['redirect'] ?? 0);
+    if (!trim($redirect)) $redirect = home_url();
 }
 
 // Verification notice
@@ -96,6 +96,15 @@ jQuery(document).ready(function()
             <?php LSD_Form::nonce('lsd_login', 'lsd_login'); ?>
             <?php if (LSD_User::requires_email_verification()) LSD_Form::nonce('lsd_resend_verification', 'lsd_resend_verification'); ?>
             <?php
+            if ($explicit_redirect && trim($redirect) !== '')
+            {
+                echo LSD_Form::hidden([
+                    'name' => 'lsd_explicit_redirect',
+                    'id' => 'lsd_explicit_redirect',
+                    'value' => '1',
+                ]);
+            }
+
             if (trim($role) && $role_signature)
             {
                 echo LSD_Form::hidden([

@@ -257,6 +257,9 @@ class LSD_Search_Builder extends LSD_Base
             'acf_true_false' => [
                 'checkbox' => esc_html__('Checkbox', 'listdom'),
             ],
+            'switcher' => [
+                'switcher' => esc_html__('Switcher', 'listdom'),
+            ],
         ];
 
         // Pro Methods

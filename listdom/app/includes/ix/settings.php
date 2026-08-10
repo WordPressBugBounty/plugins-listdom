@@ -136,9 +136,8 @@ class LSD_IX_Settings extends LSD_Base
         $options = json_decode($JSON, true);
 
         // Merge Settings
-        update_option('lsd_settings', array_merge(
-            LSD_Options::settings(), isset($options['settings']) && is_array($options['settings']) ? $options['settings'] : []
-        ));
+        $settings = isset($options['settings']) && is_array($options['settings']) ? $options['settings'] : [];
+        LSD_Options::merge('lsd_settings', $settings);
 
         // Merge Customizer
         update_option('lsd_customizer', array_merge(

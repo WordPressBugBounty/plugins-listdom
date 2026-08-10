@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 final class Listdom
 {
-    public string $version = '5.7.0';
+    public string $version = '5.8.0';
     protected static ?Listdom $instance = null;
 
     /**
@@ -110,6 +110,9 @@ final class Listdom
         $menus = new LSD_Menus();
         $menus->init();
 
+        // Listdom Announcements
+        LSD_Announcements::instance()->init();
+
         // Listdom Post Types
         $post_types = new LSD_PTypes();
         $post_types->init();
@@ -197,6 +200,10 @@ final class Listdom
         $dashboard = new LSD_Dashboard();
         $dashboard->init();
 
+        // Launch Checklist
+        $checklist = LSD_Checklist::instance();
+        $checklist->init();
+
         // Internal Actions
         LSD_Actions::instance()->init();
 
@@ -236,6 +243,10 @@ final class Listdom
         // Semantic AI
         $semantic = new LSD_AI_Semantic();
         $semantic->init();
+
+        // AI Visibility
+        $ai_visibility = new LSD_AI_Visibility();
+        $ai_visibility->init();
 
         // Listdom Bar
         $bar = LSD_Bar::instance();

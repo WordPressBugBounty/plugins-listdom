@@ -2,6 +2,169 @@
 
 class LSD_IX_Mapping extends LSD_IX
 {
+    public static function listing_taxonomies(): array
+    {
+        return [
+            LSD_Base::TAX_CATEGORY,
+            LSD_Base::TAX_LOCATION,
+            LSD_Base::TAX_TAG,
+            LSD_Base::TAX_FEATURE,
+            LSD_Base::TAX_LABEL,
+        ];
+    }
+
+    public static function is_listing_taxonomy(string $key): bool
+    {
+        return in_array($key, self::listing_taxonomies(), true);
+    }
+
+    public static function is_boolean_samples(array $samples): bool
+    {
+        $values = [];
+        foreach ($samples as $sample)
+        {
+            if (!is_scalar($sample)) continue;
+
+            $value = strtolower(trim((string) $sample));
+            if ($value === '') continue;
+
+            $values[$value] = $value;
+        }
+
+        if (!count($values)) return false;
+
+        $values = array_values($values);
+        $allowed = ['yes', 'no', 'y', 'n', 'true', 'false', '1', '0'];
+        if (count(array_diff($values, $allowed))) return false;
+
+        $word_values = ['yes', 'no', 'y', 'n', 'true', 'false'];
+        return count(array_intersect($values, $word_values)) > 0
+            || (in_array('1', $values, true) && in_array('0', $values, true));
+    }
+
+    protected static function normalize_source_column($value): ?int
+    {
+        if (is_int($value)) return $value >= 0 ? $value : null;
+        if (!is_string($value) || !preg_match('/^\d+$/', $value)) return null;
+
+        return (int) $value;
+    }
+
+    public static function taxonomy_sources(array $mapping): array
+    {
+        $sources = [];
+        if (isset($mapping['sources']) && is_array($mapping['sources']))
+        {
+            foreach ($mapping['sources'] as $source)
+            {
+                if (!is_array($source) || !isset($source['column'])) continue;
+
+                $column = self::normalize_source_column($source['column']);
+                if (is_null($column)) continue;
+
+                $sources[] = [
+                    'column' => $column,
+                    'label' => isset($source['label']) && is_scalar($source['label']) ? sanitize_text_field((string) $source['label']) : '',
+                    'mode' => isset($source['mode']) && $source['mode'] === 'label' ? 'label' : 'value',
+                ];
+            }
+        }
+
+        if (count($sources)) return $sources;
+
+        if (isset($mapping['map']) && is_scalar($mapping['map']) && trim((string) $mapping['map']) !== '')
+        {
+            $column = self::normalize_source_column((string) $mapping['map']);
+            if (is_null($column)) return $sources;
+
+            $sources[] = [
+                'column' => $column,
+                'label' => '',
+                'mode' => 'value',
+            ];
+        }
+
+        return $sources;
+    }
+
+    public static function taxonomy_mode(array $mapping): string
+    {
+        return isset($mapping['taxonomy_mode']) && $mapping['taxonomy_mode'] === 'hierarchy' ? 'hierarchy' : 'flat';
+    }
+
+    protected static function taxonomy_mapping_value(array $raw, array $mapping, string $taxonomy, array $options = []): ?array
+    {
+        $sources = self::taxonomy_sources($mapping);
+        $mode = self::taxonomy_mode($mapping);
+        $global_hierarchy = $mode === 'flat'
+            && !empty($options['hierarchical_terms'])
+            && in_array($taxonomy, [LSD_Base::TAX_CATEGORY, LSD_Base::TAX_LOCATION], true);
+        if ($global_hierarchy) $mode = 'hierarchy';
+        $values = [];
+        $explicit_false = false;
+
+        foreach ($sources as $source)
+        {
+            if ($mode === 'hierarchy' && $source['mode'] === 'label') continue;
+
+            $column = $source['column'];
+            if (!array_key_exists($column, $raw) || !is_scalar($raw[$column])) continue;
+
+            $value = (string) $raw[$column];
+            if ($value !== '' && !preg_match('!!u', $value))
+            {
+                $detected_encoding = mb_detect_encoding($value, mb_detect_order(), true);
+                $value = mb_convert_encoding($value, 'UTF-8', $detected_encoding ?: 'ISO-8859-1');
+            }
+            $value = trim($value);
+            if ($source['mode'] === 'label')
+            {
+                $normalized = strtolower($value);
+                if (in_array($normalized, ['no', 'n', 'false', '0'], true)) $explicit_false = true;
+                if (in_array($normalized, ['yes', 'y', 'true', '1'], true) && $source['label'] !== '') $values[] = $source['label'];
+                continue;
+            }
+
+            if ($value === '') continue;
+            if ($mode === 'hierarchy' && $global_hierarchy)
+            {
+                foreach (explode(',', $value) as $segment)
+                {
+                    $segment = trim($segment);
+                    if ($segment !== '') $values[] = $segment;
+                }
+            }
+            else if ($mode === 'hierarchy') $values[] = $value;
+            else
+            {
+                foreach (explode(',', $value) as $term)
+                {
+                    $term = trim($term);
+                    if ($term !== '') $values[] = $term;
+                }
+            }
+        }
+
+        if (!$explicit_false && !count($values) && isset($mapping['default']) && is_scalar($mapping['default']))
+        {
+            $default = trim((string) $mapping['default']);
+            if ($default !== '')
+            {
+                foreach (explode(',', $default) as $term)
+                {
+                    $term = trim($term);
+                    if ($term !== '') $values[] = $term;
+                }
+            }
+        }
+
+        if ($mode !== 'hierarchy') $values = array_values(array_unique($values));
+        else $values = array_values($values);
+        if (!count($values)) return null;
+
+        return $mode === 'hierarchy' ? ['path' => $values] : ['terms' => $values];
+    }
+
     public function listdom_fields()
     {
         // Default Value
@@ -296,6 +459,51 @@ class LSD_IX_Mapping extends LSD_IX
         return apply_filters('lsd_ix_listdom_fields', $fields);
     }
 
+    /**
+     * Repeatable listing fields supported by the importer.
+     *
+     * Add-ons can register their own repeaters with lsd_ix_repeater_fields.
+     */
+    public function repeater_fields(): array
+    {
+        $fields = [
+            'faqs' => [
+                'label' => esc_html__('FAQs', 'listdom'),
+                'description' => esc_html__('Map each FAQ question and answer as a pair.', 'listdom'),
+                'fields' => [
+                    'question' => [
+                        'label' => esc_html__('Question', 'listdom'),
+                        'required' => true,
+                    ],
+                    'answer' => [
+                        'label' => esc_html__('Answer', 'listdom'),
+                        'required' => true,
+                    ],
+                ],
+            ],
+        ];
+
+        if (LSD_Base::isPro())
+        {
+            $fields['embeds'] = [
+                'label' => esc_html__('Embed Codes', 'listdom'),
+                'description' => esc_html__('Map an optional title and an embed code or URL for each embed section.', 'listdom'),
+                'fields' => [
+                    'name' => [
+                        'label' => esc_html__('Title', 'listdom'),
+                        'required' => false,
+                    ],
+                    'code' => [
+                        'label' => esc_html__('Embed Code or URL', 'listdom'),
+                        'required' => true,
+                    ],
+                ],
+            ];
+        }
+
+        return apply_filters('lsd_ix_repeater_fields', $fields);
+    }
+
     public function fields_for_type(string $type = 'listings'): array
     {
         $type = LSD_IX::normalize_import_type($type);
@@ -362,9 +570,9 @@ class LSD_IX_Mapping extends LSD_IX
 
         $default_meta = [
             LSD_Base::TAX_CATEGORY => ['lsd_icon', 'lsd_color', 'lsd_disabled_icon', 'lsd_schema'],
-            LSD_Base::TAX_LOCATION => [],
+            LSD_Base::TAX_LOCATION => ['lsd_schema'],
             LSD_Base::TAX_TAG => [],
-            LSD_Base::TAX_FEATURE => ['lsd_icon', 'lsd_itemprop'],
+            LSD_Base::TAX_FEATURE => ['lsd_icon', 'lsd_itemprop', 'lsd_schema'],
             LSD_Base::TAX_LABEL => ['lsd_color'],
             LSD_Base::TAX_ATTRIBUTE => ['lsd_field_type', 'lsd_values', 'lsd_file_extensions', 'lsd_file_max_size', 'lsd_icon', 'lsd_disabled_icon', 'lsd_required', 'lsd_editor', 'lsd_link_label', 'lsd_all_categories', 'lsd_categories', 'lsd_index'],
         ];
@@ -457,18 +665,63 @@ class LSD_IX_Mapping extends LSD_IX
         return $fields;
     }
 
+    public function feed_field_samples(string $file, int $limit = 250): array
+    {
+        $samples = [];
+        $fh = fopen($file, 'r');
+        if (!$fh) return $samples;
+
+        $delimiter = $this->delimiter($file);
+        $headers = fgetcsv($fh, 0, $delimiter);
+        if (!is_array($headers))
+        {
+            fclose($fh);
+            return $samples;
+        }
+
+        foreach ($headers as $index => $header) $samples[$index] = [];
+
+        $rows = 0;
+        while (($row = fgetcsv($fh, 0, $delimiter)) !== false && $rows < $limit)
+        {
+            $rows++;
+            foreach ($headers as $index => $header)
+            {
+                if (count($samples[$index]) >= 20) continue;
+
+                $value = isset($row[$index]) ? trim((string) $row[$index]) : '';
+                if ($value === '' || in_array($value, $samples[$index], true)) continue;
+
+                $samples[$index][] = $value;
+            }
+        }
+
+        fclose($fh);
+        return $samples;
+    }
+
     /**
      * @param array $raw
      * @param array $mappings
      * @return array
      */
-    public function map(array $raw, array $mappings): array
+    public function map(array $raw, array $mappings, array $options = []): array
     {
         $mapped = [];
         foreach ($mappings as $key => $mapping)
         {
-            $field = isset($mapping['map']) && trim($mapping['map']) !== '' ? $mapping['map'] : null;
-            $default = isset($mapping['default']) && trim($mapping['default']) !== '' ? $mapping['default'] : null;
+            if (!is_array($mapping)) continue;
+
+            if (self::is_listing_taxonomy($key) && ((isset($mapping['sources']) && is_array($mapping['sources'])) || array_key_exists('taxonomy_mode', $mapping)))
+            {
+                $value = self::taxonomy_mapping_value($raw, $mapping, $key, $options);
+                if ($value !== null) $mapped[$key] = $value;
+
+                continue;
+            }
+
+            $field = isset($mapping['map']) && is_scalar($mapping['map']) && trim((string) $mapping['map']) !== '' ? $mapping['map'] : null;
+            $default = isset($mapping['default']) && is_scalar($mapping['default']) && trim((string) $mapping['default']) !== '' ? $mapping['default'] : null;
 
             // Not Mapped
             if (is_null($field) && is_null($default)) continue;
@@ -477,14 +730,75 @@ class LSD_IX_Mapping extends LSD_IX
             $value = !is_null($field) && isset($raw[$field]) && trim($raw[$field]) !== '' ? $raw[$field] : $default;
 
             // Normalize the Value
-            if ($value && !preg_match('!!u', $value))
+            if (is_scalar($value) && $value !== '' && !preg_match('!!u', (string) $value))
             {
-                $detected_encoding = mb_detect_encoding($value, mb_detect_order(), true);
-                $value = mb_convert_encoding($value, 'UTF-8', $detected_encoding ?: 'ISO-8859-1');
+                $detected_encoding = mb_detect_encoding((string) $value, mb_detect_order(), true);
+                $value = mb_convert_encoding((string) $value, 'UTF-8', $detected_encoding ?: 'ISO-8859-1');
             }
 
             // Add to Mapped Data
             $mapped[$key] = $value;
+        }
+
+        foreach ($this->repeater_fields() as $key => $repeater)
+        {
+            if (!is_array($repeater) || !isset($repeater['fields']) || !is_array($repeater['fields'])) continue;
+
+            $rows = $mappings[$key] ?? [];
+            if (!is_array($rows)) continue;
+
+            $items = [];
+            $has_mapping = false;
+            $ordinal = 0;
+            foreach ($rows as $row_index => $row)
+            {
+                $current_ordinal = $ordinal++;
+                if (!is_array($row)) continue;
+
+                $item = [];
+                $is_complete = true;
+                $has_required_mappings = true;
+                $required_fields = 0;
+
+                foreach ($repeater['fields'] as $field_key => $field)
+                {
+                    if (!is_array($field)) continue;
+
+                    $mapping = $row[$field_key] ?? [];
+                    if (!is_array($mapping)) $mapping = [];
+
+                    $column = self::normalize_source_column($mapping['map'] ?? null);
+                    if (!empty($field['required']))
+                    {
+                        $required_fields++;
+                        if ($column === null) $has_required_mappings = false;
+                    }
+                    $value = $column !== null && isset($raw[$column]) ? $raw[$column] : '';
+                    $value = is_scalar($value) ? trim((string) $value) : '';
+
+                    if ($value !== '' && !preg_match('!!u', $value))
+                    {
+                        $detected_encoding = mb_detect_encoding($value, mb_detect_order(), true);
+                        $value = mb_convert_encoding($value, 'UTF-8', $detected_encoding ?: 'ISO-8859-1');
+                    }
+
+                    if (!empty($field['required']) && $value === '') $is_complete = false;
+                    $item[$field_key] = $value;
+                }
+
+                if ($required_fields && $has_required_mappings) $has_mapping = true;
+
+                if (!$is_complete || !count($item)) continue;
+
+                if (!empty($repeater['preserve_index']))
+                {
+                    $item['_index'] = is_scalar($row_index) ? (string) $row_index : (string) $current_ordinal;
+                    $item['_legacy_index'] = $current_ordinal;
+                }
+                $items[] = $item;
+            }
+
+            if (count($items) || $has_mapping) $mapped[$key] = $items;
         }
 
         // Latitude & Longitude by Address

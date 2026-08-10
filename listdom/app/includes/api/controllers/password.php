@@ -90,6 +90,8 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         if (is_multisite()) $site_name = get_network()->site_name;
         else $site_name = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
+        $reset_link = LSD_User::password_reset_url($user_login, $key);
+
         $message = esc_html__('Someone has requested a password reset for the following account:', 'listdom') . "\r\n\r\n";
         $message .= sprintf(
             /* translators: %s: Site name. */
@@ -103,7 +105,7 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         ) . "\r\n\r\n";
         $message .= esc_html__('If this was a mistake, just ignore this email and nothing will happen.', 'listdom') . "\r\n\r\n";
         $message .= esc_html__('To reset your password, visit the following address:', 'listdom') . "\r\n\r\n";
-        $message .= '<' . network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login') . ">\r\n";
+        $message .= '<' . $reset_link . ">\r\n";
 
         $title = sprintf(
             /* translators: %s: Site name. */
@@ -111,8 +113,15 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
             $site_name
         );
         $title = apply_filters('retrieve_password_title', $title, $user_login, $user);
+
+        $default_message = $message;
         $message = apply_filters('retrieve_password_message', $message, $key, $user_login, $user);
 
-        return wp_mail($user_email, wp_specialchars_decode($title), $message);
+        // Match WordPress behavior: a falsey filtered message suppresses the email.
+        if (!$message) return true;
+
+        $html_message = LSD_User::password_reset_email_html($message, $default_message, $reset_link);
+
+        return wp_mail($user_email, wp_specialchars_decode($title), $html_message, ['Content-Type: text/html; charset=UTF-8']);
     }
 }

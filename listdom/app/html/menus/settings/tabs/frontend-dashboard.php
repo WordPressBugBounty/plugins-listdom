@@ -179,8 +179,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                                         <p class="lsd-flex lsd-flex-content-between">
                                             <span>
                                                 <i class="lsd-icon lsd-custom-menu-icon <?php echo esc_attr($icon); ?>"></i>
-                                                <span
-                                                    class="lsd-custom-menu-label"><?php echo esc_html($label); ?></span>
+                                                <span class="lsd-custom-menu-label"><?php echo esc_html($label); ?></span>
                                             </span>
                                             <span class="lsd-menu-actions">
                                                 <i class="fas fa-trash"></i>
@@ -299,8 +298,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                                 }
                                 ?>
                             </ul>
-                            <button type="button"
-                                    class="lsd-custom-menu-btn lsd-secondary-button"><?php esc_html_e('Add Custom Menu', 'listdom'); ?></button>
+                            <button type="button" class="lsd-custom-menu-btn lsd-secondary-button"><?php esc_html_e('Add Custom Menu', 'listdom'); ?></button>
                             <p class="lsd-admin-description lsd-mb-0 lsd-mt-2"><?php esc_html_e("Drag and drop the menus to change the order of dashboard menus.", 'listdom'); ?></p>
                             <?php echo LSD_Form::iconpicker([
                                 'name' => '',
@@ -509,22 +507,22 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                                 <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Choose the default listing status for new submissions from the frontend dashboard.', 'listdom'); ?></p>
                             </div>
                         </div>
-                        <div
-                            class="lsd-form-row<?php echo empty($settings['dashboard_listing_status']) ? ' lsd-util-hide' : ''; ?>"
-                            id="lsd_settings_dashboard_listing_status_guest_row">
-                            <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                    'class' => 'lsd-fields-label',
-                                    'title' => esc_html__('Apply to Guest Listings', 'listdom'),
-                                    'for' => 'lsd_settings_dashboard_listing_status_guest',
-                                ]); ?></div>
-                            <div class="lsd-col-5">
-                                <?php echo LSD_Form::switcher([
-                                    'id' => 'lsd_settings_dashboard_listing_status_guest',
-                                    'name' => 'lsd[dashboard_listing_status_guest]',
-                                    'value' => $settings['dashboard_listing_status_guest'] ?? 0,
-                                ]); ?>
-                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Enable to apply the selected listing status to guest submissions as well.', 'listdom'); ?></p>
-                            </div>
+                    </div>
+                    <div
+                        class="lsd-form-row<?php echo empty($settings['dashboard_listing_status']) ? ' lsd-util-hide' : ''; ?>"
+                        id="lsd_settings_dashboard_listing_status_guest_row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Apply to Guest Listings', 'listdom'),
+                                'for' => 'lsd_settings_dashboard_listing_status_guest',
+                            ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_settings_dashboard_listing_status_guest',
+                                'name' => 'lsd[dashboard_listing_status_guest]',
+                                'value' => $settings['dashboard_listing_status_guest'] ?? 0,
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Enable to apply the selected listing status to guest submissions as well.', 'listdom'); ?></p>
                         </div>
                     </div>
                     <div class="lsd-settings-fields-wrapper">
@@ -567,8 +565,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                 </div>
             </div>
 
-            <div
-                class="lsd-tab-switcher-content lsd-frontend-dashboard-add-listing-tab-switcher-content<?php echo $add_listing_subtab === 'guest-submission' ? ' lsd-tab-switcher-content-active' : ''; ?>"
+            <div class="lsd-tab-switcher-content lsd-frontend-dashboard-add-listing-tab-switcher-content<?php echo $add_listing_subtab === 'guest-submission' ? ' lsd-tab-switcher-content-active' : ''; ?>"
                 id="lsd-tab-switcher-frontend-dashboard-add-listing-guest-submission-content">
                 <div class="lsd-settings-group-wrapper">
                     <div class="lsd-settings-fields-wrapper">
@@ -643,8 +640,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                 </div>
             </div>
 
-            <div
-                class="lsd-tab-switcher-content lsd-frontend-dashboard-add-listing-tab-switcher-content<?php echo $add_listing_subtab === 'fields' ? ' lsd-tab-switcher-content-active' : ''; ?>"
+            <div class="lsd-tab-switcher-content lsd-frontend-dashboard-add-listing-tab-switcher-content<?php echo $add_listing_subtab === 'fields' ? ' lsd-tab-switcher-content-active' : ''; ?>"
                 id="lsd-tab-switcher-frontend-dashboard-add-listing-fields-content">
                 <div class="lsd-settings-group-wrapper">
                     <div class="lsd-settings-fields-wrapper">
@@ -956,7 +952,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                             </div>
                         </div>
                     </div>
-                    <div class="lsd-settings-fields-wrapper">
+                    <div class="lsd-settings-fields-wrapper" id="lsd_frontend_dashboard_add_listing_modules">
                         <h3 class="lsd-admin-title"><?php esc_html_e('Modules', 'listdom'); ?></h3>
                         <?php foreach ($dashboard->modules() as $module): ?>
                             <div class="lsd-form-row">

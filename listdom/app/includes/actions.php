@@ -64,6 +64,11 @@ class LSD_Actions extends LSD_Base
         }
 
         $result = $action->execute($prepared_input, $context);
+        $warnings = $result->get_warnings();
+        foreach ($validation->get_warnings() as $warning)
+        {
+            if (!in_array($warning, $warnings, true)) $result->add_warning($warning);
+        }
         LSD_Action_Log::write($result->is_success() ? 'completed' : 'failed', $action_id, $context, $result->to_array());
 
         return $result->to_array();

@@ -6,6 +6,7 @@ defined('ABSPATH') || die();
 
 // Settings
 $settings = LSD_Options::settings();
+$ai_visibility_settings = LSD_AI_Visibility_Settings::settings();
 $thousand_separator_options = LSD_Options::currency_separators();
 $decimal_separator_options = LSD_Options::currency_separators('decimal');
 
@@ -269,6 +270,137 @@ $grecaptcha_status = isset($settings['grecaptcha_status'], $settings['grecaptcha
                                 ],
                             ]); ?>
                             <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Automatically offline listings after they reach this number of visits. Leave blank for unlimited visits.', 'listdom'); ?></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lsd-settings-fields-wrapper">
+                    <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Structured Data', 'listdom'); ?></h3>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Structured Data', 'listdom'),
+                            'for' => 'lsd_settings_ai_visibility_structured_data',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_settings_ai_visibility_structured_data',
+                                'name' => 'lsd[ai_visibility][structured_data]',
+                                'value' => $ai_visibility_settings['structured_data'] ?? '1',
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Output JSON-LD for single listings and listing collection pages using only valid public listing data.', 'listdom'); ?></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lsd-settings-fields-wrapper">
+                    <h3 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('AI Visibility', 'listdom'); ?></h3>
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3"><?php echo LSD_Form::label([
+                            'class' => 'lsd-fields-label',
+                            'title' => esc_html__('Public AI Feed', 'listdom'),
+                            'for' => 'lsd_settings_ai_visibility_public_feed',
+                        ]); ?></div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_settings_ai_visibility_public_feed',
+                                'name' => 'lsd[ai_visibility][public_feed]',
+                                'value' => $ai_visibility_settings['public_feed'] ?? '0',
+                                'toggle' => '#lsd_settings_ai_visibility_public_feed_options',
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Enable stable public endpoints for listings, categories, and locations under the Listdom REST namespace.', 'listdom'); ?></p>
+                        </div>
+                    </div>
+                    <div id="lsd_settings_ai_visibility_public_feed_options" class="lsd-settings-fields-sub-wrapper <?php echo !empty($ai_visibility_settings['public_feed']) ? '' : 'lsd-util-hide'; ?>">
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                    'class' => 'lsd-fields-label',
+                                    'title' => esc_html__('Public API URLs', 'listdom'),
+                                    'for' => 'lsd_settings_ai_visibility_public_api_urls',
+                                ]); ?></div>
+                            <div class="lsd-col-9">
+                                <div id="lsd_settings_ai_visibility_public_api_urls" class="lsd-flex lsd-flex-col lsd-flex-items-start lsd-gap-2">
+                                    <?php foreach (LSD_AI_Visibility::public_feed_urls(['scope' => 'settings']) as $feed_key => $feed_url): ?>
+                                        <?php if (!is_string($feed_url) || trim($feed_url) === '') continue; ?>
+                                        <span>
+                                            <strong><?php echo esc_html(LSD_AI_Visibility::public_feed_url_label((string) $feed_key)); ?>:</strong>
+                                            <a href="<?php echo esc_url($feed_url); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($feed_url); ?></a>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-3">
+                                    <?php esc_html_e('These endpoints become publicly discoverable when Public AI Feed is enabled and Settings > Reading > Search Engine Visibility is configured to allow search engines to index the site.', 'listdom'); ?>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Add llms.txt Discovery', 'listdom'),
+                                'for' => 'lsd_settings_ai_visibility_llms_txt',
+                            ]); ?></div>
+                            <div class="lsd-col-5">
+                                <?php echo LSD_Form::switcher([
+                                    'id' => 'lsd_settings_ai_visibility_llms_txt',
+                                    'name' => 'lsd[ai_visibility][llms_txt]',
+                                    'value' => $ai_visibility_settings['llms_txt'] ?? '1',
+                                ]); ?>
+                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Expose a dynamic /llms.txt document that points AI systems to the public Listdom feeds.', 'listdom'); ?></p>
+                            </div>
+                        </div>
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Add robots.txt Discovery Hints', 'listdom'),
+                                'for' => 'lsd_settings_ai_visibility_robots_txt',
+                            ]); ?></div>
+                            <div class="lsd-col-5">
+                                <?php echo LSD_Form::switcher([
+                                    'id' => 'lsd_settings_ai_visibility_robots_txt',
+                                    'name' => 'lsd[ai_visibility][robots_txt]',
+                                    'value' => $ai_visibility_settings['robots_txt'] ?? '1',
+                                ]); ?>
+                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Append Listdom AI discovery hints to the virtual robots.txt output without touching any physical robots.txt file.', 'listdom'); ?></p>
+                            </div>
+                        </div>
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Add HTML Feed Discovery Links', 'listdom'),
+                                'for' => 'lsd_settings_ai_visibility_html_links',
+                            ]); ?></div>
+                            <div class="lsd-col-5">
+                                <?php echo LSD_Form::switcher([
+                                    'id' => 'lsd_settings_ai_visibility_html_links',
+                                    'name' => 'lsd[ai_visibility][html_links]',
+                                    'value' => $ai_visibility_settings['html_links'] ?? '1',
+                                ]); ?>
+                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Add discovery link tags to public listing, category, location, and directory archive pages.', 'listdom'); ?></p>
+                            </div>
+                        </div>
+                        <?php do_action('lsd_ai_visibility_settings', $ai_visibility_settings); ?>
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-3"><?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Public Feed Fields', 'listdom'),
+                                'for' => 'lsd_settings_ai_visibility_fields',
+                            ]); ?></div>
+                            <div class="lsd-col-9">
+                                <div id="lsd_settings_ai_visibility_fields" class="lsd-flex lsd-flex-wrap lsd-gap-4">
+                                    <?php foreach (LSD_AI_Visibility::field_options() as $field_key => $field_label): ?>
+                                        <label class="lsd-flex lsd-gap-2 lsd-flex-align-center">
+                                            <?php echo LSD_Form::switcher([
+                                                'id' => 'lsd_settings_ai_visibility_field_' . $field_key,
+                                                'name' => 'lsd[ai_visibility][fields][' . $field_key . ']',
+                                                'value' => $ai_visibility_settings['fields'][$field_key] ?? '1',
+                                            ]); ?>
+                                            <span><?php echo esc_html($field_label); ?></span>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
+                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php esc_html_e('Only these public fields will be exposed in the AI-readable listing feed. Private user, booking, payment, guest, and admin data are never included.', 'listdom'); ?></p>
+                            </div>
                         </div>
                     </div>
                 </div>

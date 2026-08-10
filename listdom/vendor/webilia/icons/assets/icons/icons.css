@@ -2,10 +2,10 @@
   font-family: 'webilia-icons';
   src: url('fonts/icons.eot?56589723');
   src: url('fonts/icons.eot?56589723#iefix') format('embedded-opentype'),
-       url('fonts/icons.woff2?56589723') format('woff2'),
-       url('fonts/icons.woff?56589723') format('woff'),
-       url('fonts/icons.ttf?56589723') format('truetype'),
-       url('fonts/icons.svg?56589723#webilia-icons') format('svg');
+  url('fonts/icons.woff2?56589723') format('woff2'),
+  url('fonts/icons.woff?56589723') format('woff'),
+  url('fonts/icons.ttf?56589723') format('truetype'),
+  url('fonts/icons.svg?56589723#webilia-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -57,94 +57,142 @@
   justify-content: center;
 }
 
-.wbli-listdom-logo:before { content: '\e800'; }
-.wbli-list-view:before { content: '\e801'; }
-.wbli-loading:before { content: '\e802'; }
-.wbli-locate:before { content: '\e803'; }
-.wbli-location:before { content: '\e804'; }
-.wbli-login-method:before { content: '\e805'; }
-.wbli-map-marker:before { content: '\e806'; }
-.wbli-map-pinpoint:before { content: '\e807'; }
-.wbli-menu-square:before { content: '\e808'; }
-.wbli-menu-square-selected:before { content: '\e809'; }
-.wbli-message-preview-01:before { content: '\e80a'; }
-.wbli-mobile:before { content: '\e80b'; }
-.wbli-move:before { content: '\e80c'; }
-.wbli-move-left:before { content: '\e80d'; }
-.wbli-payment:before { content: '\e80e'; }
-.wbli-paypal:before { content: '\e80f'; }
-.wbli-pencil-edit:before { content: '\e810'; }
-.wbli-plug-01:before { content: '\e811'; }
-.wbli-property-edit:before { content: '\e812'; }
-.wbli-puzzle:before { content: '\e813'; }
-.wbli-question:before { content: '\e814'; }
-.wbli-reset:before { content: '\e815'; }
-.wbli-responsive:before { content: '\e816'; }
-.wbli-right-arrow:before { content: '\e817'; }
-.wbli-sad-dizzy:before { content: '\e818'; }
-.wbli-screen:before { content: '\e819'; }
-.wbli-search:before { content: '\e81a'; }
-.wbli-search-area:before { content: '\e81b'; }
-.wbli-search-magnifier:before { content: '\e81c'; }
-.wbli-second-bracket-square:before { content: '\e81d'; }
-.wbli-settings-02:before { content: '\e81e'; }
-.wbli-sort-by-up:before { content: '\e81f'; }
-.wbli-stars:before { content: '\e820'; }
-.wbli-stripe:before { content: '\e821'; }
-.wbli-structure-check:before { content: '\e822'; }
-.wbli-tablet:before { content: '\e823'; }
-.wbli-tag:before { content: '\e824'; }
-.wbli-three-dots:before { content: '\e825'; }
-.wbli-three-dots-vertical:before { content: '\e826'; }
-.wbli-time-half-pass:before { content: '\e827'; }
-.wbli-title:before { content: '\e828'; }
-.wbli-toggle-on:before { content: '\e829'; }
-.wbli-transition-top:before { content: '\e82a'; }
-.wbli-type-cursor:before { content: '\e82b'; }
-.wbli-up-arrow-s:before { content: '\e82c'; }
-.wbli-user-circle:before { content: '\e82d'; }
-.wbli-waving-hand:before { content: '\e82e'; }
-.wbli-wizard:before { content: '\e82f'; }
-.wbli-account:before { content: '\e830'; }
-.wbli-add-plus:before { content: '\e831'; }
-.wbli-add-plus-circle:before { content: '\e832'; }
-.wbli-add-plus-s:before { content: '\e833'; }
-.wbli-advanced:before { content: '\e834'; }
-.wbli-ai-search:before { content: '\e835'; }
-.wbli-alert:before { content: '\e836'; }
-.wbli-api:before { content: '\e837'; }
-.wbli-bank:before { content: '\e838'; }
-.wbli-card:before { content: '\e839'; }
-.wbli-card-exchang:before { content: '\e83a'; }
-.wbli-checkmark-circle:before { content: '\e83b'; }
-.wbli-checkmark-circle-fill:before { content: '\e83c'; }
-.wbli-copy:before { content: '\e83d'; }
-.wbli-cross:before { content: '\e83e'; }
-.wbli-csv:before { content: '\e83f'; }
-.wbli-cursor-pointer-01:before { content: '\e840'; }
-.wbli-customizer:before { content: '\e841'; }
-.wbli-dashboard-circle-edit:before { content: '\e842'; }
-.wbli-dash-circle-fill:before { content: '\e843'; }
-.wbli-dash-s:before { content: '\e844'; }
-.wbli-database:before { content: '\e845'; }
-.wbli-down-arrow-s:before { content: '\e846'; }
-.wbli-excel:before { content: '\e847'; }
-.wbli-eye:before { content: '\e848'; }
-.wbli-file-01:before { content: '\e849'; }
-.wbli-file-download:before { content: '\e84a'; }
-.wbli-file-edit-pencil:before { content: '\e84b'; }
-.wbli-file-import-export:before { content: '\e84c'; }
-.wbli-file-script:before { content: '\e84d'; }
-.wbli-file-upload:before { content: '\e84e'; }
-.wbli-first-aid-kit:before { content: '\e84f'; }
-.wbli-floppy-disk:before { content: '\e850'; }
-.wbli-footer:before { content: '\e851'; }
-.wbli-frontend-dashboard:before { content: '\e852'; }
-.wbli-general:before { content: '\e853'; }
-.wbli-google-places:before { content: '\e854'; }
-.wbli-group-items:before { content: '\e855'; }
-.wbli-header:before { content: '\e856'; }
-.wbli-key:before { content: '\e857'; }
-.wbli-label-important:before { content: '\e858'; }
-.wbli-layout:before { content: '\e859'; }
-.wbli-link-square:before { content: '\e85a'; }
+.wbli-wrap:before {content: "\e000";}
+.wbli-wrap-reverse:before {content: "\e001";}
+.wbli-wizard:before {content: "\e002";}
+.wbli-waving-hand:before {content: "\e003";}
+.wbli-user-circle:before {content: "\e004";}
+.wbli-up-arrow-s:before {content: "\e005";}
+.wbli-type-cursor:before {content: "\e006";}
+.wbli-transition-top:before {content: "\e007";}
+.wbli-toggle-on:before {content: "\e008";}
+.wbli-title:before {content: "\e009";}
+.wbli-time-half-pass:before {content: "\e00a";}
+.wbli-ticket:before {content: "\e00b";}
+.wbli-three-dots:before {content: "\e00c";}
+.wbli-three-dots-vertical:before {content: "\e00d";}
+.wbli-text-square:before {content: "\e00e";}
+.wbli-text-select:before {content: "\e00f";}
+.wbli-tag:before {content: "\e010";}
+.wbli-tablet:before {content: "\e011";}
+.wbli-subtitle:before {content: "\e012";}
+.wbli-structure-check:before {content: "\e013";}
+.wbli-stripe:before {content: "\e014";}
+.wbli-stars:before {content: "\e015";}
+.wbli-sort-by-up:before {content: "\e016";}
+.wbli-share:before {content: "\e017";}
+.wbli-settings:before {content: "\e018";}
+.wbli-second-bracket-square:before {content: "\e019";}
+.wbli-search:before {content: "\e01a";}
+.wbli-search-magnifier:before {content: "\e01b";}
+.wbli-search-area:before {content: "\e01c";}
+.wbli-screen:before {content: "\e01d";}
+.wbli-sad-dizzy:before {content: "\e01e";}
+.wbli-right-arrow:before {content: "\e01f";}
+.wbli-responsive:before {content: "\e020";}
+.wbli-reset:before {content: "\e021";}
+.wbli-quotes:before {content: "\e022";}
+.wbli-question:before {content: "\e023";}
+.wbli-puzzle:before {content: "\e024";}
+.wbli-property-edit:before {content: "\e025";}
+.wbli-plug:before {content: "\e026";}
+.wbli-pencil-edit:before {content: "\e027";}
+.wbli-paypal:before {content: "\e028";}
+.wbli-payment:before {content: "\e029";}
+.wbli-nowrap:before {content: "\e02a";}
+.wbli-move:before {content: "\e02b";}
+.wbli-move-up:before {content: "\e02c";}
+.wbli-move-left:before {content: "\e02d";}
+.wbli-move-down:before {content: "\e02e";}
+.wbli-mobile:before {content: "\e02f";}
+.wbli-message-preview:before {content: "\e030";}
+.wbli-menu-square:before {content: "\e031";}
+.wbli-menu-square-selected:before {content: "\e032";}
+.wbli-maps-location:before {content: "\e033";}
+.wbli-map-pinpoint:before {content: "\e034";}
+.wbli-map-pin:before {content: "\e035";}
+.wbli-map-marker:before {content: "\e036";}
+.wbli-login-method:before {content: "\e037";}
+.wbli-location:before {content: "\e038";}
+.wbli-locate:before {content: "\e039";}
+.wbli-loading:before {content: "\e03a";}
+.wbli-listdom-logo:before {content: "\e03b";}
+.wbli-list-view:before {content: "\e03c";}
+.wbli-link-square:before {content: "\e03d";}
+.wbli-left-to-right-list-star:before {content: "\e03e";}
+.wbli-layout:before {content: "\e03f";}
+.wbli-label-important:before {content: "\e040";}
+.wbli-key:before {content: "\e041";}
+.wbli-justify-space-evenly:before {content: "\e042";}
+.wbli-justify-space-between:before {content: "\e043";}
+.wbli-justify-space-around:before {content: "\e044";}
+.wbli-justify-flex-start:before {content: "\e045";}
+.wbli-justify-flex-end:before {content: "\e046";}
+.wbli-justify-center:before {content: "\e047";}
+.wbli-job-link:before {content: "\e048";}
+.wbli-inbox:before {content: "\e049";}
+.wbli-image-composition-oval:before {content: "\e04a";}
+.wbli-identity-card:before {content: "\e04b";}
+.wbli-hot-price:before {content: "\e04c";}
+.wbli-header:before {content: "\e04d";}
+.wbli-hashtag:before {content: "\e04e";}
+.wbli-group-items:before {content: "\e04f";}
+.wbli-google-places:before {content: "\e050";}
+.wbli-git-fork:before {content: "\e051";}
+.wbli-general:before {content: "\e052";}
+.wbli-frontend-dashboard:before {content: "\e053";}
+.wbli-footer:before {content: "\e054";}
+.wbli-floppy-disk:before {content: "\e055";}
+.wbli-flag:before {content: "\e056";}
+.wbli-first-aid-kit:before {content: "\e057";}
+.wbli-file:before {content: "\e058";}
+.wbli-file-upload:before {content: "\e059";}
+.wbli-file-script:before {content: "\e05a";}
+.wbli-file-import-export:before {content: "\e05b";}
+.wbli-file-edit-pencil:before {content: "\e05c";}
+.wbli-file-download:before {content: "\e05d";}
+.wbli-file-audio:before {content: "\e05e";}
+.wbli-eye:before {content: "\e05f";}
+.wbli-excel:before {content: "\e060";}
+.wbli-down-arrow-s:before {content: "\e061";}
+.wbli-database:before {content: "\e062";}
+.wbli-dashboard-square-add:before {content: "\e063";}
+.wbli-dashboard-circle-edit:before {content: "\e064";}
+.wbli-dash-s:before {content: "\e065";}
+.wbli-dash-circle-fill:before {content: "\e066";}
+.wbli-customizer:before {content: "\e067";}
+.wbli-custom-field:before {content: "\e068";}
+.wbli-curvy-right-direction:before {content: "\e069";}
+.wbli-cursor-pointer:before {content: "\e06a";}
+.wbli-cursor-pointer-1:before {content: "\e06b";}
+.wbli-csv:before {content: "\e06c";}
+.wbli-cross:before {content: "\e06d";}
+.wbli-copy:before {content: "\e06e";}
+.wbli-computer-video:before {content: "\e06f";}
+.wbli-comment:before {content: "\e070";}
+.wbli-clipboard-clock:before {content: "\e071";}
+.wbli-checkmark-circle:before {content: "\e072";}
+.wbli-checkmark-circle-fill:before {content: "\e073";}
+.wbli-chart-relationship:before {content: "\e074";}
+.wbli-chart-increase:before {content: "\e075";}
+.wbli-card:before {content: "\e076";}
+.wbli-card-exchang:before {content: "\e077";}
+.wbli-calling:before {content: "\e078";}
+.wbli-bubble-chat-question:before {content: "\e079";}
+.wbli-bank:before {content: "\e07a";}
+.wbli-auction:before {content: "\e07b";}
+.wbli-arrow-turn-backward:before {content: "\e07c";}
+.wbli-api:before {content: "\e07d";}
+.wbli-align-stretch:before {content: "\e07e";}
+.wbli-align-flex-start:before {content: "\e07f";}
+.wbli-align-flex-end:before {content: "\e080";}
+.wbli-align-center:before {content: "\e081";}
+.wbli-alert:before {content: "\e082";}
+.wbli-ai-search:before {content: "\e083";}
+.wbli-advanced:before {content: "\e084";}
+.wbli-add-team:before {content: "\e085";}
+.wbli-add-plus:before {content: "\e086";}
+.wbli-add-plus-s:before {content: "\e087";}
+.wbli-add-plus-circle:before {content: "\e088";}
+.wbli-acf:before {content: "\e089";}
+.wbli-account:before {content: "\e08a";}

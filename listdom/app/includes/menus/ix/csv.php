@@ -9,6 +9,7 @@ class LSD_Menus_IX_CSV extends LSD_Base
         add_action('wp_ajax_lsd_ix_csv_import', [$this, 'import']);
         add_action('wp_ajax_lsd_ix_csv_load_template', [$this, 'template']);
         add_action('wp_ajax_lsd_ix_csv_ai_mapping', [$this, 'ai_mapping']);
+        add_action('wp_ajax_lsd_ix_csv_provision_custom_fields', [$this, 'provision_custom_fields']);
         add_action('wp_ajax_lsd_ix_csv_export_init', [$this, 'export_init']);
         add_action('wp_ajax_lsd_ix_csv_export_chunk', [$this, 'export_chunk']);
         add_action('wp_ajax_lsd_ix_csv_export_download', [$this, 'export_download']);
@@ -379,7 +380,53 @@ class LSD_Menus_IX_CSV extends LSD_Base
         ]);
     }
 
-    public function mapping_form($file, $type = 'listings')
+    public function provision_custom_fields()
+    {
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+        if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
+        if (!wp_verify_nonce($wpnonce, 'lsd_ix_csv_provision_custom_fields')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
+        if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
+        if (!current_user_can('manage_categories')) $this->response(['success' => 0, 'code' => 'NO_CUSTOM_FIELD_ACCESS']);
+
+        $ix = isset($_POST['ix']) && is_array($_POST['ix']) ? wp_unslash($_POST['ix']) : [];
+        $file = isset($ix['file']) ? sanitize_file_name($ix['file']) : '';
+        $type = isset($ix['type']) ? LSD_IX::normalize_import_type(sanitize_text_field($ix['type'])) : 'listings';
+        $fields = isset($ix['custom_fields']) && is_array($ix['custom_fields']) ? $ix['custom_fields'] : [];
+        $mapping = isset($ix['mapping']) && is_array($ix['mapping']) ? $ix['mapping'] : [];
+        $options = ['hierarchical_terms' => !empty($ix['hierarchical_terms'])];
+
+        if (!$file) $this->response(['success' => 0, 'code' => 'FILE_MISSED']);
+        if ($type !== 'listings') $this->response(['success' => 0, 'code' => 'INVALID_IMPORT_TYPE']);
+
+        $path = $this->get_upload_path() . $file;
+        if (!LSD_File::exists($path)) $this->response(['success' => 0, 'code' => 'FILE_NOT_FOUND']);
+
+        $result = (new LSD_IX_Custom_Fields())->provision($fields, $mapping);
+        if (empty($result['success']))
+        {
+            $created = $result['created'] ?? [];
+            $this->response([
+                'success' => 0,
+                'message' => count($created)
+                    ? esc_html__('Some custom fields were created. Review the errors before importing.', 'listdom')
+                    : esc_html__('Custom fields could not be created.', 'listdom'),
+                'errors' => $result['errors'] ?? [],
+                'warnings' => $result['warnings'] ?? [],
+                'created' => $created,
+                'output' => count($created) ? $this->mapping_form($file, $type, $result['mapping'] ?? [], $options) : '',
+            ]);
+        }
+
+        $this->response([
+            'success' => 1,
+            'message' => esc_html__('Custom fields are ready to map.', 'listdom'),
+            'warnings' => $result['warnings'] ?? [],
+            'created' => $result['created'] ?? [],
+            'output' => $this->mapping_form($file, $type, $result['mapping'] ?? [], $options),
+        ]);
+    }
+
+    public function mapping_form($file, $type = 'listings', array $mapping = [], array $options = [])
     {
         // Generate output
         return $this->include_html_file('menus/ix/tabs/csv/mapping.php', [
@@ -387,6 +434,8 @@ class LSD_Menus_IX_CSV extends LSD_Base
             'parameters' => [
                 'file' => $file,
                 'type' => $type,
+                'current_mapping' => $mapping,
+                'current_options' => $options,
             ],
         ]);
     }

@@ -22,7 +22,7 @@ abstract class LSD_AI_Models_Google extends LSD_AI_Models_Base
             ],
             'generationConfig' => [
                 'temperature' => $temperature,
-                'maxOutputTokens' => 2048,
+                'maxOutputTokens' => 8192,
             ],
         ];
 

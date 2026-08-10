@@ -6,14 +6,7 @@ defined('ABSPATH') || die();
 /** @var string $thank_you */
 /** @var bool $show_appreciation_invoice_button */
 /** @var string $appreciation_invoice_base */
-
-// General Settings
-$settings = LSD_Options::settings();
-
-// Dashboard Page
-$dashboard_page_id = isset($settings['submission_page']) && $settings['submission_page'] ? $settings['submission_page'] : 0;
-
-$url = add_query_arg(['mode' => 'manage'], get_permalink($dashboard_page_id));
+/** @var string $dashboard_url */
 ?>
 <div class="lsd-checkout-processing lsd-util-hide">
     <span class="lsd-checkout-processing-icon">
@@ -37,9 +30,11 @@ $url = add_query_arg(['mode' => 'manage'], get_permalink($dashboard_page_id));
                 </a>
             </div>
         <?php endif; ?>
-        <a class="lsd-general-button lsd-color-white-txt" href="<?php echo esc_url($url); ?>">
-            <i class="fa-solid fa-long-arrow-right"></i>
-            <?php esc_html_e('Go to Dashboard', 'listdom'); ?>
-        </a>
+        <?php if (trim($dashboard_url) !== ''): ?>
+            <a class="lsd-general-button lsd-color-white-txt" href="<?php echo esc_url($dashboard_url); ?>">
+                <i class="fa-solid fa-long-arrow-right"></i>
+                <?php esc_html_e('Go to Dashboard', 'listdom'); ?>
+            </a>
+        <?php endif; ?>
     </div>
 </div>

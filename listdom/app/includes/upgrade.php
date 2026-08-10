@@ -1050,7 +1050,35 @@ class LSD_Upgrade extends LSD_Base
 
     private function v570()
     {
+        $this->ai_visibility_upgrade_defaults();
         $this->shortcode_table_columns();
+    }
+
+    /**
+     * Keep AI visibility opt-in for upgraded sites.
+     * @return void
+     */
+    private function ai_visibility_upgrade_defaults()
+    {
+        // Stored Settings
+        $settings = get_option('lsd_settings', []);
+        if (!is_array($settings)) $settings = [];
+        $current = isset($settings['ai_visibility']) && is_array($settings['ai_visibility']) ? $settings['ai_visibility'] : [];
+
+        // Upgrade Defaults
+        $ai_visibility = array_merge([
+            'structured_data' => 0,
+            'public_feed' => 0,
+            'llms_txt' => 0,
+            'robots_txt' => 0,
+            'html_links' => 0,
+            'include_verified_status' => 0,
+            'include_reviews' => 0,
+            'include_booking_summary' => 0,
+            'fields' => LSD_AI_Visibility::field_defaults(),
+        ], $current);
+
+        LSD_Options::merge('lsd_settings', ['ai_visibility' => $ai_visibility]);
     }
 
     private function primary_categories()

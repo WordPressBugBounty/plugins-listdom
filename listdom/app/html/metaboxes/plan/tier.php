@@ -89,17 +89,17 @@ if ($type === 'recurring' && !$recurring_available) $type = 'one_time';
                 </div>
             <?php endif; ?>
         </div>
-        <div class="lsd-plan-tier-expiry-wrapper<?php echo ($recurring_available && $type === 'recurring') ? '' : ' lsd-util-hide'; ?>">
+        <div class="lsd-plan-tier-expiry-wrapper">
             <?php echo LSD_Form::label([
                 'for' => 'lsd_tiers_' . $index . '_expiry',
-                'title' => esc_html__('Expiry (days)', 'listdom'),
+                'title' => esc_html__('Expiry Duration (Days)', 'listdom'),
             ]); ?>
             <?php echo LSD_Form::number([
                 'id' => 'lsd_tiers_' . $index . '_expiry',
                 'name' => 'lsd_tiers[' . $index . '][expiry]',
                 'value' => $expiry,
                 'required' => $recurring_available && $type === 'recurring',
-                'placeholder' => esc_attr__('Expiry (days)', 'listdom'),
+                'placeholder' => esc_attr__('Expiry Duration (Days)', 'listdom'),
                 'class' => 'lsd-plan-tier-expiry',
                 'attributes' => [
                     'min' => '1',

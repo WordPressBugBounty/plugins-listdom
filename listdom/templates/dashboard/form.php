@@ -4,65 +4,27 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Shortcodes_Dashboard $this */
 
-// Entity
-$entity = new LSD_Entity_Listing($this->post->ID);
+// Helpers
 $taxonomies = new LSD_Dashboard_Taxonomies_Terms();
-
-// Category
-$category = $entity->get_data_category();
-
-// All Categories
-$all_categories = LSD_Taxonomies_Category::get_terms();
-
-// Default Category Selection
-$uncategorized_id = LSD_Main::get_uncategorized_category_id();
-$selected_category_id = $category && isset($category->term_id)
-    ? $category->term_id
-    : (is_array($all_categories) && count($all_categories) === 1
-        ? $all_categories[0]->term_id
-        : ($uncategorized_id ?: null));
-
-// Objects
 $postType = new LSD_PTypes_Listing();
 
+$form_columns = $this->form_columns ?? 2;
+$selected_category_id = $this->get_dashboard_form_selected_category_id();
 $gallery_max_size = $this->settings['submission_max_image_upload_size'] ?? '';
-$image_aspect_ratio = $this->settings['submission_image_aspect_ratio'] ?? '';
-$image_aspect_ratio = is_string($image_aspect_ratio) ? trim($image_aspect_ratio) : '';
-$image_aspect_ratio_message = $image_aspect_ratio !== ''
+$featured_image_aspect_ratio = trim((string) ($this->settings['submission_image_aspect_ratio'] ?? ''));
+$featured_image_aspect_ratio_message = $featured_image_aspect_ratio !== ''
     ? sprintf(
         /* translators: %s: Required aspect ratio for images. */
         esc_html__('Please upload an image with an aspect ratio close to %s.', 'listdom'),
-        $image_aspect_ratio
+        $featured_image_aspect_ratio
     )
     : '';
-$image_placeholder = LSD_Form::image_placeholder_data('large');
-$image_placeholder_src = $image_placeholder['src'] ?? '';
-
-// Forced Status by Settings
-$forced_listing_status = $this->settings['dashboard_listing_status'] ?? '';
-
-// Privacy Consent
-$privacy = LSD_Options::privacy();
-
-$dashboard_privacy_field = LSD_Privacy::consent_field([
-    'id' => 'lsd_dashboard_privacy_consent_' . $this->post->ID,
-    'name' => 'lsd[privacy_consent]',
-    'checked' => $privacy['privacy_consent']['submission_pc_enabled'] ?? 0,
-    'wrapper_class' => 'lsd-dashboard-privacy-consent-field',
-    'context' => 'dashboard',
-]);
-
-$form_columns = $this->form_columns ?? 2;
-$job_addon_installed = class_exists(LSDADDJOB::class) || class_exists(\LSDPACJOB\Base::class) ? 1 : 0;
-
-$classes = ['lsd-dashboard', 'lsd-dashboard-form'];
-if ($form_columns === 1) $classes[] = 'lsd-dashboard-form-single-column';
-
+$featured_image_placeholder = LSD_Form::image_placeholder_data('large');
 $dashboard_wrapper = $this->get_dashboard_wrapper([
-    'classes' => $classes,
+    'classes' => array_filter(['lsd-dashboard', 'lsd-dashboard-form', $form_columns === 1 ? 'lsd-dashboard-form-single-column' : '',]),
     'attributes' => [
-        'data-form-columns' => (int) $form_columns,
-        'data-job-addon-installed' => $job_addon_installed,
+        'data-form-columns' => $form_columns,
+        'data-job-addon-installed' => class_exists(LSDADDJOB::class) || class_exists(\LSDPACJOB\Base::class) ? 1 : 0,
     ],
 ]);
 
@@ -177,105 +139,15 @@ jQuery(document).ready(function()
 							</div>
 							<?php endif; ?>
 
+                            <?php $this->dashboard_form_submit(true); ?>
+
                             <?php if ($form_columns === 1): ?>
-                                <div class="lsd-fe-box-white">
-                                    <div class="lsd-dashboard-submit lsd-dashboard-box lsd-dashboard-submit">
-                                        <input type="hidden" name="id" value="<?php echo esc_attr($this->post->ID); ?>" id="lsd_dashboard_id">
-                                        <input type="hidden" name="action" value="lsd_dashboard_listing_save">
-
-                                        <?php LSD_Form::nonce('lsd_dashboard'); ?>
-                                        <?php /* Security Nonce */ LSD_Form::nonce('lsd_listing_cpt', '_lsdnonce'); ?>
-
-                                        <div class="lsd-fe-subsections">
-                                            <?php if ((!$forced_listing_status || $this->post->ID > 0) && current_user_can('publish_posts')): ?>
-                                                <div class="lsd-dashboard-listing-status">
-                                                    <?php echo LSD_Form::select([
-                                                        'id' => 'lsd_listing_status',
-                                                        'name' => 'lsd[listing_status]',
-                                                        'value' => $this->post->post_status ?? 'publish',
-                                                        'options' => [
-                                                            'publish' => esc_html__('Published', 'listdom'),
-                                                            'pending' => esc_html__('Pending Review', 'listdom'),
-                                                            'draft' => esc_html__('Draft', 'listdom'),
-                                                        ],
-                                                        'required' => true,
-                                                    ]); ?>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <?php if ($dashboard_privacy_field !== ''): ?>
-                                                <div class="lsd-dashboard-privacy-consent">
-                                                    <?php echo LSD_Kses::form($dashboard_privacy_field); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <div class="lsd-dashboard-submit-wrapper">
-                                            <div class="lsd-dashboard-grecaptcha">
-                                                <?php echo LSD_Main::grecaptcha_field(); ?>
-                                            </div>
-
-                                            <button type="submit" class="lsd-general-button <?php echo esc_attr($this->get_text_class()); ?>">
-                                                <?php esc_html_e('Save', 'listdom'); ?>
-                                                <i class="lsd-fe-icon fa-solid fa-long-arrow-right"></i>
-                                            </button>
-                                        </div>
-
-                                        <?php do_action('lsd_dashboard_after_submit_button', $this); ?>
-                                    </div>
-
-                                    <div id="lsd_dashboard_form_message"></div>
-                                </div>
+                                <div id="lsd_dashboard_form_message"></div>
                             <?php endif; ?>
 						</div>
                     </div>
                     <div class="lsd-dashboard-form-right-column lsd-fe-sections">
-
-                        <?php if($form_columns === 2): ?>
-                        <div class="lsd-dashboard-box lsd-dashboard-submit lsd-fe-box-white">
-                            <input type="hidden" name="id" value="<?php echo esc_attr($this->post->ID); ?>" id="lsd_dashboard_id">
-                            <input type="hidden" name="action" value="lsd_dashboard_listing_save">
-
-                            <?php LSD_Form::nonce('lsd_dashboard'); ?>
-                            <?php /* Security Nonce */ LSD_Form::nonce('lsd_listing_cpt', '_lsdnonce'); ?>
-
-                            <div class="lsd-fe-subsections">
-                                <?php if ((!$forced_listing_status || $this->post->ID > 0) && current_user_can('publish_posts')): ?>
-                                    <div class="lsd-dashboard-listing-status">
-                                        <?php echo LSD_Form::select([
-                                            'id' => 'lsd_listing_status',
-                                            'name' => 'lsd[listing_status]',
-                                            'value' => $this->post->post_status ?? 'publish',
-                                            'options' => [
-                                                'publish' => esc_html__('Published', 'listdom'),
-                                                'pending' => esc_html__('Pending Review', 'listdom'),
-                                                'draft' => esc_html__('Draft', 'listdom'),
-                                            ],
-                                            'required' => true,
-                                        ]); ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if ($dashboard_privacy_field !== ''): ?>
-                                    <div class="lsd-dashboard-privacy-consent">
-                                        <?php echo LSD_Kses::form($dashboard_privacy_field); ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="lsd-dashboard-submit-wrapper">
-                                <div class="lsd-dashboard-grecaptcha">
-                                    <?php echo LSD_Main::grecaptcha_field(); ?>
-                                </div>
-
-                                <button type="submit" class="lsd-general-button <?php echo esc_attr($this->get_text_class()); ?>">
-                                    <?php esc_html_e('Save', 'listdom'); ?>
-                                    <i class="lsd-fe-icon fa-solid fa-long-arrow-right"></i>
-                                </button>
-                            </div>
-                            <?php do_action('lsd_dashboard_after_submit_button', $this); ?>
-                        </div>
-                        <?php endif; ?>
+                        <?php $this->dashboard_form_submit(); ?>
                         <div class="lsd-dashboard-box lsd-dashboard-category lsd-fe-box-white">
                             <div class="lsd-fe-section-heading">
                                 <h4 class="lsd-fe-title"><?php echo esc_html__('Category', 'listdom').' '.LSD_Base::REQ_HTML; ?></h4>
@@ -419,7 +291,7 @@ jQuery(document).ready(function()
                                     $has_featured_image = trim($featured_image) !== '';
                                 ?>
                                 <div id="lsd_listing_featured_image_message"></div>
-                                <div id="lsd_dashboard_featured_image_placeholder" class="lsd-image-placeholder<?php echo $has_featured_image ? ' lsd-image-placeholder-has-image' : ''; ?>" data-placeholder="<?php echo esc_attr($image_placeholder_src); ?>">
+                                <div id="lsd_dashboard_featured_image_placeholder" class="lsd-image-placeholder<?php echo $has_featured_image ? ' lsd-image-placeholder-has-image' : ''; ?>" data-placeholder="<?php echo esc_attr($featured_image_placeholder['src'] ?? ''); ?>">
                                     <div class="lsd-image-placeholder-inner">
                                         <div id="lsd_dashboard_featured_image_preview" class="lsd-image-placeholder-preview<?php echo $has_featured_image ? '' : ' lsd-util-hide'; ?>">
                                             <?php if ($has_featured_image): ?>
@@ -433,7 +305,7 @@ jQuery(document).ready(function()
                                     </div>
                                 </div>
                                 <input type="hidden" id="lsd_featured_image" name="lsd[featured_image]" value="<?php echo esc_attr($attachment_id); ?>">
-                                <input class="lsd-util-hide" type="file" id="lsd_featured_image_file" data-aspect-ratio="<?php echo esc_attr($image_aspect_ratio); ?>"<?php echo $image_aspect_ratio_message !== '' ? ' data-aspect-message="' . esc_attr($image_aspect_ratio_message) . '"' : ''; ?>>
+                                <input class="lsd-util-hide" type="file" id="lsd_featured_image_file" data-aspect-ratio="<?php echo esc_attr($featured_image_aspect_ratio); ?>"<?php echo $featured_image_aspect_ratio_message !== '' ? ' data-aspect-message="' . esc_attr($featured_image_aspect_ratio_message) . '"' : ''; ?>>
                                 <div class="lsd-dashboard-feature-image-remove-wrapper lsd-mt-3">
                                     <span id="lsd_featured_image_remove_button" class="lsd-remove-image-button <?php echo esc_attr($this->get_text_class()); ?> <?php echo $has_featured_image ? '' : 'lsd-util-hide'; ?>">
                                         <?php esc_html_e('Remove Image', 'listdom'); ?>

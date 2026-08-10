@@ -26,7 +26,8 @@ if(!count($enableds)) return '';
 <div class="lsd-view-sortbar-wrapper<?php echo $sort_style ? ' lsd-sort-style-'. esc_attr($sort_style) : ''; ?>">
 	<ul class="lsd-sortbar-list">
 		<?php foreach($enableds as $key => $option): ?>
-                <li data-orderby="<?php echo esc_attr($key); ?>" data-order="<?php echo ($this->orderby == $key ? ($this->order == 'DESC' ? 'ASC' : 'DESC') : (isset($option['sort']) ? esc_attr($option['sort']) : 'DESC')); ?>" class="<?php echo ($this->orderby == $key ? 'lsd-active' : ''); ?>">
+                <?php $default_order = $option['sort'] ?? ($option['order'] ?? 'DESC'); ?>
+                <li data-orderby="<?php echo esc_attr($key); ?>" data-order="<?php echo ($this->orderby == $key ? ($this->order == 'DESC' ? 'ASC' : 'DESC') : esc_attr($default_order)); ?>" class="<?php echo ($this->orderby == $key ? 'lsd-active' : ''); ?>">
                         <?php echo esc_html($option['name']); ?>
 			<?php if($this->orderby == $key): ?>
 			<i class="lsd-fe-icon fas fa-sort-amount-<?php echo ($this->order == 'DESC' ? 'down' : 'up'); ?>" aria-hidden="true"></i>

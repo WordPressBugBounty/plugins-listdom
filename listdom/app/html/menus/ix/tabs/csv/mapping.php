@@ -5,6 +5,8 @@ defined('ABSPATH') || die();
 /** @var string $file */
 /** @var string $type */
 /** @var LSD_Menus_IX_CSV $this */
+/** @var array $current_mapping */
+/** @var array $current_options */
 
 // Main Library
 $main = new LSD_Main();
@@ -23,6 +25,9 @@ $url = $main->get_upload_url().$file;
 $mapping = new LSD_IX_Mapping();
 $f_fields = $mapping->feed_fields($path);
 $l_fields = $mapping->fields_for_type($type);
+$field_samples = $type === 'listings' ? $mapping->feed_field_samples($path) : [];
+$current_mapping = isset($current_mapping) && is_array($current_mapping) ? $current_mapping : [];
+$current_options = isset($current_options) && is_array($current_options) ? $current_options : [];
 
 $mapping_ai = [];
 
@@ -100,6 +105,30 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
             </div>
         </div>
 
+        <?php if ($type === 'listings'):
+            $custom_fields_config = [
+                'id' => 'lsd_ix_csv_custom_fields',
+                'form' => 'lsd_ix_csv_import_form',
+                'action' => 'lsd_ix_csv_provision_custom_fields',
+                'nonce' => wp_create_nonce('lsd_ix_csv_provision_custom_fields'),
+                'mapping' => 'lsd_ix_csv_import_mapping',
+            ];
+            $main->include_html_file('menus/ix/tabs/custom-fields.php', [
+                'parameters' => [
+                    'f_fields' => $f_fields,
+                    'field_samples' => $field_samples,
+                    'custom_fields_config' => $custom_fields_config,
+                ],
+            ]);
+            $main->include_html_file('menus/ix/tabs/repeater-fields.php', [
+                'parameters' => [
+                    'mapping' => $mapping,
+                    'f_fields' => $f_fields,
+                    'current_mapping' => $current_mapping,
+                ],
+            ]);
+        endif; ?>
+
         <div class="lsd-ix-mapping-fields-wrap">
             <table class="lsd-admin-table">
                 <thead>
@@ -135,12 +164,23 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                         </td>
                         <td class="lsd-ix-mapping-field-type-col lsd-admin-table-body"><?php echo isset($l_field['type']) ? ucfirst($l_field['type']) : ''; ?></td>
                         <td class="lsd-ix-mapping-field-map-col">
+                            <?php if ($type === 'listings' && LSD_IX_Mapping::is_listing_taxonomy($key)): ?>
+                                <?php $main->include_html_file('menus/ix/tabs/taxonomy-fields.php', [
+                                    'parameters' => [
+                                        'key' => $key,
+                                        'f_fields' => $f_fields,
+                                        'field_samples' => $field_samples,
+                                        'current_mapping' => $current_mapping,
+                                    ],
+                                ]); ?>
+                            <?php else: ?>
                             <select class="lsd-admin-input" id="lsd_ix_mapping_field_<?php echo esc_attr($key); ?>_map" name="ix[mapping][<?php echo esc_attr($key); ?>][map]" title="<?php esc_attr_e('Map', 'listdom'); ?>">
                                 <option value="">-----</option>
                                 <?php foreach ($f_fields as $f_key => $f_field): ?>
-                                <option value="<?php echo esc_attr($f_key); ?>"><?php echo esc_html($f_field); ?></option>
+                                <option value="<?php echo esc_attr($f_key); ?>" <?php echo isset($current_mapping[$key]['map']) && (string) $current_mapping[$key]['map'] === (string) $f_key ? 'selected="selected"' : ''; ?>><?php echo esc_html($f_field); ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <?php endif; ?>
                         </td>
                         <td class="lsd-ix-mapping-field-default-col">
                             <?php if (isset($l_field['default']) && $l_field['default'] && is_callable($l_field['default'])) call_user_func($l_field['default'], [
@@ -148,6 +188,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                                 'field' => $l_field,
                                 'class' => 'lsd-admin-input',
                                 'name' => 'ix[mapping]['.$key.'][default]',
+                                'value' => $current_mapping[$key]['default'] ?? '',
                             ]); ?>
                         </td>
                     </tr>
@@ -170,7 +211,7 @@ if (!$ai->has_access(LSD_AI::TASK_MAPPING))
                     <?php echo LSD_Form::switcher([
                         'id' => 'lsd_ix_csv_hierarchical_terms',
                         'name' => 'ix[hierarchical_terms]',
-                        'value' => 0,
+                        'value' => !empty($current_options['hierarchical_terms']) ? 1 : 0,
                     ]); ?>
                     <?php echo LSD_Form::label([
                         'for' => 'lsd_ix_csv_hierarchical_terms',
@@ -224,10 +265,16 @@ jQuery('#lsd_ix_csv_load_template_map').on('click', function ()
                     {
                         let mapping = template[key];
 
-                        jQuery('#lsd_ix_mapping_field_'+key+'_map').val(mapping.map);
-                        jQuery('#lsd_ix_mapping_field_'+key+'_default').val(mapping.default);
+                        if (window.lsd_ix_taxonomy_mappings && window.lsd_ix_taxonomy_mappings[key]) window.lsd_ix_taxonomy_mappings[key].load(mapping);
+                        else if (mapping && mapping.map !== undefined)
+                        {
+                            jQuery('#lsd_ix_mapping_field_'+key+'_map').val(mapping.map);
+                            jQuery('#lsd_ix_mapping_field_'+key+'_default').val(mapping.default);
+                        }
                     }
                 }
+
+                if (window.lsd_ix_repeaters) window.lsd_ix_repeaters.load(template);
 
                 listdom_toastify("<?php echo esc_js(esc_html__('Template mapping was successful', 'listdom')) ?>", 'lsd-success');
 
@@ -277,7 +324,8 @@ jQuery('#lsd_ix_csv_auto_map').on('click', function ()
                     if (template.hasOwnProperty(key))
                     {
                         let mapping = template[key];
-                        jQuery('#lsd_ix_mapping_field_'+key+'_map').val(mapping);
+                        if (window.lsd_ix_taxonomy_mappings && window.lsd_ix_taxonomy_mappings[key]) window.lsd_ix_taxonomy_mappings[key].load({map: mapping});
+                        else jQuery('#lsd_ix_mapping_field_'+key+'_map').val(mapping);
                     }
                 }
 

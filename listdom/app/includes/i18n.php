@@ -2,14 +2,19 @@
 
 class LSD_i18n
 {
+    protected bool $loaded = false;
+
     public function init()
     {
-        // Register Language Files
-        add_action('init', [$this, 'load_languages']);
+        // Some plugin strings are resolved before `init`, so load the textdomain on
+        // `plugins_loaded` to prevent WordPress from triggering just-in-time loading too early.
+        add_action('plugins_loaded', [$this, 'load_languages']);
     }
 
     public function load_languages()
     {
+        if ($this->loaded) return;
+
         // Listdom File
         $file = new LSD_File();
 
@@ -29,6 +34,8 @@ class LSD_i18n
         {
             load_plugin_textdomain('listdom', false, dirname(LSD_BASENAME) . '/i18n/languages/');
         }
+
+        $this->loaded = true;
     }
 
     public static function set($locale)

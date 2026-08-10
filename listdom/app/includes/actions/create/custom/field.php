@@ -50,7 +50,11 @@ class LSD_Actions_Create_Custom_Field extends LSD_Actions_Action
 
         $values = $input['values'];
         if (!count($values) && $input['values_text'] !== '') $values = preg_split('/[\s,]+/', $input['values_text']);
-        $values = array_values(array_filter(array_map('sanitize_text_field', is_array($values) ? $values : [])));
+        $values = array_map('sanitize_text_field', is_array($values) ? $values : []);
+        $values = array_values(array_filter($values, static function ($value)
+        {
+            return $value !== '';
+        }));
 
         if (in_array($input['field_type'], ['dropdown', 'radio', 'checkbox'], true) && !count($values))
         {

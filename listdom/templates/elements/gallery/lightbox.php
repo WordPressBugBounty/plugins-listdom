@@ -16,7 +16,7 @@ $gallery = $this->get_gallery($post_id , $include_thumbnail);
 // There is no Gallery!
 if(!count($gallery)) return '';
 
-$imageItemProp = 'itemprop="https://schema.org/image"';
+$imageItemProp = LSD_Schema::suppressing_markup() ? '' : 'itemprop="https://schema.org/image"';
 ?>
 <div class="lsd-image-gallery <?php echo $lightbox ? 'lsd-image-lightbox' : ''; ?>" <?php echo lsd_schema()->scope()->type('https://schema.org/ImageGallery'); ?>>
     <?php

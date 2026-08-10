@@ -492,11 +492,18 @@ class LSD_User extends LSD_Base
         $reset_key = get_password_reset_key($user);
         if (is_wp_error($reset_key)) return false;
 
-        $reset_link = network_site_url("wp-login.php?action=rp&key=$reset_key&login=" . rawurlencode($user->user_login), 'login');
+        $reset_link = self::password_reset_url($user->user_login, $reset_key);
+
+        if (is_multisite()) $site_name = get_network()->site_name;
+        else $site_name = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
         // Send password reset email
         $message = esc_html__('Someone has requested a password reset for the following account:', 'listdom') . "\r\n\r\n";
-        $message .= network_home_url('/') . "\r\n\r\n";
+        $message .= sprintf(
+            /* translators: %s: Site name. */
+            esc_html__('Site Name: %s', 'listdom'),
+            $site_name
+        ) . "\r\n\r\n";
         $message .= sprintf(
             /* translators: %s: Username for the account. */
             esc_html__('Username: %s', 'listdom'),
@@ -504,9 +511,103 @@ class LSD_User extends LSD_Base
         ) . "\r\n\r\n";
         $message .= esc_html__('If this was a mistake, just ignore this email and nothing will happen.', 'listdom') . "\r\n\r\n";
         $message .= esc_html__('To reset your password, visit the following address:', 'listdom') . "\r\n\r\n";
-        $message .= '<a href="' . esc_url($reset_link) . '">' . esc_url($reset_link) . '</a>' . "\r\n";
+        $message .= '<' . $reset_link . ">\r\n";
 
-        return wp_mail($user->user_email, esc_html__('Password Reset Request', 'listdom'), $message);
+        $title = sprintf(
+            /* translators: %s: Site name. */
+            esc_html__('[%s] Password Reset', 'listdom'),
+            $site_name
+        );
+
+        $title = apply_filters('retrieve_password_title', $title, $user->user_login, $user);
+
+        $default_message = $message;
+        $message = apply_filters('retrieve_password_message', $message, $reset_key, $user->user_login, $user);
+
+        // Match WordPress behavior: a falsey filtered message suppresses the email.
+        if (!$message) return true;
+
+        $html_message = self::password_reset_email_html($message, $default_message, $reset_link);
+
+        return wp_mail($user->user_email, wp_specialchars_decode($title), $html_message, ['Content-Type: text/html; charset=UTF-8']);
+    }
+
+    public static function password_reset_email_html(string $message, string $default_message, string $reset_link): string
+    {
+        if (self::password_reset_email_contains_html($message)) return $message;
+
+        $html_message = wpautop(esc_html($message));
+        $link = self::password_reset_email_link($message, $default_message, $reset_link);
+
+        if (!$link) return $html_message;
+
+        $html_message .= '<p><a href="' . esc_url($link) . '">' . esc_html__('Reset your password', 'listdom') . '</a></p>';
+        $html_message .= '<p><a href="' . esc_url($link) . '">' . esc_html($link) . '</a></p>';
+
+        return $html_message;
+    }
+
+    public static function password_reset_email_link(string $message, string $default_message, string $reset_link): string
+    {
+        if ($message === $default_message) return $reset_link;
+
+        $prefix = strstr($default_message, '<' . $reset_link . '>', true);
+        if (is_string($prefix) && $prefix !== '')
+        {
+            $start = strpos($message, $prefix);
+            if ($start !== false)
+            {
+                $line = substr($message, $start + strlen($prefix));
+                $line = preg_split("/\r\n|\n|\r/", $line, 2)[0] ?? '';
+                $urls = wp_extract_urls($line);
+
+                if (count($urls) === 1) return $urls[0];
+            }
+        }
+
+        return '';
+    }
+
+    public static function password_reset_email_contains_html(string $message): bool
+    {
+        $without_plaintext_tokens = preg_replace([
+            '/<https?:\/\/[^>\s]+>/i',
+            '/<[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}>/i',
+        ], '', $message);
+
+        if (!is_string($without_plaintext_tokens)) $without_plaintext_tokens = $message;
+
+        return $without_plaintext_tokens !== wp_strip_all_tags($without_plaintext_tokens);
+    }
+
+    public static function password_reset_url(string $user_login, string $reset_key): string
+    {
+        $auth = LSD_Options::auth();
+
+        $custom_form_enabled = !empty($auth['auth']['forgot_password_form']) && empty($auth['auth']['hide_forgot_password_form']);
+        $custom_page_id = isset($auth['auth']['forgot_password_page']) ? absint($auth['auth']['forgot_password_page']) : 0;
+
+        if ($custom_form_enabled && $custom_page_id)
+        {
+            $page = get_post($custom_page_id);
+
+            if ($page instanceof WP_Post && $page->post_type === 'page' && $page->post_status === 'publish')
+            {
+                $url = get_permalink($page);
+
+                if (is_string($url) && trim($url))
+                {
+                    return add_query_arg([
+                        'tab' => 'lostpassword',
+                        'action' => 'rp',
+                        'key' => $reset_key,
+                        'login' => $user_login,
+                    ], $url);
+                }
+            }
+        }
+
+        return network_site_url("wp-login.php?action=rp&key=$reset_key&login=" . rawurlencode($user_login), 'login');
     }
 
     public static function profile_link(int $id): string

@@ -12,7 +12,8 @@ $shortcode = LSD_Payload::get('shortcode');
 $assets = new LSD_Assets();
 
 // Listing Image
-$image = get_the_post_thumbnail($post_id, $size, ['itemprop' => 'image']);
+$image_attributes = (LSD_Schema::suppressing_markup() || LSD_Schema::suppressing_default_listing_properties()) ? [] : ['itemprop' => 'image'];
+$image = get_the_post_thumbnail($post_id, $size, $image_attributes);
 
 // No Image
 $no_image = '<img alt="' . esc_attr__('No Image', 'listdom') . '" src="' . esc_url($assets->lsd_asset_url('/img/no-image.jpg')) . '">';

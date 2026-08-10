@@ -28,10 +28,25 @@ class LSD_Breadcrumb extends LSD_Base
         $home_label = ($icon ? '<i class="lsd-fe-icon fas fa-home"></i> ' : '') . esc_html__('Home', 'listdom');
         $items[] = self::item(home_url(), $home_label, 'lsd-home-page');
 
-        if (is_singular())
+        $subject = null;
+
+        if (is_singular() && $post instanceof WP_Post)
         {
-            $items = array_merge($items, self::singular($post, $taxonomy));
+            $subject = $post;
         }
+        elseif ($post instanceof WP_Post && $post->post_type === LSD_Base::PTYPE_LISTING)
+        {
+            $subject = $post;
+        }
+        elseif (LSD_Template::is_template_builder_edit_page() || isset($_REQUEST['lsd_template_id']) || isset($_REQUEST['preview_listing']))
+        {
+            $preview_listing_id = LSD_Template::get_template_builder_preview_listing_id();
+            $preview_post = $preview_listing_id ? get_post($preview_listing_id) : null;
+
+            if ($preview_post instanceof WP_Post) $subject = $preview_post;
+        }
+
+        if ($subject instanceof WP_Post) $items = array_merge($items, self::singular($subject, $taxonomy));
 
         return implode("\n", $items);
     }
@@ -46,9 +61,11 @@ class LSD_Breadcrumb extends LSD_Base
      */
     protected static function singular($post, $taxonomy): array
     {
+        if (!$post instanceof WP_Post) return [];
+
         $items = [];
 
-        $post_type = get_post_type_object(get_post_type());
+        $post_type = get_post_type_object($post->post_type);
 
         // Post type archive link
         if ($post_type && $post_type->has_archive)
@@ -57,7 +74,7 @@ class LSD_Breadcrumb extends LSD_Base
         }
 
         // Page ancestors
-        if (is_page() && $post->post_parent)
+        if ($post->post_type === 'page' && $post->post_parent)
         {
             $ancestors = array_reverse(get_post_ancestors($post->ID));
             foreach ($ancestors as $ancestor_id)
@@ -87,7 +104,7 @@ class LSD_Breadcrumb extends LSD_Base
         }
 
         // Current post/page
-        $items[] = self::current(get_the_title(), 'lsd-current-page');
+        $items[] = self::current(get_the_title($post), 'lsd-current-page');
 
         return $items;
     }

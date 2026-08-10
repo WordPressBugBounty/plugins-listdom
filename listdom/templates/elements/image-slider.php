@@ -23,13 +23,14 @@ if (($include_featured_image === 'always' || ($include_featured_image === 'fallb
 
 // Unique Gallery
 $gallery = array_unique($gallery);
+$image_attributes = LSD_Schema::suppressing_markup() ? [] : ['itemprop' => 'image'];
 ?>
 <div class="lsd-image-slider-wrapper <?php echo (count($gallery) ? 'lsd-has-image' : ''); ?>">
     <?php if (count($gallery)): ?>
     <ul class="lsd-image-slider-slider">
         <?php foreach($gallery as $image_id): ?>
         <?php
-            $image = wp_get_attachment_image($image_id, $size, false, ['itemprop' => 'image']);
+            $image = wp_get_attachment_image($image_id, $size, false, $image_attributes);
             if (!$image) continue;
         ?>
         <li>

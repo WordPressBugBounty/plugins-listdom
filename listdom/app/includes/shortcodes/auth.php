@@ -69,7 +69,8 @@ class LSD_Shortcodes_Auth extends LSD_Base
         if (trim($pre)) return $pre;
 
 
-        $redirect = $atts['redirect'] ?? '';
+        $redirect = isset($atts['redirect']) ? wp_validate_redirect(wp_sanitize_redirect((string) $atts['redirect']), '') : '';
+        $explicit_redirect = $this->is_truthy($atts['explicit_redirect'] ?? false);
 
         // Role Restriction
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
@@ -82,7 +83,11 @@ class LSD_Shortcodes_Auth extends LSD_Base
         if (isset($_REQUEST['redirect_to']) && trim($_REQUEST['redirect_to']))
         {
             $requested_redirect = wp_sanitize_redirect(wp_unslash($_REQUEST['redirect_to']));
-            if ($requested_redirect !== '') $redirect = wp_validate_redirect($requested_redirect, $redirect);
+            if ($requested_redirect !== '')
+            {
+                $redirect = wp_validate_redirect($requested_redirect, $redirect);
+                $explicit_redirect = true;
+            }
         }
 
         // User is Already Logged-in
@@ -98,6 +103,19 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-register');
         if (trim($pre)) return $pre;
+
+        $redirect = isset($atts['redirect']) ? wp_validate_redirect(wp_sanitize_redirect((string) $atts['redirect']), '') : '';
+        $explicit_redirect = $this->is_truthy($atts['explicit_redirect'] ?? false);
+
+        if (isset($_REQUEST['redirect_to']) && trim((string) wp_unslash($_REQUEST['redirect_to'])))
+        {
+            $requested_redirect = wp_sanitize_redirect(wp_unslash($_REQUEST['redirect_to']));
+            if ($requested_redirect !== '')
+            {
+                $redirect = wp_validate_redirect($requested_redirect, $redirect);
+                $explicit_redirect = true;
+            }
+        }
 
         // Role Restriction
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
@@ -136,6 +154,19 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-auth');
         if (trim($pre)) return $pre;
+
+        $redirect = isset($atts['redirect']) ? wp_validate_redirect(wp_sanitize_redirect((string) $atts['redirect']), '') : '';
+        $explicit_redirect = $this->is_truthy($atts['explicit_redirect'] ?? false);
+
+        if (isset($_REQUEST['redirect_to']) && trim((string) wp_unslash($_REQUEST['redirect_to'])))
+        {
+            $requested_redirect = wp_sanitize_redirect(wp_unslash($_REQUEST['redirect_to']));
+            if ($requested_redirect !== '')
+            {
+                $redirect = wp_validate_redirect($requested_redirect, $redirect);
+                $explicit_redirect = true;
+            }
+        }
 
         $layout = isset($atts['layout']) ? strtolower(sanitize_text_field($atts['layout'])) : 'inline';
         $layout = $layout === 'dropdown' ? 'dropdown' : 'inline';
@@ -190,11 +221,11 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // Dashboard Page
         $dashboard_page = LSD_Options::post_id('submission_page');
 
-        $logout_link = isset($auth['logout']['redirect']) ? get_permalink($auth['logout']['redirect']) : false;
-        $logout_redirect = $logout_link ?: home_url();
+        $logout_redirect = $this->page_url($auth['logout']['redirect'] ?? 0);
+        if ($logout_redirect === '') $logout_redirect = home_url();
 
-        $account_link = isset($auth['account']['redirect']) ? get_permalink($auth['account']['redirect']) : false;
-        $account_redirect = $account_link ?: ($dashboard_page ? get_page_link($dashboard_page) : home_url());
+        $account_redirect = $this->page_url($auth['account']['redirect'] ?? 0);
+        if ($account_redirect === '') $account_redirect = $dashboard_page ? get_page_link($dashboard_page) : home_url();
 
         ob_start();
         include lsd_template('auth/auth-dropdown.php');
@@ -312,6 +343,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $redirect_to = isset($_POST['redirect_to']) && $_POST['redirect_to']
             ? wp_validate_redirect(wp_sanitize_redirect(wp_unslash($_POST['redirect_to'])))
             : '';
+        $explicit_redirect = $this->is_truthy($_POST['lsd_explicit_redirect'] ?? false);
 
         // Role Restriction
         $role = isset($_POST['lsd_role']) ? sanitize_text_field(wp_unslash($_POST['lsd_role'])) : '';
@@ -353,7 +385,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
             $this->response($response);
         }
 
-        $redirect_url = $this->role_based_redirect('login', $user, $redirect_to);
+        $redirect_url = ($explicit_redirect && $redirect_to !== '')
+            ? $this->validate_redirect($redirect_to)
+            : $this->role_based_redirect('login', $user, $redirect_to);
 
         // Valid Login
         $this->response([
@@ -535,7 +569,12 @@ class LSD_Shortcodes_Auth extends LSD_Base
             $user = get_user_by('id', $user_id);
 
             $redirect_value = isset($_POST['lsd_redirect']) ? wp_sanitize_redirect(wp_unslash($_POST['lsd_redirect'])) : '';
-            $redirect_url = $this->role_based_redirect('register', $user, wp_validate_redirect($redirect_value));
+            $redirect_value = wp_validate_redirect($redirect_value);
+            $explicit_redirect = $this->is_truthy($_POST['lsd_explicit_redirect'] ?? false);
+
+            $redirect_url = ($explicit_redirect && $redirect_value !== '')
+                ? $this->validate_redirect($redirect_value)
+                : $this->role_based_redirect('register', $user, $redirect_value);
         }
 
         $success_message = esc_html__('Registration successful.', 'listdom');
@@ -667,13 +706,10 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // No Redirect
         if (!isset($auth['logout']) || !isset($auth['logout']['redirect']) || !$auth['logout']['redirect']) return;
 
-        $page_id = $auth['logout']['redirect'];
-        $page = get_post($page_id);
+        $redirect_url = $this->page_url($auth['logout']['redirect'] ?? 0);
+        if ($redirect_url === '') return;
 
-        // Invalid or Draft Page
-        if (!$page || $page->post_status !== 'publish') return;
-
-        wp_redirect(get_permalink($page));
+        wp_redirect($redirect_url);
         exit;
     }
 
@@ -722,17 +758,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // No Page Configured
         if (!$this->option('login_form') || $this->option('hide_login_form')) return '';
 
-        // Page ID
-        $page_id = $this->option('login_page');
-
-        // Page
-        $page = get_post($page_id);
-
-        // Not a Valid Page
-        if (!$page || $page->post_status !== 'publish') return '';
-
         // Page URL
-        $page_url = get_permalink($page_id);
+        $page_url = $this->page_url($this->option('login_page'));
+        if ($page_url === '') return '';
 
         // Add Redirect
         if ($redirect && trim($redirect)) $page_url = add_query_arg('redirect_to', urlencode($redirect), $page_url);
@@ -749,17 +777,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // No Page Configured
         if (!$this->option('register_form') || $this->option('hide_register_form')) return '';
 
-        // Page ID
-        $page_id = $this->option('register_page');
-
-        // Page
-        $page = get_post($page_id);
-
-        // Not a Valid Page
-        if (!$page || $page->post_status !== 'publish') return '';
-
         // Page URL
-        $page_url = get_permalink($page_id);
+        $page_url = $this->page_url($this->option('register_page'));
+        if ($page_url === '') return '';
 
         // Add tab
         return add_query_arg('tab', 'register', $page_url);
@@ -770,17 +790,9 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // No Page Configured
         if (!$this->option('forgot_password_form') || $this->option('hide_forgot_password_form')) return '';
 
-        // Page ID
-        $page_id = $this->option('forgot_password_page');
-
-        // Page
-        $page = get_post($page_id);
-
-        // Not a Valid Page
-        if (!$page || $page->post_status !== 'publish') return '';
-
         // Page URL
-        $page_url = get_permalink($page_id);
+        $page_url = $this->page_url($this->option('forgot_password_page'));
+        if ($page_url === '') return '';
 
         // Add Redirect
         if ($redirect && trim($redirect)) $page_url = add_query_arg('redirect_to', urlencode($redirect), $page_url);
@@ -872,11 +884,8 @@ class LSD_Shortcodes_Auth extends LSD_Base
                 }
             }
 
-            if ($page_id)
-            {
-                $page = get_post($page_id);
-                if ($page && $page->post_status === 'publish') $redirect_url = get_permalink($page_id);
-            }
+            $page_url = $this->page_url($page_id);
+            if ($page_url !== '') $redirect_url = $page_url;
         }
 
         return $this->validate_redirect($redirect_url);
@@ -888,6 +897,23 @@ class LSD_Shortcodes_Auth extends LSD_Base
             $url,
             apply_filters('wp_safe_redirect_fallback', admin_url(), 302)
         );
+    }
+
+    private function is_truthy($value): bool
+    {
+        if (is_bool($value)) return $value;
+
+        return in_array(strtolower(trim((string) $value)), ['1', 'true', 'yes', 'on'], true);
+    }
+
+    private function page_url($page_id): string
+    {
+        $page = get_post(absint($page_id));
+        if (!$page instanceof WP_Post) return '';
+        if ($page->post_type !== 'page' || $page->post_status !== 'publish') return '';
+
+        $url = get_permalink($page);
+        return is_string($url) ? $url : '';
     }
 
     private function option($key)

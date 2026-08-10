@@ -312,7 +312,7 @@ abstract class LSD_IX_Array extends LSD_IX
         $mapper = new LSD_IX_Mapping();
 
         // Get Mapped Data
-        $mapped = $mapper->map($row, $mapping);
+        $mapped = $mapper->map($row, $mapping, $options);
         $default_status = self::default_import_status($mapping);
 
         // Required Title
@@ -336,12 +336,52 @@ abstract class LSD_IX_Array extends LSD_IX
             'meta' => [],
         ];
 
+        foreach ($mapper->repeater_fields() as $key => $repeater)
+        {
+            if (isset($mapped[$key]) && is_array($mapped[$key])) $listing[$key] = $mapped[$key];
+        }
+
         foreach ($mapped as $key => $value)
         {
             // Taxonomy
             if (in_array($key, $main->taxonomies()))
             {
                 $listing['taxonomies'][$key] = [];
+
+                if (is_array($value) && isset($value['path']) && is_array($value['path']))
+                {
+                    $path = [];
+                    foreach ($value['path'] as $segment)
+                    {
+                        if (!is_scalar($segment)) continue;
+
+                        $segment = trim((string) $segment);
+                        if ($segment !== '') $path[] = $segment;
+                    }
+
+                    if (count($path))
+                    {
+                        $listing['taxonomies'][$key][] = [
+                            'name' => end($path),
+                            'path' => $path,
+                        ];
+                    }
+
+                    continue;
+                }
+
+                if (is_array($value) && isset($value['terms']) && is_array($value['terms']))
+                {
+                    foreach ($value['terms'] as $term)
+                    {
+                        if (!is_scalar($term) || trim((string) $term) === '') continue;
+
+                        $listing['taxonomies'][$key][] = ['name' => trim((string) $term)];
+                    }
+
+                    continue;
+                }
+
                 if (is_array($value)) $value = implode(',', $value);
                 if (is_null($value) || trim((string) $value) === '') continue;
 
@@ -369,11 +409,9 @@ abstract class LSD_IX_Array extends LSD_IX
                 }
             }
             // Attributes
-            else if (strpos($key, 'lsd_attribute_') !== false)
+            else if (strpos($key, 'lsd_attribute_') === 0)
             {
-                $ex = explode('_', $key);
-
-                $slug = $ex[2] ?? 0;
+                $slug = substr($key, strlen('lsd_attribute_'));
                 if (!$slug) continue;
 
                 $term = get_term_by('slug', $slug, LSD_Base::TAX_ATTRIBUTE);
@@ -385,7 +423,7 @@ abstract class LSD_IX_Array extends LSD_IX
                         'name' => $term->name,
                         'slug' => $term->slug,
                     ],
-                    'value' => $value ? trim($value) : '',
+                    'value' => is_scalar($value) ? trim((string) $value) : '',
                 ];
             }
             // ACF

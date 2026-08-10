@@ -84,6 +84,9 @@ class LSD_Plugin_Hooks
         $settings = LSD_Options::defaults();
         add_option('lsd_settings', $settings);
 
+        // Installed Version
+        add_option('lsd_version', LSD_VERSION);
+
         // Default Social Networks
         $socials = LSD_Options::defaults('socials');
         add_option('lsd_socials', $socials);
@@ -188,13 +191,32 @@ class LSD_Plugin_Hooks
     public function deactivate(bool $network = false)
     {
         // Clear Scheduled Hook
-        wp_clear_scheduled_hook('lsd_jobs_run');
+        if ($network && is_multisite())
+        {
+            $db = new LSD_db();
+            $blogs = $db->select("SELECT `blog_id` FROM `#__blogs`", 'loadColumn');
+
+            foreach ($blogs as $blog_id)
+            {
+                switch_to_blog($blog_id);
+
+                try { self::clear_scheduled_hooks(); }
+                finally { restore_current_blog(); }
+            }
+        }
+        else self::clear_scheduled_hooks();
 
         /**
          * Refresh WordPress rewrite rules
          * We cannot use LSD_RewriteRules here because plugin is deactivated and it won't run
          */
         flush_rewrite_rules();
+    }
+
+    protected static function clear_scheduled_hooks(): void
+    {
+        wp_clear_scheduled_hook('lsd_jobs_run');
+        wp_clear_scheduled_hook(LSD_Announcements::CRON_HOOK);
     }
 
     /**
@@ -262,6 +284,7 @@ class LSD_Plugin_Hooks
             delete_option('lsd_purchase_code');
             delete_option('lsd_activation_id');
             delete_option('lsd_version');
+            delete_option(LSD_Announcements::OPTION_KEY);
         }
     }
 }

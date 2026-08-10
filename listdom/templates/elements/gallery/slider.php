@@ -16,6 +16,7 @@ $loop = isset($params['loop']) && $params['loop'];
 $thumbnail_status = $params['thumbnail_status'] ?? 'image';
 $navigation_method = $params['navigation_method'] ?? 'dots';
 $include_thumbnail = $params['include_thumbnail'] ?? false;
+$image_itemprop = LSD_Schema::suppressing_markup() ? '' : ' itemprop="https://schema.org/image"';
 
 $gallery = $this->get_gallery($post_id , $include_thumbnail);
 
@@ -71,10 +72,10 @@ jQuery(document).on("listdom:onload", () => {
                         <?php echo $link_method === 'blank' ? 'target="_blank"' : ''; ?>
                         <?php echo lsd_schema()->associatedMedia(); ?>
                     >
-                        <?php echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" itemprop="https://schema.org/image">'; ?>
+                        <?php echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
                     </a>
-                <?php elseif($lightbox): echo '<a href="'.esc_url($full[0]).'"><img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" itemprop="https://schema.org/image"></a>'; ?>
-                <?php else: echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" itemprop="https://schema.org/image">'; ?>
+                <?php elseif($lightbox): echo '<a href="'.esc_url($full[0]).'"><img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '></a>'; ?>
+                <?php else: echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
                 <?php endif; ?>
             </div>
         <?php

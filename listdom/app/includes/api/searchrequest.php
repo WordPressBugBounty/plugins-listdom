@@ -79,6 +79,7 @@ class LSD_API_SearchRequest extends LSD_Base
             case 'dropdown':
             case 'checkbox':
             case 'radio':
+            case 'switcher':
 
                 $request = self::dropdown_request($request, $filter, $key, $method, $helper, $values);
                 break;
@@ -110,7 +111,7 @@ class LSD_API_SearchRequest extends LSD_Base
                 $request['operator'] = 'date_range';
                 $datepicker_format = self::datepicker_format();
                 $request['params'][] = self::param(
-                    'sf-period',
+                    self::period_param_name($key),
                     'string',
                     false,
                     true,
@@ -213,16 +214,19 @@ class LSD_API_SearchRequest extends LSD_Base
 
     private static function price_request(array $request, array $filter, string $method): array
     {
+        $key = isset($filter['key']) ? (string) $filter['key'] : 'price';
+        $base = $key === 'price' ? 'sf-att-price' : 'sf-' . $key;
+
         if ($method === 'mm-input' || $method === 'range')
         {
             $request['operator'] = 'between';
-            $request['params'][] = self::param('sf-att-price-bt-min', 'number', false, true, 'min', 'numeric_range', self::number_example($filter, 0));
-            $request['params'][] = self::param('sf-att-price-bt-max', 'number', false, true, 'max', 'numeric_range', self::number_example($filter, 100, 'max_default_value', 'max'));
+            $request['params'][] = self::param($base . '-bt-min', 'number', false, true, 'min', 'numeric_range', self::number_example($filter, 0));
+            $request['params'][] = self::param($base . '-bt-max', 'number', false, true, 'max', 'numeric_range', self::number_example($filter, 100, 'max_default_value', 'max'));
         }
         else
         {
             $request['operator'] = 'greater_or_equal';
-            $request['params'][] = self::param('sf-att-price-grq', 'number', false, true, 'minimum', 'numeric', self::number_example($filter, 10));
+            $request['params'][] = self::param($base . '-grq', 'number', false, true, 'minimum', 'numeric', self::number_example($filter, 10));
         }
 
         return $request;
@@ -280,6 +284,13 @@ class LSD_API_SearchRequest extends LSD_Base
         }
 
         return 'sf-' . $helper->standardize_key($key) . '-lk';
+    }
+
+    private static function period_param_name(string $key): string
+    {
+        if ($key === 'booking_date') return 'sf-booking_date';
+
+        return 'sf-period';
     }
 
     private static function acf_key(string $key): string

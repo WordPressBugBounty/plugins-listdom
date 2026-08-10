@@ -123,7 +123,7 @@ class LSD_IX extends LSD_Base
             {
                 if (in_array($key, [
                     '_edit_last', '_edit_lock', '_thumbnail_id',
-                    'lsd_attributes', 'lsd_gallery', 'lsd_faqs',
+                    'lsd_attributes', 'lsd_gallery', 'lsd_embeds', 'lsd_faqs',
                 ]) || strpos($key, 'lsd_attribute_') !== false) unset($metas[$key]);
             }
 
@@ -145,6 +145,13 @@ class LSD_IX extends LSD_Base
             // FAQs
             $faqs = get_post_meta($listing_id, 'lsd_faqs', true);
             $listing['faqs'] = is_array($faqs) ? $faqs : [];
+
+            if (LSD_Base::isPro())
+            {
+                // Embed Codes
+                $embeds = get_post_meta($listing_id, 'lsd_embeds', true);
+                $listing['embeds'] = is_array($embeds) ? $embeds : [];
+            }
 
             $data[] = $listing;
         }
@@ -174,6 +181,43 @@ class LSD_IX extends LSD_Base
             if (!array_key_exists('question', $faq) && !array_key_exists('answer', $faq)) continue;
 
             $normalized[] = $faq;
+        }
+
+        return $normalized;
+    }
+
+    protected function normalize_embeds($embeds): array
+    {
+        if (is_string($embeds))
+        {
+            $decoded = json_decode($embeds, true);
+            if (json_last_error() === JSON_ERROR_NONE) $embeds = $decoded;
+        }
+
+        if (!is_array($embeds)) return [];
+
+        if (array_key_exists('name', $embeds) || array_key_exists('code', $embeds))
+        {
+            $embeds = [$embeds];
+        }
+
+        $normalized = [];
+        foreach ($embeds as $embed)
+        {
+            if (!is_array($embed)) continue;
+
+            $code = isset($embed['code']) && is_scalar($embed['code']) ? trim((string) $embed['code']) : '';
+            if ($code === '') continue;
+
+            $featured = isset($embed['featured']) && is_scalar($embed['featured'])
+                ? strtolower(trim((string) $embed['featured']))
+                : '';
+
+            $normalized[] = [
+                'name' => isset($embed['name']) && is_scalar($embed['name']) ? trim((string) $embed['name']) : '',
+                'code' => $code,
+                'featured' => in_array($featured, ['1', 'yes', 'y', 'true'], true) ? '1' : '0',
+            ];
         }
 
         return $normalized;
@@ -922,6 +966,11 @@ class LSD_IX extends LSD_Base
         if (isset($listing['faqs'])) $faqs = $this->normalize_faqs($listing['faqs']);
         else if (isset($metas['lsd_faqs'])) $faqs = $this->normalize_faqs($metas['lsd_faqs']);
 
+        $embeds = [];
+        $has_embeds = isset($listing['embeds']) || isset($metas['lsd_embeds']);
+        if (isset($listing['embeds'])) $embeds = $this->normalize_embeds($listing['embeds']);
+        else if (isset($metas['lsd_embeds'])) $embeds = $this->normalize_embeds($metas['lsd_embeds']);
+
         // Prepare Data
         $data = [
             'listing_category' => null,
@@ -950,6 +999,8 @@ class LSD_IX extends LSD_Base
             'faqs' => $faqs,
             'sc' => [], // Social Networks
         ];
+
+        if (LSD_Base::isPro() && $has_embeds) $data['embeds'] = $embeds;
 
         // Social Networks
         $SN = new LSD_Socials();

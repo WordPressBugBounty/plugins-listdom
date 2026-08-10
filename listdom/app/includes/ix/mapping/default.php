@@ -8,6 +8,7 @@ class LSD_IX_Mapping_Default
             'name' => $args['name'],
             'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'class' => $args['class'] ?? '',
+            'value' => $args['value'] ?? '',
         ], 'date');
     }
 
@@ -17,6 +18,7 @@ class LSD_IX_Mapping_Default
             'name' => $args['name'],
             'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'class' => $args['class'] ?? '',
+            'value' => $args['value'] ?? '',
         ]);
     }
 
@@ -26,6 +28,7 @@ class LSD_IX_Mapping_Default
             'name' => $args['name'],
             'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'class' => $args['class'] ?? '',
+            'value' => $args['value'] ?? '',
         ], 'number');
     }
 
@@ -35,6 +38,7 @@ class LSD_IX_Mapping_Default
             'name' => $args['name'],
             'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'class' => $args['class'] ?? '',
+            'value' => $args['value'] ?? '',
         ], 'email');
     }
 
@@ -44,6 +48,7 @@ class LSD_IX_Mapping_Default
             'name' => $args['name'],
             'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'class' => $args['class'] ?? '',
+            'value' => $args['value'] ?? '',
         ], 'url');
     }
 
@@ -53,6 +58,7 @@ class LSD_IX_Mapping_Default
             'name' => $args['name'],
             'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'class' => $args['class'] ?? '',
+            'value' => $args['value'] ?? '',
         ], 'tel');
     }
 
@@ -62,6 +68,7 @@ class LSD_IX_Mapping_Default
             'name' => $args['name'],
             'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'class' => $args['class'] ?? '',
+            'value' => $args['value'] ?? '',
             'show_empty' => true,
         ]);
     }
@@ -82,7 +89,7 @@ class LSD_IX_Mapping_Default
             'id' => 'lsd_ix_mapping_field_' . $args['key'] . '_default',
             'class' => $args['class'] ?? '',
             'options' => $options,
-            'value' => 'publish',
+            'value' => $args['value'] ?? 'publish',
         ]);
     }
 }

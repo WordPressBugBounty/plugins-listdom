@@ -19,6 +19,7 @@ $include_thumbnail = $params['include_thumbnail'] ?? false;
 $image_limit = $params['image_limit'] ?? 4;
 $image_fit = $params['image_fit'] ?? 'cover';
 $image_height = $params['image_height'] ?? '300';
+$image_itemprop = LSD_Schema::suppressing_markup() ? '' : ' itemprop="https://schema.org/image"';
 
 $gallery = $this->get_gallery($post_id, $include_thumbnail);
 
@@ -41,7 +42,7 @@ if (!count($gallery)) return '';
             $count++;
             ?>
             <div class="lsd-gallery-grid-item" style="width: <?php echo esc_attr($item_width); ?>%;">
-                <img style="object-fit: <?php echo esc_attr($image_fit); ?>; max-height: <?php echo esc_attr($image_height); ?>px; min-height: <?php echo esc_attr($image_height); ?>px;" alt="" src="<?php echo esc_url($thumb[0]); ?>" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>" itemprop="https://schema.org/image">
+                <img style="object-fit: <?php echo esc_attr($image_fit); ?>; max-height: <?php echo esc_attr($image_height); ?>px; min-height: <?php echo esc_attr($image_height); ?>px;" alt="" src="<?php echo esc_url($thumb[0]); ?>" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>"<?php echo $image_itemprop; ?>>
             </div>
             <?php
         }
@@ -74,8 +75,8 @@ if (!count($gallery)) return '';
                             if (!$full) continue;
                         ?>
                         <div class="lsd-gallery-item">
-                            <?php if ($lightbox): echo '<a href="' . esc_url($full[0]) . '"><img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" itemprop="https://schema.org/image"></a>'; ?>
-                            <?php else: echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" itemprop="https://schema.org/image">'; ?>
+                            <?php if ($lightbox): echo '<a href="' . esc_url($full[0]) . '"><img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '></a>'; ?>
+                            <?php else: echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>

@@ -11,7 +11,7 @@ defined('ABSPATH') || die();
 
 [$total, $discount, $tax] = $cart->apply_coupon();
 ?>
-<form method="post" action="<?php echo esc_url($main->current_url()); ?>" class="lsd-cart-form">
+<form method="post" action="<?php echo esc_url($main->current_url()); ?>" class="lsd-cart-form lsd-fe-sections">
     <?php wp_nonce_field('lsd_cart_action'); ?>
     <div class="lsd-cart-items lsd-fe-sections">
         <?php foreach ($items as $id => $item):
@@ -68,9 +68,10 @@ defined('ABSPATH') || die();
     </div>
     <?php if ($fees): ?>
         <div class="lsd-cart-fees lsd-fe-sections">
-            <?php foreach ($fees as $fee):
+            <?php foreach ($fees as $fee_id => $fee):
                 $title = isset($fee['title']) ? trim((string) $fee['title']) : '';
                 $amount = isset($fee['amount']) ? (float) $fee['amount'] : 0;
+                $remove_url = wp_nonce_url(add_query_arg('lsd_cart_remove_fee', $fee_id, $main->current_url()), 'lsd_cart_action');
             ?>
                 <div class="lsd-cart-fee lsd-fe-box-white">
                     <div class="lsd-cart-item-info">
@@ -79,6 +80,12 @@ defined('ABSPATH') || die();
                     <div class="lsd-cart-item-end">
                         <div class="lsd-cart-item-price lsd-fe-title">
                             <?php echo LSD_Kses::element($main->render_price($amount, $currency)); ?>
+                        </div>
+
+                        <div class="lsd-cart-item-remove">
+                            <a href="<?php echo esc_url($remove_url); ?>" class="lsd-checkout-remove">
+                                <i class="lsd-fe-icon fa fa-trash-alt"></i>
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -12,6 +12,10 @@ class LSD_PTypes extends LSD_Base
         $shortcode = new LSD_PTypes_Shortcode();
         $shortcode->init();
 
+        // Template Builder Post Type
+        $template = new LSD_PTypes_Template();
+        $template->init();
+
         // Render No Item Screen
         add_action('manage_posts_extra_tablenav', [$this, 'create_first_item']);
     }
@@ -22,6 +26,9 @@ class LSD_PTypes extends LSD_Base
 
         // It's not one of Listdom Post Types
         if (!in_array($post_type, $this->postTypes()) || 'bottom' !== $which) return;
+
+        // Template Builder has its own onboarding screen
+        if ($post_type === LSD_Base::PTYPE_TEMPLATE) return;
 
         $counts = (array) wp_count_posts($post_type);
 

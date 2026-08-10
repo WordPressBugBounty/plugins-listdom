@@ -11,6 +11,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
     public $entity;
     public $style;
     protected $filtered_content;
+    protected ?bool $suppress_legacy_schema = null;
 
     public function __construct()
     {
@@ -135,6 +136,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $this->details_page_options['general']['style'] = $listing_style;
         $this->style = $listing_style;
         $this->filtered_content = $content;
+        $this->suppress_legacy_schema = null;
 
         $this->entity = new LSD_Entity_Listing($post);
 
@@ -157,17 +159,53 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
         if (is_single() && get_post_type() === LSD_Base::PTYPE_LISTING)
         {
-            $theme_template = isset($this->details_page_options['general']['theme_template']) && trim($this->details_page_options['general']['theme_template']) ? $this->details_page_options['general']['theme_template'] : null;
-            if ($theme_template)
+            $listing_style = self::get_listing_style(get_the_ID());
+            $builder_template = '';
+
+            if (is_string($listing_style) && strpos($listing_style, 'tb_') === 0)
+            {
+                $template_id = (int) str_replace('tb_', '', $listing_style);
+                if ($template_id > 0)
+                {
+                    $template_post = get_post($template_id);
+                    if (
+                        $template_post instanceof WP_Post
+                        && $template_post->post_type === LSD_Base::PTYPE_TEMPLATE
+                        && $template_post->post_status === 'publish'
+                    ) {
+                        $builder_template = get_post_meta($template_id, '_wp_page_template', true);
+                        $builder_template = is_string($builder_template) ? trim($builder_template) : '';
+                    }
+                }
+            }
+
+            // Prefer template-builder page template when the listing uses it
+            $preferred_template = ($builder_template !== '' && $builder_template !== 'default')
+                ? $builder_template
+                : '';
+
+            $theme_template = isset($this->details_page_options['general']['theme_template']) && trim($this->details_page_options['general']['theme_template'])
+                ? $this->details_page_options['general']['theme_template']
+                : '';
+
+            if ($preferred_template === '' && $theme_template !== '')
+            {
+                $preferred_template = $theme_template;
+            }
+
+            if ($preferred_template !== '')
             {
                 // WordPress Method
-                $located_template = locate_template($theme_template);
+                $located_template = locate_template($preferred_template);
 
                 // Elementor Fix
-                if (!$located_template && class_exists(\Elementor\Modules\PageTemplates\Module::class))
+                if (!$located_template && class_exists(\Elementor\Plugin::class))
                 {
-                    $module = new \Elementor\Modules\PageTemplates\Module();
-                    $located_template = $module->get_template_path($theme_template);
+                    $module = \Elementor\Plugin::instance()->modules_manager->get_modules('page-templates');
+                    if ($module && method_exists($module, 'get_template_path'))
+                    {
+                        $located_template = $module->get_template_path($preferred_template);
+                    }
                 }
 
                 // Template Found
@@ -270,8 +308,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Listing Breadcrumb
         if (strpos($this->pattern, '{breadcrumb}') !== false)
         {
-            $breadcrumb = $this->breadcrumb();
-            $rendered = str_replace('{breadcrumb}', LSD_Kses::element($breadcrumb), $rendered);
+            $rendered = str_replace('{breadcrumb}', $this->replaced_listing_section('breadcrumb'), $rendered);
         }
 
         // Back Button
@@ -290,79 +327,70 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Listing Featured Image
         if (strpos($this->pattern, '{image}') !== false)
         {
-            $rendered = str_replace('{image}', LSD_Kses::element($this->image()), $rendered);
+            $rendered = str_replace('{image}', $this->replaced_listing_section('image'), $rendered);
         }
 
         // Listing Gallery
         if (strpos($this->pattern, '{gallery}') !== false)
         {
-            $gallery = $this->gallery();
-            $rendered = str_replace('{gallery}', LSD_Kses::element($gallery), $rendered);
+            $rendered = str_replace('{gallery}', $this->replaced_listing_section('gallery'), $rendered);
         }
 
         // Listing Embeds
         if (strpos($this->pattern, '{embed}') !== false)
         {
-            $embeds = $this->embeds();
-            $rendered = str_replace('{embed}', LSD_Kses::rich($embeds), $rendered);
+            $rendered = str_replace('{embed}', $this->replaced_listing_section('embeds', 'rich'), $rendered);
         }
 
         // Listing Featured Video
         if (strpos($this->pattern, '{video}') !== false)
         {
-            $video = $this->featured_video();
-            $rendered = str_replace('{video}', LSD_Kses::rich($video), $rendered);
+            $rendered = str_replace('{video}', $this->replaced_listing_section('featured_video', 'rich'), $rendered);
         }
 
         // Listing Address
         if (strpos($this->pattern, '{address}') !== false)
         {
-            $address = $this->address();
-            $rendered = str_replace('{address}', LSD_Kses::element($address), $rendered);
+            $rendered = str_replace('{address}', $this->replaced_listing_section('address'), $rendered);
         }
 
         // Listing Locations
         if (strpos($this->pattern, '{locations}') !== false)
         {
-            $locations = $this->locations();
+            $locations = $this->replaced_listing_section('locations');
             if (trim($locations)) $locations = '<div class="lsd-single-locations-box">' . $locations . '</div>';
 
-            $rendered = str_replace('{locations}', LSD_Kses::element($locations), $rendered);
+            $rendered = str_replace('{locations}', $locations, $rendered);
         }
 
         // Listing Owner
         if (strpos($this->pattern, '{owner}') !== false)
         {
-            $owner = $this->owner();
-            $rendered = str_replace('{owner}', LSD_Kses::form($owner), $rendered);
+            $rendered = str_replace('{owner}', $this->replaced_listing_section('owner', 'form'), $rendered);
         }
 
         // Listing Attributes
         if (strpos($this->pattern, '{attributes}') !== false)
         {
-            $attributes = $this->attributes();
-            $rendered = str_replace('{attributes}', LSD_Kses::element($attributes), $rendered);
+            $rendered = str_replace('{attributes}', $this->replaced_listing_section('attributes'), $rendered);
         }
 
         // Listing Availability
         if (strpos($this->pattern, '{availability}') !== false)
         {
-            $availability = $this->availability();
-            $rendered = str_replace('{availability}', LSD_Kses::element($availability), $rendered);
+            $rendered = str_replace('{availability}', $this->replaced_listing_section('availability'), $rendered);
         }
 
         // Listing Categories
         if (strpos($this->pattern, '{categories}') !== false)
         {
-            $categories = $this->categories();
-            $rendered = str_replace('{categories}', LSD_Kses::element($categories), $rendered);
+            $rendered = str_replace('{categories}', $this->replaced_listing_section('categories'), $rendered);
         }
 
         // Post Content
         if (strpos($this->pattern, '{content}') !== false)
         {
-            $content = $this->content($this->filtered_content);
-            $rendered = str_replace('{content}', LSD_Kses::element($content), $rendered);
+            $rendered = str_replace('{content}', $this->replaced_listing_section('content', 'element', [$this->filtered_content]), $rendered);
         }
 
         // FAQs
@@ -375,35 +403,31 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Remark
         if (strpos($this->pattern, '{remark}') !== false)
         {
-            $remark = $this->remark();
-            $rendered = str_replace('{remark}', LSD_Kses::element($remark), $rendered);
+            $rendered = str_replace('{remark}', $this->replaced_listing_section('remark'), $rendered);
         }
 
         // Listing Features
         if (strpos($this->pattern, '{features}') !== false)
         {
-            $features = $this->features();
-            $rendered = str_replace('{features}', LSD_Kses::element($features), $rendered);
+            $rendered = str_replace('{features}', $this->replaced_listing_section('features'), $rendered);
         }
 
         // Listing Map
         if (strpos($this->pattern, '{map}') !== false)
         {
-            $map = $this->map();
-            $rendered = str_replace('{map}', LSD_Kses::form($map), $rendered);
+            $rendered = str_replace('{map}', $this->replaced_listing_section('map', 'form'), $rendered);
         }
 
         // Listing Title
         if (strpos($this->pattern, '{title}') !== false)
         {
-            $title = $this->title();
-            $rendered = str_replace('{title}', LSD_Kses::element($title), $rendered);
+            $rendered = str_replace('{title}', $this->replaced_listing_section('title'), $rendered);
         }
 
         // Listing Price
         if (strpos($this->pattern, '{price}') !== false)
         {
-            $rendered = str_replace('{price}', LSD_Kses::element($this->price()), $rendered);
+            $rendered = str_replace('{price}', $this->replaced_listing_section('price'), $rendered);
         }
 
         // Listing Share
@@ -430,22 +454,19 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Listing Contact Info
         if (strpos($this->pattern, '{contact}') !== false)
         {
-            $contact_info = $this->contact_info();
-            $rendered = str_replace('{contact}', LSD_Kses::element($contact_info), $rendered);
+            $rendered = str_replace('{contact}', $this->replaced_listing_section('contact_info'), $rendered);
         }
 
         // Listing Excerpt
         if (strpos($this->pattern, '{excerpt}') !== false)
         {
-            $excerpt = $this->excerpt();
-            $rendered = str_replace('{excerpt}', LSD_Kses::element($excerpt), $rendered);
+            $rendered = str_replace('{excerpt}', $this->replaced_listing_section('excerpt'), $rendered);
         }
 
         // Listing Related
         if (strpos($this->pattern, '{related}') !== false)
         {
-            $related = $this->related();
-            $rendered = str_replace('{related}', LSD_Kses::full($related), $rendered);
+            $rendered = str_replace('{related}', $this->replaced_listing_section('related', 'full'), $rendered);
         }
 
         // Wrap the content
@@ -517,25 +538,96 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
     public function wrapper($content)
     {
         // Style Wrapper Class
-        $style = (is_numeric($this->style) ? 'builder' : $this->style);
+        $style = is_numeric($this->style) ? 'builder' : $this->style;
+        $suppress_schema = $this->should_suppress_legacy_schema();
 
         $schema = lsd_schema()->reset();
         $meta = '';
 
-        // Reliability fallback for Google-required LocalBusiness fields
-        $meta .= $schema->meta('name', get_the_title($this->entity->id()));
-        $meta .= $schema->meta('url', get_permalink($this->entity->id()));
+        if (!$suppress_schema)
+        {
+            // Reliability fallback for Google-required LocalBusiness fields
+            $meta .= $schema->meta('name', get_the_title($this->entity->id()));
+            $meta .= $schema->meta('url', get_permalink($this->entity->id()));
 
-        $image_id = get_post_thumbnail_id($this->entity->id());
-        $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'full') : '';
-        if ($image_url) $meta .= $schema->meta('image', $image_url);
+            $image_id = get_post_thumbnail_id($this->entity->id());
+            $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'full') : '';
+            if ($image_url) $meta .= $schema->meta('image', $image_url);
+        }
 
-        $rendered = '<div class="lsd-single-page-wrapper lsd-font-m lsd-single-' . $style . '" ' . lsd_schema()->scope()->type(null, $this->entity->get_data_category()) . '>'
+        $wrapper_schema = $suppress_schema ? '' : ' ' . lsd_schema()->scope()->type(null, $this->entity->get_data_category());
+
+        $rendered = '<div class="lsd-single-page-wrapper lsd-font-m lsd-single-' . $style . '"' . $wrapper_schema . '>'
             . $meta . $content . $this->powered_by_message()
         . '</div>';
 
         // Remove remained placeholders
         return preg_replace('/{.*}/', '', apply_filters('lsd_listing_single_content', $rendered, $this));
+    }
+
+    /**
+     * Check whether replacement JSON-LD suppresses legacy listing markup.
+     * @return bool
+     */
+    protected function should_suppress_legacy_schema(): bool
+    {
+        // Cached Status
+        if ($this->suppress_legacy_schema === null)
+        {
+            // AI Visibility Service
+            $ai_visibility = class_exists('LSD_AI_Visibility') ? LSD_AI_Visibility::instance() : null;
+            $this->suppress_legacy_schema = $ai_visibility instanceof LSD_AI_Visibility && $ai_visibility->schema_service()->replaces_single_listing_schema();
+        }
+
+        return $this->suppress_legacy_schema;
+    }
+
+    /**
+     * Render a listing section with optional legacy schema suppression.
+     * @param string $method
+     * @param string $sanitizer
+     * @param array $arguments
+     * @return string
+     */
+    protected function replaced_listing_section(string $method, string $sanitizer = 'element', array $arguments = []): string
+    {
+        // Suppression Status
+        $suppress_schema = $this->should_suppress_legacy_schema_for_section($method);
+
+        // Suppress Markup
+        if ($suppress_schema) LSD_Schema::suppress_markup();
+
+        try
+        {
+            // Section Content
+            $content = $this->{$method}(...$arguments);
+        }
+        finally
+        {
+            // Restore Markup
+            if ($suppress_schema) LSD_Schema::restore_markup();
+        }
+
+        // Sanitized Content
+        if ($sanitizer === 'form') return LSD_Kses::form($content);
+        if ($sanitizer === 'full') return LSD_Kses::full($content);
+        if ($sanitizer === 'rich') return LSD_Kses::rich($content);
+
+        return LSD_Kses::element($content);
+    }
+
+    /**
+     * Check whether a section should hide legacy schema markup.
+     * @param string $method
+     * @return bool
+     */
+    protected function should_suppress_legacy_schema_for_section(string $method): bool
+    {
+        // These sections expose their own independent visible entities; the
+        // replacement listing graph does not model them as listing properties.
+        if (in_array($method, ['owner', 'related'], true)) return false;
+
+        return $this->should_suppress_legacy_schema();
     }
 
     protected function powered_by_message(): string
@@ -668,7 +760,8 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $show_icons = $this->details_page_options['elements']['attributes']['show_icons'] ?? 0;
         $show_attribute_title = $this->details_page_options['elements']['attributes']['show_attribute_title'] ?? 1;
         $show_separator = $this->details_page_options['elements']['attributes']['show_separator'] ?? 0;
-        $attributes = $this->entity->get_attributes($show_icons, $show_attribute_title, $show_separator);
+        $layout = $this->details_page_options['elements']['attributes']['layout'] ?? 'column';
+        $attributes = $this->entity->get_attributes($show_icons, $show_attribute_title, $show_separator, $layout);
 
         // Don't show anything when there is no attribute!
         if (!trim($attributes)) return '';
@@ -1206,31 +1299,31 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             $global_enabled = isset($global_elements[$key]['enabled']) && $global_elements[$key]['enabled'];
             if (!$global_enabled) continue;
 
-            if ($key === 'title') $content .= '<div class="lsd-single-page-section">' . LSD_Kses::element($this->title()) . '</div>';
-            else if ($key === 'price') $content .= LSD_Kses::element($this->price());
-            else if ($key === 'address') $content .= LSD_Kses::element($this->address());
-            else if ($key === 'locations') $content .= LSD_Kses::element($this->locations());
+            if ($key === 'title') $content .= '<div class="lsd-single-page-section">' . $this->replaced_listing_section('title') . '</div>';
+            else if ($key === 'price') $content .= $this->replaced_listing_section('price');
+            else if ($key === 'address') $content .= $this->replaced_listing_section('address');
+            else if ($key === 'locations') $content .= $this->replaced_listing_section('locations');
             else if ($key === 'share') $content .= LSD_Kses::element($this->share());
-            else if ($key === 'categories') $content .= LSD_Kses::element($this->categories());
-            else if ($key === 'image') $content .= LSD_Kses::element($this->image());
-            else if ($key === 'gallery') $content .= LSD_Kses::element($this->gallery());
-            else if ($key === 'embed') $content .= LSD_Kses::rich($this->embeds());
+            else if ($key === 'categories') $content .= $this->replaced_listing_section('categories');
+            else if ($key === 'image') $content .= $this->replaced_listing_section('image');
+            else if ($key === 'gallery') $content .= $this->replaced_listing_section('gallery');
+            else if ($key === 'embed') $content .= $this->replaced_listing_section('embeds', 'rich');
             else if ($key === 'faq') $content .= LSD_Kses::element($this->faq());
-            else if ($key === 'video') $content .= LSD_Kses::rich($this->featured_video());
+            else if ($key === 'video') $content .= $this->replaced_listing_section('featured_video', 'rich');
             else if ($key === 'labels') $content .= LSD_Kses::element($this->labels());
-            else if ($key === 'content') $content .= LSD_Kses::element($this->content($this->filtered_content));
-            else if ($key === 'remark') $content .= LSD_Kses::element($this->remark());
+            else if ($key === 'content') $content .= $this->replaced_listing_section('content', 'element', [$this->filtered_content]);
+            else if ($key === 'remark') $content .= $this->replaced_listing_section('remark');
             else if ($key === 'tags') $content .= LSD_Kses::element($this->tags());
-            else if ($key === 'contact') $content .= LSD_Kses::element($this->contact_info());
-            else if ($key === 'features') $content .= LSD_Kses::element($this->features());
-            else if ($key === 'attributes') $content .= LSD_Kses::element($this->attributes());
-            else if ($key === 'map') $content .= LSD_Kses::form($this->map());
-            else if ($key === 'owner') $content .= LSD_Kses::form($this->owner());
+            else if ($key === 'contact') $content .= $this->replaced_listing_section('contact_info');
+            else if ($key === 'features') $content .= $this->replaced_listing_section('features');
+            else if ($key === 'attributes') $content .= $this->replaced_listing_section('attributes');
+            else if ($key === 'map') $content .= $this->replaced_listing_section('map', 'form');
+            else if ($key === 'owner') $content .= $this->replaced_listing_section('owner', 'form');
             else if ($key === 'abuse') $content .= LSD_Kses::form($this->abuse());
-            else if ($key === 'availability') $content .= LSD_Kses::element($this->availability());
-            else if ($key === 'excerpt') $content .= LSD_Kses::element($this->excerpt());
+            else if ($key === 'availability') $content .= $this->replaced_listing_section('availability');
+            else if ($key === 'excerpt') $content .= $this->replaced_listing_section('excerpt');
             else if ($key === 'backbutton') $content .= LSD_Kses::element($this->backbutton());
-            else if ($key === 'breadcrumb') $content .= LSD_Kses::element($this->breadcrumb());
+            else if ($key === 'breadcrumb') $content .= $this->replaced_listing_section('breadcrumb');
             else if ($key === 'cta') $content .= LSD_Kses::element($this->cta());
             else $content .= '{' . $key . '}';
         }

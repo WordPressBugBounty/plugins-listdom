@@ -110,6 +110,18 @@ class LSD_Cart extends LSD_Base
         $this->save($cart);
     }
 
+    public function remove_fee(string $id): void
+    {
+        $cart = $this->get();
+
+        if (isset($cart['fees'][$id]))
+        {
+            do_action('lsd_cart_fee_removed', $cart['fees'][$id], $id);
+            unset($cart['fees'][$id]);
+            $this->save($cart);
+        }
+    }
+
     public function remove(string $id): void
     {
         $cart = $this->get();

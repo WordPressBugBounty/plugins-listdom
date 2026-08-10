@@ -199,7 +199,10 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_gallery', isset($data['gallery']) ? array_map('sanitize_text_field', $data['gallery']) : []);
 
         // Embeds
-        update_post_meta($this->post->ID, 'lsd_embeds', isset($data['embeds']) && is_array($data['embeds']) ? $this->indexify($data['embeds']) : []);
+        if (array_key_exists('embeds', $data))
+        {
+            update_post_meta($this->post->ID, 'lsd_embeds', is_array($data['embeds']) ? $this->indexify($data['embeds']) : []);
+        }
 
         // FAQs
         update_post_meta($this->post->ID, 'lsd_faqs', isset($data['faqs']) && is_array($data['faqs']) ? $this->indexify($data['faqs']) : []);
@@ -316,10 +319,10 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->get($this->post->ID);
     }
 
-    public function get_attributes($show_icons = false, $show_attribute_title = true, $show_separator = false)
+    public function get_attributes($show_icons = false, $show_attribute_title = true, $show_separator = false, $layout = 'column')
     {
         $element = new LSD_Element_Attributes();
-        return $element->get($this->post->ID, $show_icons, $show_attribute_title, $show_separator);
+        return $element->get($this->post->ID, $show_icons, $show_attribute_title, $show_separator, $layout);
     }
 
     public function get_map($args = [])
@@ -621,7 +624,7 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function is_claimed(): bool
     {
-        return $this->is('claimed');
+        return $this->is('claimed') && class_exists(\LSDPACCLM\Base::class);
     }
 
     public function get_claim_button()

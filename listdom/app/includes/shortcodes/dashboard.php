@@ -19,7 +19,6 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     public $form_columns;
     public $sidebar_status;
     public $sidebar_horizontal_mode;
-
     /**
      * @var WP_Query
      */
@@ -123,6 +122,30 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         return $result;
     }
 
+    protected function bootstrap_shortcode_context(array $atts = [], bool $add_listing_payload = false): void
+    {
+        // Include WordPress Media
+        LSD_Assets::media();
+
+        // Shortcode attributes
+        $this->atts = is_array($atts) ? $atts : [];
+
+        // Dashboard Page
+        global $post;
+        $this->page = $post instanceof WP_Post ? $post : null;
+
+        // Dashboard URL
+        $this->url = $this->page ? get_permalink($this->page) : '';
+
+        // Payload
+        LSD_Payload::set('dashboard', $this);
+
+        if ($add_listing_payload)
+        {
+            LSD_Payload::set('add_listing', $this);
+        }
+    }
+
     public function init()
     {
         // WP Libraries
@@ -183,18 +206,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-dashboard');
         if (trim($pre)) return $pre;
 
-        // Include WordPress Media
-        LSD_Assets::media();
-
-        // Shortcode attributes
-        $this->atts = is_array($atts) ? $atts : [];
-
-        // Dashboard Page
-        global $post;
-        $this->page = $post;
-
-        // Dashboard URL
-        $this->url = get_permalink($this->page);
+        $this->bootstrap_shortcode_context($atts);
 
         // Mode
         $this->mode = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : $this->get_default_mode();
@@ -212,9 +224,6 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 esc_html__('Add Listing', 'listdom')
             );
         }
-
-        // Payload
-        LSD_Payload::set('dashboard', $this);
 
         // Dashboard Settings in Listdom Bar
         $bar->menu(
@@ -348,6 +357,26 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         ob_start();
         include lsd_template('dashboard/form.php');
         return ob_get_clean();
+    }
+
+    public function get_dashboard_form_selected_category_id(): ?int
+    {
+        $category = (new LSD_Entity_Listing($this->post->ID))->get_data_category();
+        if ($category && isset($category->term_id)) return (int) $category->term_id;
+
+        $all_categories = LSD_Taxonomies_Category::get_terms();
+        if (is_array($all_categories) && count($all_categories) === 1 && isset($all_categories[0]->term_id))
+        {
+            return (int) $all_categories[0]->term_id;
+        }
+
+        $uncategorized_id = LSD_Main::get_uncategorized_category_id();
+        return $uncategorized_id ? (int) $uncategorized_id : null;
+    }
+
+    public function dashboard_form_submit(bool $mirror = false): void
+    {
+        include lsd_template('dashboard/form/submit.php');
     }
 
     public function profile()
@@ -527,10 +556,16 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function menu_ids(bool $include_disabled = false): array
     {
+        // Refresh settings for the currently active site.
+        $settings = LSD_Options::settings();
+
+        // Keep the instance settings synchronized for the remaining methods.
+        $this->settings = $settings;
+
         // Menus Data
-        $order_menus = $this->settings['dashboard_menus'] ?? [];
-        $statuses = $this->settings['dashboard_menu_builtin_status'] ?? [];
-        $data = $this->settings['dashboard_menu_builtin'] ?? [];
+        $order_menus = isset($settings['dashboard_menus']) && is_array($settings['dashboard_menus']) ? $settings['dashboard_menus'] : [];
+        $statuses = isset($settings['dashboard_menu_builtin_status']) && is_array($settings['dashboard_menu_builtin_status']) ? $settings['dashboard_menu_builtin_status'] : [];
+        $data = isset($settings['dashboard_menu_builtin']) && is_array($settings['dashboard_menu_builtin']) ? $settings['dashboard_menu_builtin'] : [];
 
         // Default Menus
         $menus = [];
@@ -610,14 +645,14 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         }
 
         // Order Menus
-        if (isset($order_menus) && $this->is_pro)
+        if (!empty($order_menus) && $this->is_pro)
         {
             $ordered_menus = [];
             foreach ($order_menus as $menu_id)
             {
                 foreach ($menus as $key => $menu)
                 {
-                    if ($menu['id'] === $menu_id)
+                    if (($menu['id'] ?? '') === $menu_id)
                     {
                         $ordered_menus[$key] = $menu;
                         unset($menus[$key]);
@@ -626,8 +661,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 }
             }
 
-            $ordered_menus = array_merge($ordered_menus, $menus);
-            $menus = $ordered_menus;
+            $menus = array_merge($ordered_menus, $menus);
         }
 
         return $menus;
@@ -1282,7 +1316,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     public function upload()
     {
         // User is not allowed to upload files
-        if (!$this->guest_status && !LSD_Capability::can('upload_files')) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to upload files!', 'listdom')]);
+        if (!$this->guest_status && !LSD_Capability::can('upload_files')
+            && !((isset($_POST['action']) ? sanitize_key((string) $_POST['action']) : '') === 'lsd_dashboard_upload_profile_image' && $this->can_upload_profile_image())
+        ) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to upload files!', 'listdom')]);
 
         // Nonce is not set!
         if (!isset($_POST['_wpnonce'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing!', 'listdom')]);
@@ -1359,6 +1395,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         }
 
         $this->response(['success' => $success, 'message' => $message, 'data' => $data]);
+    }
+
+    protected function can_upload_profile_image(): bool
+    {
+        $user_id = get_current_user_id();
+        return $user_id > 0 && current_user_can('edit_user', $user_id);
     }
 
     public function delete()
@@ -1775,7 +1817,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             }
         }
 
-        if (metadata_exists('post', $listing->ID, 'lsd_topup') && class_exists('\LSDPACTUP\Topup'))
+        $topup_time = (int) get_post_meta($listing->ID, 'lsd_topup', true);
+
+        if ($topup_time > 0 && class_exists('\LSDPACTUP\Topup'))
         {
             $badges[] = [
                 'label' => esc_html__('Top-Uped', 'listdom'),

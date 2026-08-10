@@ -939,6 +939,7 @@ return array(
     'Webilia\\Toast\\Base' => $vendorDir . '/webilia/toast/app/Base.php',
     'Webilia\\Toast\\Boot' => $vendorDir . '/webilia/toast/app/Boot.php',
     'Webilia\\WP\\Ads' => $vendorDir . '/webilia/wp/src/Ads.php',
+    'Webilia\\WP\\Announcements' => $vendorDir . '/webilia/wp/src/Announcements.php',
     'Webilia\\WP\\Color' => $vendorDir . '/webilia/wp/src/Color.php',
     'Webilia\\WP\\Date' => $vendorDir . '/webilia/wp/src/Date.php',
     'Webilia\\WP\\DateTime' => $vendorDir . '/webilia/wp/src/DateTime.php',

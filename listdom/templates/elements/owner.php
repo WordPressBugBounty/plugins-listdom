@@ -21,6 +21,13 @@ $author_link = isset($this->args['author_link']) && $this->args['author_link'];
 $link_avatar = isset($this->args['link_avatar']) && $this->args['link_avatar'];
 $field_name = !isset($this->args['name_field']) || $this->args['name_field'];
 $field_phone = !isset($this->args['phone_field']) || $this->args['phone_field'];
+$pc_context = 'contact';
+$pc_enabled = array_key_exists('pc_enabled', $this->args)
+    ? (bool) $this->args['pc_enabled']
+    : LSD_Privacy::is_consent_enabled($pc_context);
+$pc_enabled_value = $pc_enabled ? '1' : '0';
+$pc_enabled_nonce = wp_create_nonce('lsd_privacy_consent_' . absint($post_id) . '_' . $pc_context . '_' . $pc_enabled_value);
+$pc_label = isset($this->args['pc_label']) ? (string) $this->args['pc_label'] : '';
 
 // Social Networks
 $socials = (new LSD_Socials())->list($owner_id);
@@ -29,11 +36,16 @@ $socials = (new LSD_Socials())->list($owner_id);
 $current = wp_get_current_user();
 $current_id = get_current_user_id();
 
-$owner_privacy_field = LSD_Privacy::consent_field([
-    'id' => 'lsd_owner_privacy_consent_' . absint($post_id),
-    'wrapper_class' => 'lsd-owner-privacy-consent-field',
-    'context' => 'contact',
-]);
+$owner_privacy_field = '';
+if ($display_form && $pc_enabled)
+{
+    $owner_privacy_field = LSD_Privacy::consent_field([
+        'id' => 'lsd_owner_privacy_consent_' . absint($post_id),
+        'wrapper_class' => 'lsd-owner-privacy-consent-field',
+        'context' => 'contact',
+        'label' => $pc_label,
+    ]);
+}
 ?>
 <?php if ($this->layout === 'image-name'): $size = $this->args['size'] ?? 48; ?>
 <div class="lsd-owner-image-name">
@@ -181,6 +193,9 @@ $owner_privacy_field = LSD_Privacy::consent_field([
 				required
 			></textarea>
 		</div>
+
+        <input type="hidden" name="lsd_privacy_consent_enabled" value="<?php echo esc_attr($pc_enabled_value); ?>">
+        <input type="hidden" name="lsd_privacy_consent_enabled_nonce" value="<?php echo esc_attr($pc_enabled_nonce); ?>">
 
         <?php if ($owner_privacy_field !== ''): ?>
             <div class="lsd-owner-contact-form-row lsd-owner-contact-form-row-consent">

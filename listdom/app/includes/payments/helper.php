@@ -46,7 +46,7 @@ class LSD_Payments_Helper extends LSD_Base
             'max_items' => $max_items,
             'values' => [],
             'placeholder' => sprintf(esc_html__('Type at least 3 characters of the %s name ...', 'listdom'), $label),
-            'description' => sprintf(esc_html__('Only %s %s can be selected.', 'listdom'), $max_items, $label),
+            'description' => $this->field_plan_description($max_items),
         ];
 
         return LSD_Form::autosuggest(
@@ -59,6 +59,22 @@ class LSD_Payments_Helper extends LSD_Base
         return $this->engine === LSD_Payments_Engine::WC
             ? esc_html__('Product', 'listdom')
             : esc_html__('Plan', 'listdom');
+    }
+
+    public function field_plan_description(int $max_items = 1): string
+    {
+        $description = sprintf(
+            esc_html__('Only %s %s can be selected.', 'listdom'),
+            $max_items,
+            strtolower($this->plan_label())
+        );
+
+        if ($this->engine === LSD_Payments_Engine::WC)
+        {
+            $description .= ' ' . esc_html__('Recurring WooCommerce subscription products are not supported here.', 'listdom');
+        }
+
+        return $description;
     }
 
     public function currency(): string
@@ -93,7 +109,7 @@ class LSD_Payments_Helper extends LSD_Base
      * @param int $plan_id
      * @param array $args
      */
-    public function add_to_cart(int $plan_id, array $args = []): void
+    public function add_to_cart(int $plan_id, array $args = []): bool
     {
         $fees = isset($args['fees']) && is_array($args['fees']) ? $args['fees'] : [];
         $append_fees = isset($args['append_fees']) && $args['append_fees'];
@@ -115,8 +131,10 @@ class LSD_Payments_Helper extends LSD_Base
                 $cart->set_fees($fees);
             }
 
-            return;
+            return true;
         }
+
+        if (!$this->plan_supported($plan_id)) return false;
 
         $meta = isset($args['meta']) && is_array($args['meta']) ? $args['meta'] : [];
 
@@ -137,10 +155,16 @@ class LSD_Payments_Helper extends LSD_Base
                 try
                 {
                     WC()->cart->add_to_cart($plan_id, 1, 0, [], $meta);
+                    return true;
                 }
-                catch (Exception $e) {}
+                catch (Exception $e)
+                {
+                    return false;
+                }
             }
         }
+
+        return false;
     }
 
     public function cart_clear(): void
@@ -187,6 +211,44 @@ class LSD_Payments_Helper extends LSD_Base
     public function requirements_message(): string
     {
         return esc_html__('To use payment features, either select the Listdom engine in Listdom → Settings → Payments → Engine, or install and activate WooCommerce to use the WooCommerce payment system.', 'listdom');
+    }
+
+    public function plan_supported(int $plan_id): bool
+    {
+        if ($this->engine !== LSD_Payments_Engine::WC) return true;
+        if ($plan_id < 1) return false;
+
+        return !$this->is_woocommerce_subscription_product($plan_id);
+    }
+
+    public function unsupported_plan_message(): string
+    {
+        return esc_html__('Recurring WooCommerce subscription products are not supported by Listdom add-ons. Use the Listdom payment engine for recurring services.', 'listdom');
+    }
+
+    public function unavailable_plan_message(): string
+    {
+        return esc_html__('The selected payment option is unavailable.', 'listdom');
+    }
+
+    private function is_woocommerce_subscription_product(int $plan_id): bool
+    {
+        if ($plan_id < 1 || !function_exists('wc_get_product')) return false;
+
+        if (class_exists('WC_Subscriptions_Product') && WC_Subscriptions_Product::is_subscription($plan_id)) return true;
+        if (function_exists('ywsbs_is_subscription_product') && ywsbs_is_subscription_product($plan_id)) return true;
+
+        if (function_exists('YITH_WC_Subscription'))
+        {
+            $subscription = YITH_WC_Subscription();
+
+            if (is_object($subscription) && method_exists($subscription, 'is_subscription'))
+            {
+                return (bool) $subscription->is_subscription($plan_id);
+            }
+        }
+
+        return false;
     }
 
     public function is_recurring_enabled(): bool

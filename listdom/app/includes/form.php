@@ -377,7 +377,7 @@ class LSD_Form extends LSD_Base
         $id = esc_attr($field_id);
         $button_id = $id ? $id . '_button' : uniqid('lsd_imagepicker_button_');
 
-        $output  = '<div class="lsd-imagepicker-wrapper">';
+        $output  = '<div class="lsd-imagepicker-wrapper' . ((isset($args['upload_action'], $args['upload_nonce']) && trim((string) $args['upload_action']) !== '' && trim((string) $args['upload_nonce']) !== '') ? ' lsd-imagepicker-has-upload' : '') . '">';
         $output .= '<div id="' . $id . '_img" class="lsd-image-placeholder lsd-imagepicker-image-placeholder lsd-mb-2' . ($has_image ? ' lsd-image-placeholder-has-image' : '') . '" data-placeholder="' . esc_attr($placeholder_src) . '">';
         $output .= '<div class="lsd-image-placeholder-inner">';
         $output .= '<div class="lsd-image-placeholder-preview' . ($has_image ? '' : ' lsd-util-hide') . '">' . ($has_image ? $image_html : '') . '</div>';
@@ -388,6 +388,12 @@ class LSD_Form extends LSD_Base
         $output .= '</div>';
         $output .= '</div>';
         $output .= '<input type="hidden" name="' . esc_attr($args['name']) . '" id="' . $id . '" value="' . esc_attr($image_id) . '"' . $attributes . ($required ? ' required' : '') . '>';
+        if (isset($args['upload_action'], $args['upload_nonce']) && trim((string) $args['upload_action']) !== '' && trim((string) $args['upload_nonce']) !== '')
+        {
+            $output .= '<input type="file" class="lsd-imagepicker-upload-input lsd-util-hide" accept="image/jpeg,image/png,image/webp" data-target="#' . $id . '" data-action="' . esc_attr(sanitize_key((string) $args['upload_action'])) . '" data-nonce="' . esc_attr((string) $args['upload_nonce']) . '"';
+            if (isset($args['upload_message']) && trim((string) $args['upload_message']) !== '') $output .= ' data-message="' . esc_attr((string) $args['upload_message']) . '"';
+            $output .= '>';
+        }
         $output .= '<button type="button" class="lsd-choose-file lsd-remove-image-button lsd-w-auto lsd-text-button' . ($has_image ? '' : ' lsd-util-hide') . $class . '" data-for="#' . $id . '">' . esc_html__('Remove image', 'listdom') . '</button>';
         $output .= '</div>';
 
@@ -1049,89 +1055,359 @@ class LSD_Form extends LSD_Base
         return self::select($args);
     }
 
+    /**
+     * Renders the chain toggle button for multi-value controls.
+     *
+     * @param string $id
+     * @return string
+     */
+    private static function are_multi_values_linked(array $values): bool
+    {
+        $normalized = array_map(static function ($value): string
+        {
+            return is_scalar($value) ? trim((string) $value) : '';
+        }, $values);
+
+        return count(array_unique($normalized, SORT_STRING)) <= 1;
+    }
+
+    public static function chain_button(string $id, bool $linked = true): string
+    {
+        $id_attr = esc_attr($id);
+        $state = $linked ? 'linked' : 'unlinked';
+        $icon = $linked ? 'fa-link' : 'fa-link-slash';
+        $class = 'lsd-chain-toggle' . ($linked ? ' is-linked' : '');
+
+        return sprintf(
+            '<button type="button" class="%s" data-lsd-chain-toggle="%s" data-lsd-chain-state="%s" aria-pressed="%s" aria-label="%s">%s</button>',
+            esc_attr($class),
+            $id_attr,
+            esc_attr($state),
+            $linked ? 'true' : 'false',
+            esc_attr__('Toggle linked values', 'listdom'),
+            '<i class="fa ' . esc_attr($icon) . '"></i>'
+        );
+    }
+
+    /**
+     * Shared renderer for iconset controls.
+     *
+     * @param array $args
+     * @param array $options
+     * @return string
+     */
+    protected static function iconset(array $args, array $options): string
+    {
+        if (!count($args) || !count($options)) return '';
+
+        $id     = sanitize_key($args['id'] ?? 'lsd_iconset');
+        $name   = $args['name'] ?? $id;
+        $value  = $args['value'] ?? ($args['default'] ?? '');
+        $label  = isset($args['label']) ? (string) $args['label'] : '';
+        $wrapper  = isset($args['wrapper']) ? ' ' . esc_attr($args['wrapper']) : '';
+        $class  = isset($args['class']) ? ' ' . esc_attr($args['class']) : '';
+
+        if ($value === '' && isset($args['default'])) $value = $args['default'];
+        $value = (string) $value;
+
+        $buttons = '';
+        foreach ($options as $option_value => $icon_class)
+        {
+            $option_icon = is_array($icon_class) ? (string) ($icon_class['icon'] ?? '') : (string) $icon_class;
+            $option_label = is_array($icon_class)
+                ? (string) ($icon_class['label'] ?? '')
+                : '';
+
+            if ($option_label === '') $option_label = ucwords(str_replace(['-', '_'], ' ', (string) $option_value));
+
+            $is_active = $value !== '' && $value === (string) $option_value;
+            $buttons  .= sprintf(
+                '<button type="button" class="lsd-iconset-btn lsd-tooltip lsd-tooltip-top%s" data-value="%s" aria-pressed="%s" aria-label="%s" data-lsd-tooltip="%s"><i class="webilia-icon %s"></i></button>',
+                $is_active ? ' is-active' : '',
+                esc_attr($option_value),
+                $is_active ? 'true' : 'false',
+                esc_attr($option_label),
+                esc_attr($option_label),
+                esc_attr($option_icon)
+            );
+        }
+
+        // Fallback to the first option when no value exists
+        if ($value === '' && count($options))
+        {
+            $first_key = array_keys($options)[0];
+            $value = (string) $first_key;
+        }
+
+        $input_id = $id . '_value';
+
+        return sprintf(
+            '<div class="lsd-control lsd-control--iconset%s" data-lsd-iconset="%s">'
+                . '%s'
+                . '<div class="lsd-iconset-buttons">%s</div>'
+                . '<input type="hidden" class="%s" id="%s" name="%s" value="%s">'
+            . '</div>',
+            $wrapper,
+            esc_attr($id),
+            $label !== '' ? '<label for="' . esc_attr($input_id) . '">' . esc_html($label) . '</label>' : '',
+            $buttons,
+            $class,
+            esc_attr($input_id),
+            esc_attr($name),
+            esc_attr($value)
+        );
+    }
+
+    /**
+     * Iconset: flex direction
+     *
+     * @param array $args
+     * @return string
+     */
+    public static function iconset_direction(array $args): string
+    {
+        $args['wrapper'] = ($args['wrapper'] ?? '') . ' lsd-iconset--direction';
+
+        $options = [
+            'row' => ['icon' => 'wbli-right-arrow', 'label' => __('Row', 'listdom'),],
+            'row-reverse' => ['icon' => 'wbli-move-left', 'label' => __('Row Reverse', 'listdom'),],
+            'column' => ['icon' => 'wbli-move-down', 'label' => __('Column', 'listdom'),],
+            'column-reverse' => ['icon' => 'wbli-move-up', 'label' => __('Column Reverse', 'listdom'),],
+        ];
+
+        return self::iconset($args, $options);
+    }
+
+    /**
+     * Iconset: justify-content
+     *
+     * @param array $args
+     * @return string
+     */
+    public static function iconset_justify(array $args): string
+    {
+        $args['wrapper'] = ($args['wrapper'] ?? '') . ' lsd-iconset--justify';
+
+        $options = [
+            'flex-start' => ['icon' => 'wbli-justify-flex-start', 'label' => __('Start', 'listdom'),],
+            'center' => ['icon' => 'wbli-justify-center', 'label' => __('Center', 'listdom'),],
+            'flex-end' => ['icon' => 'wbli-justify-flex-end', 'label' => __('End', 'listdom'),],
+            'space-between' => ['icon' => 'wbli-justify-space-between', 'label' => __('Space Between', 'listdom'),],
+            'space-around' => ['icon' => 'wbli-justify-space-around', 'label' => __('Space Around', 'listdom'),],
+            'space-evenly' => ['icon' => 'wbli-justify-space-evenly', 'label' => __('Space Evenly', 'listdom'),],
+        ];
+
+        return self::iconset($args, $options);
+    }
+
+    /**
+     * Iconset: align-items
+     *
+     * @param array $args
+     * @return string
+     */
+    public static function iconset_align(array $args): string
+    {
+        $args['wrapper'] = ($args['wrapper'] ?? '') . ' lsd-iconset--align';
+
+        $options = [
+            'stretch' => ['icon' => 'wbli-align-stretch', 'label' => __('Stretch', 'listdom'),],
+            'flex-start' => ['icon' => 'wbli-align-flex-start', 'label' => __('Start', 'listdom'),],
+            'center' => ['icon' => 'wbli-align-center', 'label' => __('Center', 'listdom'),],
+            'flex-end' => ['icon' => 'wbli-align-flex-end', 'label' => __('End', 'listdom'),],
+        ];
+
+        return self::iconset($args, $options);
+    }
+
+    /**
+     * Iconset: flex-wrap
+     *
+     * @param array $args
+     * @return string
+     */
+    public static function iconset_wrap(array $args): string
+    {
+        $args['wrapper'] = ($args['wrapper'] ?? '') . ' lsd-iconset--wrap';
+
+        $options = [
+            'nowrap' => ['icon' => 'wbli-nowrap', 'label' => __('No Wrap', 'listdom'),],
+            'wrap' => ['icon' => 'wbli-wrap', 'label' => __('Wrap', 'listdom'),],
+            'wrap-reverse' => ['icon' => 'wbli-wrap-reverse', 'label' => __('Wrap Reverse', 'listdom'),],
+        ];
+
+        return self::iconset($args, $options);
+    }
+
+    /**
+     * Multi-number control with chain toggle (row/column gap).
+     *
+     * @param array $args
+     * @return string
+     */
+    public static function gap(array $args): string
+    {
+        if (!count($args)) return '';
+
+        $id   = sanitize_key($args['id'] ?? 'lsd_multi_number_chain');
+        $name = $args['name'] ?? $id;
+        $labels = isset($args['labels']) && is_array($args['labels']) ? $args['labels'] : [];
+
+        if (isset($args['value']) && is_array($args['value'])) $value = $args['value'];
+        elseif (isset($args['value'])) $value = ['row' => $args['value'], 'column' => $args['value']];
+        else $value = [];
+        $default = $args['default'] ?? null;
+
+        $row_default = is_array($default) ? ($default['row'] ?? ($default['column'] ?? 0)) : $default;
+        $column_default = is_array($default) ? ($default['column'] ?? ($default['row'] ?? 0)) : $default;
+
+        $row_value = $value['row'] ?? $row_default ?? 0;
+        $column_value = $value['column'] ?? $column_default ?? $row_value;
+
+        $min = isset($args['min']) ? (float) $args['min'] : 0;
+        $max = isset($args['max']) ? (float) $args['max'] : null;
+        $step = isset($args['step']) ? (float) $args['step'] : 1;
+
+        $row_label = $labels['row'] ?? esc_html__('Row', 'listdom');
+        $column_label = $labels['column'] ?? esc_html__('Column', 'listdom');
+
+        $input_attrs = ' min="' . esc_attr($min) . '" step="' . esc_attr($step) . '"';
+        if ($max !== null) $input_attrs .= ' max="' . esc_attr($max) . '"';
+
+        $row_id = $id . '_row';
+        $column_id = $id . '_column';
+
+        $is_linked = self::are_multi_values_linked([$row_value, $column_value]);
+
+        return sprintf(
+            '<div class="lsd-gap-wrapper" data-lsd-gap-wrapper="%s">
+                <div class="lsd-multi-field-group" data-lsd-multi-field>
+                    <div class="lsd-gap-wrapper__inputs">
+                        <div class="lsd-gap-wrapper__item lsd-gap-wrapper-row">
+                            <label class="lsd-fields-label-tiny" for="%s">%s</label>
+                            <input type="number" id="%s" class="lsd-admin-input" name="%s[row]" value="%s"%s>
+                        </div>
+                        <div class="lsd-gap-wrapper__item lsd-gap-wrapper-column">
+                            <label class="lsd-fields-label-tiny" for="%s">%s</label>
+                            <input type="number" id="%s" class="lsd-admin-input" name="%s[column]" value="%s"%s>
+                        </div>
+                        <div class="lsd-gap-wrapper__item lsd-gap-wrapper__button">%s</div>
+                    </div>
+                </div>
+            </div>',
+            esc_attr($id),
+            esc_attr($row_id),
+            esc_html($row_label),
+            esc_attr($row_id),
+            esc_attr($name),
+            esc_attr($row_value),
+            $input_attrs,
+            esc_attr($column_id),
+            esc_html($column_label),
+            esc_attr($column_id),
+            esc_attr($name),
+            esc_attr($column_value),
+            $input_attrs,
+            self::chain_button($id . '_chain', $is_linked)
+        );
+    }
+
     public static function border(array $args): string
     {
         $id = $args['id'] ?? 'lsd_border';
         $name = $args['name'] ?? 'border';
-        $value = isset($args['value']) && is_array($args['value']) ? $args['value'] : [];
+        $value = $args['value'] ?? [];
+        if (!is_array($value)) $value = is_numeric($value) ? ['radius' => $value] : [];
+
+        $is_linked = self::are_multi_values_linked([
+            $value['top'] ?? 0,
+            $value['right'] ?? 0,
+            $value['bottom'] ?? 0,
+            $value['left'] ?? 0,
+        ]);
 
         return '<div class="lsd-border-wrapper">
             <div class="lsd-border-width-wrapper lsd-flex-2">
-                <div class="lsd-border-width-top">
-                    '.LSD_Form::label([
-                        'class' => 'lsd-fields-label-tiny',
-                        'title' => esc_html__('Top', 'listdom'),
-                        'for' => $id.'_top'
-                    ]).'
-                    '.LSD_Form::number([
-                        'class' => 'lsd-admin-input',
-                        'id' => $id.'_top',
-                        'name' => $name.'[top]',
-                        'placeholder' => esc_attr__('Top', 'listdom'),
-                        'attributes' => [
-                            'min' => 0,
-                            'max' => 10,
-                            'increment' => 1
-                        ],
-                        'value' => $value['top'] ?? 0
-                    ]).'
-                </div>
-                <div class="lsd-border-width-right">
-                    '.LSD_Form::label([
-                        'class' => 'lsd-fields-label-tiny',
-                        'title' => esc_html__('Right', 'listdom'),
-                        'for' => $id.'_right'
-                    ]).'
-                    '.LSD_Form::number([
-                        'class' => 'lsd-admin-input',
-                        'id' => $id.'_right',
-                        'name' => $name.'[right]',
-                        'placeholder' => esc_attr__('Right', 'listdom'),
-                        'attributes' => [
-                            'min' => 0,
-                            'max' => 10,
-                            'increment' => 1
-                        ],
-                        'value' => $value['right'] ?? 0
-                    ]).'
-                </div>
-                <div class="lsd-border-width-bottom">
-                    '.LSD_Form::label([
-                        'class' => 'lsd-fields-label-tiny',
-                        'title' => esc_html__('Bottom', 'listdom'),
-                        'for' => $id.'_bottom'
-                    ]).'
-                    '.LSD_Form::number([
-                        'class' => 'lsd-admin-input',
-                        'id' => $id.'_bottom',
-                        'name' => $name.'[bottom]',
-                        'placeholder' => esc_attr__('Bottom', 'listdom'),
-                        'attributes' => [
-                            'min' => 0,
-                            'max' => 10,
-                            'increment' => 1
-                        ],
-                        'value' => $value['bottom'] ?? 0
-                    ]).'
-                </div>
-                <div class="lsd-border-width-left">
-                    '.LSD_Form::label([
-                        'class' => 'lsd-fields-label-tiny',
-                        'title' => esc_html__('Left', 'listdom'),
-                        'for' => $id.'_left'
-                    ]).'
-                    '.LSD_Form::number([
-                        'class' => 'lsd-admin-input',
-                        'id' => $id.'_left',
-                        'name' => $name.'[left]',
-                        'placeholder' => esc_attr__('Left', 'listdom'),
-                        'attributes' => [
-                            'min' => 0,
-                            'max' => 10,
-                            'increment' => 1
-                        ],
-                        'value' => $value['left'] ?? 0
-                    ]).'
+                <div class="lsd-multi-field-group" data-lsd-multi-field>
+                    <div class="lsd-fields">
+                        <div class="lsd-border-width-top">
+                            '.LSD_Form::label([
+                                'class' => 'lsd-fields-label-tiny',
+                                'title' => esc_html__('Top', 'listdom'),
+                                'for' => $id.'_top'
+                            ]).'
+                            '.LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => $id.'_top',
+                                'name' => $name.'[top]',
+                                'placeholder' => esc_attr__('Top', 'listdom'),
+                                'attributes' => [
+                                    'min' => 0,
+                                    'max' => 10,
+                                    'increment' => 1
+                                ],
+                                'value' => $value['top'] ?? 0
+                            ]).'
+                        </div>
+                        <div class="lsd-border-width-right">
+                            '.LSD_Form::label([
+                                'class' => 'lsd-fields-label-tiny',
+                                'title' => esc_html__('Right', 'listdom'),
+                                'for' => $id.'_right'
+                            ]).'
+                            '.LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => $id.'_right',
+                                'name' => $name.'[right]',
+                                'placeholder' => esc_attr__('Right', 'listdom'),
+                                'attributes' => [
+                                    'min' => 0,
+                                    'max' => 10,
+                                    'increment' => 1
+                                ],
+                                'value' => $value['right'] ?? 0
+                            ]).'
+                        </div>
+                        <div class="lsd-border-width-bottom">
+                            '.LSD_Form::label([
+                                'class' => 'lsd-fields-label-tiny',
+                                'title' => esc_html__('Bottom', 'listdom'),
+                                'for' => $id.'_bottom'
+                            ]).'
+                            '.LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => $id.'_bottom',
+                                'name' => $name.'[bottom]',
+                                'placeholder' => esc_attr__('Bottom', 'listdom'),
+                                'attributes' => [
+                                    'min' => 0,
+                                    'max' => 10,
+                                    'increment' => 1
+                                ],
+                                'value' => $value['bottom'] ?? 0
+                            ]).'
+                        </div>
+                        <div class="lsd-border-width-left">
+                            '.LSD_Form::label([
+                                'class' => 'lsd-fields-label-tiny',
+                                'title' => esc_html__('Left', 'listdom'),
+                                'for' => $id.'_left'
+                            ]).'
+                            '.LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => $id.'_left',
+                                'name' => $name.'[left]',
+                                'placeholder' => esc_attr__('Left', 'listdom'),
+                                'attributes' => [
+                                    'min' => 0,
+                                    'max' => 10,
+                                    'increment' => 1
+                                ],
+                                'value' => $value['left'] ?? 0
+                            ]).'
+                        </div>
+                    </div>
+                    '.LSD_Form::chain_button($id.'_border', $is_linked).'
                 </div>
             </div>
             <div class="lsd-border-radius-wrapper lsd-flex-1">
@@ -1194,79 +1470,91 @@ class LSD_Form extends LSD_Base
         $name = $args['name'] ?? 'padding';
         $value = isset($args['value']) && is_array($args['value']) ? $args['value'] : [];
 
+        $is_linked = self::are_multi_values_linked([
+            $value['top'] ?? 0,
+            $value['right'] ?? 0,
+            $value['bottom'] ?? 0,
+            $value['left'] ?? 0,
+        ]);
+
         return '<div class="lsd-padding-wrapper">
             <div class="lsd-padding-width-wrapper lsd-flex-1">
-                <div class="lsd-padding-top">
-                    '.LSD_Form::label([
-                        'class' => 'lsd-fields-label-tiny',
-                        'title' => esc_html__('Top', 'listdom'),
-                        'for' => $id.'_top'
-                    ]).'
-                    '.LSD_Form::number([
-                        'class' => 'lsd-admin-input',
-                        'id' => $id.'_top',
-                        'name' => $name.'[top]',
-                        'placeholder' => esc_attr__('Top', 'listdom'),
-                        'attributes' => [
-                            'min' => 0,
-                            'increment' => 1
-                        ],
-                        'value' => $value['top'] ?? 0
-                    ]).'
-                </div>
-                <div class="lsd-padding-right">
-                    '.LSD_Form::label([
-                        'class' => 'lsd-fields-label-tiny',
-                        'title' => esc_html__('Right', 'listdom'),
-                        'for' => $id.'_right'
-                    ]).'
-                    '.LSD_Form::number([
-                        'class' => 'lsd-admin-input',
-                        'id' => $id.'_right',
-                        'name' => $name.'[right]',
-                        'placeholder' => esc_attr__('Right', 'listdom'),
-                        'attributes' => [
-                            'min' => 0,
-                            'increment' => 1
-                        ],
-                        'value' => $value['right'] ?? 0
-                    ]).'
-                </div>
-                <div class="lsd-padding-bottom">
-                    '.LSD_Form::label([
-                        'class' => 'lsd-fields-label-tiny',
-                        'title' => esc_html__('Bottom', 'listdom'),
-                        'for' => $id.'_bottom'
-                    ]).'
-                    '.LSD_Form::number([
-                        'class' => 'lsd-admin-input',
-                        'id' => $id.'_bottom',
-                        'name' => $name.'[bottom]',
-                        'placeholder' => esc_attr__('Bottom', 'listdom'),
-                        'attributes' => [
-                            'min' => 0,
-                            'increment' => 1
-                        ],
-                        'value' => $value['bottom'] ?? 0
-                    ]).'
-                </div>
-                <div class="lsd-padding-left">
-                    '.LSD_Form::label([
-                        'class' => 'lsd-fields-label-tiny',
-                        'title' => esc_html__('Left', 'listdom'),
-                        'for' => $id.'_left'
-                    ]).'
-                    '.LSD_Form::number([
-                        'class' => 'lsd-admin-input',
-                        'id' => $id.'_left',
-                        'name' => $name.'[left]',
-                        'placeholder' => esc_attr__('Left', 'listdom'),
-                        'attributes' => [
-                            'min' => 0,
-                            'increment' => 1
-                        ],
-                        'value' => $value['left'] ?? 0
-                    ]).'
+                <div class="lsd-multi-field-group" data-lsd-multi-field>
+                    <div class="lsd-fields">
+                        <div class="lsd-padding-top">
+                            '.LSD_Form::label([
+                                'class' => 'lsd-fields-label-tiny',
+                                'title' => esc_html__('Top', 'listdom'),
+                                'for' => $id.'_top'
+                            ]).'
+                            '.LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => $id.'_top',
+                                'name' => $name.'[top]',
+                                'placeholder' => esc_attr__('Top', 'listdom'),
+                                'attributes' => [
+                                    'min' => 0,
+                                    'increment' => 1
+                                ],
+                                'value' => $value['top'] ?? 0
+                            ]).'
+                        </div>
+                        <div class="lsd-padding-right">
+                            '.LSD_Form::label([
+                                'class' => 'lsd-fields-label-tiny',
+                                'title' => esc_html__('Right', 'listdom'),
+                                'for' => $id.'_right'
+                            ]).'
+                            '.LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => $id.'_right',
+                                'name' => $name.'[right]',
+                                'placeholder' => esc_attr__('Right', 'listdom'),
+                                'attributes' => [
+                                    'min' => 0,
+                                    'increment' => 1
+                                ],
+                                'value' => $value['right'] ?? 0
+                            ]).'
+                        </div>
+                        <div class="lsd-padding-bottom">
+                            '.LSD_Form::label([
+                                'class' => 'lsd-fields-label-tiny',
+                                'title' => esc_html__('Bottom', 'listdom'),
+                                'for' => $id.'_bottom'
+                            ]).'
+                            '.LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => $id.'_bottom',
+                                'name' => $name.'[bottom]',
+                                'placeholder' => esc_attr__('Bottom', 'listdom'),
+                                'attributes' => [
+                                    'min' => 0,
+                                    'increment' => 1
+                                ],
+                                'value' => $value['bottom'] ?? 0
+                            ]).'
+                        </div>
+                        <div class="lsd-padding-left">
+                            '.LSD_Form::label([
+                                'class' => 'lsd-fields-label-tiny',
+                                'title' => esc_html__('Left', 'listdom'),
+                                'for' => $id.'_left'
+                            ]).'
+                            '.LSD_Form::number([
+                                'class' => 'lsd-admin-input',
+                                'id' => $id.'_left',
+                                'name' => $name.'[left]',
+                                'placeholder' => esc_attr__('Left', 'listdom'),
+                                'attributes' => [
+                                    'min' => 0,
+                                    'increment' => 1
+                                ],
+                                'value' => $value['left'] ?? 0
+                            ]).'
+                        </div>
+                    </div>
+                    '.LSD_Form::chain_button($id.'_padding', $is_linked).'
                 </div>
             </div>
         </div>';

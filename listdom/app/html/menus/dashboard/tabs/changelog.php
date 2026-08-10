@@ -3,6 +3,16 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v5.8.0 <span>August 9th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added a Template Builder for creating reusable listing layouts.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added a guided Health Checklist to help configure a new directory site.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added repeatable field mappings for CSV and Excel imports, including FAQ data and supported add-on content.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added sorting controls for shortcode results and a Table layout for custom fields.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added AI Visibility tools for structured listing discovery and indexing.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved WordPress block editor compatibility with Block API version 3.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed password-reset redirection, profile image uploads, responsive frontend layouts, and admin bar conflicts.', 'listdom'); ?></li>
+    </ul>
     <h2>v5.7.0 <span>July 4th, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Added a new Frontend Dashboard payments area with order, subscription, billing, invoice, and Stripe payment flows.', 'listdom'); ?></li>

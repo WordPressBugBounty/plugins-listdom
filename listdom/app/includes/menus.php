@@ -7,6 +7,7 @@ class LSD_Menus extends LSD_Base
     protected LSD_Menus_IX $ix;
     protected LSD_Menus_Addons $addons;
     protected LSD_Menus_Welcome $welcome;
+    protected LSD_Menus_Launch_Checklist $launch_checklist;
     protected LSD_Activation $licenses;
     public string $tab;
 
@@ -18,10 +19,12 @@ class LSD_Menus extends LSD_Base
         $this->ix = new LSD_Menus_IX();
         $this->addons = new LSD_Menus_Addons();
         $this->welcome = new LSD_Menus_Welcome();
+        $this->launch_checklist = new LSD_Menus_Launch_Checklist();
         $this->licenses = new LSD_Activation();
 
         // Register Listdom Menus
         add_action('admin_menu', [$this, 'register_menus'], 1);
+        add_action('admin_menu', [$this, 'update_main_menu_badge'], 100);
         add_action('parent_file', [$this, 'mainmenu_selection']);
         add_action('submenu_file', [$this, 'submenu_selection']);
 
@@ -36,17 +39,25 @@ class LSD_Menus extends LSD_Base
         $listdom_name = LSD_Branding::name();
         $listdom = esc_html($listdom_name);
         $licenses = esc_html__('Licenses', 'listdom');
+        $help = esc_html__('Help', 'listdom');
+
+        $needs_attention = current_user_can('manage_options') ? LSD_Checklist::instance()->needs_attention_count() : 0;
+        if ($needs_attention > 0)
+        {
+            $help .= ' <span class="update-plugins count-' . esc_attr($needs_attention) . '"><span class="update-count">' . esc_html($needs_attention) . '</span></span>';
+        }
 
         $pending = LSD_Payments_Engine::instance()->listdom() ? LSD_Payments::pending_count() : 0;
-        if ($b = apply_filters('lsd_backend_main_badge', 0))
+        $backend_badge = (int) apply_filters('lsd_backend_main_badge', 0);
+        if ($backend_badge > 0)
         {
-            $listdom .= ' <span class="update-plugins count-' . esc_attr($b + $pending) . '"><span class="update-count">' . esc_html($b + $pending) . '</span></span>';
-            $licenses .= ' <span class="update-plugins count-' . esc_attr($b) . '"><span class="update-count">' . esc_html($b) . '</span></span>';
+            $licenses .= ' <span class="update-plugins count-' . esc_attr($backend_badge) . '"><span class="update-count">' . esc_html($backend_badge) . '</span></span>';
         }
 
         add_menu_page(esc_html($listdom_name), $listdom, 'manage_options', 'listdom', null, $icon, 26);
         add_submenu_page('listdom', esc_html__('Home', 'listdom'), esc_html__('Home', 'listdom'), 'manage_options', 'listdom', [$this->dashboard, 'output'], 1);
         add_submenu_page('listdom', esc_html__('Shortcodes', 'listdom'), esc_html__('Shortcodes', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SHORTCODE, null, 2);
+        add_submenu_page('listdom', esc_html__('Template Builder', 'listdom'), esc_html__('Template Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_TEMPLATE, null, 2.5);
         add_submenu_page('listdom', esc_html__('Search Builder', 'listdom'), esc_html__('Search and Filter Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SEARCH, null, 3);
         add_submenu_page('listdom', esc_html__('Notifications', 'listdom'), esc_html__('Notifications', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_NOTIFICATION, null, 4);
 
@@ -60,17 +71,43 @@ class LSD_Menus extends LSD_Base
 
         add_submenu_page('listdom', esc_html__('Settings', 'listdom'), esc_html__('Settings', 'listdom'), 'manage_options', 'listdom-settings', [$this->settings, 'output'], 5);
         add_submenu_page('listdom', esc_html__('Import / Export', 'listdom'), esc_html__('Import / Export', 'listdom'), 'manage_options', 'listdom-ix', [$this->ix, 'output'], 6);
-        add_submenu_page('listdom', esc_html__('Welcome to Listdom Setup Wizard', 'listdom'), esc_html__('Wizard', 'listdom'), 'manage_options', LSD_Base::WELCOME_SLUG, [$this->welcome, 'output'], 6.5);
-
-        add_submenu_page('listdom', esc_html__('Addons', 'listdom'), '<span style="color: #ffd700; font-weight: bold;">' . esc_html__('Addons', 'listdom') . '</span>', 'manage_options', 'listdom-addons', [$this->addons, 'output'], 7);
-
-        add_submenu_page('listdom', esc_html__('Documentation', 'listdom'), esc_html__('Documentation', 'listdom'), 'manage_options', LSD_Base::getListdomDocsURL(), null, 30);
-        add_submenu_page('listdom', esc_html__('Support', 'listdom'), esc_html__('Support', 'listdom'), 'manage_options', LSD_Base::getSupportURL(), null, 31);
 
         if (apply_filters('lsd_display_activation_tab', true))
         {
             add_submenu_page('listdom', esc_html__('Licenses', 'listdom'), $licenses, 'manage_options', 'listdom-licenses', [$this->licenses, 'content'], 32);
         }
+
+        add_submenu_page('listdom', esc_html__('Help', 'listdom'), $help, 'manage_options', LSD_Checklist::MENU_SLUG, [$this->launch_checklist, 'output'], 33);
+        add_submenu_page(LSD_Checklist::MENU_SLUG, esc_html__('Welcome to Listdom Setup Wizard', 'listdom'), esc_html__('Wizard', 'listdom'), 'manage_options', LSD_Base::WELCOME_SLUG, [$this->welcome, 'output'], 1);
+
+        add_submenu_page('listdom', esc_html__('Addons', 'listdom'), '<span style="color: #ffd700; font-weight: bold;">' . esc_html__('Addons', 'listdom') . '</span>', 'manage_options', 'listdom-addons', [$this->addons, 'output'], 99);
+    }
+
+    public function update_main_menu_badge(): void
+    {
+        global $menu, $submenu;
+
+        if (!isset($submenu['listdom']) || !is_array($submenu['listdom'])) return;
+
+        $submenu_count = 0;
+        foreach ($submenu['listdom'] as $submenu_item)
+        {
+            if (!isset($submenu_item[0])) continue;
+
+            preg_match_all('/<span class="update-count">(\d+)<\/span>/', (string) $submenu_item[0], $matches);
+            foreach ($matches[1] ?? [] as $count) $submenu_count += (int) $count;
+        }
+
+        if ($submenu_count < 1) return;
+
+        foreach ($menu as &$menu_item)
+        {
+            if (!isset($menu_item[2]) || $menu_item[2] !== 'listdom') continue;
+
+            $menu_item[0] = esc_html(LSD_Branding::name()) . ' <span class="update-plugins count-' . esc_attr($submenu_count) . '"><span class="update-count">' . esc_html($submenu_count) . '</span></span>';
+            break;
+        }
+        unset($menu_item);
     }
 
     /**
@@ -84,6 +121,7 @@ class LSD_Menus extends LSD_Base
         // Don't do anything if the post type is not Listdom Post Type
         $post_types = [
             LSD_Base::PTYPE_SHORTCODE,
+            LSD_Base::PTYPE_TEMPLATE,
             LSD_Base::PTYPE_SEARCH,
             LSD_Base::PTYPE_NOTIFICATION,
             LSD_Base::PTYPE_PLAN,
@@ -114,6 +152,7 @@ class LSD_Menus extends LSD_Base
         // Don't do anything if the post type is not Listdom Post Type
         $post_types = [
             LSD_Base::PTYPE_SHORTCODE,
+            LSD_Base::PTYPE_TEMPLATE,
             LSD_Base::PTYPE_SEARCH,
             LSD_Base::PTYPE_NOTIFICATION,
             LSD_Base::PTYPE_PLAN,

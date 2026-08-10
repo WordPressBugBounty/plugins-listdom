@@ -64,14 +64,16 @@
                 this.overlay = $('<div class="lsd-toast-overlay"></div>');
                 $('body').append(this.overlay);
 
-                this.overlay.on('click', (e) => {
-                    if (e.target === this.overlay[0]) {
-                        if (typeof this.confirm.onCloseOverlay === 'function') {
-                            this.confirm.onCloseOverlay(this);
-                        }
+                this.overlay.on('click', (event) =>
+                {
+                    if (event.target !== this.overlay[0]) return;
 
-                        this.remove();
+                    if (typeof this.confirm.onCloseOverlay === 'function')
+                    {
+                        this.confirm.onCloseOverlay(this);
                     }
+
+                    this.remove();
                 });
 
                 const btnWrap = $('<div class="lsd-toast-actions"></div>');
@@ -79,20 +81,29 @@
                 const confirmLabel = this.confirm.confirmText || 'Confirm';
                 const cancelLabel = this.confirm.cancelText || 'Cancel';
 
-                const confirmBtn = $('<button type="button" class="lsd-secondary-button">' + confirmLabel + '</button>');
-                const cancelBtn = $('<button type="button" class="lsd-secondary-button">' + cancelLabel + '</button>');
+                const confirmClass = this.confirm.confirmClass || 'lsd-secondary-button';
+                const cancelClass = this.confirm.cancelClass || 'lsd-secondary-button';
 
-                confirmBtn.on('click', () => {
+                const confirmFirst = this.confirm.confirmFirst !== false;
+
+                const confirmBtn = $('<button type="button"></button>').addClass(confirmClass).text(confirmLabel);
+                const cancelBtn = $('<button type="button"></button>').addClass(cancelClass).text(cancelLabel);
+
+                confirmBtn.on('click', () =>
+                {
                     if (typeof this.confirm.onConfirm === 'function') this.confirm.onConfirm(this);
                     this.remove();
                 });
 
-                cancelBtn.on('click', () => {
+                cancelBtn.on('click', () =>
+                {
                     if (typeof this.confirm.onCancel === 'function') this.confirm.onCancel(this);
                     this.remove();
                 });
 
-                btnWrap.append(confirmBtn, cancelBtn);
+                if (confirmFirst) btnWrap.append(confirmBtn, cancelBtn);
+                else btnWrap.append(cancelBtn, confirmBtn);
+
                 toast.append(btnWrap);
 
                 this.progress = false;

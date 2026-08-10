@@ -78,8 +78,8 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                             else if ($method === 'range')
                             {
                                 $keys = [
-                                    'sf-att-' . $field_key . '-grb-min',
-                                    'sf-att-' . $field_key . '-grb-max',
+                                    'sf-' . $field_key . '-grb-min',
+                                    'sf-' . $field_key . '-grb-max',
                                 ];
                             }
 
@@ -90,11 +90,12 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
                         case 'dropdown':
                         case 'checkbox':
                         case 'radio':
+                        case 'switcher':
 
                             $keys = ['sf-' . $field_key . '-eq'];
                             if ($method === 'dropdown-multiple' || $method === 'checkboxes' || ($method === 'buttons' && $buttons_multiple)) $keys = ['sf-' . $field_key . '-in[]'];
 
-                            $values = $helper->get_terms($f, true);
+                            $values = $helper->get_terms($f, $type !== 'switcher');
 
                             break;
 
@@ -128,12 +129,14 @@ class LSD_API_Resources_SearchModule extends LSD_API_Resource
 
                             if (!LSD_Components::pricing()) continue 2;
 
-                            if ($method === 'dropdown-plus') $keys = ['sf-att-' . $field_key . '-grq'];
+                            $price_base = $field_key === 'price' ? 'sf-att-' . $field_key : 'sf-' . $field_key;
+
+                            if ($method === 'dropdown-plus') $keys = [$price_base . '-grq'];
                             else if ($method === 'mm-input' || $method === 'range')
                             {
                                 $keys = [
-                                    'sf-att-' . $field_key . '-bt-min',
-                                    'sf-att-' . $field_key . '-bt-max',
+                                    $price_base . '-bt-min',
+                                    $price_base . '-bt-max',
                                 ];
                             }
 

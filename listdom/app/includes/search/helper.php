@@ -42,6 +42,10 @@ class LSD_Search_Helper extends LSD_Base
         else if ($key == 'address') return 'address';
         else if ($key == 'period') return 'period';
         else if (in_array($key, ['adults', 'children'])) return 'numeric';
+        else if ($key === 'booking_availability') return 'switcher';
+        else if ($key === 'booking_date') return 'period';
+        else if (in_array($key, ['booking_guests', 'booking_capacity', 'booking_available_slots'], true)) return 'number';
+        else if ($key === 'booking_price') return 'price';
         // ACF
         else if (strpos($key, 'acf_number_') === 0) return 'number';
         else if (strpos($key, 'acf_text_') === 0 || strpos($key, 'acf_email_') === 0) return 'text';
@@ -164,6 +168,35 @@ class LSD_Search_Helper extends LSD_Base
 
             $terms = [];
             foreach ($results as $result) $terms[$result] = $result;
+
+            return $terms;
+        }
+        else if ($key === 'booking_availability')
+        {
+            return [
+                'available' => esc_html__('Available', 'listdom-booking'),
+            ];
+        }
+        else if (in_array($key, ['booking_guests', 'booking_capacity', 'booking_available_slots'], true))
+        {
+            if (!class_exists(\LSDPACBOK\Index::class)) return [];
+            \LSDPACBOK\Index::install();
+
+            global $wpdb;
+
+            $table = \LSDPACBOK\Index::table_name();
+            $column = $key === 'booking_guests' ? 'guests' : ($key === 'booking_available_slots' ? 'available_slots' : 'capacity');
+            $results = $wpdb->get_col("SELECT DISTINCT `$column` FROM `$table` WHERE `$column` IS NOT NULL ORDER BY `$column` ASC");
+
+            $terms = [];
+            if (is_array($results))
+            {
+                foreach ($results as $result)
+                {
+                    if ($result === null || $result === '') continue;
+                    $terms[$result] = $result;
+                }
+            }
 
             return $terms;
         }

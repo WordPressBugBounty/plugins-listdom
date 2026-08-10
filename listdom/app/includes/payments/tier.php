@@ -64,6 +64,24 @@ class LSD_Payments_Tier extends LSD_Base
         return isset($this->tier['price']) ? (float) $this->tier['price'] : 0;
     }
 
+    public function has_duration(): bool
+    {
+        return array_key_exists('duration', $this->tier);
+    }
+
+    public function get_duration_days(): ?int
+    {
+        if ($this->has_duration())
+        {
+            $duration = $this->tier['duration'] ?? '';
+            if (is_numeric($duration) && (int) $duration > 0) return (int) $duration;
+        }
+
+        $expiry = $this->get_expiry_days();
+
+        return $expiry > 0 ? $expiry : null;
+    }
+
     public function get_price_html(): string
     {
         $price = $this->get_price();
@@ -117,11 +135,13 @@ class LSD_Payments_Tier extends LSD_Base
 
     public function get_frequency_days(): int
     {
-        if (isset($this->tier['type']) && $this->tier['type'] === 'recurring')
-        {
-            return isset($this->tier['expiry']) ? (int) $this->tier['expiry'] : 0;
-        }
+        if ($this->is_recurring()) return $this->get_expiry_days();
 
         return 0;
+    }
+
+    public function get_expiry_days(): int
+    {
+        return isset($this->tier['expiry']) ? (int) $this->tier['expiry'] : 0;
     }
 }

@@ -15,6 +15,8 @@ class LSD_Admin extends LSD_Base
         $report = new LSD_Plugin_Report();
         $report->init();
 
+        $payments = new LSD_Payments();
+
         // Activation Redirect
         add_action('admin_init', [$this, 'post_activate']);
 
@@ -53,6 +55,10 @@ class LSD_Admin extends LSD_Base
 
         // Show post states for Listdom system pages
         add_filter('display_post_states', [$this, 'post_states'], 10, 2);
+
+        // WooCommerce product duration field used by Listdom addons.
+        add_action('woocommerce_product_options_general_product_data', [$payments, 'product_duration_field']);
+        add_action('woocommerce_process_product_meta', [$payments, 'save_product_duration'], 10, 1);
     }
 
     public function post_activate()
@@ -205,6 +211,7 @@ class LSD_Admin extends LSD_Base
         $post_types = [
             LSD_Base::PTYPE_LISTING,
             LSD_Base::PTYPE_SHORTCODE,
+            LSD_Base::PTYPE_TEMPLATE,
             LSD_Base::PTYPE_SEARCH,
             LSD_Base::PTYPE_NOTIFICATION,
         ];
@@ -224,10 +231,25 @@ class LSD_Admin extends LSD_Base
         $obj = get_post_type_object($screen->post_type);
         if (!$obj) return;
 
+        $add_button = '';
+        if (current_user_can($obj->cap->create_posts ?? 'edit_posts'))
+        {
+            $button_label = esc_html($obj->labels->add_new);
+
+            if ($screen->post_type === LSD_Base::PTYPE_TEMPLATE && $screen->base === 'edit')
+            {
+                $add_button = ' <a href="#" class="lsd-primary-button lsd-open-template-modal" data-modal-target="lsd-template-modal">' . $button_label . '</a>';
+            }
+            else if ($screen->post_type !== LSD_Base::PTYPE_TEMPLATE)
+            {
+                $add_button = ' <a href="' . esc_url(admin_url('post-new.php?post_type=' . $screen->post_type)) . '" class="lsd-primary-button">' . $button_label . '</a>';
+            }
+        }
+
         if ($screen->base === 'edit')
         {
             $title = $obj->labels->name;
-            if (current_user_can($obj->cap->create_posts ?? 'edit_posts')) $title .= ' <a href="' . esc_url(admin_url('post-new.php?post_type=' . $screen->post_type)) . '" class="lsd-primary-button">' . esc_html($obj->labels->add_new) . '</a>';
+            $title .= $add_button;
 
             $url = admin_url('edit.php?post_type=' . $screen->post_type);
         }
@@ -236,7 +258,7 @@ class LSD_Admin extends LSD_Base
             if (isset($_GET['action']) && $_GET['action'] === 'edit')
             {
                 $title = $obj->labels->edit_item;
-                if (current_user_can($obj->cap->create_posts ?? 'edit_posts')) $title .= ' <a href="' . esc_url(admin_url('post-new.php?post_type=' . $screen->post_type)) . '" class="lsd-primary-button">' . esc_html($obj->labels->add_new) . '</a>';
+                $title .= $add_button;
 
                 $url = admin_url('post.php?post=' . (isset($_GET['post']) ? intval($_GET['post']) : 0) . '&action=edit');
             }

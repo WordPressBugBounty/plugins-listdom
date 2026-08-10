@@ -37,6 +37,7 @@ class LSD_Payments extends LSD_Base
         add_filter('lsd_post_type_header_menus', [$this, 'header_menus'], 10, 2);
         add_filter('lsd_taxonomy_header_menus', [$this, 'taxonomy_header_menus'], 10, 2);
         add_filter('lsd_backend_header_taxonomies', [$this, 'backend_header_taxonomies']);
+
     }
 
     public function backend_header_post_types($post_types)
@@ -172,5 +173,39 @@ class LSD_Payments extends LSD_Base
     {
         $counts = wp_count_posts(LSD_Base::PTYPE_ORDER);
         return isset($counts->{self::STATUS_PENDING}) ? (int) $counts->{self::STATUS_PENDING} : 0;
+    }
+
+    public function product_duration_field()
+    {
+        if (!function_exists('woocommerce_wp_text_input')) return;
+
+        echo '<div class="options_group">';
+
+        woocommerce_wp_text_input([
+            'id' => 'lsd_duration',
+            'label' => esc_html__('Duration', 'listdom'),
+            'description' => esc_html__("This field is used by the Listdom monetization tools and addons to set the active period of the users' purchased services.", 'listdom'),
+            'desc_tip' => true,
+            'type' => 'number',
+            'custom_attributes' => [
+                'min' => '1',
+                'step' => '1',
+            ],
+        ]);
+
+        echo '</div>';
+    }
+
+    public function save_product_duration($product_id)
+    {
+        $duration = isset($_POST['lsd_duration']) ? sanitize_text_field(wp_unslash($_POST['lsd_duration'])) : '';
+
+        if (!is_numeric($duration) || (int) $duration < 1)
+        {
+            delete_post_meta($product_id, 'lsd_duration');
+            return;
+        }
+
+        update_post_meta($product_id, 'lsd_duration', (int) $duration);
     }
 }

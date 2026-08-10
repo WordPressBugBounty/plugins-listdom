@@ -31,6 +31,9 @@ $max_bounds = isset($args['max_bounds']) && is_array($args['max_bounds']) ? $arg
 $access_token = LSD_Options::mapbox_token();
 $force_to_show = isset($args['force_to_show']) && $args['force_to_show'];
 $mousewheel_zoom = isset($args['mousewheel_zoom']) && $args['mousewheel_zoom'];
+$connected_shortcodes = isset($args['connected_shortcodes']) && is_array($args['connected_shortcodes'])
+    ? $args['connected_shortcodes']
+    : [];
 
 // The Unique ID
 $id = $args['id'] ?? wp_rand(100, 999);
@@ -79,6 +82,7 @@ jQuery(document).ready(function()
         mousewheel_zoom: '.($mousewheel_zoom ? 'true' : 'false').',
         display_infowindow: '.($infowindow ? 'true' : 'false').',
         infowindow_trigger: "'.esc_js($infowindow_trigger).'",
+        connected_shortcodes: '.wp_json_encode($connected_shortcodes, JSON_NUMERIC_CHECK).',
         max_bounds: '.wp_json_encode($max_bounds, JSON_NUMERIC_CHECK).',
         gps_zoom: {
             zl: '.$gps_zl.',

@@ -178,6 +178,9 @@ class LSD_Entity_Attribute extends LSD_Base
 
     public static function schema($term_id)
     {
+        if (LSD_Schema::suppressing_markup()) return '';
+        if (LSD_Schema::suppressing_default_listing_properties()) return '';
+
         $itemprop = get_term_meta($term_id, 'lsd_itemprop', true);
         if (!trim($itemprop)) return '';
 

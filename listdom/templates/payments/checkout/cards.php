@@ -14,6 +14,9 @@ defined('ABSPATH') || die();
 /** @var string $appreciation_invoice_base */
 /** @var string $gateway_warning */
 /** @var int $gateway_tabs_count */
+/** @var array $checkout_auth */
+
+$checkout_auth_required = !empty($checkout_auth['required']);
 ?>
 <div class="lsd-checkout-wrapper lsd-checkout-style-cards">
     <div class="lsd-fe-sections">
@@ -43,6 +46,18 @@ defined('ABSPATH') || die();
         </div>
         <div class="lsd-fe-box-white">
             <div class="lsd-checkout-gateways lsd-fe-subsections">
+                <?php if ($checkout_auth_required): ?>
+                    <div class="lsd-checkout-auth lsd-fe-subsections">
+                        <?php if (!empty($checkout_auth['message'])): ?>
+                            <div class="lsd-alert lsd-warning"><?php echo esc_html($checkout_auth['message']); ?></div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($checkout_auth['auth_html'])): ?>
+                            <div class="lsd-checkout-auth-form"><?php echo LSD_Kses::full($checkout_auth['auth_html']); ?></div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
                 <?php if ($gateway_tabs_count > 1): ?>
                     <div class="lsd-fe-section-heading">
                         <div class="lsd-fe-title-icon">
@@ -54,6 +69,8 @@ defined('ABSPATH') || die();
                 <?php endif; ?>
                 <?php if ($gateway_warning): ?>
                     <div class="lsd-alert lsd-warning"><?php echo esc_html($gateway_warning); ?></div>
+                <?php elseif ($checkout_auth_required): ?>
+                    <div class="lsd-alert lsd-info"><?php esc_html_e('Log in or register above to continue to payment.', 'listdom'); ?></div>
                 <?php elseif ($requires_payment): ?>
                     <div class="lsd-fe-tabs lsd-fe-subsections">
                         <?php if ($gateway_tabs_count > 1): ?>

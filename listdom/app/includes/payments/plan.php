@@ -171,6 +171,11 @@ class LSD_Payments_Plan extends LSD_Base
         return $this->tier ? $this->tier->get_frequency_days() : 0;
     }
 
+    public function get_duration_days(): ?int
+    {
+        return $this->tier ? $this->tier->get_duration_days() : null;
+    }
+
     public function get_frequency_html(): string
     {
         return $this->tier ? $this->tier->get_frequency_html() : '';

@@ -69,9 +69,10 @@ $badges = $this->get_listing_badges($listing);
                         <?php do_action('lsd_dashboard_actions', $listing, $this); ?>
 
                         <?php if (LSD_Capability::can('delete_listings', 'delete_posts')): ?>
-                            <span class="lsd-actions-menu-item lsd-dashboard-action-delete"
+                            <span class="lsd-actions-menu-item lsd-dashboard-action-delete lsd-tooltip lsd-tooltip-top"
                                   data-id="<?php echo esc_attr($listing->ID); ?>"
-                                  data-confirm="0">
+                                  data-confirm="0"
+                                  data-lsd-tooltip="<?php esc_attr_e('Click twice to delete', 'listdom'); ?>">
                                 <i class="lsd-fe-icon fas fa-trash-alt" aria-hidden="true"></i>
                                 <span><?php esc_html_e('Trash', 'listdom'); ?></span>
                             </span>

@@ -101,7 +101,7 @@
         const inputId = input && input.id ? input.id : '';
         if (!inputId) return;
 
-        const $button = $(input).closest('.lsd-search-input-clear-wrap').find('.lsd-search-input-clear[data-for="' + inputId + '"]');
+        const $button = $(input).closest('.lsd-range-picker-input-clear-wrap').find('.lsd-range-picker-input-clear[data-for="' + inputId + '"]');
         if (!$button.length) return;
 
         const hasValue = ((input.value || '').toString().trim() !== '');
@@ -823,6 +823,121 @@
         return dropdown;
     };
 })(jQuery);
+
+jQuery(function($)
+{
+    const parseBookingSelectConfig = function($select, attribute)
+    {
+        if (!$select.length) return {};
+
+        try
+        {
+            return JSON.parse($select.attr(attribute) || '{}');
+        }
+        catch (e)
+        {
+            return {};
+        }
+    };
+
+    const syncBookingSelectOptions = function($select, options, fallbackValue)
+    {
+        if (!$select.length || typeof options !== 'object' || !options) return;
+
+        const currentValue = $select.val();
+        const entries = Object.entries(options);
+
+        if (!entries.length) return;
+
+        $select.empty();
+
+        $.each(entries, function(index, entry)
+        {
+            const value = entry[0];
+            const label = entry[1];
+
+            $select.append($('<option></option>').attr('value', value).text(label));
+        });
+
+        let nextValue = Object.prototype.hasOwnProperty.call(options, currentValue) ? currentValue : fallbackValue;
+        if (!nextValue || !Object.prototype.hasOwnProperty.call(options, nextValue)) nextValue = entries[0][0];
+
+        $select.val(nextValue);
+    };
+
+    const syncBookingPriceFields = function()
+    {
+        const pricingModel = $('#lsd_bo_pricing_model').val();
+        const isFree = pricingModel === 'free';
+
+        $('.lsd-listing-module-booking')
+        .find('.lsd-bookable-price-field')
+        .toggleClass('lsd-util-hide', isFree);
+    };
+
+    const syncBookingSetupUI = function()
+    {
+        const $module = $('.lsd-listing-module-booking');
+        if(!$module.length) return;
+
+        const bookingEnabled = $('#lsd_bo_enabled').is(':checked');
+        const setup = $('#lsd_bo_setup').val() || 'date_range';
+        const legacyType = (setup === 'single_event') ? 'event' : ((setup === 'date_range' && $('#lsd_bo_guest_capacity_enabled').is(':checked')) ? 'property' : 'general');
+
+        $('#lsd_bo_type').val(legacyType);
+        $module.find('#lsd-booking-availability-section, #lsd-booking-pricing-section, #lsd-booking-advanced-section, .lsd-listing-bookable-container').toggleClass('lsd-util-hide', !bookingEnabled);
+
+        const $shell = $module.find('.lsd-booking-setup-shell');
+        $shell.attr('data-booking-setup', setup);
+
+        $.each(['date_range', 'single_event', 'time_slot', 'quantity', 'request'], function(index, key)
+        {
+            $shell.toggleClass('lsd-booking-setup-' + key, key === setup);
+            $module.find('.lsd-booking-setup-panel-' + key).toggleClass('lsd-util-hide', key !== setup);
+        });
+
+        const pricingContext = (setup === 'date_range' && $('#lsd_bo_guest_capacity_enabled').is(':checked')) ? 'date_range_guests' : setup;
+        const $pricingModel = $('#lsd_bo_pricing_model');
+        const pricingOptions = parseBookingSelectConfig($pricingModel, 'data-setup-options');
+        const pricingDefaults = parseBookingSelectConfig($pricingModel, 'data-setup-defaults');
+
+        syncBookingSelectOptions($pricingModel, pricingOptions[pricingContext] || {}, pricingDefaults[pricingContext] || '');
+        syncBookingPriceFields();
+
+        const guestEnabled = setup === 'date_range' && $('#lsd_bo_guest_capacity_enabled').is(':checked');
+
+        $module.find('.lsd-bookable-setup-date-range').toggleClass('lsd-util-hide', setup !== 'date_range');
+        $module.find('.lsd-bookable-setup-guest').toggleClass('lsd-util-hide', !guestEnabled);
+        $module.find('.lsd-bookable-setup-event').toggleClass('lsd-util-hide', setup !== 'single_event');
+        $module.find('.lsd-bookable-setup-time-slot').toggleClass('lsd-util-hide', setup !== 'time_slot');
+        $module.find('.lsd-bookable-setup-quantity').toggleClass('lsd-util-hide', setup !== 'quantity');
+        $module.find('.lsd-bookable-setup-request').toggleClass('lsd-util-hide', setup !== 'request');
+
+        $module
+        .find('.lsd-listing-bookable-container')
+        .removeClass('lsd-listing-bookables-general lsd-listing-bookables-property lsd-listing-bookables-event lsd-listing-bookables-setup-date_range lsd-listing-bookables-setup-single_event lsd-listing-bookables-setup-time_slot lsd-listing-bookables-setup-quantity lsd-listing-bookables-setup-request')
+        .addClass('lsd-listing-bookables-' + legacyType)
+        .addClass('lsd-listing-bookables-setup-' + setup);
+    };
+
+    const syncBookingPaymentUI = function()
+    {
+        const paymentModel = $('#lsd_bo_payment_model').val();
+        $('#lsd_bo_listing_payable_wrapper').toggleClass('lsd-util-hide', paymentModel !== 'partial');
+    };
+
+    $(document).on('change', '#lsd_bo_payment_model', syncBookingPaymentUI);
+    syncBookingPaymentUI();
+
+    $(document).on('change', '#lsd_bo_setup, #lsd_bo_guest_capacity_enabled, #lsd_bo_enabled, #lsd_bo_pricing_model', function()
+    {
+        syncBookingSetupUI();
+        syncBookingPriceFields();
+    });
+
+    syncBookingSetupUI();
+    syncBookingPriceFields();
+});
 
 /**
  * Address Autocomplete Sources
@@ -1868,50 +1983,6 @@
         });
 
         /**
-         * Booking -- Select Bookable Item
-         */
-        $(document).on('click', '.lsd-booking-bookable-item', function(e)
-        {
-            const $target = $(e.target);
-
-            // Prevent toggling when clicking fields, links, buttons, labels, or price toggle.
-            if($target.closest('input, button, a, select, textarea, label, .lsd-toggle').length) return;
-
-            const $bookable = $(this);
-
-            // Event mode: toggle ticket count between 0 and 1.
-            const $ticketInput = $bookable.find('.lsd-booking-bookable-ticket-count').first();
-
-            if($ticketInput.length && !$ticketInput.is(':disabled'))
-            {
-                e.preventDefault();
-
-                const currentValue = parseInt($ticketInput.val(), 10) || 0;
-                const max = parseInt($ticketInput.attr('max'), 10);
-
-                let newValue = currentValue > 0 ? 0 : 1;
-
-                if(!isNaN(max)) newValue = Math.min(newValue, max);
-
-                $ticketInput
-                .val(newValue)
-                .trigger('input')
-                .trigger('change');
-
-                return;
-            }
-
-            // General / property mode: toggle the real checkbox.
-            const $checkbox = $bookable.find('input[type="checkbox"][name="booking[items][]"]').first();
-
-            if(!$checkbox.length || $checkbox.is(':disabled')) return;
-
-            $checkbox
-            .prop('checked', !$checkbox.prop('checked'))
-            .trigger('change');
-        });
-
-        /**
          * Booking -- Event Visual Checkbox State
          */
         $(document).on('input change', '.lsd-booking-bookable-ticket-count', function()
@@ -1925,18 +1996,6 @@
 
             $checkbox.prop('checked', selected);
             $bookable.toggleClass('lsd-booking-bookable-selected', selected);
-        });
-
-        /**
-         * Booking -- Bookable Selected State
-         */
-        $(document).on('change', '.lsd-booking-bookable-item input[type="checkbox"][name="booking[items][]"]', function()
-        {
-            const $checkbox = $(this);
-
-            $checkbox
-            .closest('.lsd-booking-bookable-item')
-            .toggleClass('lsd-booking-bookable-selected', $checkbox.is(':checked'));
         });
 
         /**
@@ -1998,6 +2057,252 @@
                     loading.stop();
                 }
             });
+        });
+
+        const lsdBookingQuoteRequests = {};
+
+        const lsdBookingCountSelector = ['.lsd-booking-bookable-ticket-count', '.lsd-booking-bookable-quantity-count',].join(',');
+        const lsdBookingToggleSelector = ['.lsd-booking-bookable-visual-checkbox', '.lsd-booking-bookable-quantity-toggle',].join(',');
+
+        const lsdBookingCheckboxSelector = 'input[type="checkbox"][name="booking[items][]"]';
+        const lsdBookingCheckboxEventSelector = '.lsd-booking-bookable-item ' + lsdBookingCheckboxSelector;
+
+        function lsdBookingNormalizeCount($input)
+        {
+            let count = parseInt($input.val(), 10);
+            if (Number.isNaN(count)) count = 0;
+
+            count = Math.max(0, count);
+
+            const maximum = parseInt($input.attr('max'), 10);
+            if (!Number.isNaN(maximum)) count = Math.min(count, maximum);
+
+            $input.val(count);
+
+            return count;
+        }
+
+        function lsdBookingSyncCountSelection($input)
+        {
+            const count = lsdBookingNormalizeCount($input);
+            const selected = count > 0;
+            const $bookable = $input.closest('.lsd-booking-bookable-item');
+
+            $bookable.find(lsdBookingToggleSelector).first().prop('checked', selected);
+            $bookable.toggleClass('lsd-booking-bookable-selected', selected).attr('aria-selected', selected ? 'true' : 'false');
+
+            return count;
+        }
+
+        function lsdBookingQuoteAlert($form, message = '')
+        {
+            const $alert = $form.find('.lsd-booking-form-alert');
+            if (!$alert.length) return;
+
+            if (!message)
+            {
+                $alert.empty();
+                return;
+            }
+
+            if (typeof listdom_alertify === 'function')
+            {
+                $alert.html(listdom_alertify(message, 'lsd-error'));
+                return;
+            }
+
+            $alert.text(message);
+        }
+
+        function lsdBookingGetAjaxUrl()
+        {
+            if (typeof lsd !== 'undefined' && lsd.ajaxurl) return lsd.ajaxurl;
+            if (typeof ajaxurl !== 'undefined') return ajaxurl;
+
+            return '';
+        }
+
+        function lsdBookingApplyQuote($bookable, quote)
+        {
+            $bookable.find('.lsd-booking-total-price').html(quote.total?.rendered || '');
+
+            const $payableSection = $bookable.find('.lsd-booking-payable-section');
+            const notice = quote.partial_notice || '';
+
+            $payableSection.toggleClass('lsd-util-hide', !quote.show_payable).find('.lsd-booking-payable-price').html(quote.payable?.rendered || '');
+
+            $payableSection.find('.lsd-booking-partial-payment-note').text(notice).toggleClass('lsd-util-hide', !notice);
+        }
+
+        function lsdBookingSetQuoteLoading($bookable, loading)
+        {
+            const $stage = $bookable.find('.lsd-booking-bookable-price-stage').first();
+            const $price = $stage.find('.lsd-booking-bookable-price').first();
+            const $loader = $stage.find('.lsd-booking-bookable-price-loader').first();
+
+            $bookable
+            .toggleClass('lsd-booking-price-updating', loading)
+            .attr('aria-busy', loading ? 'true' : 'false');
+
+            $stage.toggleClass('is-loading', loading);
+            $price.attr('aria-hidden', loading ? 'true' : 'false');
+            $loader.attr('aria-hidden', loading ? 'false' : 'true');
+        }
+
+        function lsdBookingUpdateQuote($input)
+        {
+            const count = lsdBookingSyncCountSelection($input);
+            const $bookable = $input.closest('.lsd-booking-bookable-item');
+            const $form = $input.closest('.lsd-booking-form');
+
+            const bookableId = parseInt($bookable.data('bookable-id'), 10);
+            const listingId = parseInt($form.find('input[name="booking[listing_id]"]').val(), 10);
+            const nonce = $form.find('input[name="_wpnonce"]').val();
+            const period = $form.find('input[name="booking[period]"]').val() || '';
+            const ajaxUrl = lsdBookingGetAjaxUrl();
+
+            if (!ajaxUrl || !bookableId || !listingId || !nonce) return;
+
+            const previousRequest = lsdBookingQuoteRequests[bookableId];
+            if (previousRequest && typeof previousRequest.abort === 'function') previousRequest.abort();
+
+            lsdBookingSetQuoteLoading($bookable, true);
+
+            const request = $.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'lsdaddbok_quote',
+                    _wpnonce: nonce,
+                    listing_id: listingId,
+                    bookable_id: bookableId,
+                    period,
+                    count,
+                },
+            });
+
+            lsdBookingQuoteRequests[bookableId] = request;
+
+            request.done(function(response)
+            {
+                if (!response || !response.success || !response.data)
+                {
+                    lsdBookingQuoteAlert($form, response && response.message ? response.message : 'The price could not be updated.');
+                    return;
+                }
+
+                lsdBookingApplyQuote($bookable, response.data);
+                lsdBookingQuoteAlert($form);
+
+            }).fail(function(xhr, status)
+            {
+                if (status === 'abort') return;
+
+                const message = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'The price could not be updated.';
+
+                lsdBookingQuoteAlert($form, message);
+
+            }).always(function()
+            {
+                // A newer request may already be active for this item.
+                if (lsdBookingQuoteRequests[bookableId] !== request) return;
+
+                delete lsdBookingQuoteRequests[bookableId];
+                lsdBookingSetQuoteLoading($bookable, false);
+            });
+        }
+
+        function lsdBookingQueueQuote($input)
+        {
+            const previousTimer = $input.data('lsd-booking-quote-timer');
+            if (previousTimer) window.clearTimeout(previousTimer);
+
+            const timer = window.setTimeout(function()
+            {
+                lsdBookingUpdateQuote($input);
+            }, 150);
+
+            $input.data('lsd-booking-quote-timer', timer);
+        }
+
+        function lsdBookingToggleCountInput($input)
+        {
+            const currentValue = parseInt($input.val(), 10) || 0;
+            const maximum = parseInt($input.attr('max'), 10);
+
+            let newValue = currentValue > 0 ? 0 : 1;
+            if (!Number.isNaN(maximum)) newValue = Math.min(newValue, maximum);
+
+            $input.val(newValue).trigger('input');
+        }
+
+        /**
+         * Booking -- Select Bookable Item
+         */
+        $(document).on('click', '.lsd-booking-bookable-item', function(event)
+        {
+            const $target = $(event.target);
+
+            // Native controls should handle their own interaction.
+            if ($target.closest('input, button, a, select, textarea, label, .lsd-toggle').length) return;
+
+            const $bookable = $(this);
+            const $countInput = $bookable.find(lsdBookingCountSelector).first();
+
+            // Single-event and quantity booking.
+            if ($countInput.length && !$countInput.is(':disabled'))
+            {
+                event.preventDefault();
+                lsdBookingToggleCountInput($countInput);
+                return;
+            }
+
+            // Date-range, time-slot and request booking.
+            const $checkbox = $bookable.find(lsdBookingCheckboxSelector).first();
+
+            if (!$checkbox.length || $checkbox.is(':disabled')) return;
+
+            $checkbox.prop('checked', !$checkbox.prop('checked')).trigger('change');
+        });
+
+        /**
+         * Booking -- Event/Quantity Visual Toggle
+         */
+        $(document).on('change', lsdBookingToggleSelector, function()
+        {
+            const $toggle = $(this);
+            const $countInput = $toggle.closest('.lsd-booking-bookable-item').find(lsdBookingCountSelector).first();
+
+            if (!$countInput.length || $countInput.is(':disabled')) return;
+
+            const currentValue = parseInt($countInput.val(), 10) || 0;
+            const newValue = $toggle.is(':checked') ? Math.max(1, currentValue) : 0;
+
+            $countInput.val(newValue).trigger('input');
+        });
+
+        /**
+         * Booking -- Event/Quantity Count
+         */
+        $(document).on('input change', lsdBookingCountSelector, function()
+        {
+            const $input = $(this);
+
+            lsdBookingSyncCountSelection($input);
+            lsdBookingQueueQuote($input);
+        });
+
+        /**
+         * Booking -- Standard Checkbox State
+         */
+        $(document).on('change', lsdBookingCheckboxEventSelector, function()
+        {
+            const $checkbox = $(this);
+            const selected = $checkbox.is(':checked');
+
+            $checkbox.closest('.lsd-booking-bookable-item').toggleClass('lsd-booking-bookable-selected', selected)
+            .attr('aria-selected', selected ? 'true' : 'false');
         });
 
         listdom_trigger_bookable_remove();
@@ -2129,6 +2434,68 @@
 
         listdom_trigger_autosuggest_remove();
 
+        const syncSearchInputClear = function($input)
+        {
+            if (!$input.length) return;
+
+            const inputId = ($input.attr('id') || '').toString();
+            if (!inputId) return;
+
+            const hasValue = (($input.val() || '').toString().trim() !== '');
+
+            $input.closest('.lsd-range-picker-input-clear-wrap')
+            .find('.lsd-range-picker-input-clear[data-for="' + inputId + '"]')
+            .toggleClass('lsd-util-hide', !hasValue);
+        };
+
+        const resetDateRangePickerSelection = function($input)
+        {
+            const picker = $input.data('daterangepicker');
+            if (!picker) return;
+
+            const now = moment();
+            picker.setStartDate(now.clone());
+            picker.setEndDate(now.clone());
+            picker.updateView();
+            picker.updateCalendars();
+            picker.updateFormInputs();
+        };
+
+        const clearSearchInput = function($input)
+        {
+            if (!$input.length) return;
+
+            if ($input.hasClass('lsd-date-range-picker')) resetDateRangePickerSelection($input);
+
+            $input.val('');
+            $input.removeData('lsd-booking-range-invalid-message');
+            syncSearchInputClear($input);
+            $input.trigger('input').trigger('change');
+        };
+
+        $(document).on('click', '.lsd-range-picker-input-clear', function(event)
+        {
+            event.preventDefault();
+
+            const target = ($(this).attr('data-for') || '').toString();
+            if (!target) return;
+
+            clearSearchInput($('#' + target));
+        });
+
+        $(document).on('keydown', '.lsd-range-picker-input-clear', function(event)
+        {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+
+            event.preventDefault();
+            $(this).trigger('click');
+        });
+
+        $(document).on('input change', '.lsd-range-picker-input-clear-wrap input', function()
+        {
+            syncSearchInputClear($(this));
+        });
+
         // Date Range Picker
         if(typeof $.fn.daterangepicker !== 'undefined')
         {
@@ -2138,10 +2505,111 @@
                 const $input = $(this);
 
                 // Periods
-                const periods = $input.data('periods');
+                const periods = $input.data('periods') || {};
 
                 // Format
                 const df = $input.data('format');
+                const singleDate = parseInt($input.attr('data-single-date') || '0', 10) === 1;
+                const minStay = parseInt($input.attr('data-min-stay') || '0', 10) || 0;
+                const maxStay = parseInt($input.attr('data-max-stay') || '0', 10) || 0;
+                const maxAdvanceDays = parseInt($input.attr('data-max-advance-days') || '0', 10) || 0;
+                const rawUnavailableRanges = $input.attr('data-unavailable-ranges');
+                const rawAvailableWeekdays = $input.attr('data-available-weekdays');
+                const rawAvailableDates = $input.attr('data-available-dates');
+                let unavailableRanges = [];
+                let availableWeekdays = [];
+                let availableDates = [];
+
+                if (typeof rawUnavailableRanges === 'string' && rawUnavailableRanges.length)
+                {
+                    try
+                    {
+                        unavailableRanges = JSON.parse(rawUnavailableRanges);
+                    }
+                    catch (e)
+                    {
+                        unavailableRanges = [];
+                    }
+                }
+
+                unavailableRanges = Array.isArray(unavailableRanges) ? unavailableRanges.map(function (range)
+                {
+                    if (range && typeof range.start === 'string' && typeof range.end === 'string')
+                    {
+                        return {
+                            start: range.start,
+                            end: range.end
+                        };
+                    }
+
+                    if (typeof range === 'string')
+                    {
+                        const parts = range.split(',', 2);
+                        const start = (parts[0] || '').trim();
+                        const end = (parts[1] || '').trim();
+
+                        if (start && end)
+                        {
+                            return {
+                                start: start,
+                                end: end
+                            };
+                        }
+                    }
+
+                    return null;
+                }).filter(function (range)
+                {
+                    return range && range.start !== '' && range.end !== '';
+                }) : [];
+
+                if (typeof rawAvailableWeekdays === 'string' && rawAvailableWeekdays.length)
+                {
+                    try
+                    {
+                        availableWeekdays = JSON.parse(rawAvailableWeekdays);
+                    }
+                    catch (e)
+                    {
+                        availableWeekdays = [];
+                    }
+                }
+
+                if (typeof rawAvailableDates === 'string' && rawAvailableDates.length)
+                {
+                    try
+                    {
+                        availableDates = JSON.parse(rawAvailableDates);
+                    }
+                    catch (e)
+                    {
+                        availableDates = [];
+                    }
+                }
+
+                availableWeekdays = Array.isArray(availableWeekdays) ? availableWeekdays.map(function (day)
+                {
+                    return (day || '').toString().toLowerCase().trim();
+                }).filter(Boolean) : [];
+
+                availableDates = Array.isArray(availableDates) ? availableDates.map(function (date)
+                {
+                    return (date || '').toString().trim();
+                }).filter(Boolean) : [];
+
+                const isUnavailableDate = function (date)
+                {
+                    const current = date.format('YYYY-MM-DD');
+                    const weekday = date.format('dddd').toLowerCase();
+
+                    if (singleDate && availableDates.length && !availableDates.includes(current)) return true;
+                    if (availableWeekdays.length && !availableWeekdays.includes(weekday)) return true;
+
+                    return unavailableRanges.some(function (range)
+                    {
+                        return current >= range.start && current <= range.end;
+                    });
+                };
 
                 let ranges = {};
                 for(const p in periods)
@@ -2154,10 +2622,22 @@
                 $input.daterangepicker(
                 {
                     minDate: moment(),
+                    maxDate: maxAdvanceDays > 0 ? moment().add(maxAdvanceDays, 'days') : false,
                     ranges: ranges,
                     alwaysShowCalendars: true,
                     showCustomRangeLabel: false,
                     autoUpdateInput: false,
+                    singleDatePicker: singleDate,
+                    maxSpan: maxStay > 0 && !singleDate ? { days: maxStay } : false,
+                    dateLimit: maxStay > 0 && !singleDate ? { days: maxStay } : false,
+                    isInvalidDate: function (date)
+                    {
+                        return isUnavailableDate(date);
+                    },
+                    isCustomDate: function (date)
+                    {
+                        return isUnavailableDate(date) ? ['lsd-date-unavailable'] : [];
+                    },
                     locale:
                     {
                         format: df
@@ -2165,12 +2645,28 @@
                 });
 
                 $input.on('apply.daterangepicker', function(ev, picker) {
-                    $(this).val(picker.startDate.format(df) + ' - ' + picker.endDate.format(df));
+                    if (!singleDate)
+                    {
+                        const nights = picker.endDate.diff(picker.startDate, 'days');
+                        if (minStay > 0 && nights < minStay)
+                        {
+                            $(this).data('lsd-booking-range-invalid-message', 'Minimum stay is ' + minStay + ' nights.');
+                            return;
+                        }
+                    }
+
+                    $(this).removeData('lsd-booking-range-invalid-message');
+                    const start = picker.startDate.format(df);
+                    const end = singleDate ? start : picker.endDate.format(df);
+                    $(this).val(start + ' - ' + end);
+                    syncSearchInputClear($(this));
                 });
 
                 $input.on('cancel.daterangepicker', function() {
-                    $(this).val('');
+                    clearSearchInput($(this));
                 });
+
+                syncSearchInputClear($input);
             });
         }
 
@@ -2340,7 +2836,7 @@
     /**
      * Listdom Image picker -- Upload/Select Button
      */
-    $('.lsd-select-image-files-button, .lsd-add-images-button').on('click', function (event)
+    $(document).on('click', '.lsd-select-image-files-button, .lsd-add-images-button', function (event)
     {
         event.preventDefault();
 
@@ -2449,7 +2945,7 @@
         return Math.abs(actual - ratio) / ratio <= tolerance;
     }
 
-    $('.lsd-imagepicker-file-input').on('change', function ()
+    $(document).on('change', '.lsd-imagepicker-file-input', function ()
     {
         const $input = $(this);
         const existingFiles = $input.data('lsdExistingFiles');
@@ -2467,7 +2963,7 @@
         updateMultiImagepicker($input);
     });
 
-    $('.lsd-remove-images-button').on('click', function (event)
+    $(document).on('click', '.lsd-remove-images-button', function (event)
     {
         event.preventDefault();
 
@@ -2483,11 +2979,146 @@
     /**
      * Listdom Image picker -- Upload/Select Button
      */
-    $('.lsd-select-image-button').on('click', function (event)
+    $(document).on('change', '.lsd-imagepicker-upload-input', function ()
+    {
+        const $uploadInput = $(this);
+        const file = this.files && this.files[0] ? this.files[0] : null;
+
+        if (!file) return;
+
+        const target = $uploadInput.data('target');
+        const action = $uploadInput.data('action');
+        const nonce = $uploadInput.data('nonce');
+        const $input = $(target);
+        const $wrapper = $input.closest('.lsd-imagepicker-wrapper');
+        const selector = $uploadInput.data('message') || '';
+        let $message = selector ? $(selector).first() : $();
+
+        if (!target || !action || !nonce || !$input.length)
+        {
+            $uploadInput.val('');
+            return;
+        }
+
+        if (!$message.length)
+        {
+            const $attributeWrapper = $wrapper.closest('.lsd-attribute-image');
+            if ($attributeWrapper.length)
+            {
+                $message = $attributeWrapper.find('.lsd-attribute-image-message');
+
+                if (!$message.length)
+                {
+                    $message = $('<div class="lsd-attribute-image-message"></div>');
+                    $attributeWrapper.append($message);
+                }
+            }
+        }
+
+        const data = new FormData();
+        data.append('action', action);
+        data.append('_wpnonce', nonce);
+        data.append('file', file);
+
+        if ($message.length) $message.html('');
+        $wrapper.addClass('lsd-loading');
+
+        $.ajax({
+            url: lsd.ajaxurl,
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            processData: false,
+            contentType: false
+        }).done(function (response)
+        {
+            if (response && response.success && response.data && response.data.attachment_id && response.data.url)
+            {
+                const $placeholder = $(target + '_img');
+                const $preview = $placeholder.find('.lsd-image-placeholder-preview');
+                const $emptyState = $placeholder.find('.lsd-image-placeholder-empty');
+                const $selectButton = $wrapper.find('.lsd-select-image-button[data-for="' + target + '"]');
+                const $removeButton = $wrapper.find('.lsd-remove-image-button[data-for="' + target + '"]');
+
+                $preview.html('<img alt="" src="' + response.data.url + '">').removeClass('lsd-util-hide');
+                $placeholder.addClass('lsd-image-placeholder-has-image');
+                $emptyState.addClass('lsd-util-hide');
+                $input.val(response.data.attachment_id);
+                $selectButton.addClass('lsd-util-hide');
+                $removeButton.removeClass('lsd-util-hide');
+
+                if ($message.length)
+                {
+                    if (typeof listdom_alertify === 'function') $message.html(listdom_alertify(response.message || 'The image is uploaded!', 'lsd-success'));
+                    else $message.text(response.message || 'The image is uploaded!');
+                }
+            }
+            else
+            {
+                if ($message.length)
+                {
+                    if (typeof listdom_alertify === 'function') $message.html(listdom_alertify((response && response.message) ? response.message : 'Unable to upload the image.', 'lsd-error'));
+                    else $message.text((response && response.message) ? response.message : 'Unable to upload the image.');
+                }
+            }
+        }).fail(function ()
+        {
+            if ($message.length)
+            {
+                if (typeof listdom_alertify === 'function') $message.html(listdom_alertify('Unable to upload the image.', 'lsd-error'));
+                else $message.text('Unable to upload the image.');
+            }
+        }).always(function ()
+        {
+            $wrapper.removeClass('lsd-loading');
+            $uploadInput.val('');
+        });
+    });
+
+    $(document).on('click', '.lsd-select-image-button', function (event)
     {
         event.preventDefault();
 
         const $button = $(this);
+        const target = $button.data('for');
+        const $input = $(target);
+        const $wrapper = $input.closest('.lsd-imagepicker-wrapper');
+        const $uploadInput = $wrapper.find('.lsd-imagepicker-upload-input[data-target="' + target + '"]');
+
+        if ($uploadInput.length)
+        {
+            $uploadInput.trigger('click');
+            return;
+        }
+
+        if (typeof wp === 'undefined' || typeof wp.media === 'undefined')
+        {
+            const selector = $uploadInput.data('message') || '';
+            let $message = selector ? $(selector).first() : $();
+
+            if (!$message.length)
+            {
+                const $attributeWrapper = $button.closest('.lsd-attribute-image');
+                if ($attributeWrapper.length)
+                {
+                    $message = $attributeWrapper.find('.lsd-attribute-image-message');
+
+                    if (!$message.length)
+                    {
+                        $message = $('<div class="lsd-attribute-image-message"></div>');
+                        $attributeWrapper.append($message);
+                    }
+                }
+            }
+
+            if ($message.length)
+            {
+                if (typeof listdom_alertify === 'function') $message.html(listdom_alertify('The media uploader is not available on this page.', 'lsd-error'));
+                else $message.text('The media uploader is not available on this page.');
+            }
+
+            return;
+        }
 
         let frame;
         if (frame)
@@ -2506,7 +3137,6 @@
                 return;
             }
 
-            const target = $button.data('for');
             const $input = $(target);
             const $wrapper = $button.closest('.lsd-attribute-image');
             const $placeholder = $(target + '_img');
@@ -2632,7 +3262,7 @@
     /**
      * Listdom Image picker -- Remove Button
      */
-    $('.lsd-remove-image-button').on('click', function (event)
+    $(document).on('click', '.lsd-remove-image-button', function (event)
     {
         event.preventDefault();
 
@@ -2681,6 +3311,7 @@ function listdom_trigger_toggle()
 
             jQuery(target).removeClass('lsd-util-hide').show();
             if (target2) jQuery(target2).addClass('lsd-util-hide').hide();
+            $toggle.addClass('lsd-toggle-open');
 
             $toggle.data('triggered', 1);
             setTimeout(function()
@@ -2703,11 +3334,13 @@ function listdom_trigger_toggle()
         {
             jQuery(target).addClass('lsd-util-hide').hide();
             if(target2) jQuery(target2).removeClass('lsd-util-hide').show();
+            $toggle.removeClass('lsd-toggle-open');
         }
         else if(status === 'hide')
         {
             jQuery(target).removeClass('lsd-util-hide').show();
             if(target2) jQuery(target2).addClass('lsd-util-hide').hide();
+            $toggle.addClass('lsd-toggle-open');
         }
 
         $toggle.data('triggered', 1);
@@ -2763,7 +3396,7 @@ function listdom_trigger_bookable_remove()
             return;
         }
 
-        $icon.parent().parent().parent().remove();
+        $icon.closest('#lsd_listing_bookables > li').remove();
     });
 }
 

@@ -24,13 +24,7 @@ class LSD_Duplicate
      */
     public function link(array $actions, WP_Post $post): array
     {
-        if (!current_user_can('edit_posts'))
-        {
-            return $actions;
-        }
-
-        // Ensure that the link is only added for the specified post type
-        if ($post->post_type !== $this->post_type)
+        if (!$this->can_duplicate_post($post))
         {
             return $actions;
         }
@@ -71,8 +65,18 @@ class LSD_Duplicate
         $post_id = absint(wp_unslash($_GET['post']));
         $post = get_post($post_id);
 
+        if (!$post instanceof WP_Post)
+        {
+            return;
+        }
+
+        if ($post->post_type !== $this->post_type)
+        {
+            return;
+        }
+
         // Copy the post and set its status to draft
-        if ($post && current_user_can('edit_posts'))
+        if ($this->can_duplicate_post($post))
         {
             $new_post = [
                 'post_title' => $post->post_title . ' - Duplicate',
@@ -82,7 +86,16 @@ class LSD_Duplicate
                 'post_author' => get_current_user_id(),
             ];
 
-            $new_post_id = wp_insert_post($new_post);
+            $new_post_id = wp_insert_post($new_post, true);
+
+            if (is_wp_error($new_post_id) || !$new_post_id)
+            {
+                LSD_Flash::add(esc_html__('Unable to duplicate this post.', 'listdom'), 'error');
+
+                $url = $this->resolve_duplicate_redirect_url($post->post_type);
+                wp_redirect($url);
+                exit;
+            }
 
             // Copy taxonomies and metadata
             $taxonomies = get_object_taxonomies($post->post_type);
@@ -101,21 +114,84 @@ class LSD_Duplicate
                 }
             }
 
-            // Flash Message
-            LSD_Flash::add(esc_html__('Post duplicated successfully. Now you can modify the duplicated post.', 'listdom'), 'success');
+            $edit_url = get_edit_post_link($new_post_id, '');
 
-            $url = admin_url('post.php?action=edit&post=' . $new_post_id);
+            if ($edit_url)
+            {
+                LSD_Flash::add(esc_html__('Post duplicated successfully. Now you can modify the duplicated post.', 'listdom'), 'success');
+                $url = $edit_url;
+            }
+            else
+            {
+                LSD_Flash::add(esc_html__('Post duplicated successfully.', 'listdom'), 'success');
+                $url = $this->resolve_duplicate_redirect_url($post->post_type);
+            }
         }
         else
         {
             // Flash Message
             LSD_Flash::add(esc_html__("You don't have access to duplicate this post!", 'listdom'), 'error');
 
-            $url = wp_get_referer();
-            if (!$url) $url = admin_url();
+            $url = $this->resolve_duplicate_redirect_url($post->post_type);
         }
 
         wp_redirect($url);
         exit;
+    }
+
+    protected function resolve_duplicate_redirect_url(string $post_type): string
+    {
+        $url = wp_get_referer();
+        if ($url) return $url;
+
+        if ($post_type === 'post') return admin_url('edit.php');
+
+        return admin_url('edit.php?post_type=' . $post_type);
+    }
+
+    protected function can_duplicate_post(WP_Post $post): bool
+    {
+        if ($post->post_type !== $this->post_type)
+        {
+            return false;
+        }
+
+        if (!current_user_can('edit_post', $post->ID))
+        {
+            return false;
+        }
+
+        $create_capability = $this->get_create_capability($post->post_type);
+
+        return $create_capability !== '' && current_user_can($create_capability);
+    }
+
+    protected function get_create_capability(string $post_type): string
+    {
+        $post_type_object = get_post_type_object($post_type);
+
+        if (
+            $post_type_object
+            && isset($post_type_object->cap)
+            && isset($post_type_object->cap->create_posts)
+            && is_string($post_type_object->cap->create_posts)
+            && $post_type_object->cap->create_posts !== ''
+        )
+        {
+            return $post_type_object->cap->create_posts;
+        }
+
+        if (
+            $post_type_object
+            && isset($post_type_object->cap)
+            && isset($post_type_object->cap->edit_posts)
+            && is_string($post_type_object->cap->edit_posts)
+            && $post_type_object->cap->edit_posts !== ''
+        )
+        {
+            return $post_type_object->cap->edit_posts;
+        }
+
+        return 'edit_posts';
     }
 }

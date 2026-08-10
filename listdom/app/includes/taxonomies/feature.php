@@ -78,6 +78,15 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
         <?php if (!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
         <?php else: ?>
             <div class="form-field">
+                <label for="lsd_schema"><?php esc_html_e('Schema Type', 'listdom'); ?></label>
+                <?php echo LSD_Form::text([
+                    'name' => 'lsd_schema',
+                    'id' => 'lsd_schema',
+                    'placeholder' => 'LocationFeatureSpecification',
+                ]); ?>
+                <p class="description"><?php esc_html_e("Schema Type (https://schema.org/)", 'listdom'); ?></p>
+            </div>
+            <div class="form-field">
                 <label for="lsd_itemprop"><?php esc_html_e('Schema Property', 'listdom'); ?></label>
                 <?php echo LSD_Form::text([
                     'name' => 'lsd_itemprop',
@@ -93,6 +102,7 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
     public function edit_form($term)
     {
         $icon = get_term_meta($term->term_id, 'lsd_icon', true);
+        $schema = get_term_meta($term->term_id, 'lsd_schema', true);
         $itemprop = get_term_meta($term->term_id, 'lsd_itemprop', true);
         ?>
         <tr class="form-field">
@@ -110,6 +120,20 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
         </tr>
         <?php $this->archive_shortcode_edit_field($term); ?>
         <?php if ($this->isPro()): ?>
+        <tr class="form-field">
+            <th scope="row">
+                <label for="lsd_schema"><?php esc_html_e('Schema Type', 'listdom'); ?></label>
+            </th>
+            <td>
+                <?php echo LSD_Form::text([
+                    'name' => 'lsd_schema',
+                    'id' => 'lsd_schema',
+                    'value' => $schema,
+                    'placeholder' => 'LocationFeatureSpecification',
+                ]); ?>
+                <p class="description"><?php esc_html_e("Schema Type (https://schema.org/)", 'listdom'); ?></p>
+            </td>
+        </tr>
         <tr class="form-field">
             <th scope="row">
                 <label for="lsd_itemprop"><?php esc_html_e('Schema Property', 'listdom'); ?></label>
@@ -140,11 +164,11 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
         if (!$taxonomy || !current_user_can($taxonomy->cap->edit_terms)) return;
 
         $icon = sanitize_text_field(wp_unslash($_POST['lsd_icon']));
-        $itemprop = isset($_POST['lsd_itemprop']) && trim($_POST['lsd_itemprop']) ? sanitize_text_field(wp_unslash($_POST['lsd_itemprop'])) : '';
 
         update_term_meta($term_id, 'lsd_icon', $icon);
         $this->save_archive_shortcode($term_id);
-        update_term_meta($term_id, 'lsd_itemprop', $itemprop);
+        if (isset($_POST['lsd_schema'])) update_term_meta($term_id, 'lsd_schema', $this->posted_scalar('lsd_schema'));
+        if (isset($_POST['lsd_itemprop'])) update_term_meta($term_id, 'lsd_itemprop', $this->posted_scalar('lsd_itemprop'));
     }
 
     public function filter_columns($columns)

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79
+class ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -1115,6 +1115,7 @@ class ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79
         'Webilia\\Toast\\Base' => __DIR__ . '/..' . '/webilia/toast/app/Base.php',
         'Webilia\\Toast\\Boot' => __DIR__ . '/..' . '/webilia/toast/app/Boot.php',
         'Webilia\\WP\\Ads' => __DIR__ . '/..' . '/webilia/wp/src/Ads.php',
+        'Webilia\\WP\\Announcements' => __DIR__ . '/..' . '/webilia/wp/src/Announcements.php',
         'Webilia\\WP\\Color' => __DIR__ . '/..' . '/webilia/wp/src/Color.php',
         'Webilia\\WP\\Date' => __DIR__ . '/..' . '/webilia/wp/src/Date.php',
         'Webilia\\WP\\DateTime' => __DIR__ . '/..' . '/webilia/wp/src/DateTime.php',
@@ -1172,9 +1173,9 @@ class ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit61c9f2c5a80baa523134560ada6d9a79::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd::$classMap;
 
         }, null, ClassLoader::class);
     }

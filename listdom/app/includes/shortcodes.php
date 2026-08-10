@@ -66,4 +66,29 @@ class LSD_Shortcodes extends LSD_Base
     {
         return 'grid';
     }
+
+    protected function is_block_editor(): bool
+    {
+        if (!is_admin() || !function_exists('get_current_screen')) return false;
+
+        $screen = get_current_screen();
+        return $screen && method_exists($screen, 'is_block_editor') && $screen->is_block_editor();
+    }
+
+    protected function shortcode_placeholder(string $tag, $atts = []): string
+    {
+        $shortcode = '[' . $tag;
+
+        if (is_array($atts))
+        {
+            foreach ($atts as $key => $value)
+            {
+                if (!is_string($key) || is_array($value) || is_object($value)) continue;
+
+                $shortcode .= ' ' . $key . '="' . esc_attr((string) $value) . '"';
+            }
+        }
+
+        return '<code>' . esc_html($shortcode . ']') . '</code>';
+    }
 }

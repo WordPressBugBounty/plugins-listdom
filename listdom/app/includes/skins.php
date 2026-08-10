@@ -74,13 +74,18 @@ class LSD_Skins extends LSD_Base
     public $ignore_map_exclusion = false;
     public $price_components = [];
     public $connected_shortcodes = [];
+    public $collection_schema_fragment_id = '';
     public $map_position;
     public $map_component = true;
+    public $collection_output_rendered = false;
     protected $cta_override = [];
 
     protected $sort_meta_key = null;
     protected $sort_meta_orderby = null;
     protected $sort_meta_type = null;
+    protected $sort_custom_mode = null;
+    protected $sort_distance_reference = null;
+    protected $sort_search_context = [];
 
     public function __construct()
     {
@@ -210,6 +215,7 @@ class LSD_Skins extends LSD_Base
         // Default Options
         $this->map_provider = isset($this->skin_options['map_provider']) && $this->skin_options['map_provider'] ? sanitize_text_field($this->skin_options['map_provider']) : false;
         $this->style = isset($this->skin_options['style']) && $this->skin_options['style'] ? sanitize_text_field($this->skin_options['style']) : $this->default_style;
+        $this->style = $this->normalize_style($this->style);
         $this->display_image = $this->isLite() || !isset($this->skin_options['display_image']) || $this->skin_options['display_image'];
         $this->image_method = isset($this->skin_options['image_method']) && $this->skin_options['image_method'] ? $this->skin_options['image_method'] : 'cover';
         $this->image_fit = isset($this->skin_options['image_fit']) && $this->skin_options['image_fit'] ? $this->skin_options['image_fit'] : 'cover';
@@ -622,6 +628,11 @@ class LSD_Skins extends LSD_Base
 
     public function query_sort($args, $orderby, $order = 'DESC')
     {
+        $orderby = (string) $orderby;
+        $order = strtoupper((string) $order);
+        if (!in_array($order, ['ASC', 'DESC'], true)) $order = 'DESC';
+        $this->order = $order;
+
         $option = $this->sorts['options'][$orderby] ?? [];
 
         $meta_key = $option['meta_key'] ?? null;
@@ -630,8 +641,58 @@ class LSD_Skins extends LSD_Base
         $this->sort_meta_key = null;
         $this->sort_meta_orderby = null;
         $this->sort_meta_type = null;
+        $this->sort_custom_mode = null;
+        $this->sort_distance_reference = null;
 
-        if ($meta_key)
+        if ($orderby === 'lsd_categories')
+        {
+            $this->sort_custom_mode = 'categories';
+            unset($args['meta_key'], $args['meta_type']);
+            $args['orderby'] = 'post_date';
+        }
+        else if ($orderby === 'lsd_locations')
+        {
+            $this->sort_custom_mode = 'locations';
+            unset($args['meta_key'], $args['meta_type']);
+            $args['orderby'] = 'post_date';
+        }
+        else if ($orderby === 'lsd_distance')
+        {
+            $reference = $this->resolve_distance_sort_reference();
+
+            if ($reference)
+            {
+                $this->sort_custom_mode = 'distance';
+                $this->sort_distance_reference = $reference;
+
+                unset($args['meta_key'], $args['meta_type']);
+                $args['orderby'] = 'post_date';
+            }
+            else
+            {
+                $fallback_orderby = $this->sorts['default']['orderby'] ?? 'post_date';
+                if (
+                    !isset($this->sorts['options'][$fallback_orderby])
+                    || $fallback_orderby === 'lsd_distance'
+                )
+                {
+                    $fallback_orderby = 'post_date';
+                }
+
+                $fallback_option = $this->sorts['options'][$fallback_orderby] ?? [];
+                $fallback_order = strtoupper($this->sorts['default']['order'] ?? ($fallback_option['order'] ?? 'DESC'));
+                if (!in_array($fallback_order, ['ASC', 'DESC'], true))
+                {
+                    $fallback_order = strtoupper($fallback_option['order'] ?? 'DESC');
+                    if (!in_array($fallback_order, ['ASC', 'DESC'], true)) $fallback_order = 'DESC';
+                }
+
+                $this->order = $fallback_order;
+
+                return $this->query_sort($args, $fallback_orderby, $fallback_order);
+            }
+        }
+        else if ($meta_key)
         {
             $orderby_type = $option['orderby'] ?? null;
             if ($orderby_type !== 'meta_value' && $orderby_type !== 'meta_value_num')
@@ -759,9 +820,9 @@ class LSD_Skins extends LSD_Base
         }
 
         $clauses_filter_added = false;
-        if ($this->sort_meta_key)
+        if ($this->sort_meta_key || $this->sort_custom_mode)
         {
-            add_filter('posts_clauses', [$this, 'apply_sort_meta_clauses'], 10, 2);
+            add_filter('posts_clauses', [$this, 'apply_sort_clauses'], 10, 2);
             $clauses_filter_added = true;
         }
 
@@ -770,10 +831,12 @@ class LSD_Skins extends LSD_Base
 
         if ($clauses_filter_added)
         {
-            remove_filter('posts_clauses', [$this, 'apply_sort_meta_clauses']);
+            remove_filter('posts_clauses', [$this, 'apply_sort_clauses']);
             $this->sort_meta_key = null;
             $this->sort_meta_orderby = null;
             $this->sort_meta_type = null;
+            $this->sort_custom_mode = null;
+            $this->sort_distance_reference = null;
         }
 
         $ids = [];
@@ -799,9 +862,30 @@ class LSD_Skins extends LSD_Base
         return $ids;
     }
 
-    public function apply_sort_meta_clauses(array $clauses, WP_Query $wp_query): array
+    public function apply_sort_clauses(array $clauses, WP_Query $wp_query): array
     {
-        if (!$wp_query->get('lsd-init', false) || !$this->sort_meta_key)
+        if (!$wp_query->get('lsd-init', false))
+        {
+            return $clauses;
+        }
+
+        if ($this->sort_custom_mode === 'categories')
+        {
+            return $this->apply_taxonomy_sort_clauses($clauses, self::TAX_CATEGORY);
+        }
+        else if ($this->sort_custom_mode === 'locations')
+        {
+            return $this->apply_taxonomy_sort_clauses($clauses, self::TAX_LOCATION);
+        }
+        else if (
+            $this->sort_custom_mode === 'distance'
+            && is_array($this->sort_distance_reference)
+            && isset($this->sort_distance_reference['lat'], $this->sort_distance_reference['lng'])
+        )
+        {
+            return $this->apply_distance_sort_clauses($clauses);
+        }
+        else if (!$this->sort_meta_key)
         {
             return $clauses;
         }
@@ -859,6 +943,263 @@ class LSD_Skins extends LSD_Base
         return $clauses;
     }
 
+    protected function apply_taxonomy_sort_clauses(array $clauses, string $taxonomy): array
+    {
+        $db = new LSD_db();
+        $posts_table = $db->_prefix('#__posts');
+        $term_relationships_table = $db->_prefix('#__term_relationships');
+        $term_taxonomy_table = $db->_prefix('#__term_taxonomy');
+        $terms_table = $db->_prefix('#__terms');
+
+        $order = strtoupper($this->order);
+        if (!in_array($order, ['ASC', 'DESC'], true)) $order = 'ASC';
+
+        $term_order_aggregate = $order === 'DESC' ? 'MAX' : 'MIN';
+        $term_name_aggregate = $order === 'DESC' ? 'MAX' : 'MIN';
+
+        $alias = 'lsd_sort_terms';
+        if (strpos($clauses['join'], $alias) === false)
+        {
+            $clauses['join'] .= $db->prepare("
+                LEFT JOIN (
+                    SELECT sort_terms.object_id, sort_terms.sort_term_order, $term_name_aggregate(t.name) AS sort_term_name
+                    FROM (
+                        SELECT tr.object_id, $term_order_aggregate(tr.term_order) AS sort_term_order
+                        FROM `$term_relationships_table` AS tr
+                        INNER JOIN `$term_taxonomy_table` AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id AND tt.taxonomy = %s
+                        GROUP BY tr.object_id
+                    ) AS sort_terms
+                    INNER JOIN `$term_relationships_table` AS tr ON tr.object_id = sort_terms.object_id AND tr.term_order = sort_terms.sort_term_order
+                    INNER JOIN `$term_taxonomy_table` AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id AND tt.taxonomy = %s
+                    INNER JOIN `$terms_table` AS t ON t.term_id = tt.term_id
+                    GROUP BY sort_terms.object_id, sort_terms.sort_term_order
+                ) AS $alias ON $alias.object_id = `$posts_table`.ID
+            ", $taxonomy, $taxonomy);
+        }
+
+        $empties_last = "CASE WHEN $alias.sort_term_name IS NULL OR $alias.sort_term_name = '' THEN 1 ELSE 0 END ASC";
+        $term_order = "CASE WHEN $alias.sort_term_order IS NULL THEN NULL ELSE $alias.sort_term_order END $order";
+        $term_name = "$alias.sort_term_name $order";
+
+        $orderby_clause = $empties_last . ', ' . $term_order . ', ' . $term_name;
+        if (!empty($clauses['orderby'])) $orderby_clause .= ', ' . $clauses['orderby'];
+
+        $fallback_order = "`$posts_table`.ID $order";
+        if (strpos($orderby_clause, $fallback_order) === false)
+        {
+            $orderby_clause .= ', ' . $fallback_order;
+        }
+
+        $clauses['orderby'] = $orderby_clause;
+
+        return $clauses;
+    }
+
+    protected function apply_distance_sort_clauses(array $clauses): array
+    {
+        $db = new LSD_db();
+        $posts_table = $db->_prefix('#__posts');
+
+        $lat = (float) $this->sort_distance_reference['lat'];
+        $lng = (float) $this->sort_distance_reference['lng'];
+
+        $order = strtoupper($this->order);
+        if (!in_array($order, ['ASC', 'DESC'], true)) $order = 'ASC';
+
+        $distance_expression = "(6371000 * ACOS(LEAST(1, GREATEST(-1, COS(RADIANS($lat)) * COS(RADIANS(lsddata.`latitude`)) * COS(RADIANS(lsddata.`longitude`) - RADIANS($lng)) + SIN(RADIANS($lat)) * SIN(RADIANS(lsddata.`latitude`))))))";
+        $ordered_value = "CASE WHEN lsddata.`latitude` IS NULL OR lsddata.`longitude` IS NULL OR lsddata.`latitude` = '' OR lsddata.`longitude` = '' THEN NULL ELSE $distance_expression END";
+        $empties_last = "CASE WHEN lsddata.`latitude` IS NULL OR lsddata.`longitude` IS NULL OR lsddata.`latitude` = '' OR lsddata.`longitude` = '' THEN 1 ELSE 0 END ASC";
+
+        $orderby_clause = $empties_last . ', ' . $ordered_value . ' ' . $order;
+        if (!empty($clauses['orderby'])) $orderby_clause .= ', ' . $clauses['orderby'];
+
+        $fallback_order = "`$posts_table`.ID $order";
+        if (strpos($orderby_clause, $fallback_order) === false)
+        {
+            $orderby_clause .= ', ' . $fallback_order;
+        }
+
+        $clauses['orderby'] = $orderby_clause;
+
+        return $clauses;
+    }
+
+    protected function resolve_distance_sort_reference(): ?array
+    {
+        if (is_array($this->sort_search_context) && count($this->sort_search_context))
+        {
+            $reference = $this->extract_gps_distance_reference_from_search($this->sort_search_context);
+            if ($reference) return $reference;
+
+            $reference = $this->extract_distance_reference_from_search($this->sort_search_context);
+            if ($reference) return $reference;
+        }
+
+        $request = wp_unslash(array_merge($_GET, $_POST));
+        if (is_array($request) && count($request))
+        {
+            $reference = $this->extract_gps_distance_reference_from_search($request);
+            if ($reference) return $reference;
+
+            $reference = $this->extract_distance_reference_from_search($request);
+            if ($reference) return $reference;
+        }
+
+        $sf = $this->get_sf([]);
+        if (is_array($sf) && count($sf))
+        {
+            $reference = $this->extract_distance_reference_from_search($sf);
+            if ($reference) return $reference;
+        }
+
+        $reference = $this->default_distance_sort_reference();
+        if ($reference) return $reference;
+
+        return null;
+    }
+
+    protected function extract_gps_distance_reference_from_search(array $search): ?array
+    {
+        if (isset($search['sf']) && is_array($search['sf']))
+        {
+            $sf = LSD_Sanitize::search($search['sf']);
+            if ($this->is_gps_distance_reference($sf)) return [
+                'lat' => (float) $sf['gps_latitude'],
+                'lng' => (float) $sf['gps_longitude'],
+            ];
+        }
+
+        if ($this->is_gps_distance_reference($search))
+        {
+            if (isset($search['distance_reference_source'], $search['gps_latitude'], $search['gps_longitude'])) return [
+                'lat' => (float) $search['gps_latitude'],
+                'lng' => (float) $search['gps_longitude'],
+            ];
+
+            return [
+                'lat' => (float) $search['sf-gps-latitude'],
+                'lng' => (float) $search['sf-gps-longitude'],
+            ];
+        }
+
+        return null;
+    }
+
+    protected function extract_distance_reference_from_search(array $search): ?array
+    {
+        if (isset($search['sf']) && is_array($search['sf']))
+        {
+            $sf = LSD_Sanitize::search($search['sf']);
+            $shape = $sf['shape'] ?? null;
+
+            if (
+                $shape === 'circle'
+                && isset($sf['circle_latitude'], $sf['circle_longitude'])
+                && is_numeric($sf['circle_latitude'])
+                && is_numeric($sf['circle_longitude'])
+            )
+            {
+                return [
+                    'lat' => (float) $sf['circle_latitude'],
+                    'lng' => (float) $sf['circle_longitude'],
+                ];
+            }
+
+            if (isset($sf['circle']) && is_array($sf['circle']))
+            {
+                $reference = $this->normalize_distance_reference($sf['circle']);
+                if ($reference) return $reference;
+            }
+        }
+
+        if (
+            isset($search['sf-circle-center-lat'], $search['sf-circle-center-lng'])
+            && is_numeric($search['sf-circle-center-lat'])
+            && is_numeric($search['sf-circle-center-lng'])
+        )
+        {
+            return [
+                'lat' => (float) $search['sf-circle-center-lat'],
+                'lng' => (float) $search['sf-circle-center-lng'],
+            ];
+        }
+
+        if (
+            isset($search['shape'], $search['circle_latitude'], $search['circle_longitude'])
+            && $search['shape'] === 'circle'
+            && is_numeric($search['circle_latitude'])
+            && is_numeric($search['circle_longitude'])
+        )
+        {
+            return [
+                'lat' => (float) $search['circle_latitude'],
+                'lng' => (float) $search['circle_longitude'],
+            ];
+        }
+
+        if (isset($search['circle']) && is_array($search['circle']))
+        {
+            $reference = $this->normalize_distance_reference($search['circle']);
+            if ($reference) return $reference;
+        }
+
+        return null;
+    }
+
+    protected function normalize_distance_reference(array $circle): ?array
+    {
+        if (isset($circle['center-lat'], $circle['center-lng']))
+        {
+            if (!is_numeric($circle['center-lat']) || !is_numeric($circle['center-lng'])) return null;
+
+            return [
+                'lat' => (float) $circle['center-lat'],
+                'lng' => (float) $circle['center-lng'],
+            ];
+        }
+
+        if (!isset($circle['center'])) return null;
+
+        $center = $circle['center'];
+        if (!is_array($center) || !isset($center[0], $center[1])) return null;
+
+        if (!is_numeric($center[0]) || !is_numeric($center[1])) return null;
+
+        return [
+            'lat' => (float) $center[0],
+            'lng' => (float) $center[1],
+        ];
+    }
+
+    protected function default_distance_sort_reference(): ?array
+    {
+        $latitude = $this->settings['map_backend_lt'] ?? null;
+        $longitude = $this->settings['map_backend_ln'] ?? null;
+
+        if (!is_numeric($latitude) || !is_numeric($longitude)) return null;
+
+        return [
+            'lat' => (float) $latitude,
+            'lng' => (float) $longitude,
+        ];
+    }
+
+    protected function is_gps_distance_reference(array $search): bool
+    {
+        if (!isset($search['distance_reference_source'], $search['gps_latitude'], $search['gps_longitude']))
+        {
+            if (!isset($search['sf-distance-reference-source'], $search['sf-gps-latitude'], $search['sf-gps-longitude'])) return false;
+
+            return $search['sf-distance-reference-source'] === 'gps'
+                && is_numeric($search['sf-gps-latitude'])
+                && is_numeric($search['sf-gps-longitude']);
+        }
+
+        return $search['distance_reference_source'] === 'gps'
+            && is_numeric($search['gps_latitude'])
+            && is_numeric($search['gps_longitude']);
+    }
+
     /**
      * @param array $search
      * @param string $limitType
@@ -868,13 +1209,15 @@ class LSD_Skins extends LSD_Base
     {
         // Search Args
         $args = [];
+        $this->sort_search_context = $search;
 
         // Order
         $requested_orderby = isset($search['orderby']) ? sanitize_text_field($search['orderby']) : $this->orderby;
+        $requested_order = isset($search['order']) ? sanitize_text_field($search['order']) : $this->order;
+
         if (isset($this->sorts['options'][$requested_orderby])) $this->orderby = $requested_orderby;
         else if (!isset($this->sorts['options'][$this->orderby])) $this->orderby = 'post_date';
 
-        $requested_order = isset($search['order']) ? sanitize_text_field($search['order']) : $this->order;
         $order_upper = strtoupper($requested_order);
         if (!in_array($order_upper, ['ASC', 'DESC'], true))
         {
@@ -1048,7 +1391,34 @@ class LSD_Skins extends LSD_Base
     {
         ob_start();
         include $this->tpl();
-        return ob_get_clean();
+        $output = ob_get_clean();
+
+        $this->collection_output_rendered = true;
+
+        return $output;
+    }
+
+    /**
+     * Check whether this skin rendered collection output.
+     * @return bool
+     */
+    public function rendered_collection_output(): bool
+    {
+        // Render Status
+        return $this->collection_output_rendered;
+    }
+
+    /**
+     * Normalize custom styles (e.g. template builder styles like tb_123).
+     *
+     * @param mixed $style
+     * @return mixed
+     */
+    protected function normalize_style($style)
+    {
+        if (is_string($style) && preg_match('/^tb_(\d+)$/', $style, $matches)) return (int) $matches[1];
+
+        return $style;
     }
 
     protected static function get_mappable_skin_keys(): array

@@ -1,5 +1,41 @@
 // Requests Object for Skins
 let listdomPageHistoryCache = window.location.href;
+let lsdDistanceReferenceState = {};
+const lsdDistanceReferenceKeys = [
+    "sf-distance-reference-source",
+    "sf-gps-latitude",
+    "sf-gps-longitude",
+];
+
+function lsdNormalizeDistanceReferenceScope(scope) {
+    if (typeof scope === "undefined" || scope === null) return "";
+
+    const normalized = String(scope).trim();
+    if (!normalized.length) return "";
+
+    const numeric = parseInt(normalized, 10);
+    if (!isNaN(numeric) && numeric > 0) return String(numeric);
+
+    return normalized;
+}
+
+function lsdResolveDistanceReferenceScopes(scopeOrScopes, extraScopes = []) {
+    const scopes = [];
+    const appendScope = function (candidate) {
+        if (Array.isArray(candidate)) {
+            candidate.forEach(appendScope);
+            return;
+        }
+
+        const normalized = lsdNormalizeDistanceReferenceScope(candidate);
+        if (normalized && scopes.indexOf(normalized) === -1) scopes.push(normalized);
+    };
+
+    appendScope(scopeOrScopes);
+    appendScope(extraScopes);
+
+    return scopes;
+}
 
 function lsdNormalizeQueryKeys(keys) {
     if (Array.isArray(keys)) return keys.filter(key => typeof key === 'string' && key.length);
@@ -8,16 +44,140 @@ function lsdNormalizeQueryKeys(keys) {
     return [];
 }
 
+function lsdHasDistanceCoordinate(value) {
+    if (typeof value === "undefined" || value === null) return false;
+
+    const normalized = typeof value === "string" ? value.trim() : value;
+    if (normalized === "") return false;
+
+    return !isNaN(parseFloat(normalized));
+}
+
 function lsdClearQueryKeys(searchParams, keys) {
     lsdNormalizeQueryKeys(keys).forEach(function (key) {
         searchParams.delete(key);
     });
 }
 
+function lsdClearDistanceReference(scopeOrScopes, extraScopes = []) {
+    lsdResolveDistanceReferenceScopes(scopeOrScopes, extraScopes).forEach(function (scope) {
+        delete lsdDistanceReferenceState[scope];
+    });
+
+    return "";
+}
+
+function lsdSetDistanceReference(reference = {}, scopeOrScopes = []) {
+    const scopes = lsdResolveDistanceReferenceScopes(scopeOrScopes);
+    const source = typeof reference.source === "string" ? reference.source.trim() : "";
+    const latitude = parseFloat(reference.latitude ?? reference.lat);
+    const longitude = parseFloat(reference.longitude ?? reference.lng);
+
+    if (source !== "gps" || isNaN(latitude) || isNaN(longitude)) {
+        return lsdClearDistanceReference(scopes);
+    }
+
+    if (!scopes.length) return "";
+
+    scopes.forEach(function (scope) {
+        lsdDistanceReferenceState[scope] = {
+            source: "gps",
+            latitude: String(latitude),
+            longitude: String(longitude),
+        };
+    });
+
+    return lsdGetDistanceReferenceQuery(scopes[0]);
+}
+
+function lsdGetDistanceReferenceQuery(scope = null) {
+    const normalizedScope = lsdNormalizeDistanceReferenceScope(scope);
+    if (!normalizedScope || !lsdDistanceReferenceState[normalizedScope]) return "";
+
+    const reference = lsdDistanceReferenceState[normalizedScope];
+    if (
+        reference.source !== "gps" ||
+        reference.latitude === "" ||
+        reference.longitude === ""
+    ) return "";
+
+    return [
+        "sf-distance-reference-source=" + encodeURIComponent(reference.source),
+        "sf-gps-latitude=" + encodeURIComponent(reference.latitude),
+        "sf-gps-longitude=" + encodeURIComponent(reference.longitude),
+    ].join("&");
+}
+
+function lsdExtractDistanceReferenceFromQuery(query = "") {
+    if (typeof query !== "string" || !query.length) return null;
+
+    let queryString = query.trim();
+    const queryIndex = queryString.indexOf("?");
+    if (queryIndex !== -1) queryString = queryString.substring(queryIndex + 1);
+
+    const hashIndex = queryString.indexOf("#");
+    if (hashIndex !== -1) queryString = queryString.substring(0, hashIndex);
+
+    if (!queryString.length) return null;
+
+    const searchParams = new URLSearchParams(queryString);
+    const source = (searchParams.get("sf-distance-reference-source") || "").trim();
+    const latitude = parseFloat(searchParams.get("sf-gps-latitude"));
+    const longitude = parseFloat(searchParams.get("sf-gps-longitude"));
+
+    if (source !== "gps" || isNaN(latitude) || isNaN(longitude)) return null;
+
+    return {
+        source: "gps",
+        latitude: latitude,
+        longitude: longitude,
+    };
+}
+
+function lsdHydrateDistanceReferenceFromQuery(query = "", scopeOrScopes = [], clearWhenMissing = false) {
+    const reference = lsdExtractDistanceReferenceFromQuery(query);
+    if (!reference) {
+        if (clearWhenMissing) return lsdClearDistanceReference(scopeOrScopes);
+
+        return "";
+    }
+
+    return lsdSetDistanceReference(reference, scopeOrScopes);
+}
+
+function lsdAppendDistanceReferenceQuery(query = "", scope = null) {
+    const referenceQuery = lsdGetDistanceReferenceQuery(scope);
+    if (!referenceQuery) return query;
+    if (!query) return referenceQuery;
+
+    return referenceQuery + "&" + query;
+}
+
+function lsdRefreshDistanceReference(shortcodeId, scope = null, clearKeys = []) {
+    const request = lsdGetDistanceReferenceQuery(scope);
+    const id = parseInt(shortcodeId, 10);
+
+    if (!request || isNaN(id)) return;
+
+    $("body").trigger("lsd-sync", {
+        id: id,
+        request: request,
+        clearKeys: clearKeys,
+    });
+}
+
+function lsdSyncDistanceReference(shortcodeIds, scope = null) {
+    if (!Array.isArray(shortcodeIds) || !shortcodeIds.length) return;
+
+    shortcodeIds.forEach(function (shortcodeId) {
+        lsdRefreshDistanceReference(shortcodeId, scope);
+    });
+}
+
 // Listdom PAGE HISTORY PLUGIN
 function ListdomPageHistory() {
-    this.push = function (url, update = true, clearKeys = []) {
-        listdomPageHistoryCache = this.apply(listdomPageHistoryCache, url, clearKeys);
+    this.push = function (url, update = true, clearKeys = [], scope = null) {
+        listdomPageHistoryCache = this.apply(listdomPageHistoryCache, url, clearKeys, scope);
 
         if (update) {
             try {
@@ -31,15 +191,25 @@ function ListdomPageHistory() {
         }
     };
 
-    this.apply = function (source_qs, new_qs, clearKeys = []) {
+    this.apply = function (source_qs, new_qs, clearKeys = [], scope = null) {
         source_qs = decodeURI(source_qs);
         new_qs = decodeURI(new_qs);
 
         if (new_qs.substring(0, 1) === "?") new_qs = new_qs.substring(1);
         let url = new URL(source_qs);
         let new_qs_sp = new URLSearchParams(new_qs);
+        let requestClearKeys = lsdNormalizeQueryKeys(clearKeys);
 
-        lsdClearQueryKeys(url.searchParams, clearKeys);
+        if (scope !== null) {
+            requestClearKeys = [...new Set([
+                ...requestClearKeys,
+                ...lsdDistanceReferenceKeys,
+            ])];
+
+            lsdClearQueryKeys(new_qs_sp, lsdDistanceReferenceKeys);
+        }
+
+        lsdClearQueryKeys(url.searchParams, requestClearKeys);
 
         new_qs_sp.forEach(function (value, key) {
             url.searchParams.delete(key);
@@ -48,6 +218,16 @@ function ListdomPageHistory() {
         new_qs_sp.forEach(function (value, key) {
             url.searchParams.append(key, value);
         });
+
+        if (scope !== null) {
+            const referenceQuery = lsdGetDistanceReferenceQuery(scope);
+
+            if (referenceQuery) {
+                new URLSearchParams(referenceQuery).forEach(function (value, key) {
+                    url.searchParams.append(key, value);
+                });
+            }
+        }
 
         return url.toString();
     };
@@ -60,6 +240,32 @@ function lsdShouldUpdateAddressBar(id) {
     )
         return lsd_update_page_address[id];
     return true;
+}
+
+function lsdPushPaginationHistory(page, scope = null) {
+    const normalizedPage = parseInt(page, 10);
+    if (isNaN(normalizedPage) || normalizedPage < 1) return;
+    const historyScope = lsdGetDistanceReferenceQuery(scope) ? scope : null;
+
+    new ListdomPageHistory().push(
+        "?paged=" + normalizedPage,
+        lsdShouldUpdateAddressBar(scope),
+        ["page", "paged"],
+        historyScope
+    );
+}
+
+function lsdPushSortHistory(orderby, order, scope = null) {
+    const normalizedOrder = String(order || "").toUpperCase();
+    if (!orderby || !["ASC", "DESC"].includes(normalizedOrder)) return;
+    const historyScope = lsdGetDistanceReferenceQuery(scope) ? scope : null;
+
+    new ListdomPageHistory().push(
+        "?orderby=" + encodeURIComponent(orderby) + "&order=" + normalizedOrder,
+        lsdShouldUpdateAddressBar(scope),
+        ["page", "paged"],
+        historyScope
+    );
 }
 
 function lsdResetTimelineCarousel($skin) {
@@ -95,15 +301,23 @@ function ListdomRequest(id, settings) {
         // Get Cached Request
         let cached = listdomRequests[this.id];
         if (!cached) cached = "?";
+        const requestFromLocation = request === "";
 
-        if (request === "") {
+        if (requestFromLocation) {
             let url = new URL(window.location.href);
             request = url.search ? url.search.substring(1) : "";
         }
 
+        lsdHydrateDistanceReferenceFromQuery(request, this.id, requestFromLocation);
+
         // Render new Request
-        let newParameters = atts + "&" + request;
-        let rendered = this.apply(cached, newParameters, clearKeys);
+        const requestClearKeys = [...new Set([
+            ...lsdNormalizeQueryKeys(clearKeys),
+            ...lsdDistanceReferenceKeys,
+        ])];
+        let newParameters = [atts, request].filter(Boolean).join("&");
+        newParameters = lsdAppendDistanceReferenceQuery(newParameters, this.id);
+        let rendered = this.apply(cached, newParameters, requestClearKeys);
 
         // Push to Object
         listdomRequests[this.id] = rendered;
@@ -413,9 +627,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $list_wrapper.addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -444,9 +656,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -500,6 +710,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -680,9 +891,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $list_wrapper.addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -711,9 +920,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -768,6 +975,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -965,9 +1173,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $list_wrapper.addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -1137,9 +1343,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -1195,6 +1399,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -1372,9 +1577,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $list_wrapper.addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -1424,9 +1627,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -1480,6 +1681,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -1655,9 +1857,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $('.lsd-list-wrapper').addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -1684,9 +1884,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -1742,6 +1940,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $('.lsd-list-wrapper').addClass('lsd-loading');
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -1938,9 +2137,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $list_wrapper.addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -2104,9 +2301,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -2160,6 +2355,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -2337,9 +2533,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $list_wrapper.addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -2368,9 +2562,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -2424,6 +2616,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -2617,9 +2810,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $('.lsd-list-wrapper').addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -2741,9 +2932,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -2795,6 +2984,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -2985,9 +3175,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $('.lsd-list-wrapper').addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -3018,9 +3206,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -3104,6 +3290,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
             let view = $wrapper.data("view");
 
             $.ajax({
@@ -3283,9 +3470,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $('.lsd-list-wrapper').addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -3351,9 +3536,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $("#lsd_skin" + settings.id).data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -3438,6 +3621,7 @@ function ListdomDetails(id, link, settings) {
         function sort(orderby, order) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
+            lsdPushSortHistory(orderby, order, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -3792,9 +3976,7 @@ function ListdomDetails(id, link, settings) {
                 // Add loading class
                 $list_wrapper.addClass('lsd-loading');
 
-                let newUrl = new URL(window.location);
-                newUrl.searchParams.set('paged', page);
-                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                lsdPushPaginationHistory(page, settings.id);
 
                 loadMore(false, parseInt(page));
             });
@@ -3838,9 +4020,7 @@ function ListdomDetails(id, link, settings) {
             // Next Page
             let next_page = page || $skin.data("next-page");
 
-            let newUrl = new URL(window.location);
-            newUrl.searchParams.set('paged', next_page);
-            window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+            lsdPushPaginationHistory(next_page, settings.id);
 
             $.ajax({
                 url: settings.ajax_url,
@@ -3987,6 +4167,7 @@ function ListdomDetails(id, link, settings) {
                 },
                 gps: false,
                 access_token: "",
+                connected_shortcodes: [],
                 layers: [],
             },
             options
@@ -3995,6 +4176,7 @@ function ListdomDetails(id, link, settings) {
         // Listdom Request Plugin
         let req = new ListdomRequest(settings.id, settings);
         req.get("", settings.args + (settings.args && settings.atts ? "&" : "") + settings.atts);
+        const distanceReferenceScopes = lsdResolveDistanceReferenceScopes(settings.id, settings.connected_shortcodes);
 
         // Load More Wrapper
         let $loadMoreWrapper = $("#lsd_skin" + settings.id + " .lsd-load-more-wrapper");
@@ -4670,7 +4852,8 @@ function ListdomDetails(id, link, settings) {
             new ListdomPageHistory().push(
                 "?" + request,
                 lsdShouldUpdateAddressBar(settings.id),
-                clearKeys
+                clearKeys,
+                settings.id
             );
 
             // Loading Style
@@ -4754,12 +4937,21 @@ function ListdomDetails(id, link, settings) {
         function autoGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
+                    lsdSetDistanceReference({
+                        source: "gps",
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    }, distanceReferenceScopes);
+
                     map.setView(
                         [position.coords.latitude, position.coords.longitude],
                         map.getZoom() <= settings.gps_zoom.current
                             ? settings.gps_zoom.zl
                             : map.getZoom()
                     );
+
+                    if (!settings.mapsearch) lsdRefreshDistanceReference(settings.id, settings.id);
+                    lsdSyncDistanceReference(settings.connected_shortcodes, settings.id);
                 });
             }
         }
@@ -4815,6 +5007,7 @@ function ListdomDetails(id, link, settings) {
                 },
                 gps: false,
                 gplaces: false,
+                connected_shortcodes: [],
                 direction: {
                     status: false,
                 },
@@ -4849,6 +5042,7 @@ function ListdomDetails(id, link, settings) {
         // Listdom Request Plugin
         let req = new ListdomRequest(settings.id, settings);
         req.get("", settings.args + (settings.args && settings.atts ? "&" : "") + settings.atts);
+        const distanceReferenceScopes = lsdResolveDistanceReferenceScopes(settings.id, settings.connected_shortcodes);
 
         // Create the options
         let bounds = new google.maps.LatLngBounds();
@@ -4929,8 +5123,21 @@ function ListdomDetails(id, link, settings) {
                 '"></script>'
             );
 
+            const clusterSizes = [53, 56, 66, 78, 90];
+
+            const clusterStyles = clusterSizes.map(function (size, index) {
+                return {
+                    url: settings.clustering_images + (index + 1) + ".png",
+                    height: size,
+                    width: size,
+                    textColor: settings.clustering_text_color || "#ffffff",
+                    textSize: 11,
+                };
+            });
+
             markerCluster = new MarkerClusterer(map, loadedObjects, {
                 imagePath: settings.clustering_images,
+                styles: clusterStyles,
             });
         }
 
@@ -5931,6 +6138,12 @@ function ListdomDetails(id, link, settings) {
 
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(function (position) {
+                        lsdSetDistanceReference({
+                            source: "gps",
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        }, distanceReferenceScopes);
+
                         // Set the Map Center
                         map.setCenter(
                             new google.maps.LatLng(
@@ -5942,6 +6155,9 @@ function ListdomDetails(id, link, settings) {
                         // Set the Zoom Level
                         if (map.getZoom() <= settings.gps_zoom.current)
                             map.setZoom(settings.gps_zoom.zl);
+
+                        if (!settings.mapsearch) lsdRefreshDistanceReference(settings.id, settings.id);
+                        lsdSyncDistanceReference(settings.connected_shortcodes, settings.id);
 
                         clearInterval(gpsAnimation);
                         $("#lsd_gps_button_inner" + settings.id).css(
@@ -5967,6 +6183,12 @@ function ListdomDetails(id, link, settings) {
         function autoGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
+                    lsdSetDistanceReference({
+                        source: "gps",
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    }, distanceReferenceScopes);
+
                     let GPSInterval = setInterval(function () {
                         if (!mapsearchFreez) {
                             // Set the Map Center
@@ -5983,6 +6205,8 @@ function ListdomDetails(id, link, settings) {
 
                             // Clear The Loop
                             clearInterval(GPSInterval);
+                            if (!settings.mapsearch) lsdRefreshDistanceReference(settings.id, settings.id);
+                            lsdSyncDistanceReference(settings.connected_shortcodes, settings.id);
                         }
                     }, 300);
                 });
@@ -6348,7 +6572,8 @@ function ListdomDetails(id, link, settings) {
             new ListdomPageHistory().push(
                 "?" + request,
                 lsdShouldUpdateAddressBar(settings.id),
-                clearKeys
+                clearKeys,
+                settings.id
             );
 
             // Loading Style
@@ -6498,6 +6723,7 @@ function ListdomDetails(id, link, settings) {
                 shortcode: "",
                 ajax: 0,
                 sf: {},
+                connected_shortcodes: [],
                 select2: {},
                 nonce: ""
             },
@@ -6506,6 +6732,8 @@ function ListdomDetails(id, link, settings) {
 
         let $container = $(".lsd-search-" + settings.id);
         let $form = $container.find($("form:visible"));
+        const distanceReferenceScopes = lsdResolveDistanceReferenceScopes(settings.shortcode, settings.connected_shortcodes);
+        lsdHydrateDistanceReferenceFromQuery(window.location.search, distanceReferenceScopes, true);
 
         const isCompareModal = $container.closest('#lsdaddcmp-add-modal').length > 0;
         if (isCompareModal && !parseInt(settings.ajax, 10)) settings.ajax = 1;
@@ -6985,6 +7213,7 @@ function ListdomDetails(id, link, settings) {
             // Attach Clear All button handler
             $form.on("click", ".lsd-search-clear-all", function (e) {
                 e.preventDefault();
+                lsdClearDistanceReference(distanceReferenceScopes);
 
                 // Clear inputs
                 $form.find("input[type=text], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=date], input[type=time], input[type=datetime-local]").val("").trigger("input");
@@ -7045,7 +7274,7 @@ function ListdomDetails(id, link, settings) {
         }
 
         function getManagedQueryKeys() {
-            let keys = ['page', 'paged'];
+            let keys = ['page', 'paged', ...lsdDistanceReferenceKeys];
 
             $form.find(':input[name]').each(function () {
                 let name = $(this).attr('name');
@@ -7264,7 +7493,7 @@ function ListdomDetails(id, link, settings) {
                 const initialAddress = ($address.val() || '').toString().trim();
                 if (initialAddress && !$latitude.val() && !$longitude.val()) {
                     resolveCoordinatesFromAddress(initialAddress, provider, function (result) {
-                        if (!result || !result.latitude || !result.longitude) return;
+                        if (!result || !lsdHasDistanceCoordinate(result.latitude) || !lsdHasDistanceCoordinate(result.longitude)) return;
 
                         $latitude.val(result.latitude);
                         $longitude.val(result.longitude);
@@ -7303,12 +7532,14 @@ function ListdomDetails(id, link, settings) {
                     $address.data('lsd-autocomplete-selected', false);
                     $latitude.val('');
                     $longitude.val('');
+                    lsdClearDistanceReference(distanceReferenceScopes);
                 });
 
                 $address.on('change', function () {
                     if ($address.data('lsd-autocomplete-selected')) return;
                     $latitude.val('');
                     $longitude.val('');
+                    lsdClearDistanceReference(distanceReferenceScopes);
 
                     const value = $address.val();
                     if (!value || !value.length) return;
@@ -7320,7 +7551,7 @@ function ListdomDetails(id, link, settings) {
                         if ($address.data('lsd-geocode-request') !== requestKey) return;
                         $address.removeData('lsd-geocode-request');
 
-                        if (!result || !result.latitude || !result.longitude) {
+                        if (!result || !lsdHasDistanceCoordinate(result.latitude) || !lsdHasDistanceCoordinate(result.longitude)) {
                             return;
                         }
 
@@ -7363,14 +7594,15 @@ function ListdomDetails(id, link, settings) {
 
                         $address.val(optionLabel || optionValue);
 
-                        const optionLat = hasItem && item.lat ? item.lat : '';
-                        const optionLon = hasItem && item.lon ? item.lon : '';
+                        const optionLat = hasItem && lsdHasDistanceCoordinate(item.lat) ? item.lat : '';
+                        const optionLon = hasItem && lsdHasDistanceCoordinate(item.lon) ? item.lon : '';
                         const optionPlaceId = hasItem && item.placeId ? item.placeId : '';
 
-                        if (optionLat) $latitude.val(optionLat);
-                        if (optionLon) $longitude.val(optionLon);
+                        if (lsdHasDistanceCoordinate(optionLat)) $latitude.val(optionLat);
+                        if (lsdHasDistanceCoordinate(optionLon)) $longitude.val(optionLon);
 
-                        if (optionLat && optionLon) {
+                        if (lsdHasDistanceCoordinate(optionLat) && lsdHasDistanceCoordinate(optionLon)) {
+                            lsdClearDistanceReference(distanceReferenceScopes);
                             $address.data('lsd-autocomplete-selected', true);
                             dropdown.markSelected(optionValue, {
                                 lat: optionLat,
@@ -7452,15 +7684,22 @@ function ListdomDetails(id, link, settings) {
                         onDenied: function () {
                             $latitude.val('');
                             $longitude.val('');
+                            lsdClearDistanceReference(distanceReferenceScopes);
                         },
                         onError: function () {
                             $latitude.val('');
                             $longitude.val('');
+                            lsdClearDistanceReference(distanceReferenceScopes);
                         },
                         onSuccess: function (lat, lng, done) {
                             $latitude.val(lat);
                             $longitude.val(lng);
                             $address.data('lsd-autocomplete-selected', true);
+                            lsdSetDistanceReference({
+                                source: "gps",
+                                lat: lat,
+                                lng: lng
+                            }, distanceReferenceScopes);
 
                             resolveAddressFromCoordinates(
                                 lat,
@@ -7568,9 +7807,10 @@ function ListdomDetails(id, link, settings) {
 
                     $address.val(item.label || item.value || '');
 
-                    if (item.lat && item.lon) {
+                    if (lsdHasDistanceCoordinate(item.lat) && lsdHasDistanceCoordinate(item.lon)) {
                         $latitude.val(item.lat);
                         $longitude.val(item.lon);
+                        lsdClearDistanceReference(distanceReferenceScopes);
                         $address.data('lsd-autocomplete-selected', true);
                     } else {
                         $latitude.val('');
@@ -7589,6 +7829,84 @@ function ListdomDetails(id, link, settings) {
             if (!message) return;
 
             new WebiliaToast(message, {type: 'lsd-error'});
+        }
+
+        function prepareDistanceSearchFields() {
+            const $fields = $container.find('.lsd-radius-search-field');
+            if (!$fields.length) return Promise.resolve();
+
+            const radiusShared = window.lsdRadiusShared || {};
+            const getRadiusDropdownController = radiusShared.getRadiusDropdownController;
+            const resolveCoordinatesFromAddress = radiusShared.resolveCoordinatesFromAddress;
+
+            if (typeof getRadiusDropdownController !== 'function' || typeof resolveCoordinatesFromAddress !== 'function') return Promise.resolve();
+
+            const requests = [];
+
+            $fields.each(function () {
+                const $field = $(this);
+                const $address = $field.find('.lsd-radius-search-address');
+                const $latitude = $field.find('.lsd-radius-search-latitude');
+                const $longitude = $field.find('.lsd-radius-search-longitude');
+
+                if (!$address.length) return;
+
+                const value = ($address.val() || '').toString().trim();
+                if (!value.length) return;
+
+                if (
+                    lsdHasDistanceCoordinate($latitude.val())
+                    && lsdHasDistanceCoordinate($longitude.val())
+                ) {
+                    return;
+                }
+
+                requests.push(new Promise(function (resolve) {
+                    const dropdown = getRadiusDropdownController($field, $address);
+                    const provider = ($field.data('lsd-map-provider') || '').toString().toLowerCase() === 'googlemap'
+                        ? 'googlemap'
+                        : 'leaflet';
+                    const requestKey = Date.now() + '_' + Math.random().toString(36).slice(2);
+
+                    $address.data('lsd-geocode-request', requestKey);
+
+                    resolveCoordinatesFromAddress(value, provider, function (result) {
+                        if ($address.data('lsd-geocode-request') !== requestKey) {
+                            resolve();
+                            return;
+                        }
+
+                        $address.removeData('lsd-geocode-request');
+
+                        if (
+                            !result
+                            || !lsdHasDistanceCoordinate(result.latitude)
+                            || !lsdHasDistanceCoordinate(result.longitude)
+                        ) {
+                            resolve();
+                            return;
+                        }
+
+                        $latitude.val(result.latitude);
+                        $longitude.val(result.longitude);
+                        $address.data('lsd-autocomplete-selected', true);
+                        lsdClearDistanceReference(distanceReferenceScopes);
+
+                        if ($address.data('autocomplete') && result.formatted) {
+                            $address.val(result.formatted);
+                        }
+
+                        dropdown.markSelected($address.val(), {
+                            lat: result.latitude,
+                            lon: result.longitude
+                        });
+
+                        resolve();
+                    });
+                }));
+            });
+
+            return requests.length ? Promise.all(requests) : Promise.resolve();
         }
 
         function ajax() {
@@ -7629,97 +7947,100 @@ function ListdomDetails(id, link, settings) {
         }
 
         function search() {
-            // Listdom Request Plugin
-            let req = new ListdomRequest(settings.shortcode, settings);
-            let clearKeys = getManagedQueryKeys();
+            return prepareDistanceSearchFields().then(function () {
+                // Listdom Request Plugin
+                let req = new ListdomRequest(settings.shortcode, settings);
+                let clearKeys = getManagedQueryKeys();
 
-            let $skin = $("#lsd_skin" + settings.shortcode);
-            let $wrapper = $("#lsd_skin" + settings.shortcode + " .lsd-listing-wrapper");
-            let $loadMoreWrapper = $("#lsd_skin" + settings.shortcode + " .lsd-load-more-wrapper");
-            const $pagination = $skin.find($(".lsd-numeric-pagination-wrapper"));
+                let $skin = $("#lsd_skin" + settings.shortcode);
+                let $wrapper = $("#lsd_skin" + settings.shortcode + " .lsd-listing-wrapper");
+                let $loadMoreWrapper = $("#lsd_skin" + settings.shortcode + " .lsd-load-more-wrapper");
+                const $pagination = $skin.find($(".lsd-numeric-pagination-wrapper"));
 
-            // Add loading Class
-            $wrapper.addClass("lsd-loading");
+                // Add loading Class
+                $wrapper.addClass("lsd-loading");
 
-            // Push to History
-            new ListdomPageHistory().push(
-                "?" + $form.serialize(),
-                lsdShouldUpdateAddressBar(settings.id),
-                clearKeys
-            );
+                // Push to History
+                new ListdomPageHistory().push(
+                    "?" + $form.serialize(),
+                    lsdShouldUpdateAddressBar(settings.id),
+                    clearKeys,
+                    distanceReferenceScopes.length ? distanceReferenceScopes[0] : settings.shortcode
+                );
 
-            // Trigger Connected Shortcodes Sync
-            if (typeof settings.connected_shortcodes !== 'undefined' && settings.connected_shortcodes.length) {
-                for (const i in settings.connected_shortcodes) {
-                    const shortcode_id = settings.connected_shortcodes[i];
-                    $('body').trigger('lsd-sync', {
-                        id: shortcode_id,
-                        request: $form.serialize() + "&page=1",
-                        clearKeys: clearKeys
-                    });
-                }
-                // Search
-            } else {
-                $.ajax({
-                    url: settings.ajax_url,
-                    data:
-                        "action=lsd_ajax_search&" +
-                        req.get($form.serialize() + "&page=1&view=" + $skin.data('view'), "", clearKeys),
-                    dataType: "json",
-                    type: "post",
-                    success: function (response) {
-                        // Remove Loading Class
-                        $wrapper.removeClass("lsd-loading");
+                // Trigger Connected Shortcodes Sync
+                if (typeof settings.connected_shortcodes !== 'undefined' && settings.connected_shortcodes.length) {
+                    for (const i in settings.connected_shortcodes) {
+                        const shortcode_id = settings.connected_shortcodes[i];
+                        $('body').trigger('lsd-sync', {
+                            id: shortcode_id,
+                            request: $form.serialize() + "&page=1",
+                            clearKeys: clearKeys
+                        });
+                    }
+                    // Search
+                } else {
+                    $.ajax({
+                        url: settings.ajax_url,
+                        data:
+                            "action=lsd_ajax_search&" +
+                            req.get($form.serialize() + "&page=1&view=" + $skin.data('view'), "", clearKeys),
+                        dataType: "json",
+                        type: "post",
+                        success: function (response) {
+                            // Remove Loading Class
+                            $wrapper.removeClass("lsd-loading");
 
-                        lsdResetTimelineCarousel($skin);
+                            lsdResetTimelineCarousel($skin);
 
-                        // Display Items
-                        $wrapper.html(response.listings);
+                            // Display Items
+                            $wrapper.html(response.listings);
 
-                        // Masonry Filters
-                        if ($skin.hasClass("lsd-masonry-view-wrapper")) {
-                            if (typeof response.filters !== "undefined") {
-                                const $filtersWrapper = $skin.find(".lsd-masonry-filters");
+                            // Masonry Filters
+                            if ($skin.hasClass("lsd-masonry-view-wrapper")) {
+                                if (typeof response.filters !== "undefined") {
+                                    const $filtersWrapper = $skin.find(".lsd-masonry-filters");
 
-                                if ($filtersWrapper.length) {
-                                    if (response.filters) $filtersWrapper.replaceWith(response.filters);
-                                    else $filtersWrapper.remove();
-                                } else if (response.filters) {
-                                    $skin.find(".lsd-list-wrapper").prepend(response.filters);
+                                    if ($filtersWrapper.length) {
+                                        if (response.filters) $filtersWrapper.replaceWith(response.filters);
+                                        else $filtersWrapper.remove();
+                                    } else if (response.filters) {
+                                        $skin.find(".lsd-list-wrapper").prepend(response.filters);
+                                    }
                                 }
                             }
+
+                            // Update Pagination
+                            if ($pagination.length) $pagination.replaceWith(response.pagination);
+                            else $skin.find($('.lsd-list-wrapper')).append(response.pagination);
+
+                            // Hide Load More
+                            if (response.count === 0 || response.total <= response.count)
+                                $loadMoreWrapper.addClass("lsd-util-hide");
+                            else if (response.total > response.count)
+                                $loadMoreWrapper.removeClass("lsd-util-hide");
+
+                            // Update the Next Page
+                            $wrapper.data("next-page", response.next_page);
+                            $skin.data("next-page", response.next_page);
+
+                            // Map Objects
+                            new ListdomMaps(settings.shortcode).load(response.objects);
+
+                            // Search Success Event
+                            response.shortcode = settings.shortcode;
+                            window.dispatchEvent(new CustomEvent('lsd-search-success', {
+                                detail: response
+                            }));
+
+                            // Trigger
+                            listdom_onload();
+                        },
+                        error: function (err) {
                         }
-
-                        // Update Pagination
-                        if ($pagination.length) $pagination.replaceWith(response.pagination);
-                        else $skin.find($('.lsd-list-wrapper')).append(response.pagination);
-
-                        // Hide Load More
-                        if (response.count === 0 || response.total <= response.count)
-                            $loadMoreWrapper.addClass("lsd-util-hide");
-                        else if (response.total > response.count)
-                            $loadMoreWrapper.removeClass("lsd-util-hide");
-
-                        // Update the Next Page
-                        $wrapper.data("next-page", response.next_page);
-                        $skin.data("next-page", response.next_page);
-
-                        // Map Objects
-                        new ListdomMaps(settings.shortcode).load(response.objects);
-
-                        // Search Success Event
-                        response.shortcode = settings.shortcode;
-                        window.dispatchEvent(new CustomEvent('lsd-search-success', {
-                            detail: response
-                        }));
-
-                        // Trigger
-                        listdom_onload();
-                    },
-                    error: function (err) {
-                    }
-                });
-            }
+                    });
+                }
+            });
         }
 
         function toggleHiddenInputs($element) {
@@ -8256,15 +8577,17 @@ if (typeof jQuery !== 'undefined')
             options
         );
 
-        let $dashboard = $("#lsd_dashboard");
+        let $dashboard = this.first();
+        if (!$dashboard.length) $dashboard = $("#lsd_dashboard");
+        if (!$dashboard.length) return this;
+
         window.lsdDashboardApplySidebar($dashboard);
         setListeners();
 
         function setListeners() {
             $dashboard
-            .find($(".lsd-dashboard-action-delete"))
-            .off("click")
-            .on("click", function () {
+            .off("click.lsdDashboardDelete", ".lsd-dashboard-action-delete")
+            .on("click.lsdDashboardDelete", ".lsd-dashboard-action-delete", function () {
                 remove($(this));
             });
         }
@@ -8312,6 +8635,8 @@ if (typeof jQuery !== 'undefined')
                 },
             });
         }
+
+        return this;
     };
 })(jQuery);
 
@@ -8337,7 +8662,12 @@ if (typeof jQuery !== 'undefined')
         let $featured_image_container = $("#lsd_dashboard_featured_image_placeholder");
         let $featured_image_remove = $("#lsd_featured_image_remove_button");
         let $multiline_select = $(".lsd-select-multiple");
+        let $submitMirrorStatus = $form.find(".lsd-dashboard-submit-mirror-status");
+        let $submitRealStatus = $form.find(".lsd-dashboard-submit-real-status");
+        let $submitMirrorConsent = $form.find(".lsd-dashboard-submit-mirror-consent");
+        let $submitRealConsent = $form.find(".lsd-dashboard-submit-real-consent");
         let ajax = false;
+        let syncDashboardSubmitFieldsInProgress = false;
         const aspectRatioTolerance = 0.05;
 
         function parseAspectRatio(value) {
@@ -8573,6 +8903,53 @@ if (typeof jQuery !== 'undefined')
             }
         }
 
+        function syncDashboardSubmitMirrors() {
+            if ($submitRealStatus.length) {
+                syncDashboardSubmitStatus($submitRealStatus.first().val());
+            } else if ($submitMirrorStatus.length) {
+                syncDashboardSubmitStatus($submitMirrorStatus.first().val());
+            }
+
+            if ($submitRealConsent.length) {
+                syncDashboardSubmitConsent($submitRealConsent.first().is(":checked"));
+            } else if ($submitMirrorConsent.length) {
+                syncDashboardSubmitConsent($submitMirrorConsent.first().is(":checked"));
+            }
+        }
+
+        function setDashboardSubmitStatusValue($elements, value) {
+            if (!$elements.length) return;
+
+            $elements.each(function () {
+                const $element = $(this);
+
+                if ($element.val() !== value) $element.val(value);
+                if ($element.data("select2")) $element.trigger("change.select2");
+            });
+        }
+
+        function syncDashboardSubmitStatus(value) {
+            if (syncDashboardSubmitFieldsInProgress) return;
+
+            syncDashboardSubmitFieldsInProgress = true;
+
+            setDashboardSubmitStatusValue($submitRealStatus, value);
+            setDashboardSubmitStatusValue($submitMirrorStatus, value);
+
+            syncDashboardSubmitFieldsInProgress = false;
+        }
+
+        function syncDashboardSubmitConsent(checked) {
+            if (syncDashboardSubmitFieldsInProgress) return;
+
+            syncDashboardSubmitFieldsInProgress = true;
+
+            if ($submitRealConsent.length) $submitRealConsent.prop("checked", checked);
+            if ($submitMirrorConsent.length) $submitMirrorConsent.prop("checked", checked);
+
+            syncDashboardSubmitFieldsInProgress = false;
+        }
+
         setListeners();
 
         function setListeners() {
@@ -8594,6 +8971,24 @@ if (typeof jQuery !== 'undefined')
             });
 
             $multiline_select.select2();
+
+            if ($submitMirrorStatus.length && $submitRealStatus.length) {
+                $submitMirrorStatus.add($submitRealStatus)
+                    .off("change.lsdDashboardSubmitMirror")
+                    .on("change.lsdDashboardSubmitMirror", function () {
+                        syncDashboardSubmitStatus($(this).val());
+                    });
+            }
+
+            if ($submitMirrorConsent.length && $submitRealConsent.length) {
+                $submitMirrorConsent.add($submitRealConsent)
+                    .off("change.lsdDashboardSubmitMirror input.lsdDashboardSubmitMirror")
+                    .on("change.lsdDashboardSubmitMirror input.lsdDashboardSubmitMirror", function () {
+                        syncDashboardSubmitConsent($(this).is(":checked"));
+                    });
+            }
+
+            syncDashboardSubmitMirrors();
         }
 
         function save() {
@@ -11009,6 +11404,38 @@ function lsdaddbok_trigger_booking_form() {
     });
 }
 
+function lsdaddbok_bind_clear_buttons(context) {
+    let $scope = context ? jQuery(context) : jQuery(document);
+
+    $scope
+    .find(".lsd-search-input-clear-wrap input")
+    .off("input.lsdaddbokClear change.lsdaddbokClear")
+    .on("input.lsdaddbokClear change.lsdaddbokClear", function () {
+        let $input = jQuery(this);
+        let $button = $input.closest(".lsd-search-input-clear-wrap").find(".lsd-search-input-clear");
+        $button.toggleClass("lsd-util-hide", !$input.val());
+    })
+    .each(function () {
+        let $input = jQuery(this);
+        let $button = $input.closest(".lsd-search-input-clear-wrap").find(".lsd-search-input-clear");
+        $button.toggleClass("lsd-util-hide", !$input.val());
+    });
+
+    $scope
+    .find(".lsd-search-input-clear")
+    .off("click.lsdaddbokClear")
+    .on("click.lsdaddbokClear", function () {
+        let $button = jQuery(this);
+        let target = $button.data("for");
+        let $input = target ? jQuery("#" + target) : $button.closest(".lsd-search-input-clear-wrap").find("input").first();
+
+        if (!$input.length) return;
+
+        $input.val("").trigger("input").trigger("change").focus();
+        $button.addClass("lsd-util-hide");
+    });
+}
+
 function lsdaddbok_trigger_booking_manage_actions() {
     // Open Action Modal or Run Direct Action
     jQuery(document)
@@ -11928,6 +12355,9 @@ function lsdCheckoutComplete(orderKey)
                 }
             },
             error: function () {
+                switchError({
+                    message: 'Something went wrong. Please try again.'
+                }, $dropdown, $message, original_subscription_id);
             },
             complete: function () {
                 loading.stop();
@@ -12695,6 +13125,12 @@ function lsdCheckoutComplete(orderKey)
         $(".lsdaddbok-period").on("apply.daterangepicker", function () {
             let $input = $(this);
             let $form = $input.closest("form");
+            let invalidMessage = $input.data("lsd-booking-range-invalid-message");
+
+            if (invalidMessage) {
+                $form.find(".lsd-booking-inquiry-alert").html(listdom_alertify(invalidMessage, "lsd-error"));
+                return;
+            }
 
             $form.submit();
         });
@@ -12706,11 +13142,13 @@ function lsdCheckoutComplete(orderKey)
             let $form = $(this);
             let $button = $form.find('.lsd-booking-inquiry-submit');
             let $module = $form.parent();
+            let $alert = $form.find('.lsd-booking-inquiry-alert');
             let data = $form.serialize();
 
             // Loading Style
             const loading = new ListdomButtonLoader($button);
             loading.start($button.text());
+            $alert.html("");
 
             $.ajax({
                 url: lsd.ajaxurl,
@@ -12740,6 +13178,9 @@ function lsdCheckoutComplete(orderKey)
 
                         // Booking Form
                         lsdaddbok_trigger_booking_form();
+                        lsdaddbok_bind_clear_buttons($module);
+                    } else if (response.message) {
+                        $alert.html(listdom_alertify(response.message, "lsd-error"));
                     }
                 },
                 error: function () {
@@ -12751,6 +13192,7 @@ function lsdCheckoutComplete(orderKey)
 
         // Booking Form
         lsdaddbok_trigger_booking_form();
+        lsdaddbok_bind_clear_buttons(document);
 
         // Booking Manage Actions
         lsdaddbok_trigger_booking_manage_actions();
@@ -12933,6 +13375,7 @@ function lsdCheckoutComplete(orderKey)
         {
             emptyIcon: false,
             emptyIconValue: '',
+            iconsPerPage: 16,
         });
 
         /**

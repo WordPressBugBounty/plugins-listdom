@@ -110,6 +110,9 @@ jQuery(document).ready(function()
                                                 'id' => 'lsd_profile_image',
                                                 'name' => 'lsd[profile_image]',
                                                 'value' => $attachment_id,
+                                                'upload_action' => 'lsd_dashboard_upload_profile_image',
+                                                'upload_nonce' => wp_create_nonce('lsd_dashboard_profile'),
+                                                'upload_message' => '#lsd_profile_image_message',
                                             ]); ?>
                                         </div>
                                     </div>
@@ -134,6 +137,9 @@ jQuery(document).ready(function()
                                             'id' => 'lsd_hero_image',
                                             'name' => 'lsd[hero_image]',
                                             'value' => $attachment_id,
+                                            'upload_action' => 'lsd_dashboard_upload_profile_image',
+                                            'upload_nonce' => wp_create_nonce('lsd_dashboard_profile'),
+                                            'upload_message' => '#lsd_hero_image_message',
                                         ]); ?>
                                     </div>
 

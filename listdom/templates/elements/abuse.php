@@ -9,16 +9,28 @@ $owner_id = get_post_field('post_author', $post_id);
 
 $field_name = !isset($this->args['name_field']) || $this->args['name_field'];
 $field_phone = !isset($this->args['phone_field']) || $this->args['phone_field'];
+$pc_context = 'report';
+$pc_enabled = array_key_exists('pc_enabled', $this->args)
+    ? (bool) $this->args['pc_enabled']
+    : LSD_Privacy::is_consent_enabled($pc_context);
+$pc_enabled_value = $pc_enabled ? '1' : '0';
+$pc_enabled_nonce = wp_create_nonce('lsd_privacy_consent_' . absint($post_id) . '_' . $pc_context . '_' . $pc_enabled_value);
+$pc_label = isset($this->args['pc_label']) ? (string) $this->args['pc_label'] : '';
 
 // Current User
 $current = wp_get_current_user();
 $current_id = get_current_user_id();
 
-$report_privacy_field = LSD_Privacy::consent_field([
-    'id' => 'lsd_abuse_privacy_consent_' . absint($post_id),
-    'wrapper_class' => 'lsd-report-abuse-privacy-consent-field',
-    'context' => 'report',
-]);
+$report_privacy_field = '';
+if ($pc_enabled)
+{
+    $report_privacy_field = LSD_Privacy::consent_field([
+        'id' => 'lsd_abuse_privacy_consent_' . absint($post_id),
+        'wrapper_class' => 'lsd-report-abuse-privacy-consent-field',
+        'context' => 'report',
+        'label' => $pc_label,
+    ]);
+}
 ?>
 <div class="lsd-report-abuse-form-wrapper">
 	<form class="lsd-report-abuse-form" id="lsd_report_abuse_form_<?php echo esc_attr($post_id); ?>" data-id="<?php echo esc_attr($post_id); ?>">
@@ -77,6 +89,9 @@ $report_privacy_field = LSD_Privacy::consent_field([
 				required
 			></textarea>
 		</div>
+
+        <input type="hidden" name="lsd_privacy_consent_enabled" value="<?php echo esc_attr($pc_enabled_value); ?>">
+        <input type="hidden" name="lsd_privacy_consent_enabled_nonce" value="<?php echo esc_attr($pc_enabled_nonce); ?>">
 
         <?php if ($report_privacy_field !== ''): ?>
             <div class="lsd-report-abuse-form-row lsd-report-abuse-form-row-consent">

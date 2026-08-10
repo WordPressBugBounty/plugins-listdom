@@ -118,6 +118,7 @@
                 {
                     emptyIcon: false,
                     emptyIconValue: '',
+                    iconsPerPage: 16,
                 });
             });
         }
@@ -1079,6 +1080,7 @@ jQuery(document).ready(function ($)
         {
             emptyIcon: false,
             emptyIconValue: '',
+            iconsPerPage: 16,
         });
 
     /**
@@ -1870,13 +1872,16 @@ jQuery(document).ready(function ($)
     });
 
     // Tab Switcher
-    $('.lsd-tab-switcher li a').on('click', function (e)
+    $('.lsd-tab-switcher li').on('click', function (e)
     {
-        e.preventDefault();
-
-        const $tab = $(this).parent();
+        const $tab = $(this);
         const $tabs = $tab.parent();
         const content = $tabs.data('for');
+
+        if (!content) return;
+
+        e.preventDefault();
+
         const $contents = $(content);
 
         $tabs.find($('li')).removeClass('lsd-sub-tabs-active');
@@ -2025,7 +2030,8 @@ jQuery(document).ready(function ($)
                         if (typeof $.fn.fontIconPicker !== 'undefined') {
                             $inputEl.fontIconPicker({
                                 emptyIcon: false,
-                                emptyIconValue: ''
+                                emptyIconValue: '',
+                                iconsPerPage: 16,
                             });
                         }
                     }, 0);
@@ -2272,6 +2278,7 @@ jQuery(document).ready(function ($)
             if (type === 'premade') return option.value.includes('style');
             if (type === 'dynamic') return option.value === 'dynamic';
             if (type === 'elementor') return !isNaN(option.value);
+            if (type === 'template_builder') return option.value.startsWith('tb_');
             return true;
         });
     }
@@ -2691,109 +2698,110 @@ jQuery(function ($)
 jQuery(function ($)
 {
     const $wrapper = $('#lsd_plan_tiers');
-    if (!$wrapper.length) return;
-
     const $btnAdd = $('#lsd_add_tier');
 
-    function ensureDefault()
+    if ($wrapper.length)
     {
-        let $default = $wrapper.find('.lsd-plan-tier-default-input[value="1"]').closest('.lsd-plan-tier');
-
-        if (!$default.length) $default = $wrapper.children('.lsd-plan-tier').first();
-
-        $wrapper.children('.lsd-plan-tier').each(function ()
+        function ensureDefault()
         {
-            const isDefault = $(this).is($default);
-            $(this).find('.lsd-plan-tier-star').toggleClass('fas', isDefault).toggleClass('far', !isDefault);
-            $(this).find('.lsd-plan-tier-default-input').val(isDefault ? '1' : '0');
-        });
-    }
+            let $default = $wrapper.find('.lsd-plan-tier-default-input[value="1"]').closest('.lsd-plan-tier');
 
-    function renumber()
-    {
-        $wrapper.children('.lsd-plan-tier').each(function (i)
-        {
-            $(this).attr('data-index', i);
-            $(this).find('[name^="lsd_tiers"]').each(function ()
+            if (!$default.length) $default = $wrapper.children('.lsd-plan-tier').first();
+
+            $wrapper.children('.lsd-plan-tier').each(function ()
             {
-                $(this).attr('name', $(this).attr('name').replace(/lsd_tiers\[[0-9]+]/, 'lsd_tiers[' + i + ']'));
+                const isDefault = $(this).is($default);
+                $(this).find('.lsd-plan-tier-star').toggleClass('fas', isDefault).toggleClass('far', !isDefault);
+                $(this).find('.lsd-plan-tier-default-input').val(isDefault ? '1' : '0');
             });
-        });
-
-        ensureDefault();
-    }
-
-    function refreshSortable()
-    {
-        $wrapper.sortable({
-            handle: '.lsd-plan-tier-sort',
-            stop: renumber
-        });
-    }
-
-    $wrapper.on('click', '.lsd-plan-tier-remove', function ()
-    {
-        $(this).closest('.lsd-plan-tier').remove();
-        renumber();
-    });
-
-    $wrapper.on('click', '.lsd-plan-tier-star', function ()
-    {
-        const $tier = $(this).closest('.lsd-plan-tier');
-        $wrapper.find('.lsd-plan-tier-default-input').val('0');
-        $tier.find('.lsd-plan-tier-default-input').val('1');
-        ensureDefault();
-    });
-
-    $wrapper.on('change', '.lsd-plan-tier-type', function ()
-    {
-        const $tier = $(this).closest('.lsd-plan-tier');
-        const $expiry = $tier.find('.lsd-plan-tier-expiry');
-        const $expiryWrapper = $tier.find('.lsd-plan-tier-expiry-wrapper');
-        const isRecurring = $(this).val() === 'recurring';
-
-        $expiry.prop('required', isRecurring);
-
-        if ($expiryWrapper.length)
-        {
-            if (isRecurring) $expiryWrapper.removeClass('lsd-util-hide');
-            else $expiryWrapper.addClass('lsd-util-hide');
         }
-    }).trigger('change');
 
-    $wrapper.on('input', 'input[name$="[name]"]', function ()
-    {
-        const $tier = $(this).closest('.lsd-plan-tier');
-        $tier.find('.lsd-plan-tier-title').text($(this).val());
-    });
-
-    $btnAdd.on('click', function (e)
-    {
-        e.preventDefault();
-        const index = $wrapper.children('.lsd-plan-tier').length;
-
-        $.post(lsd.ajaxurl, {
-            action: 'lsd_plan_new_tier',
-            index: index,
-            _lsdnonce: $('input[name="_lsdnonce"]').val()
-        }, function (res)
+        function renumber()
         {
-            if (res.success)
+            $wrapper.children('.lsd-plan-tier').each(function (i)
             {
-                const $tier = $(res.html);
-                $wrapper.append($tier);
+                $(this).attr('data-index', i);
+                $(this).find('[name^="lsd_tiers"]').each(function ()
+                {
+                    $(this).attr('name', $(this).attr('name').replace(/lsd_tiers\[[0-9]+]/, 'lsd_tiers[' + i + ']'));
+                });
+            });
 
-                refreshSortable();
-                renumber();
+            ensureDefault();
+        }
 
-                const $name = $tier.find('input[name$="[name]"]');
-                $('html, body').animate({scrollTop: $tier.offset().top}, 300, () => $name.trigger('focus'));
+        function refreshSortable()
+        {
+            $wrapper.sortable({
+                handle: '.lsd-plan-tier-sort',
+                stop: renumber
+            });
+        }
+
+        $wrapper.on('click', '.lsd-plan-tier-remove', function ()
+        {
+            $(this).closest('.lsd-plan-tier').remove();
+            renumber();
+        });
+
+        $wrapper.on('click', '.lsd-plan-tier-star', function ()
+        {
+            const $tier = $(this).closest('.lsd-plan-tier');
+            $wrapper.find('.lsd-plan-tier-default-input').val('0');
+            $tier.find('.lsd-plan-tier-default-input').val('1');
+            ensureDefault();
+        });
+
+        $wrapper.on('change', '.lsd-plan-tier-type', function ()
+        {
+            const $tier = $(this).closest('.lsd-plan-tier');
+            const $expiry = $tier.find('.lsd-plan-tier-expiry');
+            const $expiryWrapper = $tier.find('.lsd-plan-tier-expiry-wrapper');
+            const isRecurring = $(this).val() === 'recurring';
+
+            $expiry.prop('required', isRecurring);
+
+            if ($expiryWrapper.length)
+            {
+                if (isRecurring) $expiryWrapper.removeClass('lsd-util-hide');
+                else $expiryWrapper.addClass('lsd-util-hide');
             }
-        }, 'json');
-    });
+        }).trigger('change');
 
-    refreshSortable();
-    renumber();
+        $wrapper.on('input', 'input[name$="[name]"]', function ()
+        {
+            const $tier = $(this).closest('.lsd-plan-tier');
+            $tier.find('.lsd-plan-tier-title').text($(this).val());
+        });
+
+        $btnAdd.on('click', function (e)
+        {
+            e.preventDefault();
+            const index = $wrapper.children('.lsd-plan-tier').length;
+
+            $.post(lsd.ajaxurl, {
+                action: 'lsd_plan_new_tier',
+                index: index,
+                _lsdnonce: $('input[name="_lsdnonce"]').val()
+            }, function (res)
+            {
+                if (res.success)
+                {
+                    const $tier = $(res.html);
+                    $wrapper.append($tier);
+
+                    refreshSortable();
+                    renumber();
+
+                    const $name = $tier.find('input[name$="[name]"]');
+                    $('html, body').animate({scrollTop: $tier.offset().top}, 300, () => $name.trigger('focus'));
+                }
+            }, 'json');
+        });
+
+        refreshSortable();
+        renumber();
+    }
 
     $('.lsd-switch-confirm').each(function()
     {
@@ -2818,12 +2826,163 @@ jQuery(function ($)
             $box.addClass('lsd-util-hide');
         });
     });
+
+    // Multi-value chain toggle (padding, border, margin)
+    (function ($) {
+        const selectors = {
+            group: '[data-lsd-multi-field]',
+            toggle: '[data-lsd-chain-toggle]'
+        };
+
+        let syncLock = false;
+
+        const resolveInputValue = (value) => (value ?? '').toString().trim();
+        const getGroupInputs = ($group) => $group.find('input[type="number"]');
+        const areGroupValuesLinked = ($group) => {
+            const values = getGroupInputs($group).map(function ()
+            {
+                return resolveInputValue($(this).val());
+            }).get();
+
+            return values.length <= 1 || values.every((value) => value === values[0]);
+        };
+
+        const setLinked = ($btn, linked) =>
+        {
+            $btn
+                .toggleClass('is-linked', linked)
+                .attr('aria-pressed', linked ? 'true' : 'false')
+                .attr('data-lsd-chain-state', linked ? 'linked' : 'unlinked');
+
+            const $icon = $btn.find('i');
+
+            if (linked) {
+                $icon.removeClass('fa-link-slash').addClass('fa-link');
+            } else {
+                $icon.removeClass('fa-link').addClass('fa-link-slash');
+            }
+        };
+
+        const refreshLinkedState = (context) =>
+        {
+            const $root = context ? $(context) : $(document);
+
+            $root.find(selectors.toggle).each(function ()
+            {
+                const $btn = $(this);
+                const state = ($btn.attr('data-lsd-chain-state') || '').toString();
+                const linked = state === 'linked'
+                    ? true
+                    : state === 'unlinked'
+                        ? false
+                        : areGroupValuesLinked($btn.closest(selectors.group));
+
+                setLinked($btn, linked);
+            });
+        };
+
+        const syncGroup = ($group, $source) =>
+        {
+            if (syncLock) return;
+
+            const $inputs = $group.find('input[type="number"]');
+            if (!$inputs.length) return;
+
+            const value = ($source && $source.length) ? $source.val() : $inputs.first().val();
+
+            syncLock = true;
+            $inputs.each(function ()
+            {
+                if ($source && $source[0] === this) return;
+                $(this).val(value).trigger('change');
+            });
+            syncLock = false;
+        };
+
+        $(document).on('click', selectors.toggle, function (event)
+        {
+            event.preventDefault();
+
+            const $btn = $(this);
+            const $group = $btn.closest(selectors.group);
+            const $inputs = getGroupInputs($group);
+
+            const currentlyLinked = $btn.hasClass('is-linked');
+            const newLinked = !currentlyLinked;
+
+            setLinked($btn, newLinked);
+
+            if (newLinked && $inputs.length) {
+                const $focusedInput = $inputs.filter(':focus').first();
+                syncGroup($group, $focusedInput.length ? $focusedInput : $inputs.first());
+            }
+        });
+
+        $(document).on('input change', `${selectors.group} input[type="number"]`, function ()
+        {
+            const $input = $(this);
+            const $group = $input.closest(selectors.group);
+            const $btn = $group.find(selectors.toggle);
+
+            if (!$btn.length || !$btn.hasClass('is-linked')) return;
+
+            syncGroup($group, $input);
+        });
+
+        $(document).ready(() => refreshLinkedState());
+        $(document).on('ajaxComplete', () => refreshLinkedState());
+    })(jQuery);
+
+    // Iconset controls (shared backend UI)
+    (function ($) {
+        const refreshIconset = (context) => {
+            const $root = context ? $(context) : $(document);
+
+            $root.find('[data-lsd-iconset]').each(function () {
+                const $control = $(this);
+                const $input = $control.find('input[type="hidden"]').first();
+                const $buttons = $control.find('.lsd-iconset-btn');
+                if (!$buttons.length) return;
+
+                let value = $input.length ? $input.val() : '';
+                if (value === '' && $buttons.length) {
+                    value = $buttons.first().data('value');
+                    if ($input.length) $input.val(value);
+                }
+
+                $buttons.each(function () {
+                    const $button = $(this);
+                    const isActive = ('' + $button.data('value')) === ('' + value);
+                    $button.toggleClass('is-active', isActive).attr('aria-pressed', isActive ? 'true' : 'false');
+                });
+            });
+        };
+
+        $(document).off('.lsdIconset').on('click.lsdIconset', '[data-lsd-iconset] .lsd-iconset-btn', function (event) {
+            event.preventDefault();
+            const $btn = $(this);
+            const $control = $btn.closest('[data-lsd-iconset]');
+            const $input = $control.find('input[type="hidden"]').first();
+            const value = $btn.data('value');
+
+            $control.find('.lsd-iconset-btn').removeClass('is-active').attr('aria-pressed', 'false');
+            $btn.addClass('is-active').attr('aria-pressed', 'true');
+
+            if ($input.length) {
+                $input.val(value);
+                $input.trigger('change');
+            }
+        });
+
+        $(document).ready(() => refreshIconset());
+        $(document).on('ajaxComplete', () => refreshIconset());
+    })(jQuery);
+
 });
 
 jQuery(function ($)
 {
     const config = window.lsdGooglePlacesAdmin || {};
-    if (!Object.keys(config).length) return;
 
     const escapeHtml = function (value)
     {
@@ -3844,6 +4003,548 @@ jQuery(function ($)
         $suggestions.hide().html('');
     };
 
+    const initLaunchChecklistMoreButtons = function ()
+    {
+        const $buttons = $('.lsd-launch-checklist-more-button');
+        if (!$buttons.length) return;
+
+        const toggleLaunchChecklistSection = function ($section, $button, expanded)
+        {
+            const $label = $button.find('span').first();
+
+            $section.toggleClass('is-expanded', expanded);
+
+            if ($label.length)
+            {
+                const defaultLabel = $label.attr('data-default-label') || $label.text();
+                const lessLabel = $label.attr('data-less-label') || 'Show less';
+                $label.text(expanded ? lessLabel : defaultLabel);
+            }
+
+            $button.attr('aria-expanded', expanded ? 'true' : 'false');
+        };
+
+        $buttons.each(function ()
+        {
+            const $button = $(this);
+            const $label = $button.find('span').first();
+            const $section = $button.closest('.lsd-launch-checklist-section');
+
+            if ($label.length && !$label.attr('data-default-label'))
+            {
+                $label.attr('data-default-label', $label.text());
+            }
+
+            toggleLaunchChecklistSection($section, $button, $section.hasClass('is-expanded'));
+        });
+
+        $(document)
+            .off('click.lsdChecklistMore', '.lsd-launch-checklist-more-button')
+            .on('click.lsdChecklistMore', '.lsd-launch-checklist-more-button', function ()
+            {
+                const $button = $(this);
+                const $section = $button.closest('.lsd-launch-checklist-section');
+
+                if (!$section.length) return;
+
+                toggleLaunchChecklistSection($section, $button, !$section.hasClass('is-expanded'));
+            });
+    };
+
+    const initLaunchChecklistSmoothScroll = function ()
+    {
+        $(document)
+            .off('click.lsdChecklistScroll', '.lsd-launch-checklist-scroll-link')
+            .on('click.lsdChecklistScroll', '.lsd-launch-checklist-scroll-link', function (event)
+            {
+                const href = String($(this).attr('href') || '');
+                if (!href || href.charAt(0) !== '#') return;
+
+                const $target = $(href);
+                if (!$target.length) return;
+
+                event.preventDefault();
+
+                $('html, body').stop(true).animate({
+                    scrollTop: Math.max($target.offset().top - 24, 0)
+                }, 350);
+            });
+    };
+
+    const initChecklistFocusTarget = function ()
+    {
+        const params = new URLSearchParams(window.location.search || '');
+        if (params.get('lsd_checklist_focus') !== '1') return;
+
+        const highlightClass = 'is-checklist-focus-target';
+        const tabHighlightClass = 'is-checklist-focus-tab';
+        const highlightDuration = 5000;
+        const focusSelectorEncoding = params.get('lsd_checklist_focus_target_encoding') || '';
+        const rawFocusSelector = params.get('lsd_checklist_focus_target') || '';
+        const wrapperSelectors = [
+            '.lsd-form-row',
+            '.lsd-settings-fields-sub-wrapper',
+            '.lsd-settings-fields-wrapper',
+            '.lsd-tab-switcher-content',
+            '.lsd-settings-form-group',
+            '.lsd-payments-form-group',
+            '.lsd-auth-form-group',
+            '.lsd-launch-checklist-item',
+            '.lsd-launch-checklist-section',
+            '[id$="_options"]',
+            'li',
+        ].join(', ');
+
+        const decodeChecklistValue = function (value, encoding)
+        {
+            if (!value) return '';
+            if (encoding !== 'b64' || typeof window.atob !== 'function') return value;
+
+            try
+            {
+                const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+                const padding = normalized.length % 4 ? '='.repeat(4 - (normalized.length % 4)) : '';
+
+                return window.atob(normalized + padding);
+            }
+            catch (error)
+            {
+                return '';
+            }
+        };
+
+        const getLegacyHashFocusSelector = function ()
+        {
+            if (rawFocusSelector || typeof window.location.hash !== 'string' || window.location.hash.indexOf('#lsd_') !== 0) return '';
+
+            try
+            {
+                return decodeURIComponent(window.location.hash);
+            }
+            catch (error)
+            {
+                return window.location.hash;
+            }
+        };
+
+        const legacyHashFocusSelector = getLegacyHashFocusSelector();
+        const focusSelector = decodeChecklistValue(rawFocusSelector, focusSelectorEncoding) || legacyHashFocusSelector;
+        const hasExplicitFocusTarget = focusSelector !== '';
+
+        const clearHighlight = function ($targets, $tabs)
+        {
+            $targets.removeClass(highlightClass);
+            $tabs.removeClass(tabHighlightClass);
+        };
+
+        const clearChecklistFocusQuery = function ()
+        {
+            if (!(window.history && typeof window.history.replaceState === 'function')) return;
+
+            params.delete('lsd_checklist_focus');
+            params.delete('lsd_checklist_focus_target');
+            params.delete('lsd_checklist_focus_target_encoding');
+
+            const query = params.toString();
+            const nextUrl = window.location.pathname + (query ? '?' + query : '') + (legacyHashFocusSelector ? '' : window.location.hash);
+
+            window.history.replaceState({}, document.title, nextUrl);
+        };
+
+        const scrollIntoViewIfNeeded = function ($targets)
+        {
+            if (!$targets.length) return;
+
+            const node = $targets.first().get(0);
+            if (!node || typeof node.getBoundingClientRect !== 'function') return;
+
+            const rect = node.getBoundingClientRect();
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+            const elementIsVisible = rect.top >= 24 && rect.bottom <= viewportHeight - 24;
+
+            if (!elementIsVisible && typeof node.scrollIntoView === 'function')
+            {
+                node.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                });
+            }
+        };
+
+        const collectHighlightTargets = function ($elements, resolver)
+        {
+            if (!$elements.length) return $();
+
+            const nodes = [];
+            const seen = new Set();
+
+            $elements.each(function ()
+            {
+                const $target = resolver($(this)).filter(':visible').first();
+                const node = $target.get(0);
+                if (!node || seen.has(node)) return;
+
+                seen.add(node);
+                nodes.push(node);
+            });
+
+            return $(nodes);
+        };
+
+        const getSpecificHighlightTarget = function ($element)
+        {
+            if (!$element.length) return $();
+
+            if ($element.is(wrapperSelectors))
+            {
+                return $element.first();
+            }
+
+            if ($element.is('.select2-container'))
+            {
+                return $element.first();
+            }
+
+            if ($element.is('.select2-selection'))
+            {
+                return $element.closest('.select2-container').first();
+            }
+
+            if ($element.is('input[type="radio"]'))
+            {
+                const id = $element.attr('id') || '';
+                if (id)
+                {
+                    const $label = $('label[for="' + id + '"]').filter(':visible').first();
+                    if ($label.length) return $label;
+                }
+            }
+
+            if ($element.is('input[type="checkbox"], .lsd-slider'))
+            {
+                const $switch = $element.closest('.lsd-switch');
+                if ($switch.length) return $switch.first();
+            }
+
+            if ($element.is('select') && $element.hasClass('select2-hidden-accessible'))
+            {
+                const $container = $element.nextAll('.select2-container').filter(':visible').first();
+                if ($container.length) return $container;
+            }
+
+            if ($element.is(':hidden'))
+            {
+                const id = $element.attr('id') || '';
+
+                if ($element.hasClass('select2-hidden-accessible'))
+                {
+                    const $container = $element.nextAll('.select2-container').filter(':visible').first();
+                    if ($container.length) return $container;
+                }
+
+                if (id)
+                {
+                    const $label = $('label[for="' + id + '"]').filter(':visible').first();
+                    if ($label.length) return $label;
+                }
+
+                const $switch = $element.closest('.lsd-switch');
+                if ($switch.length && $switch.is(':visible')) return $switch.first();
+            }
+
+            const $select2Container = $element.closest('.select2-container');
+            if ($select2Container.length) return $select2Container.first();
+
+            return $element.first();
+        };
+
+        const isPreciseHighlightTarget = function ($element)
+        {
+            if (!$element.length) return false;
+            if ($element.is(wrapperSelectors)) return false;
+
+            return $element.is([
+                'input',
+                'select',
+                'textarea',
+                'button',
+                'label',
+                '.lsd-switch',
+                '.select2-container',
+                '.select2-selection',
+                '[role="button"]',
+                '[role="checkbox"]',
+                '[role="radio"]',
+            ].join(', '));
+        };
+
+        const getFocusTargetsFromSelector = function (selector)
+        {
+            if (!selector) return $();
+
+            try
+            {
+                return collectHighlightTargets($(selector), getSpecificHighlightTarget);
+            }
+            catch (error)
+            {
+                return $();
+            }
+        };
+
+        window.setTimeout(function ()
+        {
+            if (!hasExplicitFocusTarget)
+            {
+                clearChecklistFocusQuery();
+                return;
+            }
+
+            const $resolvedTargets = getFocusTargetsFromSelector(focusSelector);
+            const $preciseTargets = $resolvedTargets.filter(function ()
+            {
+                return isPreciseHighlightTarget($(this));
+            });
+            const $target = $preciseTargets.length ? $preciseTargets : $resolvedTargets;
+            const $tabs = $('.lsd-nav-tab-active, .nav-tab-active');
+
+            if (!$target.length)
+            {
+                clearChecklistFocusQuery();
+                return;
+            }
+
+            $target.addClass(highlightClass);
+            $tabs.addClass(tabHighlightClass);
+            scrollIntoViewIfNeeded($target);
+
+            window.setTimeout(function ()
+            {
+                clearHighlight($target, $tabs);
+            }, highlightDuration);
+
+            clearChecklistFocusQuery();
+        }, 250);
+    };
+
+    initLaunchChecklistMoreButtons();
+    initLaunchChecklistSmoothScroll();
+    initChecklistFocusTarget();
     initSeedingPage();
     initSuggestionsMetabox();
 });
+
+(function ($)
+{
+    const bodyClass = 'lsd-announcements-panel-open';
+    let closeTimer = null;
+
+    function elements()
+    {
+        return {
+            $body: $('body'),
+            $button: $('.lsd-header-announcements-button'),
+            $overlay: $('.lsd-announcements-overlay'),
+            $panel: $('#lsd-announcements-panel')
+        };
+    }
+
+    function openPanel()
+    {
+        const {$body, $button, $overlay, $panel} = elements();
+        if (!$panel.length) return;
+
+        clearTimeout(closeTimer);
+        $overlay.add($panel).removeAttr('hidden');
+        $panel.attr('aria-hidden', 'false');
+        $button.attr('aria-expanded', 'true');
+
+        window.requestAnimationFrame(function ()
+        {
+            $body.addClass(bodyClass);
+            $panel.find('.lsd-announcements-panel-close').trigger('focus');
+        });
+    }
+
+    function closePanel()
+    {
+        const {$body, $button, $overlay, $panel} = elements();
+        if (!$panel.length) return;
+
+        $body.removeClass(bodyClass);
+        $panel.attr('aria-hidden', 'true');
+        $button.attr('aria-expanded', 'false');
+
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(function ()
+        {
+            $overlay.add($panel).attr('hidden', 'hidden');
+        }, 300);
+    }
+
+    function showMessage(message, type)
+    {
+        if (!message) return;
+
+        if (typeof window.listdom_toastify === 'function')
+        {
+            window.listdom_toastify(message, type || 'lsd-error');
+        }
+    }
+
+    function switchTab(tab)
+    {
+        const {$panel} = elements();
+        if (!$panel.length) return;
+
+        $panel.find('[data-lsd-announcements-tab]').each(function ()
+        {
+            const $tab = $(this);
+            const active = $tab.data('lsdAnnouncementsTab') === tab;
+            $tab.attr({
+                'aria-selected': active ? 'true' : 'false',
+                'tabindex': active ? '0' : '-1'
+            });
+
+            $tab.closest('.lsd-announcements-panel-tab').toggleClass('lsd-sub-tabs-active', active);
+        });
+
+        $panel.find('[data-lsd-announcements-list]').each(function ()
+        {
+            const $list = $(this);
+            const active = $list.data('lsdAnnouncementsList') === tab;
+            if (active) $list.removeAttr('hidden');
+            else $list.attr('hidden', 'hidden');
+        });
+    }
+
+    function updateEmptyState($list)
+    {
+        const hasItems = $list.children('.lsd-announcement-item').length > 0;
+        $list.children('.lsd-announcements-empty')
+            .prop('hidden', hasItems)
+            .toggleClass('lsd-util-hide', hasItems)
+            .toggle(!hasItems);
+    }
+
+    function updateEmptyStates()
+    {
+        $('[data-lsd-announcements-list]').each(function ()
+        {
+            updateEmptyState($(this));
+        });
+    }
+
+    function updateActiveCount(count)
+    {
+        const safeCount = Math.max(0, parseInt(count, 10) || 0);
+        $('[data-lsd-announcements-count]').text(safeCount);
+
+        const $headerBadge = $('[data-lsd-announcements-header-badge]');
+        if (safeCount > 0)
+        {
+            $headerBadge.text(safeCount).removeAttr('hidden');
+        }
+        else
+        {
+            $headerBadge.attr('hidden', 'hidden');
+        }
+    }
+
+    function insertDismissedItem($item)
+    {
+        const $list = $('[data-lsd-announcements-list="dismissed"]');
+        if (!$list.length) return;
+
+        const createdAt = parseInt($item.data('lsdAnnouncementCreatedAt'), 10) || 0;
+        let inserted = false;
+
+        $list.children('.lsd-announcement-item').each(function ()
+        {
+            const $current = $(this);
+            const currentCreatedAt = parseInt($current.data('lsdAnnouncementCreatedAt'), 10) || 0;
+            if (createdAt >= currentCreatedAt)
+            {
+                $item.insertBefore($current);
+                inserted = true;
+                return false;
+            }
+        });
+
+        if (!inserted) $item.insertBefore($list.children('.lsd-announcements-empty'));
+        updateEmptyState($list);
+    }
+
+    function dismissAnnouncement($button)
+    {
+        const id = $button.data('lsdAnnouncementDismiss');
+        const nonce = window.lsd && window.lsd.announcements_nonce ? window.lsd.announcements_nonce : '';
+        if (!id || !nonce) return;
+
+        const $item = $button.closest('.lsd-announcement-item');
+        const $activeList = $item.closest('[data-lsd-announcements-list]');
+        const $dismissedItem = $item.clone();
+
+        $button.prop('disabled', true);
+
+        $.post(window.lsd.ajaxurl, {
+            action: 'lsd_announcements_dismiss',
+            _wpnonce: nonce,
+            id: id
+        }).done(function (response)
+        {
+            if (!response || !response.success)
+            {
+                const message = response && response.data && response.data.message ? response.data.message : '';
+                showMessage(message);
+                $button.prop('disabled', false);
+                return;
+            }
+
+            $dismissedItem.find('[data-lsd-announcement-dismiss]').remove();
+            $item.slideUp(160, function ()
+            {
+                $item.remove();
+                updateEmptyState($activeList);
+                insertDismissedItem($dismissedItem);
+            });
+
+            if (response.data && typeof response.data.active_count !== 'undefined')
+            {
+                updateActiveCount(response.data.active_count);
+            }
+        }).fail(function ()
+        {
+            showMessage(window.lsd && window.lsd.i18n_announcements_dismiss_failed ? window.lsd.i18n_announcements_dismiss_failed : '');
+            $button.prop('disabled', false);
+        });
+    }
+
+    $(document)
+        .on('click', '.lsd-header-announcements-button', function (event)
+        {
+            event.preventDefault();
+            openPanel();
+        })
+        .on('click', '[data-lsd-announcements-close]', function (event)
+        {
+            event.preventDefault();
+            closePanel();
+        })
+        .on('click', '[data-lsd-announcements-tab]', function (event)
+        {
+            event.preventDefault();
+            switchTab($(this).data('lsdAnnouncementsTab'));
+        })
+        .on('click', '[data-lsd-announcement-dismiss]', function (event)
+        {
+            event.preventDefault();
+            dismissAnnouncement($(this));
+        })
+        .on('keydown', function (event)
+        {
+            if (event.key === 'Escape') closePanel();
+        });
+
+    updateEmptyStates();
+})(jQuery);

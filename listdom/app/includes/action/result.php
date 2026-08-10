@@ -51,6 +51,11 @@ class LSD_Action_Result
         return $this->data;
     }
 
+    public function get_warnings(): array
+    {
+        return $this->warnings;
+    }
+
     public function get_meta(string $key = null, $default = null)
     {
         if ($key === null) return $this->meta;

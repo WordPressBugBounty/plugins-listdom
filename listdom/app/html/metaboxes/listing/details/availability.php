@@ -13,9 +13,8 @@ $ava = get_post_meta($post->ID, 'lsd_ava', true);
 if (!is_array($ava)) $ava = [];
 ?>
 <div class="lsd-listing-module-availability <?php echo LSD_Base::get_lsd_class('box-white'); ?>">
-    <div class="lsd-form-row">
-
-        <div class="lsd-col-8 lsd-flex lsd-flex-row lsd-flex-content-start lsd-flex-items-center lsd-gap-3">
+    <div class="lsd-fe-section-heading">
+        <div class="lsd-listing-availability-heading">
             <h3 class="<?php echo LSD_Base::get_lsd_class('title'); ?>"><?php esc_html_e('Work Hours', 'listdom'); ?><?php $dashboard && $dashboard->required_html('ava'); ?></h3>
             <?php if ($ai->has_access(LSD_AI::TASK_AVAILABILITY)): ?>
                 <div class="lsd-inline-popup-wrapper lsd-no-button-styles">
@@ -38,25 +37,27 @@ if (!is_array($ava)) $ava = [];
             <?php endif; ?>
         </div>
     </div>
-    <?php foreach (LSD_Main::get_weekdays() as $weekday): $daycode = $weekday['code']; ?>
-    <div class="lsd-form-row" id="lsd-ava-<?php echo esc_attr($daycode); ?>">
-        <div class="lsd-col-2 ">
-            <label class="lsd-fields-label" for="lsd_ava<?php echo esc_attr($daycode); ?>"><?php echo esc_html($weekday['day']); ?></label>
+    <div class="lsd-listing-availability-days">
+        <?php foreach (LSD_Main::get_weekdays() as $weekday): $daycode = $weekday['code']; ?>
+        <div class="lsd-listing-availability-day" id="lsd-ava-<?php echo esc_attr($daycode); ?>">
+            <div class="lsd-listing-availability-day-label">
+                <label class="lsd-fields-label" for="lsd_ava<?php echo esc_attr($daycode); ?>"><?php echo esc_html($weekday['day']); ?></label>
+            </div>
+            <div class="lsd-listing-availability-day-fields">
+                <div class="lsd-ava-hours">
+                    <input class="lsd-admin-input" type="text" name="lsd[ava][<?php echo esc_attr($daycode); ?>][hours]" id="lsd_ava<?php echo esc_attr($daycode); ?>" placeholder="<?php esc_attr_e('9 - 18, 9 AM to 9 PM', 'listdom'); ?>" value="<?php echo isset($ava[$daycode]['hours']) ? esc_attr($ava[$daycode]['hours']) : ''; ?>">
+                </div>
+                <div class="lsd-ava-off">
+                    <label class="lsd-fields-label">
+                        <input type="hidden" name="lsd[ava][<?php echo esc_attr($daycode); ?>][off]" value="0">
+                        <input type="checkbox" name="lsd[ava][<?php echo esc_attr($daycode); ?>][off]" value="1" class="lsd-ava-off" data-daycode="<?php echo esc_attr($daycode); ?>" <?php echo isset($ava[$daycode]['off']) && $ava[$daycode]['off'] ? 'checked="checked"' : ''; ?>>
+                        <?php esc_html_e('Closed', 'listdom'); ?>
+                    </label>
+                </div>
+            </div>
         </div>
-        <?php echo !is_admin() ? '<div class="lsd-form-row lsd-col-12">' : ''; ?>
-            <div class="<?php echo is_admin() ? 'lsd-col-7' : 'lsd-col-11'; ?> lsd-ava-hours">
-                <input class="lsd-admin-input" type="text" name="lsd[ava][<?php echo esc_attr($daycode); ?>][hours]" id="lsd_ava<?php echo esc_attr($daycode); ?>" placeholder="<?php esc_attr_e('9 - 18, 9 AM to 9 PM', 'listdom'); ?>" value="<?php echo isset($ava[$daycode]['hours']) ? esc_attr($ava[$daycode]['hours']) : ''; ?>">
-            </div>
-            <div class="lsd-col-1 lsd-ava-off">
-                <label class="lsd-fields-label">
-                    <input type="hidden" name="lsd[ava][<?php echo esc_attr($daycode); ?>][off]" value="0">
-                    <input type="checkbox" name="lsd[ava][<?php echo esc_attr($daycode); ?>][off]" value="1" class="lsd-ava-off" data-daycode="<?php echo esc_attr($daycode); ?>" <?php echo isset($ava[$daycode]['off']) && $ava[$daycode]['off'] ? 'checked="checked"' : ''; ?>>
-                    <?php esc_html_e('Closed', 'listdom'); ?>
-                </label>
-            </div>
-        <?php echo !is_admin() ? '</div>' : ''; ?>
+        <?php endforeach; ?>
     </div>
-    <?php endforeach; ?>
 </div>
 <?php if ($ai->has_access(LSD_AI::TASK_AVAILABILITY)): ?>
 <script>
