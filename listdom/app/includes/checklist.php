@@ -4,6 +4,7 @@ class LSD_Checklist extends LSD_Base
 {
     public const MENU_SLUG = 'listdom-launch-checklist';
     public const USER_META_SKIPS = 'lsd_checklist_skips';
+    public const USER_META_BADGE_COUNT = 'lsd_checklist_badge_count';
     public const BADGE_CACHE_VERSION_OPTION = 'lsd_checklist_badge_cache_version';
     public const BADGE_CACHE_OPTIONS = [
         'blogdescription',
@@ -152,20 +153,20 @@ class LSD_Checklist extends LSD_Base
             'total' => count($results),
         ];
 
+        $needs_attention = (int) $counts['warning'] + (int) $counts['incomplete'];
+        set_transient($this->badge_cache_key(), $needs_attention, DAY_IN_SECONDS);
+        update_user_meta(get_current_user_id(), $this->badge_user_meta_key(), $needs_attention);
+
         return $this->report;
     }
 
     public function needs_attention_count(): int
     {
-        $cache_key = 'lsd_checklist_badge_' . get_current_user_id() . '_' . $this->badge_cache_version();
-        $needs_attention = get_transient($cache_key);
+        $needs_attention = get_transient($this->badge_cache_key());
         if ($needs_attention !== false) return (int) $needs_attention;
 
-        $report = $this->get_report();
-        $needs_attention = (int) ($report['counts']['warning'] ?? 0) + (int) ($report['counts']['incomplete'] ?? 0);
-
-        set_transient($cache_key, $needs_attention, DAY_IN_SECONDS);
-        return $needs_attention;
+        $needs_attention = get_user_meta(get_current_user_id(), $this->badge_user_meta_key(), true);
+        return is_numeric($needs_attention) ? (int) $needs_attention : 0;
     }
 
     public function invalidate_badge_cache(): void
@@ -202,6 +203,16 @@ class LSD_Checklist extends LSD_Base
     protected function badge_cache_version(): string
     {
         return (string) get_option(self::BADGE_CACHE_VERSION_OPTION, '1');
+    }
+
+    protected function badge_cache_key(): string
+    {
+        return 'lsd_checklist_badge_' . get_current_user_id() . '_' . $this->badge_cache_version();
+    }
+
+    protected function badge_user_meta_key(): string
+    {
+        return self::USER_META_BADGE_COUNT . '_' . get_current_blog_id();
     }
 
     public function handle_optional_actions(): void

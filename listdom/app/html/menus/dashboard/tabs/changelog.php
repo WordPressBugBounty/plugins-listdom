@@ -3,6 +3,11 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v5.8.1 <span>August 12th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Improved Health Checklist performance on large sites.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed Health Checklist status badges and shortcode detection on multisite sites.', 'listdom'); ?></li>
+    </ul>
     <h2>v5.8.0 <span>August 9th, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Added a Template Builder for creating reusable listing layouts.', 'listdom'); ?></li>

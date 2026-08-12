@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.2
 Requires PHP: 7.4
 Tested up to: 7.0
-Stable tag: 5.8.0
+Stable tag: 5.8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,7 +41,7 @@ Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [
 
 == Free WordPress Listing Plugin Features ==
 
-Listdom Free includes the core directory features needed to launch a searchable WordPress business directory, classifieds website, store locator, service directory, or local listings portal. Recent user-facing improvements include richer custom fields, more flexible search forms, frontend listing workflows, better import/export tools, and SEO-friendly structured listing content.
+Listdom Free includes the core features needed to launch a searchable directory, classifieds, store locator, service, or local portal. Improvements include richer fields, flexible search forms, frontend workflows, stronger import tools, and structured content.
 
 **👉 Display and Layout Tools**
 
@@ -72,6 +72,7 @@ Listdom Free includes the core directory features needed to launch a searchable 
 *   Several [skins and views](https://demo.webilia.com/listdom/skins/multiple-shortcodes/) on one page
 *   4 Different pre-made styles for single listing page
 *   A built-in Design Builder to design the single listing page
+*   Template Builder for reusable single listing and listing card layouts
 *   Custom color for settings
 *   Single listing elements manager (Enable/disable listing elements)
 *   FAQ element for the single listing
@@ -120,6 +121,7 @@ Listdom Free includes the core directory features needed to launch a searchable 
 *   Several AI providers support including: OpenAI, Claude, and Gemini
 *   Multiple AI profiles for different directory tasks
 *   Structured and semantic AI search for natural-language listing discovery
+*   Optional AI Visibility feed and discovery hints for public, machine-readable directory content
 *   CSV import auto mapping, with support for compatible import add-ons
 *   Text generation
 *   Work hours generation
@@ -134,6 +136,7 @@ Listdom Free includes the core directory features needed to launch a searchable 
 *   Maximum number of tags restriction
 *   Directory author profile (User profile)
 *   Public user profiles and a user directory shortcode
+*   Subscriber-safe profile image upload from the frontend dashboard
 *   Listing status controls and status filters for frontend listing management
 *   Unlimited number of directories
 *   Custom fields with text, number, email, telephone, URL, date, time, date/time, image, file, dropdown, textarea, radio, checkbox, and separator types
@@ -179,6 +182,9 @@ Listdom Free includes the core directory features needed to launch a searchable 
 *   CSV importer and exporter
 *   Import and export listings, working hours, custom fields, and listing taxonomies (categories, locations, tags, features, and labels) with CSV files
 *   Hierarchical category and location import support for larger directories
+*   Create missing custom fields during CSV listing import mapping
+*   Map multiple CSV columns into listing taxonomies and import repeatable FAQ data
+*   Directory Health and Launch Checklist to review setup, search, submission, monetization, and SEO readiness before launch
 *   Powerful notifications manager (Admin and user notification emails)
 *   [Custom CSS styles](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Custom+CSS+styles)
 *   [Google reCAPTCHA](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Google+Recaptcha)
@@ -204,6 +210,7 @@ Listdom Free includes the core directory features needed to launch a searchable 
 
 **👉 Seo Ready**
 *   Structured data output for SEO-friendly listing pages
+*   Public AI feed controls for published listing, category, and location discovery
 *   [Friendly slug manager](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Friendly+slug+manager) (Change the slug of listings, categories, features, tags, attributes, labels, locations)
 *   Compatible with popular SEO plugins e.g. Yoast SEO, RankMath, AIOSEO
 
@@ -438,6 +445,10 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 5.8.1 =
+* Improved Health Checklist performance on large sites.
+* Fixed Health Checklist status badges and shortcode detection on multisite sites.
 
 = 5.8.0 =
 * Added a Template Builder for creating reusable listing layouts.
@@ -897,130 +908,4 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 * Fixed some issues regarding schema feature.
 * Fixed some issues.
 
-= 1.9.0 =
-* [ADDON] Released ACF Integration addon!
-* [ADDON] Released Auction addon!
-* [ADDON] Released BuddyPress Integration addon!
-* [ADDON] Released KML addon!
-* Added price class feature.
-* Added an option to display human-readable criteria to the search module.
-* Added an option to change the currency position.
-* Added style 3 to list, grid, listgrid, and halfmap skins.
-* Added style 5 to carousel skin.
-* Added style 4 to cover skin.
-* Added style 3 to masonry skin.
-* Added style 3 to table skin.
-* Added website field to contact details of listing and owner.
-* Disabled scroll wheel on leaflet map.
-
-= 1.8.0 =
-* [ADDON] Released Booking addon!
-* [ADDON] Released Multiple Categories addon!
-* [ADDON] Released Advanced Icon addon!
-* [ADDON] Released Listing Visibility addon!
-* [PRO] Added an option to load locations and features in multiple dropdown instead of checkboxes in frontend dashboard.
-* [PRO] Added required option for the attribute fields.
-* Added a new feature to select some predefined terms in taxonomy fields of search builder.
-* Added list / grid switcher in the half map skin.
-* Added random sort option.
-* Added an option to manage zoom levels of GPS feature.
-* Added no listing message.
-* Improved the settings menu.
-* Fixed an issue of not having HTML codes in Notifications.
-* Fixed an issue in modal content.
-* Fixed an issue in featured image uploading for guest users.
-
-= 1.7.0 =
-* [ADDON] Released Team addon!
-* Added an option to load single listing page into light-box on click of marker.
-* Improved the listdom icons.
-* Fixed some issues.
-
-= 1.6.2 =
-* [ADDON] Released Rate & Review addon!
-* [PRO] Added radius search in search module.
-* Added compatibility with WP 2020 theme.
-* Applied many improvements.
-* Fixed an issue in assigning listing to user after approving by admin.
-* Fixed an issue in showing map element in style 1.
-
-= 1.6.1 =
-* [ADDON] Released Labelize addon!
-* [ADDON] Released Membership addon!
-* [ADDON] Released Paid Member Subscriptions Integration addon!
-* [PRO] Added hierarchical dropdown method for taxonomies in search builder.
-* Added some new endpoints to the API.
-* Improved security of listdom and addons.
-* Fixed an issue in search builder regarding default values.
-* Fixed some issues.
-
-= 1.6.0 =
-* [ADDON] Released Claim addon!
-* [ADDON] Released Topup addon!
-* Added an ability to show all values of a certain attribute in the search builder.
-* Improved security of listdom.
-* Fixed an issue regarding showing all attributes in API.
-
-= 1.5.0 =
-* [ADDON] Released Favorites addon!
-* [ADDON] Released Rank addon!
-* [PRO] Added schema (Structured Data) feature to boost SEO.
-* Improved Listdom Restful API.
-* Fixed some issues in permission of Restful API.
-* Fixed an issue in search of text fields.
-* Fixed some issues.
-
-= 1.4.0 =
-* [ADDON] Released Mobile Application addon!
-* Added Listdom Restful API.
-* [PRO] Added embed code feature to submit videos, virtual tours etc. for certain listings!.
-* Fixed category hierarchy issue on attributes' menu.
-* Fixed a conflict between Listdom and Elementor.
-* Fixed some PHP notices.
-
-= 1.3.1 =
-* [ADDON] Released CSV addon!
-* [PRO] Added dashboard module controls so the modules can be disabled / enabled.
-* [PRO] Added ability to export and import listing gallery.
-* Fixed an issue in target page of search form when the shortcode loads in archive instead of singular page.
-* Fixed some PHP notices.
-
-= 1.3.0 =
-* [ADDON] Released Advanced Map addon!
-* [PRO] Added advanced import and export system.
-* Fixed an issue in map search feature.
-
-= 1.2.1 =
-* [PRO] Added hierarchical support for category taxonomy.
-* Added a dashboard notification system to manage the system emails.
-* Added HTML marker to leaflet.
-* Improved leaflet clustering for polygon, rectangle and poly-lines.
-* Fixed an issue in leaflet clustering.
-
-= 1.2.0 =
-* [PRO] Added dashboard shortcode to add and manage listings from frontend.
-* [PRO] Added clustering feature for leaflet map.
-* Added search functionality to the shortcode builder for different skins.
-* Fixed some issues on search builder.
-* Fixed an issue in availability form.
-* Fixed an issue in warning of Google Maps API Key.
-* Fixed an issue in saving the attributes.
-* Fixed a query issue on skins.
-
-= 1.1.1 =
-* Added multiple dropdown search methods.
-* Improved dummy data importer to import a default search form too.
-* Fixed some issues on settings page.
-
-= 1.1.0 =
-* Added Advanced Search Builder.
-* Added ability to hide email, fax, mobile, etc. in owner element.
-* Improved search widget to work with search builder!
-* Fixed some issues.
-
-= 1.0.2 =
-* [PRO] Improved design of GPS icon in the map module.
-* Fixed some tiny issues.
-
-= 1.0.0 =
-* Initial version released with lots of features.
+For changelog entries before version 2.0.0, see the [full Listdom changelog](https://docs.webilia.com/listdom/changelog/listdom/).

@@ -2,6 +2,10 @@
 
 class LSD_Checklist_Helper
 {
+    protected const SHORTCODE_SCAN_BATCH_SIZE = 100;
+
+    protected array $published_shortcode_post_ids = [];
+
     public function published_post_ids(string $post_type): array
     {
         $posts = get_posts([
@@ -111,8 +115,12 @@ class LSD_Checklist_Helper
      */
     protected function elementor_builder_elements(int $page_id): array
     {
-        // Raw Data
-        $raw = get_post_meta($page_id, '_elementor_data', true);
+        return $this->elementor_builder_elements_from_value(get_post_meta($page_id, '_elementor_data', true));
+    }
+
+    protected function elementor_builder_elements_from_value($raw): array
+    {
+        $raw = maybe_unserialize($raw);
         if (is_array($raw)) $raw = wp_json_encode($raw);
         if (!is_string($raw) || trim($raw) === '') return [];
 
@@ -129,9 +137,16 @@ class LSD_Checklist_Helper
      */
     protected function bricks_builder_elements(int $page_id): array
     {
-        // Bricks Data
-        $elements = get_post_meta($page_id, '_bricks_page_content_2', true);
-        if (!is_array($elements) || !count($elements)) $elements = get_post_meta($page_id, '_bricks_page_content', true);
+        return $this->bricks_builder_elements_from_values(
+            get_post_meta($page_id, '_bricks_page_content_2', true),
+            get_post_meta($page_id, '_bricks_page_content', true)
+        );
+    }
+
+    protected function bricks_builder_elements_from_values($primary, $fallback): array
+    {
+        $elements = maybe_unserialize($primary);
+        if (!is_array($elements) || !count($elements)) $elements = maybe_unserialize($fallback);
 
         return is_array($elements) ? $elements : [];
     }
@@ -149,6 +164,145 @@ class LSD_Checklist_Helper
         $post_types = array_values(array_diff($post_types, ['attachment']));
 
         return count($post_types) ? $post_types : ['page', 'post'];
+    }
+
+    protected function builder_content_meta_keys(int $post_id = 0): array
+    {
+        $meta_keys = apply_filters(
+            'lsd_checklist_builder_content_meta_keys',
+            [
+                '_elementor_data',
+                '_bricks_page_content_2',
+                '_bricks_page_content',
+            ],
+            $post_id
+        );
+
+        if (!is_array($meta_keys)) return [];
+
+        return array_values(array_filter($meta_keys, 'is_string'));
+    }
+
+    protected function shortcode_host_post_batches(): Generator
+    {
+        global $wpdb;
+
+        $post_types = $this->shortcode_host_post_types();
+        if (!count($post_types)) return;
+
+        // Keep the report memory-bounded while preserving post-query visibility filters.
+        $page = 1;
+
+        do
+        {
+            $query = new WP_Query([
+                'post_type' => $post_types,
+                'post_status' => 'publish',
+                'posts_per_page' => self::SHORTCODE_SCAN_BATCH_SIZE,
+                'paged' => $page,
+                'fields' => 'ids',
+                'orderby' => 'ID',
+                'order' => 'ASC',
+                'suppress_filters' => false,
+                'no_found_rows' => true,
+                'cache_results' => false,
+                'update_post_meta_cache' => false,
+                'update_post_term_cache' => false,
+            ]);
+            $post_ids = array_map('absint', is_array($query->posts) ? $query->posts : []);
+            if (!count($post_ids)) break;
+
+            $meta_keys = [
+                '_elementor_data',
+                '_bricks_page_content_2',
+                '_bricks_page_content',
+            ];
+            foreach ($post_ids as $post_id)
+            {
+                $meta_keys = array_merge($meta_keys, $this->builder_content_meta_keys($post_id));
+            }
+
+            $posts = $this->shortcode_host_posts($post_ids);
+            yield [$posts, $this->builder_meta_values($post_ids, array_values(array_unique($meta_keys)))];
+
+            $page++;
+        }
+        while (true);
+    }
+
+    protected function shortcode_host_posts(array $post_ids): array
+    {
+        global $wpdb;
+
+        if (!count($post_ids)) return [];
+
+        $post_id_placeholders = implode(', ', array_fill(0, count($post_ids), '%d'));
+        $query = $wpdb->prepare(
+            "SELECT ID, post_content, post_password
+            FROM {$wpdb->posts}
+            WHERE ID IN ({$post_id_placeholders})",
+            $post_ids
+        );
+        $rows = $wpdb->get_results($query);
+        $posts = [];
+
+        foreach ($rows as $row)
+        {
+            if ($row->post_password !== '') continue;
+
+            $posts[(int) $row->ID] = $row;
+        }
+
+        return $posts;
+    }
+
+    protected function builder_meta_values(array $post_ids, array $meta_keys): array
+    {
+        global $wpdb;
+
+        if (!count($post_ids) || !count($meta_keys)) return [];
+
+        $post_id_placeholders = implode(', ', array_fill(0, count($post_ids), '%d'));
+        $meta_key_placeholders = implode(', ', array_fill(0, count($meta_keys), '%s'));
+        $query = $wpdb->prepare(
+            "SELECT meta_id, post_id, meta_key, meta_value
+            FROM {$wpdb->postmeta}
+            WHERE post_id IN ({$post_id_placeholders})
+                AND meta_key IN ({$meta_key_placeholders})
+            ORDER BY post_id ASC, meta_key ASC, meta_id ASC",
+            array_merge($post_ids, $meta_keys)
+        );
+        $rows = $wpdb->get_results($query);
+        $values = [];
+
+        foreach ($rows as $row)
+        {
+            $post_id = (int) $row->post_id;
+            if (isset($values[$post_id][$row->meta_key])) continue;
+
+            $values[$post_id][$row->meta_key] = $row->meta_value;
+        }
+
+        return $values;
+    }
+
+    protected function shortcode_post_content_sources(object $post, array $meta_values): array
+    {
+        $sources = [];
+        $post_content = (string) ($post->post_content ?? '');
+
+        if (trim($post_content) !== '') $sources['post_content'] = $post_content;
+
+        foreach ($this->builder_content_meta_keys((int) $post->ID) as $meta_key)
+        {
+            if (!array_key_exists($meta_key, $meta_values)) continue;
+
+            $value = $meta_values[$meta_key];
+            $content = $this->normalize_content_source(maybe_unserialize($value));
+            if ($content !== '') $sources[$meta_key] = $content;
+        }
+
+        return apply_filters('lsd_checklist_post_content_sources', array_values($sources), (int) $post->ID);
     }
 
     /**
@@ -280,76 +434,65 @@ class LSD_Checklist_Helper
 
     public function published_shortcode_post_ids(string $shortcode, string $post_type): array
     {
-        $posts = get_posts([
-            'post_type' => $this->shortcode_host_post_types(),
-            'post_status' => 'publish',
-            'posts_per_page' => -1,
-            'suppress_filters' => false,
-        ]);
+        $cache_key = $shortcode . ':' . $post_type;
+        if (isset($this->published_shortcode_post_ids[$cache_key])) return $this->published_shortcode_post_ids[$cache_key];
 
         $referenced_ids = [];
-        $pattern = get_shortcode_regex([$shortcode]);
+        $widget = $this->builder_shortcode_widget($shortcode);
+        $widget_type = (string) ($widget['type'] ?? '');
+        $widget_setting = (string) ($widget['setting'] ?? '');
 
-        foreach ($posts as $post)
+        foreach ($this->shortcode_host_post_batches() as [$posts, $meta_values])
         {
-            if (!$post instanceof WP_Post) continue;
-            if (!$this->is_published_post((int) $post->ID)) continue;
-
-            foreach ($this->post_content_sources((int) $post->ID) as $content)
+            foreach ($posts as $post)
             {
-                $content = wp_unslash($content);
-                $matches = [];
+                $post_id = (int) $post->ID;
+                $values = $meta_values[$post_id] ?? [];
 
-                if (!preg_match_all('/' . $pattern . '/s', $content, $matches, PREG_SET_ORDER)) continue;
-
-                foreach ($matches as $match)
+                foreach ($this->shortcode_post_content_sources($post, $values) as $content)
                 {
-                    if (($match[1] ?? '') === '[' && ($match[6] ?? '') === ']') continue;
-                    if (($match[2] ?? '') !== $shortcode) continue;
-                    $attributes = shortcode_parse_atts($match[3] ?? '');
-
-                    if (!is_array($attributes)) continue;
-
-                    $referenced_post_id = absint($attributes['id'] ?? 0);
-
-                    if ($referenced_post_id < 1) continue;
-
-                    if (get_post_type($referenced_post_id) !== $post_type) continue;
-                    if (!$this->is_published_post($referenced_post_id)) continue;
-
-                    $referenced_ids[$referenced_post_id]
-                        = $referenced_post_id;
+                    $this->collect_shortcode_referenced_post_ids((string) $content, $shortcode, $post_type, $referenced_ids);
                 }
+
+                if ($widget_type === '' || $widget_setting === '') continue;
+
+                $elementor = $this->elementor_builder_elements_from_value($values['_elementor_data'] ?? '');
+                $this->collect_elementor_referenced_post_ids($elementor, $widget_type, $widget_setting, $post_type, $referenced_ids);
+
+                $bricks = $this->bricks_builder_elements_from_values(
+                    $values['_bricks_page_content_2'] ?? '',
+                    $values['_bricks_page_content'] ?? ''
+                );
+                $this->collect_bricks_referenced_post_ids($bricks, $widget_type, $widget_setting, $post_type, $referenced_ids);
             }
         }
 
-        // Elementor
-        foreach ($posts as $post)
+        $this->published_shortcode_post_ids[$cache_key] = array_values($referenced_ids);
+        return $this->published_shortcode_post_ids[$cache_key];
+    }
+
+    protected function collect_shortcode_referenced_post_ids(string $content, string $shortcode, string $post_type, array &$referenced_ids): void
+    {
+        $pattern = get_shortcode_regex([$shortcode]);
+        $matches = [];
+
+        if (!preg_match_all('/' . $pattern . '/s', wp_unslash($content), $matches, PREG_SET_ORDER)) return;
+
+        foreach ($matches as $match)
         {
-            if (!$post instanceof WP_Post) continue;
-            if (!$this->is_published_post((int) $post->ID)) continue;
+            if (($match[1] ?? '') === '[' && ($match[6] ?? '') === ']') continue;
+            if (($match[2] ?? '') !== $shortcode) continue;
 
-            foreach ($this->elementor_referenced_post_ids((int) $post->ID, $shortcode, $post_type) as $referenced_post_id)
-            {
-                $referenced_ids[$referenced_post_id] = $referenced_post_id;
-            }
+            $attributes = shortcode_parse_atts($match[3] ?? '');
+            if (!is_array($attributes)) continue;
+
+            $referenced_post_id = absint($attributes['id'] ?? 0);
+            if ($referenced_post_id < 1) continue;
+            if (get_post_type($referenced_post_id) !== $post_type) continue;
+            if (!$this->is_published_post($referenced_post_id)) continue;
+
+            $referenced_ids[$referenced_post_id] = $referenced_post_id;
         }
-
-        // Bricks Builder
-        foreach ($posts as $post)
-        {
-            if (!$post instanceof WP_Post) continue;
-            if (!$this->is_published_post((int) $post->ID)) continue;
-
-            $bricks_ids = $this->bricks_referenced_post_ids((int) $post->ID, $shortcode, $post_type);
-
-            foreach ($bricks_ids as $referenced_post_id)
-            {
-                $referenced_ids[$referenced_post_id] = $referenced_post_id;
-            }
-        }
-
-        return array_values($referenced_ids);
     }
 
     public function published_search_form_ids(): array
@@ -491,19 +634,23 @@ class LSD_Checklist_Helper
 
     public function count_pages_with_shortcodes(array $shortcodes): int
     {
-        $posts = get_posts([
-            'post_type' => $this->shortcode_host_post_types(),
-            'post_status' => 'publish',
-            'posts_per_page' => -1,
-            'fields' => 'ids',
-            'suppress_filters' => false,
-        ]);
-
         $count = 0;
 
-        foreach ($posts as $post_id)
+        foreach ($this->shortcode_host_post_batches() as [$posts, $meta_values])
         {
-            if ($this->published_post_has_shortcodes((int) $post_id, $shortcodes)) $count++;
+            foreach ($posts as $post)
+            {
+                foreach ($this->shortcode_post_content_sources($post, $meta_values[(int) $post->ID] ?? []) as $content)
+                {
+                    foreach ($shortcodes as $shortcode)
+                    {
+                        if (!$this->content_has_unescaped_shortcode((string) $content, (string) $shortcode)) continue;
+
+                        $count++;
+                        continue 3;
+                    }
+                }
+            }
         }
 
         return $count;
