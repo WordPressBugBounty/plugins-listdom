@@ -1280,7 +1280,7 @@ class LSD_Base
             $rendered = number_format($price, ($decimal_separator === false ? 0 : 2), ($decimal_separator === false ? '' : $decimal_separator), $thousand_separator);
         }
 
-        $sign = $this->get_currency_sign($currency);
+        $sign = esc_html($this->get_currency_sign($currency));
 
         if ($currency_sign_position == 'after') $rendered = $rendered . $sign;
         else if ($currency_sign_position == 'after_ws') $rendered = $rendered . ' ' . $sign;

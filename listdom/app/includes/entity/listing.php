@@ -193,7 +193,10 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_remark', $data['remark'] ?? '');
 
         // Display Options
-        update_post_meta($this->post->ID, 'lsd_displ', $data['displ'] ?? []);
+        $display_options = isset($data['displ']) && is_array($data['displ']) ? $data['displ'] : [];
+        if (isset($display_options['style'])) $display_options['style'] = self::sanitize_display_style($display_options['style']);
+
+        update_post_meta($this->post->ID, 'lsd_displ', $display_options);
 
         // Gallery
         update_post_meta($this->post->ID, 'lsd_gallery', isset($data['gallery']) ? array_map('sanitize_text_field', $data['gallery']) : []);
@@ -238,6 +241,23 @@ class LSD_Entity_Listing extends LSD_Entity
 
         // New Listing Action
         if ($trigger_actions && !$data_id) do_action('lsd_new_listing', $this->post->ID);
+    }
+
+    /**
+     * Sanitize a single-listing display style before storing it in post meta.
+     *
+     * @param mixed $style
+     * @return string
+     */
+    public static function sanitize_display_style($style): string
+    {
+        if (!is_scalar($style)) return '';
+
+        $style = sanitize_key((string) $style);
+        if ($style === 'builder' || preg_match('/^tb_[1-9][0-9]*$/', $style)) return $style;
+
+        $styles = LSD_Styles::details();
+        return isset($styles[$style]) ? $style : '';
     }
 
     public function update_geopoint($listing_id, $lat, $lng)

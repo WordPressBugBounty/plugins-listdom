@@ -16,7 +16,7 @@ $api = LSD_Options::api();
                 <div class="lsd-settings-form-group lsd-box-white lsd-rounded">
                     <div class="lsd-settings-group-wrapper">
                         <div class="lsd-settings-fields-wrapper">
-                            <div class="lsd-my-0">
+                            <div class="lsd-my-0 lsd-flex lsd-flex-col lsd-flex-items-start lsd-gap-3">
                                 <p class="lsd-admin-description lsd-m-0"><?php esc_html_e("Do not remove a token if an application is using it because it will destroy the functionality of that application. Insert a descriptive name for any token.", 'listdom'); ?></p>
                                 <div class="lsd-alert lsd-info"><?php echo sprintf(
                                     /* translators: %s: REST API base URL. */

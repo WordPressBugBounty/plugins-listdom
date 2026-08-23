@@ -437,6 +437,8 @@ function ListdomDetails(id, link, settings) {
     }
 
     this.panel = function ($panel, created) {
+        this.$panel = $panel;
+
         // Add Iframe
         $panel.html(`
             <div class="lsd-panel-close"><i class="lsd-icon fa fa-window-close"></i></div>
@@ -451,18 +453,32 @@ function ListdomDetails(id, link, settings) {
         const $overlay = this.getOverlay();
         $overlay.addClass('lsd-active');
 
-        // Not Scrollable
-        this.body.addClass('lsd-not-scrollable');
+        // Prevent background scrolling without changing the current scroll position.
+        if (
+            !$panel.data('lsdPanelOwnsScrollLock') &&
+            typeof ListdomPageScroll !== 'undefined' &&
+            typeof ListdomPageScroll.stop === 'function' &&
+            !ListdomPageScroll.isLocked
+        ) {
+            ListdomPageScroll.stop();
+            $panel.data('lsdPanelOwnsScrollLock', true);
+        }
 
         // Close Panel by Icon
-        jQuery('.lsd-panel-close i').on('click', () => this.closePanel());
+        $panel.find('.lsd-panel-close i')
+        .off('click.listdomPanel')
+        .on('click.listdomPanel', () => this.closePanel());
 
         // Close Panel by Overlay
-        $overlay.off('click').on('click', () => this.closePanel());
+        $overlay
+        .off('click.listdomPanel')
+        .on('click.listdomPanel', () => this.closePanel());
 
         // Close Panel by Key
-        jQuery(document).off('keydown').on('keydown', (event) => {
-            if (event.key === 'Escape') {
+        jQuery(document)
+        .off('keydown.listdomPanel')
+        .on('keydown.listdomPanel', (event) => {
+            if (event.key === 'Escape' && $panel.hasClass('lsd-panel-open')) {
                 this.closePanel();
             }
         });
@@ -490,16 +506,24 @@ function ListdomDetails(id, link, settings) {
     };
 
     this.closePanel = function () {
+        const $panel = this.$panel;
+        if (!$panel || !$panel.length || !$panel.hasClass('lsd-panel-open')) return;
+
         // Overlay
         const $overlay = this.getOverlay();
         $overlay.removeClass('lsd-active');
 
         // Panel
-        const $panel = this.get('.lsd-panel');
         $panel.removeClass('lsd-panel-open');
 
-        // Scrollable
-        this.body.removeClass('lsd-not-scrollable');
+        // Restore background scrolling.
+        if ($panel.data('lsdPanelOwnsScrollLock')) {
+            $panel.removeData('lsdPanelOwnsScrollLock');
+
+            if (typeof ListdomPageScroll !== 'undefined' && typeof ListdomPageScroll.start === 'function') {
+                ListdomPageScroll.start();
+            }
+        }
     }
 }
 
@@ -6715,6 +6739,7 @@ function ListdomDetails(id, link, settings) {
 // Listdom SEARCH FORM PLUGIN
 (function ($) {
     $.fn.listdomSearchForm = function (options) {
+        return this.each(function () {
         // Default Options
         let settings = $.extend(
             {
@@ -6730,8 +6755,8 @@ function ListdomDetails(id, link, settings) {
             options
         );
 
-        let $container = $(".lsd-search-" + settings.id);
-        let $form = $container.find($("form:visible"));
+        let $container = $(this);
+        let $form = $container.find("form:visible").first();
         const distanceReferenceScopes = lsdResolveDistanceReferenceScopes(settings.shortcode, settings.connected_shortcodes);
         lsdHydrateDistanceReferenceFromQuery(window.location.search, distanceReferenceScopes, true);
 
@@ -7273,10 +7298,10 @@ function ListdomDetails(id, link, settings) {
             }
         }
 
-        function getManagedQueryKeys() {
+        function getManagedQueryKeys($activeForm = $form) {
             let keys = ['page', 'paged', ...lsdDistanceReferenceKeys];
 
-            $form.find(':input[name]').each(function () {
+            $activeForm.find(':input[name]').each(function () {
                 let name = $(this).attr('name');
                 if (typeof name === 'string' && name.length) keys.push(name);
             });
@@ -7831,8 +7856,8 @@ function ListdomDetails(id, link, settings) {
             new WebiliaToast(message, {type: 'lsd-error'});
         }
 
-        function prepareDistanceSearchFields() {
-            const $fields = $container.find('.lsd-radius-search-field');
+        function prepareDistanceSearchFields($activeForm = $form) {
+            const $fields = $activeForm.find('.lsd-radius-search-field');
             if (!$fields.length) return Promise.resolve();
 
             const radiusShared = window.lsdRadiusShared || {};
@@ -7912,14 +7937,21 @@ function ListdomDetails(id, link, settings) {
         function ajax() {
             // On The Fly
             if (settings.ajax === 2) {
-                $form.on("change", ":input", function (e) {
+                $container
+                .off("change.lsdSearchAjax", "form :input")
+                .on("change.lsdSearchAjax", "form :input", function (e) {
                     e.preventDefault();
-                    search();
+
+                    search($(this).closest("form"));
                 });
 
-                $form.on("paste", ":input", function (e) {
+                $container
+                .off("paste.lsdSearchAjax", "form :input")
+                .on("paste.lsdSearchAjax", "form :input", function () {
+                    const $activeForm = $(this).closest("form");
+
                     setTimeout(() => {
-                        search();
+                        search($activeForm);
                     }, 50);
                 });
             }
@@ -7938,19 +7970,22 @@ function ListdomDetails(id, link, settings) {
             };
 
             // On Submit
-            $form.on("submit", function (e) {
+            $container
+            .off("submit.lsdSearchAjax", "form")
+            .on("submit.lsdSearchAjax", "form", function (e) {
                 e.preventDefault();
-                search();
+
+                search($(this));
 
                 closeSearchPopups();
             });
         }
 
-        function search() {
-            return prepareDistanceSearchFields().then(function () {
+        function search($activeForm = $form) {
+            return prepareDistanceSearchFields($activeForm).then(function () {
                 // Listdom Request Plugin
                 let req = new ListdomRequest(settings.shortcode, settings);
-                let clearKeys = getManagedQueryKeys();
+                let clearKeys = getManagedQueryKeys($activeForm);
 
                 let $skin = $("#lsd_skin" + settings.shortcode);
                 let $wrapper = $("#lsd_skin" + settings.shortcode + " .lsd-listing-wrapper");
@@ -7962,7 +7997,7 @@ function ListdomDetails(id, link, settings) {
 
                 // Push to History
                 new ListdomPageHistory().push(
-                    "?" + $form.serialize(),
+                    "?" + $activeForm.serialize(),
                     lsdShouldUpdateAddressBar(settings.id),
                     clearKeys,
                     distanceReferenceScopes.length ? distanceReferenceScopes[0] : settings.shortcode
@@ -7974,7 +8009,7 @@ function ListdomDetails(id, link, settings) {
                         const shortcode_id = settings.connected_shortcodes[i];
                         $('body').trigger('lsd-sync', {
                             id: shortcode_id,
-                            request: $form.serialize() + "&page=1",
+                            request: $activeForm.serialize() + "&page=1",
                             clearKeys: clearKeys
                         });
                     }
@@ -7984,7 +8019,7 @@ function ListdomDetails(id, link, settings) {
                         url: settings.ajax_url,
                         data:
                             "action=lsd_ajax_search&" +
-                            req.get($form.serialize() + "&page=1&view=" + $skin.data('view'), "", clearKeys),
+                            req.get($activeForm.serialize() + "&page=1&view=" + $skin.data('view'), "", clearKeys),
                         dataType: "json",
                         type: "post",
                         success: function (response) {
@@ -8055,6 +8090,7 @@ function ListdomDetails(id, link, settings) {
                 $checkbox.val(0);
             }
         }
+        });
     };
 })(jQuery);
 

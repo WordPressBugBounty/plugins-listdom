@@ -2,6 +2,8 @@
 
 class LSD_Upgrade extends LSD_Base
 {
+    private const DEFAULT_NOTIFICATIONS_SEEDED_OPTION = 'lsd_default_notifications_seeded';
+
     public function init()
     {
         // Plugin is not installed yet!
@@ -13,6 +15,8 @@ class LSD_Upgrade extends LSD_Base
 
     public function upgrade()
     {
+        $this->seed_default_notifications();
+
         $version = get_option('lsd_version', '1.0.0');
 
         // It's updated to latest version
@@ -47,6 +51,15 @@ class LSD_Upgrade extends LSD_Base
 
         // Regenerate personalized CSS after any update
         LSD_Personalize::generate();
+    }
+
+    public function seed_default_notifications(): void
+    {
+        if (get_option(self::DEFAULT_NOTIFICATIONS_SEEDED_OPTION)) return;
+
+        foreach (array_keys($this->default_notifications()) as $hook) $this->seed_notification($hook);
+
+        update_option(self::DEFAULT_NOTIFICATIONS_SEEDED_OPTION, 1, false);
     }
 
     private function default_notifications(): array

@@ -21,7 +21,7 @@ $assets = new LSD_Assets();
 $assets->footer('<script>
 jQuery(document).ready(function()
 {
-    jQuery("#lsd_search_'.$this->id.'").listdomSearchForm(
+    jQuery("[data-lsd-search-instance=\"'.esc_js($this->unique).'\"]").listdomSearchForm(
     {
         id: "'.$this->id.'",
         shortcode: "'.$shortcode.'",
@@ -36,7 +36,7 @@ jQuery(document).ready(function()
 });
 </script>');
 ?>
-<div class="lsd-search lsd-search-style-<?php echo esc_attr($style); ?> lsd-search-default-style lsd-search-<?php echo esc_attr($this->id); ?>" id="lsd_search_<?php echo esc_attr($this->id); ?>">
+<div class="lsd-search lsd-search-style-<?php echo esc_attr($style); ?> lsd-search-default-style lsd-search-<?php echo esc_attr($this->id); ?>" id="lsd_search_<?php echo esc_attr($this->id); ?>" data-lsd-search-instance="<?php echo esc_attr($this->unique); ?>">
 
     <div class="lsd-search-devices-wrapper">
         <?php if (count($this->desktop)) $this->device($action, $criteria); ?>

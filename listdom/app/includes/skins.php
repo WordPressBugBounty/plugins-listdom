@@ -1573,7 +1573,23 @@ class LSD_Skins extends LSD_Base
         global $post;
 
         $shortcode_id = isset($this->atts['id']) ? (int) $this->atts['id'] : $this->id;
-        return do_shortcode('[listdom-search id="' . $this->sm_shortcode . '" style="' . ($style ?: (in_array($this->sm_position, ['left', 'right']) ? 'sidebar' : '')) . '" page="' . (is_singular() && $post && isset($post->ID) ? $post->ID : '') . '" shortcode="' . $shortcode_id . '" ajax="' . $this->sm_ajax . '"]');
+        $search_shortcode_id = $this->translated_search_shortcode_id();
+
+        return do_shortcode('[listdom-search id="' . $search_shortcode_id . '" style="' . ($style ?: (in_array($this->sm_position, ['left', 'right']) ? 'sidebar' : '')) . '" page="' . (is_singular() && $post && isset($post->ID) ? $post->ID : '') . '" shortcode="' . $shortcode_id . '" ajax="' . $this->sm_ajax . '"]');
+    }
+
+    /**
+     * Resolve the configured Search & Filter form for the active Polylang language.
+     * @return string
+     */
+    protected function translated_search_shortcode_id(): string
+    {
+        if (!is_numeric($this->sm_shortcode) || !function_exists('pll_get_post')) return (string) $this->sm_shortcode;
+
+        $language = function_exists('pll_current_language') ? pll_current_language('slug') : '';
+        $translated_shortcode_id = pll_get_post((int) $this->sm_shortcode, $language);
+
+        return is_numeric($translated_shortcode_id) && (int) $translated_shortcode_id > 0 ? (string) $translated_shortcode_id : (string) $this->sm_shortcode;
     }
 
     public function get_sortbar()

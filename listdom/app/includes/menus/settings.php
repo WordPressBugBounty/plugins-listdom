@@ -12,6 +12,7 @@ class LSD_Menus_Settings extends LSD_Menus
 
     public function init()
     {
+        add_action('admin_init', [$this, 'redirect_legacy_slugs']);
         add_action('wp_ajax_lsd_save_settings', [$this, 'save_settings']);
         add_action('wp_ajax_lsd_save_dashboard', [$this, 'save_dashboard']);
         add_action('wp_ajax_lsd_save_customizer', [$this, 'save_customizer']);
@@ -43,6 +44,18 @@ class LSD_Menus_Settings extends LSD_Menus
         $this->include_html_file('menus/settings/tpl.php');
     }
 
+    public function redirect_legacy_slugs()
+    {
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        $tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : '';
+        $subtab = isset($_GET['subtab']) ? sanitize_text_field(wp_unslash($_GET['subtab'])) : '';
+
+        if ($page !== 'listdom-settings' || $tab !== 'general' || $subtab !== 'slugs') return;
+
+        wp_safe_redirect(admin_url('admin.php?page=listdom-settings&tab=seo&subtab=slugs'));
+        exit;
+    }
+
     public function get_default_subtab(): string
     {
         if ($this->tab === 'frontend-dashboard') return 'general';
@@ -51,6 +64,7 @@ class LSD_Menus_Settings extends LSD_Menus
         if ($this->tab === 'single-listing') return 'style-elements';
         if ($this->tab === 'payments') return 'engine';
         if ($this->tab === 'ai') return 'profiles';
+        if ($this->tab === 'seo') return 'structured-data';
 
         return 'general';
     }
@@ -173,19 +187,21 @@ class LSD_Menus_Settings extends LSD_Menus
         }
 
         // Separate social settings
-        $social_settings = array_filter($lsd, function ($key)
+        $social_setting_keys = [
+            'twitter',
+            'pinterest',
+            'linkedin',
+            'facebook',
+            'instagram',
+            'whatsapp',
+            'youtube',
+            'tiktok',
+            'telegram',
+        ];
+        $has_social_settings = count(array_intersect(array_keys($lsd_raw), $social_setting_keys)) > 0;
+        $social_settings = array_filter($lsd, function ($key) use ($social_setting_keys)
         {
-            return in_array($key, [
-                'twitter',
-                'pinterest',
-                'linkedin',
-                'facebook',
-                'instagram',
-                'whatsapp',
-                'youtube',
-                'tiktok',
-                'telegram',
-            ]);
+            return in_array($key, $social_setting_keys, true);
         }, ARRAY_FILTER_USE_KEY);
 
         // Remove social settings from main settings
@@ -194,8 +210,8 @@ class LSD_Menus_Settings extends LSD_Menus
         // Save Settings
         LSD_Options::merge('lsd_settings', $lsd);
 
-        // Save social settings
-        update_option('lsd_socials', $social_settings);
+        // Save social settings only when the submitted form includes them.
+        if ($has_social_settings) update_option('lsd_socials', $social_settings);
 
         // Generate personalized CSS File
         LSD_Personalize::generate();

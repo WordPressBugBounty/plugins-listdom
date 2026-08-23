@@ -14,7 +14,7 @@ class LSD_Checklist_Provider_Seo extends LSD_Checklist_Provider_Base
                 'category' => $category,
                 'importance' => 'medium',
                 'action_label' => esc_html__('Configure', 'listdom'),
-                'action_url' => $this->helper->settings_action_url('general', 'general'),
+                'action_url' => $this->helper->settings_action_url('seo', 'structured-data'),
                 'action_focus_target' => '#lsd_settings_ai_visibility_structured_data',
             ], [$this, 'listing_schema']),
             $this->check([
@@ -36,7 +36,7 @@ class LSD_Checklist_Provider_Seo extends LSD_Checklist_Provider_Base
                 'importance' => 'low',
                 'optional' => true,
                 'action_label' => esc_html__('Configure', 'listdom'),
-                'action_url' => $this->helper->settings_action_url('general', 'general'),
+                'action_url' => $this->helper->settings_action_url('seo', 'ai-visibility'),
                 'action_focus_target' => '#lsd_settings_ai_visibility_public_feed',
             ], [$this, 'ai_feed']),
             $this->check([
@@ -46,7 +46,7 @@ class LSD_Checklist_Provider_Seo extends LSD_Checklist_Provider_Base
                 'category' => $category,
                 'importance' => 'medium',
                 'action_label' => esc_html__('Configure', 'listdom'),
-                'action_url' => $this->helper->settings_action_url('general', 'general'),
+                'action_url' => $this->helper->settings_action_url('seo', 'ai-visibility'),
                 'action_focus_target' => $this->required_fields_focus_target(),
             ], [$this, 'content_completeness']),
             $this->check([

@@ -284,6 +284,7 @@ class LSD_Plugin_Hooks
             delete_option('lsd_purchase_code');
             delete_option('lsd_activation_id');
             delete_option('lsd_version');
+            delete_option('lsd_default_notifications_seeded');
             delete_option(LSD_Announcements::OPTION_KEY);
         }
     }

@@ -3,6 +3,15 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v5.9.0 <span>August 22nd, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added resume-able CSV and Excel imports with activity history and Resume or Discard controls.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added dedicated SEO and Geo settings menus for easier directory configuration.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved import mapping reliability by preserving mappings and handling interrupted batches more clearly.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved embedded search forms, Divi integration, API token notices, and frontend listing interactions.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved multilingual archive shortcode compatibility, including Polylang-based sites.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed unsafe stored values in listing and price rendering.', 'listdom'); ?></li>
+    </ul>
     <h2>v5.8.1 <span>August 12th, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Improved Health Checklist performance on large sites.', 'listdom'); ?></li>

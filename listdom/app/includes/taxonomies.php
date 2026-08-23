@@ -124,20 +124,48 @@ class LSD_Taxonomies extends LSD_Base
      */
     public static function archive_shortcode_id(string $taxonomy, int $term_id = 0): int
     {
+        $shortcode_id = 0;
+
         // Term Override
         if ($term_id > 0 && LSD_Base::isPro())
         {
             $term_shortcode = get_term_meta($term_id, 'lsd_archive_shortcode', true);
             $term_shortcode = is_scalar($term_shortcode) ? absint($term_shortcode) : 0;
-            if ($term_shortcode > 0) return $term_shortcode;
+            if ($term_shortcode > 0) $shortcode_id = $term_shortcode;
         }
 
         // Global Archive Setting
-        $setting_key = self::archive_setting_key($taxonomy);
-        if ($setting_key === '') return 0;
+        if ($shortcode_id <= 0)
+        {
+            $setting_key = self::archive_setting_key($taxonomy);
+            if ($setting_key === '') return 0;
 
-        $settings = LSD_Options::settings();
-        return isset($settings[$setting_key]) && is_scalar($settings[$setting_key]) ? absint($settings[$setting_key]) : 0;
+            $settings = LSD_Options::settings();
+            $shortcode_id = isset($settings[$setting_key]) && is_scalar($settings[$setting_key]) ? absint($settings[$setting_key]) : 0;
+        }
+
+        return self::translate_archive_shortcode_id($shortcode_id, $term_id);
+    }
+
+    /**
+     * Resolve an archive shortcode for the archive term's Polylang language when possible.
+     * @param int $shortcode_id
+     * @param int $term_id
+     * @return int
+     */
+    protected static function translate_archive_shortcode_id(int $shortcode_id, int $term_id = 0): int
+    {
+        if ($shortcode_id <= 0 || !function_exists('pll_get_post')) return $shortcode_id;
+
+        $language = '';
+        if ($term_id > 0 && function_exists('pll_get_term_language'))
+        {
+            $term_language = pll_get_term_language($term_id);
+            if (is_string($term_language) && $term_language !== '') $language = $term_language;
+        }
+
+        $translated_shortcode_id = pll_get_post($shortcode_id, $language);
+        return is_numeric($translated_shortcode_id) && (int) $translated_shortcode_id > 0 ? (int) $translated_shortcode_id : $shortcode_id;
     }
 
     /**

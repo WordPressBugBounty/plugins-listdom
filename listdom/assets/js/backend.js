@@ -4139,11 +4139,34 @@ jQuery(function ($)
 
         const clearChecklistFocusQuery = function ()
         {
-            if (!(window.history && typeof window.history.replaceState === 'function')) return;
-
             params.delete('lsd_checklist_focus');
             params.delete('lsd_checklist_focus_target');
             params.delete('lsd_checklist_focus_target_encoding');
+
+            $('input[name="_wp_http_referer"]').each(function ()
+            {
+                const $referer = $(this);
+                const refererUrl = $referer.val();
+
+                if (typeof refererUrl !== 'string' || refererUrl === '') return;
+
+                try
+                {
+                    const url = new URL(refererUrl, window.location.origin);
+
+                    url.searchParams.delete('lsd_checklist_focus');
+                    url.searchParams.delete('lsd_checklist_focus_target');
+                    url.searchParams.delete('lsd_checklist_focus_target_encoding');
+
+                    $referer.val(url.pathname + url.search + url.hash);
+                }
+                catch (error)
+                {
+                    // Leave an invalid legacy referrer unchanged.
+                }
+            });
+
+            if (!(window.history && typeof window.history.replaceState === 'function')) return;
 
             const query = params.toString();
             const nextUrl = window.location.pathname + (query ? '?' + query : '') + (legacyHashFocusSelector ? '' : window.location.hash);

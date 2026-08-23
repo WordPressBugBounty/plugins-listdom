@@ -4,8 +4,8 @@ Donate link: https://listdom.net
 Tags: business directory, listings, classifieds, local business directory, directory plugin
 Requires at least: 4.2
 Requires PHP: 7.4
-Tested up to: 7.0
-Stable tag: 5.8.1
+Tested up to: 7.1
+Stable tag: 5.9.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -445,6 +445,14 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 5.9.0 =
+* Added resume-able CSV and Excel imports with activity history and Resume or Discard controls.
+* Added dedicated SEO and Geo settings menus for easier directory configuration.
+* Improved import mapping reliability by preserving mappings and handling interrupted batches more clearly.
+* Improved embedded search forms, Divi integration, API token notices, and frontend listing interactions.
+* Improved multilingual archive shortcode compatibility, including Polylang-based sites.
+* Fixed unsafe stored values in listing and price rendering.
 
 = 5.8.1 =
 * Improved Health Checklist performance on large sites.

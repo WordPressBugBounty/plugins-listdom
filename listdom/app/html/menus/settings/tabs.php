@@ -31,10 +31,20 @@ $ai_module_panels = $this->get_ai_module_panels();
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'socials' ? 'lsd-nav-tab-active' : ''; ?>" data-key="socials"><?php esc_html_e('Socials', 'listdom'); ?></li>
                 <?php endif; ?>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'archive-pages' ? 'lsd-nav-tab-active' : ''; ?>" data-key="archive-pages"><?php esc_html_e('Archive Pages', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'slugs' ? 'lsd-nav-tab-active' : ''; ?>" data-key="slugs"><?php esc_html_e('Slugs', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'Google-reCAPTCHA' ? 'lsd-nav-tab-active' : ''; ?>" data-key="Google-reCAPTCHA"><?php esc_html_e('Google reCAPTCHA', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'gdpr' ? 'lsd-nav-tab-active' : ''; ?>" data-key="gdpr"><?php esc_html_e('GDPR', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'general' && $this->subtab === 'integrations' ? 'lsd-nav-tab-active' : ''; ?>" data-key="integrations"><?php esc_html_e('Integrations', 'listdom'); ?></li>
+            </ul>
+        </li>
+        <li class="lsd-has-children lsd-seo-nav <?php echo $this->tab === 'seo' ? ' lsd-nav-expanded' : ''; ?>">
+            <a class="lsd-nav-tab <?php echo $this->tab === 'seo' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=seo')); ?>">
+                <i class="webilia-icon wbli-chart-increase lsd-m-0"></i>
+                <?php esc_html_e('SEO & GEO', 'listdom'); ?>
+            </a>
+            <ul data-parent="seo" class="lsd-nav-sub-tabs lsd-tabs">
+                <li class="lsd-nav-tab <?php echo $this->tab === 'seo' && ($this->subtab === 'structured-data' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="structured-data"><?php esc_html_e('Structured Data', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'seo' && $this->subtab === 'ai-visibility' ? 'lsd-nav-tab-active' : ''; ?>" data-key="ai-visibility"><?php esc_html_e('AI Visibility', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'seo' && $this->subtab === 'slugs' ? 'lsd-nav-tab-active' : ''; ?>" data-key="slugs"><?php esc_html_e('Slugs', 'listdom'); ?></li>
             </ul>
         </li>
         <li class="lsd-has-children lsd-customizer-nav <?php echo $this->tab === 'customizer' ? ' lsd-nav-expanded' : ''; ?>">

@@ -19,9 +19,9 @@ switch ($this->tab)
         $this->include_html_file('menus/settings/tabs/customizer.php');
         break;
 
-    case 'slugs':
+    case 'seo':
 
-        $this->include_html_file('menus/settings/tabs/slugs.php');
+        $this->include_html_file('menus/settings/tabs/seo.php');
         break;
 
     case 'addons':

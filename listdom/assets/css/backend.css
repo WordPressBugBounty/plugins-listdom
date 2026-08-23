@@ -7455,9 +7455,7 @@ body.lsd-template-editor .lsd-template-editor-workspace__content .lsd-template-e
 .lsd-loading-wrapper .lsd-activation-message,
 .lsd-loading-wrapper .lsd-deactivation-message,
 .lsd-loading-wrapper #lsd_ix_listdom_import_message,
-.lsd-loading-wrapper #lsd_ix_csv_import_message,
-.lsd-loading-wrapper #lsd_ix_csv_auto_import_message,
-.lsd-loading-wrapper #lsd_ix_excel_import_message {
+.lsd-loading-wrapper #lsd_ix_csv_auto_import_message {
   position: fixed;
   top: calc(50% + 40px);
   left: 50%;
@@ -9268,6 +9266,47 @@ body.lsd-template-editor .lsd-template-editor-workspace__content .lsd-template-e
 .lsd-dummy-data-wrap .lsd-settings-form-group .lsd-form-row {
   width: calc(25% - 10px);
   margin: 0;
+}
+
+#lsd_ix_csv_import_message, #lsd_ix_excel_import_message {
+  margin-top: 16px;
+  text-align: left;
+}
+#lsd_ix_csv_import_message .lsd-flex, #lsd_ix_excel_import_message .lsd-flex {
+  justify-content: flex-start;
+}
+
+#lsd_ix_csv_import_activity, #lsd_ix_excel_import_activity {
+  text-align: left;
+}
+
+.lsd-ix-import-log {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid #d8dce2;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.lsd-ix-import-log-entry {
+  padding: 10px 12px;
+  border-bottom: 1px solid #edf0f2;
+  color: #4a4a4a;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+}
+.lsd-ix-import-log-entry:last-child {
+  border-bottom: 0;
+}
+.lsd-ix-import-log-entry.lsd-info {
+  color: #1e4b7a;
+}
+.lsd-ix-import-log-entry.lsd-success {
+  color: #256029;
+}
+.lsd-ix-import-log-entry.lsd-error {
+  color: #a94442;
 }
 
 #lsdaddbrg_import_form .lsdaddbrg-import-row {

@@ -209,7 +209,7 @@ if (!class_exists(\LSDPACELM\Base::class) && !class_exists(\LSDPACDIV\Base::clas
                         <li data-tab="builder" class="<?php echo $current_style === 'dynamic' ? 'lsd-sub-tabs-active' : ''; ?>"><a href="#"><?php esc_html_e('Design Builder', 'listdom'); ?></a></li>
                     </ul>
                     <div class="lsd-tab-switcher-content lsd-tab-switcher-content-details <?php echo $current_style !== 'dynamic' ? 'lsd-tab-switcher-content-active' : ''; ?>" id="lsd-tab-switcher-config-content">
-                        <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch">
+                        <div class="lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-3">
                             <ul class="lsd-elements lsd-sortable lsd-m-0 lsd-flex-o-2">
                                 <?php foreach($details_page['elements'] as $key => $element): ?>
                                     <?php

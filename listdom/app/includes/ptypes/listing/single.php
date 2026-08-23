@@ -557,7 +557,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
         $wrapper_schema = $suppress_schema ? '' : ' ' . lsd_schema()->scope()->type(null, $this->entity->get_data_category());
 
-        $rendered = '<div class="lsd-single-page-wrapper lsd-font-m lsd-single-' . $style . '"' . $wrapper_schema . '>'
+        $rendered = '<div class="lsd-single-page-wrapper lsd-font-m lsd-single-' . esc_attr($style) . '"' . $wrapper_schema . '>'
             . $meta . $content . $this->powered_by_message()
         . '</div>';
 

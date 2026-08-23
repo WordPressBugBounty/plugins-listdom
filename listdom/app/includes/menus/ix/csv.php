@@ -4,9 +4,13 @@ class LSD_Menus_IX_CSV extends LSD_Base
 {
     public function init()
     {
+        LSD_IX_Import_Session::init();
+
         // Manual Import
         add_action('wp_ajax_lsd_ix_csv_upload', [$this, 'upload']);
         add_action('wp_ajax_lsd_ix_csv_import', [$this, 'import']);
+        add_action('wp_ajax_lsd_ix_csv_import_state', [$this, 'import_state']);
+        add_action('wp_ajax_lsd_ix_csv_import_discard', [$this, 'import_discard']);
         add_action('wp_ajax_lsd_ix_csv_load_template', [$this, 'template']);
         add_action('wp_ajax_lsd_ix_csv_ai_mapping', [$this, 'ai_mapping']);
         add_action('wp_ajax_lsd_ix_csv_provision_custom_fields', [$this, 'provision_custom_fields']);
@@ -171,6 +175,15 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
         if (!current_user_can('manage_options')) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to perform this action.', 'listdom'), 'code' => 'NO_ACCESS']);
 
+        if ((new LSD_IX_Import_Session())->get('csv'))
+        {
+            $this->response([
+                'success' => 0,
+                'message' => esc_html__('An import is waiting to be resumed or discarded.', 'listdom'),
+                'code' => 'IMPORT_IN_PROGRESS',
+            ]);
+        }
+
         $uploaded_file = $_FILES['file'] ?? null;
         $type = isset($_POST['type']) ? LSD_IX::normalize_import_type(sanitize_text_field(wp_unslash($_POST['type']))) : 'listings';
 
@@ -210,112 +223,174 @@ class LSD_Menus_IX_CSV extends LSD_Base
 
     public function import()
     {
-        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : null;
+        $this->verify_import_request();
 
-        // Check if nonce is not set
-        if (!trim($wpnonce)) $this->response(['success' => 0, 'code' => 'NONCE_MISSING']);
-
-        // Verify that the nonce is valid.
-        if (!wp_verify_nonce($wpnonce, 'lsd_ix_csv_import')) $this->response(['success' => 0, 'code' => 'NONCE_IS_INVALID']);
-
-        if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
-
-        // Get Parameters
-        $ix = isset($_POST['ix']) && is_array($_POST['ix']) ? wp_unslash($_POST['ix']) : [];
-
-        // Sanitization
-        array_walk_recursive($ix, 'sanitize_text_field');
-
-        $type = isset($ix['type']) ? LSD_IX::normalize_import_type($ix['type']) : 'listings';
-        $type_label = LSD_IX::import_type_label($type);
-
-        // File
-        $file = isset($ix['file']) ? sanitize_text_field($ix['file']) : '';
-
-        // No File
-        if (trim($file) === '') $this->response(['success' => 0, 'code' => 'FILE_MISSED']);
-
-        // Main Library
-        $main = new LSD_Main();
-
-        // File Full Path
-        $path = $main->get_upload_path() . $file;
-
-        // File Not Found
-        if (!LSD_File::exists($path)) $this->response(['success' => 0, 'code' => 'FILE_NOT_FOUND']);
-
-        // Offset & Limit
-        $offset = $ix['offset'] ?? 0;
-        $limit = $ix['size'] ?? 20;
-        $options = [
-            'hierarchical_terms' => !empty($ix['hierarchical_terms']),
-        ];
-
+        $sessions = new LSD_IX_Import_Session();
+        $session_id = isset($_POST['session']) ? sanitize_text_field(wp_unslash($_POST['session'])) : '';
+        $session = $sessions->get('csv');
         $templates = '';
         $dropdown = '';
 
-        if (isset($ix['template']) && trim($ix['template']) && $offset == 0)
+        if ($session_id !== '')
         {
-            $template = new LSD_IX_Templates_CSV($type);
-            $template->upsert([
-                'name' => $ix['template'],
-                'fields' => $ix['mapping'],
-            ]);
-
-            // Updated templates list
-            $templates = $this->templates_markup();
-
-            // Updated dropdown
-            if ($type === 'listings')
+            if (!$session || !hash_equals((string) ($session['id'] ?? ''), $session_id))
             {
-                $dropdown = (new LSD_IX_Templates_CSV('listings'))->dropdown([
-                    'id' => 'lsd_ix_csv_auto_import_mapping',
-                    'name' => 'ix[mapping]',
-                    'show_empty' => true,
-                ]);
+                $this->response(['success' => 0, 'message' => esc_html__('The import session is no longer available. Upload the file again to start over.', 'listdom'), 'code' => 'SESSION_NOT_FOUND']);
             }
         }
+        elseif ($session)
+        {
+            $this->response(['success' => 0, 'message' => esc_html__('An import is waiting to be resumed or discarded.', 'listdom'), 'code' => 'IMPORT_IN_PROGRESS']);
+        }
+        else
+        {
+            $ix = isset($_POST['ix']) && is_array($_POST['ix']) ? wp_unslash($_POST['ix']) : [];
+            array_walk_recursive($ix, 'sanitize_text_field');
+
+            $file = isset($ix['file']) ? sanitize_file_name($ix['file']) : '';
+            if ($file === '') $this->response(['success' => 0, 'message' => esc_html__('The import file is missing.', 'listdom'), 'code' => 'FILE_MISSED']);
+
+            $path = $this->get_upload_path() . $file;
+            if (!LSD_File::exists($path)) $this->response(['success' => 0, 'message' => esc_html__('The import file could not be found.', 'listdom'), 'code' => 'FILE_NOT_FOUND']);
+
+            $type = isset($ix['type']) ? LSD_IX::normalize_import_type($ix['type']) : 'listings';
+            $limit = isset($ix['size']) ? absint($ix['size']) : 20;
+            if ($limit < 1) $limit = 20;
+            $mapping = isset($ix['mapping']) && is_array($ix['mapping']) ? $ix['mapping'] : [];
+            $options = ['hierarchical_terms' => !empty($ix['hierarchical_terms'])];
+
+            if (isset($ix['template']) && trim($ix['template']) && count($mapping))
+            {
+                $template = new LSD_IX_Templates_CSV($type);
+                $template->upsert(['name' => $ix['template'], 'fields' => $mapping]);
+                $templates = $this->templates_markup();
+
+                if ($type === 'listings')
+                {
+                    $dropdown = (new LSD_IX_Templates_CSV('listings'))->dropdown([
+                        'id' => 'lsd_ix_csv_auto_import_mapping',
+                        'name' => 'ix[mapping]',
+                        'show_empty' => true,
+                    ]);
+                }
+            }
+
+            $session = $sessions->create('csv', [
+                'file' => $file,
+                'type' => $type,
+                'mapping' => $mapping,
+                'options' => $options,
+                'size' => $limit,
+            ]);
+
+            if (!$session) $this->response(['success' => 0, 'message' => esc_html__('An import is waiting to be resumed or discarded.', 'listdom'), 'code' => 'IMPORT_IN_PROGRESS']);
+        }
+
+        $file = sanitize_file_name($session['file'] ?? '');
+        $path = $this->get_upload_path() . $file;
+        if (!LSD_File::exists($path))
+        {
+            $sessions->delete('csv', $session['id'] ?? '');
+            $this->response(['success' => 0, 'message' => esc_html__('The import file could not be found. Upload it again to start over.', 'listdom'), 'code' => 'FILE_NOT_FOUND']);
+        }
+
+        $type = LSD_IX::normalize_import_type($session['type'] ?? 'listings');
+        $type_label = LSD_IX::import_type_label($type);
+        $offset = absint($session['offset'] ?? 0);
+        $limit = absint($session['size'] ?? 20);
+        if ($limit < 1) $limit = 20;
+        $mapping = isset($session['mapping']) && is_array($session['mapping']) ? $session['mapping'] : [];
+        $options = isset($session['options']) && is_array($session['options']) ? $session['options'] : [];
 
         $csv = new LSD_IX_CSV();
-        [$count] = $csv->import_by_mapping($path, $ix['mapping'], $offset, $limit, $type, $options);
+        [$count] = $csv->import_by_mapping($path, $mapping, $offset, $limit, $type, $options);
+        $next_offset = $offset + $count;
+        $done = $count < $limit;
 
-        // Message
-        $message = sprintf(
-            /* translators: 1: Number processed, 2: Import type label. */
-            esc_html__('%1$s %2$s imported successfully! Please be patient and do not close the window. Continuing to import the remaining items...', 'listdom'),
-            '<strong>' . (($offset / $limit) + 1) * $count . '</strong>',
-            strtolower($type_label)
-        );
-        $done = 0;
-
-        // Import Finished
-        if ($count < $limit)
+        if ($done)
         {
-            // Delete the File
-            LSD_File::delete($path);
-
-            // Import Finished
+            $sessions->delete('csv', $session['id']);
             do_action('lsdaddcsv_import_finished');
             do_action('lsd_import_finished');
 
-            // Message
             $message = sprintf(
                 /* translators: 1: Total imported count, 2: Import type label. */
                 esc_html__('%1$s %2$s imported successfully! The import process is now complete.', 'listdom'),
-                $offset + $count,
+                $next_offset,
                 strtolower($type_label)
             );
-            $done = 1;
+        }
+        else
+        {
+            // Checkpoint before responding so a lost browser response can resume safely.
+            $session = $sessions->update_offset($session, $next_offset);
+            $message = sprintf(
+                /* translators: 1: Number processed, 2: Import type label. */
+                esc_html__('%1$s %2$s imported successfully. Continuing to import the remaining items...', 'listdom'),
+                '<strong>' . $next_offset . '</strong>',
+                strtolower($type_label)
+            );
         }
 
-        // Print the response
         $this->response([
             'success' => 1,
-            'done' => $done,
+            'done' => $done ? 1 : 0,
             'message' => $message,
             'templates' => $templates,
             'dropdown' => $dropdown,
+            'data' => [
+                'session' => $done ? '' : $session['id'],
+                'offset' => $next_offset,
+            ],
         ]);
+    }
+
+    public function import_state()
+    {
+        $this->verify_import_request();
+
+        $session = (new LSD_IX_Import_Session())->get('csv');
+        if (!$session) $this->response(['success' => 1, 'active' => 0]);
+
+        $file = sanitize_file_name($session['file'] ?? '');
+        if (!LSD_File::exists($this->get_upload_path() . $file))
+        {
+            (new LSD_IX_Import_Session())->delete('csv', $session['id'] ?? '');
+            $this->response(['success' => 1, 'active' => 0, 'expired' => 1]);
+        }
+
+        $this->response(['success' => 1, 'active' => 1, 'data' => $this->session_data($session)]);
+    }
+
+    public function import_discard()
+    {
+        $this->verify_import_request();
+
+        $session = (new LSD_IX_Import_Session())->get('csv');
+        if ($session) (new LSD_IX_Import_Session())->delete('csv', $session['id'] ?? '');
+
+        $this->response(['success' => 1]);
+    }
+
+    protected function verify_import_request(): void
+    {
+        $wpnonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+
+        if (!trim($wpnonce)) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing.', 'listdom'), 'code' => 'NONCE_MISSING']);
+        if (!wp_verify_nonce($wpnonce, 'lsd_ix_csv_import')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is invalid.', 'listdom'), 'code' => 'NONCE_IS_INVALID']);
+        if (!current_user_can('manage_options')) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to perform this action.', 'listdom'), 'code' => 'NO_ACCESS']);
+    }
+
+    protected function session_data(array $session): array
+    {
+        $type = LSD_IX::normalize_import_type($session['type'] ?? 'listings');
+
+        return [
+            'session' => $session['id'] ?? '',
+            'type' => $type,
+            'label' => LSD_IX::import_type_label($type),
+            'offset' => absint($session['offset'] ?? 0),
+        ];
     }
 
     public function template()
@@ -338,7 +413,16 @@ class LSD_Menus_IX_CSV extends LSD_Base
         $tpl = new LSD_IX_Templates_CSV($type);
         $template = $tpl->get($key);
 
-        $this->response(['success' => 1, 'template' => $template['fields'] ?? []]);
+        if (!count($template['fields'] ?? []))
+        {
+            $this->response([
+                'success' => 0,
+                'message' => esc_html__('The selected template does not contain any mapped fields.', 'listdom'),
+                'code' => 'EMPTY_TEMPLATE',
+            ]);
+        }
+
+        $this->response(['success' => 1, 'template' => $template['fields']]);
     }
 
     public function ai_mapping()

@@ -50,7 +50,13 @@ $export_url = add_query_arg('lsd-type', 'listings', $export_base);
 
                 <div class="lsd-form-row">
                     <div class="lsd-col-12">
-                        <p id="lsd_ix_csv_import_message"></p>
+                        <div id="lsd_ix_csv_import_message" class="lsd-util-hide" aria-live="polite"></div>
+                        <div id="lsd_ix_csv_import_activity" class="lsd-util-hide" aria-live="polite">
+                            <h4 class="lsd-admin-title lsd-mt-4 lsd-mb-2"><?php esc_html_e('Import Activity', 'listdom'); ?></h4>
+                            <div class="lsd-ix-import-log">
+                                <div id="lsd_ix_csv_import_activity_entries"></div>
+                            </div>
+                        </div>
                         <div id="lsd_ix_csv_import_mapping"></div>
                     </div>
                 </div>
@@ -273,6 +279,74 @@ $importTypeSelect.on('change', function()
     }
 });
 
+const lsdCsvApplyTemplate = function(template)
+{
+    for (const key in template)
+    {
+        if (!template.hasOwnProperty(key)) continue;
+
+        const mapping = template[key];
+        if (window.lsd_ix_taxonomy_mappings && window.lsd_ix_taxonomy_mappings[key])
+        {
+            window.lsd_ix_taxonomy_mappings[key].load(mapping);
+        }
+        else if (mapping && mapping.map !== undefined)
+        {
+            jQuery('#lsd_ix_mapping_field_' + key + '_map').val(mapping.map).trigger('change');
+            jQuery('#lsd_ix_mapping_field_' + key + '_default').val(mapping.default).trigger('change');
+        }
+    }
+
+    if (window.lsd_ix_repeaters) window.lsd_ix_repeaters.load(template);
+};
+
+// The mapping form is rendered after the file upload, so keep this binding on the
+// persistent import form instead of the injected mapping markup.
+jQuery('#lsd_ix_csv_import_form').on('click', '#lsd_ix_csv_load_template_map', function()
+{
+    const $button = jQuery(this);
+    const $submit = jQuery('#lsd_ix_csv_import_submit');
+    const template = $importMapping.find('#lsd_ix_template').val();
+    const loading = new ListdomButtonLoader($button);
+
+    jQuery('#ix_template_new').val('');
+    $submit.attr('disabled', 'disabled');
+    loading.start("<?php echo esc_js(esc_html__('Mapping', 'listdom')); ?>");
+
+    jQuery.ajax({
+        type: 'POST',
+        url: ajaxurl,
+        dataType: 'json',
+        data: {
+            action: 'lsd_ix_csv_load_template',
+            template: template,
+            type: $importTypeHidden.val(),
+            _wpnonce: '<?php echo wp_create_nonce('lsd_ix_csv_load_template'); ?>'
+        }
+    })
+    .done(function(response)
+    {
+        if (response.success !== 1)
+        {
+            listdom_toastify(response.message || "<?php echo esc_js(esc_html__('The template could not be applied. Please try again.', 'listdom')); ?>", 'lsd-error');
+            return;
+        }
+
+        lsdCsvApplyTemplate(response.template || {});
+        listdom_toastify("<?php echo esc_js(esc_html__('Template mapping was successful', 'listdom')); ?>", 'lsd-success');
+        jQuery('#lsd_csv_template_name_toggle').trigger('change');
+    })
+    .fail(function()
+    {
+        listdom_toastify("<?php echo esc_js(esc_html__('The template could not be applied. Please try again.', 'listdom')); ?>", 'lsd-error');
+    })
+    .always(function()
+    {
+        loading.stop();
+        $submit.removeAttr('disabled');
+    });
+});
+
 const lsdCsvExportReset = function()
 {
     csvExportInProgress = false;
@@ -393,6 +467,7 @@ jQuery('#lsd_ix_csv_import_file_input').on('change', function()
 
     // Mapping Form
     $importMapping.html('');
+    lsdCsvImportResetLog();
 
     // Loading Wrapper
     const loading = (new ListdomButtonLoader(jQuery('.lsd-csv-import-choose-file')));
@@ -460,8 +535,14 @@ jQuery('#lsd_ix_csv_import_file_input').on('change', function()
             loading.stop();
             $file.removeAttr('disabled');
 
-            // Show Alert
-            listdom_toastify(response.message, 'lsd-error');
+            if (response.code === 'IMPORT_IN_PROGRESS')
+            {
+                lsdCsvImportShowRecovery(response.message, csvImportSession);
+            }
+            else
+            {
+                listdom_toastify(response.message, 'lsd-error');
+            }
         }
     });
 });
@@ -518,117 +599,234 @@ jQuery('#lsd_ix_csv_auto_import_form').on('submit', function(e)
     });
 });
 
-// Manual Import Submit
-jQuery('#lsd_ix_csv_import_form').on('submit', function(e)
+const $csvImportForm = jQuery('#lsd_ix_csv_import_form');
+const $csvImportButton = jQuery('#lsd_ix_csv_import_submit');
+const $csvImportControls = $importTypeSelect.closest('.lsd-flex');
+const $csvImportStatus = jQuery('#lsd_ix_csv_import_message');
+const $csvImportActivity = jQuery('#lsd_ix_csv_import_activity');
+const $csvImportActivityEntries = jQuery('#lsd_ix_csv_import_activity_entries');
+const $csvImportOffset = jQuery('#lsd_ix_csv_import_offset');
+let csvImportSession = '';
+let csvImportInProgress = false;
+let csvImportLoading = null;
+
+const lsdCsvImportLog = function(message, type)
 {
-    e.preventDefault();
+    $csvImportActivity.removeClass('lsd-util-hide');
+    jQuery('<div>', {class: 'lsd-ix-import-log-entry ' + type}).html(message).prependTo($csvImportActivityEntries);
+};
 
-    const $button = jQuery('#lsd_ix_csv_import_submit');
-    const $alert = jQuery("#lsd_ix_csv_import_message");
-    const $mapping = jQuery("#lsd_ix_csv_import_mapping");
-    const $input = jQuery("#lsd_ix_csv_import_file_input");
-    const $offset = jQuery("#lsd_ix_csv_import_offset");
-    const $size = jQuery("#lsd_ix_csv_import_size");
-    const $form = jQuery(this);
+const lsdCsvImportSetStatus = function(message, type, actions)
+{
+    $csvImportStatus
+        .removeClass('lsd-util-hide lsd-info lsd-success lsd-error lsd-warning')
+        .addClass('lsd-alert ' + type)
+        .html('<div>' + message + '</div>' + (actions || ''));
+};
 
-    // Hide Elements
-    $mapping.hide();
-    $input.hide();
+const lsdCsvImportResetLog = function()
+{
+    $csvImportActivityEntries.html('');
+    $csvImportActivity.addClass('lsd-util-hide');
+    $csvImportStatus.removeClass('lsd-alert lsd-info lsd-success lsd-error lsd-warning').addClass('lsd-util-hide').html('');
+};
 
-    // Loading Wrapper
-    const loading = new ListdomButtonLoader($button);
-    loading.start("<?php echo esc_js( esc_html__('Importing', 'listdom') ); ?>");
+const lsdCsvImportHideForm = function()
+{
+    $csvImportControls.hide();
+    $importMapping.hide();
+    $csvImportForm.find('.lsd-settings-submit-wrapper').addClass('lsd-util-hide');
+};
 
-    $alert.html('');
-    $alert.removeClass('lsd-util-hide');
+const lsdCsvImportRestoreForm = function()
+{
+    csvImportSession = '';
+    $csvImportControls.show();
+    $importMapping.html('').show();
+    $importFileInput.val('');
+    $importHiddenFile.val('');
+    $csvImportOffset.val('0');
+    lastImportType = '';
+};
 
-    // Start the Import
-    lsd_csv_chunk_import();
+const lsdCsvImportStopLoading = function()
+{
+    if (!csvImportLoading) return;
 
-    // Import Function
-    function lsd_csv_chunk_import()
+    csvImportLoading.stop();
+    csvImportLoading = null;
+};
+
+const lsdCsvImportShowRecovery = function(message, session)
+{
+    csvImportInProgress = false;
+    lsdCsvImportStopLoading();
+    lsdCsvImportHideForm();
+
+    if (session) csvImportSession = session;
+    lsdCsvImportLog(message, 'lsd-error');
+    lsdCsvImportSetStatus(
+        message,
+        'lsd-warning',
+        '<div class="lsd-mt-2 lsd-flex lsd-gap-2">'
+        + '<button type="button" id="lsd_ix_csv_import_resume" class="lsd-secondary-button"><?php echo esc_js(esc_html__('Resume Import', 'listdom')); ?><i class="webilia-icon wbli-right-arrow"></i></button>'
+        + '<button type="button" id="lsd_ix_csv_import_discard" class="lsd-text-button"><?php echo esc_js(esc_html__('Discard', 'listdom')); ?></button>'
+        + '</div>'
+    );
+};
+
+const lsdCsvImportRun = function(resuming)
+{
+    if (csvImportInProgress) return;
+
+    csvImportInProgress = true;
+    lsdCsvImportHideForm();
+
+    if (resuming)
     {
-        const data = $form.serialize();
-        jQuery.ajax(
-        {
-            type: "POST",
-            url: ajaxurl,
-            data: "action=lsd_ix_csv_import&" + data,
-            dataType: 'json',
-            success: function(response)
-            {
-                if(response.success === 1)
-                {
-                    if(response.templates) jQuery('#lsd_panel_csv_mapping-templates .lsd-settings-fields-wrapper').html(response.templates);
-                    if(response.dropdown) jQuery('#lsd_ix_csv_auto_import_mapping').replaceWith(response.dropdown);
-
-                    if(response.done)
-                    {
-                        // Show Alert
-                        listdom_toastify(response.message, 'lsd-success');
-                        $alert.addClass('lsd-util-hide');
-
-                        listdom_trigger_toggle();
-
-                        loading.stop();
-                        $form.find(".lsd-settings-submit-wrapper").addClass('lsd-util-hide');
-
-                        // Reset file input and hidden value
-                        $input.val('');
-                        jQuery("#lsd_ix_csv_import_file").val('');
-                        $offset.val('0');
-
-                        // Show form elements for next import
-                        $input.show();
-                        $mapping.html('').show();
-                    }
-                    else
-                    {
-                        // Show Alert
-                        $alert.html(listdom_alertify(response.message, 'lsd-info'));
-
-                        // New Offset
-                        $offset.val(parseInt($offset.val()) + parseInt($size.val()));
-
-                        loading.stop();
-                        $form.find(".lsd-settings-submit-wrapper").addClass('lsd-util-hide');
-
-                        // Run the import again
-                        setTimeout(function()
-                        {
-                            lsd_csv_chunk_import();
-                        }, 500);
-                    }
-                }
-                else
-                {
-                    // Show Alert
-                    listdom_toastify(response.message, 'lsd-error');
-
-                    loading.stop();
-
-                    // Show Mapping Form
-                    setTimeout(function()
-                    {
-                        $input.show();
-                        $mapping.show();
-                    }, 3000);
-                }
-            },
-            error: function()
-            {
-                // Show Alert
-                listdom_toastify("<?php echo esc_js(esc_html__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
-
-                loading.stop();
-
-                // Show Mapping Form
-                setTimeout(function()
-                {
-                    $mapping.show();
-                }, 3000);
-            }
-        });
+        lsdCsvImportSetStatus("<?php echo esc_js(esc_html__('Resuming the interrupted import.', 'listdom')); ?>", 'lsd-info');
+        lsdCsvImportLog("<?php echo esc_js(esc_html__('Resuming the interrupted import.', 'listdom')); ?>", 'lsd-info');
     }
+    else
+    {
+        lsdCsvImportResetLog();
+        lsdCsvImportSetStatus("<?php echo esc_js(esc_html__('Import started.', 'listdom')); ?>", 'lsd-info');
+        lsdCsvImportLog("<?php echo esc_js(esc_html__('Import started.', 'listdom')); ?>", 'lsd-info');
+    }
+
+    csvImportLoading = new ListdomButtonLoader($csvImportButton);
+    csvImportLoading.start("<?php echo esc_js(esc_html__('Importing', 'listdom')); ?>");
+
+    const importChunk = function()
+    {
+        const data = csvImportSession
+            ? 'action=lsd_ix_csv_import&_wpnonce=<?php echo wp_create_nonce('lsd_ix_csv_import'); ?>&session=' + encodeURIComponent(csvImportSession)
+            : 'action=lsd_ix_csv_import&' + $csvImportForm.serialize();
+
+        jQuery.ajax({
+            type: 'POST',
+            url: ajaxurl,
+            data: data,
+            dataType: 'json'
+        })
+        .done(function(response)
+        {
+            if (response.success !== 1)
+            {
+                lsdCsvImportShowRecovery(response.message || "<?php echo esc_js(esc_html__('The import could not continue. Check your connection and try again.', 'listdom')); ?>", csvImportSession);
+                return;
+            }
+
+            if (response.templates) jQuery('#lsd_panel_csv_mapping-templates .lsd-settings-fields-wrapper').html(response.templates);
+            if (response.dropdown) jQuery('#lsd_ix_csv_auto_import_mapping').replaceWith(response.dropdown);
+            if (response.data && response.data.session) csvImportSession = response.data.session;
+            if (response.data && response.data.offset !== undefined) $csvImportOffset.val(response.data.offset);
+
+            lsdCsvImportSetStatus(response.message, response.done ? 'lsd-success' : 'lsd-info');
+            lsdCsvImportLog(response.message, response.done ? 'lsd-success' : 'lsd-info');
+
+            if (response.done)
+            {
+                csvImportInProgress = false;
+                lsdCsvImportStopLoading();
+                $csvImportForm.find('.lsd-settings-submit-wrapper').addClass('lsd-util-hide');
+                lsdCsvImportRestoreForm();
+                listdom_trigger_toggle();
+                return;
+            }
+
+            setTimeout(importChunk, 500);
+        })
+        .fail(function()
+        {
+            lsdCsvImportShowRecovery("<?php echo esc_js(esc_html__('The import was interrupted. Check your connection, then resume from the last completed batch.', 'listdom')); ?>", csvImportSession);
+        });
+    };
+
+    importChunk();
+};
+
+const lsdCsvImportLoadRecovery = function(resume)
+{
+    jQuery.ajax({
+        type: 'POST',
+        url: ajaxurl,
+        dataType: 'json',
+        data: {
+            action: 'lsd_ix_csv_import_state',
+            _wpnonce: '<?php echo wp_create_nonce('lsd_ix_csv_import'); ?>'
+        }
+    })
+    .done(function(response)
+    {
+        if (response.success === 1 && response.active === 1 && response.data)
+        {
+            csvImportSession = response.data.session;
+            $csvImportOffset.val(response.data.offset);
+
+            if (resume)
+            {
+                lsdCsvImportRun(true);
+                return;
+            }
+
+            const type = response.data.label || response.data.type || 'listings';
+            lsdCsvImportShowRecovery(
+                "<?php echo esc_js(esc_html__('A previous import was interrupted after', 'listdom')); ?> <strong>" + response.data.offset + "</strong> " + type + ".",
+                csvImportSession
+            );
+            return;
+        }
+
+        if (resume)
+        {
+            lsdCsvImportRestoreForm();
+            const message = "<?php echo esc_js(esc_html__('The import session is no longer available. Upload the file again to start over.', 'listdom')); ?>";
+            lsdCsvImportSetStatus(message, 'lsd-error');
+            lsdCsvImportLog(message, 'lsd-error');
+        }
+    })
+    .fail(function()
+    {
+        lsdCsvImportShowRecovery("<?php echo esc_js(esc_html__('The import session could not be loaded. Check your connection, then retry.', 'listdom')); ?>", csvImportSession);
+    });
+};
+
+$csvImportForm.on('submit', function(event)
+{
+    event.preventDefault();
+    lsdCsvImportRun(false);
 });
+
+$csvImportStatus.on('click', '#lsd_ix_csv_import_resume', function()
+{
+    lsdCsvImportLoadRecovery(true);
+});
+
+$csvImportStatus.on('click', '#lsd_ix_csv_import_discard', function()
+{
+    jQuery.ajax({
+        type: 'POST',
+        url: ajaxurl,
+        dataType: 'json',
+        data: {
+            action: 'lsd_ix_csv_import_discard',
+            _wpnonce: '<?php echo wp_create_nonce('lsd_ix_csv_import'); ?>'
+        }
+    })
+    .done(function(response)
+    {
+        if (response.success !== 1)
+        {
+            lsdCsvImportShowRecovery(response.message || "<?php echo esc_js(esc_html__('The import could not be discarded. Please try again.', 'listdom')); ?>", csvImportSession);
+            return;
+        }
+
+        lsdCsvImportRestoreForm();
+        lsdCsvImportSetStatus("<?php echo esc_js(esc_html__('The interrupted import was discarded.', 'listdom')); ?>", 'lsd-info');
+        lsdCsvImportLog("<?php echo esc_js(esc_html__('The interrupted import was discarded.', 'listdom')); ?>", 'lsd-info');
+    });
+});
+
+lsdCsvImportLoadRecovery(false);
 </script>
