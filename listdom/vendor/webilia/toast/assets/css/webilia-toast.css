@@ -6,7 +6,8 @@
   align-items: flex-end;
   flex-direction: column;
   gap: 8px;
-  width: 50%;
+  width: 100%;
+  max-width: 30%;
 }
 .lsd-toast-container.lsd-top-right {
   top: 20px;

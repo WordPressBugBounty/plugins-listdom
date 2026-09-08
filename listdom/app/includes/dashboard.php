@@ -11,6 +11,10 @@ class LSD_Dashboard extends LSD_Base
         // Payments and Billing Dashboard
         $payments = new LSD_Dashboard_Payments();
         $payments->init();
+
+        // Promotions Dashboard
+        $promotions = new LSD_Dashboard_Promotions();
+        $promotions->init();
     }
 
     public function modules()

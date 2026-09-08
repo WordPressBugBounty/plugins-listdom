@@ -112,6 +112,6 @@ class LSD_Checklist_Provider_Addons extends LSD_Checklist_Provider_Base
     protected function visibility_addon_action_url(): string
     {
         $addon = $this->active_visibility_addon();
-        return $addon !== '' ? $this->addon_action_url($addon) : admin_url('admin.php?page=listdom-addons');
+        return $addon !== '' ? $this->addon_action_url($addon) : admin_url('admin.php?page=listdom-connect&tab=addons');
     }
 }

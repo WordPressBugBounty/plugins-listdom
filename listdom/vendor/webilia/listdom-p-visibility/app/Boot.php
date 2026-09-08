@@ -39,5 +39,17 @@ class Boot extends Base
 
         // Check visits on each listing visit
         add_action('lsd_listing_visited', [$this->addon, 'listing']);
+
+        // Allow a publisher to override visibility rules from the dashboard
+        add_action('lsd_dashboard_listing_put_online', [$this->addon, 'put_online'], 10, 2);
+
+        // Preserve approval for explicit dashboard publication
+        add_action('lsd_dashboard_listing_published', [$this->addon, 'dashboard_publish']);
+
+        // Reevaluate visibility after subscription renewal restores a listing.
+        add_action('lsd_listing_renewed', [$this->addon, 'renewed']);
+
+        // Preserve approval across standard WordPress publication paths
+        add_action('transition_post_status', [$this->addon, 'publication_transition'], 10, 3);
     }
 }

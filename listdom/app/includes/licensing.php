@@ -41,6 +41,28 @@ class LSD_Licensing extends LSD_Base
      */
     public static function isValid(string $basename, string $prefix): int
     {
+        if (LSD_Webilia_Connect::isAllowed($basename)) return self::STATUS_VALID;
+        return self::legacyIsValid($basename, $prefix);
+    }
+
+    /**
+     * Determine whether the product may receive an update.
+     *
+     * Connect use and update capabilities are intentionally separate. A
+     * connected account may be allowed to use a product while its update
+     * entitlement is denied. Legacy license validation remains an independent
+     * fallback so Connect cannot take update access away from existing users.
+     */
+    public static function isUpdateAllowed(string $basename, string $prefix): bool
+    {
+        if (LSD_Webilia_Connect::isAllowed($basename, 'update')) return true;
+
+        return self::legacyIsValid($basename, $prefix) === self::STATUS_VALID;
+    }
+
+    /** Keep legacy caching, trials, and grace periods isolated from Connect. */
+    private static function legacyIsValid(string $basename, string $prefix): int
+    {
         // Product Key
         $key = self::getProductKey($basename);
 
@@ -142,6 +164,12 @@ class LSD_Licensing extends LSD_Base
      */
     public static function validate(string $basename, string $prefix): array
     {
+        if (LSD_Webilia_Connect::isAllowed($basename)) return ['status' => 'active', 'source' => 'webilia_connect', 'expiry' => esc_html__('Connected account', 'listdom')];
+        return self::legacyValidate($basename, $prefix);
+    }
+
+    private static function legacyValidate(string $basename, string $prefix): array
+    {
         // Product Key for validation details
         $key = self::getProductKey($basename) . '_data';
 
@@ -210,8 +238,11 @@ class LSD_Licensing extends LSD_Base
      */
     public static function runIfValid(string $basename, string $prefix, Closure $callable)
     {
-        // Check Validity
-        $valid = self::isValid($basename, $prefix);
+        // Resolve Connect first so a connected, entitled add-on is treated as
+        // registered everywhere in this request, including the admin badges.
+        // The legacy result remains an independent fallback.
+        $connect_authorized = LSD_Webilia_Connect::isAllowed($basename);
+        $valid = $connect_authorized ? self::STATUS_VALID : self::legacyIsValid($basename, $prefix);
 
         // Run the Callback
         if ($valid !== self::STATUS_INVALID) call_user_func($callable);
@@ -219,7 +250,7 @@ class LSD_Licensing extends LSD_Base
         // Add to Listdom Notifications when
         // the license is either invalid
         // or in a trial or grace period
-        if ($valid === self::STATUS_INVALID || in_array($valid, [self::STATUS_TRIAL, self::STATUS_GRACE], true))
+        if (! $connect_authorized && ($valid === self::STATUS_INVALID || in_array($valid, [self::STATUS_TRIAL, self::STATUS_GRACE], true)))
         {
             add_filter('lsd_license_activation_required', function (int $counter)
             {
@@ -355,8 +386,18 @@ class LSD_Licensing extends LSD_Base
 
     public static function getStatus(string $basename, string $prefix): array
     {
+        $connect_authorized = LSD_Webilia_Connect::isAllowed($basename);
         $valid = self::isValid($basename, $prefix);
         $validation_status = self::validate($basename, $prefix);
+
+        if ($connect_authorized) return [
+            'valid' => self::STATUS_VALID, 'validation_status' => $validation_status, 'installed_date' => '', 'expired' => false,
+            'expiring' => false, 'progress' => 100, 'days_remaining' => 0, 'valid_license' => true,
+            'has_license_key' => trim((string) get_option($prefix . '_purchase_code', '')) !== '', 'state' => 'active',
+            'badge' => ['class' => 'lsd-success', 'icon' => 'wbli-checkmark-circle', 'text' => esc_html__('Active', 'listdom')],
+            'progress_class' => 'lsd-success', 'card_class' => 'lsd-activation-valid', 'action' => '', 'show_status' => false,
+            'show_valid_from' => false, 'status_text' => '', 'expiry_mode' => 'none', 'connect_authorized' => true, 'source' => 'webilia_connect',
+        ];
         $installed_at = (int) get_option($prefix . '_installed_at', 0);
         $expiry_time = isset($validation_status['expiry_timestamp'])
             ? (int) $validation_status['expiry_timestamp']
@@ -392,6 +433,8 @@ class LSD_Licensing extends LSD_Base
             'show_valid_from' => $show_valid_from,
             'status_text' => $state === 'inactive' ? esc_html__('Not Registered', 'listdom') : '',
             'expiry_mode' => self::getExpiryMode($state, $expiry_time, $validation_status),
+            'connect_authorized' => false,
+            'source' => 'legacy',
         ];
     }
 
@@ -423,7 +466,7 @@ class LSD_Licensing extends LSD_Base
                         'type' => 'warning',
                         'message' => sprintf(
                             /* translators: 1: Number of days remaining on the license. 2: Add-on name. */
-                            esc_html__("Your license will expire in %1\$s days. Please renew it to avoid any interruption in using %2\$s Addon.", 'listdom'),
+                            _n("Your license will expire in %1\$s day. Please renew it to avoid any interruption in using %2\$s Addon.", "Your license will expire in %1\$s days. Please renew it to avoid any interruption in using %2\$s Addon.", $days_remaining, 'listdom'),
                             $days_remaining,
                             $product_name
                         ),
@@ -459,7 +502,7 @@ class LSD_Licensing extends LSD_Base
                         'type' => 'warning',
                         'message' => sprintf(
                             /* translators: 1: Remaining grace period in days, 2: Add-on name. */
-                            esc_html__("There seems to be an issue verifying your license, which may be due to a connection problem between our server and yours, or because your license has expired. You are now in a 7-day grace period. If your license is expired, please renew or activate your license within the next %1\$s days to avoid any disruption in using %2\$s. If you believe this is an error, kindly check your server connection or contact Webilia support for assistance.", 'listdom'),
+                            _n("There seems to be an issue verifying your license, which may be due to a connection problem between our server and yours, or because your license has expired. You are now in a 7-day grace period. If your license is expired, please renew or activate your license within the next %1\$s day to avoid any disruption in using %2\$s. If you believe this is an error, kindly check your server connection or contact Webilia support for assistance.", "There seems to be an issue verifying your license, which may be due to a connection problem between our server and yours, or because your license has expired. You are now in a 7-day grace period. If your license is expired, please renew or activate your license within the next %1\$s days to avoid any disruption in using %2\$s. If you believe this is an error, kindly check your server connection or contact Webilia support for assistance.", self::remainingGracePeriod($prefix), 'listdom'),
                             '<strong style="color: red;">' . esc_html(self::remainingGracePeriod($prefix)) . '</strong>',
                             $product_name
                         ),
@@ -473,12 +516,14 @@ class LSD_Licensing extends LSD_Base
 
                 return ['type' => '', 'message' => '', 'cta' => []];
             case 'trial_notice':
+                $trial_days = self::remainingTrialPeriod($prefix);
+
                 return [
                     'type' => 'info',
                     'message' => sprintf(
                         /* translators: 1: Remaining trial period in days, 2: Add-on name. */
-                        esc_html__("Please activate your license promptly. You have less than %1\$s days remaining to activate %2\$s; after that, %2\$s will no longer be operational.", 'listdom'),
-                        '<strong style="color: red;">' . esc_html(self::remainingTrialPeriod($prefix)) . '</strong>',
+                        _n("Please activate your license promptly. You have less than %1\$s day remaining to activate %2\$s; after that, %2\$s will no longer be operational.", "Please activate your license promptly. You have less than %1\$s days remaining to activate %2\$s; after that, %2\$s will no longer be operational.", $trial_days, 'listdom'),
+                        '<strong style="color: red;">' . esc_html($trial_days) . '</strong>',
                         $product_name
                     ),
                     'cta' => [
@@ -498,7 +543,7 @@ class LSD_Licensing extends LSD_Base
                     'type' => 'warning',
                     'message' => sprintf(
                         /* translators: 1: Remaining days, 2: Add-on name. */
-                        esc_html__("Your license will expire in %1\$s days. Please renew it to avoid any interruption in using %2\$s.", 'listdom'),
+                        _n("Your license will expire in %1\$s day. Please renew it to avoid any interruption in using %2\$s.", "Your license will expire in %1\$s days. Please renew it to avoid any interruption in using %2\$s.", $days_remaining, 'listdom'),
                         '<strong style="color: red;">' . esc_html($days_remaining) . '</strong>',
                         $product_name
                     ),
@@ -597,5 +642,6 @@ class LSD_Licensing extends LSD_Base
 
         // Runtime Cache
         unset(self::$runtime[$key], self::$runtime[$key . '_data']);
+        LSD_Webilia_Connect::forgetAuthorization($basename);
     }
 }

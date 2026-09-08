@@ -11,6 +11,8 @@ $currency = LSD_Options::currency();
 $cart = new LSD_Cart();
 [$total, $discount, $tax] = $cart->apply_coupon();
 $items = $cart->get_items();
+$cart_id = isset($_COOKIE['lsd_cart_id']) ? sanitize_text_field(wp_unslash($_COOKIE['lsd_cart_id'])) : '';
+$capture_key = md5($cart_id);
 $order_title = wp_date('Y-m-d H:i:s');
 if ($items)
 {
@@ -60,6 +62,17 @@ if ($items)
         const $gatewayForm = $('#lsd-gateway-form-paypal');
         const $wrapper = $gatewayForm.find('.lsd-gateway-wrapper').first();
         if (!$wrapper.length) return;
+
+        const failureMessage = '<?php echo esc_js(esc_html__('Unable to complete checkout. Please try again.', 'listdom')); ?>';
+        const ajaxUrl = typeof lsd !== 'undefined' ? lsd.ajaxurl : '';
+        const showResponse = function (message)
+        {
+            const text = message || failureMessage;
+            const $response = $wrapper.find('.lsd-checkout-response');
+
+            if (typeof listdom_alertify === 'function') $response.html(listdom_alertify(text, 'lsd-error'));
+            else $response.text(text);
+        };
 
         const storage = (function ()
         {
@@ -127,12 +140,70 @@ if ($items)
             return true;
         };
 
+        const capturedOrderStorageKey = 'lsd-paypal-captured-order-<?php echo esc_js($capture_key); ?>';
+        const capturedOrderCookieName = 'lsd_paypal_captured_order_<?php echo esc_js($capture_key); ?>';
+        let capturedOrderId = '';
+        const capturedPaymentMessage = '<?php echo esc_js(__('Your PayPal payment was captured, but checkout confirmation is pending. Please contact the site administrator with your PayPal order ID.', 'listdom')); ?>';
+
+        const getCapturedOrderCookie = function ()
+        {
+            const prefix = capturedOrderCookieName + '=';
+            const cookies = document.cookie ? document.cookie.split(';') : [];
+
+            for (let index = 0; index < cookies.length; index++)
+            {
+                const cookie = cookies[index].trim();
+                if (cookie.indexOf(prefix) !== 0) continue;
+
+                return decodeURIComponent(cookie.substring(prefix.length));
+            }
+
+            return '';
+        };
+
+        const storeCapturedOrderCookie = function (orderId)
+        {
+            const value = orderId ? encodeURIComponent(orderId) : '';
+            const expires = orderId ? '; max-age=86400' : '; max-age=0';
+            document.cookie = capturedOrderCookieName + '=' + value + expires + '; path=/; SameSite=Lax';
+        };
+
+        try
+        {
+            capturedOrderId = window.sessionStorage.getItem(capturedOrderStorageKey) || getCapturedOrderCookie();
+        }
+        catch (err)
+        {
+            capturedOrderId = getCapturedOrderCookie();
+        }
+
+        const storeCapturedOrderId = function (orderId)
+        {
+            capturedOrderId = orderId || '';
+            storeCapturedOrderCookie(capturedOrderId);
+
+            try
+            {
+                if (capturedOrderId !== '') window.sessionStorage.setItem(capturedOrderStorageKey, capturedOrderId);
+                else window.sessionStorage.removeItem(capturedOrderStorageKey);
+            }
+            catch (err)
+            {
+            }
+        };
+
         paypal.Buttons({
             style: {
                 disableMaxWidth: true
             },
             onClick: function (data, actions)
             {
+                if (capturedOrderId !== '')
+                {
+                    showResponse(capturedPaymentMessage + ' ' + capturedOrderId);
+                    return actions && typeof actions.reject === 'function' ? actions.reject() : false;
+                }
+
                 if (!validateConsent())
                 {
                     return actions && typeof actions.reject === 'function' ? actions.reject() : false;
@@ -154,10 +225,17 @@ if ($items)
             },
             onApprove: function (data, actions)
             {
+                if (!ajaxUrl)
+                {
+                    showResponse(failureMessage);
+                    return;
+                }
+
                 return actions.order.capture().then(function (orderData)
                 {
                     if (orderData.status === 'COMPLETED')
                     {
+                        storeCapturedOrderId(orderData.id || '');
                         const name = $wrapper.find('.lsd-checkout-user-name').val() || '';
                         const email = $wrapper.find('.lsd-checkout-user-email').val() || '';
 
@@ -166,7 +244,7 @@ if ($items)
                             : getStoredConsent();
 
                         $.ajax({
-                            url: lsd.ajaxurl,
+                            url: ajaxUrl,
                             type: 'post',
                             dataType: 'json',
                             data: {
@@ -182,17 +260,27 @@ if ($items)
                             {
                                 if (res && res.success)
                                 {
+                                    storeCapturedOrderId('');
                                     storeConsent('');
                                     lsdCheckoutComplete(res.key ? res.key : res.order_id);
                                 }
-                                else if (res && res.message)
-                                {
-                                    $wrapper.find('.lsd-checkout-response').html(res.message);
-                                }
+                                else showResponse(capturedPaymentMessage + ' ' + capturedOrderId);
+                            },
+                            error: function ()
+                            {
+                                showResponse(capturedPaymentMessage + ' ' + capturedOrderId);
                             }
                         });
                     }
+                    else showResponse(failureMessage);
+                }).catch(function ()
+                {
+                    showResponse(failureMessage);
                 });
+            },
+            onError: function ()
+            {
+                showResponse(failureMessage);
             }
         }).render('#lsd-paypal-button-container');
     }, 100);

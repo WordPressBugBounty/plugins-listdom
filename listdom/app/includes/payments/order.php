@@ -137,6 +137,10 @@ class LSD_Payments_Order extends LSD_Base
         if ($key === 'lsd_package_id') return __('Package', 'listdom');
         if ($key === 'lsd_user_id') return __('User', 'listdom');
         if ($key === 'lsd_claim_id') return __('Claim', 'listdom');
+        if ($key === 'lsd_label_id') return __('Label', 'listdom');
+        if ($key === '_lsd_label_duration') return __('Label Duration', 'listdom');
+        if ($key === '_lsd_topup_item') return __('Service Type', 'listdom');
+        if ($key === '_lsd_topup_duration') return __('Top-up Duration', 'listdom');
 
         return $key;
     }
@@ -166,6 +170,29 @@ class LSD_Payments_Order extends LSD_Base
 
                 return $url ? '<a href="'.esc_url($url).'">'.esc_html($title).'</a>' : $title;
             }
+        }
+
+        if ($key === 'lsd_label_id')
+        {
+            $term = get_term(absint($value), LSD_Base::TAX_LABEL);
+            if ($term instanceof WP_Term) return esc_html($term->name);
+        }
+
+        if ($key === '_lsd_label_duration')
+        {
+            $duration = absint($value);
+            if ($duration < 1) return __('Lifetime', 'listdom');
+
+            return sprintf(_n('%s day', '%s days', $duration, 'listdom'), number_format_i18n($duration));
+        }
+
+        if ($key === '_lsd_topup_item') return __('Top-up', 'listdom');
+        if ($key === '_lsd_topup_duration')
+        {
+            $duration = absint($value);
+            if ($duration < 1) return __('Lifetime', 'listdom');
+
+            return sprintf(_n('%s day', '%s days', $duration, 'listdom'), number_format_i18n($duration));
         }
 
         return $value;

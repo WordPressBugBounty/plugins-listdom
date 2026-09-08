@@ -19,6 +19,7 @@ class LSD_Base
     const TAX_LABEL = 'listdom-label';
     const TAX_TAX = 'listdom-tax';
     const STATUS_TRASH = 'trash';
+    const STATUS_PRIVATE = 'private';
     const STATUS_INACTIVE = 'inactive';
     const STATUS_DENIED = 'denied';
     const STATUS_OFFLINE = 'offline';
@@ -420,6 +421,43 @@ class LSD_Base
     {
         if (!trim($message)) return '';
         return '<div class="lsd-alert lsd-' . esc_attr($type) . '">' . $message . '</div>';
+    }
+
+    public function membership_chip(string $label, array $args = []): string
+    {
+        $args = wp_parse_args($args, [
+            'seed' => 1,
+            'tag' => 'span',
+            'class' => '',
+            'label_class' => '',
+            'attributes' => [],
+            'icon_html' => '',
+        ]);
+
+        $tag = in_array($args['tag'], ['button', 'span', 'div'], true) ? $args['tag'] : 'span';
+        $chip = ['label' => trim($label), 'class' => 'lsd-membership-chip',];
+        $classes = trim($chip['class'] . ' ' . $args['class']);
+        $attributes = is_array($args['attributes']) ? $args['attributes'] : [];
+        $attributes['class'] = $classes;
+
+        $attribute_html = '';
+        foreach ($attributes as $attribute => $value)
+        {
+            if ($value === null) continue;
+
+            $attribute = esc_attr((string) $attribute);
+            $value = is_scalar($value) ? (string) $value : '';
+
+            $attribute_html .= $value === ''
+                ? sprintf(' %s', $attribute)
+                : sprintf(' %s="%s"', $attribute, esc_attr($value));
+        }
+
+        $content = '';
+        if (is_string($args['icon_html']) && trim($args['icon_html']) !== '') $content .= $args['icon_html'];
+        $content .= '<span class="' . esc_attr(trim('lsd-membership-chip-label ' . $args['label_class'])) . '">' . esc_html($chip['label']) . '</span>';
+
+        return sprintf('<%1$s%2$s>%3$s</%1$s>', $tag, $attribute_html, $content);
     }
 
     public static function parse_args($a, $b): array
@@ -1499,12 +1537,15 @@ class LSD_Base
         return apply_filters('lsd_mapstyles', $mapstyles);
     }
 
-    public static function get_clustering_icons()
+    public static function get_clustering_icons(bool $include_custom_color = true)
     {
         $icons = [
             'img/cluster1/m' => esc_html__('Classic Bubbles', 'listdom'),
             'img/cluster2/m' => esc_html__('Modern Bubbles', 'listdom'),
+            'img/cluster3/m' => esc_html__('Clean Bubbles', 'listdom'),
         ];
+
+        if ($include_custom_color) $icons['cluster-color'] = esc_html__('Custom Color', 'listdom');
 
         // Apply Filters
         return apply_filters('lsd_clustering_icons', $icons);

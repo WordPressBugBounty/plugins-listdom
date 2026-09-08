@@ -39,10 +39,12 @@ class LSD_Element_Labels extends LSD_Element
 
     public static function styles($label_id): string
     {
-        $color = get_term_meta($label_id, 'lsd_color', true);
-        $text = LSD_Base::get_text_color($color);
+        $color = sanitize_hex_color(get_term_meta($label_id, 'lsd_color', true));
+        if (!$color) return '';
 
-        return 'style="background-color: ' . esc_attr($color) . '; color: ' . esc_attr($text) . ';"';
+        $text = LSD_Color::text_color($color);
+
+        return 'style="color: ' . esc_attr($text) . '; border-color: ' . esc_attr($color) . '; background-color: ' . esc_attr($color) . ';"';
     }
 
     protected function general_settings(array $data): string

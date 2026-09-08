@@ -10,6 +10,7 @@ return array(
     'Webilia\\WP\\' => array($vendorDir . '/webilia/wp/src'),
     'Webilia\\Toast\\' => array($vendorDir . '/webilia/toast/app'),
     'Webilia\\Icons\\' => array($vendorDir . '/webilia/icons/app'),
+    'Webilia\\Connect\\' => array($vendorDir . '/webilia/connect/src'),
     'Symfony\\Polyfill\\Php80\\' => array($vendorDir . '/symfony/polyfill-php80'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Contracts\\Translation\\' => array($vendorDir . '/symfony/translation-contracts'),

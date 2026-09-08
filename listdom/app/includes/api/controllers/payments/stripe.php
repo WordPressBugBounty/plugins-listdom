@@ -252,6 +252,11 @@ class LSD_API_Controllers_Payments_Stripe extends LSD_API_Controller
                 update_post_meta($order_id, 'lsd_stripe_charge_id', sanitize_text_field((string) $invoice['charge']));
             }
 
+            $period_meta = [];
+            if ($period['current_period_start'] > 0) $period_meta['current_period_start'] = (string) $period['current_period_start'];
+            if ($period['current_period_end'] > 0) $period_meta['current_period_end'] = (string) $period['current_period_end'];
+            if ($period_meta) LSD_Payments_Recurrings::update_gateway_meta($recurring_id, $period_meta);
+
             LSD_Payments_Orders::completed($order_id);
 
             $meta_update = [

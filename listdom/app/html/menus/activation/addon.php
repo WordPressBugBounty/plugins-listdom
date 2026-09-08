@@ -13,11 +13,13 @@ $status = LSD_Licensing::getStatus($licensing->getBasename(), $licensing->getPre
 $prefix = $licensing->getPrefix();
 $shop_url = $this->getWebiliaShopURL();
 $state = $status['state'];
+$connect_authorized = !empty($status['connect_authorized']);
 
 $primary_message_payload = LSD_Licensing::getMessagePayload($status, $product, 'primary', $prefix, $shop_url);
 $trial_notice_payload = LSD_Licensing::getMessagePayload($status, $product, 'trial_notice', $prefix, $shop_url);
 $trial_inline_payload = LSD_Licensing::getMessagePayload($status, $product, 'trial_inline', $prefix, $shop_url);
 $expiring_notice_payload = LSD_Licensing::getMessagePayload($status, $product, 'expiring_notice', $prefix, $shop_url);
+$has_stored_legacy_license = trim($licensing->getLicenseKey()) !== '';
 ?>
 <div id="lsd-license-card-<?php echo esc_attr($key); ?>" class="lsd-license-card <?php echo esc_attr($status['card_class']); ?>">
     <div class="lsd-validation">
@@ -55,7 +57,7 @@ $expiring_notice_payload = LSD_Licensing::getMessagePayload($status, $product, '
                                     echo wp_kses(
                                         sprintf(
                                         /* translators: %s: Number of days remaining on the license. */
-                                            __('%s days remaining', 'listdom'),
+                                            _n('%s day remaining', '%s days remaining', (int) $status['days_remaining'], 'listdom'),
                                             '<span class="lsd-days">' . intval($status['days_remaining']) . '</span>'
                                         ),
                                         [
@@ -92,7 +94,102 @@ $expiring_notice_payload = LSD_Licensing::getMessagePayload($status, $product, '
             <?php endif; ?>
         </div>
     <?php endif; ?>
-    <?php if (!$status['valid_license']): ?>
+    <?php if ($connect_authorized): ?>
+        <div class="lsd-alert lsd-success lsd-my-0"><?php esc_html_e('Active through your connected Webilia account. This add-on is checked automatically.', 'listdom'); ?></div>
+        <?php if ($has_stored_legacy_license): ?>
+            <div class="lsd-alert lsd-info lsd-my-0"><?php esc_html_e('A license key is stored separately for this add-on. Webilia Connect does not change it.', 'listdom'); ?></div>
+        <?php endif; ?>
+        <details class="lsd-connect-legacy-license">
+            <summary class="lsd-cursor-pointer"><span class="lsd-ml-3"><?php esc_html_e('Use a license key instead', 'listdom'); ?></span></summary>
+            <?php if ($has_stored_legacy_license): ?>
+                <p><?php esc_html_e('This stored license key is separate from Webilia Connect and can be removed without disconnecting this website.', 'listdom'); ?></p>
+                <div class="lsd-license-manage lsd-my-3">
+                    <div class="lsd-license-key">
+                        <h3 class="lsd-my-0 lsd-fields-label"><?php echo esc_html__('License Key:', 'listdom'); ?></h3>
+                        <div class="lsd-flex lsd-gap-1 lsd-flex-align-items-center">
+                            <code class="lsd-license-code lsd-license-code-<?php echo esc_attr($key); ?>"
+                                  data-lsd-copy="<?php echo esc_attr($licensing->getLicenseKey()); ?>">
+                                <?php echo esc_html($licensing->getLicenseKey(true)); ?>
+                            </code>
+                            <a data-copied="<?php echo esc_html__('Copied!', 'listdom'); ?>"
+                               class="lsd-copy lsd-w-auto"
+                               data-target="lsd-license-code-<?php echo esc_attr($key); ?>">
+                                <i class="webilia-icon wbli-copy"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <a class="lsd-neutral-button lsd-w-auto" href="<?php echo esc_url($this->getManageLicensesURL()); ?>" target="_blank">
+                        <?php esc_html_e('Manage Licenses', 'listdom'); ?>
+                        <i class="webilia-icon wbli-link-square"></i>
+                    </a>
+                </div>
+                <div class="lsd-w-full lsd-deactivation">
+                    <form class="lsd-deactivation-form" data-key="<?php echo esc_attr($key); ?>">
+                        <div class="lsd-form-row lsd-deactivation-wrapper lsd-m-0">
+                            <div class="lsd-col-12">
+                                <div class="lsd-w-full">
+                                    <?php echo LSD_Form::text([
+                                        'name' => 'confirmation',
+                                        'id' => $key . '_deactivation_confirm',
+                                        'class' => 'lsd-admin-input',
+                                        'placeholder' => esc_attr__('Type deactivate here to confirm ...', 'listdom'),
+                                    ]); ?>
+                                </div>
+                                <div>
+                                    <?php echo LSD_Form::hidden(['name' => 'license_key', 'value' => $licensing->getLicenseKey()]); ?>
+                                    <?php echo LSD_Form::hidden(['name' => 'key', 'value' => $key]); ?>
+                                    <?php echo LSD_Form::hidden(['name' => 'basename', 'value' => $licensing->getBasename()]); ?>
+                                    <?php LSD_Form::nonce($key . '_deactivation_form'); ?>
+                                    <?php echo LSD_Form::submit([
+                                        'label' => esc_html__('Deactivate', 'listdom'),
+                                        'id' => $key . '_deactivation_button',
+                                        'class' => 'lsd-secondary-button',
+                                    ]); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lsd-form-row lsd-mb-0">
+                            <div class="lsd-col-12">
+                                <div class="lsd-my-0" id="<?php echo esc_attr($key); ?>_deactivation_alert"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            <?php else: ?>
+                <p><?php esc_html_e('A license key remains an optional fallback and is never changed by Webilia Connect.', 'listdom'); ?></p>
+                <div class="lsd-activation">
+                    <form class="lsd-activation-form lsd-alert-no-my" data-key="<?php echo esc_attr($key); ?>">
+                        <div class="lsd-form-row lsd-my-0">
+                            <div class="lsd-col-12">
+                                <div class="lsd-w-full">
+                                    <?php echo LSD_Form::text([
+                                        'id' => $key . '_license_key',
+                                        'class' => 'lsd-admin-input',
+                                        'name' => 'license_key',
+                                        'value' => '',
+                                        'placeholder' => esc_attr__('Enter the license here', 'listdom'),
+                                    ]); ?>
+                                </div>
+                                <div>
+                                    <?php echo LSD_Form::hidden(['name' => 'key', 'value' => $key]); ?>
+                                    <?php echo LSD_Form::hidden(['name' => 'basename', 'value' => $licensing->getBasename()]); ?>
+                                    <?php LSD_Form::nonce($key . '_activation_form'); ?>
+                                    <?php echo LSD_Form::submit([
+                                        'label' => esc_html__('Activate', 'listdom'),
+                                        'id' => $key . '_activation_button',
+                                        'class' => 'lsd-secondary-button',
+                                    ]); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lsd-w-full lsd-activation-form-alert-wrapper">
+                            <div class="lsd-activation-form-alert" id="<?php echo esc_attr($key); ?>_activation_alert"></div>
+                        </div>
+                    </form>
+                </div>
+            <?php endif; ?>
+        </details>
+    <?php elseif (!$status['valid_license']): ?>
         <?php if ($state !== 'trial' && !empty($primary_message_payload['message'])): ?>
             <div class="lsd-form-row lsd-activation-guide">
                 <div class="lsd-col-12">

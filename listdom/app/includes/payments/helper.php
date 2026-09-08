@@ -145,8 +145,27 @@ class LSD_Payments_Helper extends LSD_Base
             {
                 if ($plan_id > 0 && isset($item['product_id']) && (int) $item['product_id'] === $plan_id)
                 {
-                    $plan_id = 0;
-                    break;
+                    $is_same_item = !count($meta);
+
+                    if (count($meta))
+                    {
+                        $is_same_item = true;
+
+                        foreach ($meta as $meta_key => $meta_value)
+                        {
+                            $cart_value = $item[$meta_key] ?? null;
+                            if ((string) $cart_value !== (string) $meta_value)
+                            {
+                                $is_same_item = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($is_same_item)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -154,8 +173,7 @@ class LSD_Payments_Helper extends LSD_Base
             {
                 try
                 {
-                    WC()->cart->add_to_cart($plan_id, 1, 0, [], $meta);
-                    return true;
+                    return (bool) WC()->cart->add_to_cart($plan_id, 1, 0, [], $meta);
                 }
                 catch (Exception $e)
                 {

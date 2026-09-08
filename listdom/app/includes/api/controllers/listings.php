@@ -45,6 +45,12 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
             'status' => 400,
         ]);
 
+        $validation = apply_filters('lsd_api_listing_validate', true, $vars, null);
+        if (is_wp_error($validation)) return $this->response([
+            'data' => $validation,
+            'status' => 400,
+        ]);
+
         // Post Status
         $status = 'pending';
         if (current_user_can('publish_posts')) $status = 'publish';
@@ -132,6 +138,12 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         // Listing Title is Required
         if (!trim($post_title)) return $this->response([
             'data' => new WP_Error('400', esc_html__("Listing title field is required!", 'listdom')),
+            'status' => 400,
+        ]);
+
+        $validation = apply_filters('lsd_api_listing_validate', true, $vars, $listing);
+        if (is_wp_error($validation)) return $this->response([
+            'data' => $validation,
             'status' => 400,
         ]);
 

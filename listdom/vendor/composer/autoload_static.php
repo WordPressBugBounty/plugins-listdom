@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd
+class ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -26,6 +26,7 @@ class ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd
             'Webilia\\WP\\' => 11,
             'Webilia\\Toast\\' => 14,
             'Webilia\\Icons\\' => 14,
+            'Webilia\\Connect\\' => 16,
         ),
         'S' => 
         array (
@@ -88,6 +89,10 @@ class ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd
         'Webilia\\Icons\\' => 
         array (
             0 => __DIR__ . '/..' . '/webilia/icons/app',
+        ),
+        'Webilia\\Connect\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webilia/connect/src',
         ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
@@ -1110,6 +1115,22 @@ class ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd
         'Symfony\\Polyfill\\Php80\\PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/PhpToken.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+        'Webilia\\Connect\\AuthorizationResult' => __DIR__ . '/..' . '/webilia/connect/src/AuthorizationResult.php',
+        'Webilia\\Connect\\Capability' => __DIR__ . '/..' . '/webilia/connect/src/Capability.php',
+        'Webilia\\Connect\\Client' => __DIR__ . '/..' . '/webilia/connect/src/Client.php',
+        'Webilia\\Connect\\Connection' => __DIR__ . '/..' . '/webilia/connect/src/Connection.php',
+        'Webilia\\Connect\\Contracts\\AuthorizationResult' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/AuthorizationResult.php',
+        'Webilia\\Connect\\Contracts\\Capability' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/Capability.php',
+        'Webilia\\Connect\\Contracts\\ConditionalConnectionStorage' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/ConditionalConnectionStorage.php',
+        'Webilia\\Connect\\Contracts\\Connection' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/Connection.php',
+        'Webilia\\Connect\\Contracts\\HttpClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/HttpClient.php',
+        'Webilia\\Connect\\Contracts\\Storage' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/Storage.php',
+        'Webilia\\Connect\\Contracts\\UpdateClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/UpdateClient.php',
+        'Webilia\\Connect\\Exception\\RequestException' => __DIR__ . '/..' . '/webilia/connect/src/Exception/RequestException.php',
+        'Webilia\\Connect\\Exception\\TransientException' => __DIR__ . '/..' . '/webilia/connect/src/Exception/TransientException.php',
+        'Webilia\\Connect\\WordPress\\UpdateClient' => __DIR__ . '/..' . '/webilia/connect/src/WordPress/UpdateClient.php',
+        'Webilia\\Connect\\WordPress\\WordPressHttpClient' => __DIR__ . '/..' . '/webilia/connect/src/WordPress/WordPressHttpClient.php',
+        'Webilia\\Connect\\WordPress\\WordPressStorage' => __DIR__ . '/..' . '/webilia/connect/src/WordPress/WordPressStorage.php',
         'Webilia\\Icons\\Base' => __DIR__ . '/..' . '/webilia/icons/app/Base.php',
         'Webilia\\Icons\\Boot' => __DIR__ . '/..' . '/webilia/icons/app/Boot.php',
         'Webilia\\Toast\\Base' => __DIR__ . '/..' . '/webilia/toast/app/Base.php',
@@ -1173,9 +1194,9 @@ class ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit1c7c234a3a40f2b1437086939c2120fd::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6::$classMap;
 
         }, null, ClassLoader::class);
     }

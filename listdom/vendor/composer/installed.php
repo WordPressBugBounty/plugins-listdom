@@ -3,7 +3,7 @@
         'name' => 'webilia/listdom',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'ae024bd9d751ecc3736f9b3261b4b603a160520f',
+        'reference' => '3eda6af9fdac710a8d442335df06580f3fb40d8d',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -253,6 +253,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'webilia/connect' => array(
+            'pretty_version' => '1.0.1',
+            'version' => '1.0.1.0',
+            'reference' => '6c54a14e79c9690ce48a1fd5726490d6245155f8',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../webilia/connect',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'webilia/icons' => array(
             'pretty_version' => '1.0.0',
             'version' => '1.0.0.0',
@@ -265,7 +274,7 @@
         'webilia/listdom' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'ae024bd9d751ecc3736f9b3261b4b603a160520f',
+            'reference' => '3eda6af9fdac710a8d442335df06580f3fb40d8d',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

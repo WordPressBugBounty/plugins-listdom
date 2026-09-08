@@ -140,6 +140,7 @@ class LSD_Cart extends LSD_Base
         if (isset($cart['items'][$id]))
         {
             $cart['items'][$id]['tier_id'] = sanitize_text_field($tier_id);
+            $cart['items'][$id] = apply_filters('lsd_cart_item_tier_updated', $cart['items'][$id], $cart['items'][$id]['tier_id'], $id);
             $this->save($cart);
         }
     }

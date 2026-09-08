@@ -3,12 +3,17 @@
 defined('ABSPATH') || die();
 
 /** @var LSD_Menus_Dashboard $this */
+$connect_notice = LSD_Webilia_Connect::notice();
+$connect_notice_type = in_array($connect_notice['type'] ?? '', ['error', 'info', 'success', 'warning'], true) ? $connect_notice['type'] : 'info';
 ?>
 <div class="wrap about-wrap lsd-wrap">
     <?php LSD_Menus::header(); ?>
 
     <div class="lsd-admin-main-wrapper">
         <?php echo lsd_ads('dashboard-top'); ?>
+        <?php if (!empty($connect_notice['message'])): ?>
+            <div class="lsd-alert lsd-<?php echo esc_attr($connect_notice_type); ?> lsd-my-0"><?php echo esc_html($connect_notice['message']); ?></div>
+        <?php endif; ?>
         <?php if ($this->isLite() && $this->isPastFromInstallationTime(604800)): // 7 days ?>
             <div class="lsd-alert-no-my"><?php echo LSD_Base::alert($this->upgradeMessage(), 'warning'); ?></div>
         <?php endif; ?>

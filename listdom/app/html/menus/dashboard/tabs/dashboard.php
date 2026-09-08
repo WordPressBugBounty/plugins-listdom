@@ -46,7 +46,7 @@ defined('ABSPATH') || die();
 
         <div class="welcome-video">
             <iframe width="640" height="360"
-                src="https://www.youtube-nocookie.com/embed/du_96cv6BAw?si=E1LwDdzdgdZNXpkw"
+                src="https://www.youtube-nocookie.com/embed/du_96cv6BAw?rel=0&amp;vq=hd1080"
                 title="YouTube video player" frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>

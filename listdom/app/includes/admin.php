@@ -23,6 +23,7 @@ class LSD_Admin extends LSD_Base
         // Notices
         add_action('admin_notices', ['LSD_Flash', 'show']);
         add_action('admin_notices', [$this, 'general_settings_roles_notice']);
+        add_action('admin_notices', [$this, 'loco_addon_translation_notice']);
         add_action('user_new_form', [$this, 'user_profile_roles_notice']);
         add_action('edit_user_profile', [$this, 'user_profile_roles_notice']);
         add_action('show_user_profile', [$this, 'user_profile_roles_notice']);
@@ -144,6 +145,67 @@ class LSD_Admin extends LSD_Base
                 <strong><?php esc_html_e('Listdom roles:', 'listdom'); ?></strong>
                 <?php echo esc_html($this->roles_notice_description()); ?>
             </p>
+        </div>
+        <?php
+    }
+
+    public function loco_addon_translation_notice(): void
+    {
+        if (!is_admin()) return;
+
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        if (strpos($page, 'loco') !== 0) return;
+
+        $domain = isset($_GET['domain']) ? sanitize_key(wp_unslash($_GET['domain'])) : '';
+        $bundle_domain = '';
+        if (isset($_GET['bundle']))
+        {
+            $bundle = sanitize_text_field(wp_unslash($_GET['bundle']));
+            $parts = explode('/', trim($bundle, '/'));
+
+            foreach ($parts as $part)
+            {
+                $part = sanitize_key($part);
+                if (strpos($part, 'listdom-') === 0)
+                {
+                    $bundle_domain = $part;
+                    break;
+                }
+            }
+        }
+
+        if ($bundle_domain) $domain = $bundle_domain;
+
+        if (!$domain || strpos($domain, 'listdom-') !== 0) return;
+
+        $listdom_url = add_query_arg([
+            'page' => 'loco-plugin',
+            'bundle' => 'listdom/listdom.php',
+            'action' => 'view',
+        ], admin_url('admin.php'));
+
+        ?>
+        <div class="lsd-ask-review-wrapper notice notice-info is-dismissible lsd-flex lsd-flex-row lsd-flex-content-start lsd-flex-items-start">
+            <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-flex-items-start">
+                <h3 class="lsd-m-0 lsd-admin-title">
+                    <?php esc_html_e('Listdom translation reminder', 'listdom'); ?>
+                </h3>
+                <p class="lsd-m-0">
+                    <?php
+                    echo wp_kses_post(sprintf(
+                        /* translators: %s: The Listdom product name. */
+                        __('Some strings used by this addon are provided by Listdom core. To fully translate the addon, please translate the %s strings as well.', 'listdom'),
+                        '<strong>' . esc_html__('Listdom', 'listdom') . '</strong>'
+                    ));
+                    ?>
+                </p>
+                <div class="lsd-ask-review-buttons lsd-flex lsd-flex-row lsd-gap-3 lsd-mt-3 lsd-flex-items-center">
+                    <a class="lsd-primary-button" href="<?php echo esc_url($listdom_url); ?>">
+                        <span><?php esc_html_e('Translate Listdom core', 'listdom'); ?></span>
+                        <i class="webilia-icon wbli-right-arrow"></i>
+                    </a>
+                </div>
+            </div>
         </div>
         <?php
     }

@@ -102,7 +102,7 @@ class LSD_Payments_Tier extends LSD_Base
     public function get_frequency_html(): string
     {
         $days = $this->get_frequency_days();
-        if ($days) return sprintf(esc_html__('Per %d days', 'listdom'), $days);
+        if ($days) return sprintf(_n('Per %d day', 'Per %d days', $days, 'listdom'), $days);
 
         return esc_html__('One time', 'listdom');
     }

@@ -491,7 +491,17 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Get Listdom options
         $lsd = isset($_POST['addons']) ? wp_unslash($_POST['addons']) : [];
-        $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
+        $lsd_raw = is_array($lsd) ? $lsd : [];
+        $lsd = LSD_Sanitize::deep($lsd_raw);
+
+        /**
+         * Allows trusted addons to preserve specific option values that require custom sanitization.
+         *
+         * @param array $lsd Sanitized addon options.
+         * @param array $lsd_raw Original unslashed addon options.
+         */
+        $lsd = apply_filters('lsd_addons_sanitized_options', $lsd, $lsd_raw);
+        if (!is_array($lsd)) $lsd = [];
 
         // Get current Addons options
         $current = get_option('lsd_addons', []);

@@ -14,7 +14,7 @@ $total = $order->get_total();
 $gateway_key = $order->get_gateway();
 $coupon = $order->get_coupon();
 $message = $order->get_message();
-$gateway = LSD_Payments::gateway($gateway_key);
+$gateway = $gateway_key ? LSD_Payments::gateway($gateway_key) : null;
 $recurring = $order->get_recurring();
 $payment_number = $order->get_recurring_number();
 

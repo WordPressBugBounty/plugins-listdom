@@ -14,6 +14,28 @@ class LSD_Statuses extends LSD_Base
     {
         add_action('init', function ()
         {
+            // Keep previously stored Listdom statuses queryable when the addon
+            // that normally registers them is temporarily deactivated.
+            $fallback_statuses = [
+                'offline' => __('Offline', 'listdom'),
+                'hold' => __('On Hold', 'listdom'),
+                'on-hold' => __('On Hold', 'listdom'),
+                'expired' => __('Expired', 'listdom'),
+                'inactive' => __('Inactive', 'listdom'),
+                'denied' => __('Denied', 'listdom'),
+            ];
+            foreach ($fallback_statuses as $key => $label)
+            {
+                if (!get_post_status_object($key)) register_post_status($key, [
+                    'label' => $label,
+                    'public' => false,
+                    'internal' => false,
+                    'protected' => true,
+                    'show_in_admin_status_list' => false,
+                    'show_in_admin_all_list' => false,
+                ]);
+            }
+
             $statuses = $this->statuses();
             foreach ($statuses as $key => $params) register_post_status($key, $params['args']);
         });
@@ -104,7 +126,7 @@ class LSD_Statuses extends LSD_Base
         $post_status = isset($_GET['post_status']) && trim($_GET['post_status']) ? sanitize_text_field($_GET['post_status']) : '';
         if (!$post_status || $post_status === 'all')
         {
-            $all = ['publish', 'private', 'future', 'draft', 'pending'];
+            $all = ['publish', 'private', 'future', 'draft', 'pending', 'offline', 'hold', 'on-hold', 'expired', 'inactive', 'denied'];
 
             $statuses = $this->statuses();
             foreach ($statuses as $key => $status) $all[] = $key;

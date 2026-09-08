@@ -49,6 +49,7 @@ jQuery(document).ready(function()
                     'provider' => $this->map_provider,
                     'clustering' => $this->skin_options['clustering'] ?? true,
                     'clustering_images' => $this->skin_options['clustering_images'] ?? '',
+                    'clustering_color' => $this->skin_options['clustering_color'] ?? '#3f51b5',
                     'mapstyle' => $this->skin_options['mapstyle'] ?? '',
                     'id' => $this->id,
                     'sidebar' => $this->sidebar,

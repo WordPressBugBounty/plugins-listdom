@@ -3726,7 +3726,8 @@ const ListdomPageScroll = {
 
     getScrollableModalContainers(target) {
         const modalContent = target.closest('.lsd-modal-content');
-        if (!modalContent) return [];
+        const select2Dropdown = target.closest('.select2-dropdown');
+        if (!modalContent && !select2Dropdown) return [];
 
         const containers = [];
         let node = target;
@@ -3742,7 +3743,7 @@ const ListdomPageScroll = {
                 if (canScrollY || canScrollX) containers.push(node);
             }
 
-            if (node === modalContent) break;
+            if (node === modalContent || node === select2Dropdown) break;
             node = node.parentElement;
         }
 

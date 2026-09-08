@@ -88,15 +88,22 @@ $render_announcement = function (array $announcement, string $tab) use ($announc
             </button>
         <?php endif; ?>
 
-        <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-addons')); ?>" class="lsd-text-button lsd-header-addons-button">
+        <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-connect&tab=addons')); ?>" class="lsd-text-button lsd-header-addons-button">
             <i class="webilia-icon wbli-add-plus-circle"></i>
             <span><?php echo esc_html__('Addons', 'listdom'); ?></span>
         </a>
 
-        <a href="<?php echo esc_url(LSD_Base::getAccountURL()); ?>" target="_blank" class="lsd-text-button">
-            <i class="webilia-icon wbli-user-circle"></i>
-            <span><?php echo esc_html(sprintf(__('My %s Account', 'listdom'), LSD_Branding::name())); ?></span>
-        </a>
+        <?php if ($can_manage_options): ?>
+            <?php
+                $connect_connected = LSD_Webilia_Connect::enabled() && LSD_Webilia_Connect::isConnected();
+                $connect_return_url = admin_url('admin.php?page=listdom-connect&tab=connect');
+                $connect_url = $connect_connected ? $connect_return_url : LSD_Webilia_Connect::connectUrl($connect_return_url);
+            ?>
+            <a href="<?php echo esc_url($connect_url); ?>" class="lsd-primary-button lsd-header-connect-button<?php echo $connect_connected ? ' lsd-header-connect-button-connected' : ''; ?>">
+                <i class="webilia-icon <?php echo $connect_connected ? 'wbli-checkmark-circle' : 'wbli-link-square'; ?>" aria-hidden="true"></i>
+                <span><?php echo $connect_connected ? esc_html__('Connected to Webilia', 'listdom') : esc_html__('Connect Now', 'listdom'); ?></span>
+            </a>
+        <?php endif; ?>
 
         <?php echo lsd_ads('header-links-end'); ?>
     </div>
@@ -142,7 +149,13 @@ $render_announcement = function (array $announcement, string $tab) use ($announc
 <?php if (is_array($menus) && count($menus)): ?>
   <div class="lsd-header-submenu">
       <?php foreach ($menus as $menu): if (!isset($menu['title']) || !isset($menu['url'])) continue; ?>
-      <a href="<?php echo esc_url($menu['url']); ?>" class="lsd-submenu-item<?php echo isset($menu['selected']) && $menu['selected'] ? ' selected' : ''; ?>"><?php echo esc_html($menu['title']); ?></a>
+      <?php $badge = isset($menu['badge']) ? (int) $menu['badge'] : 0; ?>
+      <a href="<?php echo esc_url($menu['url']); ?>" class="lsd-submenu-item<?php echo isset($menu['selected']) && $menu['selected'] ? ' selected' : ''; ?>">
+          <?php if (!empty($menu['icon'])): ?><i class="webilia-icon <?php echo esc_attr($menu['icon']); ?>" aria-hidden="true"></i><?php endif; ?>
+          <?php echo esc_html($menu['title']); ?>
+          <?php if ($badge > 0): ?><span class="update-plugins count-<?php echo esc_attr($badge); ?>"><span class="update-count"><?php echo esc_html($badge); ?></span></span><?php endif; ?>
+      </a>
       <?php endforeach; ?>
   </div>
 <?php endif;
+?>

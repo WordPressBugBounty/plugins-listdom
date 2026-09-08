@@ -421,6 +421,7 @@ class LSD_Assets extends LSD_Base
             'startOfWeek' => (int) get_option('start_of_week', 0),
             'datepicker_format' => (isset($this->settings['datepicker_format']) && trim((string) $this->settings['datepicker_format']) ? $this->settings['datepicker_format'] : 'yyyy-mm-dd'),
             'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
+            'i18n_checkout_failed' => esc_html__('Unable to complete checkout. Please try again.', 'listdom'),
         ]);
     }
 
@@ -694,9 +695,8 @@ class LSD_Assets extends LSD_Base
                     'listdom-blueprints',
                     'listdom-ix',
                     LSD_Base::WELCOME_SLUG,
-                    'listdom-addons',
+                    'listdom-connect',
                     'listdom-launch-checklist',
-                    'listdom-licenses',
                     'toplevel_page_listdom',
                     'widgets',
                     'plugins',

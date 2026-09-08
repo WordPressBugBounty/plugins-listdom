@@ -29,4 +29,5 @@ $comment = $payments['free_checkout_comment'] ?? '';
         <?php esc_html_e('Complete Purchase', 'listdom'); ?>
         <i class="fa-solid fa-long-arrow-right"></i>
     </button>
+    <div class="lsd-checkout-response"></div>
 </div>

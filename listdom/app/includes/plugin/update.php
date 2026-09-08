@@ -39,6 +39,10 @@ class LSD_Plugin_Update
             $args['server'] ?? 'https://api.webilia.com/update'
         );
 
+        // Connect registers after legacy metadata and only overrides its
+        // package when the configured update capability is authorized.
+        LSD_Webilia_Connect::updateClient($this->basename, $args['version']);
+
         if ($this->license_gate)
         {
             add_filter('upgrader_pre_download', [$this, 'block'], 10, 4);
@@ -54,8 +58,7 @@ class LSD_Plugin_Update
 
         if (is_array($hook_extra) && isset($hook_extra['plugin']) && $hook_extra['plugin'] === $this->basename)
         {
-            $valid = LSD_Licensing::isValid($this->basename, $this->prefix);
-            if ($valid !== 1)
+            if (!LSD_Licensing::isUpdateAllowed($this->basename, $this->prefix))
             {
                 $renew_link = sprintf(
                     '<a href="%s" target="_blank">%s</a>',
@@ -70,7 +73,7 @@ class LSD_Plugin_Update
                             'An error occurred while updating this add-on: please %1$s or %2$s your license to receive updates.',
                             'listdom'
                         ),
-                        '<a href="' . admin_url('admin.php?page=listdom-licenses') . '" target="_parent">' . esc_html__('activate', 'listdom') . '</a>',
+                        '<a href="' . admin_url('admin.php?page=listdom-connect&tab=licenses') . '" target="_parent">' . esc_html__('activate', 'listdom') . '</a>',
                         wp_kses($renew_link, ['a' => ['href' => [], 'target' => []]])
                     )
                 );
@@ -85,8 +88,7 @@ class LSD_Plugin_Update
         if (!$this->license_gate) return;
         if (!$this->basename || !$this->prefix || !is_array($plugin_data)) return;
 
-        $valid = LSD_Licensing::isValid($this->basename, $this->prefix);
-        if ($valid === 1) return;
+        if (LSD_Licensing::isUpdateAllowed($this->basename, $this->prefix)) return;
 
         $version = $response->new_version ?? '';
         $renew_link = sprintf(
@@ -101,7 +103,7 @@ class LSD_Plugin_Update
                 esc_html__('%1$s %2$s is available. Please %3$s or %4$s your license to receive this update.', 'listdom'),
                 esc_html($plugin_data['Name'] ?? esc_html__('This add-on', 'listdom')),
                 esc_html($version),
-                '<a href="' . admin_url('admin.php?page=listdom-licenses') . '" target="_parent">' . esc_html__('activate', 'listdom') . '</a>',
+                '<a href="' . admin_url('admin.php?page=listdom-connect&tab=licenses') . '" target="_parent">' . esc_html__('activate', 'listdom') . '</a>',
                 wp_kses($renew_link, ['a' => ['href' => [], 'target' => []]])
             )
             : esc_html__('A new version is available. You need an active license to update this add-on.', 'listdom');

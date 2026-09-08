@@ -17,7 +17,7 @@ if (!is_array($labels) || !count($labels)) return '';
         <?php endforeach; ?>
     </ul>
 <?php else: ?>
-    <ul class="lsd-labels-list">
+    <ul class="lsd-labels-list lsd-labels-list-chips">
         <?php foreach ($labels as $label): ?>
             <li class="lsd-labels-list-item">
                 <?php if ($this->enable_link): ?>

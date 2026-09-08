@@ -1342,7 +1342,7 @@ class LSD_Dashboard_Payments extends LSD_Base
     {
         if ($days < 1) return '';
 
-        return sprintf(esc_html__('%d Days', 'listdom'), $days);
+        return sprintf(_n('%d Day', '%d Days', $days, 'listdom'), $days);
     }
 
     protected function get_plan_interval_days(?LSD_Payments_Plan $plan): int
@@ -2386,7 +2386,7 @@ class LSD_Dashboard_Payments extends LSD_Base
             'percent' => $progress_percent,
             'next_renewal' => $next_renewal_timestamp > 0 ? $this->format_activity_date($next_renewal_timestamp) : esc_html__('N/A', 'listdom'),
             'label' => sprintf(
-                esc_html__('%1$s days remaining', 'listdom'),
+                _n('%1$s day remaining', '%1$s days remaining', $remaining_days, 'listdom'),
                 sprintf(
                     '<span class="lsd-status-label lsd-status-%1$s">%2$d</span>',
                     esc_attr($state),
@@ -2432,7 +2432,7 @@ class LSD_Dashboard_Payments extends LSD_Base
                 'icon' => 'fa-solid fa-circle-exclamation',
                 'title' => esc_html__('Auto-renewal is disabled', 'listdom'),
                 'message' => sprintf(
-                    esc_html__('This subscription will expire on %1$s (%2$d days). Activate the auto-renewal or extend it to avoid loosing the function and features of this subscription.', 'listdom'),
+                    _n('This subscription will expire on %1$s (%2$d day). Activate the auto-renewal or extend it to avoid loosing the function and features of this subscription.', 'This subscription will expire on %1$s (%2$d days). Activate the auto-renewal or extend it to avoid loosing the function and features of this subscription.', $remaining_days, 'listdom'),
                     $next_renewal_timestamp > 0 ? $this->format_activity_date($next_renewal_timestamp) : esc_html__('N/A', 'listdom'),
                     $remaining_days
                 ),
@@ -2444,7 +2444,7 @@ class LSD_Dashboard_Payments extends LSD_Base
             'icon' => 'fa-solid fa-circle-check',
             'title' => esc_html__('Auto-renewal scheduled', 'listdom'),
             'message' => sprintf(
-                esc_html__('This subscription renews on %1$s (%2$d days)', 'listdom'),
+                _n('This subscription renews on %1$s (%2$d day)', 'This subscription renews on %1$s (%2$d days)', $remaining_days, 'listdom'),
                 $next_renewal_timestamp > 0 ? $this->format_activity_date($next_renewal_timestamp) : esc_html__('N/A', 'listdom'),
                 $remaining_days
             ),
@@ -2520,7 +2520,7 @@ class LSD_Dashboard_Payments extends LSD_Base
     {
         if ($frequency_days < 1) return esc_html__('N/A', 'listdom');
 
-        return sprintf(esc_html__('%d days', 'listdom'), $frequency_days);
+        return sprintf(_n('%d day', '%d days', $frequency_days, 'listdom'), $frequency_days);
     }
 
     protected function get_listing_title(int $listing_id): string

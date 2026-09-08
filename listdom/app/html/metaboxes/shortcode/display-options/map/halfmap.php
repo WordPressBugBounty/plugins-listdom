@@ -204,12 +204,12 @@ $infowindow_trigger = $halfmap['mapobject_infowindow_trigger'] ?? 'click';
                     ]); ?>
                 </div>
             </div>
-            <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap">
+            <div class="lsd-map-provider-dependency lsd-map-provider-dependency-googlemap lsd-map-provider-dependency-leaflet">
                 <div id="lsd_display_options_skin_halfmap_clustering_options" <?php echo ((!isset($halfmap['clustering']) || $halfmap['clustering']) ? '' : 'style="display: none;"'); ?>>
-                    <div class="lsd-form-row">
+                    <div class="lsd-form-row lsd-map-provider-dependency lsd-map-provider-dependency-googlemap lsd-map-provider-dependency-leaflet">
                         <div class="lsd-col-3"><?php echo LSD_Form::label([
                                 'class' => 'lsd-fields-label',
-                                'title' => esc_html__('Bubbles', 'listdom'),
+                                'title' => esc_html__('Bubble Style', 'listdom'),
                                 'for' => 'lsd_display_options_skin_halfmap_clustering_images',
                             ]); ?></div>
                         <div class="lsd-col-7">
@@ -219,10 +219,11 @@ $infowindow_trigger = $halfmap['mapobject_infowindow_trigger'] ?? 'click';
                                 'name' => 'lsd[display][halfmap][clustering_images]',
                                 'options' => LSD_Base::get_clustering_icons(),
                                 'value' => $halfmap['clustering_images'] ?? 'img/cluster1/m'
-                            ]); ?>
+                                ]); ?>
+                            </div>
                         </div>
+                        <div class="lsd-form-row"><div class="lsd-col-3"><?php echo LSD_Form::label(['class' => 'lsd-fields-label', 'title' => esc_html__('Cluster Color', 'listdom'), 'for' => 'lsd_display_options_skin_halfmap_clustering_color']); ?></div><div class="lsd-col-7"><?php echo LSD_Form::colorpicker(['class' => 'lsd-colorpicker', 'id' => 'lsd_display_options_skin_halfmap_clustering_color', 'name' => 'lsd[display][halfmap][clustering_color]', 'value' => $halfmap['clustering_color'] ?? '#3f51b5', 'default' => '#3f51b5']); ?></div></div>
                     </div>
-                </div>
             </div>
         </div>
 

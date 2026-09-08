@@ -203,7 +203,11 @@ class LSD_Form extends LSD_Base
         }
 
         $required = isset($args['required']) && $args['required'];
-        return '<textarea class="' . (isset($args['class']) ? esc_attr($args['class']) : '') .'" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" placeholder="' . (isset($args['placeholder']) ? esc_attr($args['placeholder']) : '') . '" rows="' . (isset($args['rows']) ? esc_attr($args['rows']) : '') . '" ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '>' . (isset($args['value']) ? esc_textarea(stripslashes($args['value'])) : '') . '</textarea>';
+        $strip_slashes = !isset($args['strip_slashes']) || $args['strip_slashes'];
+        $value = isset($args['value']) ? $args['value'] : '';
+        if ($strip_slashes) $value = stripslashes($value);
+
+        return '<textarea class="' . (isset($args['class']) ? esc_attr($args['class']) : '') .'" name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" placeholder="' . (isset($args['placeholder']) ? esc_attr($args['placeholder']) : '') . '" rows="' . (isset($args['rows']) ? esc_attr($args['rows']) : '') . '" ' . trim($attributes) . ' ' . ($required ? 'required' : '') . '>' . esc_textarea($value) . '</textarea>';
     }
 
     public static function editor($args = [])

@@ -17,6 +17,8 @@ defined('ABSPATH') || die();
         <?php foreach ($items as $id => $item):
             $plan_id = (int) ($item['plan_id'] ?? 0);
             $tier_id = $item['tier_id'] ?? '';
+            $listing_id = isset($item['meta']['lsd_listing_id']) ? absint($item['meta']['lsd_listing_id']) : 0;
+            $listing_title = $listing_id && get_post_type($listing_id) === LSD_Base::PTYPE_LISTING ? get_the_title($listing_id) : '';
 
             $plan = new LSD_Payments_Plan($plan_id, $tier_id);
             $tiers = $plan->get_tiers();
@@ -31,7 +33,13 @@ defined('ABSPATH') || die();
             ?>
             <div class="lsd-cart-item lsd-fe-box-white">
                 <div class="lsd-cart-item-info">
-                    <h3 class="lsd-cart-item-title lsd-fe-title"><?php echo esc_html(get_the_title($plan_id)); ?></h3>
+                    <div class="lsd-cart-item-heading">
+                        <h3 class="lsd-cart-item-title lsd-fe-title"><?php echo esc_html(get_the_title($plan_id)); ?></h3>
+
+                        <?php if ($listing_title): ?>
+                            <div class="lsd-cart-item-listing lsd-fe-description"><?php echo esc_html($listing_title); ?></div>
+                        <?php endif; ?>
+                    </div>
 
                     <?php if (count($tiers) > 1): ?>
                         <div class="lsd-checkout-tier">

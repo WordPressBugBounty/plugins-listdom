@@ -13,14 +13,28 @@ jQuery(document).ready(function()
     {
         ajax_url: "' . admin_url('admin-ajax.php', null) . '",
         page: ' . wp_json_encode($this->page) . ',
-        nonce: "' . wp_create_nonce('lsd_dashboard') . '"
+        nonce: "' . wp_create_nonce('lsd_dashboard') . '",
+        messages: ' . wp_json_encode([
+            'delete' => esc_html__('Unable to delete the listing.', 'listdom'),
+            'status' => esc_html__('Unable to update the listing status.', 'listdom'),
+            'schedule' => esc_html__('Unable to update the schedule.', 'listdom'),
+            'visibility' => esc_html__('Unable to update the visibility.', 'listdom'),
+        ]) . '
     });
 });
 </script>');
 
-global $wp_post_statuses;
 $counts = $this->listing_counts();
-$current_status = isset($_GET['status']) ? sanitize_text_field(wp_unslash($_GET['status'])) : '';
+$status_data = $this->get_listing_statuses_data();
+$requested_status = isset($_GET['status']) ? sanitize_key(wp_unslash($_GET['status'])) : '';
+$current_status = isset($status_data[$requested_status]) ? $requested_status : '';
+$status_filter_args = [];
+foreach ($_GET as $query_key => $query_value) {
+    if (in_array($query_key, ['status', 'paged', 'page'], true) || !is_scalar($query_value)) continue;
+    $status_filter_args[sanitize_key($query_key)] = sanitize_text_field(wp_unslash($query_value));
+}
+$status_filter_url = $this->url ?: (new LSD_Main())->current_url();
+if (count($status_filter_args)) $status_filter_url = add_query_arg($status_filter_args, $status_filter_url);
 
 $dashboard_wrapper = $this->get_dashboard_wrapper();
 ?>
@@ -56,15 +70,15 @@ $dashboard_wrapper = $this->get_dashboard_wrapper();
                     <?php echo LSD_Form::search(['id' => 'lsd_dashboard_search', 'name' => 'lsd_s', 'placeholder' => esc_attr__('Search…', 'listdom'), 'value' => $this->search]); ?>
                     <button type="submit" class="lsd-search-button"><?php esc_html_e('Search', 'listdom'); ?></button>
                 </form>
-                <?php if (count($counts) && is_array($wp_post_statuses) && count($wp_post_statuses)): ?>
+                <?php if (count($counts)): ?>
                     <div class="lsd-dashboard-listing-status-filter lsd-fe-tabs">
                         <ul class="lsd-fe-tabs-nav">
                             <li class="<?php echo $current_status === '' ? 'lsd-active' : ''; ?>">
-                                <a href="<?php echo (new LSD_Main())->remove_qs_var('status'); ?>"><?php esc_html_e('All', 'listdom'); ?></a>
+                                <a href="<?php echo esc_url((new LSD_Main())->remove_qs_var('status', $status_filter_url)); ?>"><?php esc_html_e('All', 'listdom'); ?></a>
                             </li>
-                            <?php foreach ($counts as $status => $count): if (!$count || !isset($wp_post_statuses[$status])) continue; if (!isset($wp_post_statuses[$status]->show_in_admin_status_list) || !$wp_post_statuses[$status]->show_in_admin_status_list) continue; ?>
+                            <?php foreach ($counts as $status => $count): if (!$count || !isset($status_data[$status])) continue; ?>
                                 <li class="<?php echo $current_status === $status ? 'lsd-active' : ''; ?>">
-                                    <a href="<?php echo (new LSD_Main())->add_qs_var('status', $status); ?>"><?php echo esc_html($wp_post_statuses[$status]->label); ?></a>
+                                    <a href="<?php echo esc_url((new LSD_Main())->add_qs_var('status', $status, $status_filter_url)); ?>"><?php echo esc_html($status_data[$status]['label']); ?></a>
                                 </li>
                             <?php endforeach; ?>
                         </ul>

@@ -1103,6 +1103,62 @@ jQuery(document).ready(function ($)
     if (typeof $.fn.wpColorPicker !== 'undefined') $('.lsd-colorpicker').wpColorPicker();
 
     /**
+     * Cluster color visibility
+     */
+    const toggleClusterStyle = function ($style) {
+        const provider = $style.closest('.lsd-skin-display-options').find('.lsd-map-provider-toggle').val();
+        const classic = 'img/cluster1/m';
+        const custom = 'cluster-color';
+        let $options = $style.data('lsd-clustering-options');
+
+        if (!$options)
+        {
+            $options = $style.children('option').clone();
+            $style.data('lsd-clustering-options', $options);
+        }
+
+        if (provider === 'leaflet')
+        {
+            const value = $style.val();
+            if (value !== classic && value !== custom) $style.data('lsd-google-clustering-style', value);
+
+            $style.empty();
+            $options.each(function () {
+                if ([classic, custom].includes($(this).val())) $style.append($(this).clone());
+            });
+            $style.val(value === custom ? custom : classic);
+        }
+        else
+        {
+            const value = $style.val();
+            $style.empty().append($options.clone());
+
+            const googleStyle = $style.data('lsd-google-clustering-style') || value;
+            if (googleStyle) $style.val(googleStyle);
+        }
+    };
+
+    const toggleClusterColor = function ($style) {
+        const $colorRow = $style.closest('.lsd-form-row').next('.lsd-form-row');
+        if (!$colorRow.find('input[name*="[clustering_color]"]').length) return;
+
+        $colorRow.addClass('lsd-clustering-color-option').css('margin-top', '12px').toggle($style.val() === 'cluster-color');
+    };
+
+    $('[id$="_clustering_images"]').each(function () {
+        const $style = $(this);
+        toggleClusterStyle($style);
+        toggleClusterColor($style);
+    }).on('change', function () {
+        const $style = $(this);
+        const provider = $style.closest('.lsd-skin-display-options').find('.lsd-map-provider-toggle').val();
+        if (provider === 'googlemap') $style.removeData('lsd-google-clustering-style');
+
+        toggleClusterStyle($style);
+        toggleClusterColor($style);
+    });
+
+    /**
      * Listdom Flatpickr
      */
     if (typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr(document);
@@ -1359,6 +1415,11 @@ jQuery(document).ready(function ($)
 
         $(parent + ' .lsd-map-provider-dependency').hide();
         $(parent + ' .lsd-map-provider-dependency-' + provider).show();
+        $(parent + ' [id$="_clustering_images"]').each(function () {
+            const $style = $(this);
+            toggleClusterStyle($style);
+            toggleClusterColor($style);
+        });
     }).trigger('change');
 
     $('.lsd-default-view-toggle').on('change', function ()

@@ -10,7 +10,7 @@ class LSD_Branding extends LSD_Base
             'support_url' => LSD_Base::addUtmParameters('https://listdom.net/support/'),
             'docs_url' => LSD_Base::addUtmParameters('https://api.webilia.com/go/listdom-docs'),
             'shop_url' => 'https://api.webilia.com/go/shop',
-            'account_url' => LSD_Base::addUtmParameters('https://listdom.net/my-account/'),
+            'account_url' => LSD_Base::addUtmParameters('https://my.webilia.com'),
             'manage_licenses_url' => 'https://api.webilia.com/go/my-account',
             'plugin_uri' => 'https://listdom.net',
             'author_uri' => 'https://webilia.com/',

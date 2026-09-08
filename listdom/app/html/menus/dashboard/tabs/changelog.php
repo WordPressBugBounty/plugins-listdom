@@ -3,6 +3,14 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v6.0.0 <span>September 7th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added Webilia Connect activation and account-based add-on updates.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added a streamlined action menu to the My Listings dashboard.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed default notification setup on new installations.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed an issue in payment-order handling when a gateway is unavailable.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed modal scrolling conflicts with Select2 fields.', 'listdom'); ?></li>
+    </ul>
     <h2>v5.9.0 <span>August 22nd, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Added resume-able CSV and Excel imports with activity history and Resume or Discard controls.', 'listdom'); ?></li>

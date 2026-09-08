@@ -314,6 +314,39 @@ class LSD_Taxonomies extends LSD_Base
         return $term ? $term->name : '';
     }
 
+    public static function get_labels_data($labels = []): array
+    {
+        if (!is_array($labels)) $labels = [$labels];
+
+        $data = [];
+
+        foreach ($labels as $label_id)
+        {
+            $term = get_term((int) $label_id, LSD_Base::TAX_LABEL);
+            if (!($term instanceof WP_Term)) continue;
+
+            $color = (string) get_term_meta($term->term_id, 'lsd_color', true);
+
+            $data[] = [
+                'id' => (int) $term->term_id,
+                'name' => $term->name,
+                'color' => $color,
+                'background_color' => LSD_Color::with_opacity($color),
+            ];
+        }
+
+        return $data;
+    }
+
+    public static function label_chip_style(array $label_data): string
+    {
+        $color = isset($label_data['color']) ? trim((string) $label_data['color']) : '';
+        $color = sanitize_hex_color($color);
+        if (!$color) return '';
+
+        return 'color: ' . LSD_Color::text_color($color) . '; border-color: ' . $color . '; background-color: ' . $color . ';';
+    }
+
     public static function resolve_term_ids(string $taxonomy, $values): array
     {
         if (!is_array($values)) $values = [$values];

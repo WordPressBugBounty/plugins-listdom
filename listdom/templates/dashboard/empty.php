@@ -6,8 +6,15 @@ defined('ABSPATH') || die();
 /** @var array $empty_state */
 
 $empty_state = isset($empty_state) && is_array($empty_state) ? $empty_state : [];
+$classes = ['lsd-dashboard-empty-state'];
+
+foreach (($empty_state['classes'] ?? []) as $class)
+{
+    $class = sanitize_html_class($class);
+    if ($class !== '') $classes[] = $class;
+}
 ?>
-<div class="lsd-dashboard-empty-state">
+<div class="<?php echo esc_attr(implode(' ', array_unique($classes))); ?>">
     <div class="lsd-dashboard-empty-state-illustration" aria-hidden="true">
         <img src="<?php echo esc_url($this->lsd_asset_url($empty_state['image'] ?? 'img/dashboard/no-listings.svg')); ?>" alt="<?php echo esc_attr($empty_state['title'] ?? esc_attr__('Nothing here yet', 'listdom')); ?>">
     </div>

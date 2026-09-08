@@ -37,7 +37,7 @@ class LSD_Checklist_Provider_Monetization extends LSD_Checklist_Provider_Base
         if (!LSD_Payments_Engine::instance()->listdom()) return ['status' => LSD_Checklist_Result::STATUS_OPTIONAL, 'message' => esc_html__('Listdom Engine Payments are disabled on this site.', 'listdom'),];
 
         $post_type = $this->packages_post_type();
-        if (!post_type_exists($post_type)) return ['status' => LSD_Checklist_Result::STATUS_OPTIONAL, 'message' => esc_html__('Activate Listdom Membership or enable it through an active toolkit to create pricing packages.', 'listdom'), 'action_label' => esc_html__('View', 'listdom'), 'action_url' => admin_url('admin.php?page=listdom-addons'),];
+        if (!post_type_exists($post_type)) return ['status' => LSD_Checklist_Result::STATUS_OPTIONAL, 'message' => esc_html__('Activate Listdom Membership or enable it through an active toolkit to create pricing packages.', 'listdom'), 'action_label' => esc_html__('View', 'listdom'), 'action_url' => admin_url('admin.php?page=listdom-connect&tab=addons'),];
 
         $packages = $this->helper->published_posts_count($post_type);
 
@@ -107,7 +107,7 @@ class LSD_Checklist_Provider_Monetization extends LSD_Checklist_Provider_Base
     {
         $post_type = $this->packages_post_type();
 
-        if ($post_type === '' || !post_type_exists($post_type)) return admin_url('admin.php?page=listdom-addons');
+        if ($post_type === '' || !post_type_exists($post_type)) return admin_url('admin.php?page=listdom-connect&tab=addons');
         $post_id = $this->helper->first_published_post_id($post_type);
 
         return $post_id > 0 ? $this->helper->edit_post_url($post_id) : $this->helper->post_new_url($post_type);

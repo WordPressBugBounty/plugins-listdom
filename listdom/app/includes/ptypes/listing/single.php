@@ -562,7 +562,28 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         . '</div>';
 
         // Remove remained placeholders
-        return preg_replace('/{.*}/', '', apply_filters('lsd_listing_single_content', $rendered, $this));
+        return $this->remove_remaining_placeholders(apply_filters('lsd_listing_single_content', $rendered, $this));
+    }
+
+    protected function remove_remaining_placeholders(string $content): string
+    {
+        $segments = preg_split(
+            '~(<script\\b[^>]*>.*?</script\\s*>|<style\\b[^>]*>.*?</style\\s*>)~is',
+            $content,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE
+        );
+
+        if (!is_array($segments)) return $content;
+
+        foreach ($segments as $index => $segment)
+        {
+            if ($index % 2 === 1) continue;
+
+            $segments[$index] = preg_replace('/{[^{}]*}/', '', $segment);
+        }
+
+        return implode('', $segments);
     }
 
     /**

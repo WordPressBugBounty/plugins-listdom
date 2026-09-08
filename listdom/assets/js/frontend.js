@@ -1,6 +1,47 @@
 // Requests Object for Skins
 let listdomPageHistoryCache = window.location.href;
 let lsdDistanceReferenceState = {};
+const lsdClusterColorPresets = {
+    red: "#e53935",
+    green: "#43a047",
+    yellow: "#fdd835",
+    orange: "#fb8c00",
+    purple: "#8e24aa",
+    pink: "#d81b60",
+    white: "#ffffff",
+    black: "#000000",
+};
+
+function lsdGetClusterColor(style, color) {
+    if (typeof style !== "string") return "";
+
+    if (style === "cluster-color") {
+        return typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color) ? color : "#3f51b5";
+    }
+
+    if (style.indexOf("cluster-color-") !== 0) return "";
+
+    return lsdClusterColorPresets[style.substring("cluster-color-".length)] || "";
+}
+
+function lsdGetClusterTextColor(background) {
+    const hex = background.replace("#", "");
+    const red = parseInt(hex.substring(0, 2), 16);
+    const green = parseInt(hex.substring(2, 4), 16);
+    const blue = parseInt(hex.substring(4, 6), 16);
+    const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+
+    return luminance > 0.6 ? "#111111" : "#ffffff";
+}
+
+function lsdGetClusterSvgUrl(color, size) {
+    const center = size / 2;
+    const radius = (size - 2) / 2;
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '"><circle cx="' + center + '" cy="' + center + '" r="' + radius + '" fill="' + color + '" opacity=".22"/><circle cx="' + center + '" cy="' + center + '" r="' + (radius * .78) + '" fill="' + color + '" opacity=".58"/><circle cx="' + center + '" cy="' + center + '" r="' + (radius * .58) + '" fill="' + color + '" opacity=".96" stroke="#ffffff" stroke-opacity=".45" stroke-width="1"/></svg>';
+
+    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+}
+
 const lsdDistanceReferenceKeys = [
     "sf-distance-reference-source",
     "sf-gps-latitude",
@@ -4170,6 +4211,7 @@ function ListdomDetails(id, link, settings) {
                 icon: "../img/m-01.png",
                 clustering: false,
                 clustering_images: "",
+                clustering_color: "#3f51b5",
                 richmarker: "",
                 objects: {},
                 styles: "",
@@ -4259,9 +4301,23 @@ function ListdomDetails(id, link, settings) {
 
         // Load Clustering
         if (settings.clustering) {
+            const clusterColor = lsdGetClusterColor(settings.clustering_images, settings.clustering_color);
             clustering = L.markerClusterGroup({
                 chunkedLoading: true,
                 spiderfyOnMaxZoom: true,
+                iconCreateFunction: clusterColor ? function (cluster) {
+                    const count = cluster.getChildCount();
+                    const clusterSizes = [53, 56, 66, 78, 90];
+                    const clusterSize = clusterSizes[Math.min(String(count).length, clusterSizes.length) - 1];
+                    const clusterInnerSize = Math.round(clusterSize * 0.65);
+                    const textColor = lsdGetClusterTextColor(clusterColor);
+
+                    return new L.DivIcon({
+                        html: '<div class="lsd-cluster-color-ring" style="--lsd-cluster-size:' + clusterSize + 'px;--lsd-cluster-inner-size:' + clusterInnerSize + 'px;border-color:' + clusterColor + ';background-color:' + clusterColor + '38;"><div style="background-color:' + clusterColor + ';color:' + textColor + ';">' + count + '</div></div>',
+                        className: "marker-cluster lsd-marker-cluster-color",
+                        iconSize: new L.Point(clusterSize, clusterSize),
+                    });
+                } : null,
             });
         }
 
@@ -5009,6 +5065,7 @@ function ListdomDetails(id, link, settings) {
                 icon: "../img/m-01.png",
                 clustering: false,
                 clustering_images: "",
+                clustering_color: "#3f51b5",
                 richmarker: "",
                 objects: {},
                 styles: "",
@@ -5141,6 +5198,7 @@ function ListdomDetails(id, link, settings) {
 
         // Load Clustering
         if (settings.clustering) {
+            const clusterColor = lsdGetClusterColor(settings.clustering_images, settings.clustering_color);
             $head.append(
                 '<script type="text/javascript" src="' +
                 settings.clustering +
@@ -5151,10 +5209,10 @@ function ListdomDetails(id, link, settings) {
 
             const clusterStyles = clusterSizes.map(function (size, index) {
                 return {
-                    url: settings.clustering_images + (index + 1) + ".png",
+                    url: clusterColor ? lsdGetClusterSvgUrl(clusterColor, size) : settings.clustering_images + (index + 1) + ".png",
                     height: size,
                     width: size,
-                    textColor: settings.clustering_text_color || "#ffffff",
+                    textColor: clusterColor ? lsdGetClusterTextColor(clusterColor) : settings.clustering_text_color || "#ffffff",
                     textSize: 11,
                 };
             });
@@ -8601,6 +8659,864 @@ if (typeof jQuery !== 'undefined')
     });
 }
 
+window.lsdDashboardInitPromotions = function (context)
+{
+    if (typeof jQuery === 'undefined') return;
+
+    const $ = jQuery;
+    const $context = context && context.length ? context : $(document);
+
+    const escapeHtml = function (value)
+    {
+        return $('<div></div>').text((value || '').toString()).html();
+    };
+
+    const showMessage = function (message, type)
+    {
+        if (!message) return;
+
+        if (typeof listdom_toastify === 'function')
+        {
+            listdom_toastify(message, type || 'lsd-info');
+            return;
+        }
+
+        window.alert(message);
+    };
+
+    $context.find('.lsd-dashboard-promotions').each(function ()
+    {
+        const $root = $(this);
+        if ($root.data('lsdPromotionsReady')) return;
+
+        const ajaxUrl = ($root.data('promotionsAjaxUrl') || lsd.ajaxurl || '').toString();
+        const checkoutNonce = ($root.data('promotionsCheckoutNonce') || '').toString();
+        const topupCheckoutNonce = ($root.data('promotionsTopupCheckoutNonce') || '').toString();
+        const removeNonce = ($root.data('promotionsRemoveNonce') || '').toString();
+        const removeTopupNonce = ($root.data('promotionsRemoveTopupNonce') || '').toString();
+        const listingsNonce = ($root.data('promotionsListingsNonce') || '').toString();
+        const topupRecordsNonce = ($root.data('promotionsTopupRecordsNonce') || '').toString();
+        const messageSelectLabel = ($root.data('promotionsMessageSelectLabel') || '').toString();
+        const messageSelectListing = ($root.data('promotionsMessageSelectListing') || '').toString();
+        const messageProcessing = ($root.data('promotionsMessageProcessing') || 'Processing...').toString();
+        const messageRemoveConfirm = ($root.data('promotionsMessageRemoveConfirm') || '').toString();
+        const messageRemoveTopupConfirm = ($root.data('promotionsMessageRemoveTopupConfirm') || '').toString();
+        const messageRemoveTopupTitle = ($root.data('promotionsMessageRemoveTopupTitle') || 'Remove Top-up?').toString();
+        const messageRemoveTopupApprove = ($root.data('promotionsMessageRemoveTopupApprove') || 'Remove').toString();
+        const messageRemoveTopupCancel = ($root.data('promotionsMessageRemoveTopupCancel') || 'Cancel').toString();
+        const messageRequestFailed = ($root.data('promotionsMessageRequestFailed') || 'Something went wrong. Please try again.').toString();
+        const defaultTab = ($root.data('promotionsDefaultTab') || 'labelize').toString();
+        const $modal = $root.find('#lsd_dashboard_promotions_popup');
+        const selectedLabels = {};
+        let selectedListings = {};
+        let modalMode = 'labelize';
+        let popupSearchTimer = 0;
+        const modalState = {
+            page: 1,
+            nextPage: 0,
+            hasMore: false,
+            loading: false,
+            loaded: false,
+            reload: false
+        };
+
+        const initPopupCategory = function ()
+        {
+            const $category = $modal.find('.lsd-promotion-popup-category');
+            if (!$category.length || typeof $.fn.select2 !== 'function' || $category.data('lsdPromotionPopupSelect2')) return;
+
+            if ($category.data('select2')) $category.select2('destroy');
+
+            $category.select2({
+                allowClear: true,
+                placeholder: $category.attr('placeholder'),
+                width: '100%',
+                minimumResultsForSearch: 0,
+                shouldFocusInput: () => false,
+            });
+
+            $category.data('lsdPromotionPopupSelect2', true);
+        };
+
+        window.lsdDashboardApplySidebar($root);
+
+        const switchTab = function (tab)
+        {
+            const targetTab = (tab || defaultTab || 'labelize').toString();
+
+            $root.find('.lsd-promotions-tab-trigger').each(function ()
+            {
+                const $trigger = $(this);
+                const isActive = ($trigger.data('tab') || '').toString() === targetTab;
+
+                $trigger.closest('li').toggleClass('lsd-active', isActive);
+            });
+
+            $root.find('.lsd-dashboard-promotions-tab-content').each(function ()
+            {
+                const $panel = $(this);
+                const isActive = ($panel.data('promotionsTab') || '').toString() === targetTab;
+
+                $panel.toggleClass('lsd-tab-content-active', isActive);
+            });
+        };
+
+        const getSelectedLabelIds = function ()
+        {
+            return Object.keys(selectedLabels).filter(function (key)
+            {
+                return !!selectedLabels[key];
+            });
+        };
+
+        const getSelectedListingIds = function ()
+        {
+            return Object.keys(selectedListings).filter(function (key)
+            {
+                return !!selectedListings[key];
+            });
+        };
+
+        const updateLabelCount = function ()
+        {
+            $root.find('.lsd-promotion-selected-label-count').text(getSelectedLabelIds().length);
+        };
+
+        const updateListingCount = function ()
+        {
+            const count = getSelectedListingIds().length;
+            $root.add($modal).find('.lsd-promotion-selected-listing-count').text(count);
+        };
+
+        const renderSelectedListings = function ()
+        {
+            const $container = $modal.find('.lsd-promotion-selected-listings');
+            if (!$container.length) return;
+
+            $container.empty();
+
+            getSelectedListingIds().forEach(function (listingId)
+            {
+                const title = (selectedListings[listingId] && selectedListings[listingId].title ? selectedListings[listingId].title : '').toString();
+                const $pill = $('<span class="lsd-dashboard-promotions-selected-pill"></span>');
+                const $remove = $('<button type="button" class="lsd-dashboard-promotions-selected-pill-remove" aria-label="Remove listing"><i class="lsd-fe-icon fa fa-trash-alt"></i></button>');
+
+                $remove.attr('data-listing-id', listingId);
+                $pill.append($('<span></span>').text(title));
+                $pill.append($remove);
+                $container.append($pill);
+            });
+
+            $container.toggleClass('has-items', $container.children().length > 0);
+        };
+
+        const resetSelectedListings = function ()
+        {
+            selectedListings = {};
+            syncListingSelectionState();
+        };
+
+        const updateSelectedListing = function ($checkbox)
+        {
+            const listingId = ($checkbox.val() || '').toString();
+            if (!listingId) return;
+
+            if ($checkbox.is(':checked'))
+            {
+                selectedListings[listingId] = {
+                    title: (($checkbox.data('listingTitle') || '').toString())
+                };
+            }
+            else delete selectedListings[listingId];
+
+            syncListingSelectionState();
+        };
+
+        const removeSelectedListing = function (listingId)
+        {
+            if (!listingId) return;
+
+            delete selectedListings[listingId];
+            syncListingSelectionState();
+        };
+
+        const syncListingSelectionState = function ()
+        {
+            $modal.find('.lsd-promotion-popup-listing').each(function ()
+            {
+                const $item = $(this);
+                $item.find('.lsd-promotion-listing-checkbox').each(function ()
+                {
+                    const $checkbox = $(this);
+                    const listingId = ($checkbox.val() || '').toString();
+                    const isSelected = !!selectedListings[listingId];
+                    const $row = $checkbox.closest('.lsd-dashboard-listing-item');
+
+                    if ($checkbox.is(':disabled'))
+                    {
+                        $row.addClass('lsd-tooltip lsd-tooltip-top').attr('data-lsd-tooltip', $checkbox.attr('aria-label') || '');
+                    }
+                    else $row.removeClass('lsd-tooltip lsd-tooltip-top').removeAttr('data-lsd-tooltip');
+
+                    $checkbox.prop('checked', !$checkbox.is(':disabled') && isSelected);
+                    $checkbox.closest('li[id^="lsd_dashboard_listing_"]').toggleClass('is-selected', isSelected);
+                });
+            });
+
+            updateListingCount();
+            renderSelectedListings();
+        };
+
+        const setModalMode = function (mode)
+        {
+            modalMode = (mode || 'labelize').toString() === 'topup' ? 'topup' : 'labelize';
+            $modal.find('.lsd-promotion-modal-results').attr('data-mode', modalMode);
+        };
+
+        const setModalLoading = function (loading)
+        {
+            modalState.loading = !!loading;
+            $modal.find('.lsd-promotion-modal-loading').toggleClass('lsd-util-hide', !loading);
+            $modal.find('.lsd-promotion-modal-results').toggleClass('is-loading', !!loading);
+        };
+
+        const toggleModalEmpty = function (isEmpty)
+        {
+            $modal.find('.lsd-promotion-modal-empty').toggleClass('lsd-util-hide', !isEmpty);
+            $modal.find('.lsd-promotion-modal-list').toggleClass('lsd-util-hide', !!isEmpty);
+        };
+
+        const updateModalPagination = function (responseData)
+        {
+            modalState.nextPage = parseInt(responseData.next_page, 10) || 0;
+            modalState.hasMore = parseInt(responseData.has_more, 10) === 1;
+
+            const $results = $modal.find('.lsd-promotion-modal-results');
+            $results.attr('data-next-page', modalState.nextPage);
+            $results.attr('data-has-more', modalState.hasMore ? 1 : 0);
+        };
+
+        const fetchPopupListings = function (reset)
+        {
+            const shouldReset = !!reset;
+
+            if (modalState.loading)
+            {
+                if (shouldReset) modalState.reload = true;
+                return;
+            }
+            if (!shouldReset && !modalState.hasMore) return;
+
+            const page = shouldReset ? 1 : (modalState.nextPage || 0);
+            if (page < 1) return;
+
+            const searchValue = (($modal.find('.lsd-promotion-popup-search').val() || '').toString()).trim();
+            const search = searchValue.length >= 3 ? searchValue : '';
+            const categoryId = (($modal.find('.lsd-promotion-popup-category').val() || '').toString()).trim();
+            const $list = $modal.find('.lsd-promotion-modal-list');
+
+            if (shouldReset)
+            {
+                modalState.page = 1;
+                modalState.nextPage = 0;
+                modalState.hasMore = false;
+                toggleModalEmpty(false);
+                $list.empty().addClass('lsd-util-hide');
+                $modal.find('.lsd-promotion-modal-results').scrollTop(0);
+            }
+
+            setModalLoading(true);
+
+            $.ajax({
+                url: ajaxUrl,
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    action: 'lsd_dashboard_promotions_listings',
+                    _wpnonce: listingsNonce,
+                    page: page,
+                    search: search,
+                    category_id: categoryId,
+                    mode: modalMode
+                },
+                success: function (response)
+                {
+                    if (!response || parseInt(response.success, 10) !== 1 || !response.data)
+                    {
+                        showMessage(response && response.message ? response.message : messageRequestFailed, 'lsd-error');
+                        return;
+                    }
+
+                    if (shouldReset) $list.html(response.data.html || '');
+                    else
+                    {
+                        const $group = $list.find('.lsd-dashboard-promotions-modal-list-group').first();
+                        const $items = $(response.data.html || '').find('.lsd-dashboard-promotions-modal-item');
+
+                        if ($group.length && $items.length) $group.append($items);
+                        else $list.append(response.data.html || '');
+                    }
+
+                    modalState.loaded = true;
+                    modalState.page = page;
+                    updateModalPagination(response.data);
+                    toggleModalEmpty(parseInt(response.data.total, 10) < 1);
+                    syncListingSelectionState();
+                },
+                error: function ()
+                {
+                    showMessage(messageRequestFailed, 'lsd-error');
+                },
+                complete: function ()
+                {
+                    setModalLoading(false);
+
+                    if (modalState.reload)
+                    {
+                        modalState.reload = false;
+                        fetchPopupListings(true);
+                    }
+                }
+            });
+        };
+
+        const schedulePopupSearch = function ()
+        {
+            window.clearTimeout(popupSearchTimer);
+
+            popupSearchTimer = window.setTimeout(function ()
+            {
+                fetchPopupListings(true);
+            }, 300);
+        };
+
+        const applySearch = function ($trigger)
+        {
+            const targetSelector = ($trigger.data('target') || '').toString();
+            const itemsSelector = ($trigger.data('items') || '').toString();
+            const $wrap = $trigger.closest('.lsd-promotion-search-wrap');
+            const term = (($wrap.find('.lsd-promotion-search-input').val() || '').toString()).toLowerCase().trim();
+            const $items = $root.find(targetSelector).find(itemsSelector);
+
+            if (targetSelector === '.lsd-promotion-topup-active-section')
+            {
+                fetchTopupRecords(1, true);
+                return;
+            }
+
+            if (!$items.length) return;
+
+            $items.each(function ()
+            {
+                const $item = $(this);
+                const haystack = (($item.data('search') || '').toString()).toLowerCase();
+                const isVisible = !term || haystack.indexOf(term) !== -1;
+
+                $item.toggleClass('is-hidden', !isVisible);
+                $item.toggle(isVisible);
+            });
+        };
+
+        const updateTopupLoadMore = function (responseData)
+        {
+            const $wrap = $root.find('.lsd-dashboard-promotions-load-more-wrap');
+            const $button = $wrap.find('.lsd-promotion-topup-load-more');
+            const hasMore = parseInt(responseData.has_more, 10) === 1;
+            const nextPage = parseInt(responseData.next_page, 10) || 0;
+
+            $wrap.toggleClass('lsd-util-hide', !hasMore);
+            $button.data('nextPage', nextPage);
+        };
+
+        const sortRenderedTopups = function (sort)
+        {
+            const $section = $root.find('.lsd-promotion-topup-active-section');
+            const cards = $section.children('.lsd-promotion-topup-active-card').get();
+
+            cards.sort(function (first, second)
+            {
+                const $first = $(first);
+                const $second = $(second);
+                const firstTitle = ($first.data('sortTitle') || '').toString();
+                const secondTitle = ($second.data('sortTitle') || '').toString();
+
+                if (sort === 'title_asc') return firstTitle.localeCompare(secondTitle);
+                if (sort === 'title_desc') return secondTitle.localeCompare(firstTitle);
+
+                const firstExpiry = ($first.data('sortExpiry') || '').toString();
+                const secondExpiry = ($second.data('sortExpiry') || '').toString();
+
+                if (!firstExpiry && !secondExpiry) return firstTitle.localeCompare(secondTitle);
+                if (!firstExpiry) return 1;
+                if (!secondExpiry) return -1;
+                if (firstExpiry === secondExpiry) return firstTitle.localeCompare(secondTitle);
+
+                return sort === 'expiry_desc' ? secondExpiry.localeCompare(firstExpiry) : firstExpiry.localeCompare(secondExpiry);
+            });
+
+            $.each(cards, function (_, card)
+            {
+                $section.append(card);
+            });
+        };
+
+        const fetchTopupRecords = function (page, reset, $button)
+        {
+            const $section = $root.find('.lsd-promotion-topup-active-section');
+            if (!$section.length || $section.data('loading')) return;
+
+            const $search = $root.find('.lsd-promotion-topup-active-section').closest('.lsd-dashboard-promotions-section').find('.lsd-promotion-search-input').first();
+            const search = (($search.val() || '').toString()).trim();
+            const sort = ($root.find('.lsd-promotion-topup-sort').val() || 'expiry_asc').toString();
+            const loading = $button && $button.length && typeof ListdomButtonLoader === 'function' ? new ListdomButtonLoader($button) : null;
+
+            $section.data('loading', true).addClass('is-loading');
+            if (loading) loading.start('');
+
+            $.ajax({
+                url: ajaxUrl,
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    action: 'lsd_dashboard_promotions_topup_records',
+                    _wpnonce: topupRecordsNonce,
+                    page: page,
+                    sort: sort,
+                    search: search
+                },
+                success: function (response)
+                {
+                    if (!response || parseInt(response.success, 10) !== 1 || !response.data)
+                    {
+                        showMessage(response && response.message ? response.message : messageRequestFailed, 'lsd-error');
+                        return;
+                    }
+
+                    if (reset) $section.html(response.data.html || '');
+                    else $section.append(response.data.html || '');
+
+                    updateTopupLoadMore(response.data);
+                },
+                error: function ()
+                {
+                    showMessage(messageRequestFailed, 'lsd-error');
+                },
+                complete: function ()
+                {
+                    $section.data('loading', false).removeClass('is-loading');
+                    if (loading) loading.stop();
+                }
+            });
+        };
+
+        const removeTopup = function ($button)
+        {
+            const listingId = parseInt($button.data('listingId'), 10) || 0;
+            if (!listingId) return;
+
+            const loading = typeof ListdomButtonLoader === 'function' ? new ListdomButtonLoader($button) : null;
+            if (loading) loading.start('');
+
+            $.ajax({
+                url: ajaxUrl,
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    action: 'lsd_dashboard_promotions_remove_topup',
+                    _wpnonce: removeTopupNonce,
+                    listing_id: listingId
+                },
+                success: function (response)
+                {
+                    if (!response || parseInt(response.success, 10) !== 1)
+                    {
+                        showMessage(response && response.message ? response.message : messageRequestFailed, 'lsd-error');
+                        return;
+                    }
+
+                    window.location.reload();
+                },
+                error: function ()
+                {
+                    showMessage(messageRequestFailed, 'lsd-error');
+                },
+                complete: function ()
+                {
+                    if (loading) loading.stop();
+                }
+            });
+        };
+
+        const submitLabelCheckout = function (labelIds, listingIds, $button)
+        {
+            if (!labelIds.length)
+            {
+                showMessage(messageSelectLabel, 'lsd-error');
+                return;
+            }
+
+            if (!listingIds.length)
+            {
+                showMessage(messageSelectListing, 'lsd-error');
+                return;
+            }
+
+            const loading = typeof ListdomButtonLoader === 'function' ? new ListdomButtonLoader($button) : null;
+            if (loading) loading.start(messageProcessing);
+
+            $.ajax({
+                url: ajaxUrl,
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    action: 'lsd_dashboard_promotions_checkout',
+                    _wpnonce: checkoutNonce,
+                    labels: labelIds,
+                    listing_ids: listingIds
+                },
+                success: function (response)
+                {
+                    if (!response || parseInt(response.success, 10) !== 1)
+                    {
+                        showMessage(response && response.message ? response.message : messageRequestFailed, 'lsd-error');
+                        return;
+                    }
+
+                    if (response.notice) showMessage(response.notice, 'lsd-info');
+
+                    if (response.data && response.data.next)
+                    {
+                        window.location.href = response.data.next;
+                        return;
+                    }
+
+                    showMessage(response.message || '', 'lsd-success');
+                },
+                error: function ()
+                {
+                    showMessage(messageRequestFailed, 'lsd-error');
+                },
+                complete: function ()
+                {
+                    if (loading) loading.stop();
+                }
+            });
+        };
+
+        const submitTopupCheckout = function (listingIds, $button)
+        {
+            if (!listingIds.length)
+            {
+                showMessage(messageSelectListing, 'lsd-error');
+                return;
+            }
+
+            const loading = typeof ListdomButtonLoader === 'function' ? new ListdomButtonLoader($button) : null;
+            if (loading) loading.start(messageProcessing);
+
+            $.ajax({
+                url: ajaxUrl,
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    action: 'lsd_dashboard_promotions_topup_checkout',
+                    _wpnonce: topupCheckoutNonce,
+                    listing_ids: listingIds
+                },
+                success: function (response)
+                {
+                    if (!response || parseInt(response.success, 10) !== 1)
+                    {
+                        showMessage(response && response.message ? response.message : messageRequestFailed, 'lsd-error');
+                        return;
+                    }
+
+                    if (response.notice) showMessage(response.notice, 'lsd-info');
+
+                    if (response.data && response.data.next)
+                    {
+                        window.location.href = response.data.next;
+                        return;
+                    }
+
+                    showMessage(response.message || '', 'lsd-success');
+                },
+                error: function ()
+                {
+                    showMessage(messageRequestFailed, 'lsd-error');
+                },
+                complete: function ()
+                {
+                    if (loading) loading.stop();
+                }
+            });
+        };
+
+        const submitModalCheckout = function ($button)
+        {
+            if (modalMode === 'topup')
+            {
+                submitTopupCheckout(getSelectedListingIds(), $button);
+                return;
+            }
+
+            submitLabelCheckout(getSelectedLabelIds(), getSelectedListingIds(), $button);
+        };
+
+        $root
+        .off('click.lsdPromotionLabel', '.lsd-promotion-label')
+        .on('click.lsdPromotionLabel', '.lsd-promotion-label', function ()
+        {
+            const $button = $(this);
+            const labelId = ($button.data('labelId') || '').toString();
+            if (!labelId) return;
+
+            if (selectedLabels[labelId]) delete selectedLabels[labelId];
+            else selectedLabels[labelId] = true;
+
+            $button.toggleClass('is-selected', !!selectedLabels[labelId]);
+            updateLabelCount();
+        })
+        .off('click.lsdPromotionsTab', '.lsd-promotions-tab-trigger')
+        .on('click.lsdPromotionsTab', '.lsd-promotions-tab-trigger', function (event)
+        {
+            event.preventDefault();
+            switchTab($(this).data('tab'));
+        })
+        .off('click.lsdPromotionSearch', '.lsd-promotion-search-submit')
+        .on('click.lsdPromotionSearch', '.lsd-promotion-search-submit', function (event)
+        {
+            event.preventDefault();
+            applySearch($(this));
+        })
+        .off('keydown.lsdPromotionSearch', '.lsd-promotion-search-input')
+        .on('keydown.lsdPromotionSearch', '.lsd-promotion-search-input', function (event)
+        {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+            applySearch($(this).closest('.lsd-promotion-search-wrap').find('.lsd-promotion-search-submit'));
+        })
+        .off('change.lsdPromotionTopupSort', '.lsd-promotion-topup-sort')
+        .on('change.lsdPromotionTopupSort', '.lsd-promotion-topup-sort', function ()
+        {
+            sortRenderedTopups(($(this).val() || 'expiry_asc').toString());
+            fetchTopupRecords(1, true);
+        })
+        .off('click.lsdPromotionTopupLoadMore', '.lsd-promotion-topup-load-more')
+        .on('click.lsdPromotionTopupLoadMore', '.lsd-promotion-topup-load-more', function (event)
+        {
+            event.preventDefault();
+
+            const $button = $(this);
+            const nextPage = parseInt($button.data('nextPage'), 10) || 0;
+            if (nextPage < 1) return;
+
+            fetchTopupRecords(nextPage, false, $button);
+        })
+        .off('click.lsdPromotionOpenPopup', '.lsd-promotion-open-popup')
+        .on('click.lsdPromotionOpenPopup', '.lsd-promotion-open-popup', function (event)
+        {
+            event.preventDefault();
+
+            const mode = (($(this).data('mode') || 'labelize').toString() === 'topup') ? 'topup' : 'labelize';
+
+            if (mode === 'labelize' && !getSelectedLabelIds().length)
+            {
+                showMessage(messageSelectLabel, 'lsd-error');
+                return;
+            }
+
+            if (!$modal.length || typeof window.ListdomModal === 'undefined') return;
+
+            resetSelectedListings();
+            setModalMode(mode);
+            initPopupCategory();
+            window.ListdomModal.open($modal, { appendToBody: true });
+            fetchPopupListings(true);
+        })
+        .off('click.lsdPromotionRenew', '.lsd-promotion-renew')
+        .on('click.lsdPromotionRenew', '.lsd-promotion-renew', function (event)
+        {
+            event.preventDefault();
+
+            const $button = $(this);
+            const labelId = ($button.data('labelId') || '').toString();
+            const listingId = ($button.data('listingId') || '').toString();
+
+            if (!labelId || !listingId) return;
+
+            submitLabelCheckout([labelId], [listingId], $button);
+        })
+        .off('click.lsdPromotionTopupRenew', '.lsd-promotion-topup-renew')
+        .on('click.lsdPromotionTopupRenew', '.lsd-promotion-topup-renew', function (event)
+        {
+            event.preventDefault();
+
+            const $button = $(this);
+            const listingId = ($button.data('listingId') || '').toString();
+            if (!listingId) return;
+
+            submitTopupCheckout([listingId], $button);
+        })
+        .off('click.lsdPromotionRemove', '.lsd-promotion-remove-label')
+        .on('click.lsdPromotionRemove', '.lsd-promotion-remove-label', function (event)
+        {
+            event.preventDefault();
+
+            const $button = $(this);
+            const labelId = parseInt($button.data('labelId'), 10) || 0;
+            const listingId = parseInt($button.data('listingId'), 10) || 0;
+            const recurringId = parseInt($button.data('recurringId'), 10) || 0;
+
+            if (!labelId || !listingId || recurringId > 0) return;
+            if (messageRemoveConfirm && !window.confirm(messageRemoveConfirm)) return;
+
+            const loading = typeof ListdomButtonLoader === 'function' ? new ListdomButtonLoader($button) : null;
+            if (loading) loading.start('');
+
+            $.ajax({
+                url: ajaxUrl,
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    action: 'lsd_dashboard_promotions_remove_label',
+                    _wpnonce: removeNonce,
+                    label_id: labelId,
+                    listing_id: listingId,
+                    recurring_id: recurringId
+                },
+                success: function (response)
+                {
+                    if (!response || parseInt(response.success, 10) !== 1)
+                    {
+                        showMessage(response && response.message ? response.message : messageRequestFailed, 'lsd-error');
+                        return;
+                    }
+
+                    window.location.reload();
+                },
+                error: function ()
+                {
+                    showMessage(messageRequestFailed, 'lsd-error');
+                },
+                complete: function ()
+                {
+                    if (loading) loading.stop();
+                }
+            });
+        })
+        .off('click.lsdPromotionRemoveTopup', '.lsd-promotion-remove-topup')
+        .on('click.lsdPromotionRemoveTopup', '.lsd-promotion-remove-topup', function (event)
+        {
+            event.preventDefault();
+
+            const $button = $(this);
+            const listingId = parseInt($button.data('listingId'), 10) || 0;
+
+            if (!listingId) return;
+
+            if (typeof WebiliaToast === 'function' && messageRemoveTopupConfirm)
+            {
+                new WebiliaToast(
+                    '<div class="lsd-dashboard-promotions-remove-topup-toast">' +
+                        '<h4 class="lsd-fe-title">' + escapeHtml(messageRemoveTopupTitle) + '</h4>' +
+                        '<p class="lsd-fe-description">' + escapeHtml(messageRemoveTopupConfirm) + '</p>' +
+                    '</div>',
+                    {
+                        type: 'lsd-confirm',
+                        icon: '<i class="lsd-fe-icon fa-solid fa-info-circle"></i>',
+                        position: 'lsd-center-center',
+                        confirm: {
+                            confirmText: messageRemoveTopupApprove,
+                            cancelText: messageRemoveTopupCancel,
+                            confirmClass: 'lsd-light-button',
+                            cancelClass: 'lsd-general-button',
+                            confirmFirst: false,
+                            onConfirm: function () {
+                                removeTopup($button);
+                            }
+                        }
+                    }
+                );
+
+                return;
+            }
+
+            if (messageRemoveTopupConfirm && !window.confirm(messageRemoveTopupConfirm)) return;
+            removeTopup($button);
+        });
+
+        $modal.find('.lsd-promotion-modal-results')
+        .off('scroll.lsdPromotionInfinite')
+        .on('scroll.lsdPromotionInfinite', function ()
+        {
+            const element = this;
+            if (modalState.loading || !modalState.hasMore) return;
+
+            if ((element.scrollTop + element.clientHeight) < (element.scrollHeight - 80)) return;
+            fetchPopupListings(false);
+        });
+
+        $modal
+        .off('change.lsdPromotionListing', '.lsd-promotion-listing-checkbox')
+        .on('change.lsdPromotionListing', '.lsd-promotion-listing-checkbox', function ()
+        {
+            updateSelectedListing($(this));
+        })
+        .off('click.lsdPromotionListingRow', '.lsd-dashboard-listing-item')
+        .on('click.lsdPromotionListingRow', '.lsd-dashboard-listing-item', function (event)
+        {
+            const $target = $(event.target);
+            if ($target.closest('input, .lsd-dashboard-listing-actions').length) return;
+
+            const $checkbox = $(this).find('.lsd-promotion-listing-checkbox').first();
+            if (!$checkbox.length || $checkbox.is(':disabled')) return;
+
+            event.preventDefault();
+            $checkbox.prop('checked', !$checkbox.is(':checked')).trigger('change');
+        })
+        .off('click.lsdPromotionSelectedPill', '.lsd-dashboard-promotions-selected-pill-remove')
+        .on('click.lsdPromotionSelectedPill', '.lsd-dashboard-promotions-selected-pill-remove', function (event)
+        {
+            event.preventDefault();
+            event.stopPropagation();
+            removeSelectedListing(($(this).data('listingId') || '').toString());
+        });
+
+        $(document)
+        .off('input.lsdPromotionPopupSearch', '#lsd_dashboard_promotions_popup .lsd-promotion-popup-search')
+        .on('input.lsdPromotionPopupSearch', '#lsd_dashboard_promotions_popup .lsd-promotion-popup-search', function ()
+        {
+            schedulePopupSearch();
+        })
+        .off('change.lsdPromotionPopupCategory', '#lsd_dashboard_promotions_popup .lsd-promotion-popup-category')
+        .on('change.lsdPromotionPopupCategory', '#lsd_dashboard_promotions_popup .lsd-promotion-popup-category', function ()
+        {
+            fetchPopupListings(true);
+        })
+        .off('click.lsdPromotionSubmit', '#lsd_dashboard_promotions_popup .lsd-promotion-submit-checkout')
+        .on('click.lsdPromotionSubmit', '#lsd_dashboard_promotions_popup .lsd-promotion-submit-checkout', function (event)
+        {
+            event.preventDefault();
+            submitModalCheckout($(this));
+        });
+
+        updateLabelCount();
+        syncListingSelectionState();
+        setModalMode(defaultTab);
+        switchTab(defaultTab);
+        $root.data('lsdPromotionsReady', true);
+    });
+};
+
+if (typeof jQuery !== 'undefined')
+{
+    jQuery(function ($)
+    {
+        window.lsdDashboardInitPromotions($(document));
+    });
+}
+
 // Listdom DASHBOARD PLUGIN
 (function ($) {
     $.fn.listdomDashboard = function (options) {
@@ -8616,6 +9532,7 @@ if (typeof jQuery !== 'undefined')
         let $dashboard = this.first();
         if (!$dashboard.length) $dashboard = $("#lsd_dashboard");
         if (!$dashboard.length) return this;
+        const messages = settings.messages || {};
 
         window.lsdDashboardApplySidebar($dashboard);
         setListeners();
@@ -8626,9 +9543,74 @@ if (typeof jQuery !== 'undefined')
             .on("click.lsdDashboardDelete", ".lsd-dashboard-action-delete", function () {
                 remove($(this));
             });
+
+            $dashboard
+            .off("click.lsdDashboardStatus", ".lsd-dashboard-action-status")
+            .on("click.lsdDashboardStatus", ".lsd-dashboard-action-status", function (e) {
+                e.preventDefault();
+                changeStatus($(this));
+            });
+
+            $dashboard
+            .off("click.lsdDashboardScheduleOpen", ".lsd-dashboard-schedule-open")
+            .on("click.lsdDashboardScheduleOpen", ".lsd-dashboard-schedule-open", function (e) {
+                e.preventDefault();
+                const selector = $(this).data("modal");
+                const $modal = $(selector);
+                const $listingActions = $(this).closest(".lsd-dashboard-listing-actions");
+                if ($modal.length && $listingActions.length && !$modal.parent().is($listingActions)) {
+                    $listingActions.append($modal);
+                }
+                if ($modal.length && typeof window.lsdInitFlatpickr === "function") window.lsdInitFlatpickr($modal);
+                if ($modal.length) ListdomModal.open(selector, { appendToBody: false });
+            });
+
+            $dashboard
+            .off("click.lsdDashboardVisibilityOpen", ".lsd-dashboard-visibility-open")
+            .on("click.lsdDashboardVisibilityOpen", ".lsd-dashboard-visibility-open", function (e) {
+                e.preventDefault();
+                const selector = $(this).data("modal");
+                const $modal = $(selector);
+                const $listingActions = $(this).closest(".lsd-dashboard-listing-actions");
+                if ($modal.length && $listingActions.length && !$modal.parent().is($listingActions)) {
+                    $listingActions.append($modal);
+                }
+                if ($modal.length && typeof window.lsdInitFlatpickr === "function") window.lsdInitFlatpickr($modal);
+                if ($modal.length) ListdomModal.open(selector, { appendToBody: false });
+            });
+
+            $dashboard
+            .off("click.lsdDashboardScheduleCancel", ".lsd-dashboard-schedule-cancel")
+            .on("click.lsdDashboardScheduleCancel", ".lsd-dashboard-schedule-cancel", function (e) {
+                e.preventDefault();
+                ListdomModal.close($(this).closest(".lsd-modal"));
+            });
+
+            $dashboard
+            .off("click.lsdDashboardVisibilityCancel", ".lsd-dashboard-visibility-cancel")
+            .on("click.lsdDashboardVisibilityCancel", ".lsd-dashboard-visibility-cancel", function (e) {
+                e.preventDefault();
+                ListdomModal.close($(this).closest(".lsd-modal"));
+            });
+
+            $dashboard
+            .off("click.lsdDashboardScheduleSave", ".lsd-dashboard-schedule-save")
+            .on("click.lsdDashboardScheduleSave", ".lsd-dashboard-schedule-save", function (e) {
+                e.preventDefault();
+                saveSchedule($(this));
+            });
+
+            $dashboard
+            .off("click.lsdDashboardVisibilitySave", ".lsd-dashboard-visibility-save")
+            .on("click.lsdDashboardVisibilitySave", ".lsd-dashboard-visibility-save", function (e) {
+                e.preventDefault();
+                saveVisibility($(this));
+            });
         }
 
         function remove($btn) {
+            if ($btn.data("loading")) return;
+
             let confirm = $btn.data("confirm");
             if (confirm === 0) {
                 $btn.data("confirm", 1);
@@ -8642,7 +9624,11 @@ if (typeof jQuery !== 'undefined')
                 return;
             }
 
-            // Loading Style
+            $btn.data("loading", 1);
+            const $menu = $btn.closest(".lsd-actions-menu");
+            $menu.trigger("lsd:actions-menu:lock");
+            const loader = new ListdomButtonLoader($btn);
+            loader.start($.trim($btn.text()));
             $dashboard.fadeTo(200, 0.7);
 
             let id = $btn.data("id");
@@ -8659,16 +9645,152 @@ if (typeof jQuery !== 'undefined')
                 success: function (response) {
                     if (response.success === 1) {
                         let $listing = $("#lsd_dashboard_listing_" + id);
-                        $listing.remove();
-                    }
-
-                    // Loading Style
-                    $dashboard.fadeTo(200, 1);
+                        const hasStatusFilter = new URL(window.location.href).searchParams.has("status");
+                        if (hasStatusFilter) $listing.remove();
+                        else window.location.reload();
+                    } else showStatusError(response && response.message ? response.message : messages.delete);
                 },
                 error: function () {
-                    // Loading Style
+                    showStatusError(messages.delete);
+                },
+                complete: function () {
+                    $btn.data("loading", 0);
+                    loader.stop();
+                    $menu.trigger("lsd:actions-menu:unlock");
+                    $dashboard.fadeTo(200, 1);
+                }
+            });
+        }
+
+        function changeStatus($btn) {
+            if ($btn.data("loading")) return;
+            $btn.data("loading", 1);
+            const $menu = $btn.closest(".lsd-actions-menu");
+            $menu.trigger("lsd:actions-menu:lock");
+            const loader = new ListdomButtonLoader($btn);
+            loader.start($.trim($btn.text()));
+            $dashboard.fadeTo(200, 0.7);
+
+            $.ajax({
+                url: settings.ajax_url,
+                data: {
+                    action: "lsd_dashboard_listing_status",
+                    id: $btn.data("id"),
+                    status_action: $btn.data("status-action"),
+                    _lsdnonce: settings.nonce,
+                },
+                dataType: "json",
+                type: "post",
+                complete: function () {
+                    $btn.data("loading", 0);
+                    loader.stop();
+                    $menu.trigger("lsd:actions-menu:unlock");
                     $dashboard.fadeTo(200, 1);
                 },
+                success: function (response) {
+                    if (response.success === 1) {
+                        const hasStatusFilter = new URL(window.location.href).searchParams.has("status");
+                        if (hasStatusFilter) $("#lsd_dashboard_listing_" + $btn.data("id")).remove();
+                        else window.location.reload();
+                    } else showStatusError(response && response.message ? response.message : messages.status);
+                },
+                error: function () {
+                    showStatusError(messages.status);
+                }
+            });
+        }
+
+        function showStatusError(message) {
+            message = message || messages.status;
+
+            if (typeof window.listdom_toastify === "function") {
+                window.listdom_toastify(message, "lsd-error");
+                return;
+            }
+
+            if (typeof window.WebiliaToast === "function") {
+                new window.WebiliaToast(message, {type: "lsd-error"});
+                return;
+            }
+
+            window.alert(message);
+        }
+
+        function saveSchedule($btn) {
+            if ($btn.data("loading")) return;
+            const $modal = $btn.closest(".lsd-modal");
+            const datetime = $modal.find(".lsd-dashboard-schedule-datetime").val();
+            const $message = $modal.find(".lsd-dashboard-schedule-message");
+            $btn.data("loading", 1);
+            const loader = new ListdomButtonLoader($btn);
+            loader.start($.trim($btn.text()));
+            $message.addClass("lsd-util-hide").text("");
+
+            $.ajax({
+                url: settings.ajax_url,
+                data: {
+                    action: "lsd_dashboard_listing_schedule",
+                    id: $btn.data("id"),
+                    datetime: datetime,
+                    _lsdnonce: $btn.data("nonce"),
+                },
+                dataType: "json",
+                type: "post",
+                success: function (response) {
+                    if (response && response.success === 1) {
+                        ListdomModal.close($modal);
+                        window.location.reload();
+                    } else {
+                        $message.removeClass("lsd-util-hide").text(response && response.message ? response.message : messages.schedule);
+                    }
+                },
+                error: function () {
+                    $message.removeClass("lsd-util-hide").text(messages.schedule);
+                },
+                complete: function () {
+                    $btn.data("loading", 0);
+                    loader.stop();
+                }
+            });
+        }
+
+        function saveVisibility($btn) {
+            if ($btn.data("loading")) return;
+            const $modal = $btn.closest(".lsd-modal");
+            const visibleFrom = $modal.find("[name=\"lsd[visible_from]\"]").val();
+            const visibleUntil = $modal.find("[name=\"lsd[visible_until]\"]").val();
+            const $message = $modal.find(".lsd-dashboard-visibility-message");
+            $btn.data("loading", 1);
+            const loader = new ListdomButtonLoader($btn);
+            loader.start($.trim($btn.text()));
+            $message.addClass("lsd-util-hide").text("");
+
+            $.ajax({
+                url: settings.ajax_url,
+                data: {
+                    action: "lsd_dashboard_listing_visibility",
+                    id: $btn.data("id"),
+                    visible_from: visibleFrom,
+                    visible_until: visibleUntil,
+                    _lsdnonce: $btn.data("nonce"),
+                },
+                dataType: "json",
+                type: "post",
+                success: function (response) {
+                    if (response && response.success === 1) {
+                        ListdomModal.close($modal);
+                        window.location.reload();
+                    } else {
+                        $message.removeClass("lsd-util-hide").text(response && response.message ? response.message : messages.visibility);
+                    }
+                },
+                error: function () {
+                    $message.removeClass("lsd-util-hide").text(messages.visibility);
+                },
+                complete: function () {
+                    $btn.data("loading", 0);
+                    loader.stop();
+                }
             });
         }
 
@@ -11475,13 +12597,13 @@ function lsdaddbok_bind_clear_buttons(context) {
 function lsdaddbok_trigger_booking_manage_actions() {
     // Open Action Modal or Run Direct Action
     jQuery(document)
-    .off("click.lsdaddbokBookingManageAction", ".lsd-bookings-manage-actions .lsd-actions-menu-item")
-    .on("click.lsdaddbokBookingManageAction", ".lsd-bookings-manage-actions .lsd-actions-menu-item", function (e) {
+    .off("click.lsdaddbokBookingManageAction", ".lsd-bookings-manage-actions .lsd-actions-menu-item, .lsd-bookings-manage-actions .lsd-booking-action-approve, .lsd-dashboard-booking-detail-pic-change")
+    .on("click.lsdaddbokBookingManageAction", ".lsd-bookings-manage-actions .lsd-actions-menu-item, .lsd-bookings-manage-actions .lsd-booking-action-approve, .lsd-dashboard-booking-detail-pic-change", function (e) {
         let $button = jQuery(this);
         let method = ($button.attr("data-method") || "").trim();
         let modalSelector = $button.attr("data-action-modal");
 
-        // Real links such as view details / invoice / book again should use normal navigation.
+        // Real booking, invoice, and rebooking links should use normal navigation.
         if (!method) return;
 
         e.preventDefault();
@@ -12103,6 +13225,13 @@ function lsdCheckoutComplete(orderKey)
             $(this).removeClass(loadingClass);
         });
 
+        // Close the source menu after one of its dialogs opens.
+        $(document)
+        .off('listdom:modal:opened.lsdDashboardActionsMenu', modalSelector)
+        .on('listdom:modal:opened.lsdDashboardActionsMenu', modalSelector, function () {
+            closeMenus();
+        });
+
         // Close When Clicking Outside
         $(document)
         .off('click.lsdDashboardActionsMenuClose')
@@ -12160,6 +13289,7 @@ function lsdCheckoutComplete(orderKey)
         if (!$menu.length) return;
 
         $menu.addClass(openClass);
+        $menu.find(toggleSelector).first().attr('aria-expanded', 'true');
         setMenuDirection($menu);
     }
 
@@ -12170,6 +13300,9 @@ function lsdCheckoutComplete(orderKey)
         .removeClass(openClass)
         .removeClass(openTopClass)
         .removeClass(openBottomClass);
+
+        resetMenuPosition($menu);
+        $menu.find(toggleSelector).first().attr('aria-expanded', 'false');
     }
 
     function closeMenus($except) {
@@ -12217,6 +13350,34 @@ function lsdCheckoutComplete(orderKey)
         } else {
             $menu.addClass(openBottomClass);
         }
+
+        positionMenu($menu, $dropdown, $toggle);
+    }
+
+    function positionMenu($menu, $dropdown, $toggle) {
+        if (!$menu.closest('.lsd-bookings-table-wrapper').length) return;
+
+        let toggleRect = $toggle[0].getBoundingClientRect();
+        let dropdownWidth = $dropdown.outerWidth() || 0;
+        let dropdownHeight = $dropdown.outerHeight() || 0;
+        let spacing = 8;
+        let left = Math.max(spacing, toggleRect.right - dropdownWidth);
+        let top = $menu.hasClass(openTopClass)
+            ? Math.max(spacing, toggleRect.top - dropdownHeight - spacing)
+            : toggleRect.bottom + spacing;
+
+        $menu.addClass('is-floating');
+        $dropdown.css({left: left + 'px', top: top + 'px', bottom: 'auto'});
+    }
+
+    function resetMenuPosition($menu) {
+        if (!$menu.hasClass('is-floating')) return;
+
+        $menu
+        .removeClass('is-floating')
+        .find(dropdownSelector)
+        .first()
+        .css({left: '', top: '', bottom: ''});
     }
 })(jQuery);
 
@@ -12474,12 +13635,26 @@ function lsdCheckoutComplete(orderKey)
             e.preventDefault();
 
             const $btn = $(this);
+            if ($btn.data('lsdCheckoutLoading')) return;
+
             const nonce = $btn.data('nonce');
             const gateway = $btn.data('gateway');
             const $wrapper = $btn.closest('.lsd-gateway-wrapper');
+            const $response = $wrapper.find('.lsd-checkout-response');
             const message = $wrapper.find('.lsd-checkout-message').val() || '';
             const name = $wrapper.find('.lsd-checkout-user-name').val() || '';
             const email = $wrapper.find('.lsd-checkout-user-email').val() || '';
+            const failureMessage = (typeof lsd !== 'undefined' && lsd.i18n_checkout_failed)
+                ? lsd.i18n_checkout_failed
+                : 'Unable to complete checkout. Please try again.';
+
+            const showResponse = function (responseMessage)
+            {
+                const text = responseMessage || failureMessage;
+
+                if (typeof listdom_alertify === 'function') $response.html(listdom_alertify(text, 'lsd-error'));
+                else $response.text(text);
+            };
 
             const consentEl = $wrapper.find('input[name="lsd_privacy_consent"]').get(0);
 
@@ -12496,25 +13671,46 @@ function lsdCheckoutComplete(orderKey)
             }
 
             const consentValue = consentEl && consentEl.checked ? '1' : '';
+            const ajaxUrl = typeof lsd !== 'undefined' ? lsd.ajaxurl : '';
+            if (!ajaxUrl)
+            {
+                showResponse(failureMessage);
+                return;
+            }
+
+            const loading = typeof ListdomButtonLoader === 'function' ? new ListdomButtonLoader($btn) : null;
+            if (loading) loading.start($btn.text().trim());
+            else $btn.prop('disabled', true).addClass('lsd-loading');
+
+            $btn.data('lsdCheckoutLoading', true);
+            $response.empty();
+            let succeeded = false;
 
             $.ajax({
-                url: lsd.ajaxurl,
+                url: ajaxUrl,
                 data: {action: 'lsd_checkout', _wpnonce: nonce, gateway: gateway, message: message, name: name, email: email, lsd_privacy_consent: consentValue},
                 dataType: 'json',
                 type: 'post',
                 success: function (res) {
-                    if (res && res.success) {
+                    if (res && parseInt(res.success, 10) === 1) {
+                        succeeded = true;
                         lsdCheckoutComplete(res.key ? res.key : res.order_id);
-                    } else {
-                        lsdCheckoutRestoreFromProcessing();
-
-                        if (res && res.message) {
-                            $wrapper.find('.lsd-checkout-response').html(res.message);
-                        }
+                        return;
                     }
+
+                    lsdCheckoutRestoreFromProcessing();
+                    showResponse(res && res.message ? res.message : failureMessage);
                 },
                 error: function () {
                     lsdCheckoutRestoreFromProcessing();
+                    showResponse(failureMessage);
+                },
+                complete: function () {
+                    $btn.removeData('lsdCheckoutLoading');
+                    if (succeeded) return;
+
+                    if (loading) loading.stop();
+                    else $btn.prop('disabled', false).removeClass('lsd-loading');
                 }
             });
         });
@@ -12926,8 +14122,12 @@ function lsdCheckoutComplete(orderKey)
                     $button.removeProp("disabled");
 
                     if (response.success) {
-                        // Alert
-                        $alert.html(listdom_alertify(response.message, "lsd-success"));
+                        let html = "";
+
+                        if (response.notice) html += listdom_alertify(response.notice, "lsd-warning");
+                        if (response.message) html += listdom_alertify(response.message, "lsd-success");
+
+                        $alert.html(html);
                     } else {
                         // Alert
                         $alert.html(listdom_alertify(response.message, "lsd-error"));

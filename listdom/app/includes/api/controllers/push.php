@@ -49,6 +49,14 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
             'post_status' => $status,
         ];
 
+        $post_date_gmt = isset($vars['post_date_gmt']) ? sanitize_text_field($vars['post_date_gmt']) : '';
+        if ($post_date_gmt && $post_date_gmt !== '0000-00-00 00:00:00')
+        {
+            $post['post_date_gmt'] = $post_date_gmt;
+            $post['post_date'] = get_date_from_gmt($post_date_gmt);
+        }
+        else if (!isset($vars['post_date_gmt']) && isset($vars['post_date'])) $post['post_date'] = sanitize_text_field($vars['post_date']);
+
         // Create User
         if (isset($vars['user']) && is_email($vars['user']))
         {

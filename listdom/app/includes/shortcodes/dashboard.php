@@ -172,6 +172,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         add_action('wp_ajax_lsd_dashboard_listing_delete', [$this, 'delete']);
         add_action('wp_ajax_nopriv_lsd_dashboard_listing_delete', [$this, 'delete']);
 
+        // Change Listing Status
+        add_action('wp_ajax_lsd_dashboard_listing_status', [$this, 'status_action']);
+
+        // Change Listing Schedule
+        add_action('wp_ajax_lsd_dashboard_listing_schedule', [$this, 'schedule_action']);
+
         // Upload Gallery
         add_action('wp_ajax_lsd_dashboard_listing_upload_gallery', [$this, 'gallery']);
         add_action('wp_ajax_nopriv_lsd_dashboard_listing_upload_gallery', [$this, 'gallery']);
@@ -255,7 +261,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $paged = max(1, get_query_var('paged'));
 
         // Status
-        $status = $_GET['status'] ?? '';
+        $requested_status = isset($_GET['status']) ? sanitize_key(wp_unslash($_GET['status'])) : '';
+        $listing_statuses = $this->get_listing_statuses_data();
+        $status = isset($listing_statuses[$requested_status]) ? $requested_status : '';
+        $status_query = $status === LSD_Base::STATUS_HOLD ? [LSD_Base::STATUS_HOLD, 'on-hold'] : $status;
 
         // Search
         $this->search = isset($_GET['lsd_s']) ? sanitize_text_field($_GET['lsd_s']) : '';
@@ -265,7 +274,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $query = [
             'post_type' => LSD_Base::PTYPE_LISTING,
             'posts_per_page' => $this->limit,
-            'post_status' => $status ?: ['publish', 'pending', 'draft', 'trash', LSD_Base::STATUS_HOLD, LSD_Base::STATUS_EXPIRED],
+            // Keep the All view in sync with the status menu, including custom
+            // Listdom statuses that are not registered as WordPress statuses.
+            'post_status' => $status_query ?: array_values(array_unique(array_merge(array_keys($listing_statuses), ['on-hold']))),
+            'perm' => 'readable',
             'paged' => $paged,
         ];
 
@@ -419,7 +431,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         }
     }
 
-    public function is_enabled($module)
+    public function is_enabled($module, $listing_id = 0)
     {
         $enabled = true;
 
@@ -430,7 +442,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if (isset($this->settings['submission_module'][$module]) && $this->settings['submission_module'][$module] == 2 && !current_user_can('edit_others_pages')) $enabled = false;
 
         // Apply Filters
-        return apply_filters('lsd_dashboard_modules_status', $enabled, $module);
+        return apply_filters('lsd_dashboard_modules_status', $enabled, $module, $listing_id);
     }
 
     public function is_required($field)
@@ -696,6 +708,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     {
         $action = $args['action'] ?? null;
         $quick_actions = $args['quick_actions'] ?? null;
+        $classes = $args['classes'] ?? [];
 
         $empty_state = [
             'title' => isset($args['title']) ? (string) $args['title'] : esc_html__('Nothing here yet', 'listdom'),
@@ -703,6 +716,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             'image' => isset($args['image']) && trim((string) $args['image']) !== '' ? (string) $args['image'] : 'img/dashboard/no-listings.svg',
             'action' => is_array($action) ? $action : [],
             'quick_actions' => is_array($quick_actions) ? $quick_actions : [],
+            'classes' => is_array($classes) ? $classes : [],
         ];
 
         include lsd_template('dashboard/empty.php');
@@ -734,6 +748,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
             if (!isset($listing->ID) || $listing->post_type !== LSD_Base::PTYPE_LISTING) $this->response(['success' => 0, 'message' => esc_html__('The listing is not available!', 'listdom')]);
             if (!current_user_can('edit_post', $id) || (get_current_user_id() !== (int) $listing->post_author && !current_user_can('edit_others_posts'))) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to edit this listing!', 'listdom')]);
+            if ($listing->post_status === LSD_Base::STATUS_TRASH) $this->response(['success' => 0, 'message' => esc_html__('Please restore this listing before editing it.', 'listdom')]);
         }
 
         $lsd = $_POST['lsd'] ?? [];
@@ -1142,6 +1157,19 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if ($this->is_enabled('labels'))
         {
             $labels = isset($tax[LSD_Base::TAX_LABEL]) && is_array($tax[LSD_Base::TAX_LABEL]) ? $tax[LSD_Base::TAX_LABEL] : [];
+
+            // Never persist a configured premium label without active access.
+            if (class_exists('\LSDPACLBL\Access'))
+            {
+                $access = new \LSDPACLBL\Access();
+                $package_labels = class_exists('\LSDPACLBL\Addon') ? \LSDPACLBL\Addon::package_label_ids((int) $id) : [];
+                $labels = array_values(array_unique(array_merge($labels, $package_labels)));
+                $labels = array_values(array_filter(array_map('absint', $labels), static function (int $label_id) use ($id, $access, $package_labels): bool
+                {
+                    return (int) get_term_meta($label_id, 'lsd_product', true) < 1 || $access->is_active((int) $id, $label_id) || in_array($label_id, $package_labels, true);
+                }));
+            }
+
             wp_set_post_terms($id, LSD_Taxonomies::name($labels, LSD_Base::TAX_LABEL), LSD_Base::TAX_LABEL);
         }
 
@@ -1419,11 +1447,131 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         // Current User Cannot Remove Listing of Others
         if ($listing->post_author != get_current_user_id() && !current_user_can('delete_others_posts')) $this->response(['success' => 0]);
+        if (!current_user_can('delete_post', $id)) $this->response(['success' => 0]);
 
         // Delete The Post
-        wp_delete_post($id);
+        $deleted = $listing->post_status === LSD_Base::STATUS_TRASH ? wp_delete_post($id, true) : wp_trash_post($id);
+
+        if (!$deleted) $this->response(['success' => 0]);
 
         // Response
+        $this->response(['success' => 1]);
+    }
+
+    public function status_action()
+    {
+        if (!isset($_POST['_lsdnonce'])) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is missing!', 'listdom')]);
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_lsdnonce'])), 'lsd_dashboard')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is not valid!', 'listdom')]);
+
+        $id = isset($_POST['id']) ? absint(wp_unslash($_POST['id'])) : 0;
+        $action = isset($_POST['status_action']) ? sanitize_key(wp_unslash($_POST['status_action'])) : '';
+        $listing = $id ? get_post($id) : null;
+
+        if (!$listing instanceof WP_Post || $listing->post_type !== LSD_Base::PTYPE_LISTING) $this->response(['success' => 0]);
+        if (!current_user_can('edit_post', $id) || ((int) $listing->post_author !== get_current_user_id() && !current_user_can('edit_others_posts'))) $this->response(['success' => 0]);
+
+        if ($action === 'restore')
+        {
+            if (!current_user_can('delete_post', $id)) $this->response(['success' => 0]);
+
+            $trash_status = get_post_meta($id, '_wp_trash_meta_status', true);
+            $restore_status = $trash_status;
+            $restoring_public_status = in_array($trash_status, [LSD_Base::STATUS_PUBLISHED, LSD_Base::STATUS_SCHEDULED], true);
+            if ($restoring_public_status)
+            {
+                $valid = apply_filters('lsd_dashboard_validate_request', true);
+                if ($valid !== true) $restore_status = LSD_Base::STATUS_PENDING;
+                else if (!current_user_can('publish_posts'))
+                {
+                    $restore_status = apply_filters('lsd_dashboard_listing_status', LSD_Base::STATUS_PENDING, [
+                        'id' => $id,
+                        'listing' => $listing,
+                        'subscription_id' => get_post_meta($id, 'lsd_subscription', true),
+                    ]);
+                }
+            }
+
+            $updated = wp_untrash_post($id);
+            if ($updated && $restore_status !== get_post_status($id)) $updated = wp_update_post(['ID' => $id, 'post_status' => $restore_status], true);
+        }
+        else
+        {
+            $valid = apply_filters('lsd_dashboard_validate_request', true);
+            if ($valid !== true) $this->response(['success' => 0, 'message' => $valid]);
+
+            $allowed_transitions = [
+                LSD_Base::STATUS_DRAFT => ['publish', 'pending'],
+                LSD_Base::STATUS_SCHEDULED => ['publish', 'pending'],
+                LSD_Base::STATUS_OFFLINE => ['publish', 'pending'],
+                LSD_Base::STATUS_DENIED => ['pending'],
+                LSD_Base::STATUS_INACTIVE => ['publish', 'pending'],
+            ];
+            if (!isset($allowed_transitions[$listing->post_status]) || !in_array($action, $allowed_transitions[$listing->post_status], true)) $this->response(['success' => 0]);
+            if ($action === 'publish' && !current_user_can('publish_posts')) $action = 'pending';
+
+            $action = apply_filters('lsd_dashboard_listing_status', $action, [
+                'id' => $id,
+                'listing' => $listing,
+                'subscription_id' => get_post_meta($id, 'lsd_subscription', true),
+            ]);
+
+            if ($listing->post_status === LSD_Base::STATUS_DENIED) $action = LSD_Base::STATUS_PENDING;
+            if (!in_array($action, ['publish', 'pending'], true)) $this->response(['success' => 0]);
+            $publish_now = in_array($listing->post_status, [LSD_Base::STATUS_DRAFT, LSD_Base::STATUS_SCHEDULED], true) && $action === 'publish';
+
+            $post_data = [
+                'ID' => $id,
+                'post_status' => $action,
+            ];
+
+            if ($publish_now)
+            {
+                $now = current_time('mysql');
+                $post_data['post_date'] = $now;
+                $post_data['post_date_gmt'] = get_gmt_from_date($now);
+            }
+
+            $updated = wp_update_post($post_data, true);
+        }
+
+        if (is_wp_error($updated) || !$updated) $this->response(['success' => 0]);
+        $updated_listing = get_post($id);
+        if ($updated_listing instanceof WP_Post)
+        {
+            $put_online = $listing->post_status === LSD_Base::STATUS_OFFLINE && $action === 'publish';
+            if ($put_online) do_action('lsd_dashboard_listing_put_online', $listing, $action);
+            if ($action === 'publish' || ($action === 'restore' && $updated_listing->post_status === LSD_Base::STATUS_PUBLISHED)) do_action('lsd_dashboard_listing_published', $updated_listing);
+            do_action('lsd_listing_saved', $updated_listing, [], false);
+        }
+        $this->response(['success' => 1]);
+    }
+
+    public function schedule_action()
+    {
+        if (!isset($_POST['_lsdnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_lsdnonce'])), 'lsd_dashboard')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is not valid!', 'listdom')]);
+
+        $id = isset($_POST['id']) ? absint(wp_unslash($_POST['id'])) : 0;
+        $listing = $id ? get_post($id) : null;
+        $datetime = isset($_POST['datetime']) ? sanitize_text_field(wp_unslash($_POST['datetime'])) : '';
+
+        if (!$listing instanceof WP_Post || $listing->post_type !== LSD_Base::PTYPE_LISTING || $listing->post_status !== LSD_Base::STATUS_SCHEDULED) $this->response(['success' => 0]);
+        if (!current_user_can('edit_post', $id) || ((int) $listing->post_author !== get_current_user_id() && !current_user_can('edit_others_posts'))) $this->response(['success' => 0]);
+        if (!current_user_can('publish_posts')) $this->response(['success' => 0]);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $datetime)) $this->response(['success' => 0, 'message' => esc_html__('Please enter a valid date and time.', 'listdom')]);
+
+        $date_time = \DateTimeImmutable::createFromFormat('!Y-m-d\\TH:i', $datetime, wp_timezone());
+        if (!$date_time || $date_time->getTimestamp() <= current_time('timestamp', true) + MINUTE_IN_SECONDS) $this->response(['success' => 0, 'message' => esc_html__('Please choose a future date and time.', 'listdom')]);
+
+        $local_date = $date_time->format('Y-m-d H:i:s');
+        $updated = wp_update_post([
+            'ID' => $id,
+            'post_date' => $local_date,
+            'post_date_gmt' => get_gmt_from_date($local_date),
+        ], true);
+
+        if (is_wp_error($updated) || !$updated) $this->response(['success' => 0]);
+        $updated_listing = get_post($id);
+        if ($updated_listing instanceof WP_Post) do_action('lsd_listing_quick_updated', $updated_listing);
         $this->response(['success' => 1]);
     }
 
@@ -1572,16 +1720,38 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function listing_counts(): array
     {
-        global $wp_post_statuses;
-        $counts = wp_count_posts(LSD_Base::PTYPE_LISTING, 'readable');
+        $db = new LSD_db();
 
-        $valid = [];
-        foreach ($counts as $s => $count)
+        // Count directly from the posts table so custom statuses such as hold
+        // are included even when an addon has not registered them yet.
+        $where = 'post_type = %s';
+        $args = [LSD_Base::PTYPE_LISTING];
+        if (!current_user_can('edit_others_posts'))
         {
-            if (!$count || !isset($wp_post_statuses[$s])) continue;
-            if (!isset($wp_post_statuses[$s]->show_in_admin_status_list) || !$wp_post_statuses[$s]->show_in_admin_status_list) continue;
+            $where .= ' AND post_author = %d';
+            $args[] = get_current_user_id();
+        }
+        if (!current_user_can('read_private_posts'))
+        {
+            $where .= ' AND (post_status != %s OR post_author = %d)';
+            $args[] = LSD_Base::STATUS_PRIVATE;
+            $args[] = get_current_user_id();
+        }
 
-            $valid[$s] = $count;
+        $query = $db->prepare(
+            "SELECT post_status, COUNT(*) AS count FROM #__posts WHERE {$where} GROUP BY post_status",
+            $args
+        );
+        $rows = $db->select($query, 'loadObjectList');
+        $counts = [];
+        foreach ($rows as $row) $counts[(string) $row->post_status] = (int) $row->count;
+        $valid = [];
+
+        foreach ($this->get_listing_statuses_data() as $status => $data)
+        {
+            $count = $counts[$status] ?? 0;
+            if ($status === LSD_Base::STATUS_HOLD) $count += $counts['on-hold'] ?? 0;
+            if ($count) $valid[$status] = $count;
         }
 
         return $valid;
@@ -1639,7 +1809,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function get_listing_statuses_data(): array
     {
-        return [
+        $statuses = [
             LSD_Base::STATUS_TRASH => [
                 'label' => esc_html__('Trash', 'listdom'),
                 'icon' => 'fa-solid fa-trash-alt',
@@ -1690,7 +1860,26 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 'icon' => 'fa-regular fa-circle-check',
                 'class' => 'lsd-dashboard-status-published',
             ],
+            LSD_Base::STATUS_PRIVATE => [
+                'label' => esc_html__('Private', 'listdom'),
+                'icon' => 'fa-solid fa-lock',
+                'class' => 'lsd-dashboard-status-private',
+            ],
         ];
+
+        foreach ((new LSD_Statuses())->statuses() as $key => $params)
+        {
+            if (isset($statuses[$key])) continue;
+
+            $label = $params['applied'] ?? ($params['args']['label'] ?? $key);
+            $statuses[$key] = [
+                'label' => (string) $label,
+                'icon' => 'fa-regular fa-circle',
+                'class' => 'lsd-dashboard-status-' . sanitize_html_class($key),
+            ];
+        }
+
+        return $statuses;
     }
 
     public function get_listing_status_data(string $status): array
@@ -1702,6 +1891,69 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             'icon' => 'far fa-file-alt',
             'class' => 'lsd-dashboard-status-unknown',
         ];
+    }
+
+    public function get_listing_status_key(WP_Post $listing): string
+    {
+        return $listing->post_status === 'on-hold' ? LSD_Base::STATUS_HOLD : $listing->post_status;
+    }
+
+    public function get_listing_status_tooltip(WP_Post $listing, array $status): string
+    {
+        if ($listing->post_status !== LSD_Base::STATUS_SCHEDULED) return $status['label'];
+
+        $schedule_datetime = get_date_from_gmt($listing->post_date_gmt, LSD_Base::datetime_format());
+        if (!$schedule_datetime) return $status['label'];
+
+        return sprintf(
+            /* translators: 1: listing status, 2: scheduled date and time. */
+            esc_html__('%1$s: %2$s', 'listdom'),
+            $status['label'],
+            $schedule_datetime
+        );
+    }
+
+    public function get_listing_renewal(WP_Post $listing): array
+    {
+        // Renewal Defaults
+        $renewal = [
+            'link' => '',
+            'unavailable_message' => '',
+        ];
+
+        if ($listing->post_status !== LSD_Base::STATUS_EXPIRED) return $renewal;
+        if ((int) $listing->post_author !== get_current_user_id()) return $renewal;
+        if (!class_exists('LSDPACSUB\\Base')) return $renewal;
+
+        // Subscription and Package
+        $subscription_id = (int) get_post_meta($listing->ID, 'lsd_subscription', true);
+        $subscription = $subscription_id ? get_post($subscription_id) : null;
+        $package_id = $subscription instanceof WP_Post ? (int) get_post_meta($subscription->ID, 'lsd_package', true) : 0;
+        $package_post = $package_id ? get_post($package_id) : null;
+
+        if ($package_post instanceof WP_Post && $package_post->post_type === LSDPACSUB\Base::PTYPE_PACKAGE && $package_post->post_status === 'publish')
+        {
+            $package = new LSDPACSUB\Package($package_post);
+            // Purchase State
+            $purchase_state = $package->get_purchase_state(get_current_user_id(), 'renew');
+
+            if (!empty($purchase_state['can_purchase'])) $renewal['link'] = $package->url();
+            else $renewal['unavailable_message'] = $purchase_state['message'] ?: esc_html__('This package is unavailable right now.', 'listdom');
+        }
+        else $renewal['unavailable_message'] = esc_html__('The original package is no longer available.', 'listdom');
+
+        return $renewal;
+    }
+
+    public function get_listing_payment_link(WP_Post $listing): string
+    {
+        if ((int) $listing->post_author !== get_current_user_id()) return '';
+        if (!class_exists('LSD_Dashboard_Payments') || !(new LSD_Dashboard_Payments())->is_available()) return '';
+
+        return $this->add_qs_vars([
+            'mode' => LSD_Dashboard_Payments::MODE,
+            LSD_Dashboard_Payments::SECTION_QUERY_VAR => 'overview',
+        ], $this->url);
     }
 
     public function get_listing_primary_category_name(WP_Post $listing): string
@@ -1789,8 +2041,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             ];
         }
 
-        if (taxonomy_exists(LSD_Base::TAX_LABEL) && class_exists('\LSDPACLBL\Base'))
+        if (taxonomy_exists(LSD_Base::TAX_LABEL) && class_exists('\LSDPACLBL\Access'))
         {
+            $access = new \LSDPACLBL\Access();
             $labels = wp_get_post_terms((int) $listing->ID, LSD_Base::TAX_LABEL, ['fields' => 'all']);
 
             if (!is_wp_error($labels) && is_array($labels))
@@ -1801,30 +2054,22 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 {
                     if (!$label instanceof WP_Term) continue;
 
-                    if (!metadata_exists('post', (int) $listing->ID, 'lsd_labelize_time_' . (int) $label->term_id)) continue;
+                    if (!$access->is_active((int) $listing->ID, (int) $label->term_id)) continue;
 
                     $has_labelized_badge = true;
                     break;
                 }
 
-                if ($has_labelized_badge)
-                {
-                    $badges[] = [
-                        'label' => esc_html__('Labelized', 'listdom'),
-                        'class' => 'lsd-labelize',
-                    ];
-                }
+                if ($has_labelized_badge) $badges[] = ['label' => esc_html__('Labelized', 'listdom'), 'class' => 'lsd-labelize',];
             }
         }
 
-        $topup_time = (int) get_post_meta($listing->ID, 'lsd_topup', true);
-
-        if ($topup_time > 0 && class_exists('\LSDPACTUP\Topup'))
+        if (class_exists('\LSDPACTUP\Access'))
         {
-            $badges[] = [
-                'label' => esc_html__('Top-Uped', 'listdom'),
-                'class' => 'lsd-success',
-            ];
+            $topup_access = new \LSDPACTUP\Access();
+            $is_topped_up = $topup_access->is_active((int) $listing->ID);
+
+            if ($is_topped_up) $badges[] = ['label' => esc_html__('Top-Uped', 'listdom'), 'class' => 'lsd-success'];
         }
 
         return $badges;

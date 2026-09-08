@@ -257,6 +257,7 @@
   line-height: 16px;
   padding: 4px 8px;
   border-radius: 12px;
+  width: max-content;
 }
 .lsd-badge i, ul.lsd-boxed-list li i {
   height: 13px;
@@ -339,6 +340,13 @@
 }
 .lsd-badge.lsd-neutral i, ul.lsd-boxed-list li i {
   color: var(--lsd-neutral-badge, #8D8D8D);
+}
+
+.lsd-dashboard-payments-activity-recurring i {
+  width: 16px;
+  height: 14px;
+  font-size: 10px;
+  line-height: 9px;
 }
 
 ul.lsd-unordered {
@@ -1719,25 +1727,22 @@ form button[type="submit"].lsd-text-button:disabled {
 .toplevel_page_listdom #wpcontent,
 body[class*="_page_listdom-ix"] #wpcontent,
 body[class*="_page_listdom-settings"] #wpcontent,
-body[class*="_page_listdom-addons"] #wpcontent,
 body[class*="_page_listdom-launch-checklist"] #wpcontent,
-body[class*="_page_listdom-licenses"] #wpcontent {
+body[class*="_page_listdom-connect"] #wpcontent {
   padding: 0;
 }
 .toplevel_page_listdom .wrap,
 body[class*="_page_listdom-ix"] .wrap,
 body[class*="_page_listdom-settings"] .wrap,
-body[class*="_page_listdom-addons"] .wrap,
 body[class*="_page_listdom-launch-checklist"] .wrap,
-body[class*="_page_listdom-licenses"] .wrap {
+body[class*="_page_listdom-connect"] .wrap {
   margin: 0 !important;
 }
 .toplevel_page_listdom .notice,
 body[class*="_page_listdom-ix"] .notice,
 body[class*="_page_listdom-settings"] .notice,
-body[class*="_page_listdom-addons"] .notice,
 body[class*="_page_listdom-launch-checklist"] .notice,
-body[class*="_page_listdom-licenses"] .notice {
+body[class*="_page_listdom-connect"] .notice {
   display: none !important;
 }
 

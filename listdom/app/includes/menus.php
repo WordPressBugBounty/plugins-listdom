@@ -38,7 +38,7 @@ class LSD_Menus extends LSD_Base
 
         $listdom_name = LSD_Branding::name();
         $listdom = esc_html($listdom_name);
-        $licenses = esc_html__('Licenses', 'listdom');
+        $webilia = esc_html__('Webilia Connect', 'listdom');
         $help = esc_html__('Help', 'listdom');
 
         $needs_attention = current_user_can('manage_options') ? LSD_Checklist::instance()->needs_attention_count() : 0;
@@ -48,10 +48,10 @@ class LSD_Menus extends LSD_Base
         }
 
         $pending = LSD_Payments_Engine::instance()->listdom() ? LSD_Payments::pending_count() : 0;
-        $backend_badge = (int) apply_filters('lsd_backend_main_badge', 0);
+        $backend_badge = self::displayActivationTab() ? self::webiliaBadgeCount() : 0;
         if ($backend_badge > 0)
         {
-            $licenses .= ' <span class="update-plugins count-' . esc_attr($backend_badge) . '"><span class="update-count">' . esc_html($backend_badge) . '</span></span>';
+            $webilia .= ' <span class="update-plugins count-' . esc_attr($backend_badge) . '"><span class="update-count">' . esc_html($backend_badge) . '</span></span>';
         }
 
         add_menu_page(esc_html($listdom_name), $listdom, 'manage_options', 'listdom', null, $icon, 26);
@@ -72,15 +72,79 @@ class LSD_Menus extends LSD_Base
         add_submenu_page('listdom', esc_html__('Settings', 'listdom'), esc_html__('Settings', 'listdom'), 'manage_options', 'listdom-settings', [$this->settings, 'output'], 5);
         add_submenu_page('listdom', esc_html__('Import / Export', 'listdom'), esc_html__('Import / Export', 'listdom'), 'manage_options', 'listdom-ix', [$this->ix, 'output'], 6);
 
-        if (apply_filters('lsd_display_activation_tab', true))
-        {
-            add_submenu_page('listdom', esc_html__('Licenses', 'listdom'), $licenses, 'manage_options', 'listdom-licenses', [$this->licenses, 'content'], 32);
-        }
+        add_submenu_page('listdom', esc_html__('Webilia Connect', 'listdom'), $webilia, 'manage_options', 'listdom-connect', [$this, 'connect'], 31);
 
         add_submenu_page('listdom', esc_html__('Help', 'listdom'), $help, 'manage_options', LSD_Checklist::MENU_SLUG, [$this->launch_checklist, 'output'], 33);
         add_submenu_page(LSD_Checklist::MENU_SLUG, esc_html__('Welcome to Listdom Setup Wizard', 'listdom'), esc_html__('Wizard', 'listdom'), 'manage_options', LSD_Base::WELCOME_SLUG, [$this->welcome, 'output'], 1);
 
-        add_submenu_page('listdom', esc_html__('Addons', 'listdom'), '<span style="color: #ffd700; font-weight: bold;">' . esc_html__('Addons', 'listdom') . '</span>', 'manage_options', 'listdom-addons', [$this->addons, 'output'], 99);
+    }
+
+    public function connect(): void
+    {
+        $tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'connect';
+        $tabs = self::webiliaTabs($tab);
+        $available_tabs = array_column($tabs, 'key');
+        if (!in_array($tab, $available_tabs, true)) $tab = 'connect';
+
+        if ($tab === 'licenses')
+        {
+            $this->licenses->content();
+            return;
+        }
+
+        if ($tab === 'addons')
+        {
+            $this->addons->output();
+            return;
+        }
+
+        $this->include_html_file('menus/connect/tpl.php', ['parameters' => ['active_tab' => $tab]]);
+    }
+
+    public static function webiliaTabs(string $selected = 'connect'): array
+    {
+        $url = admin_url('admin.php?page=listdom-connect');
+        $tabs = [];
+
+        $tabs[] = [
+            'key' => 'connect',
+            'title' => esc_html__('Connect', 'listdom'),
+            'url' => add_query_arg('tab', 'connect', $url),
+        ];
+
+        if (self::displayActivationTab())
+        {
+            $tabs[] = [
+                'key' => 'licenses',
+                'title' => esc_html__('Licenses', 'listdom'),
+                'url' => add_query_arg('tab', 'licenses', $url),
+                'badge' => self::webiliaBadgeCount(),
+            ];
+        }
+
+        $tabs[] = [
+            'key' => 'addons',
+            'title' => esc_html__('Addons', 'listdom'),
+            'url' => add_query_arg('tab', 'addons', $url),
+        ];
+
+        foreach ($tabs as &$tab)
+        {
+            $tab['selected'] = $tab['key'] === $selected;
+        }
+        unset($tab);
+
+        return $tabs;
+    }
+
+    public static function webiliaBadgeCount(): int
+    {
+        return (int) apply_filters('lsd_backend_main_badge', 0);
+    }
+
+    private static function displayActivationTab(): bool
+    {
+        return (bool) apply_filters('lsd_display_activation_tab', true);
     }
 
     public function update_main_menu_badge(): void

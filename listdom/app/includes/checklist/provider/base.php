@@ -36,7 +36,7 @@ abstract class LSD_Checklist_Provider_Base implements LSD_Checklist_Provider_Int
 
     protected function addon_action_url(string $key): string
     {
-        if (!$this->addon_active($key)) return admin_url('admin.php?page=listdom-addons');
+        if (!$this->addon_active($key)) return admin_url('admin.php?page=listdom-connect&tab=addons');
 
         return admin_url('admin.php?page=listdom-settings&tab=addons&subtab=' . rawurlencode($key));
     }

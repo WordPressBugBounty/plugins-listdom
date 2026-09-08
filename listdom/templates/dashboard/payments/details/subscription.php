@@ -67,9 +67,10 @@ if (!is_array($detail))
             </div>
             <div class="lsd-dashboard-payments-subscription-progress-card-head">
                 <?php if (!empty($detail['disable_autorenew_enabled'])): ?>
+                    <span class="lsd-tooltip lsd-tooltip-top" data-lsd-tooltip="<?php esc_attr_e('Disable auto-renewal', 'listdom'); ?>">
                     <button
                         type="button"
-                        class="lsd-fe-icon-button lsd-tooltip lsd-tooltip-top lsd-dashboard-payments-disable-autorenew lsd-fe-icon-button-trash"
+                        class="lsd-fe-icon-button lsd-dashboard-payments-disable-autorenew lsd-fe-icon-button-trash"
                         data-recurring-id="<?php echo esc_attr($detail['recurring_id']); ?>"
                         data-nonce="<?php echo esc_attr($detail['disable_autorenew_nonce']); ?>"
                         data-dashboard-url="<?php echo esc_url($dashboard->url); ?>"
@@ -79,10 +80,10 @@ if (!is_array($detail))
                         data-confirm-approve-label="<?php esc_attr_e('Yes', 'listdom'); ?>"
                         data-confirm-cancel-label="<?php esc_attr_e('No', 'listdom'); ?>"
                         aria-label="<?php esc_attr_e('Disable auto-renewal', 'listdom'); ?>"
-                        data-lsd-tooltip="<?php esc_attr_e('Disable auto-renewal', 'listdom'); ?>"
                     >
                         <i class="lsd-fe-icon fa fa-trash-alt"></i>
                     </button>
+                    </span>
                 <?php endif; ?>
                 <?php if (!empty($detail['activate_autorenew_enabled'])): ?>
                     <button

@@ -304,6 +304,25 @@ class LSD_Shortcodes_Checkout extends LSD_Base
         $gateway = LSD_Payments::gateway($gateway_key);
         if (!$gateway || !$gateway->enabled() || !$gateway->validate($_POST)) wp_send_json(['success' => 0, 'message' => esc_html__('Payment is invalid.', 'listdom')]);
 
+        $cart_id = $this->get_checkout_cart_id();
+        $paypal_order_id = $gateway_key === 'paypal' ? sanitize_text_field(wp_unslash($_POST['paypal_order_id'] ?? '')) : '';
+        if ($paypal_order_id !== '')
+        {
+            $existing_order_id = LSD_Main::get_post_id_by_meta('lsd_paypal_order_id', $paypal_order_id);
+            if ($existing_order_id && get_post_status($existing_order_id) === LSD_Payments::STATUS_COMPLETED)
+            {
+                $existing_order = LSD_Payments_Orders::get($existing_order_id);
+                if ($existing_order && $this->can_replay_paypal_order($existing_order, $cart_id))
+                {
+                    wp_send_json([
+                        'success' => 1,
+                        'order_id' => $existing_order_id,
+                        'key' => $existing_order->get_key(),
+                    ]);
+                }
+            }
+        }
+
         $cart = new LSD_Cart();
         $items = $cart->get_items();
         $checkout_validation_error = apply_filters('lsd_payments_checkout_validation_error', '', $items, $_POST, 0);
@@ -366,6 +385,8 @@ class LSD_Shortcodes_Checkout extends LSD_Base
         ]);
 
         $order_key = get_post_meta($order_id, 'lsd_key', true);
+        if ($paypal_order_id !== '') update_post_meta($order_id, 'lsd_paypal_order_id', $paypal_order_id);
+        if ($paypal_order_id !== '' && $cart_id !== '') update_post_meta($order_id, 'lsd_checkout_cart_id', $cart_id);
 
         $completion = $gateway->complete_order($order_id, [
             'items' => $items,
@@ -414,6 +435,20 @@ class LSD_Shortcodes_Checkout extends LSD_Base
             'order_id' => $order_id,
             'key' => $order_key,
         ]);
+    }
+
+    protected function get_checkout_cart_id(): string
+    {
+        return isset($_COOKIE['lsd_cart_id']) ? sanitize_text_field(wp_unslash($_COOKIE['lsd_cart_id'])) : '';
+    }
+
+    protected function can_replay_paypal_order(LSD_Payments_Order $order, string $cart_id): bool
+    {
+        $current_user_id = get_current_user_id();
+        if ($current_user_id > 0 && $current_user_id === $order->get_user_id()) return true;
+
+        $stored_cart_id = (string) get_post_meta($order->get_id(), 'lsd_checkout_cart_id', true);
+        return $cart_id !== '' && $stored_cart_id !== '' && hash_equals($stored_cart_id, $cart_id);
     }
 
     protected function auth_requirement(array $items): array
