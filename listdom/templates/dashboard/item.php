@@ -21,6 +21,11 @@ $skip_dashboard_actions = false;
 $detail_parts = $this->get_listing_detail_parts($listing);
 $badges = $this->get_listing_badges($listing);
 $selection_control = apply_filters('lsd_dashboard_listing_selection_control', '', $listing);
+$schedule_modal_id = $this->form_id('lsd_dashboard_schedule_modal_' . $listing->ID);
+$schedule_title_id = $this->form_id('lsd_dashboard_schedule_title_' . $listing->ID);
+$schedule_datetime_id = $this->form_id('lsd_dashboard_schedule_datetime_' . $listing->ID);
+$visibility_modal_id = $this->form_id('lsd_dashboard_visibility_modal_' . $listing->ID);
+$visibility_title_id = $this->form_id('lsd_dashboard_visibility_title_' . $listing->ID);
 
 // Listing Permissions
 $can_edit_listing = LSD_Capability::can('edit_listings', 'edit_posts') && current_user_can('edit_post', $listing->ID);
@@ -28,7 +33,7 @@ $can_manage_listing_status = $can_edit_listing && ((int) $listing->post_author =
 $is_listing_owner = (int) $listing->post_author === get_current_user_id();
 $visibility_enabled = class_exists('LSDPACVIS\\Module') && LSD_Components::visibility() && $this->is_enabled('visibility', $listing->ID);
 ?>
-<li id="lsd_dashboard_listing_<?php echo esc_attr($listing->ID); ?>">
+<li id="<?php echo esc_attr($this->form_id('lsd_dashboard_listing_' . $listing->ID)); ?>" data-listing-id="<?php echo esc_attr($listing->ID); ?>">
     <div class="lsd-dashboard-listing-item">
         <?php echo $selection_control; ?>
         <div class="lsd-dashboard-listing-status-icon">
@@ -95,7 +100,7 @@ $visibility_enabled = class_exists('LSDPACVIS\\Module') && LSD_Components::visib
                             <?php endif; ?>
                         <?php elseif ($status_key === LSD_Base::STATUS_SCHEDULED): ?>
                             <?php if ($can_manage_listing_status && current_user_can('publish_posts')): ?>
-                                <button type="button" class="lsd-actions-menu-item lsd-dashboard-action-schedule lsd-dashboard-schedule-open" data-modal="#lsd_dashboard_schedule_modal_<?php echo esc_attr($listing->ID); ?>">
+                                <button type="button" class="lsd-actions-menu-item lsd-dashboard-action-schedule lsd-dashboard-schedule-open" data-modal="#<?php echo esc_attr($schedule_modal_id); ?>">
                                     <i class="lsd-fe-icon fa-solid fa-refresh" aria-hidden="true"></i>
                                     <span><?php esc_html_e('Edit Schedule', 'listdom'); ?></span>
                                 </button>
@@ -108,7 +113,7 @@ $visibility_enabled = class_exists('LSDPACVIS\\Module') && LSD_Components::visib
                             <?php endif; ?>
                         <?php elseif ($status_key === LSD_Base::STATUS_OFFLINE): ?>
                             <?php if ($can_manage_listing_status && $visibility_enabled): ?>
-                                <button type="button" class="lsd-actions-menu-item lsd-dashboard-action-visibility lsd-dashboard-visibility-open" data-modal="#lsd_dashboard_visibility_modal_<?php echo esc_attr($listing->ID); ?>">
+                                <button type="button" class="lsd-actions-menu-item lsd-dashboard-action-visibility lsd-dashboard-visibility-open" data-modal="#<?php echo esc_attr($visibility_modal_id); ?>">
                                     <i class="lsd-fe-icon fa-solid fa-eye" aria-hidden="true"></i>
                                     <span><?php esc_html_e('Edit Visibility', 'listdom'); ?></span>
                                 </button>
@@ -203,12 +208,12 @@ $visibility_enabled = class_exists('LSDPACVIS\\Module') && LSD_Components::visib
     </div>
 
     <?php if ($status_key === LSD_Base::STATUS_SCHEDULED): ?>
-        <div id="lsd_dashboard_schedule_modal_<?php echo esc_attr($listing->ID); ?>" class="lsd-modal lsd-dashboard-schedule-modal" role="dialog" aria-modal="true" aria-labelledby="lsd_dashboard_schedule_title_<?php echo esc_attr($listing->ID); ?>">
+        <div id="<?php echo esc_attr($schedule_modal_id); ?>" class="lsd-modal lsd-dashboard-schedule-modal" role="dialog" aria-modal="true" aria-labelledby="<?php echo esc_attr($schedule_title_id); ?>">
             <div class="lsd-modal-content">
                 <div class="lsd-fe-section-heading">
                     <div class="lsd-fe-title-icon">
                         <i class="lsd-fe-icon fa-solid fa-calendar-days" aria-hidden="true"></i>
-                        <h3 id="lsd_dashboard_schedule_title_<?php echo esc_attr($listing->ID); ?>" class="lsd-fe-title"><?php esc_html_e('Edit Schedule', 'listdom'); ?></h3>
+                        <h3 id="<?php echo esc_attr($schedule_title_id); ?>" class="lsd-fe-title"><?php esc_html_e('Edit Schedule', 'listdom'); ?></h3>
                     </div>
                     <p class="lsd-fe-description"><?php echo esc_html($listing->post_title); ?></p>
                 </div>
@@ -217,7 +222,7 @@ $visibility_enabled = class_exists('LSDPACVIS\\Module') && LSD_Components::visib
                         <label>
                             <span><?php esc_html_e('Date & Time', 'listdom'); ?></span>
                             <?php echo LSD_Form::input([
-                                'id' => 'lsd_dashboard_schedule_datetime_' . $listing->ID,
+                                'id' => $schedule_datetime_id,
                                 'class' => 'lsd-dashboard-schedule-datetime',
                                 'value' => get_date_from_gmt($listing->post_date_gmt, 'Y-m-d\TH:i'),
                             ], 'datetime-local'); ?>
@@ -234,12 +239,12 @@ $visibility_enabled = class_exists('LSDPACVIS\\Module') && LSD_Components::visib
     <?php endif; ?>
 
     <?php if ($status_key === LSD_Base::STATUS_OFFLINE && $can_manage_listing_status && $visibility_enabled): ?>
-        <div id="lsd_dashboard_visibility_modal_<?php echo esc_attr($listing->ID); ?>" class="lsd-modal lsd-dashboard-visibility-modal" role="dialog" aria-modal="true" aria-labelledby="lsd_dashboard_visibility_title_<?php echo esc_attr($listing->ID); ?>">
+        <div id="<?php echo esc_attr($visibility_modal_id); ?>" class="lsd-modal lsd-dashboard-visibility-modal" role="dialog" aria-modal="true" aria-labelledby="<?php echo esc_attr($visibility_title_id); ?>">
             <div class="lsd-modal-content">
                 <div class="lsd-fe-section-heading">
                     <div class="lsd-fe-title-icon">
                         <i class="lsd-fe-icon fa-solid fa-eye" aria-hidden="true"></i>
-                        <h3 id="lsd_dashboard_visibility_title_<?php echo esc_attr($listing->ID); ?>" class="lsd-fe-title"><?php esc_html_e('Edit Visibility', 'listdom'); ?></h3>
+                        <h3 id="<?php echo esc_attr($visibility_title_id); ?>" class="lsd-fe-title"><?php esc_html_e('Edit Visibility', 'listdom'); ?></h3>
                     </div>
                     <p class="lsd-fe-description"><?php echo esc_html($listing->post_title); ?></p>
                 </div>

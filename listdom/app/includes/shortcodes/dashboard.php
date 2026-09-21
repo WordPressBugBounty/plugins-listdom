@@ -19,6 +19,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     public $form_columns;
     public $sidebar_status;
     public $sidebar_horizontal_mode;
+    public $form_id_suffix = '';
+    public $widget_options = [];
     /**
      * @var WP_Query
      */
@@ -35,15 +37,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $form_columns = isset($this->settings['dashboard_form_columns']) ? (int) $this->settings['dashboard_form_columns'] : 2;
         $this->form_columns = $form_columns === 1 ? 1 : 2;
 
-        // Sidebar Status
-        $sidebar_status = $this->settings['dashboard_menu_sidebar_status'] ?? 'default';
-        $allowed_sidebar_status = ['default', 'compact', 'horizontal'];
-        $this->sidebar_status = in_array($sidebar_status, $allowed_sidebar_status, true) ? $sidebar_status : 'default';
-
-        // Horizontal Sidebar Mode
-        $horizontal_mode = $this->settings['dashboard_menu_sidebar_horizontal_mode'] ?? 'default';
-        $allowed_horizontal_modes = ['default', 'dropdown', 'carousel'];
-        $this->sidebar_horizontal_mode = in_array($horizontal_mode, $allowed_horizontal_modes, true) ? $horizontal_mode : 'default';
+        $this->reset_layout();
 
         // Listdom Pro?
         $this->is_pro = $this->isPro();
@@ -96,11 +90,28 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $attributes = is_array($options['attributes']) ? $options['attributes'] : [];
         $attributes['data-sidebar-status'] = $sidebar_status;
         $attributes['data-horizontal-mode'] = $sidebar_horizontal_mode;
+        $attributes['data-dashboard-nonce'] = wp_create_nonce('lsd_dashboard');
+        if (!empty($this->widget_options['mobile_behavior'])) $attributes['data-mobile-behavior'] = sanitize_key($this->widget_options['mobile_behavior']);
+        if (!empty($this->widget_options['content_loading'])) $attributes['data-content-loading'] = sanitize_key($this->widget_options['content_loading']);
+        if (!empty($this->widget_options['elementor_widget_id'])) $attributes['data-elementor-widget-id'] = sanitize_key($this->widget_options['elementor_widget_id']);
+
+        if (($this->widget_options['sidebar_position'] ?? 'left') === 'right') $classes[] = 'lsd-dashboard-sidebar-right';
 
         return [
             'class' => implode(' ', array_unique($classes)),
             'attributes' => $this->format_html_attributes($attributes),
         ];
+    }
+
+    private function reset_layout(): void
+    {
+        $sidebar_status = $this->settings['dashboard_menu_sidebar_status'] ?? 'default';
+        $allowed_sidebar_status = ['default', 'compact', 'horizontal'];
+        $this->sidebar_status = in_array($sidebar_status, $allowed_sidebar_status, true) ? $sidebar_status : 'default';
+
+        $horizontal_mode = $this->settings['dashboard_menu_sidebar_horizontal_mode'] ?? 'default';
+        $allowed_horizontal_modes = ['default', 'dropdown', 'carousel'];
+        $this->sidebar_horizontal_mode = in_array($horizontal_mode, $allowed_horizontal_modes, true) ? $horizontal_mode : 'default';
     }
 
     private function format_html_attributes(array $attributes): string
@@ -122,13 +133,48 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         return $result;
     }
 
-    protected function bootstrap_shortcode_context(array $atts = [], bool $add_listing_payload = false): void
+    protected function setup(array $atts = [], bool $add_listing_payload = false): void
     {
         // Include WordPress Media
         LSD_Assets::media();
 
         // Shortcode attributes
         $this->atts = is_array($atts) ? $atts : [];
+        $this->form_id_suffix = sanitize_key($this->atts['instance'] ?? '');
+
+        $widget_options = LSD_Payload::get('elementor_dashboard_options');
+        if (is_array($widget_options))
+        {
+            $this->widget_options = $widget_options;
+
+            $layout = $widget_options['dashboard_layout'] ?? 'vertical';
+            if ($layout === 'horizontal')
+            {
+                $this->sidebar_status = 'horizontal';
+                $this->sidebar_horizontal_mode = 'default';
+            }
+            else if ($layout === 'minimized')
+            {
+                $this->sidebar_status = 'compact';
+                $this->sidebar_horizontal_mode = 'default';
+            }
+            else
+            {
+                $this->sidebar_status = 'default';
+                $this->sidebar_horizontal_mode = 'default';
+            }
+        }
+        else
+        {
+            $this->widget_options = [];
+            $this->reset_layout();
+        }
+
+        if (($this->widget_options['content_loading'] ?? '') === 'ajax')
+        {
+            if (function_exists('wp_enqueue_editor')) wp_enqueue_editor();
+            LSD_Assets::map(true);
+        }
 
         // Dashboard Page
         global $post;
@@ -212,15 +258,26 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-dashboard');
         if (trim($pre)) return $pre;
 
-        $this->bootstrap_shortcode_context($atts);
+        $this->setup($atts);
+
+        // Menus
+        $menus = $this->menu_ids();
 
         // Mode
-        $this->mode = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : $this->get_default_mode();
+        $requested_mode = isset($_GET['mode']) ? sanitize_key($_GET['mode']) : '';
+        $default_mode = sanitize_key($this->widget_options['default_active_section'] ?? '');
+        $fallback_mode = $default_mode !== 'logout' && isset($menus[$default_mode])
+            ? $default_mode
+            : $this->get_default_mode($menus);
+        $this->mode = $requested_mode !== 'logout' && isset($menus[$requested_mode]) ? $requested_mode : $fallback_mode;
+
+        // Widget custom menu content takes precedence over built-in mode names.
+        $custom_menu = $this->get_widget_custom_menu($this->mode);
 
         // Listdom Bar
         $bar = LSD_Bar::instance();
 
-        if ($this->mode === 'form')
+        if ($this->mode === 'form' && $custom_menu === null)
         {
             $id = isset($_GET['id']) ? (int) sanitize_text_field($_GET['id']) : 0;
 
@@ -238,13 +295,65 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         );
 
         // Dashboard
+        if ($custom_menu !== null)
+        {
+            if (($custom_menu['login_status'] ?? 'required') === 'required' && !is_user_logged_in()) return $this->auth();
+
+            return $this->custom_menu_output($custom_menu);
+        }
+
         if ($this->mode === 'manage') return $this->manage();
         // Form
         else if ($this->mode === 'form') return $this->form();
         // Profile
         else if ($this->mode === 'profile') return $this->profile();
         // Other Modes
-        else return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'warning'), $this);
+        else
+        {
+            $output = apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'warning'), $this);
+
+            // External-only Menus
+            if ($this->mode === '' && count($menus)) return $this->custom_menu_output([]);
+
+            return $output;
+        }
+    }
+
+    private function get_widget_custom_menu(string $mode): ?array
+    {
+        $items = isset($this->widget_options['custom_menu_items']) && is_array($this->widget_options['custom_menu_items'])
+            ? $this->widget_options['custom_menu_items']
+            : [];
+        $reserved = array_keys($this->menu_ids(false, false));
+        $seen = [];
+
+        foreach ($items as $index => $item)
+        {
+            if (!is_array($item) || (int) ($item['enabled'] ?? 1) !== 1) continue;
+            if (trim((string) ($item['content'] ?? '')) === '') continue;
+
+            $slug = sanitize_key($item['slug'] ?? '');
+            if ($slug === '') $slug = 'custom-' . (int) $index;
+            if (in_array($slug, $reserved, true) || isset($seen[$slug])) continue;
+            $seen[$slug] = true;
+            if ($slug !== sanitize_key($mode)) continue;
+
+            return $item;
+        }
+
+        return null;
+    }
+
+    private function custom_menu_output(array $menu): string
+    {
+        $dashboard_wrapper = $this->get_dashboard_wrapper();
+        $content = do_shortcode((string) ($menu['content'] ?? ''));
+
+        return '<div class="' . esc_attr($dashboard_wrapper['class']) . '" id="' . esc_attr($this->form_id('lsd_dashboard')) . '"' . $dashboard_wrapper['attributes'] . '>'
+            . '<div class="lsd-row lsd-dashboard-wrapper">'
+            . '<div class="lsd-dashboard-menus-wrapper">' . LSD_Kses::full($this->menus()) . '</div>'
+            . '<div class="lsd-dashboard-content-wrapper">' . LSD_Kses::full($content) . '</div>'
+            . '</div></div>';
     }
 
     public function manage()
@@ -271,6 +380,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $this->category = isset($_GET['lsd_category']) ? (int) sanitize_text_field($_GET['lsd_category']) : 0;
 
         // Get Listings
+        $this->listings = [];
         $query = [
             'post_type' => LSD_Base::PTYPE_LISTING,
             'posts_per_page' => $this->limit,
@@ -391,6 +501,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         include lsd_template('dashboard/form/submit.php');
     }
 
+    public function form_id(string $id): string
+    {
+        return $this->form_id_suffix === '' ? $id : $id . '_' . $this->form_id_suffix;
+    }
+
     public function profile()
     {
         if (!get_current_user_id()) return $this->auth();
@@ -475,15 +590,29 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $menus = $this->menu_ids();
 
         // Current Page
-        $current = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : $this->get_default_mode($menus);
+        $current = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : sanitize_key($this->widget_options['default_active_section'] ?? $this->get_default_mode($menus));
+        if (!isset($menus[$current])) $current = $this->get_default_mode($menus);
 
         $sidebar_status = $this->sidebar_status ?? 'default';
         $horizontal_mode = $this->sidebar_horizontal_mode ?? 'default';
         $initial_mode = $sidebar_status === 'compact' ? 'compact' : 'default';
 
+        $mobile_behavior = sanitize_key($this->widget_options['mobile_behavior'] ?? '');
+        $menu_id = uniqid('lsd-dashboard-menu-');
         $output = '<div class="lsd-dashboard-menu-container" data-sidebar-status="' . esc_attr($sidebar_status) . '" data-horizontal-mode="' . esc_attr($horizontal_mode) . '">';
+        if (in_array($mobile_behavior, ['hamburger', 'overlay'], true))
+        {
+            $output .= '<button type="button" class="lsd-dashboard-mobile-toggle" aria-expanded="false" aria-controls="' . esc_attr($menu_id) . '">'
+                . '<i class="lsd-fe-icon fa-solid fa-bars" aria-hidden="true"></i>'
+                . '<span class="screen-reader-text">' . esc_html__('Toggle dashboard menu', 'listdom') . '</span>'
+                . '</button>';
+        }
 
         $menu_classes = ['lsd-dashboard-menus'];
+        $active_indicator = sanitize_key($this->widget_options['active_item_indicator'] ?? 'background');
+        if (in_array($active_indicator, ['background', 'border', 'underline', 'none'], true)) $menu_classes[] = 'lsd-dashboard-menu-indicator-' . $active_indicator;
+        if (($this->widget_options['show_menu_icons'] ?? true) === false) $menu_classes[] = 'lsd-dashboard-menu-icons-hidden';
+        if (($this->widget_options['show_menu_labels'] ?? true) === false) $menu_classes[] = 'lsd-dashboard-menu-labels-hidden';
 
         if ($sidebar_status === 'horizontal' && $horizontal_mode === 'carousel')
         {
@@ -491,7 +620,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $menu_classes[] = 'lsd-owl-carousel';
         }
 
-        $output .= '<ul class="' . esc_attr(implode(' ', $menu_classes)) . '">';
+        $output .= '<ul id="' . esc_attr($menu_id) . '" class="' . esc_attr(implode(' ', $menu_classes)) . '">';
 
         $visible_menus = $menus;
         $dropdown_menus = [];
@@ -503,12 +632,16 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $dropdown_menus = array_slice($menus, $dropdown_limit, null, true);
         }
 
-        $render_menu_item = static function ($key, $menu, $current, $extra_classes = '')
+        $show_icons = ($this->widget_options['show_menu_icons'] ?? true) !== false;
+        $show_labels = ($this->widget_options['show_menu_labels'] ?? true) !== false;
+        $render_menu_item = function ($key, $menu, $current, $extra_classes = '') use ($show_icons, $show_labels)
         {
             $target = $menu['target'] ?? '_self';
             $icon = $menu['icon'] ?? 'fas fa-tachometer-alt';
             $id = $menu['id'] ?? 'lsd_dashboard_menus_' . $key;
+            $id = $this->form_id($id);
             $url = $menu['url'] ?? '#';
+            $rel = trim((string) ($menu['rel'] ?? ''));
             $label = $menu['label'] ?? '';
 
             $classes = [];
@@ -518,7 +651,18 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $class_attribute = count($classes) ? ' class="' . esc_attr(implode(' ', $classes)) . '"' : '';
 
             $item  = '<li id="' . esc_attr($id) . '"' . $class_attribute . '>';
-            $item .= '<a href="' . esc_url($url) . '" target="' . esc_attr($target) . '"><i class="lsd-fe-icon ' . esc_attr($icon) . '"></i><span class="lsd-dashboard-menu-label">' . esc_html($label) . '</span></a>';
+            $accessible_label = trim((string) $label);
+            if ($accessible_label === '') $accessible_label = trim((string) ($menu['default_label'] ?? $key));
+            $aria_label = !$show_labels ? ' aria-label="' . esc_attr($accessible_label) . '"' : '';
+            $rel_attribute = $rel !== '' ? ' rel="' . esc_attr($rel) . '"' : '';
+            $item .= '<a href="' . esc_url($url) . '" target="' . esc_attr($target) . '"' . $rel_attribute . $aria_label . '>';
+            if ($show_icons)
+            {
+                if (!empty($menu['icon_html'])) $item .= LSD_Kses::full($menu['icon_html']);
+                else $item .= '<i class="lsd-fe-icon ' . esc_attr($icon) . '" aria-hidden="true"></i>';
+            }
+            if ($show_labels) $item .= '<span class="lsd-dashboard-menu-label">' . esc_html($label) . '</span>';
+            $item .= '</a>';
             $item .= '</li>';
 
             return $item;
@@ -535,10 +679,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             if (isset($dropdown_menus[$current])) $more_classes .= ' lsd-active';
 
             $output .= '<li class="' . esc_attr($more_classes) . '">';
-            $output .= '<a class="lsd-dashboard-menu-more-trigger" aria-haspopup="true" aria-expanded="false">';
+            $output .= '<button type="button" class="lsd-dashboard-menu-more-trigger" aria-haspopup="true" aria-expanded="false">';
             $output .= '<i class="lsd-fe-icon fa-solid fa-ellipsis" aria-hidden="true"></i>';
             $output .= '<span class="screen-reader-text">' . esc_html__('Open additional dashboard links', 'listdom') . '</span>';
-            $output .= '</a>';
+            $output .= '</button>';
             $output .= '<ul class="lsd-dashboard-menu-more-list">';
             foreach ($dropdown_menus as $key => $menu)
             {
@@ -566,7 +710,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         return $output;
     }
 
-    public function menu_ids(bool $include_disabled = false): array
+    public function menu_ids(bool $include_disabled = false, bool $include_widget_menus = true): array
     {
         // Refresh settings for the currently active site.
         $settings = LSD_Options::settings();
@@ -639,21 +783,70 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Apply Filters
         $menus = apply_filters('lsd_dashboard_menus', $menus, $this);
 
+        $widget_options = $include_widget_menus && is_array($this->widget_options) ? $this->widget_options : [];
+        $custom_menu_items = isset($widget_options['custom_menu_items']) && is_array($widget_options['custom_menu_items']) ? $widget_options['custom_menu_items'] : [];
+        $custom_menus = [];
+        foreach ($custom_menu_items as $index => $custom_menu)
+        {
+            if (!is_array($custom_menu) || trim((string) ($custom_menu['label'] ?? '')) === '') continue;
+
+            $key = sanitize_key($custom_menu['slug'] ?? '');
+            if ($key === '') $key = 'custom-' . (int) $index;
+            if ((int) ($custom_menu['enabled'] ?? 1) !== 1) continue;
+            if (($custom_menu['login_status'] ?? 'required') === 'required' && !is_user_logged_in()) continue;
+            if (isset($custom_menus[$key])) continue;
+            if (isset($menus[$key]))
+            {
+                if ($include_disabled || !isset($statuses[$key]) || (int) $statuses[$key] !== 0) continue;
+                unset($menus[$key]);
+            }
+
+            $icon = (string) ($custom_menu['icon'] ?? 'fas fa-link');
+            $icon_html = strpos($icon, '<') !== false ? $icon : '';
+            $icon_class = $icon_html ? '' : implode(' ', array_filter(array_map('sanitize_html_class', preg_split('/\s+/', $icon))));
+            $custom_url = esc_url_raw($custom_menu['url'] ?? '');
+            $has_content = trim((string) ($custom_menu['content'] ?? '')) !== '';
+            if ($has_content) $custom_url = $this->add_qs_var('mode', $key, $this->url);
+
+            $custom_menus[$key] = [
+                'label' => sanitize_text_field($custom_menu['label']),
+                'default_label' => sanitize_text_field($custom_menu['label']),
+                'id' => 'lsd_dashboard_menus_' . $key,
+                'url' => $custom_url,
+                'target' => $has_content || ($custom_menu['target'] ?? '_self') !== '_blank' ? '_self' : '_blank',
+                'rel' => $has_content ? '' : sanitize_text_field($custom_menu['rel'] ?? ''),
+                'icon' => $icon_class ?: 'fas fa-link',
+                'icon_html' => $icon_html,
+                'login_status' => ($custom_menu['login_status'] ?? 'required') === 'optional' ? 'optional' : 'required',
+            ];
+        }
+
+        $visible_menu_items = isset($widget_options['visible_menu_items']) && is_array($widget_options['visible_menu_items'])
+            ? array_values(array_filter(array_map('sanitize_key', $widget_options['visible_menu_items'])))
+            : [];
+        if (array_key_exists('visible_menu_items', $widget_options))
+            $menus = array_intersect_key($menus, array_flip($visible_menu_items));
+
+        foreach ($custom_menus as $key => $custom_menu)
+        {
+            if (!isset($menus[$key])) $menus[$key] = $custom_menu;
+        }
         foreach ($menus as $key => $menu)
         {
-            if (!$include_disabled && isset($statuses[$key]) && (int) $statuses[$key] === 0)
+            if (!$include_disabled && !isset($custom_menus[$key]) && isset($statuses[$key]) && (int) $statuses[$key] === 0)
             {
                 unset($menus[$key]);
                 continue;
             }
 
-            if (!isset($data[$key]) || !is_array($data[$key])) continue;
+            if (!isset($custom_menus[$key]) && isset($data[$key]) && is_array($data[$key]))
+            {
+                $override_label = $data[$key]['label'] ?? '';
+                $override_icon = $data[$key]['icon'] ?? '';
 
-            $override_label = $data[$key]['label'] ?? '';
-            $override_icon = $data[$key]['icon'] ?? '';
-
-            if ($override_label !== '') $menus[$key]['label'] = $override_label;
-            if ($override_icon !== '') $menus[$key]['icon'] = $override_icon;
+                if ($override_label !== '') $menus[$key]['label'] = $override_label;
+                if ($override_icon !== '') $menus[$key]['icon'] = $override_icon;
+            }
         }
 
         // Order Menus
@@ -679,9 +872,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         return $menus;
     }
 
-    public function get_default_mode(array $menus = []): string
+    public function get_default_mode(?array $menus = null): string
     {
-        if (!count($menus)) $menus = $this->menu_ids();
+        if ($menus === null) $menus = $this->menu_ids();
 
         foreach ($menus as $key => $menu)
         {
@@ -691,7 +884,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             if ($url !== '' && strpos($url, 'mode=') !== false) return $key;
         }
 
-        return 'manage';
+        return '';
     }
 
     public function get_form_link($listing_id = null): string
@@ -710,10 +903,35 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $quick_actions = $args['quick_actions'] ?? null;
         $classes = $args['classes'] ?? [];
 
+        if (($args['use_widget_empty_state'] ?? true) && $this->mode === 'manage' && !empty($this->widget_options))
+        {
+            if (isset($this->widget_options['empty_state_title']) && trim((string) $this->widget_options['empty_state_title']) !== '') $args['title'] = $this->widget_options['empty_state_title'];
+            if (isset($this->widget_options['empty_state_description'])) $args['description'] = $this->widget_options['empty_state_description'];
+
+            if (($this->widget_options['empty_show_cta'] ?? true) === false) $action = [];
+            else if (isset($this->widget_options['empty_cta_label']) && trim((string) $this->widget_options['empty_cta_label']) !== '')
+            {
+                $has_cta_url = !empty($this->widget_options['empty_cta_url']);
+                if (!$has_cta_url && !isset($this->menu_ids()['form'])) $action = [];
+                else
+                {
+                    $action = [
+                        'label' => $this->widget_options['empty_cta_label'],
+                        'url' => $has_cta_url ? $this->widget_options['empty_cta_url'] : $this->get_form_link(),
+                        'target' => $has_cta_url ? ($this->widget_options['empty_cta_target'] ?? '_self') : '_self',
+                        'rel' => $has_cta_url ? ($this->widget_options['empty_cta_rel'] ?? '') : '',
+                        'class' => 'lsd-general-button',
+                        'icon' => $this->widget_options['empty_cta_icon'] ?? '',
+                    ];
+                }
+            }
+        }
+
         $empty_state = [
             'title' => isset($args['title']) ? (string) $args['title'] : esc_html__('Nothing here yet', 'listdom'),
             'description' => isset($args['description']) ? (string) $args['description'] : esc_html__('There is no data to show right now.', 'listdom'),
             'image' => isset($args['image']) && trim((string) $args['image']) !== '' ? (string) $args['image'] : 'img/dashboard/no-listings.svg',
+            'icon' => $this->mode === 'manage' ? ($this->widget_options['empty_state_icon'] ?? '') : '',
             'action' => is_array($action) ? $action : [],
             'quick_actions' => is_array($quick_actions) ? $quick_actions : [],
             'classes' => is_array($classes) ? $classes : [],
@@ -783,6 +1001,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         // Gallery
         if (isset($lsd['_gallery']) && is_array($lsd['_gallery'])) $lsd['gallery'] = $lsd['_gallery'];
+        if (isset($lsd['_gallery_alt']) && is_array($lsd['_gallery_alt']))
+        {
+            $lsd['gallery_alt'] = $lsd['_gallery_alt'];
+            unset($lsd['_gallery_alt']);
+        }
 
         // Embeds
         if (isset($lsd['_embeds']) && is_array($lsd['_embeds']))
@@ -1416,6 +1639,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
             $data['attachment_id'] = $attachment_id;
             $data['url'] = $uploaded['url'];
+            $data['alt'] = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
         }
         else
         {
@@ -1699,6 +1923,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 $data[] = [
                     'id' => $attachment_id,
                     'url' => $uploaded['url'],
+                    'alt' => get_post_meta($attachment_id, '_wp_attachment_image_alt', true),
                 ];
             }
         }
@@ -1712,7 +1937,43 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function auth(): string
     {
-        // Dashboard
+        $current_url = (new LSD_Main())->current_url();
+        $redirect = !empty($this->widget_options['redirect_after_login']) ? wp_validate_redirect($this->widget_options['redirect_after_login'], $current_url) : $current_url;
+        $signin_url = !empty($this->widget_options['signin_button_url']) ? $this->widget_options['signin_button_url'] : wp_login_url($redirect);
+        $register_url = !empty($this->widget_options['register_link_url'])
+            ? $this->widget_options['register_link_url']
+            : (get_option('users_can_register') ? wp_registration_url() : '');
+        $restricted_state = [];
+
+        if (!empty($this->widget_options))
+        {
+            $social_login = '';
+            if (!empty($this->widget_options['show_social_login']))
+            {
+                ob_start();
+                do_action('lsd_dashboard_social_login', $this);
+                $social_login = ob_get_clean();
+                $social_login = apply_filters('lsd_dashboard_social_login_output', $social_login, $this);
+            }
+
+            $restricted_state = [
+                'icon' => $this->widget_options['restricted_state_icon'] ?? '',
+                'title' => $this->widget_options['restricted_title'] ?? esc_html__('Sign in to continue', 'listdom'),
+                'description' => $this->widget_options['restricted_description'] ?? esc_html__('You need to be signed in to access your dashboard...', 'listdom'),
+                'show_signin_button' => ($this->widget_options['show_signin_button'] ?? true) === true,
+                'signin_button_label' => $this->widget_options['signin_button_label'] ?? esc_html__('Sign In', 'listdom'),
+                'signin_url' => $signin_url,
+                'signin_target' => !empty($this->widget_options['signin_button_url']) ? ($this->widget_options['signin_button_target'] ?? '_self') : '_self',
+                'signin_rel' => !empty($this->widget_options['signin_button_url']) ? ($this->widget_options['signin_button_rel'] ?? '') : '',
+                'show_register_link' => ($this->widget_options['show_register_link'] ?? true) === true,
+                'register_link_text' => $this->widget_options['register_link_text'] ?? esc_html__("Don't have an account? Register", 'listdom'),
+                'register_url' => $register_url,
+                'register_target' => !empty($this->widget_options['register_link_url']) ? ($this->widget_options['register_link_target'] ?? '_self') : '_self',
+                'register_rel' => !empty($this->widget_options['register_link_url']) ? ($this->widget_options['register_link_rel'] ?? '') : '',
+                'social_login' => $social_login,
+            ];
+        }
+
         ob_start();
         include lsd_template('dashboard/auth.php');
         return ob_get_clean();
@@ -1764,6 +2025,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         $post_id = isset($_POST['post_id']) ? (int) $_POST['post_id'] : 0;
         $primary_id = isset($_POST['primary_id']) ? (int) $_POST['primary_id'] : 0;
+        $id_suffix = isset($_POST['id_suffix']) ? sanitize_key(wp_unslash($_POST['id_suffix'])) : '';
 
         $selected = isset($_POST['selected']) && is_array($_POST['selected']) ? array_map('intval', $_POST['selected']) : [];
         $selected = array_values(array_filter(array_unique($selected)));
@@ -1799,6 +2061,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             'orderby' => 'name',
             'order' => 'ASC',
             'name' => 'lsd[additional_categories]',
+            'id' => 'lsd_additional_categories' . $id_suffix,
+            'id_prefix' => 'in-listdom-additional-category' . $id_suffix,
             'pre' => '',
             'post_id' => $post_id,
             'selected' => $selected,

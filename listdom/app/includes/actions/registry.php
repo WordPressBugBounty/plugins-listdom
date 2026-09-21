@@ -9,6 +9,7 @@ class LSD_Actions_Registry extends LSD_Base
         $this->register(new LSD_Actions_Create_Category());
         $this->register(new LSD_Actions_Create_Custom_Field());
         $this->register(new LSD_Actions_Create_Search_Form());
+        $this->register(new LSD_Actions_Create_Directory_Shortcode());
         $this->register(new LSD_Actions_Create_Directory_Page());
         $this->register(new LSD_Actions_Create_Demo_Listing());
         $this->register(new LSD_Actions_Audit_Directory_Setup());

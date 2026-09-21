@@ -124,14 +124,16 @@ if (!is_array($detail))
                 </div>
             <?php endforeach; ?>
         </div>
-        <div class="lsd-dashboard-payments-subscription-membership-link">
-            <a class="lsd-light-button" href="<?php echo esc_url(add_query_arg([
-                'mode' => 'subscription',
-                'membership_tab' => 'active',
-            ], $dashboard->url)); ?>">
-                <?php esc_html_e('View More Details', 'listdom-subscriptions'); ?>
-            </a>
-        </div>
+        <?php if (!in_array($detail['type_key'], ['claim', 'topup', 'labelize'], true)): ?>
+            <div class="lsd-dashboard-payments-subscription-membership-link">
+                <a class="lsd-light-button" href="<?php echo esc_url(add_query_arg([
+                    'mode' => 'subscription',
+                    'membership_tab' => 'active',
+                ], $dashboard->url)); ?>">
+                    <?php esc_html_e('View More Details', 'listdom-subscriptions'); ?>
+                </a>
+            </div>
+        <?php endif; ?>
     </div>
 
     <div class="lsd-fe-box-white lsd-dashboard-payments-billing-subscription-details-renewal">

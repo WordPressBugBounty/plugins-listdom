@@ -12,6 +12,7 @@ if (!is_array($raw)) $raw = [];
 
 // Dashboard context and restrictions
 $dashboard = LSD_Payload::get('dashboard');
+$form_id = [$this, 'form_id'];
 $max_upload_size_limit = 0;
 $image_aspect_ratio = '';
 if ($dashboard instanceof LSD_Shortcodes_Dashboard)
@@ -76,12 +77,12 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
 
             $meta_value = get_post_meta($post->ID, 'lsd_attribute_' . $attribute->slug, true);
             ?>
-            <div class="lsd-form-row lsd-category-specific lsd-attribute-type-<?php echo esc_attr($type); ?>  <?php echo esc_attr(trim($categories_class)); ?>" id="lsd_attribute_<?php echo esc_attr($attribute->term_id); ?>">
+            <div class="lsd-form-row lsd-category-specific lsd-attribute-type-<?php echo esc_attr($type); ?>  <?php echo esc_attr(trim($categories_class)); ?>" id="<?php echo esc_attr($form_id('lsd_attribute_' . $attribute->term_id)); ?>">
                 <div class="lsd-col-2 lsd-label-col">
                     <?php if ($type !== 'separator'): ?>
                         <?php echo LSD_Form::label([
                             'class' => 'lsd-fields-label',
-                            'for' => 'lsd_listing_attributes' . $attribute->term_id . (in_array($type, ['radio', 'checkbox']) ? 1 : ''),
+                            'for' => $form_id('lsd_listing_attributes' . $attribute->term_id . (in_array($type, ['radio', 'checkbox']) ? 1 : '')),
                             'title' => $attribute->name,
                             'required' => $required
                         ]); ?>
@@ -91,7 +92,7 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
                     <?php
                     $data_required = $required ? 1 : 0;
                     if ($type === 'dropdown') echo LSD_Form::select([
-                        'id' => 'lsd_listing_attributes' . $attribute->term_id,
+                        'id' => $form_id('lsd_listing_attributes' . $attribute->term_id),
                         'options' => $options,
                         'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'required' => $required,
@@ -118,7 +119,7 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
 
                             echo '<div>';
                             echo LSD_Form::input([
-                                'id' => 'lsd_listing_attributes' . $attribute->term_id . $r,
+                                'id' => $form_id('lsd_listing_attributes' . $attribute->term_id . $r),
                                 'name' => 'lsd[attributes][' . $attribute->slug . ']',
                                 'value' => $opt,
                                 'required' => $required,
@@ -126,7 +127,7 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
                             ], 'radio');
                             echo LSD_Form::label([
                                 'class' => 'lsd-fields-label',
-                                'for' => 'lsd_listing_attributes' . $attribute->term_id . $r,
+                                'for' => $form_id('lsd_listing_attributes' . $attribute->term_id . $r),
                                 'title' => $option,
                             ]);
                             echo '</div>';
@@ -150,14 +151,14 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
 
                             echo '<div>';
                             echo LSD_Form::checkbox([
-                                'id' => 'lsd_listing_attributes' . $attribute->term_id . $c,
+                                'id' => $form_id('lsd_listing_attributes' . $attribute->term_id . $c),
                                 'name' => 'lsd[attributes][' . $attribute->slug . '][]',
                                 'value' => $opt,
                                 'attributes' => $attributes,
                             ]);
                             echo LSD_Form::label([
                                 'class' => 'lsd-fields-label',
-                                'for' => 'lsd_listing_attributes' . $attribute->term_id . $c,
+                                'for' => $form_id('lsd_listing_attributes' . $attribute->term_id . $c),
                                 'title' => $option,
                             ]);
                             echo '</div>';
@@ -166,7 +167,7 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
                     }
                     else if ($type === 'textarea' && !$editor) echo LSD_Form::textarea([
                         'class' => 'lsd-admin-input',
-                        'id' => 'lsd_listing_attributes' . $attribute->term_id,
+                        'id' => $form_id('lsd_listing_attributes' . $attribute->term_id),
                         'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'required' => $required,
                         'rows' => 8,
@@ -176,7 +177,7 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
                         ],
                     ]);
                     else if ($type === 'textarea' && $editor) echo LSD_Form::editor([
-                        'id' => 'lsd_listing_attributes' . $attribute->term_id,
+                        'id' => $form_id('lsd_listing_attributes' . $attribute->term_id),
                         'name' => 'lsd[attributes][' . $attribute->slug . ']',
                         'value' => $raw[$attribute->slug] ?? '',
                     ]);
@@ -232,7 +233,7 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
 
                         echo '<div' . $wrapper_attributes_str . '>';
                         echo LSD_Form::imagepicker([
-                            'id' => 'lsd_listing_attributes' . $attribute->term_id,
+                            'id' => $form_id('lsd_listing_attributes' . $attribute->term_id),
                             'name' => 'lsd[attributes][' . $attribute->slug . ']',
                             'value' => $meta_value,
                             'required' => $required,
@@ -288,7 +289,7 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
 
                         echo '<div' . $wrapper_attributes_str . '>';
                         echo LSD_Form::filepicker([
-                            'id' => 'lsd_listing_attributes' . $attribute->term_id,
+                            'id' => $form_id('lsd_listing_attributes' . $attribute->term_id),
                             'name' => 'lsd[attributes][' . $attribute->slug . ']',
                             'value' => $meta_value,
                             'required' => $required,
@@ -306,7 +307,7 @@ $attribute_context = LSD_Taxonomies_Attribute::context($attribute_context_args);
                         if ($type === 'datetime') $value = str_replace(' ', 'T', trim($value));
 
                         echo LSD_Form::input([
-                            'id' => 'lsd_listing_attributes' . $attribute->term_id,
+                            'id' => $form_id('lsd_listing_attributes' . $attribute->term_id),
                             'name' => 'lsd[attributes][' . $attribute->slug . ']',
                             'required' => $required,
                             'class' => 'lsd-admin-input',

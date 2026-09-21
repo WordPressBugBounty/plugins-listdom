@@ -4,8 +4,14 @@ defined('ABSPATH') || die();
 
 /** @var array $settings */
 /** @var array $shape */
+/** @var string $id_suffix */
 ?>
 <script>
+(function($)
+{
+const idSuffix = '<?php echo esc_js($id_suffix ?? ''); ?>';
+const fieldId = (id) => id + idSuffix;
+const $field = (id) => $('#' + fieldId(id));
 let bounds;
 const fill_color = '<?php echo esc_js($settings['map_shape_fill_color']); ?>';
 const fill_opacity = '<?php echo esc_js($settings['map_shape_fill_opacity']); ?>';
@@ -14,24 +20,24 @@ const stroke_opacity = '<?php echo esc_js($settings['map_shape_stroke_opacity'])
 const stroke_weight = '<?php echo esc_js($settings['map_shape_stroke_weight']); ?>';
 const address_autosuggest_enabled = <?php echo isset($settings['address_autosuggest']) && !$settings['address_autosuggest'] ? 'false' : 'true'; ?>;
 
-jQuery(document).ready(function($)
+jQuery(document).ready(function()
 {
     listdom_add_googlemaps_callbacks(function()
     {
-        const object_type = $('#lsd_object_type').val();
-        const latitude = $('#lsd_object_type_latitude').val();
-        const longitude = $('#lsd_object_type_longitude').val();
-        const zoomlevel = parseInt($('#lsd_object_type_zoomlevel').val());
-        const $addressField = $('#lsd_object_type_address');
-        const $latitudeField = $('#lsd_object_type_latitude');
-        const $longitudeField = $('#lsd_object_type_longitude');
-        const $locateButton = $('#lsd_object_type_address_locate');
+        const object_type = $field('lsd_object_type').val();
+        const latitude = $field('lsd_object_type_latitude').val();
+        const longitude = $field('lsd_object_type_longitude').val();
+        const zoomlevel = parseInt($field('lsd_object_type_zoomlevel').val());
+        const $addressField = $field('lsd_object_type_address');
+        const $latitudeField = $field('lsd_object_type_latitude');
+        const $longitudeField = $field('lsd_object_type_longitude');
+        const $locateButton = $field('lsd_object_type_address_locate');
         const dropdownTriggers = $locateButton.length ? $addressField.add($locateButton) : $addressField;
         let coordinateInputsAreUpdating = false;
 
         const dropdown = address_autosuggest_enabled ? (function ()
         {
-            const $dropdownElement = $('#lsd_object_type_address_dropdown');
+            const $dropdownElement = $field('lsd_object_type_address_dropdown');
             const loadingText =
                 ($dropdownElement.length && $dropdownElement.data('loading-text'))
                     ? $dropdownElement.data('loading-text')
@@ -71,7 +77,7 @@ jQuery(document).ready(function($)
                 show: function () {},
             };
         })() : {
-            $element: $('#lsd_object_type_address_dropdown'),
+            $element: $field('lsd_object_type_address_dropdown'),
             reset: function () {},
             populate: function () {},
             markSelected: function () {},
@@ -267,7 +273,7 @@ jQuery(document).ready(function($)
         const center = new google.maps.LatLng(latitude, longitude);
 
         // Init map
-        const map = new google.maps.Map(document.getElementById('lsd_address_map'),
+        const map = new google.maps.Map(document.getElementById(fieldId('lsd_address_map')),
         {
             scrollwheel: false,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -704,20 +710,20 @@ jQuery(document).ready(function($)
         }
 
         // Latitude and Longitude Changed Manually
-        $('#lsd_object_type_latitude, #lsd_object_type_longitude').on('change', function()
+        $latitudeField.add($longitudeField).on('change', function()
         {
             if (coordinateInputsAreUpdating) return;
 
-            const lat = $('#lsd_object_type_latitude').val();
-            const lng = $('#lsd_object_type_longitude').val();
+            const lat = $latitudeField.val();
+            const lng = $longitudeField.val();
             const coords = applyCoordinates(lat, lng, {reverse: false});
             if (coords) finalizeAddressFromCoordinates(coords.lat, coords.lon);
         });
 
         // Object Marker Type Selected
-        $('#lsd_metabox_object_type_marker').on('click', function()
+        $field('lsd_metabox_object_type_marker').on('click', function()
         {
-            $('#lsd_object_type').val('marker');
+            $field('lsd_object_type').val('marker');
 
             marker.setMap(map);
             if(drawingManager) drawingManager.setMap(null);
@@ -725,9 +731,9 @@ jQuery(document).ready(function($)
         });
 
         // Object Shape Type Selected
-        $('#lsd_metabox_object_type_shape').on('click', function ()
+        $field('lsd_metabox_object_type_shape').on('click', function ()
         {
-            $('#lsd_object_type').val('shape');
+            $field('lsd_object_type').val('shape');
 
             marker.setMap(null);
             if(drawingManager) drawingManager.setMap(map);
@@ -773,9 +779,9 @@ function lsd_set_boundaries(overlay, type)
         radius = overlay.getRadius();
     }
 
-    jQuery('#lsd_shape_type').val(type);
-    jQuery('#lsd_shape_paths').val(paths.toString());
-    jQuery('#lsd_shape_radius').val(radius).trigger('change');
+    $field('lsd_shape_type').val(type);
+    $field('lsd_shape_paths').val(paths.toString());
+    $field('lsd_shape_radius').val(radius).trigger('change');
 }
 
 function lsd_set_listeners(overlay, type)
@@ -888,4 +894,5 @@ function lsd_extend_map_bounds(overlay, type)
         bounds.union(overlay.getBounds());
     }
 }
+})(jQuery);
 </script>

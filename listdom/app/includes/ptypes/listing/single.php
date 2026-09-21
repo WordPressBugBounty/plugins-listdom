@@ -1264,7 +1264,7 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         $output .= $title;
 
         // Add claimed icon inside h1
-        if ($this->entity->is_claimed()) $output .= ' <span class="lsd-tooltip" data-lsd-tooltip="' . esc_attr__('Verified', 'listdom') . '"><i class="lsd-fe-icon fas fa-check-circle lsd-claimed-icon"></i></span>';
+        if ($this->entity->is_verified() && \LSDPACCLM\Claim::display_verified()) $output .= ' <span class="lsd-tooltip" data-lsd-tooltip="' . esc_attr__('Verified', 'listdom') . '"><i class="lsd-fe-icon fas fa-check-circle lsd-claimed-icon"></i></span>';
 
         $output .= '</h1>';
 

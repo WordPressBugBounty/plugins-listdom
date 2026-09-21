@@ -7,7 +7,7 @@ defined('ABSPATH') || die();
 ?>
 <div class="lsd-dashboard-box lsd-dashboard-submit <?php echo esc_attr($mirror ? 'lsd-dashboard-submit-mirror lsd-dashboard-submit-secondary' : 'lsd-dashboard-submit-primary'); ?> lsd-fe-box-white">
     <?php if (!$mirror): ?>
-        <input type="hidden" name="id" value="<?php echo esc_attr($this->post->ID); ?>" id="lsd_dashboard_id">
+        <input type="hidden" name="id" value="<?php echo esc_attr($this->post->ID); ?>" id="<?php echo esc_attr($this->form_id('lsd_dashboard_id')); ?>">
         <input type="hidden" name="action" value="lsd_dashboard_listing_save">
 
         <?php LSD_Form::nonce('lsd_dashboard'); ?>
@@ -18,7 +18,7 @@ defined('ABSPATH') || die();
         <?php if ((!($this->settings['dashboard_listing_status'] ?? '') || $this->post->ID > 0) && current_user_can('publish_posts')): ?>
             <div class="lsd-dashboard-listing-status">
                 <?php echo LSD_Form::select([
-                    'id' => $mirror ? 'lsd_listing_status_mirror_bottom' : 'lsd_listing_status',
+                    'id' => $this->form_id($mirror ? 'lsd_listing_status_mirror_bottom' : 'lsd_listing_status'),
                     'name' => $mirror ? 'lsd_dashboard_listing_status_mirror_bottom' : 'lsd[listing_status]',
                     'class' => $mirror ? 'lsd-dashboard-submit-mirror-status' : 'lsd-dashboard-submit-real-status',
                     'value' => $this->post->post_status ?? 'publish',
@@ -34,7 +34,7 @@ defined('ABSPATH') || die();
 
         <?php
             $privacy_field = LSD_Privacy::consent_field([
-                'id' => $mirror ? 'lsd_dashboard_privacy_consent_mirror_' . $this->post->ID : 'lsd_dashboard_privacy_consent_' . $this->post->ID,
+                'id' => $this->form_id($mirror ? 'lsd_dashboard_privacy_consent_mirror_' . $this->post->ID : 'lsd_dashboard_privacy_consent_' . $this->post->ID),
                 'name' => $mirror ? 'lsd_dashboard_privacy_consent_mirror' : 'lsd[privacy_consent]',
                 'class' => $mirror ? 'lsd-privacy-consent-checkbox lsd-dashboard-submit-mirror-consent' : 'lsd-privacy-consent-checkbox lsd-dashboard-submit-real-consent',
                 'required' => !$mirror,

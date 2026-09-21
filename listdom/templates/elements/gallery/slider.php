@@ -19,6 +19,7 @@ $include_thumbnail = $params['include_thumbnail'] ?? false;
 $image_itemprop = LSD_Schema::suppressing_markup() ? '' : ' itemprop="https://schema.org/image"';
 
 $gallery = $this->get_gallery($post_id , $include_thumbnail);
+$featured_image_id = get_post_thumbnail_id($post_id);
 
 // There is no Gallery!
 if (!count($gallery)) return '';
@@ -52,12 +53,14 @@ jQuery(document).on("listdom:onload", () => {
 <div class="<?php echo $thumbnail_status === 'list' ? 'lsd-gallery-slider-wrapper-list' : 'lsd-gallery-slider-wrapper'; ?>">
     <div class="lsd-gallery-slider lsd-owl-carousel <?php echo $lightbox ? 'lsd-image-lightbox' : ''; ?>" <?php echo lsd_schema()->scope()->type('https://schema.org/ImageGallery'); ?>>
         <?php
-            foreach ($gallery as $id)
+            foreach ($gallery as $index => $id)
             {
                 $thumb = wp_get_attachment_image_src($id, [$width, $height]);
                 $full = wp_get_attachment_image_src($id, 'full');
 
                 if (!$thumb || !$full) continue;
+
+                $alt = LSD_Entity_Listing::image_alt($post_id, $id, $include_thumbnail && $index === 0 && (int) $id === (int) $featured_image_id);
         ?>
             <div class="lsd-gallery-item">
                 <?php if (!$lightbox && in_array($link_method, ['normal', 'blank', 'map', 'lightbox', 'left-panel', 'right-panel', 'bottom-panel'])): ?>
@@ -72,10 +75,10 @@ jQuery(document).on("listdom:onload", () => {
                         <?php echo $link_method === 'blank' ? 'target="_blank"' : ''; ?>
                         <?php echo lsd_schema()->associatedMedia(); ?>
                     >
-                        <?php echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
+                        <?php echo '<img alt="' . esc_attr($alt) . '" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
                     </a>
-                <?php elseif($lightbox): echo '<a href="'.esc_url($full[0]).'"><img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '></a>'; ?>
-                <?php else: echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
+                <?php elseif($lightbox): echo '<a href="'.esc_url($full[0]).'"><img alt="' . esc_attr($alt) . '" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '></a>'; ?>
+                <?php else: echo '<img alt="' . esc_attr($alt) . '" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
                 <?php endif; ?>
             </div>
         <?php
@@ -87,13 +90,15 @@ jQuery(document).on("listdom:onload", () => {
         <!-- Thumbnails -->
         <div class="lsd-gallery-slider-thumbs lsd-owl-carousel">
             <?php
-            foreach ($gallery as $id)
+            foreach ($gallery as $index => $id)
             {
                 $thumb = wp_get_attachment_image_src($id, 'full');
                 if (!$thumb) continue;
 
+                $alt = LSD_Entity_Listing::image_alt($post_id, $id, $include_thumbnail && $index === 0 && (int) $id === (int) $featured_image_id);
+
                 echo '<div class="lsd-gallery-thumb-item">
-                    <img alt="" src="' . esc_url($thumb[0]) . '" width="300" height="200">
+                    <img alt="' . esc_attr($alt) . '" src="' . esc_url($thumb[0]) . '" width="300" height="200">
                 </div>';
             }
             ?>

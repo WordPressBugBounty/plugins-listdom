@@ -16,7 +16,15 @@ foreach (($empty_state['classes'] ?? []) as $class)
 ?>
 <div class="<?php echo esc_attr(implode(' ', array_unique($classes))); ?>">
     <div class="lsd-dashboard-empty-state-illustration" aria-hidden="true">
-        <img src="<?php echo esc_url($this->lsd_asset_url($empty_state['image'] ?? 'img/dashboard/no-listings.svg')); ?>" alt="<?php echo esc_attr($empty_state['title'] ?? esc_attr__('Nothing here yet', 'listdom')); ?>">
+        <?php if (!empty($empty_state['icon'])): ?>
+            <?php if (strpos((string) $empty_state['icon'], '<') !== false): ?>
+                <?php echo LSD_Kses::full($empty_state['icon']); ?>
+            <?php else: ?>
+                <i class="lsd-fe-icon <?php echo esc_attr($empty_state['icon']); ?>"></i>
+            <?php endif; ?>
+        <?php else: ?>
+            <img src="<?php echo esc_url($this->lsd_asset_url($empty_state['image'] ?? 'img/dashboard/no-listings.svg')); ?>" alt="<?php echo esc_attr($empty_state['title'] ?? esc_attr__('Nothing here yet', 'listdom')); ?>">
+        <?php endif; ?>
     </div>
 
     <div class="lsd-dashboard-empty-state-content">
@@ -28,9 +36,13 @@ foreach (($empty_state['classes'] ?? []) as $class)
 
         <?php if (!empty($empty_state['action']['label']) && !empty($empty_state['action']['url'])): ?>
             <div class="lsd-dashboard-empty-state-action">
-                <a class="<?php echo esc_attr($empty_state['action']['class'] ?? 'lsd-primary-button'); ?>" href="<?php echo esc_url($empty_state['action']['url']); ?>">
+                <a class="<?php echo esc_attr($empty_state['action']['class'] ?? 'lsd-primary-button'); ?>" href="<?php echo esc_url($empty_state['action']['url']); ?>" target="<?php echo esc_attr($empty_state['action']['target'] ?? '_self'); ?>"<?php echo !empty($empty_state['action']['rel']) ? ' rel="' . esc_attr($empty_state['action']['rel']) . '"' : ''; ?>>
                     <?php if (!empty($empty_state['action']['icon'])): ?>
-                        <i class="lsd-fe-icon <?php echo esc_attr($empty_state['action']['icon']); ?>" aria-hidden="true"></i>
+                        <?php if (strpos((string) $empty_state['action']['icon'], '<') !== false): ?>
+                            <?php echo LSD_Kses::full($empty_state['action']['icon']); ?>
+                        <?php else: ?>
+                            <i class="lsd-fe-icon <?php echo esc_attr($empty_state['action']['icon']); ?>" aria-hidden="true"></i>
+                        <?php endif; ?>
                     <?php endif; ?>
 
                     <?php echo esc_html($empty_state['action']['label']); ?>

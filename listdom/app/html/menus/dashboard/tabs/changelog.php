@@ -3,6 +3,16 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v6.1.0 <span>September 20th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added an interactive setup wizard to help launch a directory site.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added Comparison and Frontend Dashboard widgets for Elementor.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added configurable alt text for listing images.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Enhanced claim ownership, payment, and dashboard workflows.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed scheduled jobs with missing intervals.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed an issue in Google Places address copying.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed some user interface issues.', 'listdom'); ?></li>
+    </ul>
     <h2>v6.0.0 <span>September 7th, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Added Webilia Connect activation and account-based add-on updates.', 'listdom'); ?></li>

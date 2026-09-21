@@ -166,6 +166,16 @@ class LSD_Shortcodes_Checkout extends LSD_Base
             if ($has_recurring && $has_non_recurring) break;
         }
 
+        // One-time fees cannot be collected by the recurring Stripe checkout.
+        foreach ($cart->get_fees() as $fee)
+        {
+            if ((float) ($fee['amount'] ?? 0) > 0)
+            {
+                $has_non_recurring = true;
+                break;
+            }
+        }
+
         if ($has_recurring)
         {
             $allowed_gateways = ['stripe'];
@@ -184,7 +194,7 @@ class LSD_Shortcodes_Checkout extends LSD_Base
         $gateway_warning = '';
         if ($has_recurring && $has_non_recurring)
         {
-            $gateway_warning = esc_html__('You cannot purchase recurring and non-recurring items at the same time. Please adjust your cart to continue.', 'listdom');
+            $gateway_warning = esc_html__('You cannot purchase recurring items and one-time items or fees at the same time. Please adjust your cart to continue.', 'listdom');
         }
 
         // Checkout Style

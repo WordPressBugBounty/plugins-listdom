@@ -25,10 +25,10 @@ $dashboard_wrapper = $dashboard->get_dashboard_wrapper([
     'classes' => ['lsd-dashboard', 'lsd-dashboard-payments'],
 ]);
 ?>
-<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="lsd_dashboard"<?php echo $dashboard_wrapper['attributes']; ?>>
+<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="<?php echo esc_attr($dashboard->form_id('lsd_dashboard')); ?>"<?php echo $dashboard_wrapper['attributes']; ?>>
     <div class="lsd-row lsd-dashboard-wrapper">
         <div class="lsd-dashboard-menus-wrapper">
-            <?php echo LSD_Kses::element($dashboard->menus()); ?>
+            <?php echo LSD_Kses::full($dashboard->menus()); ?>
         </div>
         <div class="lsd-dashboard-content-wrapper lsd-dashboard-payment-billing-wrapper">
             <?php if ($section !== LSD_Dashboard_Payments::DETAIL_SECTION): ?>

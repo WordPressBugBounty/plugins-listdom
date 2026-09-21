@@ -20,7 +20,7 @@ class LSD_Map_Provider extends LSD_Base
         ];
     }
 
-    public function form($shape)
+    public function form($shape, string $id_suffix = '', bool $inline = false)
     {
         // Listdom Settings
         $settings = LSD_Options::settings();
@@ -35,11 +35,15 @@ class LSD_Map_Provider extends LSD_Base
             'parameters' => [
                 'settings' => $settings,
                 'shape' => $shape,
+                'id_suffix' => $id_suffix,
             ],
         ]);
 
+        if ($inline) return $output;
+
         // Add to Footer
         LSD_Assets::footer($output);
+        return '';
     }
 
     public static function valid($provider): bool

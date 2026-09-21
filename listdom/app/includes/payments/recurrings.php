@@ -391,8 +391,11 @@ class LSD_Payments_Recurrings extends LSD_Base
         return $changed;
     }
 
-    public static function cancel(int $recurring_id): bool
+    public static function cancel(int $recurring_id, bool $gateway_cancelled = false): bool
     {
+        // Give addons a chance to stop provider billing before local cancellation.
+        if (!$gateway_cancelled && !apply_filters('lsd_payments_recurring_cancel_allowed', true, $recurring_id)) return false;
+
         $changed = self::set_status($recurring_id, self::STATUS_CANCEL);
         if ($changed) do_action('lsd_payments_recurring_cancel', $recurring_id);
 
@@ -401,6 +404,9 @@ class LSD_Payments_Recurrings extends LSD_Base
 
     public static function refunded(int $recurring_id): bool
     {
+        // Give addons a chance to stop provider billing before local refunding.
+        if (!apply_filters('lsd_payments_recurring_refund_allowed', true, $recurring_id)) return false;
+
         $changed = self::set_status($recurring_id, self::STATUS_REFUNDED);
         if ($changed) do_action('lsd_payments_recurring_refunded', $recurring_id);
 

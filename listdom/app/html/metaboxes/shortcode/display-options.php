@@ -48,21 +48,23 @@ $price_components = LSD_Options::price_components();
             </div>
         </div>
         <div id="lsd_tab_content_elements" class="lsd-tab-content">
-            <div id="lsd_skin_display_options_container">
-                <?php foreach ($skins->get_skins() as $skin => $label): ?>
-                <div class="lsd-skin-display-options" id="lsd_skin_display_options_<?php echo esc_attr($skin); ?>" data-skin="<?php echo esc_attr($skin); ?>">
-                    <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/'.$skin.'.php', [
-                        'parameters' => [
-                            'options' => $options,
-                            'skin' => $skin,
-                            'price_components' => $price_components,
-                        ]
-                    ]); ?>
+            <div class="lsd-admin-subsections">
+                <div id="lsd_skin_display_options_container">
+                    <?php foreach ($skins->get_skins() as $skin => $label): ?>
+                        <div class="lsd-skin-display-options" id="lsd_skin_display_options_<?php echo esc_attr($skin); ?>" data-skin="<?php echo esc_attr($skin); ?>">
+                            <?php $this->include_html_file('metaboxes/shortcode/display-options/elements/'.$skin.'.php', [
+                                'parameters' => [
+                                    'options' => $options,
+                                    'skin' => $skin,
+                                    'price_components' => $price_components,
+                                ]
+                            ]); ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
-            </div>
-            <div id="lsd_display_options_builder_message_elements" class="lsd-display-options-builder-skin lsd-util-hide">
-                <p class="lsd-alert lsd-info"><?php esc_html_e("Because you're using a custom style, certain display options in the shortcode will be turned off. You can adjust them in the custom layout settings.", 'listdom'); ?></p>
+                <div id="lsd_display_options_builder_message_elements" class="lsd-display-options-builder-skin lsd-util-hide">
+                    <p class="lsd-alert lsd-info"><?php esc_html_e("Because you're using a custom style, certain display options in the shortcode will be turned off. You can adjust them in the custom layout settings.", 'listdom'); ?></p>
+                </div>
             </div>
         </div>
         <div id="lsd_tab_content_map" class="lsd-tab-content">

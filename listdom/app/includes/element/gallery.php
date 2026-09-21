@@ -110,7 +110,15 @@ class LSD_Element_Gallery extends LSD_Element
                 'value' => $data['thumbnail'] ?? 0,
             ]) . '
         </div>
-
+        <div>
+            <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_custom_alt">' . esc_html__('Use Custom Alt Text', 'listdom') . '</label>
+            ' . LSD_Form::switcher([
+                'id' => 'lsd_elements_' . esc_attr($this->key) . '_custom_alt',
+                'name' => 'lsd[elements][' . esc_attr($this->key) . '][custom_alt]',
+                'value' => $data['custom_alt'] ?? 0,
+            ]) . '
+            <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2">' . esc_html__('Use listing-specific alt text for gallery images instead of the Media Library alt text.', 'listdom') . '</p>
+        </div>
         <div class="lsd-gallery-element">
             <div class="lsd-gallery-element-style-dependency lsd-gallery-element-style-dependency-linear">
                 <label class="lsd-fields-label-tiny" for="lsd_elements_' . esc_attr($this->key) . '_image_height">' . esc_html__('Image Height (px)', 'listdom') . '</label>

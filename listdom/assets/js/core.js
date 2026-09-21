@@ -865,27 +865,29 @@ jQuery(function($)
         $select.val(nextValue);
     };
 
-    const syncBookingPriceFields = function()
+    const syncBookingPriceFields = function($module)
     {
-        const pricingModel = $('#lsd_bo_pricing_model').val();
+        if (!$module || !$module.length) return;
+
+        const pricingModel = $module.find('[id^="lsd_bo_pricing_model"]').first().val();
         const isFree = pricingModel === 'free';
 
-        $('.lsd-listing-module-booking')
-        .find('.lsd-bookable-price-field')
+        $module.find('.lsd-bookable-price-field')
         .toggleClass('lsd-util-hide', isFree);
     };
 
-    const syncBookingSetupUI = function()
+    const syncBookingSetupUI = function($module)
     {
-        const $module = $('.lsd-listing-module-booking');
-        if(!$module.length) return;
+        if (!$module || !$module.length) return;
 
-        const bookingEnabled = $('#lsd_bo_enabled').is(':checked');
-        const setup = $('#lsd_bo_setup').val() || 'date_range';
-        const legacyType = (setup === 'single_event') ? 'event' : ((setup === 'date_range' && $('#lsd_bo_guest_capacity_enabled').is(':checked')) ? 'property' : 'general');
+        const $bookingEnabled = $module.find('[id^="lsd_bo_enabled"]').first();
+        const $guestCapacity = $module.find('[id^="lsd_bo_guest_capacity_enabled"]').first();
+        const bookingEnabled = $bookingEnabled.is(':checked');
+        const setup = $module.find('[id^="lsd_bo_setup"]').first().val() || 'date_range';
+        const legacyType = (setup === 'single_event') ? 'event' : ((setup === 'date_range' && $guestCapacity.is(':checked')) ? 'property' : 'general');
 
-        $('#lsd_bo_type').val(legacyType);
-        $module.find('#lsd-booking-availability-section, #lsd-booking-pricing-section, #lsd-booking-advanced-section, .lsd-listing-bookable-container').toggleClass('lsd-util-hide', !bookingEnabled);
+        $module.find('[id^="lsd_bo_type"]').first().val(legacyType);
+        $module.find('[id^="lsd-booking-availability-section"], [id^="lsd-booking-pricing-section"], [id^="lsd-booking-advanced-section"], .lsd-listing-bookable-container').toggleClass('lsd-util-hide', !bookingEnabled);
 
         const $shell = $module.find('.lsd-booking-setup-shell');
         $shell.attr('data-booking-setup', setup);
@@ -896,15 +898,15 @@ jQuery(function($)
             $module.find('.lsd-booking-setup-panel-' + key).toggleClass('lsd-util-hide', key !== setup);
         });
 
-        const pricingContext = (setup === 'date_range' && $('#lsd_bo_guest_capacity_enabled').is(':checked')) ? 'date_range_guests' : setup;
-        const $pricingModel = $('#lsd_bo_pricing_model');
+        const pricingContext = (setup === 'date_range' && $guestCapacity.is(':checked')) ? 'date_range_guests' : setup;
+        const $pricingModel = $module.find('[id^="lsd_bo_pricing_model"]').first();
         const pricingOptions = parseBookingSelectConfig($pricingModel, 'data-setup-options');
         const pricingDefaults = parseBookingSelectConfig($pricingModel, 'data-setup-defaults');
 
         syncBookingSelectOptions($pricingModel, pricingOptions[pricingContext] || {}, pricingDefaults[pricingContext] || '');
-        syncBookingPriceFields();
+        syncBookingPriceFields($module);
 
-        const guestEnabled = setup === 'date_range' && $('#lsd_bo_guest_capacity_enabled').is(':checked');
+        const guestEnabled = setup === 'date_range' && $guestCapacity.is(':checked');
 
         $module.find('.lsd-bookable-setup-date-range').toggleClass('lsd-util-hide', setup !== 'date_range');
         $module.find('.lsd-bookable-setup-guest').toggleClass('lsd-util-hide', !guestEnabled);
@@ -920,23 +922,43 @@ jQuery(function($)
         .addClass('lsd-listing-bookables-setup-' + setup);
     };
 
-    const syncBookingPaymentUI = function()
+    const syncBookingPaymentUI = function($module)
     {
-        const paymentModel = $('#lsd_bo_payment_model').val();
-        $('#lsd_bo_listing_payable_wrapper').toggleClass('lsd-util-hide', paymentModel !== 'partial');
+        if (!$module || !$module.length) return;
+
+        const paymentModel = $module.find('[id^="lsd_bo_payment_model"]').first().val();
+        $module.find('[id^="lsd_bo_listing_payable_wrapper"]').first().toggleClass('lsd-util-hide', paymentModel !== 'partial');
     };
 
-    $(document).on('change', '#lsd_bo_payment_model', syncBookingPaymentUI);
-    syncBookingPaymentUI();
-
-    $(document).on('change', '#lsd_bo_setup, #lsd_bo_guest_capacity_enabled, #lsd_bo_enabled, #lsd_bo_pricing_model', function()
+    $(document).on('change', '[id^="lsd_bo_payment_model"]', function()
     {
-        syncBookingSetupUI();
-        syncBookingPriceFields();
+        syncBookingPaymentUI($(this).closest('.lsd-listing-module-booking'));
     });
 
-    syncBookingSetupUI();
-    syncBookingPriceFields();
+    $(document).on('change', '[id^="lsd_bo_setup"], [id^="lsd_bo_guest_capacity_enabled"], [id^="lsd_bo_enabled"], [id^="lsd_bo_pricing_model"]', function()
+    {
+        const $module = $(this).closest('.lsd-listing-module-booking');
+        syncBookingSetupUI($module);
+        syncBookingPriceFields($module);
+    });
+
+    window.lsdInitBookingModuleControls = function(root)
+    {
+        const $root = root && root.jquery ? root : $(root || document);
+        const $modules = $root.is('.lsd-listing-module-booking')
+            ? $root
+            : $root.find('.lsd-listing-module-booking');
+
+        $modules.each(function()
+        {
+            const $module = $(this);
+            syncBookingPaymentUI($module);
+            syncBookingSetupUI($module);
+            syncBookingPriceFields($module);
+        });
+    };
+
+    window.lsdInitBookingModuleControls($(document));
 });
 
 /**
@@ -1460,15 +1482,24 @@ jQuery(function($)
         /**
          * Listdom tab system
          */
-        $('.lsd-tabs .nav-tab').on('click', function()
+        $(document).off('click.lsdDashboardTabs', '.lsd-tabs .nav-tab').on('click.lsdDashboardTabs', '.lsd-tabs .nav-tab', function()
         {
-            const key = $(this).data('key');
+            const $tab = $(this);
+            const key = $tab.data('key');
+            const $tabs = $tab.closest('.lsd-tabs');
+            const $scope = $tabs.closest('.lsd-metabox');
+            const $contents = $scope.length ? $scope.find('.lsd-tab-content') : $('.lsd-tab-content');
+            let $target = $contents.filter(function()
+            {
+                return $(this).data('key') === key;
+            });
 
-            $('.nav-tab').removeClass('nav-tab-active');
-            $(this).addClass('nav-tab-active');
+            $tabs.find('.nav-tab').removeClass('nav-tab-active');
+            $tab.addClass('nav-tab-active');
 
-            $('.lsd-tab-content').removeClass('lsd-tab-content-active');
-            $('#lsd_tab_content_' + key).addClass('lsd-tab-content-active');
+            $contents.removeClass('lsd-tab-content-active');
+            if (!$target.length) $target = $('#lsd_tab_content_' + key);
+            $target.addClass('lsd-tab-content-active');
         });
 
         /**
@@ -1535,11 +1566,12 @@ jQuery(function($)
         /**
          * Listdom Gallery picker -- Upload/Select Button
          */
-        $('.lsd-select-gallery-button').on('click', function(event)
+        $(document).off('click.lsdSelectGallery', '.lsd-select-gallery-button').on('click.lsdSelectGallery', '.lsd-select-gallery-button', function(event)
         {
             event.preventDefault();
 
             const button = $(this);
+            const $galleryContainer = button.closest('.lsd-listing-gallery-container');
 
             let frame;
             if(frame)
@@ -1557,20 +1589,25 @@ jQuery(function($)
                 // Grab the selected attachments.
                 const attachments = frame.state().get('selection');
 
-                const target = $(button).data('for');
-                const name = $(button).data('name');
-                const $target = $(target);
-                const $container = $target.closest('.lsd-listing-gallery-container');
-                const ratioLabel = ($container.data('aspectRatio') || '').toString().trim();
+                const target = button.data('for');
+                const name = button.data('name');
+                const targetId = (target || '').toString().replace(/^#/, '');
+                const $target = $galleryContainer.find('[id="' + targetId + '"]');
+                const customAlt = $target.data('customAlt') === 1;
+                const altLabel = $target.data('altLabel') || 'Alt Text';
+                const altPlaceholder = $target.data('altPlaceholder') || 'Optional image alt text';
+                const altIdSuffix = ($target.data('altIdSuffix') || '').toString();
+                const ratioLabel = ($galleryContainer.data('aspectRatio') || '').toString().trim();
                 const ratioValue = parseAspectRatio(ratioLabel);
                 const aspectMessage =
-                    ($container.data('aspectMessage') || '').toString().trim() ||
+                    ($galleryContainer.data('aspectMessage') || '').toString().trim() ||
                     (ratioLabel ? 'Please upload images with an aspect ratio close to ' + ratioLabel + '.' : '');
                 let hasRatioMismatch = false;
 
                 attachments.map(function(attachment)
                 {
                     attachment = attachment.toJSON();
+                    const mediaAlt = attachment.alt || '';
 
                     if (ratioValue)
                     {
@@ -1584,14 +1621,35 @@ jQuery(function($)
                         }
                     }
 
-                    $target.append('<li data-id="'+attachment.id+'"><input type="hidden" name="'+name+'" value="'+attachment.id+'"><img src="'+attachment.url+'" alt=""><div class="lsd-gallery-actions"><i class="lsd-icon fas fa-trash-alt lsd-remove-gallery-single-button"></i> <i class="lsd-icon fas fa-arrows-alt lsd-handler"></i></div></li>');
+                    const $item = $('<li>').attr('data-id', attachment.id);
+                    $('<input>', {type: 'hidden', name: name, value: attachment.id}).appendTo($item);
+                    const $image = $('<div>', {class: 'lsd-gallery-image'}).appendTo($item);
+                    $('<img>', {src: attachment.url, alt: ''}).appendTo($image);
+                    $('<div class="lsd-gallery-actions"><i class="lsd-icon fas fa-trash-alt lsd-remove-gallery-single-button"></i> <i class="lsd-icon fas fa-arrows-alt lsd-handler"></i></div>').appendTo($image);
+
+                    if (customAlt)
+                    {
+                        const $altFields = $('<div>', {class: 'lsd-gallery-alt-fields'}).appendTo($item);
+                        const altId = 'lsd_gallery_alt_' + attachment.id + altIdSuffix;
+                        $('<label>', {for: altId, text: altLabel}).appendTo($altFields);
+                        $('<input>', {
+                            class: 'lsd-admin-input lsd-gallery-alt-text',
+                            type: 'text',
+                            name: 'lsd[_gallery_alt][' + attachment.id + ']',
+                            id: altId,
+                            value: '',
+                            placeholder: mediaAlt || altPlaceholder,
+                        }).appendTo($altFields);
+                    }
+
+                    $target.append($item);
                 });
 
                 lsdUpdateGalleryPlaceholder($target);
 
                 if (hasRatioMismatch)
                 {
-                    const $message = $('#lsd_listing_gallery_uploader_message');
+                    const $message = $galleryContainer.find('[id^="lsd_listing_gallery_uploader_message"]').first();
                     if ($message.length)
                     {
                         if (typeof listdom_alertify === 'function') $message.html(listdom_alertify(aspectMessage, 'lsd-error'));
@@ -1612,21 +1670,25 @@ jQuery(function($)
         /**
          * Listdom Gallery Uploader
          */
-        $('.lsd-upload-gallery-button').on('click', function(event)
+        $(document).off('click.lsdUploadGallery', '.lsd-upload-gallery-button').on('click.lsdUploadGallery', '.lsd-upload-gallery-button', function(event)
         {
             event.preventDefault();
 
-            $('#lsd_listing_gallery_uploader').click();
+            $(this).closest('.lsd-listing-gallery-container')
+                .find('input[id^="lsd_listing_gallery_uploader"]')
+                .first()
+                .trigger('click');
         });
 
         /**
          * Listdom Gallery picker -- Remove All Button
          */
-        $('.lsd-remove-gallery-button').on('click', function(event)
+        $(document).off('click.lsdRemoveGallery', '.lsd-remove-gallery-button').on('click.lsdRemoveGallery', '.lsd-remove-gallery-button', function(event)
         {
             event.preventDefault();
             const target = $(this).data('for');
-            const $target = $(target);
+            const targetId = (target || '').toString().replace(/^#/, '');
+            const $target = $(this).closest('.lsd-listing-gallery-container').find('[id="' + targetId + '"]');
 
             $target.html('');
 
@@ -1636,7 +1698,7 @@ jQuery(function($)
         /**
          * Listdom Gallery picker -- Single Remove Button
          */
-        $(document).on('click', '.lsd-remove-gallery-single-button', function(event)
+        $(document).off('click.lsdRemoveGallerySingle', '.lsd-remove-gallery-single-button').on('click.lsdRemoveGallerySingle', '.lsd-remove-gallery-single-button', function(event)
         {
             event.preventDefault();
 
@@ -1651,14 +1713,15 @@ jQuery(function($)
         /**
          * Listdom Embed -- Toggle Featured
          */
-        $(document).on('click', '.lsd-embed-featured-icon', function()
+        $(document).off('click.lsdEmbedFeatured', '.lsd-embed-featured-icon').on('click.lsdEmbedFeatured', '.lsd-embed-featured-icon', function()
         {
             let $icon = $(this);
             let isCurrentlyFeatured = $icon.attr('data-featured') === '1';
+            const $embedList = $icon.closest('.lsd-listing-embed-list');
 
             if(!isCurrentlyFeatured)
             {
-                $('.lsd-embed-featured-icon[data-featured="1"]').removeClass('fas fa-star')
+                $embedList.find('.lsd-embed-featured-icon[data-featured="1"]').removeClass('fas fa-star')
                     .addClass('far fa-star')
                     .attr('title', 'Add as Featured Video')
                     .attr('data-featured', '0')
@@ -1683,15 +1746,20 @@ jQuery(function($)
         /**
          * Listdom Embed -- Add Button
          */
-        $('.lsd-add-embed-button').on('click', function(event)
+        $(document).off('click.lsdAddEmbed', '.lsd-add-embed-button').on('click.lsdAddEmbed', '.lsd-add-embed-button', function(event)
         {
             event.preventDefault();
 
             const template = $(this).data('template');
             const target = $(this).data('for');
+            const templateId = (template || '').toString().replace(/^#/, '');
+            const targetId = (target || '').toString().replace(/^#/, '');
+            const $container = $(this).closest('.lsd-listing-embed-container');
+            const $target = $container.find('[id="' + targetId + '"]');
+            const $template = $container.find('[id="' + templateId + '"]');
 
             // New Index
-            const $index = $('#lsd_listing_embeds_index');
+            const $index = $target.closest('.lsd-listing-embed-list').find('[id^="lsd_listing_embeds_index"]').first();
             const index = $index.val();
             const new_index = parseInt(index)+1;
 
@@ -1699,52 +1767,58 @@ jQuery(function($)
             $index.val(new_index);
 
             // Content
-            const content = $(template).html().replace(/:i:/g, index);
+            const content = $template.html().replace(/:i:/g, index);
 
-            $(target).append(content);
-
-            // Trigger Remove Button
-            $('.lsd-remove-embed-single-button').off('click').on('click', function(event)
-            {
-                event.preventDefault();
-                $(this).parent().parent().parent().remove();
-            });
+            $target.append(content);
+            $container.find('.lsd-remove-embed-button').removeClass('lsd-util-hide');
         });
 
         /**
          * Listdom Embed -- Remove All Button
          */
-        $('.lsd-remove-embed-button').on('click', function(event)
+        $(document).off('click.lsdRemoveEmbeds', '.lsd-remove-embed-button').on('click.lsdRemoveEmbeds', '.lsd-remove-embed-button', function(event)
         {
             event.preventDefault();
             const target = $(this).data('for');
+            const targetId = (target || '').toString().replace(/^#/, '');
 
-            $(target).html('');
+            $(this).closest('.lsd-listing-embed-container').find('[id="' + targetId + '"]').html('');
 
-            $(this).toggleClass('lsd-util-hide');
+            $(this).addClass('lsd-util-hide');
         });
 
         /**
          * Listdom Embed -- Single Remove Button
          */
-        $('.lsd-remove-embed-single-button').off('click').on('click', function(event)
+        $(document).off('click.lsdRemoveEmbedSingle', '.lsd-remove-embed-single-button').on('click.lsdRemoveEmbedSingle', '.lsd-remove-embed-single-button', function(event)
         {
             event.preventDefault();
-            $(this).parent().parent().parent().remove();
+            const $container = $(this).closest('.lsd-listing-embed-container');
+            $(this).closest('li').remove();
+
+            if (!$container.find('.lsd-listing-embeds > li').length)
+            {
+                $container.find('.lsd-remove-embed-button').addClass('lsd-util-hide');
+            }
         });
 
         /**
          * Listdom FAQ -- Add Button
          */
-        $('.lsd-add-faq-button').on('click', function(event)
+        $(document).off('click.lsdAddFaq', '.lsd-add-faq-button').on('click.lsdAddFaq', '.lsd-add-faq-button', function(event)
         {
             event.preventDefault();
 
             const template = $(this).data('template');
             const target = $(this).data('for');
+            const templateId = (template || '').toString().replace(/^#/, '');
+            const targetId = (target || '').toString().replace(/^#/, '');
+            const $container = $(this).closest('.lsd-listing-faqs-container');
+            const $target = $container.find('[id="' + targetId + '"]');
+            const $template = $container.find('[id="' + templateId + '"]');
 
             // New Index
-            const $index = $('#lsd_listing_faqs_index');
+            const $index = $target.closest('.lsd-listing-faqs-list').find('[id^="lsd_listing_faqs_index"]').first();
             const index = $index.val();
             const new_index = parseInt(index)+1;
 
@@ -1752,48 +1826,50 @@ jQuery(function($)
             $index.val(new_index);
 
             // Content
-            const content = $(template).html().replace(/:i:/g, index);
+            const content = $template.html().replace(/:i:/g, index);
 
-            $(target).append(content);
-
-            // Trigger Remove Button
-            $('.lsd-remove-faq-single-button').off('click').on('click', function(event)
-            {
-                event.preventDefault();
-                $(this).parent().parent().parent().remove();
-            });
+            $target.append(content);
+            $container.find('.lsd-remove-faq-button').removeClass('lsd-util-hide');
         });
 
         /**
          * Listdom FAQ -- Remove All Button
          */
-        $('.lsd-remove-faq-button').on('click', function(event)
+        $(document).off('click.lsdRemoveFaqs', '.lsd-remove-faq-button').on('click.lsdRemoveFaqs', '.lsd-remove-faq-button', function(event)
         {
             event.preventDefault();
             const target = $(this).data('for');
+            const targetId = (target || '').toString().replace(/^#/, '');
 
-            $(target).html('');
+            $(this).closest('.lsd-listing-faqs-container').find('[id="' + targetId + '"]').html('');
 
-            $(this).toggleClass('lsd-util-hide');
+            $(this).addClass('lsd-util-hide');
         });
 
         /**
          * Listdom FAQ -- Single Remove Button
          */
-        $('.lsd-remove-faq-single-button').off('click').on('click', function(event)
+        $(document).off('click.lsdRemoveFaqSingle', '.lsd-remove-faq-single-button').on('click.lsdRemoveFaqSingle', '.lsd-remove-faq-single-button', function(event)
         {
             event.preventDefault();
-            $(this).parent().parent().parent().remove();
+            const $container = $(this).closest('.lsd-listing-faqs-container');
+            $(this).closest('li').remove();
+
+            if (!$container.find('.lsd-listing-faqs > li').length)
+            {
+                $container.find('.lsd-remove-faq-button').addClass('lsd-util-hide');
+            }
         });
 
         /**
          * Listdom file picker -- Upload/Select Button
          */
-        $('.lsd-select-file-button').on('click', function(event)
+        $(document).off('click.lsdSelectFile', '.lsd-select-file-button').on('click.lsdSelectFile', '.lsd-select-file-button', function(event)
         {
             event.preventDefault();
 
             const button = $(this);
+            const $scope = button.closest('.lsd-filepicker-wrapper');
 
             let frame;
             if(frame)
@@ -1808,12 +1884,12 @@ jQuery(function($)
                 // Grab the selected attachment.
                 const attachment = frame.state().get('selection').first();
 
-                const target = $(button).data('for');
-                const $target = $(target);
+                const target = button.data('for');
+                const targetId = (target || '').toString().replace(/^#/, '');
+                const $target = $scope.find('[id="' + targetId + '"]');
                 const url = attachment.attributes.url;
                 const label = attachment.attributes.filename || url;
-                const $preview = $(target + '_file');
-                const $scope = $target.closest('.lsd-filepicker-wrapper, .lsd-attribute-file');
+                const $preview = $scope.find('[id="' + targetId + '_file"]');
                 const $fieldWrapper = $target.closest('.lsd-attribute-file');
                 const $rulesSource = $fieldWrapper.length ? $fieldWrapper : $scope;
                 const $message = $fieldWrapper.length ? $fieldWrapper.find('.lsd-attribute-file-message') : $scope.find('.lsd-attribute-file-message');
@@ -1888,16 +1964,8 @@ jQuery(function($)
                     $scope.find('.lsd-file-error-msg, .lsd-attribute-error-msg').remove();
                 }
 
-                if ($scope.length)
-                {
-                    $scope.find('.lsd-select-file-button[data-for="' + target + '"]').addClass('lsd-util-hide');
-                    $scope.find('.lsd-remove-file-button[data-for="' + target + '"]').removeClass('lsd-util-hide');
-                }
-                else
-                {
-                    $('.lsd-select-file-button[data-for="' + target + '"]').addClass('lsd-util-hide');
-                    $('.lsd-remove-file-button[data-for="' + target + '"]').removeClass('lsd-util-hide');
-                }
+                $scope.find('.lsd-select-file-button').addClass('lsd-util-hide');
+                $scope.find('.lsd-remove-file-button').removeClass('lsd-util-hide');
 
                 frame.close();
             });
@@ -1908,16 +1976,17 @@ jQuery(function($)
         /**
          * Listdom File picker -- Remove Button
          */
-        $('.lsd-remove-file-button').on('click', function(event)
+        $(document).off('click.lsdRemoveFile', '.lsd-remove-file-button').on('click.lsdRemoveFile', '.lsd-remove-file-button', function(event)
         {
             event.preventDefault();
             const target = $(this).data('for');
+            const targetId = (target || '').toString().replace(/^#/, '');
+            const $scope = $(this).closest('.lsd-filepicker-wrapper');
+            const $target = $scope.find('[id="' + targetId + '"]');
 
-            $(target+'_file').html('');
-            $(target).val('');
+            $scope.find('[id="' + targetId + '_file"]').html('');
+            $target.val('');
 
-            const $target = $(target);
-            const $scope = $target.closest('.lsd-filepicker-wrapper, .lsd-attribute-file');
             const $fieldWrapper = $target.closest('.lsd-attribute-file');
             if ($scope.length)
             {
@@ -1927,30 +1996,27 @@ jQuery(function($)
             }
             if ($fieldWrapper.length) $fieldWrapper.find('.lsd-attribute-file-message').html('');
 
-            if ($scope.length)
-            {
-                $scope.find('.lsd-select-file-button[data-for="' + target + '"]').removeClass('lsd-util-hide');
-                $scope.find('.lsd-remove-file-button[data-for="' + target + '"]').addClass('lsd-util-hide');
-            }
-            else
-            {
-                $('.lsd-select-file-button[data-for="' + target + '"]').removeClass('lsd-util-hide');
-                $('.lsd-remove-file-button[data-for="' + target + '"]').addClass('lsd-util-hide');
-            }
+            $scope.find('.lsd-select-file-button').removeClass('lsd-util-hide');
+            $scope.find('.lsd-remove-file-button').addClass('lsd-util-hide');
         });
 
         /**
          * Bookables -- Add Button
          */
-        $('.lsd-add-bookable-button').on('click', function(event)
+        $(document).off('click.lsdAddBookable', '.lsd-add-bookable-button').on('click.lsdAddBookable', '.lsd-add-bookable-button', function(event)
         {
             event.preventDefault();
 
             const template = $(this).data('template');
             const target = $(this).data('for');
+            const templateId = (template || '').toString().replace(/^#/, '');
+            const targetId = (target || '').toString().replace(/^#/, '');
+            const $module = $(this).closest('.lsd-listing-module-booking');
+            const $target = $module.find('[id="' + targetId + '"]');
+            const $template = $module.find('[id="' + templateId + '"]');
 
             // New Index
-            const $index = $('#lsd_listing_bookables_index');
+            const $index = $module.find('[id^="lsd_listing_bookables_index"]').first();
             const index = $index.val();
             const new_index = parseInt(index)+1;
 
@@ -1958,24 +2024,25 @@ jQuery(function($)
             $index.val(new_index);
 
             // Content
-            const content = $(template).html().replace(/:i:/g, index);
+            const content = $template.html().replace(/:i:/g, index);
 
-            $(target).append(content);
+            $target.append(content);
 
             listdom_trigger_bookable_remove();
             listdom_trigger_bookable_advanced();
             listdom_trigger_bookable_prices();
             listdom_trigger_toggle();
+            if (typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr($target);
         });
 
         /**
          * Booking -- Bookables Type
          */
-        $('#lsd_bo_type').on('change', function()
+        $(document).off('change.lsdBookableType', '[id^="lsd_bo_type"]').on('change.lsdBookableType', '[id^="lsd_bo_type"]', function()
         {
             const type = $(this).val();
 
-            $('.lsd-listing-bookable-container')
+            $(this).closest('.lsd-listing-module-booking').find('.lsd-listing-bookable-container')
                 .removeClass('lsd-listing-bookables-general')
                 .removeClass('lsd-listing-bookables-property')
                 .removeClass('lsd-listing-bookables-event')
@@ -2312,36 +2379,46 @@ jQuery(function($)
         /**
          * Add/Edit Listing
          */
-        $('#lsd_listing_category').on('change', function() {
-            let category = $(this).val();
+        const lsdListingCategorySelector = '.lsd-dashboard form.lsd-dashboard-form select[id^="lsd_listing_category"], #post select#lsd_listing_category';
+        $(document).off('change.lsdListingCategory', lsdListingCategorySelector)
+        .on('change.lsdListingCategory', lsdListingCategorySelector, function()
+        {
+            const $select = $(this);
+            const $form = $select.closest('form.lsd-dashboard-form');
+            const $scope = $form.length ? $form : $select.closest('#post');
+            let category = $select.val();
 
-            const $fields = $('.lsd-category-specific');
-            const $all = $('.lsd-category-specific-all');
-            const $category = $('.lsd-category-specific-' + category);
-            const $required_fields = $('input[data-required="1"], select[data-required="1"], textarea[data-required="1"]');
+            const $fields = $scope.find('.lsd-category-specific');
+            const $all = $scope.find('.lsd-category-specific-all');
+            const $category = $scope.find('.lsd-category-specific-' + category);
+            const $required_fields = $scope.find('input[data-required="1"], select[data-required="1"], textarea[data-required="1"]');
 
             $fields.addClass('lsd-util-hide');
             $all.removeClass('lsd-util-hide');
             $category.removeClass('lsd-util-hide');
 
-            $fields.find($('input[required], select[required], textarea[required]')).removeAttr('required');
+            $fields.find('input[required], select[required], textarea[required]').removeAttr('required');
             $all.find($required_fields).attr('required', true);
             $category.find($required_fields).attr('required', true);
 
-            lsdaddjob_new_category(category);
-        }).trigger('change');
+            lsdaddjob_new_category(category, $scope);
+        });
 
         // Opening Hours Off
-        $('.lsd-ava-off').on('change', function()
+        const lsdListingAvailabilitySelector = '.lsd-dashboard form.lsd-dashboard-form input.lsd-ava-off, #post input.lsd-ava-off';
+        $(document).off('change.lsdListingAvailability', lsdListingAvailabilitySelector)
+        .on('change.lsdListingAvailability', lsdListingAvailabilitySelector, function()
         {
-            const daycode = $(this).data('daycode');
+            const $hours = $(this).closest('.lsd-listing-availability-day').find('.lsd-ava-hours input');
 
-            if($(this).is(':checked')) $('#lsd-ava-'+daycode+' .lsd-ava-hours input').attr('disabled', 'disabled').addClass('disabled');
-            else $('#lsd-ava-'+daycode+' .lsd-ava-hours input').removeAttr('disabled').removeClass('disabled');
-        }).trigger('change');
+            if($(this).is(':checked')) $hours.attr('disabled', 'disabled').addClass('disabled');
+            else $hours.removeAttr('disabled').removeClass('disabled');
+        });
 
         // Disable Form Submit on Enter of Address Field
-        $('#lsd_object_type_address').on('keyup keypress', function(e)
+        const lsdListingAddressSelector = '.lsd-dashboard form.lsd-dashboard-form input[id^="lsd_object_type_address"], #post input#lsd_object_type_address';
+        $(document).off('keyup.lsdListingAddress keypress.lsdListingAddress', lsdListingAddressSelector)
+        .on('keyup.lsdListingAddress keypress.lsdListingAddress', lsdListingAddressSelector, function(e)
         {
             const keyCode = e.keyCode || e.which;
             if(keyCode === 13)
@@ -2355,7 +2432,7 @@ jQuery(function($)
          * Listdom Auto Suggest Field
          */
         let $lsd_autosuggest_ajax;
-        $('.lsd-autosuggest').on('keyup', function()
+        $(document).off('keyup.lsdAutosuggest', '.lsd-autosuggest').on('keyup.lsdAutosuggest', '.lsd-autosuggest', function()
         {
             const $input = $(this);
 
@@ -2432,7 +2509,21 @@ jQuery(function($)
             });
         });
 
-        listdom_trigger_autosuggest_remove();
+        window.lsdDashboardInitCoreControls = function(root)
+        {
+            const $root = root && root.jquery ? root : $(root || document);
+            const $sortable = $root.is('.lsd-sortable') ? $root : $root.find('.lsd-sortable');
+            if ($sortable.length && typeof $.fn.sortable === 'function') $sortable.not('.ui-sortable').sortable();
+            $root.find(lsdListingCategorySelector).trigger('change');
+            $root.find(lsdListingAvailabilitySelector).trigger('change');
+            if (typeof window.lsdInitBookingModuleControls === 'function') window.lsdInitBookingModuleControls($root);
+            listdom_trigger_bookable_remove();
+            listdom_trigger_bookable_advanced();
+            listdom_trigger_bookable_prices();
+            listdom_trigger_autosuggest_remove();
+        };
+
+        window.lsdDashboardInitCoreControls($(document));
 
         const syncSearchInputClear = function($input)
         {
@@ -2783,7 +2874,7 @@ jQuery(function($)
         });
 
         // Inline Popup
-        $('.lsd-inline-popup-trigger').on('click', function(e)
+        $(document).off('click.lsdInlinePopup', '.lsd-inline-popup-trigger').on('click.lsdInlinePopup', '.lsd-inline-popup-trigger', function(e)
         {
             e.preventDefault();
             e.stopPropagation();
@@ -3396,7 +3487,7 @@ function listdom_trigger_bookable_remove()
             return;
         }
 
-        $icon.closest('#lsd_listing_bookables > li').remove();
+        $icon.closest('.lsd-listing-bookables > li').remove();
     });
 }
 
@@ -3405,8 +3496,9 @@ function listdom_trigger_bookable_advanced()
     // Trigger Advanced Button
     jQuery('.lsd-bookable-advanced').off('click').on('click', function()
     {
-        const i = jQuery(this).data('i');
-        const $advanced = jQuery('#lsd_listing_bookables_'+i+'_advanced');
+        const $button = jQuery(this);
+        const i = $button.data('i');
+        const $advanced = $button.closest('.lsd-listing-module-booking').find('[id^="lsd_listing_bookables_'+i+'_advanced"]').first();
 
         if($advanced.hasClass('lsd-util-hide')) $advanced.removeClass('lsd-util-hide');
         else $advanced.addClass('lsd-util-hide');
@@ -3418,8 +3510,9 @@ function listdom_trigger_bookable_prices()
     // Trigger Price Button
     jQuery('.lsd-bookable-add-price-button').off('click').on('click', function()
     {
-        const i = jQuery(this).data('i');
-        const $advanced = jQuery('#lsd_listing_bookables_'+i+'_advanced');
+        const $button = jQuery(this);
+        const i = $button.data('i');
+        const $advanced = $button.closest('.lsd-listing-module-booking').find('[id^="lsd_listing_bookables_'+i+'_advanced"]').first();
         const $start = $advanced.find(jQuery('.lsd-bookable-adv-start-date'));
         const $end = $advanced.find(jQuery('.lsd-bookable-adv-end-date'));
         const $price = $advanced.find(jQuery('.lsd-bookable-adv-price'));
@@ -3456,8 +3549,9 @@ function listdom_trigger_bookable_prices()
     // Trigger Unavailable Button
     jQuery('.lsd-bookable-add-unavailable-button').off('click').on('click', function()
     {
-        const i = jQuery(this).data('i');
-        const $advanced = jQuery('#lsd_listing_bookables_'+i+'_advanced');
+        const $button = jQuery(this);
+        const i = $button.data('i');
+        const $advanced = $button.closest('.lsd-listing-module-booking').find('[id^="lsd_listing_bookables_'+i+'_advanced"]').first();
         const $start = $advanced.find(jQuery('.lsd-bookable-unavailable-start-date'));
         const $end = $advanced.find(jQuery('.lsd-bookable-unavailable-end-date'));
         const $list = $advanced.find(jQuery('.lsd-listing-bookables-unavailable-periods'));
@@ -3578,9 +3672,9 @@ function listdom_trigger_autosuggest_remove()
     });
 }
 
-function lsdaddjob_new_category(category)
+function lsdaddjob_new_category(category, $form)
 {
-    const $dashboard = jQuery('#lsd_dashboard');
+    const $dashboard = $form && $form.length ? $form.closest('.lsd-dashboard') : jQuery('#lsd_dashboard');
     if(!$dashboard.data('job-addon-installed')) return;
 
     jQuery.ajax(
@@ -3602,13 +3696,13 @@ function lsdaddjob_new_category(category)
             {
                 response.modules.forEach(function(item)
                 {
-                    const $module = jQuery('.lsd-listing-module-'+item);
+                    const $module = $dashboard.find('.lsd-listing-module-'+item);
 
                     $module.addClass('lsd-util-hide');
                     $module.find('[required]').removeAttr('required');
 
-                    if(item === 'attributes') jQuery('.lsd-dashboard-attributes > h4').addClass('lsd-util-hide');
-                    else if(item === 'address') jQuery('.lsd-dashboard-address > h4').addClass('lsd-util-hide');
+                    if(item === 'attributes') $dashboard.find('.lsd-dashboard-attributes > h4').addClass('lsd-util-hide');
+                    else if(item === 'address') $dashboard.find('.lsd-dashboard-address > h4').addClass('lsd-util-hide');
                 });
             }
             // Show Modules
@@ -3616,10 +3710,10 @@ function lsdaddjob_new_category(category)
             {
                 response.modules.forEach(function(item)
                 {
-                    jQuery('.lsd-listing-module-'+item).removeClass('lsd-util-hide');
+                    $dashboard.find('.lsd-listing-module-'+item).removeClass('lsd-util-hide');
 
-                    if(item === 'attributes') jQuery('.lsd-dashboard-attributes > h4').removeClass('lsd-util-hide');
-                    else if(item === 'address') jQuery('.lsd-dashboard-address > h4').removeClass('lsd-util-hide');
+                    if(item === 'attributes') $dashboard.find('.lsd-dashboard-attributes > h4').removeClass('lsd-util-hide');
+                    else if(item === 'address') $dashboard.find('.lsd-dashboard-address > h4').removeClass('lsd-util-hide');
                 });
             }
         }

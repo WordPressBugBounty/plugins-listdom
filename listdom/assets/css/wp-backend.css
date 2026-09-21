@@ -1238,7 +1238,7 @@ ul.lsd-boxed-list li label .lsd-inline-checkbox {
 .lsd-inline-popup-wrapper {
   position: relative;
 }
-.lsd-inline-popup-wrapper button#lsd_ava_ai_open.lsd-text-button i {
+.lsd-inline-popup-wrapper button[id^="lsd_ava_ai_open"].lsd-text-button i {
   color: var(--lsd-fe-gold, #F5BC00);
 }
 .lsd-inline-popup-wrapper.lsd-editor-ai-button {

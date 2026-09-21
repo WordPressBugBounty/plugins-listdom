@@ -21,9 +21,13 @@ class LSD_Actions_Create_Directory_Page extends LSD_Actions_Action
     {
         return [
             'title' => ['type' => 'string', 'required' => true],
+            'slug' => ['type' => 'string', 'default' => ''],
             'content' => ['type' => 'string', 'default' => ''],
             'shortcode_id' => ['type' => 'int', 'default' => 0],
+            'shortcode_title' => ['type' => 'string', 'default' => ''],
             'search_form_id' => ['type' => 'int', 'default' => 0],
+            'search_form_title' => ['type' => 'string', 'default' => ''],
+            'directory_page' => ['type' => 'bool', 'default' => false],
             'status' => ['type' => 'string', 'default' => 'publish'],
             'overwrite_existing' => ['type' => 'bool', 'default' => false],
             'reuse_existing' => ['type' => 'bool', 'default' => false],
@@ -41,8 +45,8 @@ class LSD_Actions_Create_Directory_Page extends LSD_Actions_Action
         if ($input['search_form_id'] > 0 && !get_post($input['search_form_id'])) $errors[] = esc_html__('Referenced search form was not found.', 'listdom');
 
         $content = trim($input['content']);
+        $input['slug'] = $input['slug'] !== '' ? sanitize_title($input['slug']) : '';
         if ($input['shortcode_id'] > 0) $content = trim($content . "\n\n" . '[listdom id="' . $input['shortcode_id'] . '"]');
-        if ($input['search_form_id'] > 0) $content = trim($content . "\n\n" . '[listdom-search id="' . $input['search_form_id'] . '"]');
         $input['content'] = $content;
 
         if (count($errors))
@@ -52,13 +56,24 @@ class LSD_Actions_Create_Directory_Page extends LSD_Actions_Action
 
         $existing = LSD_Base::get_post_by_title($input['title'], 'page');
         $warnings = [];
-        if ($existing instanceof WP_Post)
+        if ($existing instanceof WP_Post && $existing->post_status !== 'trash')
         {
             if ($input['reuse_existing'])
             {
-                $warnings[] = esc_html__('An existing page will be reused.', 'listdom');
-                $input['existing_post_id'] = (int) $existing->ID;
-                $input['reuse_existing_mode'] = true;
+                if (!$this->compatible($existing, $input))
+                {
+                    $original_title = $input['title'];
+                    $input = $this->alternative_page($input);
+                    $warnings[] = !empty($input['reuse_existing_mode'])
+                        ? esc_html__('An existing compatible Listdom page with a conflicting title will be reused.', 'listdom')
+                        : sprintf(esc_html__('A page named "%1$s" already exists without the required Listdom page role. A new page named "%2$s" will be created.', 'listdom'), esc_html($original_title), esc_html($input['title']));
+                }
+                else
+                {
+                    $warnings[] = esc_html__('An existing compatible Listdom page will be reused without replacing its content.', 'listdom');
+                    $input['existing_post_id'] = (int) $existing->ID;
+                    $input['reuse_existing_mode'] = true;
+                }
             }
             else if (!$input['overwrite_existing'])
             {
@@ -81,6 +96,47 @@ class LSD_Actions_Create_Directory_Page extends LSD_Actions_Action
         ]);
     }
 
+    private function compatible(WP_Post $post, array $input): bool
+    {
+        $expected_content = trim((string) ($input['content'] ?? ''));
+        if ($expected_content === '' && !empty($input['shortcode_title'])) $expected_content = '[listdom]';
+        else if ($expected_content === '' && !empty($input['search_form_title'])) $expected_content = '[listdom-search]';
+        if ($expected_content === '' || !preg_match('/\[listdom(?:-[a-z0-9_-]+)?(?:\s|\]|\/)/i', $expected_content)) return false;
+
+        return !count($this->missing_shortcodes((string) $post->post_content, $expected_content));
+    }
+
+    private function alternative_page(array $input): array
+    {
+        $base_title = (string) $input['title'];
+        $number = 0;
+
+        while (true)
+        {
+            $title = $number === 0
+                ? sprintf(__('%s (Listdom)', 'listdom'), $base_title)
+                : sprintf(__('%s (Listdom %d)', 'listdom'), $base_title, $number + 1);
+            $existing = LSD_Base::get_post_by_title($title, 'page');
+
+            if ($existing instanceof WP_Post && $existing->post_status !== 'trash')
+            {
+                if ($this->compatible($existing, $input))
+                {
+                    $input['title'] = $title;
+                    $input['existing_post_id'] = (int) $existing->ID;
+                    $input['reuse_existing_mode'] = true;
+                    return $input;
+                }
+
+                $number++;
+                continue;
+            }
+
+            $input['title'] = $title;
+            return $input;
+        }
+    }
+
     public function execute(array $input, LSD_Action_Context $context): LSD_Action_Result
     {
         $post_id = (int) ($input['existing_post_id'] ?? 0);
@@ -98,8 +154,6 @@ class LSD_Actions_Create_Directory_Page extends LSD_Actions_Action
                 $this->set_nested_option($input['option_name'], $input['option_path'], (int) $post_id);
             }
 
-            $this->mark_post($post_id, $context);
-
             return $this->success(esc_html__('Existing directory page reused.', 'listdom'), [
                 'post_id' => (int) $post_id,
                 'permalink' => get_permalink($post_id),
@@ -116,6 +170,7 @@ class LSD_Actions_Create_Directory_Page extends LSD_Actions_Action
                 'post_content' => $input['content'],
                 'post_type' => 'page',
                 'post_status' => $input['status'],
+                'post_name' => $input['slug'],
             ], true);
         }
         else
@@ -140,6 +195,7 @@ class LSD_Actions_Create_Directory_Page extends LSD_Actions_Action
             $this->set_nested_option($input['option_name'], $input['option_path'], (int) $post_id);
         }
         $this->mark_post((int) $post_id, $context);
+        if ($creating && $context->source() === 'blueprint') update_post_meta((int) $post_id, 'lsd_blueprint_owned', '1');
 
         return $this->success(
             $creating ? esc_html__('Directory page created successfully.', 'listdom') : esc_html__('Directory page updated successfully.', 'listdom'),
@@ -156,37 +212,55 @@ class LSD_Actions_Create_Directory_Page extends LSD_Actions_Action
         $post = get_post($post_id);
         if (!$post instanceof WP_Post) return new WP_Error('invalid_post', esc_html__('The existing page could not be loaded.', 'listdom'));
 
-        $expected_content = isset($input['content']) ? (string) $input['content'] : '';
-        $expected_status = isset($input['status']) ? (string) $input['status'] : 'publish';
-        $needs_update = $post->post_status !== $expected_status
-            || (string) $post->post_title !== (string) $input['title']
-            || !$this->page_contains_expected_content($post, $expected_content);
+        $content = (string) $post->post_content;
+        $shortcode_id = (int) ($input['shortcode_id'] ?? 0);
+        if ($shortcode_id > 0) $content = $this->sync_shortcode_id($content, 'listdom', $shortcode_id);
 
-        if (!$needs_update) return $post_id;
+        $search_form_id = (int) ($input['search_form_id'] ?? 0);
+        if ($search_form_id > 0) $content = $this->sync_shortcode_id($content, 'listdom-search', $search_form_id);
 
-        return wp_update_post([
-            'ID' => $post_id,
-            'post_title' => $input['title'],
-            'post_content' => $expected_content,
-            'post_status' => $expected_status,
-        ], true);
+        $missing_shortcodes = $this->missing_shortcodes($content, (string) ($input['content'] ?? ''));
+        $update = ['ID' => $post_id];
+
+        if (count($missing_shortcodes)) $content = rtrim($content) . "\n\n" . implode("\n", $missing_shortcodes);
+        if ($content !== (string) $post->post_content) $update['post_content'] = $content;
+        if ($post->post_status !== $input['status']) $update['post_status'] = $input['status'];
+        if (count($update) === 1) return $post_id;
+
+        return wp_update_post($update, true);
     }
 
-    private function page_contains_expected_content(WP_Post $post, string $expected_content): bool
+    private function sync_shortcode_id(string $content, string $tag, int $shortcode_id): string
     {
-        if (trim($expected_content) === '') return true;
-
-        $current_content = (string) ($post->post_content ?? '');
-        if (trim($current_content) === trim($expected_content)) return true;
-
-        preg_match_all('/\[([a-z0-9_-]+)(\s|]|\/)/i', $expected_content, $matches);
-        $shortcodes = isset($matches[1]) && is_array($matches[1]) ? array_unique($matches[1]) : [];
-
-        foreach ($shortcodes as $shortcode)
+        $pattern = '/\[' . preg_quote($tag, '/') . '(?=\s|\])([^\]]*)\]/i';
+        $updated_content = preg_replace_callback($pattern, static function ($match) use ($tag, $shortcode_id)
         {
-            if (!preg_match('/\[(' . preg_quote($shortcode, '/') . ')(\s|]|\/)/i', $current_content)) return false;
-        }
+            $attributes = isset($match[1]) ? (string) $match[1] : '';
+            if (preg_match('/\bid\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s\]]+)/i', $attributes))
+            {
+                $attributes = preg_replace('/\bid\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s\]]+)/i', 'id="' . $shortcode_id . '"', $attributes, 1);
+            }
+            else $attributes = ' id="' . $shortcode_id . '"' . $attributes;
 
-        return count($shortcodes) > 0;
+            return '[' . $tag . $attributes . ']';
+        }, $content, 1, $replacements);
+
+        return $replacements ? (string) $updated_content : $content;
     }
+
+    private function missing_shortcodes(string $content, string $expected_content): array
+    {
+        preg_match_all('/\[([a-z0-9_-]+)(?:\s+[^\]]*)?\]/i', $expected_content, $matches, PREG_SET_ORDER);
+        $shortcodes = is_array($matches) ? $matches : [];
+
+        return array_values(array_map(static function ($shortcode)
+        {
+            return $shortcode[0];
+        }, array_filter($shortcodes, static function ($shortcode) use ($content)
+        {
+            $tag = isset($shortcode[1]) ? $shortcode[1] : '';
+            return !preg_match('/\[' . preg_quote($tag, '/') . '(?=\s|\])/i', $content);
+        })));
+    }
+
 }

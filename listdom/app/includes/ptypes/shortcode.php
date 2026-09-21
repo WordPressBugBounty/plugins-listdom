@@ -282,15 +282,18 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
     {
         $single_styles = ['' => esc_html__('Inherit From Global Options', 'listdom')] + LSD_Styles::details();
         $method = $options['listing_link'] ?? 'normal';
+        $style = (string) ($options['style'] ?? '');
+        $is_mappable = LSD_Skins::is_mappable($skin);
+        $is_builder_style = is_numeric($style) || preg_match('/^tb_\d+$/', $style);
         $link_methods = LSD_Base::get_listing_link_methods();
         $map_supported = LSD_Components::map()
-            && LSD_Skins::is_mappable($skin)
+            && $is_mappable
             && !empty($options['map_provider']);
 
         if (!$map_supported) unset($link_methods['map']);
         if (!isset($link_methods[$method])) $method = 'normal';
         ?>
-        <div class="lsd-display-options-builder-option lsd-settings-fields-sub-wrapper">
+        <div class="lsd-display-options-builder-option lsd-settings-fields-sub-wrapper lsd-do-listing-link-wrapper <?php echo $is_builder_style ? 'lsd-util-hide' : ''; ?>">
             <?php if ($this->isPro()): ?>
                 <div class="lsd-form-row">
                     <div class="lsd-col-3"><?php echo LSD_Form::label([

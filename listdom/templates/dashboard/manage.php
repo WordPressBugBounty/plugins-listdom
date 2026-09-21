@@ -5,26 +5,34 @@ defined('ABSPATH') || die();
 /** @var LSD_Shortcodes_Dashboard $this */
 
 // Add JS codes to footer
+$dashboard_id = $this->form_id('lsd_dashboard');
 $assets = new LSD_Assets();
 $assets->footer('<script>
 jQuery(document).ready(function()
 {
-    jQuery("#lsd_dashboard").listdomDashboard(
+    jQuery("#' . esc_js($dashboard_id) . '").each(function()
     {
-        ajax_url: "' . admin_url('admin-ajax.php', null) . '",
-        page: ' . wp_json_encode($this->page) . ',
-        nonce: "' . wp_create_nonce('lsd_dashboard') . '",
-        messages: ' . wp_json_encode([
-            'delete' => esc_html__('Unable to delete the listing.', 'listdom'),
-            'status' => esc_html__('Unable to update the listing status.', 'listdom'),
-            'schedule' => esc_html__('Unable to update the schedule.', 'listdom'),
-            'visibility' => esc_html__('Unable to update the visibility.', 'listdom'),
-        ]) . '
+        jQuery(this).listdomDashboard(
+        {
+            ajax_url: "' . admin_url('admin-ajax.php', null) . '",
+            page: ' . wp_json_encode($this->page) . ',
+            nonce: "' . wp_create_nonce('lsd_dashboard') . '",
+            messages: ' . wp_json_encode([
+                'delete' => esc_html__('Unable to delete the listing.', 'listdom'),
+                'status' => esc_html__('Unable to update the listing status.', 'listdom'),
+                'schedule' => esc_html__('Unable to update the schedule.', 'listdom'),
+                'visibility' => esc_html__('Unable to update the visibility.', 'listdom'),
+            ]) . '
+        });
     });
 });
 </script>');
 
 $counts = $this->listing_counts();
+$current_status = isset($_GET['status']) ? sanitize_text_field(wp_unslash($_GET['status'])) : '';
+$has_filters = !empty($this->search) || !empty($this->category) || $current_status !== '';
+$tab_style = sanitize_key($this->widget_options['tab_style'] ?? 'inline');
+if (!in_array($tab_style, ['inline', 'pill', 'button'], true)) $tab_style = 'inline';
 $status_data = $this->get_listing_statuses_data();
 $requested_status = isset($_GET['status']) ? sanitize_key(wp_unslash($_GET['status'])) : '';
 $current_status = isset($status_data[$requested_status]) ? $requested_status : '';
@@ -38,11 +46,11 @@ if (count($status_filter_args)) $status_filter_url = add_query_arg($status_filte
 
 $dashboard_wrapper = $this->get_dashboard_wrapper();
 ?>
-<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="lsd_dashboard"<?php echo $dashboard_wrapper['attributes']; ?>>
+<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="<?php echo esc_attr($dashboard_id); ?>"<?php echo $dashboard_wrapper['attributes']; ?>>
 
     <div class="lsd-row lsd-dashboard-wrapper">
         <div class="lsd-dashboard-menus-wrapper">
-            <?php echo LSD_Kses::element($this->menus()); ?>
+            <?php echo LSD_Kses::full($this->menus()); ?>
         </div>
         <div class="lsd-dashboard-content-wrapper lsd-dashboard-listings-list">
             <div class="lsd-fe-section-heading">
@@ -61,17 +69,17 @@ $dashboard_wrapper = $this->get_dashboard_wrapper();
                         <input type="hidden" name="status" value="<?php echo esc_attr(sanitize_text_field($_GET['status'])); ?>">
                     <?php endif; ?>
                     <?php echo LSD_Form::taxonomy(LSD_Base::TAX_CATEGORY, [
-                        'id' => 'lsd_dashboard_category',
+                        'id' => $this->form_id('lsd_dashboard_category'),
                         'name' => 'lsd_category',
                         'show_empty' => true,
                         'empty_label' => esc_html__('View All', 'listdom'),
                         'value' => $this->category ?: ''
                     ]); ?>
-                    <?php echo LSD_Form::search(['id' => 'lsd_dashboard_search', 'name' => 'lsd_s', 'placeholder' => esc_attr__('Search…', 'listdom'), 'value' => $this->search]); ?>
+                    <?php echo LSD_Form::search(['id' => $this->form_id('lsd_dashboard_search'), 'name' => 'lsd_s', 'placeholder' => esc_attr__('Search…', 'listdom'), 'value' => $this->search]); ?>
                     <button type="submit" class="lsd-search-button"><?php esc_html_e('Search', 'listdom'); ?></button>
                 </form>
                 <?php if (count($counts)): ?>
-                    <div class="lsd-dashboard-listing-status-filter lsd-fe-tabs">
+                    <div class="lsd-dashboard-listing-status-filter lsd-fe-tabs lsd-dashboard-tabs-style-<?php echo esc_attr($tab_style); ?>">
                         <ul class="lsd-fe-tabs-nav">
                             <li class="<?php echo $current_status === '' ? 'lsd-active' : ''; ?>">
                                 <a href="<?php echo esc_url((new LSD_Main())->remove_qs_var('status', $status_filter_url)); ?>"><?php esc_html_e('All', 'listdom'); ?></a>
@@ -103,9 +111,7 @@ $dashboard_wrapper = $this->get_dashboard_wrapper();
                 </div>
             <?php else: ?>
                 <div class="lsd-fe-box-white">
-                    <?php $has_filters = !empty($this->search) || !empty($this->category) || $current_status !== '';
-
-                    $this->empty([
+                    <?php $this->empty([
                         'title' => $has_filters ? esc_html__('No listings match current filter', 'listdom') : esc_html__('No listings yet', 'listdom'),
                         'description' => $has_filters ? esc_html__('Try changing your search or category filter to find more listings.', 'listdom') : esc_html__('Create your first listing and start managing it from your dashboard.', 'listdom'),
                         'image' => 'img/dashboard/no-listings.svg',
@@ -115,6 +121,7 @@ $dashboard_wrapper = $this->get_dashboard_wrapper();
                             'class' => 'lsd-general-button',
                         ],
                         'quick_actions' => [],
+                        'use_widget_empty_state' => !$has_filters,
                     ]); ?>
                 </div>
             <?php endif; ?>

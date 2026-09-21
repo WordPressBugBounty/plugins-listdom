@@ -8,6 +8,8 @@ defined('ABSPATH') || die();
 $listing_categories = $this->get_popup_listing_categories();
 
 $default_tab = $this->is_topup_available() ? 'topup' : 'labelize';
+$promotions_id = $dashboard->form_id('lsd_dashboard_promotions');
+$promotions_popup_id = $dashboard->form_id('lsd_dashboard_promotions_popup');
 $dashboard_wrapper = $dashboard->get_dashboard_wrapper([
     'classes' => ['lsd-dashboard', 'lsd-dashboard-promotions'],
     'attributes' => [
@@ -33,10 +35,10 @@ $dashboard_wrapper = $dashboard->get_dashboard_wrapper([
     ],
 ]);
 ?>
-<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="lsd_dashboard_promotions"<?php echo $dashboard_wrapper['attributes']; ?>>
+<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="<?php echo esc_attr($promotions_id); ?>"<?php echo $dashboard_wrapper['attributes']; ?>>
     <div class="lsd-row lsd-dashboard-wrapper">
         <div class="lsd-dashboard-menus-wrapper">
-            <?php echo LSD_Kses::element($dashboard->menus()); ?>
+            <?php echo LSD_Kses::full($dashboard->menus()); ?>
         </div>
         <div class="lsd-dashboard-content-wrapper <?php echo LSD_Base::get_lsd_class('sections'); ?>">
             <div class="lsd-fe-section-heading">
@@ -75,7 +77,7 @@ $dashboard_wrapper = $dashboard->get_dashboard_wrapper([
         </div>
     </div>
 
-    <div class="lsd-modal lsd-dashboard-promotions-modal" id="lsd_dashboard_promotions_popup">
+    <div class="lsd-modal lsd-dashboard-promotions-modal" id="<?php echo esc_attr($promotions_popup_id); ?>">
         <div class="lsd-modal-content lsd-dashboard-promotions-modal-content">
             <div class="lsd-dashboard-promotions-modal-header">
                 <div class="lsd-dashboard-promotions-modal-title">

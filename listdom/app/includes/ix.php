@@ -123,7 +123,7 @@ class LSD_IX extends LSD_Base
             {
                 if (in_array($key, [
                     '_edit_last', '_edit_lock', '_thumbnail_id',
-                    'lsd_attributes', 'lsd_gallery', 'lsd_embeds', 'lsd_faqs',
+                    'lsd_attributes', 'lsd_gallery', 'lsd_gallery_alt', 'lsd_embeds', 'lsd_faqs',
                 ]) || strpos($key, 'lsd_attribute_') !== false) unset($metas[$key]);
             }
 
@@ -135,6 +135,7 @@ class LSD_IX extends LSD_Base
 
             // Gallery
             $listing['gallery'] = $this->get_gallery($listing_id);
+            $listing['gallery_alt'] = $this->get_gallery_alt($listing_id);
 
             // Featured Image
             $listing['image'] = get_the_post_thumbnail_url($listing_id, 'full');
@@ -898,12 +899,22 @@ class LSD_IX extends LSD_Base
 
         // Import Gallery
         $gallery = [];
+        $gallery_alt = [];
+        $gallery_alt_data = isset($listing['gallery_alt']) && is_array($listing['gallery_alt']) ? array_values($listing['gallery_alt']) : [];
         if (isset($listing['gallery']) && is_array($listing['gallery']) && count($listing['gallery']))
         {
-            foreach ($listing['gallery'] as $image)
+            foreach ($listing['gallery'] as $index => $image)
             {
-                $attachment_id = $this->attach(trim($image));
-                if ($attachment_id) $gallery[] = $attachment_id;
+                $image_url = is_array($image) ? ($image['url'] ?? '') : $image;
+                $image_url = is_scalar($image_url) ? trim((string) $image_url) : '';
+                if ($image_url === '') continue;
+
+                $alt = is_array($image) ? ($image['alt'] ?? '') : ($gallery_alt_data[$index] ?? '');
+                $attachment_id = $this->attach($image_url);
+                if (!$attachment_id) continue;
+
+                $gallery[] = $attachment_id;
+                if (is_scalar($alt) && trim((string) $alt) !== '') $gallery_alt[$attachment_id] = $alt;
             }
         }
 
@@ -995,7 +1006,9 @@ class LSD_IX extends LSD_Base
             'contact_address' => $metas['lsd_contact_address'] ?? '',
             'remark' => $metas['lsd_remark'] ?? '',
             'displ' => $metas['lsd_displ'] ?? [],
+            'featured_image_alt' => $metas['lsd_featured_image_alt'] ?? '',
             'gallery' => $gallery,
+            'gallery_alt' => $gallery_alt,
             'faqs' => $faqs,
             'sc' => [], // Social Networks
         ];
@@ -1301,6 +1314,26 @@ class LSD_IX extends LSD_Base
         }
 
         return $gallery;
+    }
+
+    public function get_gallery_alt($post_id): array
+    {
+        $gallery = get_post_meta($post_id, 'lsd_gallery', true);
+        if (!is_array($gallery)) $gallery = [];
+
+        $gallery_alt = get_post_meta($post_id, 'lsd_gallery_alt', true);
+        if (!is_array($gallery_alt)) $gallery_alt = [];
+
+        $alts = [];
+        foreach ($gallery as $attachment_id)
+        {
+            if (!wp_get_attachment_url($attachment_id)) continue;
+
+            $alt = $gallery_alt[$attachment_id] ?? '';
+            $alts[] = is_scalar($alt) ? (string) $alt : '';
+        }
+
+        return $alts;
     }
 
     public function attach($image)

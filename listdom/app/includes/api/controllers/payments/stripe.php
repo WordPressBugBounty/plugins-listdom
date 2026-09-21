@@ -356,7 +356,7 @@ class LSD_API_Controllers_Payments_Stripe extends LSD_API_Controller
 
             if (in_array($status, ['active', 'trialing'], true) && $cancel_at_period_end)
             {
-                LSD_Payments_Recurrings::cancel($recurring->get_id());
+                LSD_Payments_Recurrings::cancel($recurring->get_id(), true);
             }
             else if (in_array($status, ['active', 'trialing'], true))
             {
@@ -364,7 +364,7 @@ class LSD_API_Controllers_Payments_Stripe extends LSD_API_Controller
             }
             else if (in_array($status, ['canceled', 'unpaid', 'incomplete_expired'], true))
             {
-                LSD_Payments_Recurrings::cancel($recurring->get_id());
+                LSD_Payments_Recurrings::cancel($recurring->get_id(), true);
             }
 
             $handled = true;
@@ -394,7 +394,7 @@ class LSD_API_Controllers_Payments_Stripe extends LSD_API_Controller
             if (!$recurring instanceof LSD_Payments_Recurring) continue;
 
             $this->update_recurring_from_subscription($recurring, $subscription);
-            LSD_Payments_Recurrings::cancel($recurring->get_id());
+            LSD_Payments_Recurrings::cancel($recurring->get_id(), true);
             $handled = true;
         }
 

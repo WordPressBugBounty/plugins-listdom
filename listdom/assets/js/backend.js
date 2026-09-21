@@ -1604,7 +1604,7 @@ jQuery(document).ready(function ($)
 
     function lsdIsCustomBuilderStyle(style)
     {
-        return !isNaN(parseFloat(style)) && isFinite(style);
+        return /^tb_\d+$/.test(String(style || '')) || (!isNaN(parseFloat(style)) && isFinite(style));
     }
 
     function lsdToggleBuilderStyleState(skin)
@@ -3643,7 +3643,10 @@ jQuery(function ($)
                 item.placeId = details.place_id;
             }
 
-            $addressField.val(label).trigger('input');
+            // The Google Place details already provide the selected address and coordinates.
+            // Do not start the native address autocomplete, which can replace the address
+            // with a nearby geocoding result before the selected item is applied.
+            $addressField.val(label);
 
             if ($dropdown.length && ((details && typeof details.latitude === 'number' && typeof details.longitude === 'number') || (details && details.place_id)))
             {
@@ -4631,4 +4634,38 @@ jQuery(function ($)
         });
 
     updateEmptyStates();
+})(jQuery);
+
+// Claim Payment Settings
+(function ($)
+{
+    $(function ()
+    {
+        const $payment_time = $('#lsd_addons_claim_payment_time');
+        const $approval_behavior = $('#lsd_addons_claim_approval_behavior');
+        if (!$payment_time.length || !$approval_behavior.length) return;
+
+        const $auto_approval = $approval_behavior.find('option[value="auto"]');
+        const $products = $('#lsd_addons_claim_products_row');
+        const $products_notice = $('#lsd_addons_claim_products_notice');
+        const $no_payment = $('.lsd-claim-payment-none');
+        const $payment_unavailable = $('.lsd-claim-payment-unavailable');
+
+        const sync_claim_payment_options = function ()
+        {
+            const after_approval = $payment_time.val() === 'after';
+            const no_payment = $payment_time.val() === 'none';
+
+            $auto_approval.prop('disabled', after_approval);
+            if (after_approval && $approval_behavior.val() === 'auto') $approval_behavior.val('manual');
+
+            $products.toggleClass('lsd-util-hide', no_payment);
+            $products_notice.toggleClass('lsd-util-hide', no_payment);
+            $no_payment.toggleClass('lsd-util-hide', !no_payment);
+            $payment_unavailable.toggleClass('lsd-util-hide', no_payment);
+        };
+
+        $payment_time.on('change', sync_claim_payment_options);
+        sync_claim_payment_options();
+    });
 })(jQuery);

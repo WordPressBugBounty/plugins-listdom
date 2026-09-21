@@ -13,6 +13,8 @@ if($mode === 'disabled') return;
 
 $custom_fields = LSD_Dashboard_Taxonomies_Terms::taxonomy_fields($taxonomy);
 $tax_name = ucfirst(str_replace('listdom-', '', $taxonomy));
+$term_nonce = wp_create_nonce('lsd_dashboard_new_term');
+$id_suffix = sanitize_key($args['id_suffix'] ?? '');
 
 $assets = new LSD_Assets();
 $assets->footer('<script>
@@ -22,28 +24,28 @@ jQuery(document).ready(function($)
     {
         let $wrapper = $(this);
         let tax = $wrapper.data("tax");
-        let $form = $("#lsd_dashboard_new_term_" + tax);
+        let $form = $wrapper.find(".lsd-dashboard-new-term-form").first();
 
         $form.listdomDashboardTaxForm({
             ajax_url: "' . admin_url('admin-ajax.php') . '",
-            nonce: "' . wp_create_nonce('lsd_dashboard_new_term') . '"
+            nonce: "' . $term_nonce . '"
         });
     });
 });
 </script>');
 ?>
-<div data-tax="<?php echo esc_attr($taxonomy); ?>" class="lsd-new-tax-wrapper">
+<div data-tax="<?php echo esc_attr($taxonomy); ?>" data-tax-nonce="<?php echo esc_attr($term_nonce); ?>" class="lsd-new-tax-wrapper">
     <div class="lsd-new-tax-link">
         <?php
         echo sprintf(
             /* translators: 1: Taxonomy name, 2: Link to add a new taxonomy term. */
             esc_html__("Select the %1\$s or %2\$s", 'listdom'),
             esc_html($tax_name),
-            '<a href="#" id="lsd_show_create_taxonomy_form_' . esc_attr($taxonomy) . '">' . esc_html__('Add a new one', 'listdom') . '</a>'
+            '<a href="#" id="lsd_show_create_taxonomy_form_' . esc_attr($taxonomy . $id_suffix) . '">' . esc_html__('Add a new one', 'listdom') . '</a>'
         );
         ?>
     </div>
-    <div class="lsd-dashboard-new-term-form lsd-modal" id="lsd_dashboard_new_term_<?php echo esc_attr($taxonomy); ?>">
+    <div class="lsd-dashboard-new-term-form lsd-modal" id="lsd_dashboard_new_term_<?php echo esc_attr($taxonomy . $id_suffix); ?>">
         <div class="lsd-modal-content">
             <h3 class="lsd-tax-title lsd-fe-title"><?php echo sprintf(
                 /* translators: %s: Taxonomy name. */
@@ -56,11 +58,11 @@ jQuery(document).ready(function($)
                         <?php echo LSD_Form::label([
                             /* translators: %s: Taxonomy name. */
                             'title' => sprintf(esc_attr__("%1\$s Name", 'listdom'), $tax_name),
-                            'for' => 'lsd_express_term_name_'. $taxonomy,
+                            'for' => 'lsd_express_term_name_'. $taxonomy . $id_suffix,
                         ]); ?>
                         <?php echo LSD_Form::input([
                             'name' => 'term_name',
-                            'id' => 'lsd_express_term_name_'. $taxonomy,
+                            'id' => 'lsd_express_term_name_'. $taxonomy . $id_suffix,
                             'class' => 'lsd_express_term_name',
                             /* translators: %s: Taxonomy name. */
                             'placeholder' => sprintf(esc_attr__("%1\$s Name", 'listdom'), $tax_name),
@@ -74,7 +76,7 @@ jQuery(document).ready(function($)
                             'label' => sprintf(esc_html__('Add %s', 'listdom'), $tax_name),
                         ]); ?>
                     </div>
-                    <div id="lsd_new_term_message_<?php echo esc_attr($taxonomy); ?>"></div>
+                    <div id="lsd_new_term_message_<?php echo esc_attr($taxonomy . $id_suffix); ?>"></div>
                 </div>
             <?php else: ?>
                 <div class="lsd-add-term-detailed lsd-new-term-<?php echo esc_attr($taxonomy); ?>">
@@ -82,11 +84,11 @@ jQuery(document).ready(function($)
                             <?php echo LSD_Form::label([
                                 /* translators: %s: Taxonomy name. */
                                 'title' => sprintf(esc_attr__("%1\$s Name", 'listdom'), $tax_name),
-                                'for' => 'lsd_detailed_term_name_'. $taxonomy,
+                                'for' => 'lsd_detailed_term_name_'. $taxonomy . $id_suffix,
                             ]); ?>
                             <?php echo LSD_Form::input([
                                 'name' => 'term_name',
-                                'id' => 'lsd_detailed_term_name_'. $taxonomy,
+                                'id' => 'lsd_detailed_term_name_'. $taxonomy . $id_suffix,
                                 'class' => 'lsd_detailed_term_name',
                                 /* translators: %s: Taxonomy name. */
                                 'placeholder' => sprintf(esc_attr__("%1\$s Name", 'listdom'), $tax_name),
@@ -96,11 +98,11 @@ jQuery(document).ready(function($)
                             <div class="lsd-w-full lsd-new-tax-inputs">
                                 <?php echo LSD_Form::label([
                                     'title' => esc_html__('Parent', 'listdom') . ' ' . $tax_name,
-                                    'for' => 'lsd_detailed_term_parent_' . $taxonomy,
+                                    'for' => 'lsd_detailed_term_parent_' . $taxonomy . $id_suffix,
                                 ]); ?>
                                 <?php echo LSD_Form::taxonomy($taxonomy , [
                                     'name' => 'term_parent',
-                                    'id' => 'lsd_detailed_term_parent_' . $taxonomy,
+                                    'id' => 'lsd_detailed_term_parent_' . $taxonomy . $id_suffix,
                                     'class' => 'lsd_detailed_term_parent',
                                     'show_empty' => true,
                                 ]); ?>
@@ -111,11 +113,11 @@ jQuery(document).ready(function($)
                             <div class="lsd-w-full lsd-new-tax-inputs lsd-flex lsd-gap-2">
                                 <?php echo LSD_Form::label([
                                     'title' => esc_attr__('Pick the color', 'listdom'),
-                                    'for' => 'lsd_color_'  . $taxonomy,
+                                    'for' => 'lsd_color_'  . $taxonomy . $id_suffix,
                                 ]); ?>
                                 <?php echo LSD_Form::input([
                                     'name' => 'lsd_color',
-                                    'id' => 'lsd_color_' . $taxonomy,
+                                    'id' => 'lsd_color_' . $taxonomy . $id_suffix,
                                     'class' => 'lsd_color',
                                     'default' => '#1d7ed3',
                                     'value' => '#1d7ed3',
@@ -128,13 +130,13 @@ jQuery(document).ready(function($)
                             <div class="lsd-w-full lsd-new-tax-inputs">
                                 <?php echo LSD_Form::label([
                                     'title' => esc_attr__('Select the icon', 'listdom'),
-                                    'for' => 'lsd_icon_' . $taxonomy,
+                                    'for' => 'lsd_icon_' . $taxonomy . $id_suffix,
                                     'class' => 'lsd-m-0',
                                 ]); ?>
                                 <div>
                                     <?php echo LSD_Form::iconpicker([
                                         'name' => 'lsd_icon',
-                                        'id' => 'lsd_icon_' . $taxonomy,
+                                        'id' => 'lsd_icon_' . $taxonomy . $id_suffix,
                                         'class' => 'lsd_icon lsd-fe-iconpicker lsd-iconpicker',
                                         'value' => '',
                                     ]); ?>
@@ -146,11 +148,11 @@ jQuery(document).ready(function($)
                     <div class="lsd-w-full lsd-new-tax-inputs">
                         <?php echo LSD_Form::label([
                             'title' => esc_html__('Description', 'listdom'),
-                            'for' => 'lsd_detailed_term_description_'. $taxonomy,
+                            'for' => 'lsd_detailed_term_description_'. $taxonomy . $id_suffix,
                         ]); ?>
                         <?php echo LSD_Form::textarea([
                             'name' => 'term_description',
-                            'id' => 'lsd_detailed_term_description_'. $taxonomy,
+                            'id' => 'lsd_detailed_term_description_'. $taxonomy . $id_suffix,
                             'placeholder' => esc_attr__('Description', 'listdom'),
                             'attributes' => [
                                 'class' => 'lsd_detailed_term_description',
@@ -164,7 +166,7 @@ jQuery(document).ready(function($)
                             'label' => sprintf(esc_html__('Add %s', 'listdom'), $tax_name),
                         ]); ?>
                     </div>
-                    <div id="lsd_new_term_message_<?php echo esc_attr($taxonomy); ?>" class="lsd-m-0"></div>
+                    <div id="lsd_new_term_message_<?php echo esc_attr($taxonomy . $id_suffix); ?>" class="lsd-m-0"></div>
                 </div>
             <?php endif; ?>
         </div>

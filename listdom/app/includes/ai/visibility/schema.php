@@ -372,7 +372,7 @@ class LSD_AI_Visibility_Schema extends LSD_Base
     protected function apply_addon_schema(array &$schema, WP_Post $post, LSD_Entity_Listing $entity): void
     {
         // Verified Status
-        if ($entity->is_claimed())
+        if ($entity->is_verified())
         {
             $schema['additionalProperty'][] = [
                 '@type' => 'PropertyValue',

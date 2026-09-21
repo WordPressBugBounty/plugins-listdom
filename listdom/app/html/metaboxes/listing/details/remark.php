@@ -7,6 +7,9 @@ defined('ABSPATH') || die();
 /** @var WP_Post $post */
 
 $remark = get_post_meta($post->ID, 'lsd_remark', true);
+$remark_editor_id = $dashboard instanceof LSD_Shortcodes_Dashboard
+    ? $dashboard->form_id('lsd_remark')
+    : 'lsd_remark';
 ?>
 <div class="lsd-listing-module-remark <?php echo LSD_Base::get_lsd_class('box-white'); ?>">
     <div class="lsd-form-row">
@@ -21,7 +24,7 @@ $remark = get_post_meta($post->ID, 'lsd_remark', true);
     </div>
     <div class="lsd-form-row lsd-remark-row">
         <div class="lsd-col-10">
-            <?php wp_editor($remark, 'lsd_remark', [
+            <?php wp_editor($remark, $remark_editor_id, [
                 'textarea_name' => 'lsd[remark]',
                 'textarea_rows' => 6,
                 'quicktags' => false,

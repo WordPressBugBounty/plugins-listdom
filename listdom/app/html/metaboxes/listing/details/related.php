@@ -8,6 +8,7 @@ defined('ABSPATH') || die();
 
 $related = get_post_meta($post->ID, 'lsd_related_listings', true);
 if (!is_array($related)) $related = [];
+$related_id = $dashboard instanceof LSD_Shortcodes_Dashboard ? $dashboard->form_id('lsd_related_listing_manual_selection') : 'lsd_related_listing_manual_selection';
 ?>
 <div class="<?php echo LSD_Base::get_lsd_class('box-white'); ?>">
     <div class="lsd-form-row">
@@ -19,9 +20,9 @@ if (!is_array($related)) $related = [];
             <?php echo LSD_Form::autosuggest([
                 'source' => LSD_Base::PTYPE_LISTING,
                 'name' => 'lsd[related_listings]',
-                'id' => 'lsd_related_listing_manual_selection',
-                'input_id' => 'lsd_related_listing_manual_selection_input',
-                'suggestions' => 'lsd_related_listing_manual_selection_suggestion',
+                'id' => $related_id,
+                'input_id' => $related_id . '_input',
+                'suggestions' => $related_id . '_suggestion',
                 'values' => $related,
                 'max_items' => 20,
                 'placeholder' => esc_attr__("Enter at least 3 characters of the Listing's title ...", 'listdom'),

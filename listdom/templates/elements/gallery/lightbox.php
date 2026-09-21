@@ -12,6 +12,7 @@ $lightbox = !isset($params['lightbox']) || $params['lightbox'];
 $include_thumbnail = $params['include_thumbnail'] ?? false;
 
 $gallery = $this->get_gallery($post_id , $include_thumbnail);
+$featured_image_id = get_post_thumbnail_id($post_id);
 
 // There is no Gallery!
 if(!count($gallery)) return '';
@@ -20,15 +21,17 @@ $imageItemProp = LSD_Schema::suppressing_markup() ? '' : 'itemprop="https://sche
 ?>
 <div class="lsd-image-gallery <?php echo $lightbox ? 'lsd-image-lightbox' : ''; ?>" <?php echo lsd_schema()->scope()->type('https://schema.org/ImageGallery'); ?>>
     <?php
-        foreach($gallery as $id)
+        foreach($gallery as $index => $id)
         {
             $thumb = wp_get_attachment_image_src($id, [$width, $height]);
             $full = wp_get_attachment_image_src($id, 'full');
 
             if(!$thumb || !$full) continue;
 
+            $alt = LSD_Entity_Listing::image_alt($post_id, $id, $include_thumbnail && $index === 0 && (int) $id === (int) $featured_image_id);
+
             echo '<a href="'.esc_url($full[0]).'" '.lsd_schema()->associatedMedia().'>
-                <img alt="" src="'.esc_url($thumb[0]).'" width="'.esc_attr($width).'" height="'.esc_attr($height).'" '.$imageItemProp.'>
+                <img alt="'.esc_attr($alt).'" src="'.esc_url($thumb[0]).'" width="'.esc_attr($width).'" height="'.esc_attr($height).'" '.$imageItemProp.'>
             </a>';
         }
     ?>

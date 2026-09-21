@@ -15,13 +15,30 @@ class LSD_Jobs extends LSD_Base
 
     public function init()
     {
-        add_filter('cron_schedules', [$this, 'schedule']);
+        add_filter('cron_schedules', [$this, 'schedule'], 999);
         add_action('lsd_jobs_run', [$this, 'run']);
 
-        add_action('init', function ()
+        add_action('init', [$this, 'schedule_event']);
+    }
+
+    public function schedule_event()
+    {
+        $timestamp = wp_next_scheduled('lsd_jobs_run');
+        if (!$timestamp)
         {
-            if (!wp_next_scheduled('lsd_jobs_run')) wp_schedule_event(time(), 'lsd_minute', 'lsd_jobs_run');
-        });
+            wp_schedule_event(time(), 'lsd_minute', 'lsd_jobs_run');
+            return;
+        }
+
+        // Repair an existing event that cannot be rescheduled because its interval was not stored.
+        if (!function_exists('wp_get_scheduled_event')) return;
+
+        $event = wp_get_scheduled_event('lsd_jobs_run', [], $timestamp);
+        if (!$event || $event->schedule !== 'lsd_minute' || !empty($event->interval)) return;
+
+        if (!wp_unschedule_event($timestamp, 'lsd_jobs_run')) return;
+
+        wp_schedule_event(time(), 'lsd_minute', 'lsd_jobs_run');
     }
 
     public function schedule($schedules)

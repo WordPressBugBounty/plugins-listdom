@@ -27,34 +27,38 @@ $dashboard_wrapper = $this->get_dashboard_wrapper([
         'data-job-addon-installed' => class_exists(LSDADDJOB::class) || class_exists(\LSDPACJOB\Base::class) ? 1 : 0,
     ],
 ]);
+$dashboard_id = $this->form_id('lsd_dashboard');
 
 // Add JS codes to footer
 $assets = new LSD_Assets();
 $assets->footer('<script>
 jQuery(document).ready(function()
 {
-    jQuery("#lsd_dashboard").listdomDashboardForm(
+    jQuery("#' . esc_js($dashboard_id) . '").each(function()
     {
-        ajax_url: "'.admin_url('admin-ajax.php', null).'",
-        nonce: "'.wp_create_nonce('lsd_dashboard').'"
+        jQuery(this).listdomDashboardForm(
+        {
+            ajax_url: "'.admin_url('admin-ajax.php', null).'",
+            nonce: "'.wp_create_nonce('lsd_dashboard').'"
+        });
     });
 });
 </script>');
 ?>
-<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="lsd_dashboard"<?php echo $dashboard_wrapper['attributes']; ?>>
+<div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>" id="<?php echo esc_attr($dashboard_id); ?>"<?php echo $dashboard_wrapper['attributes']; ?>>
 
-    <div class="lsd-dashboard-wrapper">
+    <div class="lsd-row lsd-dashboard-wrapper">
         <?php if (!$this->form_type): ?>
             <div class="lsd-dashboard-menus-wrapper">
-                <?php echo LSD_Kses::element($this->menus()); ?>
+                <?php echo LSD_Kses::full($this->menus()); ?>
             </div>
         <?php endif; ?>
 
         <div class="lsd-dashboard-content-wrapper">
             <?php if($form_columns === 2): ?>
-            <div id="lsd_dashboard_form_message"></div>
+            <div id="<?php echo esc_attr($this->form_id('lsd_dashboard_form_message')); ?>"></div>
             <?php endif; ?>
-            <form class="lsd-dashboard-form" id="lsd_dashboard_form" enctype="multipart/form-data">
+            <form class="lsd-dashboard-form" id="<?php echo esc_attr($this->form_id('lsd_dashboard_form')); ?>" enctype="multipart/form-data">
                 <div class="lsd-dashboard-form-columns">
                     <div class="lsd-dashboard-form-left-column">
 						<div class="lsd-dashboard-form-left-col-wrapper lsd-fe-sections">
@@ -70,7 +74,7 @@ jQuery(document).ready(function()
                                     <h4 class="lsd-fe-title"><?php esc_html_e('Description', 'listdom'); ?><?php $this->required_html('content'); ?></h4>
                                 </div>
 
-								<?php wp_editor($this->post->post_content ?? '', 'lsd_dashboard_content', ['textarea_name'=>'lsd[content]']); ?>
+								<?php wp_editor($this->post->post_content ?? '', $this->form_id('lsd_dashboard_content'), ['textarea_name'=>'lsd[content]']); ?>
 							</div>
 
                             <?php if ($this->is_enabled('excerpt')): ?>
@@ -80,7 +84,7 @@ jQuery(document).ready(function()
                                             <h4 class="lsd-fe-title"><?php esc_html_e('Excerpt', 'listdom'); ?><?php $this->required_html('excerpt'); ?></h4>
                                         </div>
                                         <div>
-                                            <?php wp_editor($this->post->post_excerpt ?? '', 'lsd_dashboard_excerpt', ['textarea_name' => 'lsd[excerpt]']); ?>
+                                            <?php wp_editor($this->post->post_excerpt ?? '', $this->form_id('lsd_dashboard_excerpt'), ['textarea_name' => 'lsd[excerpt]']); ?>
                                         </div>
                                     </div>
                                 </div>
@@ -115,26 +119,26 @@ jQuery(document).ready(function()
 								<h4 class="lsd-fe-title"><?php esc_html_e('To Reviewer', 'listdom'); ?></h4>
 
 								<div class="lsd-dashboard-guest-email">
-									<label for="lsd_guest_email"><?php echo esc_html__('Email', 'listdom').' '.LSD_Base::REQ_HTML; ?></label>
-									<input type="email" id="lsd_guest_email" name="lsd[guest_email]" required value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_email', true)); ?>" placeholder="<?php esc_attr_e('Your Email', 'listdom'); ?>">
+									<label for="<?php echo esc_attr($this->form_id('lsd_guest_email')); ?>"><?php echo esc_html__('Email', 'listdom').' '.LSD_Base::REQ_HTML; ?></label>
+									<input type="email" id="<?php echo esc_attr($this->form_id('lsd_guest_email')); ?>" name="lsd[guest_email]" required value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_email', true)); ?>" placeholder="<?php esc_attr_e('Your Email', 'listdom'); ?>">
 								</div>
 
                                 <?php if ($this->guest_registration): ?>
                                     <div class="lsd-dashboard-guest-name">
-                                        <label for="lsd_guest_fullname"><?php esc_html_e('Full Name', 'listdom'); ?></label>
-                                        <input type="text" id="lsd_guest_fullname" name="lsd[guest_fullname]" value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_fullname', true)); ?>" placeholder="<?php esc_attr_e('Please insert your full name', 'listdom'); ?>">
+                                        <label for="<?php echo esc_attr($this->form_id('lsd_guest_fullname')); ?>"><?php esc_html_e('Full Name', 'listdom'); ?></label>
+                                        <input type="text" id="<?php echo esc_attr($this->form_id('lsd_guest_fullname')); ?>" name="lsd[guest_fullname]" value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_fullname', true)); ?>" placeholder="<?php esc_attr_e('Please insert your full name', 'listdom'); ?>">
                                     </div>
                                     <?php if($this->guest_registration === 'submission'): ?>
                                     <div class="lsd-dashboard-guest-password">
-                                        <label for="lsd_guest_password"><?php echo esc_html__('Password', 'listdom').' '.LSD_Base::REQ_HTML; ?></label>
-                                        <input type="password" id="lsd_guest_password" name="lsd[guest_password]" required value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_password', true)); ?>" placeholder="<?php esc_attr_e('Should be at-least 8 characters', 'listdom'); ?>">
+                                        <label for="<?php echo esc_attr($this->form_id('lsd_guest_password')); ?>"><?php echo esc_html__('Password', 'listdom').' '.LSD_Base::REQ_HTML; ?></label>
+                                        <input type="password" id="<?php echo esc_attr($this->form_id('lsd_guest_password')); ?>" name="lsd[guest_password]" required value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_password', true)); ?>" placeholder="<?php esc_attr_e('Should be at-least 8 characters', 'listdom'); ?>">
                                     </div>
                                     <?php endif; ?>
                                 <?php endif; ?>
 
 								<div class="lsd-dashboard-guest-message">
-									<label for="lsd_guest_message"><?php esc_html_e('Message', 'listdom'); ?></label>
-									<textarea id="lsd_guest_message" name="lsd[guest_message]" placeholder="<?php esc_attr_e('Message to Reviewer', 'listdom'); ?>" rows="7"><?php echo esc_textarea(stripslashes(get_post_meta($this->post->ID, 'lsd_guest_message', true))); ?></textarea>
+									<label for="<?php echo esc_attr($this->form_id('lsd_guest_message')); ?>"><?php esc_html_e('Message', 'listdom'); ?></label>
+									<textarea id="<?php echo esc_attr($this->form_id('lsd_guest_message')); ?>" name="lsd[guest_message]" placeholder="<?php esc_attr_e('Message to Reviewer', 'listdom'); ?>" rows="7"><?php echo esc_textarea(stripslashes(get_post_meta($this->post->ID, 'lsd_guest_message', true))); ?></textarea>
 								</div>
 							</div>
 							<?php endif; ?>
@@ -142,7 +146,7 @@ jQuery(document).ready(function()
                             <?php $this->dashboard_form_submit(true); ?>
 
                             <?php if ($form_columns === 1): ?>
-                                <div id="lsd_dashboard_form_message"></div>
+                                <div id="<?php echo esc_attr($this->form_id('lsd_dashboard_form_message')); ?>"></div>
                             <?php endif; ?>
 						</div>
                     </div>
@@ -151,7 +155,7 @@ jQuery(document).ready(function()
                         <div class="lsd-dashboard-box lsd-dashboard-category lsd-fe-box-white">
                             <div class="lsd-fe-section-heading">
                                 <h4 class="lsd-fe-title"><?php echo esc_html__('Category', 'listdom').' '.LSD_Base::REQ_HTML; ?></h4>
-                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_CATEGORY])); ?>
+                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_CATEGORY, 'id_suffix' => $this->form_id('')])); ?>
                             </div>
                             <div class="lsd-fe-subsections">
                                 <?php
@@ -162,7 +166,8 @@ jQuery(document).ready(function()
                                         'order' => 'ASC',
                                         'selected' => $selected_category_id,
                                         'hierarchical' => 0,
-                                        'id' => 'lsd_listing_category',
+                                        'id' => $this->form_id('lsd_listing_category'),
+                                        'id_prefix' => $this->form_id('in-listdom-location'),
                                         'name' => 'lsd[listing_category]',
                                         'required' => true,
                                         'parent' => 0,
@@ -179,7 +184,7 @@ jQuery(document).ready(function()
                         <div class="lsd-dashboard-box lsd-dashboard-locations lsd-fe-box-white">
                             <div class="lsd-fe-section-heading">
                                 <h4 class="lsd-fe-title"><?php esc_html_e('Locations', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_LOCATION); ?></h4>
-                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_LOCATION])); ?>
+                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_LOCATION, 'id_suffix' => $this->form_id('')])); ?>
                             </div>
                             <?php
                                 echo LSD_Dashboard_Terms::locations([
@@ -190,7 +195,8 @@ jQuery(document).ready(function()
                                     'orderby' => 'name',
                                     'order' => 'ASC',
                                     'post_id' => $this->post->ID,
-                                    'name' => 'tax_input['.LSD_Base::TAX_LOCATION.']'
+                                    'name' => 'tax_input['.LSD_Base::TAX_LOCATION.']',
+                                    'id_prefix' => $this->form_id('in-listdom-location')
                                 ]);
                             ?>
                         </div>
@@ -200,7 +206,7 @@ jQuery(document).ready(function()
                         <div class="lsd-dashboard-box lsd-dashboard-tags lsd-fe-box-white">
                             <div class="lsd-fe-section-heading">
                                 <h4 class="lsd-fe-title"><?php esc_html_e('Tags', 'listdom'); ?><?php $this->required_html('tags'); ?></h4>
-                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_TAG])); ?>
+                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_TAG, 'id_suffix' => $this->form_id('')])); ?>
                             </div>
                             <?php
                                 $terms = wp_get_post_terms($this->post->ID, LSD_Base::TAX_TAG);
@@ -211,10 +217,11 @@ jQuery(document).ready(function()
                                 echo LSD_Dashboard_Terms::tags([
                                     'taxonomy' => LSD_Base::TAX_TAG,
                                     'name' => 'tags',
-                                    'id' => 'lsd_dashboard_tags',
+                                    'id' => $this->form_id('lsd_dashboard_tags'),
                                     'level' => 0,
                                     'rows' => 3,
                                     'post_id' => $this->post->ID,
+                                    'id_prefix' => $this->form_id('in-listdom-location'),
                                     'hide_empty' => 0,
                                     'orderby' => 'name',
                                     'order' => 'ASC',
@@ -229,7 +236,7 @@ jQuery(document).ready(function()
                         <div class="lsd-dashboard-box lsd-dashboard-features lsd-fe-box-white">
                             <div class="lsd-fe-section-heading">
                                 <h4 class="lsd-fe-title"><?php esc_html_e('Features', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_FEATURE); ?></h4>
-                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_FEATURE])); ?>
+                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_FEATURE, 'id_suffix' => $this->form_id('')])); ?>
                             </div>
                             <?php
                                 echo LSD_Dashboard_Terms::features([
@@ -240,6 +247,7 @@ jQuery(document).ready(function()
                                     'orderby' => 'name',
                                     'order' => 'ASC',
                                     'post_id' => $this->post->ID,
+                                    'id_prefix' => $this->form_id('in-listdom-location'),
                                     'name' => 'tax_input['.LSD_Base::TAX_FEATURE.']'
                                 ]);
                             ?>
@@ -247,10 +255,10 @@ jQuery(document).ready(function()
                         <?php endif; ?>
 
                         <?php if ($this->is_enabled('labels')): ?>
-                        <div class="lsd-dashboard-box lsd-dashboard-labels lsd-fe-box-white" id="lsd-dashboard-labels">
+                        <div class="lsd-dashboard-box lsd-dashboard-labels lsd-fe-box-white" id="<?php echo esc_attr($this->form_id('lsd-dashboard-labels')); ?>">
                             <div class="lsd-fe-section-heading">
                                 <h4 class="lsd-fe-title"><?php esc_html_e('Labels', 'listdom'); ?><?php $this->required_html(LSD_Base::TAX_LABEL); ?></h4>
-                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_LABEL])); ?>
+                                <?php echo LSD_KSes::full($taxonomies->display(['taxonomy' => LSD_Base::TAX_LABEL, 'id_suffix' => $this->form_id('')])); ?>
                             </div>
                             <?php
                                 echo LSD_Dashboard_Terms::labels([
@@ -261,6 +269,7 @@ jQuery(document).ready(function()
                                     'orderby' => 'name',
                                     'order' => 'ASC',
                                     'post_id' => $this->post->ID,
+                                    'id_prefix' => $this->form_id('in-listdom-location'),
                                     'name' => 'tax_input['.LSD_Base::TAX_LABEL.']'
                                 ]);
                             ?>
@@ -290,24 +299,31 @@ jQuery(document).ready(function()
                                     $featured_image = $featured_image[0] ?? '';
                                     $has_featured_image = trim($featured_image) !== '';
                                 ?>
-                                <div id="lsd_listing_featured_image_message"></div>
-                                <div id="lsd_dashboard_featured_image_placeholder" class="lsd-image-placeholder<?php echo $has_featured_image ? ' lsd-image-placeholder-has-image' : ''; ?>" data-placeholder="<?php echo esc_attr($featured_image_placeholder['src'] ?? ''); ?>">
+                                <div id="<?php echo esc_attr($this->form_id('lsd_listing_featured_image_message')); ?>"></div>
+                                <div id="<?php echo esc_attr($this->form_id('lsd_dashboard_featured_image_placeholder')); ?>" class="lsd-image-placeholder<?php echo $has_featured_image ? ' lsd-image-placeholder-has-image' : ''; ?>" data-placeholder="<?php echo esc_attr($featured_image_placeholder['src'] ?? ''); ?>">
                                     <div class="lsd-image-placeholder-inner">
-                                        <div id="lsd_dashboard_featured_image_preview" class="lsd-image-placeholder-preview<?php echo $has_featured_image ? '' : ' lsd-util-hide'; ?>">
+                                        <div id="<?php echo esc_attr($this->form_id('lsd_dashboard_featured_image_preview')); ?>" class="lsd-image-placeholder-preview<?php echo $has_featured_image ? '' : ' lsd-util-hide'; ?>">
                                             <?php if ($has_featured_image): ?>
                                                 <img src="<?php echo esc_url($featured_image); ?>" alt="<?php esc_attr_e('Featured image preview', 'listdom'); ?>">
                                             <?php endif; ?>
                                         </div>
                                         <div class="lsd-image-placeholder-empty<?php echo $has_featured_image ? ' lsd-util-hide' : ''; ?>">
                                             <p class="lsd-image-placeholder-text"><?php esc_html_e('No image selected', 'listdom'); ?></p>
-                                            <label for="lsd_featured_image_file" class="lsd-choose-file lsd-light-button"><?php echo esc_html__('Choose Image', 'listdom'); ?></label>
+                                            <label for="<?php echo esc_attr($this->form_id('lsd_featured_image_file')); ?>" class="lsd-choose-file lsd-light-button"><?php echo esc_html__('Choose Image', 'listdom'); ?></label>
                                         </div>
                                     </div>
                                 </div>
-                                <input type="hidden" id="lsd_featured_image" name="lsd[featured_image]" value="<?php echo esc_attr($attachment_id); ?>">
-                                <input class="lsd-util-hide" type="file" id="lsd_featured_image_file" data-aspect-ratio="<?php echo esc_attr($featured_image_aspect_ratio); ?>"<?php echo $featured_image_aspect_ratio_message !== '' ? ' data-aspect-message="' . esc_attr($featured_image_aspect_ratio_message) . '"' : ''; ?>>
+                                <input type="hidden" id="<?php echo esc_attr($this->form_id('lsd_featured_image')); ?>" name="lsd[featured_image]" value="<?php echo esc_attr($attachment_id); ?>">
+                                <?php if (LSD_Entity_Listing::custom_alt(true)): ?>
+                                <div class="lsd-featured-image-alt lsd-mt-3">
+                                    <label class="lsd-fields-label" for="<?php echo esc_attr($this->form_id('lsd_featured_image_alt')); ?>"><?php esc_html_e('Alt Text', 'listdom'); ?></label>
+                                    <input class="lsd-admin-input" type="text" name="lsd[featured_image_alt]" id="<?php echo esc_attr($this->form_id('lsd_featured_image_alt')); ?>" value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_featured_image_alt', true)); ?>" placeholder="<?php echo esc_attr(get_post_meta($attachment_id, '_wp_attachment_image_alt', true) ?: __('Optional image alt text', 'listdom')); ?>" data-default-placeholder="<?php echo esc_attr__('Optional image alt text', 'listdom'); ?>">
+                                    <p class="lsd-fe-description"><?php esc_html_e('This listing-specific text overrides the Media Library alt text.', 'listdom'); ?></p>
+                                </div>
+                                <?php endif; ?>
+                                <input class="lsd-util-hide" type="file" id="<?php echo esc_attr($this->form_id('lsd_featured_image_file')); ?>" data-aspect-ratio="<?php echo esc_attr($featured_image_aspect_ratio); ?>"<?php echo $featured_image_aspect_ratio_message !== '' ? ' data-aspect-message="' . esc_attr($featured_image_aspect_ratio_message) . '"' : ''; ?>>
                                 <div class="lsd-dashboard-feature-image-remove-wrapper lsd-mt-3">
-                                    <span id="lsd_featured_image_remove_button" class="lsd-remove-image-button <?php echo esc_attr($this->get_text_class()); ?> <?php echo $has_featured_image ? '' : 'lsd-util-hide'; ?>">
+                                    <span id="<?php echo esc_attr($this->form_id('lsd_featured_image_remove_button')); ?>" class="lsd-remove-image-button <?php echo esc_attr($this->get_text_class()); ?> <?php echo $has_featured_image ? '' : 'lsd-util-hide'; ?>">
                                         <?php esc_html_e('Remove Image', 'listdom'); ?>
                                     </span>
                                 </div>

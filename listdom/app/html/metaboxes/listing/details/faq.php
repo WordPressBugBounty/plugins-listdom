@@ -8,15 +8,18 @@ defined('ABSPATH') || die();
 
 $faqs = get_post_meta($post->ID, 'lsd_faqs', true);
 if (!is_array($faqs)) $faqs = [];
+$form_id = [$this, 'form_id'];
+$faqs_id = $form_id('lsd_listing_faqs');
+$faqs_template_id = $form_id('lsd_listing_faqs_template');
 ?>
 <div class="lsd-listing-faqs-container lsd-listing-module-faq <?php echo LSD_Base::get_lsd_class('box-white'); ?>">
     <div class="lsd-fe-section-heading">
         <h3 class="<?php echo \LSD_Base::get_lsd_class('title'); ?>"><?php esc_html_e('FAQs', 'listdom'); ?><?php $dashboard && $dashboard->required_html('_faqs'); ?></h3>
     </div>
     <div class="lsd-listing-faqs-list">
-        <ul id="lsd_listing_faqs" class="lsd-listing-faqs lsd-sortable">
+        <ul id="<?php echo esc_attr($faqs_id); ?>" class="lsd-listing-faqs lsd-sortable">
             <?php $i = 0; foreach ($faqs as $faq): ?>
-            <li class="<?php echo LSD_Base::get_lsd_class('box-gray'); ?>" data-id="<?php echo esc_attr($i); ?>" id="lsd_listing_faqs_<?php echo esc_attr($i); ?>">
+            <li class="<?php echo LSD_Base::get_lsd_class('box-gray'); ?>" data-id="<?php echo esc_attr($i); ?>" id="<?php echo esc_attr($form_id('lsd_listing_faqs_' . $i)); ?>">
                 <div class="lsd-listing-faq-item">
                     <div class="lsd-faqs-fields <?php echo LSD_Base::get_lsd_class('subsections'); ?>">
                         <input class="lsd-admin-input" type="text" name="lsd[_faqs][<?php echo esc_attr($i); ?>][question]" value="<?php echo isset($faq['question']) ? esc_attr($faq['question']) : ''; ?>" title="<?php esc_attr_e('Question', 'listdom'); ?>" placeholder="<?php esc_attr_e('Question', 'listdom'); ?>">
@@ -30,10 +33,10 @@ if (!is_array($faqs)) $faqs = [];
             </li>
             <?php $i++; endforeach; ?>
         </ul>
-        <input type="hidden" id="lsd_listing_faqs_index" value="<?php echo esc_attr($i); ?>">
+        <input type="hidden" id="<?php echo esc_attr($form_id('lsd_listing_faqs_index')); ?>" value="<?php echo esc_attr($i); ?>">
     </div>
-    <ul id="lsd_listing_faqs_template" class="lsd-util-hide">
-        <li class="lsd-admin-box-gray" data-id=":i:" id="lsd_listing_faqs_:i:">
+    <ul id="<?php echo esc_attr($faqs_template_id); ?>" class="lsd-util-hide">
+        <li class="lsd-admin-box-gray" data-id=":i:" id="<?php echo esc_attr($form_id('lsd_listing_faqs_:i:')); ?>">
             <div class="lsd-listing-faq-item">
                 <div class="lsd-faqs-fields lsd-admin-subsections">
                     <input class="lsd-admin-input" type="text" name="lsd[_faqs][:i:][question]" value="" title="<?php esc_attr_e('Question', 'listdom'); ?>" placeholder="<?php esc_attr_e('Question', 'listdom'); ?>">
@@ -47,7 +50,7 @@ if (!is_array($faqs)) $faqs = [];
         </li>
     </ul>
     <div class="lsd-fe-subsections lsd-faqs-buttons">
-            <button class="<?php echo is_admin() ? 'lsd-neutral-button':'lsd-light-button'; ?> lsd-w-auto lsd-add-faq-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" data-template="#lsd_listing_faqs_template" data-for="#lsd_listing_faqs" type="button"><?php esc_html_e('Add FAQ', 'listdom'); ?></button>
-            <button class="lsd-text-button lsd-w-auto lsd-remove-faq-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($faqs) ? '' : 'lsd-util-hide'; ?>" data-for="#lsd_listing_faqs" type="button"><?php esc_html_e('Remove All FAQs', 'listdom'); ?></button>
+            <button class="<?php echo is_admin() ? 'lsd-neutral-button':'lsd-light-button'; ?> lsd-w-auto lsd-add-faq-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" data-template="#<?php echo esc_attr($faqs_template_id); ?>" data-for="#<?php echo esc_attr($faqs_id); ?>" type="button"><?php esc_html_e('Add FAQ', 'listdom'); ?></button>
+            <button class="lsd-text-button lsd-w-auto lsd-remove-faq-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($faqs) ? '' : 'lsd-util-hide'; ?>" data-for="#<?php echo esc_attr($faqs_id); ?>" type="button"><?php esc_html_e('Remove All FAQs', 'listdom'); ?></button>
     </div>
 </div>

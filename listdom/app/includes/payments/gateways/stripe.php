@@ -400,6 +400,16 @@ class LSD_Payments_Gateways_Stripe extends LSD_Payments_Gateway
             }
         }
 
+        // Stripe subscriptions cannot collect one-time cart fees.
+        foreach ($cart->get_fees() as $fee)
+        {
+            if ((float) ($fee['amount'] ?? 0) > 0)
+            {
+                $result['has_non_recurring'] = true;
+                break;
+            }
+        }
+
         if ($result['has_recurring'])
         {
             $result['recurring_subtotal'] = round($result['recurring_subtotal'], 2);
@@ -871,6 +881,15 @@ class LSD_Payments_Gateways_Stripe extends LSD_Payments_Gateway
         if (!$order)
         {
             return new WP_Error('lsd_stripe_order_missing', esc_html__('Unable to load the order for Stripe subscription setup.', 'listdom'));
+        }
+
+        // Do not complete a recurring order when its one-time fees are unpaid.
+        foreach ($order->get_fees() as $fee)
+        {
+            if ((float) ($fee['amount'] ?? 0) > 0)
+            {
+                return new WP_Error('lsd_stripe_recurring_fees_unsupported', esc_html__('Recurring payments cannot be combined with one-time fees.', 'listdom'));
+            }
         }
 
         $user_id = $order->get_user_id();

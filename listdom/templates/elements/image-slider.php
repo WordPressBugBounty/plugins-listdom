@@ -17,9 +17,15 @@ if (!is_array($gallery)) $gallery = [];
 $include_featured_image = isset($this->settings['gallery_featured_image']) && trim($this->settings['gallery_featured_image'])
     ? $this->settings['gallery_featured_image']
     : 'always';
+$featured_image_id = get_post_thumbnail_id($post_id);
+$featured_image_added = false;
 
 // Add Featured Image to Gallery
-if (($include_featured_image === 'always' || ($include_featured_image === 'fallback' && !count($gallery))) && has_post_thumbnail($post_id)) array_unshift($gallery, get_post_thumbnail_id($post_id));
+if (($include_featured_image === 'always' || ($include_featured_image === 'fallback' && !count($gallery))) && $featured_image_id)
+{
+    array_unshift($gallery, $featured_image_id);
+    $featured_image_added = true;
+}
 
 // Unique Gallery
 $gallery = array_unique($gallery);
@@ -30,6 +36,7 @@ $image_attributes = LSD_Schema::suppressing_markup() ? [] : ['itemprop' => 'imag
     <ul class="lsd-image-slider-slider">
         <?php foreach($gallery as $image_id): ?>
         <?php
+            $image_attributes['alt'] = LSD_Entity_Listing::image_alt($post_id, $image_id, $featured_image_added && (int) $image_id === (int) $featured_image_id);
             $image = wp_get_attachment_image($image_id, $size, false, $image_attributes);
             if (!$image) continue;
         ?>

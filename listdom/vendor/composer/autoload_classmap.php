@@ -942,6 +942,7 @@ return array(
     'Webilia\\Connect\\Contracts\\Capability' => $vendorDir . '/webilia/connect/src/Contracts/Capability.php',
     'Webilia\\Connect\\Contracts\\ConditionalConnectionStorage' => $vendorDir . '/webilia/connect/src/Contracts/ConditionalConnectionStorage.php',
     'Webilia\\Connect\\Contracts\\Connection' => $vendorDir . '/webilia/connect/src/Contracts/Connection.php',
+    'Webilia\\Connect\\Contracts\\GetHttpClient' => $vendorDir . '/webilia/connect/src/Contracts/GetHttpClient.php',
     'Webilia\\Connect\\Contracts\\HttpClient' => $vendorDir . '/webilia/connect/src/Contracts/HttpClient.php',
     'Webilia\\Connect\\Contracts\\Storage' => $vendorDir . '/webilia/connect/src/Contracts/Storage.php',
     'Webilia\\Connect\\Contracts\\UpdateClient' => $vendorDir . '/webilia/connect/src/Contracts/UpdateClient.php',

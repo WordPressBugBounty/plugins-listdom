@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.2
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 6.0.0
+Stable tag: 6.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -445,6 +445,15 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 6.1.0 =
+* Added an interactive setup wizard to help launch a directory site.
+* Added Comparison and Frontend Dashboard widgets for Elementor.
+* Added configurable alt text for listing images.
+* Enhanced claim ownership, payment, and dashboard workflows.
+* Fixed scheduled jobs with missing intervals.
+* Fixed an issue in Google Places address copying.
+* Fixed some user interface issues.
 
 = 6.0.0 =
 * Added Webilia Connect activation and account-based add-on updates.

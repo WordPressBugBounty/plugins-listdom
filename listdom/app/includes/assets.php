@@ -71,6 +71,10 @@ class LSD_Assets extends LSD_Base
         // Listdom Toast
         $this->toast();
 
+        $has_elementor_dashboard = LSD_Dashboard::has_elementor_dashboard();
+        if (LSD_Main::is_grecaptcha_enabled($this->settings)) $this->grecaptcha(true);
+        if ($has_elementor_dashboard) $this->iconpicker();
+
         // Include Listdom frontend script file
         wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), $frontend_dependencies, $this->version(), true);
 
@@ -243,16 +247,17 @@ class LSD_Assets extends LSD_Base
         wp_enqueue_script('isotope', $this->lsd_asset_url('packages/isotope/isotope.pkgd.min.js'), [], LSD_Assets::version());
     }
 
-    public function grecaptcha()
+    public function grecaptcha(bool $explicit = false)
     {
         // Scripts
-        wp_enqueue_script('google-recaptcha', 'https://www.google.com/recaptcha/api.js');
+        $url = $explicit ? 'https://www.google.com/recaptcha/api.js?render=explicit' : 'https://www.google.com/recaptcha/api.js';
+        wp_enqueue_script('google-recaptcha', $url);
     }
 
     public function iconpicker()
     {
         // Include the icon-picker JS file
-        wp_enqueue_script('jquery-fonticonpicker', $this->lsd_asset_url('packages/font-iconpicker/jquery.fonticonpicker.min.js'), [], LSD_Assets::version());
+        wp_enqueue_script('jquery-fonticonpicker', $this->lsd_asset_url('packages/font-iconpicker/jquery.fonticonpicker.min.js'), ['jquery'], LSD_Assets::version());
     }
 
     public function colorpicker()
@@ -526,7 +531,11 @@ class LSD_Assets extends LSD_Base
         // Dependencies
         $dependencies = [];
 
-        if (is_admin()) $dependencies[] = 'lsd-backend';
+        if (is_admin())
+        {
+            // Google Maps can be requested from admin/AJAX contexts where backend assets are not loaded.
+            if (wp_script_is('lsd-backend', 'registered')) $dependencies[] = 'lsd-backend';
+        }
         else $dependencies[] = 'lsd-frontend';
 
         // Keep the drawing library available for draw-search controls on Google maps shortcodes.

@@ -11,8 +11,13 @@ if (!is_array($call_to_action)) $call_to_action = [];
 
 $cta_mode = $call_to_action['mode'] ?? 'inherit';
 if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
+$form_id = [$this, 'form_id'];
+$cta_root_id = $form_id('lsd_listing_cta');
+$cta_target_id = $form_id('lsd_cta_target');
+$cta_modal_id = $form_id('lsd_cta_popup_modal');
+$cta_editor_id = $form_id('lsd_cta_popup_editor');
 ?>
-<div class="lsd-listing-module-cta <?php echo LSD_Base::get_lsd_class('box-white'); ?>" data-lsd-cta-root>
+<div class="lsd-listing-module-cta <?php echo LSD_Base::get_lsd_class('box-white'); ?>" id="<?php echo esc_attr($cta_root_id); ?>" data-lsd-cta-root>
     <div class="lsd-form-row">
         <div class="lsd-col-8"><h3 class="lsd-mt-0"><?php esc_html_e('Call to Action', 'listdom'); ?></h3></div>
     </div>
@@ -21,18 +26,18 @@ if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
             <?php echo LSD_Form::label([
                 'class' => 'lsd-fields-label',
                 'title' => esc_html__('Inherit', 'listdom'),
-                'for' => 'lsd_cta_mode_toggle',
+                'for' => $form_id('lsd_cta_mode_toggle'),
             ]); ?>
         </div>
         <div class="lsd-col-8">
             <div data-lsd-cta-mode-toggle>
                 <?php echo LSD_Form::switcher([
-                    'id' => 'lsd_cta_mode_toggle',
+                    'id' => $form_id('lsd_cta_mode_toggle'),
                     'name' => 'lsd[cta_mode_toggle]',
                     'value' => $cta_mode === 'custom' ? '0' : '1',
                 ]); ?>
             </div>
-            <input type="hidden" name="lsd[cta_mode]" id="lsd_cta_mode"
+            <input type="hidden" name="lsd[cta_mode]" id="<?php echo esc_attr($form_id('lsd_cta_mode')); ?>"
                    value="<?php echo esc_attr($cta_mode); ?>"
                    data-lsd-cta-mode="input">
             <p class="<?php echo LSD_Base::get_lsd_class('description-tiny'); ?>"><?php esc_html_e('Inherit call to action settings from element global settings', 'listdom'); ?></p>
@@ -42,10 +47,10 @@ if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
     <div class="lsd-cta-custom-fields <?php echo LSD_Base::get_lsd_class('subsections'); ?> <?php echo (($call_to_action['mode'] ?? '') === 'custom') ? '' : 'lsd-util-hide'; ?>" data-lsd-cta-custom-fields>
         <div class="lsd-form-row">
             <div class="lsd-col-2">
-                <label class="lsd-fields-label" for="lsd_cta_text"><?php esc_html_e('Button Text', 'listdom'); ?></label>
+                <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_cta_text')); ?>"><?php esc_html_e('Button Text', 'listdom'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input class="lsd-admin-input" type="text" name="lsd[cta_text]" id="lsd_cta_text"
+                <input class="lsd-admin-input" type="text" name="lsd[cta_text]" id="<?php echo esc_attr($form_id('lsd_cta_text')); ?>"
                        placeholder="<?php esc_attr_e('Click Here', 'listdom'); ?>"
                        value="<?php echo esc_attr($call_to_action['text'] ?? ''); ?>">
                 <p class="<?php echo LSD_Base::get_lsd_class('description-tiny'); ?>"><?php esc_html_e('Leave empty to use the default "Click Here" button text for this listing.', 'listdom'); ?></p>
@@ -54,10 +59,10 @@ if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
 
         <div class="lsd-form-row">
             <div class="lsd-col-2">
-                <label class="lsd-fields-label" for="lsd_cta_target"><?php esc_html_e('Button Action', 'listdom'); ?></label>
+                <label class="lsd-fields-label" for="<?php echo esc_attr($cta_target_id); ?>"><?php esc_html_e('Button Action', 'listdom'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <select class="lsd-admin-input" name="lsd[cta_target]" id="lsd_cta_target" data-lsd-cta-target="1">
+                <select class="lsd-admin-input" name="lsd[cta_target]" id="<?php echo esc_attr($cta_target_id); ?>" data-lsd-cta-target="1">
                     <option value="details" <?php selected(($call_to_action['target'] ?? 'details'), 'details'); ?>><?php esc_html_e('Open listing details page', 'listdom'); ?></option>
                     <option value="lightbox" <?php selected(($call_to_action['target'] ?? 'details'), 'lightbox'); ?>><?php esc_html_e('Open listing details in lightbox', 'listdom'); ?></option>
                     <option value="custom" <?php selected(($call_to_action['target'] ?? 'details'), 'custom'); ?>><?php esc_html_e('Open a custom link', 'listdom'); ?></option>
@@ -77,10 +82,10 @@ if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
 
         <div class="lsd-form-row lsd-cta-target-field <?php echo (($call_to_action['target'] ?? 'details') === 'custom') ? '' : 'lsd-util-hide'; ?>" data-lsd-cta-target-field="custom">
             <div class="lsd-col-2">
-                <label class="lsd-fields-label" for="lsd_cta_url"><?php esc_html_e('Custom Link', 'listdom'); ?></label>
+                <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_cta_url')); ?>"><?php esc_html_e('Custom Link', 'listdom'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input type="url" name="lsd[cta_url]" id="lsd_cta_url"
+                <input type="url" name="lsd[cta_url]" id="<?php echo esc_attr($form_id('lsd_cta_url')); ?>"
                        placeholder="<?php esc_attr_e('https://example.com/apply', 'listdom'); ?>"
                        value="<?php echo esc_url($call_to_action['url'] ?? ''); ?>">
             </div>
@@ -90,7 +95,7 @@ if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
             <div class="lsd-form-row lsd-cta-target-field <?php echo (($call_to_action['target'] ?? 'details') === 'popup') ? '' : 'lsd-util-hide'; ?>" data-lsd-cta-target-field="popup">
                 <div class="lsd-col-2"></div>
                 <div class="lsd-col-8">
-                    <button type="button" class="lsd-cta-popup-button <?php echo $dashboard ? 'lsd-light-button': 'lsd-secondary-button'; ?>" data-lsd-cta-open-modal="lsd_cta_popup_modal"><?php esc_html_e('Edit Popup Content', 'listdom'); ?></button>
+                    <button type="button" class="lsd-cta-popup-button <?php echo $dashboard ? 'lsd-light-button': 'lsd-secondary-button'; ?>" data-lsd-cta-open-modal="<?php echo esc_attr($cta_modal_id); ?>"><?php esc_html_e('Edit Popup Content', 'listdom'); ?></button>
                     <p class="<?php echo LSD_Base::get_lsd_class('description-tiny'); ?>"><?php esc_html_e('HTML and shortcodes are supported.', 'listdom'); ?></p>
                 </div>
             </div>
@@ -99,13 +104,13 @@ if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
 </div>
 
 <?php if (LSD_Base::isPro()): ?>
-    <div class="lsd-modal lsd-cta-modal lsd-util-hide" id="lsd_cta_popup_modal">
+    <div class="lsd-modal lsd-cta-modal lsd-util-hide" id="<?php echo esc_attr($cta_modal_id); ?>">
         <div class="lsd-modal-content">
             <a href="#" class="lsd-modal-close" aria-label="<?php esc_attr_e('Close popup', 'listdom'); ?>">
                 <i class="listdom-icon fa fa-times"></i>
             </a>
             <div class="lsd-modal-body">
-                <?php wp_editor(($call_to_action['content'] ?? ''), 'lsd_cta_popup_editor', [
+                <?php wp_editor(($call_to_action['content'] ?? ''), $cta_editor_id, [
                     'textarea_name' => 'lsd[cta_popup]',
                     'textarea_rows' => 6,
                     'media_buttons' => true,
@@ -115,7 +120,7 @@ if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
         </div>
     </div>
     <textarea class="lsd-util-hide"
-          data-lsd-cta-storage="lsd_cta_popup_editor"
+          data-lsd-cta-storage="<?php echo esc_attr($cta_editor_id); ?>"
           name="lsd[cta_popup]"><?php echo esc_textarea($call_to_action['content'] ?? ''); ?></textarea>
 <?php else: ?>
     <input type="hidden" name="lsd[cta_popup]" value="<?php echo esc_attr($call_to_action['content'] ?? ''); ?>">
@@ -124,7 +129,8 @@ if (!in_array($cta_mode, ['inherit', 'custom'], true)) $cta_mode = 'inherit';
 <script>
 jQuery(document).ready(function($)
 {
-    const $ctaRoot = $('.lsd-listing-module-cta');
+    const $ctaRoot = $('#<?php echo esc_js($cta_root_id); ?>');
+    const $ctaModal = $('#<?php echo esc_js($cta_modal_id); ?>');
     const $modeToggle = $ctaRoot.find('[data-lsd-cta-mode-toggle] input[type="checkbox"]');
     const $modeInput = $ctaRoot.find('[data-lsd-cta-mode]');
 
@@ -142,7 +148,7 @@ jQuery(document).ready(function($)
 
     function listdomToggleCTATarget(triggered)
     {
-        const value = $('#lsd_cta_target').val();
+        const value = $ctaRoot.find('[data-lsd-cta-target]').val();
         $ctaRoot.find('[data-lsd-cta-target-field]').addClass('lsd-util-hide');
 
         if (value === 'custom')
@@ -168,7 +174,7 @@ jQuery(document).ready(function($)
         });
     }
 
-    $('#lsd_cta_target').on('change', function ()
+    $ctaRoot.find('[data-lsd-cta-target]').on('change', function ()
     {
         listdomToggleCTATarget(true);
     });
@@ -176,21 +182,22 @@ jQuery(document).ready(function($)
     listdomToggleCTAMode(false);
     listdomToggleCTATarget(false);
 
-    $(document).on('click', '[data-lsd-cta-open-modal]', function(e)
+    $ctaRoot.on('click', '[data-lsd-cta-open-modal]', function(e)
     {
         e.preventDefault();
 
         const target = $(this).data('lsd-cta-open-modal');
         if (!target) return;
 
-        const $modal = $('#' + target);
+        const $modal = target === '<?php echo esc_js($cta_modal_id); ?>' ? $ctaModal : $();
         if (!$modal.length) return;
 
+        $modal.attr('data-lsd-dashboard-owner', $ctaRoot.closest('.lsd-dashboard').attr('id') || '');
         if (!$modal.parent().is('body')) $modal.appendTo('body');
         $modal.removeClass('lsd-util-hide').css('display', 'flex').hide().fadeIn(100);
     });
 
-    $(document).on('click', '.lsd-cta-modal .lsd-modal-close', function(e)
+    $ctaModal.on('click', '.lsd-modal-close', function(e)
     {
         e.preventDefault();
         $(this).closest('.lsd-cta-modal').fadeOut(100, function ()
@@ -199,7 +206,7 @@ jQuery(document).ready(function($)
         });
     });
 
-    $(document).on('click', '.lsd-cta-modal', function(e)
+    $ctaModal.on('click', function(e)
     {
         if ($(e.target).is('.lsd-cta-modal'))
         {

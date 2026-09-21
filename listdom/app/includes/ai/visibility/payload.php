@@ -244,7 +244,7 @@ class LSD_AI_Visibility_Payload extends LSD_Base
     protected function append_listing_addon_data(array &$payload, WP_Post $post, LSD_Entity_Listing $entity): void
     {
         // Verified Status
-        if ($this->settings->enabled('include_verified_status')) $payload['verified'] = $entity->is_claimed();
+        if ($this->settings->enabled('include_verified_status')) $payload['verified'] = $entity->is_verified();
 
         if ($this->settings->enabled('include_reviews'))
         {

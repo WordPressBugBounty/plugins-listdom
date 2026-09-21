@@ -1123,6 +1123,7 @@ class ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6
         'Webilia\\Connect\\Contracts\\Capability' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/Capability.php',
         'Webilia\\Connect\\Contracts\\ConditionalConnectionStorage' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/ConditionalConnectionStorage.php',
         'Webilia\\Connect\\Contracts\\Connection' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/Connection.php',
+        'Webilia\\Connect\\Contracts\\GetHttpClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/GetHttpClient.php',
         'Webilia\\Connect\\Contracts\\HttpClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/HttpClient.php',
         'Webilia\\Connect\\Contracts\\Storage' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/Storage.php',
         'Webilia\\Connect\\Contracts\\UpdateClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/UpdateClient.php',

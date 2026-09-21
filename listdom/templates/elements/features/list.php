@@ -14,7 +14,10 @@ if (!count($terms)) return '';
             $icon = LSD_Taxonomies::icon($term->term_id);
             $itemprop = get_term_meta($term->term_id, 'lsd_itemprop', true);
             $link = $this->enable_link ? '<a href="' . esc_url(get_term_link($term->term_id)) . '">' . esc_html($term->name) . '</a>' : '<span class="lsd-single-term">'.esc_html($term->name).'</span>';
+            $feature_icon = $list_style === 'checkmarks'
+                ? '<i class="lsd-fe-icon fas fa-check" aria-hidden="true"></i> '
+                : ($this->show_icons && trim($icon) ? $icon . ' ' : '');
         ?>
-        <li class="lsd-fe-icon-wrapper" <?php echo $itemprop ? lsd_schema()->prop($itemprop) : ''; ?>><?php echo $this->show_icons && trim($icon) ? $icon . ' ' : ''; ?><?php echo $link; ?></li>
+        <li class="lsd-fe-icon-wrapper" <?php echo $itemprop ? lsd_schema()->prop($itemprop) : ''; ?>><?php echo $feature_icon; ?><?php echo $link; ?></li>
     <?php endforeach; ?>
 </ul>

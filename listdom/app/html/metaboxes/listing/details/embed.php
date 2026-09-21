@@ -8,15 +8,18 @@ defined('ABSPATH') || die();
 
 $embeds = get_post_meta($post->ID, 'lsd_embeds', true);
 if (!is_array($embeds)) $embeds = [];
+$form_id = [$this, 'form_id'];
+$embeds_id = $form_id('lsd_listing_embeds');
+$embeds_template_id = $form_id('lsd_listing_embeds_template');
 ?>
 <div class="lsd-listing-embed-container lsd-listing-module-embed <?php echo LSD_Base::get_lsd_class('box-white'); ?>">
     <div class="lsd-fe-section-heading">
         <h3 class="<?php echo \LSD_Base::get_lsd_class('title'); ?>"><?php esc_html_e('Embed', 'listdom'); ?><?php $dashboard && $dashboard->required_html('_embeds'); ?></h3>
     </div>
     <div class="lsd-listing-embed-list">
-        <ul id="lsd_listing_embeds" class="lsd-listing-embeds lsd-sortable">
+        <ul id="<?php echo esc_attr($embeds_id); ?>" class="lsd-listing-embeds lsd-sortable">
             <?php $i = 0; foreach ($embeds as $embed): ?>
-            <li class="<?php echo LSD_Base::get_lsd_class('box-gray'); ?>" data-id="<?php echo esc_attr($i); ?>" id="lsd_listing_embeds_<?php echo esc_attr($i); ?>">
+            <li class="<?php echo LSD_Base::get_lsd_class('box-gray'); ?>" data-id="<?php echo esc_attr($i); ?>" id="<?php echo esc_attr($form_id('lsd_listing_embeds_' . $i)); ?>">
                 <div class="lsd-listing-embed-item">
                     <div class="lsd-embeds-fields <?php echo LSD_Base::get_lsd_class('subsections'); ?>">
                         <input class="lsd-admin-input" type="text" name="lsd[_embeds][<?php echo esc_attr($i); ?>][name]" value="<?php echo esc_attr($embed['name'] ?? ''); ?>" title="<?php esc_attr_e('Title', 'listdom'); ?>" placeholder="<?php esc_attr_e('Title', 'listdom'); ?>">
@@ -36,10 +39,10 @@ if (!is_array($embeds)) $embeds = [];
             </li>
             <?php $i++; endforeach; ?>
         </ul>
-        <input type="hidden" id="lsd_listing_embeds_index" value="<?php echo esc_attr($i); ?>">
+        <input type="hidden" id="<?php echo esc_attr($form_id('lsd_listing_embeds_index')); ?>" value="<?php echo esc_attr($i); ?>">
     </div>
-    <ul id="lsd_listing_embeds_template" class="lsd-util-hide">
-        <li data-id=":i:" id="lsd_listing_embeds_:i:">
+    <ul id="<?php echo esc_attr($embeds_template_id); ?>" class="lsd-util-hide">
+        <li data-id=":i:" id="<?php echo esc_attr($form_id('lsd_listing_embeds_:i:')); ?>">
             <div class="lsd-listing-embed-item">
                 <div class="lsd-embeds-fields">
                     <input class="lsd-admin-input" type="text" name="lsd[_embeds][:i:][name]" value="" title="<?php esc_attr_e('Title', 'listdom'); ?>" placeholder="<?php esc_attr_e('Title', 'listdom'); ?>">
@@ -55,7 +58,7 @@ if (!is_array($embeds)) $embeds = [];
         </li>
     </ul>
     <div class="lsd-fe-subsections lsd-embeds-buttons">
-            <button class="<?php echo is_admin() ? 'lsd-neutral-button':'lsd-light-button'; ?> lsd-w-auto lsd-add-embed-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" data-template="#lsd_listing_embeds_template" data-for="#lsd_listing_embeds" type="button"><?php esc_html_e('Add Embed Section', 'listdom'); ?></button>
-            <button class="lsd-text-button lsd-w-auto lsd-remove-embed-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($embeds) ? '' : 'lsd-util-hide'; ?>" data-for="#lsd_listing_embeds" type="button"><?php esc_html_e('Remove All Embed Codes', 'listdom'); ?></button>
+            <button class="<?php echo is_admin() ? 'lsd-neutral-button':'lsd-light-button'; ?> lsd-w-auto lsd-add-embed-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?>" data-template="#<?php echo esc_attr($embeds_template_id); ?>" data-for="#<?php echo esc_attr($embeds_id); ?>" type="button"><?php esc_html_e('Add Embed Section', 'listdom'); ?></button>
+            <button class="lsd-text-button lsd-w-auto lsd-remove-embed-button lsd-color-m-bg <?php echo esc_attr($this->get_text_class()); ?> <?php echo count($embeds) ? '' : 'lsd-util-hide'; ?>" data-for="#<?php echo esc_attr($embeds_id); ?>" type="button"><?php esc_html_e('Remove All Embed Codes', 'listdom'); ?></button>
     </div>
 </div>

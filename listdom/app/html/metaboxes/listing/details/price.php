@@ -16,6 +16,8 @@ $price_after = get_post_meta($post->ID, 'lsd_price_after', true);
 $price_class = get_post_meta($post->ID, 'lsd_price_class', true);
 if (!trim($price_class)) $price_class = 2;
 
+$form_id = [$this, 'form_id'];
+
 // Price Components
 $price_components = LSD_Options::price_components();
 ?>
@@ -27,10 +29,10 @@ $price_components = LSD_Options::price_components();
     <div class="lsd-form-row">
 
         <div class="lsd-col-2">
-            <label class="lsd-fields-label" for="lsd_currency"><?php esc_html_e('Currency', 'listdom'); ?></label>
+            <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_currency')); ?>"><?php esc_html_e('Currency', 'listdom'); ?></label>
         </div>
         <div class="lsd-col-8">
-            <select name="lsd[currency]" id="lsd_currency" class="lsd-admin-input">
+            <select name="lsd[currency]" id="<?php echo esc_attr($form_id('lsd_currency')); ?>" class="lsd-admin-input">
                 <?php foreach (LSD_Base::get_currencies() as $symbol => $currency): ?>
                 <option value="<?php echo esc_attr($currency); ?>" <?php echo $price_currency === $currency ? 'selected="selected"' : ''; ?>><?php echo esc_html($symbol); ?></option>
                 <?php endforeach; ?>
@@ -41,20 +43,20 @@ $price_components = LSD_Options::price_components();
     <div class="lsd-form-row">
 
         <div class="lsd-col-2">
-            <label class="lsd-fields-label" for="lsd_price"><?php esc_html_e('Price', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price'); ?></label>
+            <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_price')); ?>"><?php esc_html_e('Price', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price'); ?></label>
         </div>
         <div class="lsd-col-8">
-            <input class="lsd-admin-input" type="text" name="lsd[price]" id="lsd_price" placeholder="<?php esc_attr_e('Price', 'listdom'); ?>" value="<?php echo esc_attr($price); ?>">
+            <input class="lsd-admin-input" type="text" name="lsd[price]" id="<?php echo esc_attr($form_id('lsd_price')); ?>" placeholder="<?php esc_attr_e('Price', 'listdom'); ?>" value="<?php echo esc_attr($price); ?>">
         </div>
     </div>
     <?php if ($price_components['max']): ?>
     <div class="lsd-form-row">
 
         <div class="lsd-col-2">
-            <label class="lsd-fields-label" for="lsd_price_max"><?php esc_html_e('Price (Max)', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_max'); ?></label>
+            <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_price_max')); ?>"><?php esc_html_e('Price (Max)', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_max'); ?></label>
         </div>
         <div class="lsd-col-8">
-            <input class="lsd-admin-input" type="text" name="lsd[price_max]" id="lsd_price_max" placeholder="<?php esc_attr_e('Price (Max)', 'listdom'); ?>" value="<?php echo esc_attr($price_max); ?>">
+            <input class="lsd-admin-input" type="text" name="lsd[price_max]" id="<?php echo esc_attr($form_id('lsd_price_max')); ?>" placeholder="<?php esc_attr_e('Price (Max)', 'listdom'); ?>" value="<?php echo esc_attr($price_max); ?>">
         </div>
     </div>
     <?php endif; ?>
@@ -62,10 +64,10 @@ $price_components = LSD_Options::price_components();
     <div class="lsd-form-row">
 
         <div class="lsd-col-2">
-            <label class="lsd-fields-label" for="lsd_price_after"><?php esc_html_e('Price Description', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_after'); ?></label>
+            <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_price_after')); ?>"><?php esc_html_e('Price Description', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_after'); ?></label>
         </div>
         <div class="lsd-col-8">
-            <input class="lsd-admin-input" type="text" name="lsd[price_after]" id="lsd_price_after" placeholder="<?php esc_attr_e('Per night, Per cup, ...', 'listdom'); ?>" value="<?php echo esc_attr($price_after); ?>">
+            <input class="lsd-admin-input" type="text" name="lsd[price_after]" id="<?php echo esc_attr($form_id('lsd_price_after')); ?>" placeholder="<?php esc_attr_e('Per night, Per cup, ...', 'listdom'); ?>" value="<?php echo esc_attr($price_after); ?>">
         </div>
     </div>
     <?php endif; ?>
@@ -73,10 +75,10 @@ $price_components = LSD_Options::price_components();
     <div class="lsd-form-row">
 
         <div class="lsd-col-2">
-            <label class="lsd-fields-label" for="lsd_price_class"><?php esc_html_e('Price Class', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_class'); ?></label>
+            <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_price_class')); ?>"><?php esc_html_e('Price Class', 'listdom'); ?><?php $dashboard && $dashboard->required_html('price_class'); ?></label>
         </div>
         <div class="lsd-col-8">
-            <select name="lsd[price_class]" id="lsd_price_class" class="lsd-admin-input">
+            <select name="lsd[price_class]" id="<?php echo esc_attr($form_id('lsd_price_class')); ?>" class="lsd-admin-input">
                 <option value="1" <?php echo $price_class == '1' ? 'selected="selected"' : ''; ?>><?php esc_html_e('$ (Cheap)', 'listdom'); ?></option>
                 <option value="2" <?php echo $price_class == '2' ? 'selected="selected"' : ''; ?>><?php esc_html_e('$$ (Normal)', 'listdom'); ?></option>
                 <option value="3" <?php echo $price_class == '3' ? 'selected="selected"' : ''; ?>><?php esc_html_e('$$$ (High)', 'listdom'); ?></option>

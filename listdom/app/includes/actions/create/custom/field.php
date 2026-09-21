@@ -91,9 +91,20 @@ class LSD_Actions_Create_Custom_Field extends LSD_Actions_Action
         {
             if ($input['reuse_existing'])
             {
-                $warnings[] = esc_html__('An existing custom field will be reused.', 'listdom');
-                $input['existing_term_id'] = (int) $existing->term_id;
-                $input['reuse_existing_mode'] = true;
+                if (!$this->compatible($existing, $input))
+                {
+                    $original_name = $input['name'];
+                    $input = $this->alternative_field($input);
+                    $warnings[] = !empty($input['reuse_existing_mode'])
+                        ? esc_html__('An existing compatible custom field with a conflicting slug will be reused.', 'listdom')
+                        : sprintf(esc_html__('A custom field named "%1$s" is not compatible with the blueprint requirement. A new field named "%2$s" will be created.', 'listdom'), esc_html($original_name), esc_html($input['name']));
+                }
+                else
+                {
+                    $warnings[] = esc_html__('An existing custom field will be reused.', 'listdom');
+                    $input['existing_term_id'] = (int) $existing->term_id;
+                    $input['reuse_existing_mode'] = true;
+                }
             }
             else if (!$input['overwrite_existing'])
             {
@@ -116,13 +127,76 @@ class LSD_Actions_Create_Custom_Field extends LSD_Actions_Action
         ]);
     }
 
+    protected function compatible(WP_Term $term, array $input): bool
+    {
+        if ((string) get_term_meta($term->term_id, 'lsd_field_type', true) !== (string) $input['field_type']) return false;
+
+        $rules = LSD_Taxonomies_Attribute::category_rules((int) $term->term_id);
+        if ((bool) $rules['all_categories'] !== (bool) $input['all_categories']) return false;
+
+        if (!$input['all_categories'])
+        {
+            $current_categories = $rules['categories'];
+            $required_categories = LSD_Taxonomies_Attribute::normalize_categories($input['categories']);
+            if ($current_categories !== $required_categories) return false;
+        }
+
+        if (!in_array($input['field_type'], ['dropdown', 'radio', 'checkbox'], true)) return true;
+
+        $values = get_term_meta($term->term_id, 'lsd_values', true);
+        if (is_array($values)) $values = implode(',', $values);
+        $values = array_values(array_filter(array_map('trim', preg_split('/,/', (string) $values))));
+        $values = array_map('strtolower', $values);
+        foreach ($input['values'] as $required)
+        {
+            if (!in_array(strtolower((string) $required), $values, true)) return false;
+        }
+
+        return true;
+    }
+
+    private function alternative_field(array $input): array
+    {
+        $base_name = (string) $input['name'];
+        $base_slug = $input['slug'] !== '' ? (string) $input['slug'] : sanitize_title($base_name);
+        if ($base_slug === '') $base_slug = 'listdom-field';
+        $number = 0;
+
+        while (true)
+        {
+            $suffix = $number === 0 ? __('(Listdom)', 'listdom') : sprintf(__('(Listdom %d)', 'listdom'), $number + 1);
+            $name = $base_name . ' ' . $suffix;
+            $slug = $base_slug . '-listdom' . ($number > 0 ? '-' . ($number + 1) : '');
+            $existing = get_term_by('slug', $slug, LSD_Base::TAX_ATTRIBUTE);
+            if (!$existing) $existing = get_term_by('name', $name, LSD_Base::TAX_ATTRIBUTE);
+
+            if ($existing instanceof WP_Term)
+            {
+                if ($this->compatible($existing, $input))
+                {
+                    $input['name'] = $existing->name;
+                    $input['slug'] = $existing->slug;
+                    $input['existing_term_id'] = (int) $existing->term_id;
+                    $input['reuse_existing_mode'] = true;
+                    return $input;
+                }
+
+                $number++;
+                continue;
+            }
+
+            $input['name'] = $name;
+            $input['slug'] = $slug;
+            return $input;
+        }
+    }
+
     public function execute(array $input, LSD_Action_Context $context): LSD_Action_Result
     {
         $term_id = (int) ($input['existing_term_id'] ?? 0);
         if (!empty($input['reuse_existing_mode']) && $term_id > 0)
         {
             $term = get_term($term_id, LSD_Base::TAX_ATTRIBUTE);
-            $this->mark_term($term_id, $context);
 
             return $this->success(esc_html__('Existing custom field reused.', 'listdom'), [
                 'term_id' => $term_id,
@@ -175,8 +249,11 @@ class LSD_Actions_Create_Custom_Field extends LSD_Actions_Action
         update_term_meta($term_id, 'lsd_file_extensions', $file_extensions);
         update_term_meta($term_id, 'lsd_file_max_size', max(0, (int) $input['file_max_size']));
         $this->mark_term($term_id, $context);
-
         $term = get_term($term_id, LSD_Base::TAX_ATTRIBUTE);
+        if ($creating && $context->source() === 'blueprint')
+        {
+            update_term_meta((int) $term_id, 'lsd_blueprint_owned', '1');
+        }
 
         return $this->success(
             $creating ? esc_html__('Custom field created successfully.', 'listdom') : esc_html__('Custom field updated successfully.', 'listdom'),

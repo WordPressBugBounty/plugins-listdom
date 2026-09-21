@@ -125,10 +125,10 @@ class LSD_Skins extends LSD_Base
     public function start($atts)
     {
         $this->atts = apply_filters('lsd_skins_atts', $atts);
-        $this->id = LSD_id::get(isset($this->atts['id'])
-            ? (int) $this->atts['id']
-            : wp_rand(100, 999)
-        );
+        $instance_id = isset($this->atts['lsd_instance_id'])
+            ? (int) $this->atts['lsd_instance_id']
+            : (isset($this->atts['id']) ? (int) $this->atts['id'] : wp_rand(100, 999));
+        $this->id = LSD_id::get($instance_id);
 
         $update_address_bar = apply_filters('lsd_update_page_address', true, $this);
         LSD_Assets::update_address_bar($update_address_bar, $this->id);
@@ -1656,7 +1656,7 @@ class LSD_Skins extends LSD_Base
 
         $title = $listing->get_title_tag($method, $style);
 
-        if ($this->skin === 'table' || !$this->display_is_claimed || !$listing->is_claimed()) return $title;
+        if ($this->skin === 'table' || !$this->display_is_claimed || !$listing->is_verified() || !\LSDPACCLM\Claim::display_verified()) return $title;
 
         $icon = '<span class="lsd-tooltip" data-lsd-tooltip="' . esc_attr__('Verified', 'listdom') . '"><i class="lsd-fe-icon fas fa-check-circle lsd-claimed-icon"></i></span>';
 
@@ -1714,6 +1714,8 @@ class LSD_Skins extends LSD_Base
 
     public function get_listing_link_method()
     {
+        if ($this->is_builder_style()) return 'normal';
+
         $method = $this->isPro() && isset($this->skin_options['listing_link']) && trim($this->skin_options['listing_link'])
             ? $this->skin_options['listing_link']
             : 'normal';
@@ -1723,6 +1725,137 @@ class LSD_Skins extends LSD_Base
         }
 
         return $method;
+    }
+
+    public function get_map_listing_link_method()
+    {
+        if ($this->is_builder_style() && !in_array($this->skin, ['accordion', 'mosaic'], true))
+        {
+            if ($this->map_component && $this->map_provider && self::is_mappable($this->skin) && $this->builder_uses_map_link()) return 'map';
+
+            return 'normal';
+        }
+
+        if (
+            $this->is_builder_style()
+            && $this->map_component
+            && $this->map_provider
+            && self::is_mappable($this->skin)
+            && $this->builder_uses_map_link()
+        ) return 'map';
+
+        return $this->get_listing_link_method();
+    }
+
+    public function is_builder_style(): bool
+    {
+        return is_numeric($this->style) || (is_string($this->style) && preg_match('/^tb_\d+$/', $this->style));
+    }
+
+    private function builder_uses_map_link(): bool
+    {
+        if (!$this->is_builder_style()) return false;
+
+        $style = (string) $this->style;
+        $template_id = preg_match('/^tb_(\d+)$/', $style, $matches) ? (int) $matches[1] : (int) $style;
+        if ($template_id <= 0) return false;
+
+        $sources = [];
+        $template = get_post($template_id);
+        if (!$template instanceof WP_Post) return false;
+
+        if ($template->post_type === LSD_Base::PTYPE_TEMPLATE)
+        {
+            $sources[] = get_post_meta($template_id, '_lsd_template_layout', true);
+        }
+        else
+        {
+            $sources[] = get_post_meta($template_id, '_elementor_data', true);
+            $sources[] = get_post_meta($template_id, '_bricks_page_content_2', true);
+            $sources[] = get_post_meta($template_id, '_bricks_page_content', true);
+            $sources[] = $template->post_content;
+        }
+
+        foreach ($sources as $source)
+        {
+            if (self::contains_map_link($source)) return true;
+        }
+
+        return false;
+    }
+
+    private static function contains_map_link($source): bool
+    {
+        if (is_array($source))
+        {
+            if (self::is_gallery_element($source)) return self::gallery_contains_map_link($source);
+
+            foreach ($source as $key => $value)
+            {
+                if ($key === 'link_method' && (string) $value === 'map') return true;
+                if (self::contains_map_link($value)) return true;
+            }
+
+            return false;
+        }
+
+        if (!is_string($source) || trim($source) === '') return false;
+
+        $unserialized = maybe_unserialize($source);
+        if ($unserialized !== $source && self::contains_map_link($unserialized)) return true;
+
+        $decoded = json_decode($source, true);
+        if (is_array($decoded)) return self::contains_map_link($decoded);
+
+        $source = str_replace(['\\"', "\\'"], ['"', "'"], $source);
+
+        return (bool) preg_match('/(?:["\']?link_method["\']?|s:\d+:"link_method")\s*(?:=>|=|:|;)?\s*(?:["\']?map["\']?|s:\d+:"map")/i', $source);
+    }
+
+    private static function is_gallery_element(array $element): bool
+    {
+        foreach (['type', 'widgetType', 'name', 'element', 'key'] as $identifier_key)
+        {
+            if (!isset($element[$identifier_key]) || !is_string($element[$identifier_key])) continue;
+
+            $identifier = strtolower(trim($element[$identifier_key]));
+            if (in_array($identifier, ['gallery', 'lsd-listing-gallery'], true)) return true;
+        }
+
+        return false;
+    }
+
+    private static function gallery_contains_map_link(array $element): bool
+    {
+        $style = (string) self::element_setting($element, 'style', 'list');
+        if ($style !== 'slider') return false;
+
+        $lightbox = self::element_setting($element, 'lightbox', 1);
+        if (self::setting_is_enabled($lightbox)) return false;
+
+        return (string) self::element_setting($element, 'link_method', 'normal') === 'map';
+    }
+
+    private static function element_setting(array $element, string $setting_key, $default = null)
+    {
+        $settings = isset($element['settings']) && is_array($element['settings']) ? $element['settings'] : $element;
+
+        if (array_key_exists($setting_key, $settings)) return $settings[$setting_key];
+
+        foreach (['content', 'style', 'advanced'] as $settings_group)
+        {
+            if (isset($settings[$settings_group]) && is_array($settings[$settings_group]) && array_key_exists($setting_key, $settings[$settings_group]))
+            {
+                return $settings[$settings_group][$setting_key];
+            }
+        }
+
+        return $default;
+    }
+
+    private static function setting_is_enabled($value): bool
+    {
+        return !in_array($value, [null, false, 0, '0', '', 'off', 'no'], true);
     }
 
     public function get_single_listing_style()
@@ -1747,7 +1880,7 @@ class LSD_Skins extends LSD_Base
             'mapstyle' => $this->skin_options['mapstyle'] ?? '',
             'id' => $this->id,
             'onclick' => $this->skin_options['mapobject_onclick'] ?? 'infowindow',
-            'listing_link_method' => $this->get_listing_link_method(),
+            'listing_link_method' => $this->get_map_listing_link_method(),
             'infowindow_trigger' => $this->skin_options['mapobject_infowindow_trigger'] ?? 'click',
             'mapcontrols' => $this->mapcontrols,
             'map_height' => $this->map_height,

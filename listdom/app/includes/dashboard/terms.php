@@ -87,11 +87,12 @@ class LSD_Dashboard_Terms extends LSD_Base
     public static function checkboxes($args, $selected = null): string
     {
         $a = $args;
-        foreach (['id', 'name', 'post_id', 'class'] as $key) if (isset($a[$key])) unset($a[$key]);
+        foreach (['id', 'id_prefix', 'name', 'post_id', 'class'] as $key) if (isset($a[$key])) unset($a[$key]);
 
         // Field Name
         $name = $args['name'] ?? '';
         $pre = $args['pre'] ?? '-';
+        $id_prefix = $args['id_prefix'] ?? 'in-listdom-location';
 
         // Current Values
         if (is_null($selected))
@@ -119,7 +120,7 @@ class LSD_Dashboard_Terms extends LSD_Base
 
             $output .= '<li>';
             $output .= '<label class="selectit lsd-fields-label">';
-            $output .= '<input value="' . esc_attr($term_id) . '" type="checkbox" name="' . esc_attr($name) . '[]" id="in-listdom-location-' . esc_attr($term_id) . '" ' . (in_array($term_id, $selected, true) ? 'checked="checked"' : '') . '> ';
+            $output .= '<input value="' . esc_attr($term_id) . '" type="checkbox" name="' . esc_attr($name) . '[]" id="' . esc_attr($id_prefix) . '-' . esc_attr($term_id) . '" ' . (in_array($term_id, $selected, true) ? 'checked="checked"' : '') . '> ';
             $output .= esc_html(($prefix . (trim($prefix) ? ' ' : '') . $term->name));
             $output .= '</label>';
 

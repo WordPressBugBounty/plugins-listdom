@@ -1,8 +1,67 @@
 (function ($) {
+    window.lsdDashboardInitializeElementor = function ($root) {
+        let $dashboards = $root && $root.length
+            ? $root.filter('.lsd-dashboard').add($root.find('.lsd-dashboard'))
+            : $('.lsd-dashboard');
+
+        if (typeof window.lsdDashboardApplySidebar === 'function') {
+            window.lsdDashboardApplySidebar($dashboards);
+        }
+
+        $dashboards.each(function () {
+            const dashboard = $(this);
+            const dashboardOptions = {
+                ajax_url: typeof lsd !== 'undefined' ? lsd.ajaxurl : 0,
+                nonce: dashboard.data('dashboard-nonce') || ''
+            };
+
+            if (typeof $.fn.listdomDashboard === 'function') {
+                dashboard.listdomDashboard(dashboardOptions);
+            }
+
+            if (dashboard.find('form.lsd-dashboard-form').length && typeof $.fn.listdomDashboardForm === 'function') {
+                dashboard.listdomDashboardForm(dashboardOptions);
+            }
+
+            if (typeof window.lsdDashboardInitEditors === 'function') {
+                window.lsdDashboardInitEditors(dashboard);
+            }
+
+            if (typeof window.lsdDashboardInitACF === 'function') {
+                window.lsdDashboardInitACF(dashboard);
+            }
+
+            if (typeof window.lsdDashboardInitTaxonomyForms === 'function') {
+                window.lsdDashboardInitTaxonomyForms(dashboard);
+            }
+
+            if (typeof window.lsdDashboardInitAdditionalCategories === 'function') {
+                window.lsdDashboardInitAdditionalCategories(dashboard);
+            }
+
+            if (typeof window.lsdDashboardInitCoreControls === 'function') {
+                window.lsdDashboardInitCoreControls(dashboard);
+            }
+
+            if (typeof window.lsdDashboardInitRecaptcha === 'function') {
+                window.lsdDashboardInitRecaptcha(dashboard);
+            }
+
+            if (dashboard.find('form.lsd-dashboard-profile-form').length && typeof $.fn.listdomDashboardProfile === 'function') {
+                dashboard.find('form.lsd-dashboard-profile-form').listdomDashboardProfile({
+                    ajax_url: dashboardOptions.ajax_url,
+                    nonce: dashboard.data('profile-nonce') || ''
+                });
+            }
+        });
+    };
+
     // Elementor's init Hook
     $(window).on('elementor/frontend/init', function () {
-        elementorFrontend.hooks.addAction('frontend/element_ready/global', function () {
+        elementorFrontend.hooks.addAction('frontend/element_ready/global', function ($element) {
             if (elementorFrontend.isEditMode()) {
+                window.lsdDashboardInitializeElementor($element);
+
                 typeof listdom_image_slider === 'function' && listdom_image_slider();
                 typeof listdom_linear_gallery_modal === 'function' && listdom_linear_gallery_modal();
 
@@ -38,6 +97,8 @@
 
                 // Masonry Init
                 triggerListdomMasonry(0);
+
+                if (typeof listdom_onload === 'function') listdom_onload($element);
 
                 // Trigger Listdom Preview
                 $(window).trigger("listdom/preview-content");

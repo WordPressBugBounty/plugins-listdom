@@ -195,19 +195,34 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
 
         // Gallery
         $gallery = isset($vars['gallery']) && is_array($vars['gallery']) ? $vars['gallery'] : [];
+        $gallery_alt = isset($vars['gallery_alt']) && is_array($vars['gallery_alt']) ? array_values($vars['gallery_alt']) : [];
         if (count($gallery))
         {
             $images = [];
-            foreach ($gallery as $image)
+            $gallery_alts = [];
+            foreach ($gallery as $index => $image)
             {
-                $image_id = $ix->attach($image);
-                if ($image_id) $images[] = $image_id;
+                $image_url = is_array($image) ? ($image['url'] ?? '') : $image;
+                $image_url = is_scalar($image_url) ? trim((string) $image_url) : '';
+                if ($image_url === '') continue;
+
+                $alt = is_array($image) ? ($image['alt'] ?? '') : ($gallery_alt[$index] ?? '');
+                $image_id = $ix->attach($image_url);
+                if (!$image_id) continue;
+
+                $images[] = $image_id;
+                if (is_scalar($alt) && trim((string) $alt) !== '') $gallery_alts[$image_id] = $alt;
             }
 
             update_post_meta($id, 'lsd_gallery', $images);
             $vars['gallery'] = $images;
+            $vars['gallery_alt'] = $gallery_alts;
         }
-        else update_post_meta($id, 'lsd_gallery', []);
+        else
+        {
+            update_post_meta($id, 'lsd_gallery', []);
+            $vars['gallery_alt'] = [];
+        }
 
         // Publish Listing
         if ($status === 'publish' && get_post_status($id) !== 'published') wp_publish_post($id);
@@ -222,7 +237,11 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
         // Metadata
         if (isset($vars['meta']) && is_array($vars['meta']))
         {
-            foreach ($vars['meta'] as $k => $v) update_post_meta($id, $k, $v);
+            foreach ($vars['meta'] as $k => $v)
+            {
+                if ($k === 'lsd_gallery_alt') continue;
+                update_post_meta($id, $k, $v);
+            }
         }
 
         if ($status === 'publish') $message = esc_html__('The listing published.', 'listdom');

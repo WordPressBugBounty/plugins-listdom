@@ -311,12 +311,26 @@ class LSD_Announcements extends LSD_Base
             'title' => $title,
             'description' => wp_kses_post((string) $description),
             'cta_label' => sanitize_text_field((string) $cta_label),
-            'url' => esc_url_raw((string) $url),
+            'url' => $this->normalize_url((string) $url),
             'severity' => $severity,
             'created_at' => $this->normalize_timestamp($created_at),
             'expires_at' => $this->normalize_timestamp($expires_at),
             'meta' => $meta,
         ];
+    }
+
+    public function is_site_relative_url(string $url): bool
+    {
+        return preg_match('~^/(?!/)[^\s\\\\]*$~', $url) === 1;
+    }
+
+    protected function normalize_url(string $url): string
+    {
+        $url = trim($url);
+
+        if ($this->is_site_relative_url($url)) return $url;
+
+        return esc_url_raw($url);
     }
 
     protected function announcement_products(): array

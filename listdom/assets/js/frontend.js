@@ -42,6 +42,50 @@ function lsdGetClusterSvgUrl(color, size) {
     return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
 }
 
+let lsdLoadingPositionFrame = null;
+
+function lsdUpdateLoadingPositions() {
+    lsdLoadingPositionFrame = null;
+
+    document.querySelectorAll('form.lsd-loading, div.lsd-loading').forEach(function (element) {
+        const rectangle = element.getBoundingClientRect();
+        const loaderSize = 34;
+        const maximumTop = Math.max(rectangle.height - loaderSize, 0);
+        const viewportCenterTop = (window.innerHeight / 2) - rectangle.top - (loaderSize / 2);
+        const loadingTop = Math.min(Math.max(viewportCenterTop, 0), maximumTop);
+
+        if (rectangle.height > 0) {
+            element.style.setProperty('--lsd-loading-top', loadingTop + 'px');
+        }
+    });
+}
+
+function lsdScheduleLoadingPositionUpdate() {
+    if (lsdLoadingPositionFrame !== null) return;
+
+    lsdLoadingPositionFrame = window.requestAnimationFrame(lsdUpdateLoadingPositions);
+}
+
+function lsdInitializeLoadingPositioning() {
+    const observer = new MutationObserver(lsdScheduleLoadingPositionUpdate);
+
+    observer.observe(document.body, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class'],
+    });
+
+    window.addEventListener('scroll', lsdScheduleLoadingPositionUpdate, {passive: true});
+    window.addEventListener('resize', lsdScheduleLoadingPositionUpdate);
+    lsdScheduleLoadingPositionUpdate();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', lsdInitializeLoadingPositioning);
+} else {
+    lsdInitializeLoadingPositioning();
+}
+
 const lsdDistanceReferenceKeys = [
     "sf-distance-reference-source",
     "sf-gps-latitude",
@@ -6818,7 +6862,7 @@ function ListdomDetails(id, link, settings) {
         const distanceReferenceScopes = lsdResolveDistanceReferenceScopes(settings.shortcode, settings.connected_shortcodes);
         lsdHydrateDistanceReferenceFromQuery(window.location.search, distanceReferenceScopes, true);
 
-        const isCompareModal = $container.closest('#lsdaddcmp-add-modal').length > 0;
+        const isCompareModal = $container.closest('.lsdaddcmp-add-modal').length > 0;
         if (isCompareModal && !parseInt(settings.ajax, 10)) settings.ajax = 1;
 
         setListeners();
@@ -8153,6 +8197,71 @@ function ListdomDetails(id, link, settings) {
 })(jQuery);
 
 (function () {
+    window.lsdDashboardInitEditors = function ($root)
+    {
+        if (typeof jQuery === 'undefined' || typeof wp === 'undefined' || !wp.editor || typeof wp.editor.initialize !== 'function') return;
+        if (typeof window.tinymce === 'undefined' || typeof window.quicktags !== 'function') return;
+
+        const $ = jQuery;
+        $root = $root && $root.length ? $root : $(document);
+
+        $root.find('.wp-editor-wrap textarea.wp-editor-area').each(function ()
+        {
+            const $textarea = $(this);
+            const editorId = ($textarea.attr('id') || '').toString();
+            if (!editorId) return;
+            if (typeof window.tinymce !== 'undefined' && window.tinymce.get(editorId)) return;
+
+            const $wrap = $textarea.closest('.wp-editor-wrap');
+            if ($wrap.length)
+            {
+                $textarea.detach();
+                $wrap.replaceWith($textarea);
+            }
+
+            wp.editor.initialize(editorId, {
+                tinymce: true,
+                quicktags: true,
+                mediaButtons: true
+            });
+        });
+    };
+
+    window.lsdDashboardRemoveEditors = function ($root)
+    {
+        if (typeof jQuery === 'undefined') return;
+
+        const $ = jQuery;
+        $root = $root && $root.length ? $root : $(document);
+        const dashboardId = ($root.first().attr('id') || '').toString();
+        const $externalModals = dashboardId
+            ? $('.lsd-modal[data-lsd-dashboard-owner]').filter(function ()
+            {
+                return ($(this).attr('data-lsd-dashboard-owner') || '').toString() === dashboardId;
+            })
+            : $();
+        const $editors = $root.add($externalModals);
+
+        if (typeof wp !== 'undefined' && wp.editor && typeof wp.editor.remove === 'function') $editors.find('.wp-editor-wrap textarea.wp-editor-area').each(function ()
+        {
+            const editorId = ($(this).attr('id') || '').toString();
+            if (editorId) wp.editor.remove(editorId);
+        });
+
+        $externalModals.remove();
+    };
+
+    window.lsdDashboardInitACF = function ($root)
+    {
+        if (typeof jQuery === 'undefined' || typeof window.acf === 'undefined' || typeof window.acf.doAction !== 'function') return;
+
+        const $ = jQuery;
+        $root = $root && $root.length ? $root : $(document);
+
+        const $modules = $root.filter('.lsd-listing-module-acf').add($root.find('.lsd-listing-module-acf'));
+        if ($modules.length) window.acf.doAction('append', $modules);
+    };
+
     window.lsdDashboardApplySidebar = function ($dashboards)
     {
         if (typeof jQuery === 'undefined') return;
@@ -8370,6 +8479,205 @@ function ListdomDetails(id, link, settings) {
                     $icon.toggleClass('fa-long-arrow-right', !isExpanded);
                 }
             }
+
+            function bindMobileNavigation()
+            {
+                const mobileBehavior = ($dashboard.data('mobile-behavior') || $container.data('mobile-behavior') || '').toString();
+                const $mobileToggle = $container.find('.lsd-dashboard-mobile-toggle').first();
+                if (!$mobileToggle.length || !['hamburger', 'overlay'].includes(mobileBehavior)) return;
+
+                const closeMobileMenu = function ()
+                {
+                    $container.removeClass('lsd-mobile-menu-open');
+                    $mobileToggle.attr('aria-expanded', 'false');
+                    $mobileToggle.find('.lsd-fe-icon').removeClass('fa-xmark').addClass('fa-bars');
+                };
+
+                $mobileToggle.off('click.lsdDashboardMobile').on('click.lsdDashboardMobile', function (event)
+                {
+                    event.preventDefault();
+                    const isOpen = $container.toggleClass('lsd-mobile-menu-open').hasClass('lsd-mobile-menu-open');
+                    $mobileToggle.attr('aria-expanded', isOpen ? 'true' : 'false');
+                    $mobileToggle.find('.lsd-fe-icon').toggleClass('fa-bars', !isOpen).toggleClass('fa-xmark', isOpen);
+                });
+
+                $container.find('.lsd-dashboard-menus a').off('click.lsdDashboardMobile').on('click.lsdDashboardMobile', closeMobileMenu);
+            }
+
+            function bindAjaxNavigation()
+            {
+                if (($dashboard.data('content-loading') || '').toString() !== 'ajax') return;
+
+                const dashboardIndex = $('.lsd-dashboard').index($dashboard);
+                const dashboardWidgetId = ($dashboard.attr('data-elementor-widget-id') || '').toString();
+                const currentUrl = new URL(window.location.href);
+                const isElementorEditor = (typeof elementorFrontend !== 'undefined'
+                    && typeof elementorFrontend.isEditMode === 'function'
+                    && elementorFrontend.isEditMode())
+                    || currentUrl.searchParams.has('elementor-preview');
+                const namespace = '.lsdDashboardAjax' + (dashboardIndex >= 0 ? dashboardIndex : 0);
+                const navigationId = dashboardWidgetId || 'dashboard-' + (dashboardIndex >= 0 ? dashboardIndex : 0);
+                const normalizeDashboardPath = function (path)
+                {
+                    return path.replace(/\/page\/\d+\/?$/, '/');
+                };
+                const addEditorPreviewParameters = function (url)
+                {
+                    ['elementor-preview', 'ver'].forEach(function (parameter)
+                    {
+                        if (currentUrl.searchParams.has(parameter)) url.searchParams.set(parameter, currentUrl.searchParams.get(parameter));
+                    });
+
+                    return url;
+                };
+                const loadUrl = function (url, updateHistory)
+                {
+                    if ($dashboard.hasClass('lsd-dashboard-loading')) return;
+
+                    addEditorPreviewParameters(url);
+                    const $loader = $('<i class="lsd-loader" aria-hidden="true"></i>');
+                    let loadingFinished = false;
+                    const finishLoading = function (callback)
+                    {
+                        if (loadingFinished) return;
+
+                        loadingFinished = true;
+                        $dashboard.removeClass('lsd-loading');
+                        $loader.remove();
+                        $dashboard.removeClass('lsd-dashboard-loading').attr('aria-busy', 'false');
+                        if (typeof callback === 'function') callback();
+                    };
+                    $dashboard.addClass('lsd-dashboard-loading lsd-loading').attr('aria-busy', 'true');
+                    $dashboard.append($loader);
+                    $.get(url.href)
+                        .done(function (response)
+                        {
+                            const $parsed = $($.parseHTML(response, document, true));
+                            const $dashboards = $parsed.filter('.lsd-dashboard').add($parsed.find('.lsd-dashboard'));
+                            let $next = dashboardWidgetId
+                                ? $dashboards.filter(function ()
+                                {
+                                    return ($(this).attr('data-elementor-widget-id') || '').toString() === dashboardWidgetId;
+                                }).first()
+                                : $();
+                            if (!$next.length && !dashboardWidgetId) $next = $dashboards.eq(dashboardIndex >= 0 ? dashboardIndex : 0);
+                            if (!$next.length)
+                            {
+                                finishLoading();
+                                if (!isElementorEditor) window.location.href = url.href;
+                                return;
+                            }
+
+                            const $fragmentAssets = $next.find('script').detach();
+
+                            finishLoading(function ()
+                            {
+                                if (updateHistory)
+                                {
+                                    window.history.pushState({}, '', url.href);
+                                    $(window).trigger('listdom:dashboard:navigate', [url.href, navigationId]);
+                                }
+                                if (typeof window.lsdDashboardRemoveEditors === 'function') window.lsdDashboardRemoveEditors($dashboard);
+                                $dashboard.replaceWith($next);
+                                listdom_mount_fragment_assets($fragmentAssets, true);
+                                if (typeof window.lsdDashboardApplySidebar === 'function') window.lsdDashboardApplySidebar($next);
+                                if (isElementorEditor && typeof window.lsdDashboardInitializeElementor === 'function') window.lsdDashboardInitializeElementor($next);
+                                if (typeof $.fn.listdomDashboard === 'function')
+                                {
+                                    $next.listdomDashboard({
+                                        ajax_url: typeof lsd !== 'undefined' ? lsd.ajaxurl : 0,
+                                        nonce: $next.data('dashboard-nonce') || ''
+                                    });
+                                }
+                                if ($next.find('form.lsd-dashboard-form').length && typeof $.fn.listdomDashboardForm === 'function')
+                                {
+                                    $next.listdomDashboardForm({
+                                        ajax_url: typeof lsd !== 'undefined' ? lsd.ajaxurl : 0,
+                                        nonce: $next.data('dashboard-nonce') || ''
+                                    });
+                                }
+                                if (typeof window.lsdDashboardInitEditors === 'function') window.lsdDashboardInitEditors($next);
+                                if (!isElementorEditor && typeof window.lsdDashboardInitACF === 'function') window.lsdDashboardInitACF($next);
+                                if (typeof window.lsdDashboardInitRecaptcha === 'function') window.lsdDashboardInitRecaptcha($next);
+                                if (typeof window.lsdDashboardInitTaxonomyForms === 'function') window.lsdDashboardInitTaxonomyForms($next);
+                                if (typeof window.lsdDashboardInitAdditionalCategories === 'function') window.lsdDashboardInitAdditionalCategories($next);
+                                if (typeof window.lsdDashboardInitCoreControls === 'function') window.lsdDashboardInitCoreControls($next);
+                                if ($next.find('form.lsd-dashboard-profile-form').length && typeof $.fn.listdomDashboardProfile === 'function')
+                                {
+                                    $next.find('form.lsd-dashboard-profile-form').listdomDashboardProfile({
+                                        ajax_url: typeof lsd !== 'undefined' ? lsd.ajaxurl : 0,
+                                        nonce: $next.data('profile-nonce') || ''
+                                    });
+                                }
+                                if (typeof window.lsdDashboardInitLoadMoreTables === 'function') window.lsdDashboardInitLoadMoreTables($next);
+                                if (typeof window.lsdDashboardInitPaymentActions === 'function') window.lsdDashboardInitPaymentActions($next);
+                                if (typeof window.lsdDashboardInitPromotions === 'function') window.lsdDashboardInitPromotions($next);
+                                if (typeof listdom_onload === 'function') listdom_onload();
+                            });
+                        })
+                        .fail(function ()
+                        {
+                            if (!isElementorEditor) window.location.href = url.href;
+                        })
+                        .always(function ()
+                        {
+                            finishLoading();
+                        });
+                };
+
+                const load = function (event)
+                {
+                    const href = $(this).prop('href');
+                    if (!href || $(this).attr('target') === '_blank') return;
+
+                    let url;
+                    try
+                    {
+                        url = new URL(href, window.location.href);
+                    }
+                    catch (error)
+                    {
+                        return;
+                    }
+
+                    const currentUrl = new URL(window.location.href);
+                    const isManageNavigation = $(this).closest('.lsd-dashboard-listing-status-filter, .lsd-dashboard-listings-list .lsd-pagination').length > 0;
+                    const isDashboardUrl = isManageNavigation || (normalizeDashboardPath(url.pathname) === normalizeDashboardPath(currentUrl.pathname) && url.searchParams.has('mode'));
+                    if (url.origin !== window.location.origin || url.hash || !isDashboardUrl) return;
+
+                    event.preventDefault();
+                    loadUrl(url, true);
+                };
+
+                const loadForm = function (event)
+                {
+                    const url = new URL($(this).prop('action') || window.location.href, window.location.href);
+                    url.search = $(this).serialize();
+
+                    const currentUrl = new URL(window.location.href);
+                    const isDashboardUrl = normalizeDashboardPath(url.pathname) === normalizeDashboardPath(currentUrl.pathname) && url.searchParams.has('mode');
+                    if (url.origin !== window.location.origin || url.hash || !isDashboardUrl) return;
+
+                    event.preventDefault();
+                    loadUrl(url, true);
+                };
+
+                $dashboard.find('a[href*="mode="], .lsd-dashboard-listing-status-filter a, .lsd-dashboard-listings-list .lsd-pagination a').off('click' + namespace).on('click' + namespace, load);
+                $dashboard.find('form.lsd-dashboard-search-form, form.lsd-dashboard-payments-subscriptions-search').off('submit' + namespace).on('submit' + namespace, loadForm);
+                $(window).off('popstate' + namespace).on('popstate' + namespace, function ()
+                {
+                    loadUrl(new URL(window.location.href), false);
+                });
+                $(window).off('listdom:dashboard:navigate' + namespace).on('listdom:dashboard:navigate' + namespace, function (event, href, sourceId)
+                {
+                    if (!href || sourceId === navigationId) return;
+
+                    loadUrl(new URL(href), false);
+                });
+            }
+
+            bindMobileNavigation();
+            bindAjaxNavigation();
 
             if (sidebarStatus === 'horizontal')
             {
@@ -8684,7 +8992,7 @@ window.lsdDashboardInitPromotions = function (context)
         window.alert(message);
     };
 
-    $context.find('.lsd-dashboard-promotions').each(function ()
+    $context.filter('.lsd-dashboard-promotions').add($context.find('.lsd-dashboard-promotions')).each(function ()
     {
         const $root = $(this);
         if ($root.data('lsdPromotionsReady')) return;
@@ -8706,7 +9014,7 @@ window.lsdDashboardInitPromotions = function (context)
         const messageRemoveTopupCancel = ($root.data('promotionsMessageRemoveTopupCancel') || 'Cancel').toString();
         const messageRequestFailed = ($root.data('promotionsMessageRequestFailed') || 'Something went wrong. Please try again.').toString();
         const defaultTab = ($root.data('promotionsDefaultTab') || 'labelize').toString();
-        const $modal = $root.find('#lsd_dashboard_promotions_popup');
+        const $modal = $root.find('.lsd-dashboard-promotions-modal').first();
         const selectedLabels = {};
         let selectedListings = {};
         let modalMode = 'labelize';
@@ -9483,19 +9791,19 @@ window.lsdDashboardInitPromotions = function (context)
             removeSelectedListing(($(this).data('listingId') || '').toString());
         });
 
-        $(document)
-        .off('input.lsdPromotionPopupSearch', '#lsd_dashboard_promotions_popup .lsd-promotion-popup-search')
-        .on('input.lsdPromotionPopupSearch', '#lsd_dashboard_promotions_popup .lsd-promotion-popup-search', function ()
+        $modal
+        .off('input.lsdPromotionPopupSearch', '.lsd-promotion-popup-search')
+        .on('input.lsdPromotionPopupSearch', '.lsd-promotion-popup-search', function ()
         {
             schedulePopupSearch();
         })
-        .off('change.lsdPromotionPopupCategory', '#lsd_dashboard_promotions_popup .lsd-promotion-popup-category')
-        .on('change.lsdPromotionPopupCategory', '#lsd_dashboard_promotions_popup .lsd-promotion-popup-category', function ()
+        .off('change.lsdPromotionPopupCategory', '.lsd-promotion-popup-category')
+        .on('change.lsdPromotionPopupCategory', '.lsd-promotion-popup-category', function ()
         {
             fetchPopupListings(true);
         })
-        .off('click.lsdPromotionSubmit', '#lsd_dashboard_promotions_popup .lsd-promotion-submit-checkout')
-        .on('click.lsdPromotionSubmit', '#lsd_dashboard_promotions_popup .lsd-promotion-submit-checkout', function (event)
+        .off('click.lsdPromotionSubmit', '.lsd-promotion-submit-checkout')
+        .on('click.lsdPromotionSubmit', '.lsd-promotion-submit-checkout', function (event)
         {
             event.preventDefault();
             submitModalCheckout($(this));
@@ -9516,6 +9824,36 @@ if (typeof jQuery !== 'undefined')
         window.lsdDashboardInitPromotions($(document));
     });
 }
+
+window.lsdDashboardInitRecaptcha = function (root)
+{
+    if (typeof window.grecaptcha === 'undefined' || typeof window.grecaptcha.render !== 'function') return;
+
+    const $root = root && root.length ? root : jQuery(document);
+    $root.find('.g-recaptcha').each(function ()
+    {
+        const $field = jQuery(this);
+        if ($field.data('lsdRecaptchaReady') || $field.children().length) return;
+
+        const sitekey = ($field.data('sitekey') || '').toString();
+        if (!sitekey) return;
+
+        const widgetId = window.grecaptcha.render(this, {sitekey: sitekey});
+        $field.data('lsdRecaptchaWidgetId', widgetId);
+        $field.data('lsdRecaptchaReady', true);
+    });
+};
+
+window.lsdResetRecaptcha = function (form)
+{
+    const $form = form && form.jquery ? form : jQuery(form);
+    const $recaptcha = $form.find('.g-recaptcha').first();
+    if (typeof window.grecaptcha === 'undefined' || !$recaptcha.length) return;
+
+    const widgetId = $recaptcha.data('lsdRecaptchaWidgetId');
+    if (typeof widgetId !== 'undefined') window.grecaptcha.reset(widgetId);
+    else window.grecaptcha.reset();
+};
 
 // Listdom DASHBOARD PLUGIN
 (function ($) {
@@ -9556,13 +9894,13 @@ if (typeof jQuery !== 'undefined')
             .on("click.lsdDashboardScheduleOpen", ".lsd-dashboard-schedule-open", function (e) {
                 e.preventDefault();
                 const selector = $(this).data("modal");
-                const $modal = $(selector);
+                const $modal = $dashboard.find(selector).first();
                 const $listingActions = $(this).closest(".lsd-dashboard-listing-actions");
                 if ($modal.length && $listingActions.length && !$modal.parent().is($listingActions)) {
                     $listingActions.append($modal);
                 }
                 if ($modal.length && typeof window.lsdInitFlatpickr === "function") window.lsdInitFlatpickr($modal);
-                if ($modal.length) ListdomModal.open(selector, { appendToBody: false });
+                if ($modal.length) ListdomModal.open($modal, { appendToBody: false });
             });
 
             $dashboard
@@ -9570,13 +9908,13 @@ if (typeof jQuery !== 'undefined')
             .on("click.lsdDashboardVisibilityOpen", ".lsd-dashboard-visibility-open", function (e) {
                 e.preventDefault();
                 const selector = $(this).data("modal");
-                const $modal = $(selector);
+                const $modal = $dashboard.find(selector).first();
                 const $listingActions = $(this).closest(".lsd-dashboard-listing-actions");
                 if ($modal.length && $listingActions.length && !$modal.parent().is($listingActions)) {
                     $listingActions.append($modal);
                 }
                 if ($modal.length && typeof window.lsdInitFlatpickr === "function") window.lsdInitFlatpickr($modal);
-                if ($modal.length) ListdomModal.open(selector, { appendToBody: false });
+                if ($modal.length) ListdomModal.open($modal, { appendToBody: false });
             });
 
             $dashboard
@@ -9644,7 +9982,9 @@ if (typeof jQuery !== 'undefined')
                 type: "post",
                 success: function (response) {
                     if (response.success === 1) {
-                        let $listing = $("#lsd_dashboard_listing_" + id);
+                        let $listing = $dashboard.find('[data-listing-id="' + id + '"]');
+                        $listing.remove();
+
                         const hasStatusFilter = new URL(window.location.href).searchParams.has("status");
                         if (hasStatusFilter) $listing.remove();
                         else window.location.reload();
@@ -9657,6 +9997,8 @@ if (typeof jQuery !== 'undefined')
                     $btn.data("loading", 0);
                     loader.stop();
                     $menu.trigger("lsd:actions-menu:unlock");
+
+                    // Loading Style
                     $dashboard.fadeTo(200, 1);
                 }
             });
@@ -9690,7 +10032,7 @@ if (typeof jQuery !== 'undefined')
                 success: function (response) {
                     if (response.success === 1) {
                         const hasStatusFilter = new URL(window.location.href).searchParams.has("status");
-                        if (hasStatusFilter) $("#lsd_dashboard_listing_" + $btn.data("id")).remove();
+                        if (hasStatusFilter) $dashboard.find('[data-listing-id="' + $btn.data("id") + '"]').remove();
                         else window.location.reload();
                     } else showStatusError(response && response.message ? response.message : messages.status);
                 },
@@ -9810,16 +10152,20 @@ if (typeof jQuery !== 'undefined')
             options
         );
 
-        let $dashboard = $("#lsd_dashboard");
-        let $form = $("#lsd_dashboard_form");
+        const $source = this.first();
+        let $dashboard = $source.closest('.lsd-dashboard');
+        if (!$dashboard.length && $source.is('.lsd-dashboard')) $dashboard = $source;
+        if (!$dashboard.length) $dashboard = $('.lsd-dashboard').has('form.lsd-dashboard-form').first();
+        let $form = $source.is('form.lsd-dashboard-form') ? $source : $dashboard.find('form.lsd-dashboard-form').first();
         window.lsdDashboardApplySidebar($dashboard);
-        let $featured_image_input = $("#lsd_featured_image");
-        let $featured_image_upload = $("#lsd_featured_image_file");
-        let $gallery_upload = $("#lsd_listing_gallery_uploader");
-        let $featured_image_preview = $("#lsd_dashboard_featured_image_preview");
-        let $featured_image_container = $("#lsd_dashboard_featured_image_placeholder");
-        let $featured_image_remove = $("#lsd_featured_image_remove_button");
-        let $multiline_select = $(".lsd-select-multiple");
+        let $featured_image_input = $dashboard.find('input[name="lsd[featured_image]"]');
+        let $featured_image_alt = $dashboard.find('[id^="lsd_featured_image_alt"]');
+        let $featured_image_upload = $dashboard.find('[id^="lsd_featured_image_file"]');
+        let $gallery_upload = $dashboard.find('input[id^="lsd_listing_gallery_uploader"]');
+        let $featured_image_preview = $dashboard.find('[id^="lsd_dashboard_featured_image_preview"]');
+        let $featured_image_container = $dashboard.find('[id^="lsd_dashboard_featured_image_placeholder"]');
+        let $featured_image_remove = $dashboard.find('[id^="lsd_featured_image_remove_button"]');
+        let $multiline_select = $dashboard.find(".lsd-select-multiple");
         let $submitMirrorStatus = $form.find(".lsd-dashboard-submit-mirror-status");
         let $submitRealStatus = $form.find(".lsd-dashboard-submit-real-status");
         let $submitMirrorConsent = $form.find(".lsd-dashboard-submit-mirror-consent");
@@ -9956,7 +10302,7 @@ if (typeof jQuery !== 'undefined')
         }
 
         updateGalleryPlaceholder();
-        bindGalleryRemoveHandler($(".lsd-listing-gallery"));
+        bindGalleryRemoveHandler($dashboard.find(".lsd-listing-gallery"));
 
         function syncDashboardEditors() {
             if (
@@ -9978,7 +10324,7 @@ if (typeof jQuery !== 'undefined')
         }
 
         function clearFieldMessages() {
-            const $featuredAlert = $("#lsd_listing_featured_image_message");
+            const $featuredAlert = $dashboard.find('[id^="lsd_listing_featured_image_message"]');
             if ($featuredAlert.length) $featuredAlert.html("");
 
             if ($form.length) {
@@ -10002,7 +10348,7 @@ if (typeof jQuery !== 'undefined')
             clearFieldMessages();
             if (!data) return;
 
-            const $featuredAlert = $("#lsd_listing_featured_image_message");
+            const $featuredAlert = $dashboard.find('[id^="lsd_listing_featured_image_message"]');
             if (data.featured_image && $featuredAlert.length) {
                 if (typeof listdom_alertify === 'function') $featuredAlert.html(listdom_alertify(data.featured_image, "lsd-error"));
                 else $featuredAlert.text(data.featured_image);
@@ -10019,7 +10365,7 @@ if (typeof jQuery !== 'undefined')
                     if (!$input.length) return;
 
                     const $wrapper = $input.closest('.lsd-attribute-image');
-                    const $placeholder = $('#' + $input.attr('id') + '_img');
+                    const $placeholder = $form.find('[id="' + $input.attr('id') + '_img"]');
                     const $alert = $wrapper.find('.lsd-attribute-image-message');
 
                     if ($alert.length) {
@@ -10043,7 +10389,7 @@ if (typeof jQuery !== 'undefined')
                     if (!$input.length) return;
 
                     const $wrapper = $input.closest('.lsd-attribute-file');
-                    const $placeholder = $('#' + $input.attr('id') + '_img');
+                    const $placeholder = $form.find('[id="' + $input.attr('id') + '_img"]');
                     const $alert = $wrapper.find('.lsd-attribute-file-message');
 
                     if ($alert.length) {
@@ -10151,7 +10497,7 @@ if (typeof jQuery !== 'undefined')
 
         function save() {
             // Message
-            const $message = $("#lsd_dashboard_form_message");
+            const $message = $dashboard.find('[id^="lsd_dashboard_form_message"]');
 
             // Hide the Message
             $message.html("");
@@ -10203,7 +10549,7 @@ if (typeof jQuery !== 'undefined')
                 const $input = $(this).find('input[type=hidden]');
                 const value = $input.val();
                 const requiredMessage = $this.data('required-message');
-                const $placeholder = $('#' + $input.attr('id') + '_img');
+                const $placeholder = $form.find('[id="' + $input.attr('id') + '_img"]');
 
                 if (!value) {
                     isValid = false;
@@ -10223,7 +10569,7 @@ if (typeof jQuery !== 'undefined')
                 const $input = $(this).find('input[type=hidden]');
                 const value = $input.val();
                 const requiredMessage = $this.data('required-message') || 'Please select a file.';
-                const $placeholder = $('#' + $input.attr('id') + '_img');
+                const $placeholder = $form.find('[id="' + $input.attr('id') + '_img"]');
 
                 if (!value) {
                     isValid = false;
@@ -10238,7 +10584,7 @@ if (typeof jQuery !== 'undefined')
             });
 
             if (!isValid) {
-                const $firstError = $('.lsd-attribute-error:visible:first');
+                const $firstError = $form.find('.lsd-attribute-error:visible:first');
                 if ($firstError.length) {
                     $('html, body').animate(
                         {
@@ -10279,16 +10625,16 @@ if (typeof jQuery !== 'undefined')
                         $message.html(listdom_alertify(response.message, "lsd-success"));
 
                         // Set the event id
-                        $("#lsd_dashboard_id").val(response.data.id);
+                        $dashboard.find('[id^="lsd_dashboard_id"]').val(response.data.id);
 
                         // Labelize Addon
-                        const $labelize = $("#lsd_labelize_button");
+                        const $labelize = $dashboard.find('.lsd-labelize-button');
                         if ($labelize.length) {
                             // Set Listing ID
                             $labelize.data("id", response.data.id);
 
                             // Hide Message
-                            $(".lsd-labelize-metabox .lsd-labelize-message").addClass(
+                            $dashboard.find(".lsd-labelize-metabox .lsd-labelize-message").addClass(
                                 "lsd-util-hide"
                             );
 
@@ -10301,7 +10647,7 @@ if (typeof jQuery !== 'undefined')
                     }
 
                     // Reset Recaptcha
-                    typeof grecaptcha !== 'undefined' && grecaptcha.reset();
+                    if (typeof window.lsdResetRecaptcha === 'function') window.lsdResetRecaptcha($form);
 
                     // Loading Style
                     $dashboard.fadeTo(200, 1);
@@ -10318,10 +10664,10 @@ if (typeof jQuery !== 'undefined')
 
         function featured_image_upload() {
             // Alert
-            let $alert = $("#lsd_listing_featured_image_message");
+            let $alert = $dashboard.find('[id^="lsd_listing_featured_image_message"]');
 
             // Wrapper
-            let $wrapper = $(".lsd-dashboard-featured-image");
+            let $wrapper = $dashboard.find(".lsd-dashboard-featured-image");
 
             const file = $featured_image_upload.prop("files")[0];
             if (!file) return;
@@ -10398,6 +10744,7 @@ if (typeof jQuery !== 'undefined')
 
                     $featured_image_input.val(response.data.attachment_id);
                     $featured_image_upload.val("");
+                    $featured_image_alt.attr("placeholder", response.data.alt || $featured_image_alt.data("defaultPlaceholder") || "");
                     $featured_image_preview.html('<img src="' + response.data.url + '" alt="">').removeClass('lsd-util-hide');
                     $featured_image_container.addClass('lsd-image-placeholder-has-image');
                     $emptyState.addClass('lsd-util-hide');
@@ -10436,11 +10783,14 @@ if (typeof jQuery !== 'undefined')
 
         function gallery_upload() {
             // Alert
-            let $alert = $("#lsd_listing_gallery_uploader_message");
+            let $alert = $dashboard.find('[id^="lsd_listing_gallery_uploader_message"]');
 
-            let $target = $($gallery_upload.data("for"));
+            const targetSelector = $gallery_upload.data("for");
+            let $target = targetSelector && targetSelector.charAt(0) === "#"
+                ? $dashboard.find('[id="' + targetSelector.substring(1) + '"]')
+                : $dashboard.find(targetSelector);
             let $wrapper = $target.closest(".lsd-listing-gallery-container");
-            if (!$wrapper.length) $wrapper = $(".lsd-listing-gallery-container");
+            if (!$wrapper.length) $wrapper = $dashboard.find(".lsd-listing-gallery-container");
             let name = $gallery_upload.data("name");
             let files = $gallery_upload.prop("files");
             let ins = files.length;
@@ -10577,10 +10927,33 @@ if (typeof jQuery !== 'undefined')
                 const hasData = Array.isArray(response.data) && response.data.length > 0;
 
                 if (hasData) {
+                    const customAlt = $target.data("customAlt") == 1;
+                    const altLabel = $target.data("altLabel") || "Alt Text";
+                    const altPlaceholder = $target.data("altPlaceholder") || "Optional image alt text";
+                    const altIdSuffix = ($target.data("altIdSuffix") || "").toString();
+
                     response.data.map(function (attachment) {
-                        $target.append(
-                            '<li data-id="' + attachment.id + '"><input type="hidden" name="' + name + '" value="' + attachment.id + '"><img src="' + attachment.url + '" alt=""><div class="lsd-gallery-actions"><i class="lsd-icon fas fa-trash-alt lsd-remove-gallery-single-button"></i> <i class="lsd-icon fas fa-arrows-alt lsd-handler"></i></div></li>'
-                        );
+                        const $item = $("<li>").attr("data-id", attachment.id);
+                        $("<input>", {type: "hidden", name: name, value: attachment.id}).appendTo($item);
+                        const $image = $("<div>", {class: "lsd-gallery-image"}).appendTo($item);
+                        $("<img>", {src: attachment.url, alt: ""}).appendTo($image);
+                        $("<div class=\"lsd-gallery-actions\"><i class=\"lsd-icon fas fa-trash-alt lsd-remove-gallery-single-button\"></i> <i class=\"lsd-icon fas fa-arrows-alt lsd-handler\"></i></div>").appendTo($image);
+
+                        if (customAlt) {
+                            const $altFields = $("<div>", {class: "lsd-gallery-alt-fields"}).appendTo($item);
+                            const altId = "lsd_gallery_alt_" + attachment.id + altIdSuffix;
+                            $("<label>", {for: altId, text: altLabel}).appendTo($altFields);
+                            $("<input>", {
+                                class: "lsd-admin-input lsd-gallery-alt-text",
+                                type: "text",
+                                name: "lsd[_gallery_alt][" + attachment.id + "]",
+                                id: altId,
+                                value: "",
+                                placeholder: attachment.alt || altPlaceholder,
+                            }).appendTo($altFields);
+                        }
+
+                        $target.append($item);
                     });
 
                     $alert.html(listdom_alertify(response.message, "lsd-success"));
@@ -10605,7 +10978,7 @@ if (typeof jQuery !== 'undefined')
 (function ($) {
     $.fn.AdditionalCategories = function(options)
     {
-        const defaults = {post_id: '', children_only: '0', ajax_url: '', nonce: ''};
+        const defaults = {post_id: '', children_only: '0', id_suffix: '', ajax_url: '', nonce: ''};
 
         return this.each(function()
         {
@@ -10617,6 +10990,7 @@ if (typeof jQuery !== 'undefined')
             const ajaxUrl = settings.ajax_url || '';
             const nonce = settings.nonce || '';
             const postId = parseInt(settings.post_id, 10) || 0;
+            const idSuffix = (settings.id_suffix || '').toString();
             const namespace = '.lsdAddCat';
 
             const $form = $wrapper.closest('form');
@@ -10647,7 +11021,7 @@ if (typeof jQuery !== 'undefined')
 
             const currentPrimaryId = function()
             {
-                const $select = $form.find('#lsd_listing_category');
+                const $select = $form.find('[id^="lsd_listing_category"]');
                 if ($select.length)
                 {
                     const val = parseInt($select.val(), 10);
@@ -10734,7 +11108,8 @@ if (typeof jQuery !== 'undefined')
                         nonce: nonce,
                         post_id: postId,
                         primary_id: primaryId,
-                        selected: selected
+                        selected: selected,
+                        id_suffix: idSuffix
                     },
                     success: function(response)
                     {
@@ -10768,7 +11143,7 @@ if (typeof jQuery !== 'undefined')
 
             const bindPrimaryHandlers = function()
             {
-                const $primarySelect = $form.find('#lsd_listing_category');
+                const $primarySelect = $form.find('[id^="lsd_listing_category"]');
                 if ($primarySelect.length)
                 {
                     $primarySelect
@@ -10796,6 +11171,23 @@ if (typeof jQuery !== 'undefined')
         });
     };
 })(jQuery);
+
+window.lsdDashboardInitAdditionalCategories = function (root) {
+    const $root = root && root.length ? root : jQuery(document);
+
+    $root.find('.lsd-additional-categories-dashboard-wrapper').each(function () {
+        const $wrapper = jQuery(this);
+        if ($wrapper.data('lsdAdditionalCategories')) return;
+
+        $wrapper.AdditionalCategories({
+            post_id: ($wrapper.data('postId') || '').toString(),
+            children_only: ($wrapper.data('childrenOnly') || '0').toString(),
+            id_suffix: ($wrapper.data('idSuffix') || '').toString(),
+            ajax_url: ($wrapper.data('ajaxUrl') || '').toString(),
+            nonce: ($wrapper.data('nonce') || '').toString()
+        });
+    });
+};
 
 // Listdom DASHBOARD NEW TAX FORM PLUGIN
 (function ($) {
@@ -10840,7 +11232,7 @@ if (typeof jQuery !== 'undefined')
             function save(mode)
             {
                 const $button = $form.find('button[type=submit]');
-                const $message = $form.find("#lsd_new_term_message_" + tax);
+                const $message = $form.find('[id^="lsd_new_term_message_' + tax + '"]');
                 $message.html("");
 
                 let term_name = '';
@@ -10915,7 +11307,8 @@ if (typeof jQuery !== 'undefined')
                     'listdom-label': '.lsd-dashboard-labels'
                 };
 
-                const $container = jQuery(containers[tax]);
+                const $dashboard = $form.closest('.lsd-dashboard');
+                const $container = $dashboard.length ? $dashboard.find(containers[tax]) : jQuery(containers[tax]);
                 if (!$container.length) return;
 
                 const $select = $container.find('select.lsd-fd-taxonomies-dropdown');
@@ -10931,7 +11324,7 @@ if (typeof jQuery !== 'undefined')
                 if ($ul.length)
                 {
                     const nameAttr = $ul.find('input[type=checkbox]').first().attr('name');
-                    const inputId = 'in-listdom-location-' + id;
+                    const inputId = ($ul.find('input[type=checkbox]').first().attr('id') || 'in-listdom-location-0').replace(/-\d+$/, '') + '-' + id;
                     const $checkbox = jQuery('<input>', {
                         type: 'checkbox',
                         name: nameAttr,
@@ -10945,6 +11338,76 @@ if (typeof jQuery !== 'undefined')
                     $ul.append(jQuery('<li>').append($label));
                 }
             }
+        });
+    };
+
+    window.lsdDashboardInitTaxonomyForms = function (root) {
+        const $root = root && root.length ? root : $(document);
+
+        if (typeof window.lsdDashboardInitTaxonomyModals === 'function') window.lsdDashboardInitTaxonomyModals($root);
+
+        $root.find('.lsd-new-tax-wrapper').each(function () {
+            const $wrapper = $(this);
+            const tax = ($wrapper.data('tax') || '').toString();
+            const $form = $wrapper.find('[id^="lsd_dashboard_new_term_' + tax + '"]').first();
+            if (!$form.length) return;
+
+            $form.listdomDashboardTaxForm({
+                ajax_url: typeof lsd !== 'undefined' ? lsd.ajaxurl : '',
+                nonce: ($wrapper.data('tax-nonce') || '').toString()
+            });
+        });
+    };
+
+    window.lsdDashboardInitTaxonomyModals = function (root) {
+        const $root = root && root.length ? root : $(document);
+
+        $root.filter('.lsd-new-tax-wrapper').add($root.find('.lsd-new-tax-wrapper')).each(function ()
+        {
+            const $wrapper = $(this);
+            const tax = $wrapper.data('tax');
+            const $modal = $wrapper.find('.lsd-dashboard-new-term-form').first();
+            const $opener = $wrapper.find('[id^="lsd_show_create_taxonomy_form_' + tax + '"]');
+
+            if ($modal.length)
+            {
+                $modal.off('listdom:modal:opened.listdomNewTax listdom:modal:closed.listdomNewTax');
+                $modal.on('listdom:modal:closed.listdomNewTax', function ()
+                {
+                    $modal.find('[id^="lsd_new_term_message_' + tax + '"]').html('');
+                });
+            }
+
+            $opener.off('click.listdomNewTax').on('click.listdomNewTax', function(e)
+            {
+                e.preventDefault();
+                if (!$modal.length) return;
+
+                if (typeof ListdomModal !== 'undefined')
+                {
+                    jQuery(window).off('click.listdomNewTaxFallback');
+                    ListdomModal.open($modal);
+                }
+                else
+                {
+                    $modal.css('display', 'flex').hide().fadeIn(100);
+                    if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
+
+                    jQuery(window)
+                    .off('click.listdomNewTaxFallback')
+                    .on('click.listdomNewTaxFallback', function (event)
+                    {
+                        if (jQuery(event.target).closest('.lsd-modal-content').length === 0 && jQuery(event.target).is('.lsd-modal'))
+                        {
+                            $modal.fadeOut(100, function ()
+                            {
+                                if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.start();
+                            });
+                            $modal.find('[id^="lsd_new_term_message_' + tax + '"]').html('');
+                        }
+                    });
+                }
+            });
         });
     };
 })(jQuery);
@@ -10961,20 +11424,23 @@ if (typeof jQuery !== 'undefined')
             options
         );
 
-        let $dashboard = $("#lsd_dashboard");
-        let $form = $("#lsd_dashboard_profile");
+        const $source = this.first();
+        let $dashboard = $source.closest('.lsd-dashboard');
+        if (!$dashboard.length && $source.is('.lsd-dashboard')) $dashboard = $source;
+        if (!$dashboard.length) $dashboard = $('.lsd-dashboard').has('form.lsd-dashboard-profile-form').first();
+        let $form = $source.is('form.lsd-dashboard-profile-form') ? $source : $dashboard.find('form.lsd-dashboard-profile-form').first();
         window.lsdDashboardApplySidebar($dashboard);
-        let $profile_image_input = $("#lsd_profile_image");
-        let $profile_image_upload = $("#lsd_profile_image_file");
-        let $profile_image_preview = $("#lsd_dashboard_profile_image_preview");
-        let $profile_image_remove = $("#lsd_profile_image_remove_button");
-        let $profile_image_button = $(".lsd-choose-profile-image");
+        let $profile_image_input = $dashboard.find('input[name="lsd[profile_image]"]');
+        let $profile_image_upload = $dashboard.find('[id^="lsd_profile_image_file"]');
+        let $profile_image_preview = $dashboard.find('[id^="lsd_dashboard_profile_image_preview"]');
+        let $profile_image_remove = $dashboard.find('[id^="lsd_profile_image_remove_button"]');
+        let $profile_image_button = $dashboard.find(".lsd-choose-profile-image");
 
-        let $hero_image_input = $("#lsd_hero_image");
-        let $hero_image_upload = $("#lsd_hero_image_file");
-        let $hero_image_preview = $("#lsd_dashboard_hero_image_preview");
-        let $hero_image_remove = $("#lsd_hero_image_remove_button");
-        let $hero_image_button = $(".lsd-choose-hero-image");
+        let $hero_image_input = $dashboard.find('input[name="lsd[hero_image]"]');
+        let $hero_image_upload = $dashboard.find('[id^="lsd_hero_image_file"]');
+        let $hero_image_preview = $dashboard.find('[id^="lsd_dashboard_hero_image_preview"]');
+        let $hero_image_remove = $dashboard.find('[id^="lsd_hero_image_remove_button"]');
+        let $hero_image_button = $dashboard.find(".lsd-choose-hero-image");
 
         let ajax = false;
 
@@ -11005,8 +11471,8 @@ if (typeof jQuery !== 'undefined')
 
         function save() {
             // Message
-            const $message = $("#lsd_dashboard_profile_message");
-            const $pass_message = $(".lsd-password-message");
+            const $message = $form.find('[id^="lsd_dashboard_profile_message"]').first();
+            const $pass_message = $dashboard.find(".lsd-password-message");
 
             // Hide the Message
             $message.html("");
@@ -11016,8 +11482,8 @@ if (typeof jQuery !== 'undefined')
             $form.addClass("lsd-loading");
 
             // Check Password Matching
-            const password = $("#lsd_password").val();
-            const confirmPassword = $("#lsd_confirm_password").val();
+            const password = $form.find('input[name="lsd[password]"]').val();
+            const confirmPassword = $form.find('input[name="lsd[confirm_password]"]').val();
 
             if (password && password.length < 6) {
                 $pass_message.html(listdom_alertify("Password must be at least 6 characters long!", "lsd-error"));
@@ -11051,16 +11517,16 @@ if (typeof jQuery !== 'undefined')
                         $message.html(listdom_alertify(response.message, "lsd-success"));
 
                         // Set the event id
-                        $("#lsd_dashboard_id").val(response.data.id);
+                        $dashboard.find('[id^="lsd_dashboard_id"]').val(response.data.id);
 
                         // Labelize Addon
-                        const $labelize = $("#lsd_labelize_button");
+                        const $labelize = $dashboard.find('.lsd-labelize-button');
                         if ($labelize.length) {
                             // Set Listing ID
                             $labelize.data("id", response.data.id);
 
                             // Hide Message
-                            $(".lsd-labelize-metabox .lsd-labelize-message").addClass(
+                            $dashboard.find(".lsd-labelize-metabox .lsd-labelize-message").addClass(
                                 "lsd-util-hide"
                             );
 
@@ -11081,10 +11547,10 @@ if (typeof jQuery !== 'undefined')
         }
         function profile_image_upload() {
             // Alert
-            let $alert = $("#lsd_profile_image_message");
+            let $alert = $form.find('[id^="lsd_profile_image_message"]').first();
 
             // Wrapper
-            let $wrapper = $(".lsd-profile-image-container");
+            let $wrapper = $dashboard.find(".lsd-profile-image-container");
 
             // Loading Style
             $wrapper.addClass("lsd-loading");
@@ -11143,10 +11609,10 @@ if (typeof jQuery !== 'undefined')
 
         function hero_image_upload() {
             // Alert
-            let $alert = $("#lsd_hero_image_message");
+            let $alert = $form.find('[id^="lsd_hero_image_message"]').first();
 
             // Wrapper
-            let $wrapper = $(".lsd-profile-hero-image-container");
+            let $wrapper = $dashboard.find(".lsd-profile-hero-image-container");
 
             // Loading Style
             $wrapper.addClass("lsd-loading");
@@ -11738,8 +12204,10 @@ if (typeof jQuery !== 'undefined')
     };
 })(jQuery);
 
-function listdom_onload() {
+function listdom_onload(element) {
     if (typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr(document);
+    if (typeof window.lsdDashboardInitAdditionalCategories === 'function') window.lsdDashboardInitAdditionalCategories(jQuery(document));
+    lsdaddjob_trigger_application_manage_actions();
 
     jQuery(document).off('click.lsdBookableFlatpickr', '.lsd-add-bookable-button').on('click.lsdBookableFlatpickr', '.lsd-add-bookable-button', function ()
     {
@@ -11769,11 +12237,24 @@ function listdom_onload() {
     listdom_image_slider();
     listdom_linear_gallery_modal();
     listdom_listing_link_lightbox();
-    listdom_trigger_pickr();
+    listdom_trigger_pickr(element);
+    listdom_init_icon_picker(element);
     listdom_bricks_onload();
 
     // Listdom Onload Event
     jQuery(document).trigger('listdom:onload');
+}
+
+function listdom_init_icon_picker(root) {
+    if (typeof jQuery === 'undefined' || typeof jQuery.fn.fontIconPicker === 'undefined') return;
+
+    const $root = root && root.length ? jQuery(root) : jQuery(document);
+    $root.filter('.lsd-iconpicker').add($root.find('.lsd-iconpicker')).fontIconPicker(
+    {
+        emptyIcon: false,
+        emptyIconValue: '',
+        iconsPerPage: 16,
+    });
 }
 
 function listdom_bricks_onload() {
@@ -11786,7 +12267,7 @@ function listdom_bricks_infowindow_onload() {
     setTimeout(listdom_bricks_onload, 0);
 }
 
-function listdom_mount_fragment_assets($content) {
+function listdom_mount_fragment_assets($content, rerunInlineScripts = false) {
     if (!$content || !$content.length || typeof document === 'undefined') return;
 
     const trimValue = function (value) {
@@ -11831,6 +12312,17 @@ function listdom_mount_fragment_assets($content) {
             document.head.appendChild(node.cloneNode(true));
         } else if (tag === 'script') {
             const src = node.src || node.getAttribute('src');
+            const scriptType = trimValue(node.getAttribute('type') || '').toLowerCase();
+            const isClassicJavaScript = !scriptType
+                || scriptType === 'text/javascript'
+                || scriptType === 'application/javascript'
+                || scriptType === 'application/x-javascript';
+            if (!src && rerunInlineScripts && isClassicJavaScript)
+            {
+                jQuery.globalEval(node.textContent || '');
+                return;
+            }
+
             if (src) {
                 const alreadyMounted = Array.from(document.scripts).some(function (script) {
                     return script.src === src;
@@ -11865,7 +12357,8 @@ function listdom_mount_fragment_assets($content) {
 function listdom_trigger_favorites() {
     // Favorite Button
     jQuery(document)
-    .on('click', '.lsd-favorite-toggle', function (e) {
+    .off('click.lsdFavorites', '.lsd-favorite-toggle')
+    .on('click.lsdFavorites', '.lsd-favorite-toggle', function (e) {
         e.preventDefault();
 
         let $button = jQuery(this);
@@ -11911,7 +12404,7 @@ function listdom_trigger_favorites() {
 }
 
 function listdom_trigger_share_modal() {
-    jQuery('.lsd-share-modal-button').on('click', function () {
+    jQuery('.lsd-share-modal-button').off('click.lsdShareModal').on('click.lsdShareModal', function () {
         const dataId = jQuery(this).data('id');
         if (!dataId || typeof ListdomModal === 'undefined') return;
 
@@ -11920,7 +12413,7 @@ function listdom_trigger_share_modal() {
 }
 
 function listdom_trigger_message_modal() {
-    jQuery('.lsd-message-modal-button').on('click', function () {
+    jQuery('.lsd-message-modal-button').off('click.lsdMessageModal').on('click.lsdMessageModal', function () {
         if (typeof ListdomModal === 'undefined') return;
 
         ListdomModal.open('#lsd-message-modal');
@@ -11966,6 +12459,7 @@ function listdom_trigger_compare_modal() {
         if (!isClipped) return modal;
 
         const placeholder = jQuery('<span class="lsd-compare-modal-placeholder" aria-hidden="true"></span>');
+        modal.data('lsdCompareWidget', modal.closest('.lsdaddcmp-compare'));
         placeholder.insertBefore(modal);
         modal
         .data('lsdCompareDetached', true)
@@ -11998,11 +12492,12 @@ function listdom_trigger_compare_modal() {
         });
     };
 
-    jQuery('.lsd-compare-toggle').off('click.lsdCompareModal').on('click.lsdCompareModal', function () {
-        const dataId = jQuery(this).data('id');
-        const title = jQuery(this).data('listing-title');
-        const cover = jQuery(this).data('cover');
-        let modal = jQuery(`#lsd_compare_${dataId}`).find(`#lsd-compare-modal-${dataId}`);
+    jQuery('.lsd-compare > .lsd-compare-toggle').off('click.lsdCompareModal').on('click.lsdCompareModal', function () {
+        const $toggle = jQuery(this);
+        const dataId = $toggle.data('id');
+        const title = $toggle.data('listing-title');
+        const cover = $toggle.data('cover');
+        let modal = $toggle.closest('.lsd-compare').find(`[id="lsd-compare-modal-${dataId}"]`).first();
 
         if (!modal.length) modal = jQuery(`#lsd-compare-modal-${dataId}`);
 
@@ -12017,8 +12512,8 @@ function listdom_trigger_compare_modal() {
             if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
         }
 
-        jQuery('.lsd-modal-title').html(title);
-        jQuery('.lsd-modal-cover').html(cover);
+        modal.find('.lsd-modal-title').html(title);
+        modal.find('.lsd-modal-cover').html(cover);
 
         modal
         .off('listdom:modal:closed.lsdCompareModal')
@@ -12055,21 +12550,88 @@ function listdom_resume_page_scroll_if_locked() {
     }
 }
 
+function listdom_compare_widget_config(source) {
+    const $source = source ? jQuery(source) : jQuery();
+    let $wrapper = $source.closest('.lsdaddcmp-compare');
+    if (!$wrapper.length) $wrapper = $source.data('lsdCompareWidget') || $source.closest('.lsd-modal').data('lsdCompareWidget');
+    if (!$wrapper || !$wrapper.length) return {attributes: '{}', signature: ''};
+
+    return {
+        attributes: $wrapper.attr('data-attributes') || '{}',
+        signature: $wrapper.attr('data-attributes-signature') || ''
+    };
+}
+
+function listdom_compare_sync_state(id, response) {
+    if (!response || !response.success) return;
+
+    jQuery('.lsdaddcmp-count').html(response.count);
+    jQuery(`.lsd-compare-toggle[data-id="${id}"]`)
+    .data('status', response.status)
+    .toggleClass('lsd-compare-on', !!response.status)
+    .toggleClass('lsd-compare-off', !response.status);
+}
+
+function listdom_compare_reinitialize() {
+    listdom_compare_add_listings();
+    listdom_trigger_compare();
+    listdom_trigger_compare_delete();
+}
+
+function listdom_compare_refresh_widgets(wrappers, id, nonce) {
+    const requests = [];
+
+    wrappers.each(function () {
+        const $wrapper = jQuery(this);
+        const config = listdom_compare_widget_config($wrapper);
+
+        requests.push(jQuery.ajax({
+            url: lsd.ajaxurl,
+            data: {
+                action: 'lsd_compare',
+                content: 1,
+                refresh_only: 1,
+                id: id,
+                _wpnonce: nonce,
+                attributes: config.attributes,
+                attributes_signature: config.signature
+            },
+            dataType: 'json',
+            type: 'post',
+            success: function (response) {
+                if (response.success && response.content) $wrapper.replaceWith(response.content);
+            }
+        }));
+    });
+
+    if (requests.length) jQuery.when.apply(jQuery, requests).always(listdom_compare_reinitialize);
+}
+
 function listdom_trigger_compare() {
-    jQuery(".lsd-modal-content .lsd-compare-toggle")
+    jQuery('.lsd-modal[id^="lsd-compare-modal-"] > .lsd-modal-content .lsd-compare-actions > .lsd-compare-toggle')
     .off("click")
     .on("click", function (e) {
         e.preventDefault();
         let compare = jQuery(this);
-        let alert = jQuery('.lsd-compare-message');
+        let alert = compare.closest('.lsd-modal').find('.lsd-compare-message').first();
+        if (!alert.length) alert = compare.closest('.lsdaddcmp-compare').find('.lsd-compare-message').first();
+        if (!alert.length) alert = jQuery('.lsd-compare-message').first();
         let parentToggle = jQuery(`.lsd-compare-toggle[data-id="${compare.data("id")}"]`).not(compare);
 
         let id = compare.data("id"),
             nonce = compare.data("nonce");
+        const config = listdom_compare_widget_config(compare);
         compare.addClass("lsd-compare-loading"),
             jQuery.ajax({
                 url: lsd.ajaxurl,
-                data: "action=lsd_compare&content=1&id=" + id + "&_wpnonce=" + nonce,
+                data: {
+                    action: 'lsd_compare',
+                    content: 1,
+                    id: id,
+                    _wpnonce: nonce,
+                    attributes: config.attributes,
+                    attributes_signature: config.signature
+                },
                 dataType: "json",
                 type: "post",
                 success: function (res) {
@@ -12079,14 +12641,29 @@ function listdom_trigger_compare() {
                         res.status ? compare.removeClass("lsd-compare-off").addClass("lsd-compare-on") : compare.removeClass("lsd-compare-on").addClass("lsd-compare-off"),
                         jQuery(".lsdaddcmp-count").html(res.count));
 
+                    listdom_compare_sync_state(id, res);
+
                     parentToggle.data("status", res.status);
                     if (res.status) parentToggle.removeClass("lsd-compare-off").addClass("lsd-compare-on");
                     else parentToggle.removeClass("lsd-compare-on").addClass("lsd-compare-off");
 
                     if (res.success && res.content) {
-                        jQuery(".lsdaddcmp-compare").replaceWith(res.content);
-                        listdom_compare_add_listings();
-                        listdom_trigger_compare_delete();
+                        let $wrapper = compare.closest('.lsdaddcmp-compare');
+                        if (!$wrapper.length) $wrapper = compare.closest('.lsd-modal').data('lsdCompareWidget');
+                        if ($wrapper && $wrapper.length) {
+                            const $otherWrappers = jQuery('.lsdaddcmp-compare').not($wrapper);
+                            const $modal = compare.closest('.lsd-modal');
+                            const $placeholder = $modal.data('lsdComparePlaceholder');
+                            if ($placeholder && $placeholder.length) {
+                                $placeholder.replaceWith($modal);
+                                $modal.removeData('lsdComparePlaceholder').removeData('lsdCompareDetached');
+                            }
+                            $wrapper.replaceWith(res.content);
+                            listdom_compare_refresh_widgets($otherWrappers, id, nonce);
+                        }
+                        else listdom_compare_refresh_widgets(jQuery('.lsdaddcmp-compare'), id, nonce);
+
+                        listdom_compare_reinitialize();
                         listdom_resume_page_scroll_if_locked();
                     }
 
@@ -12112,10 +12689,18 @@ function listdom_trigger_compare_delete() {
 
         // Loading Style
         $icon.addClass('lsd-compare-loading');
+        const config = listdom_compare_widget_config($icon);
 
         jQuery.ajax({
             url: lsd.ajaxurl,
-            data: "action=lsd_compare&content=1&id=" + id + "&_wpnonce=" + nonce,
+            data: {
+                action: 'lsd_compare',
+                content: 1,
+                id: id,
+                _wpnonce: nonce,
+                attributes: config.attributes,
+                attributes_signature: config.signature
+            },
             dataType: 'json',
             type: 'post',
             success: function (response) {
@@ -12124,11 +12709,14 @@ function listdom_trigger_compare_delete() {
 
                 // Replace Content
                 if (response.success) {
-                    jQuery(".lsdaddcmp-compare").replaceWith(response.content);
+                    const $wrapper = $icon.closest('.lsdaddcmp-compare');
+                    const $otherWrappers = jQuery('.lsdaddcmp-compare').not($wrapper);
+                    listdom_compare_sync_state(id, response);
+                    if ($wrapper.length) $wrapper.replaceWith(response.content);
+                    listdom_compare_refresh_widgets($otherWrappers, id, nonce);
                 }
 
-                listdom_compare_add_listings();
-                listdom_trigger_compare_delete();
+                listdom_compare_reinitialize();
             },
             error: function () {
                 // Loading Style
@@ -12139,31 +12727,16 @@ function listdom_trigger_compare_delete() {
 }
 
 function listdom_compare_add_listings() {
+    jQuery('.lsdaddcmp-compare').each(function () {
+    const $compare = jQuery(this);
+    const getBtn = () => $compare.find('.lsdaddcmp-add-listings').first();
+    const getCompareWrapper = () => $compare;
 
-    const getBtn = () => jQuery('.lsdaddcmp-add-listings').first();
-
-    const getCompareWrapper = () => {
-        const $btn = getBtn();
-        if ($btn.length) {
-            const $closestCompare = $btn.closest('.lsdaddcmp-compare');
-            if ($closestCompare.length) return $closestCompare;
-
-            const $near = $btn
-            .closest('.lsdaddcmp-wrap, .lsdaddcmp-container, .lsdaddcmp-section, .lsdaddcmp')
-            .find('.lsdaddcmp-compare')
-            .first();
-
-            if ($near.length) return $near;
-        }
-
-        return jQuery('.lsdaddcmp-compare').first();
-    };
-
-    // Cache modal elements
-    const $modal = jQuery('#lsdaddcmp-add-modal');
+    // Cache modal elements within this comparison widget.
+    const $modal = $compare.find('.lsdaddcmp-add-modal').first();
     const $container = $modal.find('.lsdaddcmp-shortcode');
 
-    if (!getBtn().length) return;
+    if (!getBtn().length || !$modal.length) return;
 
     const handleAjaxError = (xhr, textStatus, error) => {
         if (typeof listdom_toastify === 'function') {
@@ -12255,6 +12828,8 @@ function listdom_compare_add_listings() {
                     if (typeof listdom_onload === 'function') {
                         listdom_onload();
                     }
+
+                    bindModalCompareToggles();
                 } else if (response && response.message && typeof listdom_toastify === 'function') {
                     listdom_toastify(response.message, 'lsd-error');
                 }
@@ -12310,30 +12885,32 @@ function listdom_compare_add_listings() {
                     return;
                 }
 
+                const config = listdom_compare_widget_config(getCompareWrapper());
                 jQuery.ajax({
                     url: lsd.ajaxurl,
                     type: 'post',
                     dataType: 'json',
-                    data: `action=lsd_compare&content=1&id=${id}&_wpnonce=${nonceRes.nonce}`,
+                    data: {
+                        action: 'lsd_compare',
+                        content: 1,
+                        id: id,
+                        _wpnonce: nonceRes.nonce,
+                        attributes: config.attributes,
+                        attributes_signature: config.signature
+                    },
                     success: (res) => {
                         if (res && res.success && res.content) {
                             const $old = getCompareWrapper();
+                            const $otherWrappers = jQuery('.lsdaddcmp-compare').not($old);
+                            listdom_compare_sync_state(id, res);
                             if ($old.length) {
                                 $old.replaceWith(res.content);
                             } else {
                                 jQuery('.lsdaddcmp-compare').first().replaceWith(res.content);
                             }
 
-                            syncModalIds();
-                            refreshAddButtonState();
-
-                            if ($modal.is(':visible')) {
-                                loadModalShortcode();
-                            }
-
-                            if (typeof listdom_trigger_compare_delete === 'function') {
-                                listdom_trigger_compare_delete();
-                            }
+                            listdom_compare_refresh_widgets($otherWrappers, id, nonceRes.nonce);
+                            listdom_compare_reinitialize();
 
                             if (typeof listdom_resume_page_scroll_if_locked === 'function') {
                                 listdom_resume_page_scroll_if_locked();
@@ -12354,8 +12931,18 @@ function listdom_compare_add_listings() {
         });
     };
 
+    const bindModalCompareToggles = () => {
+        $container.find('.lsd-compare > .lsd-compare-toggle')
+        .off('click.lsdCompareModal')
+        .off('click.lsdCompareAddListing')
+        .on('click.lsdCompareAddListing', function (e) {
+            e.preventDefault();
+            toggleCompare(jQuery(this).data('id'));
+        });
+    };
+
     // Event bindings
-    jQuery(document).off('click', '.lsdaddcmp-add-listings').on('click', '.lsdaddcmp-add-listings', (e) => {
+    getBtn().off('click.lsdCompareAdd').on('click.lsdCompareAdd', (e) => {
         e.preventDefault();
 
         if (isDisabled())
@@ -12378,7 +12965,7 @@ function listdom_compare_add_listings() {
 
     $container
     .off('click', '.lsd-listing')
-    .on('click', '.lsd-listing', (e) => {
+        .on('click', '.lsd-listing', (e) => {
         if (jQuery(e.target).closest('.lsd-compare-toggle').length) return;
 
         e.preventDefault();
@@ -12396,12 +12983,15 @@ function listdom_compare_add_listings() {
         toggleCompare(id);
     });
 
+    bindModalCompareToggles();
+
     if (typeof listdom_trigger_compare === 'function') {
         listdom_trigger_compare();
     }
 
     refreshAddButtonState();
     syncModalIds();
+    });
 }
 
 function lsdaddrev_trigger_feedback() {
@@ -12612,8 +13202,17 @@ function lsdaddbok_trigger_booking_manage_actions() {
         if (modalSelector) {
             let $modal = jQuery(modalSelector);
             let $menu = $button.closest(".lsd-actions-menu");
+            let $owner = $button.closest(".lsd-bookings-wrapper, .lsd-dashboard").first();
+            let $dashboardOwner = $owner.closest(".lsd-dashboard").first();
 
             $menu.trigger("lsd:actions-menu:open");
+            if ($modal.length && $owner.length) {
+                $modal.data("lsdBookingOwner", $owner);
+
+                if ($dashboardOwner.length && $dashboardOwner.attr("id")) {
+                    $modal.attr("data-lsd-dashboard-owner", $dashboardOwner.attr("id"));
+                }
+            }
 
             if ($modal.length && typeof window.ListdomModal !== "undefined") {
                 window.ListdomModal.open($modal, {
@@ -12670,7 +13269,11 @@ function lsdaddbok_run_booking_manage_action($button, extraData) {
     let nonce = $button.data("nonce");
 
     let $modal = $button.closest(".lsd-modal");
-    let $menu = jQuery("#lsd_bm_" + id).find(".lsd-actions-menu").first();
+    let $owner = $button.closest(".lsd-bookings-wrapper, .lsd-dashboard").first();
+    if (!$owner.length && $modal.length) $owner = $modal.data("lsdBookingOwner") || jQuery();
+
+    let $row = $owner.length ? $owner.find('.lsd-bookings-table-row[data-booking-id="' + id + '"]').first() : jQuery('.lsd-bookings-table-row[data-booking-id="' + id + '"]').first();
+    let $menu = $row.find(".lsd-actions-menu").first();
 
     $menu.trigger("lsd:actions-menu:lock");
 
@@ -12771,7 +13374,7 @@ function lsdaddjob_trigger_application_manage_actions() {
             }
         }
 
-        let $application = jQuery("#lsdaddjob_application_" + id);
+        let $application = $button.closest(".lsdaddjob-applications-list > li");
         let $status = $application.find(
             jQuery(".lsdaddjob-applications-status-wrapper")
         );
@@ -12839,13 +13442,18 @@ function listdom_image_slider() {
     });
 }
 
-function listdom_trigger_pickr()
+function listdom_trigger_pickr(element)
 {
     if (typeof Pickr === 'undefined') return;
 
-    jQuery('.lsd-color-picker').each(function ()
+    const $element = element ? jQuery(element) : jQuery(document);
+    const $pickers = $element.is('.lsd-color-picker') ? $element : $element.find('.lsd-color-picker');
+
+    $pickers.each(function ()
     {
         const $container = jQuery(this);
+        if ($container.data('lsdPickr')) return;
+
         const $input = $container.prev('.lsd_color');
         const colorPickerInput = jQuery('.lsd-color-picker-input');
 
@@ -12869,6 +13477,8 @@ function listdom_trigger_pickr()
             }
         });
 
+        $container.data('lsdPickr', picker);
+
         picker.on('change', (color) => {
             const hexColor = color.toHEXA().toString();
             if ($input.length) $input.val(hexColor);
@@ -12879,12 +13489,12 @@ function listdom_trigger_pickr()
 }
 
 function listdom_linear_gallery_modal() {
-    jQuery('.lsd-all-photos-button').on('click', function() {
+    jQuery('.lsd-all-photos-button').off('click.lsdLinearGallery').on('click.lsdLinearGallery', function() {
         jQuery('#lsd-gallery-modal').fadeIn();
         if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
     });
 
-    jQuery('.lsd-gallery-modal-close, #lsd-gallery-modal').on('click', function(e) {
+    jQuery('.lsd-gallery-modal-close, #lsd-gallery-modal').off('click.lsdLinearGallery').on('click.lsdLinearGallery', function(e) {
         if (e.target !== this) return;
 
         jQuery('#lsd-gallery-modal').fadeOut(() => {
@@ -13494,15 +14104,15 @@ function lsdCheckoutComplete(orderKey)
     }
 
     function openSwitchModal($button) {
-        let modalSelector = $button.data('modal');
-        let $modal = $(modalSelector);
         let $listingActions = $button.closest('.lsd-dashboard-listing-actions');
+        let $modal = $button.siblings('.lsdaddsub-switch-modal').first();
+        if (!$modal.length) $modal = $listingActions.find('.lsdaddsub-switch-modal').first();
 
         if ($modal.length && $listingActions.length && !$modal.parent().is($listingActions)) {
             $listingActions.append($modal);
         }
 
-        ListdomModal.open(modalSelector, {
+        ListdomModal.open($modal, {
             appendToBody: false
         });
     }
@@ -13526,7 +14136,7 @@ function lsdCheckoutComplete(orderKey)
         let subscription_id = $dropdown.val();
         let nonce = $dropdown.data('nonce');
 
-        let $message = $('#lsdaddsub_switch_message_' + listing_id);
+        let $message = $modal.find('.lsdaddsub-switch-message');
         $message.removeClass(hiddenClass);
 
         const loading = new ListdomButtonLoader($button);
@@ -13596,6 +14206,11 @@ function lsdCheckoutComplete(orderKey)
     $(document).ready(function () {
         // Trigger
         listdom_onload();
+        if (typeof window.grecaptcha !== 'undefined' && typeof window.grecaptcha.ready === 'function') {
+            window.grecaptcha.ready(function () {
+                if (typeof window.lsdDashboardInitRecaptcha === 'function') window.lsdDashboardInitRecaptcha($(document));
+            });
+        }
 
         // Checkout gateway tabs
         $(document).on('click', '.lsd-checkout-tabs-nav a', function (e) {
@@ -13610,7 +14225,7 @@ function lsdCheckoutComplete(orderKey)
             $li.addClass('lsd-active');
 
             $wrapper.find('.lsd-gateway-form').addClass('lsd-util-hide');
-            $('#lsd-gateway-form-' + gateway).removeClass('lsd-util-hide');
+            $wrapper.find('#lsd-gateway-form-' + gateway).removeClass('lsd-util-hide');
         });
 
         $(document).on('click', '.lsd-membership-active-package-tabs .lsd-fe-tabs-nav a', function (e) {
@@ -13716,7 +14331,7 @@ function lsdCheckoutComplete(orderKey)
         });
 
         // Profile Contact Form
-        $(".lsd-profile-contact-form").on("submit", function (e) {
+        $(document).off("submit.lsdProfileContactForm", ".lsd-profile-contact-form").on("submit.lsdProfileContactForm", ".lsd-profile-contact-form", function (e) {
             e.preventDefault();
 
             let $form = $(this);
@@ -13774,7 +14389,7 @@ function lsdCheckoutComplete(orderKey)
         });
 
         // Contact Form
-        $(".lsd-owner-contact-form").on("submit", function (e) {
+        $(document).off("submit.lsdOwnerContactForm", ".lsd-owner-contact-form").on("submit.lsdOwnerContactForm", ".lsd-owner-contact-form", function (e) {
             e.preventDefault();
 
             let $form = $(this);
@@ -13903,12 +14518,13 @@ function lsdCheckoutComplete(orderKey)
 
             // Append File
             let $file = $("#lsd_claim_form_file");
-            if (typeof $file.prop("files") !== "undefined")
-                fd.append("claim-doc", $file.prop("files")[0]);
+            let files = $file.prop("files");
+            if (files && files.length)
+                fd.append("claim[file]", files[0]);
 
             let $alert = $(".lsd-claim-form-alert");
             let $form = $("#lsd_claim_form_" + id);
-            let $button = $form.find($(".lsd-row-submit button"));
+            let $button = $form.find(".lsd-form-button button");
 
             // Loading Style
             $form.addClass("lsd-loading");
@@ -13916,8 +14532,8 @@ function lsdCheckoutComplete(orderKey)
             // Disable the Button
             $button.prop("disabled", "disabled");
 
-            // Remove Alert
-            $alert.html("");
+            // Clear and Hide Previous Alert
+            $alert.empty().addClass("lsd-util-hide");
 
             $.ajax({
                 url: lsd.ajaxurl,
@@ -13938,7 +14554,7 @@ function lsdCheckoutComplete(orderKey)
                         $form.hide();
 
                         // Alert
-                        $alert.html(listdom_alertify(response.message, "lsd-success"));
+                        $alert.removeClass("lsd-util-hide").html(listdom_alertify(response.message, "lsd-success"));
 
                         // Redirect to Payment Page
                         if (response.data.next) {
@@ -13946,14 +14562,11 @@ function lsdCheckoutComplete(orderKey)
                                 window.location.replace(response.data.next);
                             }, 2000);
                         }
-                    } else $alert.html(listdom_alertify(response.message, "lsd-error"));
+                    } else $alert.removeClass("lsd-util-hide").html(listdom_alertify(response.message, "lsd-error"));
                 },
                 error: function () {
                     // Loading Style
                     $form.removeClass("lsd-loading");
-
-                    // Hide Form
-                    $form.hide();
 
                     // Enable the Button
                     $button.removeProp("disabled");
@@ -14078,21 +14691,21 @@ function lsdCheckoutComplete(orderKey)
         });
 
         // Labelize Checkout Form
-        $("#lsd_labelize_button").on("click", function (e) {
+        $(document).off("click.lsdLabelize", ".lsd-labelize-button").on("click.lsdLabelize", ".lsd-labelize-button", function (e) {
             e.preventDefault();
 
-            let listing_id = $(this).data("id");
-            let nonce = $("#lsdaddlbl_nonce").val();
+            let $button = $(this);
+            let listing_id = $button.data("id");
+            let nonce = $button.data("nonce");
+            let $wrapper = $button.closest(".lsd-labelize-metabox");
 
             let labels = "";
-            $(".lsd-labelize-label:checked").each(function () {
+            $wrapper.find(".lsd-labelize-label:checked").each(function () {
                 labels += $(this).val() + ",";
             });
 
             // Elements
-            let $wrapper = $(".lsd-labelize-metabox");
-            let $button = $(this);
-            let $alert = $(".lsd-labelize-checkout-form-alert");
+            let $alert = $wrapper.find(".lsd-labelize-checkout-form-alert");
 
             // Loading Style
             $wrapper.addClass("lsd-loading");
@@ -14247,7 +14860,7 @@ function lsdCheckoutComplete(orderKey)
                     $form.removeClass("lsd-loading");
 
                     // Reset Recaptcha
-                    typeof grecaptcha !== 'undefined' && grecaptcha.reset();
+                    if (typeof window.lsdResetRecaptcha === 'function') window.lsdResetRecaptcha($form);
 
                     if (response.success) {
                         // Hide Form
@@ -14498,7 +15111,7 @@ function lsdCheckoutComplete(orderKey)
         lsdaddjob_trigger_application_manage_actions();
 
         // Terms Dropdown
-        $(".lsd-terms-dropdown select").on("change", function () {
+        $(document).off("change.lsdTermsDropdown", ".lsd-terms-dropdown select").on("change.lsdTermsDropdown", ".lsd-terms-dropdown select", function () {
             let dropdown = $(this);
             if (dropdown.val() > 0) dropdown.parent().submit();
         });
@@ -14517,7 +15130,7 @@ function lsdCheckoutComplete(orderKey)
         /**
          * Listdom Rate Field
          */
-        $(".lsd-rate .lsd-rate-stars a").on("click", function (e) {
+        $(document).off("click.lsdRateField", ".lsd-rate .lsd-rate-stars a").on("click.lsdRateField", ".lsd-rate .lsd-rate-stars a", function (e) {
             e.preventDefault();
 
             let $star = $(this);
@@ -14557,62 +15170,7 @@ function lsdCheckoutComplete(orderKey)
         // Linear Gallery
         listdom_linear_gallery_modal();
 
-        $('.lsd-new-tax-wrapper').each(function()
-        {
-            const $wrapper = $(this);
-            const tax = $wrapper.data('tax');
-            const $modal = jQuery(`#lsd_dashboard_new_term_${tax}`);
-
-            if ($modal.length)
-            {
-                $modal.off('listdom:modal:opened.listdomNewTax listdom:modal:closed.listdomNewTax');
-                $modal.on('listdom:modal:closed.listdomNewTax', function ()
-                {
-                    jQuery('#lsd_new_term_message_' + tax).html('');
-                });
-            }
-
-            $('#lsd_show_create_taxonomy_form_' + tax).on('click', function(e)
-            {
-                e.preventDefault();
-                if (!$modal.length) return;
-
-                if (typeof ListdomModal !== 'undefined')
-                {
-                    jQuery(window).off('click.listdomNewTaxFallback');
-                    ListdomModal.open($modal);
-                }
-                else
-                {
-                    $modal.css('display', 'flex').hide().fadeIn(100);
-                    if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
-
-                    jQuery(window)
-                    .off('click.listdomNewTaxFallback')
-                    .on('click.listdomNewTaxFallback', function (event)
-                    {
-                        if (jQuery(event.target).closest('.lsd-modal-content').length === 0 && jQuery(event.target).is('.lsd-modal'))
-                        {
-                            $modal.fadeOut(100, function ()
-                            {
-                                if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.start();
-                            });
-                            jQuery('#lsd_new_term_message_' + tax).html('');
-                        }
-                    });
-                }
-            });
-        });
-
-        /**
-         * Listdom Icon Picker
-         */
-        if (typeof $.fn.fontIconPicker !== 'undefined') $('.lsd-iconpicker').fontIconPicker(
-        {
-            emptyIcon: false,
-            emptyIconValue: '',
-            iconsPerPage: 16,
-        });
+        if (typeof window.lsdDashboardInitTaxonomyModals === 'function') window.lsdDashboardInitTaxonomyModals($(document));
 
         /**
          * Listdom Color Picker
@@ -14621,5 +15179,328 @@ function lsdCheckoutComplete(orderKey)
         {
             $('.lsd-colorpicker').wpColorPicker();
         }
+
+        // Listing Claims dashboard
+        $('.lsd-dashboard-claims').each(function ()
+        {
+            const $root = $(this);
+            if ($root.data('lsdClaimsReady')) return;
+
+            const $modal = $root.find('#lsd_dashboard_claims_popup');
+            const ajaxUrl = ($root.data('claimsAjaxUrl') || lsd.ajaxurl || '').toString();
+            const listingsNonce = ($root.data('claimsListingsNonce') || '').toString();
+            const messageSelectListing = ($root.data('claimsMessageSelectListing') || '').toString();
+            const messageRequestFailed = ($root.data('claimsMessageRequestFailed') || '').toString();
+            const messageRemoveListing = ($root.data('claimsMessageRemoveListing') || '').toString();
+            const selectedListings = {};
+            let popupSearchTimer = 0;
+            let nextPage = 0;
+            let hasMore = false;
+            let loading = false;
+            let reload = false;
+
+            const showMessage = function (message, type)
+            {
+                if (!message) return;
+
+                if (typeof listdom_toastify === 'function')
+                {
+                    listdom_toastify(message, type || 'lsd-info');
+                    return;
+                }
+
+                window.alert(message);
+            };
+
+            const selectedIds = function ()
+            {
+                return Object.keys(selectedListings).filter(function (listingId)
+                {
+                    return !!selectedListings[listingId];
+                });
+            };
+
+            const updateSelectedListings = function ()
+            {
+                const listingIds = selectedIds();
+                const $selected = $modal.find('.lsd-claim-selected-listings');
+
+                $modal.find('.lsd-claim-selected-listing-count').text(listingIds.length);
+                $selected.empty().toggleClass('has-items', listingIds.length > 0);
+
+                $.each(listingIds, function (_, listingId)
+                {
+                    const listing = selectedListings[listingId];
+                    const removeLabel = messageRemoveListing ? messageRemoveListing + ': ' + listing.title : listing.title;
+                    const $pill = $('<span>', { class: 'lsd-dashboard-promotions-selected-pill' });
+                    const $remove = $('<button>', {
+                        type: 'button',
+                        class: 'lsd-dashboard-promotions-selected-pill-remove',
+                        'data-listing-id': listingId,
+                        'aria-label': removeLabel
+                    }).append($('<i>', { class: 'lsd-fe-icon fa fa-trash-alt', 'aria-hidden': 'true' }));
+
+                    $pill.append($('<span>').text(listing.title)).append($remove);
+                    $selected.append($pill);
+                });
+
+                $modal.find('.lsd-claim-popup-listing-checkbox').each(function ()
+                {
+                    const $checkbox = $(this);
+                    const listingId = ($checkbox.val() || '').toString();
+                    $checkbox.prop('checked', !!selectedListings[listingId]);
+                    $checkbox.closest('.lsd-dashboard-promotions-modal-item').toggleClass('is-selected', !!selectedListings[listingId]);
+                });
+            };
+
+            const selectListing = function ($checkbox)
+            {
+                const listingId = ($checkbox.val() || '').toString();
+                if (!listingId) return;
+
+                $.each(selectedListings, function (id)
+                {
+                    delete selectedListings[id];
+                });
+
+                if ($checkbox.is(':checked'))
+                {
+                    selectedListings[listingId] = {
+                        title: ($checkbox.data('listingTitle') || '').toString(),
+                        url: ($checkbox.data('claimUrl') || '').toString()
+                    };
+                }
+
+                updateSelectedListings();
+            };
+
+            const setLoading = function (state)
+            {
+                loading = state;
+                $modal.find('.lsd-claim-modal-results').toggleClass('is-loading', state);
+                $modal.find('.lsd-claim-modal-loading').toggleClass('lsd-util-hide', !state);
+            };
+
+            const fetchListings = function (reset)
+            {
+                if (loading)
+                {
+                    if (reset) reload = true;
+                    return;
+                }
+                if (!reset && !hasMore) return;
+
+                const page = reset ? 1 : nextPage;
+                if (page < 1) return;
+
+                const searchValue = (($modal.find('.lsd-claim-popup-search').val() || '').toString()).trim();
+                const $list = $modal.find('.lsd-claim-modal-list');
+                if (reset)
+                {
+                    nextPage = 0;
+                    hasMore = false;
+                    $list.empty().addClass('lsd-util-hide');
+                    $modal.find('.lsd-claim-modal-results').scrollTop(0);
+                }
+
+                setLoading(true);
+                $.ajax({
+                    url: ajaxUrl,
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        action: 'lsd_dashboard_claims_listings',
+                        _wpnonce: listingsNonce,
+                        page: page,
+                        search: searchValue.length >= 3 ? searchValue : '',
+                        category_id: ($modal.find('.lsd-claim-popup-category').val() || '').toString()
+                    },
+                    success: function (response)
+                    {
+                        if (!response || parseInt(response.success, 10) !== 1 || !response.data)
+                        {
+                            showMessage(response && response.message ? response.message : messageRequestFailed, 'lsd-error');
+                            return;
+                        }
+
+                        if (reset) $list.html(response.data.html || '');
+                        else
+                        {
+                            const $group = $list.find('.lsd-dashboard-promotions-modal-list-group').first();
+                            const $items = $(response.data.html || '').find('.lsd-dashboard-promotions-modal-item');
+
+                            if ($group.length && $items.length) $group.append($items);
+                            else $list.append(response.data.html || '');
+                        }
+
+                        nextPage = parseInt(response.data.next_page, 10) || 0;
+                        hasMore = parseInt(response.data.has_more, 10) === 1;
+                        $list.toggleClass('lsd-util-hide', parseInt(response.data.total, 10) < 1);
+                        $modal.find('.lsd-claim-modal-empty').toggleClass('lsd-util-hide', parseInt(response.data.total, 10) > 0);
+                        updateSelectedListings();
+                    },
+                    error: function ()
+                    {
+                        showMessage(messageRequestFailed, 'lsd-error');
+                    },
+                    complete: function ()
+                    {
+                        setLoading(false);
+
+                        if (reload)
+                        {
+                            reload = false;
+                            fetchListings(true);
+                        }
+                    }
+                });
+            };
+
+            const sortActiveClaims = function ()
+            {
+                const sort = ($root.find('.lsd-claim-dashboard-sort').val() || '').toString();
+                const $section = $root.find('.lsd-claim-dashboard-active-section');
+                const cards = $section.children('.lsd-claim-dashboard-active-card').get();
+
+                cards.sort(function (first, second)
+                {
+                    const $first = $(first);
+                    const $second = $(second);
+                    const firstTitle = ($first.data('sortTitle') || '').toString();
+                    const secondTitle = ($second.data('sortTitle') || '').toString();
+
+                    if (sort === 'title_asc') return firstTitle.localeCompare(secondTitle);
+                    if (sort === 'title_desc') return secondTitle.localeCompare(firstTitle);
+
+                    const firstExpiry = parseInt($first.data('sortExpiry'), 10) || 0;
+                    const secondExpiry = parseInt($second.data('sortExpiry'), 10) || 0;
+                    if (firstExpiry === secondExpiry) return firstTitle.localeCompare(secondTitle);
+                    if (!firstExpiry) return 1;
+                    if (!secondExpiry) return -1;
+
+                    return sort === 'expiry_desc' ? secondExpiry - firstExpiry : firstExpiry - secondExpiry;
+                });
+
+                $.each(cards, function (_, card)
+                {
+                    $section.append(card);
+                });
+            };
+
+            $root.on('click.lsdClaimOpenPopup', '.lsd-claim-open-popup', function (event)
+            {
+                event.preventDefault();
+                if (!$modal.length || typeof window.ListdomModal === 'undefined') return;
+
+                $.each(selectedListings, function (listingId)
+                {
+                    delete selectedListings[listingId];
+                });
+                updateSelectedListings();
+
+                const $category = $modal.find('.lsd-claim-popup-category');
+                if ($category.length && typeof $.fn.select2 !== 'undefined' && !$category.data('lsdClaimPopupSelect2'))
+                {
+                    $category.select2({
+                        allowClear: true,
+                        placeholder: $category.attr('placeholder'),
+                        width: '100%',
+                        minimumResultsForSearch: 0,
+                        shouldFocusInput: () => false,
+                    });
+                    $category.data('lsdClaimPopupSelect2', true);
+                }
+
+                window.ListdomModal.open($modal, { appendToBody: true });
+                fetchListings(true);
+            })
+            .on('click.lsdClaimSearch', '.lsd-claim-dashboard-search-submit', function (event)
+            {
+                event.preventDefault();
+
+                const $search = $(this).closest('.lsd-claim-dashboard-search');
+                const term = (($search.find('.lsd-claim-dashboard-search-input').val() || '').toString()).toLowerCase().trim();
+                const target = ($search.data('target') || '').toString();
+                const items = ($search.data('items') || '').toString();
+
+                if (!target || !items) return;
+                $root.find(target).find(items).each(function ()
+                {
+                    const $item = $(this);
+                    const haystack = ($item.data('search') || '').toString().toLowerCase();
+                    $item.toggle(term === '' || haystack.indexOf(term) !== -1);
+                });
+            })
+            .on('keydown.lsdClaimSearch', '.lsd-claim-dashboard-search-input', function (event)
+            {
+                if (event.key === 'Enter')
+                {
+                    event.preventDefault();
+                    $(this).closest('.lsd-claim-dashboard-search').find('.lsd-claim-dashboard-search-submit').trigger('click');
+                }
+            })
+            .on('change.lsdClaimSort', '.lsd-claim-dashboard-sort', sortActiveClaims);
+
+            $modal.on('change.lsdClaimListing', '.lsd-claim-popup-listing-checkbox', function ()
+            {
+                selectListing($(this));
+            })
+            .on('click.lsdClaimListingRow', '.lsd-dashboard-listing-item', function (event)
+            {
+                const $target = $(event.target);
+                if ($target.closest('input, .lsd-dashboard-listing-actions').length) return;
+
+                const $checkbox = $(this).find('.lsd-claim-popup-listing-checkbox').first();
+                if (!$checkbox.length || $checkbox.is(':disabled')) return;
+
+                event.preventDefault();
+                $checkbox.prop('checked', !$checkbox.is(':checked')).trigger('change');
+            })
+            .on('click.lsdClaimSelectedPill', '.lsd-dashboard-promotions-selected-pill-remove', function (event)
+            {
+                event.preventDefault();
+                delete selectedListings[($(this).data('listingId') || '').toString()];
+                updateSelectedListings();
+            });
+
+            $modal.find('.lsd-claim-modal-results')
+            .off('scroll.lsdClaimInfinite')
+            .on('scroll.lsdClaimInfinite', function ()
+            {
+                if (loading || !hasMore) return;
+                if ((this.scrollTop + this.clientHeight) >= (this.scrollHeight - 80)) fetchListings(false);
+            });
+
+            $modal
+            .on('input.lsdClaimPopupSearch', '.lsd-claim-popup-search', function ()
+            {
+                window.clearTimeout(popupSearchTimer);
+                popupSearchTimer = window.setTimeout(function ()
+                {
+                    fetchListings(true);
+                }, 300);
+            })
+            .on('change.lsdClaimPopupCategory', '.lsd-claim-popup-category', function ()
+            {
+                fetchListings(true);
+            })
+            .on('click.lsdClaimSubmitSelection', '.lsd-claim-submit-selection', function (event)
+            {
+                event.preventDefault();
+
+                const listingId = selectedIds()[0];
+                const listing = listingId ? selectedListings[listingId] : null;
+                if (!listing || !listing.url)
+                {
+                    showMessage(messageSelectListing, 'lsd-error');
+                    return;
+                }
+
+                window.location.href = listing.url;
+            });
+
+            sortActiveClaims();
+            $root.data('lsdClaimsReady', true);
+        });
     });
 })(jQuery);

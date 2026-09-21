@@ -17,6 +17,13 @@ class LSD_PTypes_Listing extends LSD_PTypes
         $this->details_page_options = LSD_Options::details_page();
     }
 
+    public function form_id(string $id): string
+    {
+        $dashboard = LSD_Payload::get('dashboard');
+
+        return $dashboard instanceof LSD_Shortcodes_Dashboard ? $dashboard->form_id($id) : $id;
+    }
+
     public function init()
     {
         add_action('init', [$this, 'register_post_type']);
@@ -31,6 +38,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
 
         add_action('add_meta_boxes', [$this, 'register_metaboxes'], 10, 2);
         add_action('save_post', [$this, 'save'], 10, 2);
+        add_filter('admin_post_thumbnail_html', [$this, 'featured_image_alt'], 10, 3);
         add_filter('post_type_link', [$this, 'filter_link'], 10, 2);
 
         // AI Editor Button
@@ -185,6 +193,19 @@ class LSD_PTypes_Listing extends LSD_PTypes
         include $this->include_html_file('metaboxes/listing/details.php', ['return_path' => true]);
     }
 
+    public function featured_image_alt($content, $post_id, $thumbnail_id)
+    {
+        $post = get_post($post_id);
+        if (!$post || $post->post_type !== $this->PT || !LSD_Entity_Listing::custom_alt(true)) return $content;
+
+        $alt = get_post_meta($post_id, 'lsd_featured_image_alt', true);
+        $media_alt = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true);
+        $placeholder = $media_alt ?: __('Optional image alt text', 'listdom');
+        $content .= '<label class="lsd-fields-label" for="lsd_featured_image_alt">' . esc_html__('Alt Text', 'listdom') . '</label><input class="widefat lsd-admin-input" type="text" name="lsd[featured_image_alt]" id="lsd_featured_image_alt" value="' . esc_attr($alt) . '" placeholder="' . esc_attr($placeholder) . '"><p class="lsd-admin-description-tiny">' . esc_html__('This listing-specific text overrides the Media Library alt text.', 'listdom') . '</p>';
+
+        return $content;
+    }
+
     public function save($post_id, $post)
     {
         // It's not a listing
@@ -208,6 +229,12 @@ class LSD_PTypes_Listing extends LSD_PTypes
         {
             $lsd['gallery'] = $lsd['_gallery'];
             unset($lsd['_gallery']);
+        }
+
+        if (isset($lsd['_gallery_alt']) and is_array($lsd['_gallery_alt']))
+        {
+            $lsd['gallery_alt'] = $lsd['_gallery_alt'];
+            unset($lsd['_gallery_alt']);
         }
 
         // Embeds

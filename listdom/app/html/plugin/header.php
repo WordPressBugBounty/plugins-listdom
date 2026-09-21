@@ -20,7 +20,7 @@ $announcement_icon_urls = [
     'error' => $this->lsd_asset_url('img/announcement-exclamation.svg'),
 ];
 
-$render_announcement = function (array $announcement, string $tab) use ($announcement_icon_urls): void
+$render_announcement = function (array $announcement, string $tab) use ($announcement_icon_urls, $announcements): void
 {
     $id = sanitize_key((string) ($announcement['id'] ?? ''));
     if ($id === '') return;
@@ -31,7 +31,9 @@ $render_announcement = function (array $announcement, string $tab) use ($announc
     $severity_class = $severity === 'error' ? 'danger' : $severity;
     $created_at = (int) ($announcement['created_at'] ?? 0);
     $created_label = $created_at > 0 ? sprintf(esc_html__('%s ago', 'listdom'), human_time_diff($created_at, time())) : '';
-    $url = esc_url((string) ($announcement['url'] ?? ''));
+    $url = (string) ($announcement['url'] ?? '');
+    $is_site_relative_url = $announcements && $announcements->is_site_relative_url($url);
+    $url = $is_site_relative_url ? home_url($url) : esc_url($url);
     $cta_label = trim((string) ($announcement['cta_label'] ?? ''));
     if ($url && $cta_label === '') $cta_label = esc_html__('Learn More', 'listdom');
     ?>
@@ -54,7 +56,7 @@ $render_announcement = function (array $announcement, string $tab) use ($announc
             <?php if ($url || $tab === LSD_Announcements::STATE_ACTIVE): ?>
                 <div class="lsd-announcement-item-actions">
                     <?php if ($url): ?>
-                        <a class="lsd-announcement-item-cta lsd-primary-button" href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($cta_label); ?></a>
+                        <a class="lsd-announcement-item-cta lsd-primary-button" href="<?php echo esc_url($url); ?>"<?php if (!$is_site_relative_url): ?> target="_blank" rel="noopener noreferrer"<?php endif; ?>><?php echo esc_html($cta_label); ?></a>
                     <?php endif; ?>
                     <?php if ($tab === LSD_Announcements::STATE_ACTIVE): ?>
                         <button type="button" class="lsd-announcement-item-dismiss lsd-text-button" data-lsd-announcement-dismiss="<?php echo esc_attr($id); ?>"><?php echo esc_html__('Dismiss', 'listdom'); ?></button>

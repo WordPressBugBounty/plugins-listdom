@@ -29,7 +29,7 @@ class LSD_Shortcodes_AddListing extends LSD_Shortcodes_Dashboard
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-add-listing');
         if (trim($pre)) return $pre;
 
-        $this->bootstrap_shortcode_context($atts, true);
+        $this->setup($atts, true);
 
         // Mode
         $this->mode = isset($_GET['mode']) ? sanitize_text_field($_GET['mode']) : 'form';

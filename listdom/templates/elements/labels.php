@@ -12,7 +12,11 @@ if (!is_array($labels) || !count($labels)) return '';
     <ul class="lsd-labels-simple">
         <?php foreach ($labels as $label): ?>
             <li class="lsd-labels-simple-item">
-                <a href="<?php echo $this->enable_link ? esc_url(get_term_link($label->term_id, LSD_Base::TAX_LABEL)) : '#'; ?>"><?php echo esc_html($label->name); ?></a>
+                <?php if ($this->enable_link): ?>
+                    <a href="<?php echo esc_url(get_term_link($label->term_id, LSD_Base::TAX_LABEL)); ?>"><?php echo esc_html($label->name); ?></a>
+                <?php else: ?>
+                    <span class="lsd-single-term"><?php echo esc_html($label->name); ?></span>
+                <?php endif; ?>
             </li>
         <?php endforeach; ?>
     </ul>

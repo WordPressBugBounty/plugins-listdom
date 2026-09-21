@@ -46,7 +46,7 @@ abstract class LSD_Blueprints_Blueprint extends LSD_Base implements LSD_Blueprin
             $filter_definitions = array_merge([
                 's' => [
                     'key' => 's',
-                    'title' => 'Text Search',
+                    'title' => __('Text Search', 'listdom'),
                     'method' => 'text-input',
                     'placeholder' => '',
                     'default_value' => '',
@@ -115,6 +115,38 @@ abstract class LSD_Blueprints_Blueprint extends LSD_Base implements LSD_Blueprin
             'content' => $content,
             'reuse_existing' => true,
         ]);
+    }
+
+    protected function directory_shortcode(string $search_form_title): array
+    {
+        return [
+            'title' => esc_html__('List + Grid Directory Shortcode', 'listdom'),
+            'search_form_title' => $search_form_title,
+            'display' => [
+                'skin' => 'listgrid',
+                'listgrid' => [
+                    'style' => 'style1',
+                    'map_provider' => LSD_MP_LEAFLET,
+                    'map_position' => 'top',
+                    'clustering' => 1,
+                    'clustering_images' => 'img/cluster2/m',
+                    'mapobject_onclick' => 'infowindow',
+                    'mapsearch' => 1,
+                    'maplimit' => 300,
+                    'default_view' => 'grid',
+                    'columns' => 3,
+                    'limit' => 12,
+                    'pagination' => 'loadmore',
+                    'display_labels' => 1,
+                    'display_share_buttons' => 1,
+                ],
+            ],
+            'search' => [
+                'position' => 'top',
+                'searchable' => 1,
+            ],
+            'reuse_existing' => true,
+        ];
     }
 
     protected function demo_listing(string $title, string $category_name, array $extra = []): array

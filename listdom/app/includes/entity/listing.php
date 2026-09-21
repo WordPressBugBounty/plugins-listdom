@@ -20,6 +20,10 @@ class LSD_Entity_Listing extends LSD_Entity
         $submission = !empty($data['_lsd_submission']);
         if (isset($data['_lsd_submission'])) unset($data['_lsd_submission']);
 
+        $skip_location = !empty($data['_lsd_skip_location']);
+        if (isset($data['_lsd_skip_location'])) unset($data['_lsd_skip_location']);
+        $data_id = false;
+
         $category = isset($data['listing_category']) ? sanitize_text_field($data['listing_category']) : '';
         $term = $category ? get_term_by('term_id', $category, LSD_Base::TAX_CATEGORY) : null;
         $additional_categories = isset($data['listing_categories']) && is_array($data['listing_categories'])
@@ -46,17 +50,20 @@ class LSD_Entity_Listing extends LSD_Entity
         update_post_meta($this->post->ID, 'lsd_object_type', isset($data['object_type']) ? sanitize_text_field($data['object_type']) : 'marker');
         update_post_meta($this->post->ID, 'lsd_zoomlevel', isset($data['zoomlevel']) ? sanitize_text_field($data['zoomlevel']) : $this->settings['map_backend_zl']);
 
-        // Lat / Long
-        $lat = isset($data['latitude']) ? sanitize_text_field($data['latitude']) : $this->settings['map_backend_lt'];
-        $lng = isset($data['longitude']) ? sanitize_text_field($data['longitude']) : $this->settings['map_backend_ln'];
+        if (!$skip_location)
+        {
+            // Lat / Long
+            $lat = isset($data['latitude']) ? sanitize_text_field($data['latitude']) : $this->settings['map_backend_lt'];
+            $lng = isset($data['longitude']) ? sanitize_text_field($data['longitude']) : $this->settings['map_backend_ln'];
 
-        // Geo Point on WP Meta Table
-        update_post_meta($this->post->ID, 'lsd_address', isset($data['address']) ? sanitize_text_field($data['address']) : '');
-        update_post_meta($this->post->ID, 'lsd_latitude', $lat);
-        update_post_meta($this->post->ID, 'lsd_longitude', $lng);
+            // Geo Point on WP Meta Table
+            update_post_meta($this->post->ID, 'lsd_address', isset($data['address']) ? sanitize_text_field($data['address']) : '');
+            update_post_meta($this->post->ID, 'lsd_latitude', $lat);
+            update_post_meta($this->post->ID, 'lsd_longitude', $lng);
 
-        // Geo-point
-        $data_id = $this->update_geopoint($this->post->ID, $lat, $lng);
+            // Geo-point
+            $data_id = $this->update_geopoint($this->post->ID, $lat, $lng);
+        }
 
         // Shape
         update_post_meta($this->post->ID, 'lsd_shape_type', isset($data['shape_type']) ? sanitize_text_field($data['shape_type']) : '');
@@ -198,8 +205,28 @@ class LSD_Entity_Listing extends LSD_Entity
 
         update_post_meta($this->post->ID, 'lsd_displ', $display_options);
 
+        // Featured Image Alt Text
+        if (array_key_exists('featured_image_alt', $data))
+        {
+            update_post_meta($this->post->ID, 'lsd_featured_image_alt', sanitize_text_field($data['featured_image_alt']));
+        }
+
         // Gallery
-        update_post_meta($this->post->ID, 'lsd_gallery', isset($data['gallery']) ? array_map('sanitize_text_field', $data['gallery']) : []);
+        $gallery = isset($data['gallery']) && is_array($data['gallery']) ? array_map('absint', $data['gallery']) : [];
+        update_post_meta($this->post->ID, 'lsd_gallery', $gallery);
+
+        // Gallery Image Alt Text
+        if (array_key_exists('gallery_alt', $data))
+        {
+            $gallery_alt = [];
+            $gallery_alt_data = is_array($data['gallery_alt']) ? $data['gallery_alt'] : [];
+            foreach ($gallery as $image_id)
+            {
+                $alt = isset($gallery_alt_data[$image_id]) ? sanitize_text_field($gallery_alt_data[$image_id]) : '';
+                if ($alt !== '') $gallery_alt[(string) $image_id] = $alt;
+            }
+            update_post_meta($this->post->ID, 'lsd_gallery_alt', $gallery_alt);
+        }
 
         // Embeds
         if (array_key_exists('embeds', $data))
@@ -349,6 +376,43 @@ class LSD_Entity_Listing extends LSD_Entity
     {
         $element = new LSD_Element_Map();
         return $element->get($this->post->ID, $args);
+    }
+
+    public static function image_alt($listing_id, $attachment_id, bool $featured = false): string
+    {
+        $listing_id = (int) $listing_id;
+        $attachment_id = (int) $attachment_id;
+        $alt = '';
+        if (self::custom_alt($featured))
+        {
+            if ($featured) $alt = get_post_meta($listing_id, 'lsd_featured_image_alt', true);
+            else
+            {
+                $gallery_alt = get_post_meta($listing_id, 'lsd_gallery_alt', true);
+                if (is_array($gallery_alt) && isset($gallery_alt[$attachment_id])) $alt = $gallery_alt[$attachment_id];
+            }
+        }
+
+        $alt = is_scalar($alt) ? trim((string) $alt) : '';
+        if ($alt === '' && $attachment_id) $alt = trim((string) get_post_meta($attachment_id, '_wp_attachment_image_alt', true));
+
+        return $alt;
+    }
+
+    public static function custom_alt(bool $featured = false): bool
+    {
+        static $options = null;
+        if ($options === null)
+        {
+            $page_options = LSD_Options::details_page();
+            $elements = isset($page_options['elements']) && is_array($page_options['elements']) ? $page_options['elements'] : [];
+            $options = [
+                'image' => isset($elements['image']) && is_array($elements['image']) && !empty($elements['image']['custom_alt']),
+                'gallery' => isset($elements['gallery']) && is_array($elements['gallery']) && !empty($elements['gallery']['custom_alt']),
+            ];
+        }
+
+        return $featured ? $options['image'] : $options['gallery'];
     }
 
     public function get_featured_image($size = 'full', string $itemprop = 'image')
@@ -644,7 +708,14 @@ class LSD_Entity_Listing extends LSD_Entity
 
     public function is_claimed(): bool
     {
-        return $this->is('claimed') && class_exists(\LSDPACCLM\Base::class);
+        $claimed = apply_filters('lsd_is_claimed', $this->is('claimed') ? 1 : 0, $this->post->ID);
+        return (bool) $claimed && class_exists(\LSDPACCLM\Base::class);
+    }
+
+    public function is_verified(): bool
+    {
+        // Verified labels follow the claim badge lifecycle, not permanent ownership.
+        return class_exists(\LSDPACCLM\Claim::class) && \LSDPACCLM\Claim::badge_active($this->post->ID);
     }
 
     public function get_claim_button()

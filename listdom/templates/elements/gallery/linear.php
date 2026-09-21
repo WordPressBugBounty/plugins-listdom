@@ -22,6 +22,7 @@ $image_height = $params['image_height'] ?? '300';
 $image_itemprop = LSD_Schema::suppressing_markup() ? '' : ' itemprop="https://schema.org/image"';
 
 $gallery = $this->get_gallery($post_id, $include_thumbnail);
+$featured_image_id = get_post_thumbnail_id($post_id);
 
 // There is no Gallery!
 if (!count($gallery)) return '';
@@ -29,7 +30,7 @@ if (!count($gallery)) return '';
 <div class="lsd-gallery-linear" <?php echo lsd_schema()->scope()->type('https://schema.org/ImageGallery'); ?>>
     <?php
         $count = 0;
-        foreach ($gallery as $id)
+        foreach ($gallery as $index => $id)
         {
             if ($count >= $image_limit) break;
 
@@ -40,9 +41,10 @@ if (!count($gallery)) return '';
 
             $item_width = 100 / $image_limit;
             $count++;
+            $alt = LSD_Entity_Listing::image_alt($post_id, $id, $include_thumbnail && $index === 0 && (int) $id === (int) $featured_image_id);
             ?>
             <div class="lsd-gallery-grid-item" style="width: <?php echo esc_attr($item_width); ?>%;">
-                <img style="object-fit: <?php echo esc_attr($image_fit); ?>; max-height: <?php echo esc_attr($image_height); ?>px; min-height: <?php echo esc_attr($image_height); ?>px;" alt="" src="<?php echo esc_url($thumb[0]); ?>" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>"<?php echo $image_itemprop; ?>>
+                <img style="object-fit: <?php echo esc_attr($image_fit); ?>; max-height: <?php echo esc_attr($image_height); ?>px; min-height: <?php echo esc_attr($image_height); ?>px;" alt="<?php echo esc_attr($alt); ?>" src="<?php echo esc_url($thumb[0]); ?>" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>"<?php echo $image_itemprop; ?>>
             </div>
             <?php
         }
@@ -68,15 +70,16 @@ if (!count($gallery)) return '';
             </div>
             <div class="lsd-gallery-modal-content">
                 <div class="lsd-gallery-modal-images lsd-image-lightbox">
-                    <?php foreach ($gallery as $id): ?>
+                    <?php foreach ($gallery as $index => $id): ?>
                         <?php
                             $thumb = wp_get_attachment_image_src($id, [$width, $height]);
                             $full = wp_get_attachment_image_src($id, 'full');
                             if (!$full) continue;
+                            $alt = LSD_Entity_Listing::image_alt($post_id, $id, $include_thumbnail && $index === 0 && (int) $id === (int) $featured_image_id);
                         ?>
                         <div class="lsd-gallery-item">
-                            <?php if ($lightbox): echo '<a href="' . esc_url($full[0]) . '"><img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '></a>'; ?>
-                            <?php else: echo '<img alt="" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
+                            <?php if ($lightbox): echo '<a href="' . esc_url($full[0]) . '"><img alt="' . esc_attr($alt) . '" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '></a>'; ?>
+                            <?php else: echo '<img alt="' . esc_attr($alt) . '" src="' . esc_url($thumb[0]) . '" width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"' . $image_itemprop . '>'; ?>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>

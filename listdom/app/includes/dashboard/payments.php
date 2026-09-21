@@ -151,16 +151,47 @@ class LSD_Dashboard_Payments extends LSD_Base
     {
         $user_id = get_current_user_id();
         if ($user_id < 1) return false;
+        if (!$this->is_booking_only_order($order)) return false;
 
-        foreach ($this->get_order_booking_ids($order) as $booking_id)
+        $booking_ids = $this->get_order_booking_ids($order);
+        if (!$booking_ids) return false;
+
+        foreach ($booking_ids as $booking_id)
         {
             $listing_id = (int) get_post_meta($booking_id, 'lsd_listing', true);
             $listing = $listing_id ? get_post($listing_id) : null;
 
-            if ($listing instanceof WP_Post && (int) $listing->post_author === $user_id) return true;
+            if (!$listing instanceof WP_Post || (int) $listing->post_author !== $user_id) return false;
         }
 
-        return false;
+        return true;
+    }
+
+    protected function is_booking_only_order(LSD_Payments_Order $order): bool
+    {
+        // Booking owners may access only orders created exclusively for bookings.
+        if (count($order->get_items())) return false;
+
+        $fees = $order->get_fees();
+        if (!$fees)
+        {
+            return (bool) get_post_meta($order->get_id(), 'lsd_bookings', true)
+                || (bool) get_post_meta($order->get_id(), 'lsd_booking', true);
+        }
+
+        foreach ($fees as $fee)
+        {
+            if (!is_array($fee)) return false;
+
+            $meta = $fee['meta'] ?? [];
+            if (!is_array($meta)) return false;
+
+            $raw = $meta['lsd_booking_ids'] ?? ($meta['lsd_booking_id'] ?? ($meta['lsd_booking'] ?? null));
+            if (is_array($raw)) $raw = implode(',', $raw);
+            if (!is_string($raw) || trim($raw) === '') return false;
+        }
+
+        return (bool) $this->get_order_booking_ids($order);
     }
 
     public function get_order_booking_ids(LSD_Payments_Order $order): array
@@ -609,6 +640,11 @@ class LSD_Dashboard_Payments extends LSD_Base
         }
 
         $gateway = $recurring->get_gateway_instance();
+        if (!$gateway instanceof LSD_Payments_Gateway)
+        {
+            $this->response(['success' => 0, 'message' => esc_html__('Unable to disable auto renewal because the payment gateway is unavailable.', 'listdom')]);
+        }
+
         if ($gateway instanceof LSD_Payments_Gateway)
         {
             $result = $gateway->disable_autorenew($recurring);
@@ -618,7 +654,7 @@ class LSD_Dashboard_Payments extends LSD_Base
             }
         }
 
-        if (!LSD_Payments_Recurrings::cancel($recurring->get_id()))
+        if (!LSD_Payments_Recurrings::cancel($recurring->get_id(), true))
         {
             $this->response(['success' => 0, 'message' => esc_html__('Unable to disable auto renewal right now.', 'listdom')]);
         }
@@ -666,7 +702,21 @@ class LSD_Dashboard_Payments extends LSD_Base
             ]);
         }
 
+        if (!(bool) apply_filters('lsd_dashboard_payments_can_activate_autorenew', true, $recurring))
+        {
+            $this->response([
+                'success' => 0,
+                'message' => esc_html__('This subscription is no longer associated with an active service.', 'listdom'),
+                'redirect' => $redirect,
+            ]);
+        }
+
         $gateway = $recurring->get_gateway_instance();
+        if (!$gateway instanceof LSD_Payments_Gateway)
+        {
+            $this->response(['success' => 0, 'message' => esc_html__('Unable to activate auto renewal because the payment gateway is unavailable.', 'listdom')]);
+        }
+
         if ($gateway instanceof LSD_Payments_Gateway)
         {
             $result = $gateway->activate_autorenew($recurring);
@@ -1017,10 +1067,60 @@ class LSD_Dashboard_Payments extends LSD_Base
             'orderby' => 'date',
             'order' => 'DESC',
             'meta_query' => [
+                'relation' => 'OR',
                 [
-                    'key' => 'lsd_email',
-                    'value' => $user->user_email,
-                    'compare' => '=',
+                    'key' => 'lsd_claim_user_id',
+                    'value' => $user_id,
+                    'type' => 'NUMERIC',
+                ],
+                [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'lsd_email',
+                        'value' => $user->user_email,
+                        'compare' => '=',
+                    ],
+                    [
+                        'relation' => 'OR',
+                        [
+                            'relation' => 'AND',
+                            [
+                                'key' => 'lsd_claim_user_id',
+                                'compare' => 'NOT EXISTS',
+                            ],
+                            [
+                                'relation' => 'AND',
+                                [
+                                    'key' => 'lsd_ownership_assigned',
+                                    'compare' => 'NOT EXISTS',
+                                ],
+                                [
+                                    'key' => 'lsd_claim_badge_status',
+                                    'compare' => 'NOT EXISTS',
+                                ],
+                            ],
+                        ],
+                        [
+                            'relation' => 'AND',
+                            [
+                                'relation' => 'OR',
+                                [
+                                    'key' => 'lsd_claim_user_id',
+                                    'compare' => 'NOT EXISTS',
+                                ],
+                                [
+                                    'key' => 'lsd_claim_user_id',
+                                    'value' => 0,
+                                    'type' => 'NUMERIC',
+                                ],
+                            ],
+                            [
+                                'key' => 'lsd_status',
+                                'value' => \LSDPACCLM\Base::CLAIM_PENDING,
+                                'type' => 'NUMERIC',
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ]);
@@ -1040,6 +1140,12 @@ class LSD_Dashboard_Payments extends LSD_Base
             $product_id = (int) get_post_meta($claim->ID, 'lsd_product', true);
             $plan = $product_id ? new LSD_Payments_Plan($product_id) : null;
             $related_order = $related_order_id ? LSD_Payments_Orders::get($related_order_id) : null;
+            if ($related_order instanceof LSD_Payments_Order && $related_order->get_user_id() !== $user_id)
+            {
+                // A claimant must not see the payer's order details.
+                $related_order_id = 0;
+                $related_order = null;
+            }
             $payment_status = (int) get_post_meta($claim->ID, 'lsd_payment', true);
             $claim_status = (int) get_post_meta($claim->ID, 'lsd_status', true);
 
@@ -1625,6 +1731,8 @@ class LSD_Dashboard_Payments extends LSD_Base
     {
         $order_id = (int) ($activity['order_id'] ?? 0);
         $order = $order_id ? LSD_Payments_Orders::get($order_id) : null;
+        $activity_user_id = $user_id ?: get_current_user_id();
+        if ($order instanceof LSD_Payments_Order && $activity_user_id > 0 && $order->get_user_id() !== $activity_user_id && !$this->can_access_order_detail($order)) $order = null;
 
         if ($order instanceof LSD_Payments_Order)
         {

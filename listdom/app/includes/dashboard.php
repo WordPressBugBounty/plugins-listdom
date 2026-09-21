@@ -112,7 +112,27 @@ class LSD_Dashboard extends LSD_Base
 
     public static function is_dashboard(): bool
     {
-        return self::is_fd_page() || self::is_add_page();
+        return self::is_fd_page() || self::is_add_page() || self::has_elementor_dashboard();
+    }
+
+    public static function has_elementor_dashboard(): bool
+    {
+        $post = get_post();
+        if ($post instanceof WP_Post && self::post_has_elementor_dashboard($post->ID)) return true;
+
+        if (!is_singular() || !class_exists('\ElementorPro\\Modules\\ThemeBuilder\\Module')) return false;
+
+        $documents = \ElementorPro\Modules\ThemeBuilder\Module::instance()
+            ->get_conditions_manager()
+            ->get_documents_for_location('single');
+
+        foreach ($documents as $document)
+        {
+            $template = $document->get_post();
+            if ($template instanceof WP_Post && self::post_has_elementor_dashboard($template->ID)) return true;
+        }
+
+        return false;
     }
 
     public static function is_fd_page(): bool
@@ -122,6 +142,9 @@ class LSD_Dashboard extends LSD_Base
 
     public static function is_add_page(): bool
     {
+        $settings = LSD_Options::settings();
+        if (array_key_exists('add_listing_page_status', $settings) && empty($settings['add_listing_page_status'])) return false;
+
         return self::is_page_with_shortcode('add_listing_page', 'listdom-add-listing');
     }
 
@@ -139,5 +162,27 @@ class LSD_Dashboard extends LSD_Base
         if (!is_string($content) || trim($content) === '') return false;
 
         return (bool) preg_match('/\[(' . preg_quote($shortcode, '/') . ')(\s|]|\/)/i', $content);
+    }
+
+    private static function post_has_elementor_dashboard(int $post_id): bool
+    {
+        $elements = get_post_meta($post_id, '_elementor_data', true);
+        if (is_string($elements)) $elements = json_decode($elements, true);
+        if (!is_array($elements)) return false;
+
+        return self::contains_elementor_dashboard($elements);
+    }
+
+    private static function contains_elementor_dashboard(array $elements): bool
+    {
+        foreach ($elements as $element)
+        {
+            if (!is_array($element)) continue;
+            if (($element['widgetType'] ?? '') === 'lsd-frontend-dashboard') return true;
+
+            if (!empty($element['elements']) && is_array($element['elements']) && self::contains_elementor_dashboard($element['elements'])) return true;
+        }
+
+        return false;
     }
 }

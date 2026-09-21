@@ -1620,16 +1620,16 @@
         },
         {
             "name": "webilia/connect",
-            "version": "1.0.1",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webilia/webilia-connect.git",
-                "reference": "6c54a14e79c9690ce48a1fd5726490d6245155f8"
+                "reference": "9a648e89dc80a1c2a5fb8ac21ad8bdb0a1afc95a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webilia/webilia-connect/zipball/6c54a14e79c9690ce48a1fd5726490d6245155f8",
-                "reference": "6c54a14e79c9690ce48a1fd5726490d6245155f8",
+                "url": "https://api.github.com/repos/webilia/webilia-connect/zipball/9a648e89dc80a1c2a5fb8ac21ad8bdb0a1afc95a",
+                "reference": "9a648e89dc80a1c2a5fb8ac21ad8bdb0a1afc95a",
                 "shasum": ""
             },
             "require": {
@@ -1653,9 +1653,9 @@
             "description": "Webilia Connect SDK for WordPress products.",
             "support": {
                 "issues": "https://github.com/webilia/webilia-connect/issues",
-                "source": "https://github.com/webilia/webilia-connect/tree/v1.0.1"
+                "source": "https://github.com/webilia/webilia-connect/tree/v1.1.0"
             },
-            "time": "2026-08-22T19:56:31+00:00"
+            "time": "2026-09-19T15:10:07+00:00"
         },
         {
             "name": "webilia/icons",

@@ -13,6 +13,7 @@ $assets = new LSD_Assets();
 
 // Listing Image
 $image_attributes = (LSD_Schema::suppressing_markup() || LSD_Schema::suppressing_default_listing_properties()) ? [] : ['itemprop' => 'image'];
+$image_attributes['alt'] = LSD_Entity_Listing::image_alt($post_id, get_post_thumbnail_id($post_id), true);
 $image = get_the_post_thumbnail($post_id, $size, $image_attributes);
 
 // No Image

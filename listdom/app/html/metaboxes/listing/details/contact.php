@@ -10,6 +10,7 @@ $email = get_post_meta($post->ID, 'lsd_email', true);
 $phone = get_post_meta($post->ID, 'lsd_phone', true);
 $website = get_post_meta($post->ID, 'lsd_website', true);
 $contact_address = get_post_meta($post->ID, 'lsd_contact_address', true);
+$form_id = [$this, 'form_id'];
 
 $use_dashboard_settings = $dashboard instanceof LSD_Shortcodes_Dashboard;
 $contact_field_settings = $use_dashboard_settings ? ($this->settings['submission_contact_fields'] ?? []) : [];
@@ -26,10 +27,10 @@ $show_contact_address = !$use_dashboard_settings || !isset($contact_field_settin
     <div class="lsd-form-row">
         <?php if ($show_email): ?>
             <div class="lsd-col-2">
-                <label class="lsd-fields-label" for="lsd_email"><?php esc_html_e('Email', 'listdom'); ?><?php $dashboard && $dashboard->required_html('email'); ?></label>
+                <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_email')); ?>"><?php esc_html_e('Email', 'listdom'); ?><?php $dashboard && $dashboard->required_html('email'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input class="lsd-admin-input" type="email" name="lsd[email]" id="lsd_email" placeholder="<?php esc_attr_e('Email', 'listdom'); ?>" value="<?php echo esc_attr($email); ?>">
+                <input class="lsd-admin-input" type="email" name="lsd[email]" id="<?php echo esc_attr($form_id('lsd_email')); ?>" placeholder="<?php esc_attr_e('Email', 'listdom'); ?>" value="<?php echo esc_attr($email); ?>">
             </div>
         <?php elseif ($use_dashboard_settings): ?>
             <input type="hidden" name="lsd[email]" value="<?php echo esc_attr($email); ?>">
@@ -38,10 +39,10 @@ $show_contact_address = !$use_dashboard_settings || !isset($contact_field_settin
     <div class="lsd-form-row">
         <?php if ($show_phone): ?>
             <div class="lsd-col-2">
-                <label class="lsd-fields-label" for="lsd_phone"><?php esc_html_e('Phone', 'listdom'); ?><?php $dashboard && $dashboard->required_html('phone'); ?></label>
+                <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_phone')); ?>"><?php esc_html_e('Phone', 'listdom'); ?><?php $dashboard && $dashboard->required_html('phone'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input class="lsd-admin-input" type="tel" name="lsd[phone]" id="lsd_phone" placeholder="<?php esc_attr_e('Phone', 'listdom'); ?>" value="<?php echo esc_attr($phone); ?>">
+                <input class="lsd-admin-input" type="tel" name="lsd[phone]" id="<?php echo esc_attr($form_id('lsd_phone')); ?>" placeholder="<?php esc_attr_e('Phone', 'listdom'); ?>" value="<?php echo esc_attr($phone); ?>">
             </div>
         <?php elseif ($use_dashboard_settings): ?>
             <input type="hidden" name="lsd[phone]" value="<?php echo esc_attr($phone); ?>">
@@ -50,10 +51,10 @@ $show_contact_address = !$use_dashboard_settings || !isset($contact_field_settin
     <div class="lsd-form-row">
         <?php if ($show_website): ?>
             <div class="lsd-col-2">
-                <label class="lsd-fields-label" for="lsd_website"><?php esc_html_e('Website', 'listdom'); ?><?php $dashboard && $dashboard->required_html('website'); ?></label>
+                <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_website')); ?>"><?php esc_html_e('Website', 'listdom'); ?><?php $dashboard && $dashboard->required_html('website'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input class="lsd-admin-input" type="url" name="lsd[website]" id="lsd_website" placeholder="<?php esc_attr_e('https://yourwebsite.com', 'listdom'); ?>" value="<?php echo esc_url($website); ?>">
+                <input class="lsd-admin-input" type="url" name="lsd[website]" id="<?php echo esc_attr($form_id('lsd_website')); ?>" placeholder="<?php esc_attr_e('https://yourwebsite.com', 'listdom'); ?>" value="<?php echo esc_url($website); ?>">
             </div>
         <?php elseif ($use_dashboard_settings): ?>
             <input type="hidden" name="lsd[website]" value="<?php echo esc_url($website); ?>">
@@ -62,10 +63,10 @@ $show_contact_address = !$use_dashboard_settings || !isset($contact_field_settin
     <div class="lsd-form-row">
         <?php if ($show_contact_address): ?>
             <div class="lsd-col-2">
-                <label class="lsd-fields-label" for="lsd_contact_address"><?php esc_html_e('Contact Address', 'listdom'); ?><?php $dashboard && $dashboard->required_html('contact_address'); ?></label>
+                <label class="lsd-fields-label" for="<?php echo esc_attr($form_id('lsd_contact_address')); ?>"><?php esc_html_e('Contact Address', 'listdom'); ?><?php $dashboard && $dashboard->required_html('contact_address'); ?></label>
             </div>
             <div class="lsd-col-8">
-                <input class="lsd-admin-input" type="text" name="lsd[contact_address]" id="lsd_contact_address" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($contact_address); ?>">
+                <input class="lsd-admin-input" type="text" name="lsd[contact_address]" id="<?php echo esc_attr($form_id('lsd_contact_address')); ?>" placeholder="<?php echo esc_attr($this->settings['address_placeholder'] ?? ''); ?>" value="<?php echo esc_attr($contact_address); ?>">
             </div>
         <?php elseif ($use_dashboard_settings): ?>
             <input type="hidden" name="lsd[contact_address]" value="<?php echo esc_attr($contact_address); ?>">

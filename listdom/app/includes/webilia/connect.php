@@ -8,7 +8,10 @@ class LSD_Webilia_Connect
 {
     private const BROKER_INTEGRATION = 'listdom';
     private const WINDOWS_STORAGE_KEY_OPTION = 'lsd_webilia_connect_windows_key';
+    private const CONNECTION_STATUS_TRANSIENT = 'lsd_webilia_connect_status';
+    private const CONNECTION_STATUS_CACHE_TTL = 300;
     private static ?Client $client = null;
+    private static ?bool $connection_status = null;
     private static array $authorizations = [];
     private static string $error = '';
 
@@ -20,14 +23,69 @@ class LSD_Webilia_Connect
     public static function isConnected(): bool
     {
         if (!self::enabled()) return false;
+        if (self::$connection_status !== null) return self::$connection_status;
+
         try
         {
-            return self::client()->isConnected();
+            $client = self::client();
+            if (!$client->isConnected()) return self::rememberConnectionStatus(false);
+
+            if ((int) get_transient(self::CONNECTION_STATUS_TRANSIENT) === 1) return self::$connection_status = true;
+
+            if (method_exists($client, 'verifyConnection')) {
+                return self::rememberConnectionStatus($client->verifyConnection());
+            }
+
+            $connection = $client->connection();
+            if (!$connection) return self::rememberConnectionStatus(false);
+
+            $response = wp_remote_post(rtrim(defined('LSD_WEBILIA_CONNECT_API') ? LSD_WEBILIA_CONNECT_API : 'https://api.webilia.com', '/') . '/v1/connect/status', [
+                'timeout' => 15,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . $connection->credential(),
+                ],
+                'body' => wp_json_encode([]),
+            ]);
+
+            if (is_wp_error($response))
+            {
+                self::$error = $response->get_error_message();
+                return self::rememberConnectionStatus(true);
+            }
+
+            $status_code = (int) wp_remote_retrieve_response_code($response);
+            if ($status_code === 401)
+            {
+                (new WordPressStorage())->forgetConnectionWithCredential($connection->credential());
+                return self::rememberConnectionStatus(false);
+            }
+
+            if ($status_code < 200 || $status_code >= 300)
+            {
+                self::$error = 'Webilia Connect status verification failed.';
+                return self::rememberConnectionStatus(true);
+            }
+
+            $payload = json_decode((string) wp_remote_retrieve_body($response), true);
+            if (!is_array($payload) || (array_key_exists('success', $payload) && $payload['success'] !== true))
+            {
+                self::$error = is_array($payload) ? (string) ($payload['message'] ?? 'Webilia Connect status verification failed.') : 'Webilia Connect status verification failed.';
+                return self::rememberConnectionStatus(true);
+            }
+
+            $data = is_array($payload) && isset($payload['data']) && is_array($payload['data']) ? $payload['data'] : [];
+            $connected = ($data['status'] ?? '') === 'active' && (int) ($data['connection_id'] ?? 0) === (int) $connection->id();
+
+            if (!$connected) (new WordPressStorage())->forgetConnectionWithCredential($connection->credential());
+
+            return self::rememberConnectionStatus($connected);
         }
         catch (Throwable $e)
         {
             self::$error = $e->getMessage();
-            return false;
+            return self::$connection_status = false;
         }
     }
 
@@ -138,6 +196,8 @@ class LSD_Webilia_Connect
     {
         self::client()->complete($code, $state);
 
+        delete_transient(self::CONNECTION_STATUS_TRANSIENT);
+        self::$connection_status = null;
         self::$authorizations = [];
         self::$error = '';
     }
@@ -150,6 +210,8 @@ class LSD_Webilia_Connect
         try
         {
             self::client()->disconnect();
+            delete_transient(self::CONNECTION_STATUS_TRANSIENT);
+            self::$connection_status = null;
             self::$authorizations = [];
             self::$error = '';
         }
@@ -167,6 +229,16 @@ class LSD_Webilia_Connect
     public static function error(): string
     {
         return self::$error;
+    }
+
+    private static function rememberConnectionStatus(bool $connected): bool
+    {
+        self::$connection_status = $connected;
+
+        if ($connected) set_transient(self::CONNECTION_STATUS_TRANSIENT, 1, self::CONNECTION_STATUS_CACHE_TTL);
+        else delete_transient(self::CONNECTION_STATUS_TRANSIENT);
+
+        return $connected;
     }
 
     public static function forgetAuthorization(string $basename): void
@@ -250,6 +322,65 @@ class LSD_Webilia_Connect
         }
 
         return $package;
+    }
+
+    /**
+     * Retrieve the API-owned Overture Places taxonomy for the connected website.
+     * The later search UI owns the short-lived WordPress transient cache.
+     *
+     * @throws RuntimeException
+     */
+    public static function overtureCategories(array $query = []): array
+    {
+        if (!self::enabled() || !self::isConnected())
+        {
+            throw new RuntimeException('Webilia Connect is unavailable.');
+        }
+
+        $client = self::client();
+        if (!method_exists($client, 'overturePlaceCategories'))
+        {
+            throw new RuntimeException('Overture Places requires Webilia Connect SDK 1.1.0 or newer.');
+        }
+
+        try
+        {
+            return $client->overturePlaceCategories($query);
+        }
+        catch (Throwable $e)
+        {
+            self::$error = $e->getMessage();
+            throw new RuntimeException('Webilia could not provide Overture categories.', 0, $e);
+        }
+    }
+
+    /**
+     * Execute one bounded, metered Overture Places search for the connected website.
+     *
+     * @throws RuntimeException
+     */
+    public static function overturePlacesSearch(array $request): array
+    {
+        if (!self::enabled() || !self::isConnected())
+        {
+            throw new RuntimeException('Webilia Connect is unavailable.');
+        }
+
+        $client = self::client();
+        if (!method_exists($client, 'overturePlacesSearch'))
+        {
+            throw new RuntimeException('Overture Places requires Webilia Connect SDK 1.1.0 or newer.');
+        }
+
+        try
+        {
+            return $client->overturePlacesSearch($request);
+        }
+        catch (Throwable $e)
+        {
+            self::$error = $e->getMessage();
+            throw new RuntimeException('Webilia could not complete the Overture Places search.', 0, $e);
+        }
     }
 
     private static function client(): Client

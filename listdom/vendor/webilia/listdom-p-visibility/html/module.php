@@ -3,12 +3,14 @@
 defined('ABSPATH') || die();
 
 /** @var WP_Post $post */
+/** @var LSD_Shortcodes_Dashboard|null $dashboard */
 
 $visible_from = get_post_meta($post->ID, 'lsd_visible_from', true);
 $visible_until = get_post_meta($post->ID, 'lsd_visible_until', true);
 
-$visible_from_id = 'lsd_listing_visible_from_' . $post->ID;
-$visible_until_id = 'lsd_listing_visible_until_' . $post->ID;
+$id_suffix = $dashboard instanceof \LSD_Shortcodes_Dashboard ? $dashboard->form_id('') : '';
+$visible_from_id = 'lsd_listing_visible_from_' . $post->ID . $id_suffix;
+$visible_until_id = 'lsd_listing_visible_until_' . $post->ID . $id_suffix;
 ?>
 <div class="lsd-listing-module-visibility <?php echo \LSD_Base::get_lsd_class('box-white'); ?>">
     <div class="lsd-form-row">

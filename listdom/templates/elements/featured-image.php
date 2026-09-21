@@ -9,6 +9,7 @@ defined('ABSPATH') || die();
 $schema = [];
 if (!isset($itemprop)) $itemprop = 'image';
 if (trim($itemprop) && !LSD_Schema::suppressing_markup()) $schema['itemprop'] = $itemprop;
+$schema['alt'] = LSD_Entity_Listing::image_alt($post_id, get_post_thumbnail_id($post_id), true);
 
 // Listing Image
 $image = get_the_post_thumbnail($post_id, $size, $schema);

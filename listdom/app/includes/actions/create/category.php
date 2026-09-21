@@ -55,9 +55,17 @@ class LSD_Actions_Create_Category extends LSD_Actions_Action
 
         $input['slug'] = $input['slug'] !== '' ? sanitize_title($input['slug']) : '';
         $warnings = [];
-        $existing = $input['slug'] !== ''
-            ? get_term_by('slug', $input['slug'], $input['taxonomy'])
-            : get_term_by('name', $input['name'], $input['taxonomy']);
+        $term_query = [
+            'taxonomy' => $input['taxonomy'],
+            'parent' => max(0, (int) $input['parent']),
+            'hide_empty' => false,
+            'number' => 1,
+        ];
+        if ($input['slug'] !== '') $term_query['slug'] = $input['slug'];
+        else $term_query['name'] = $input['name'];
+
+        $terms = get_terms($term_query);
+        $existing = !is_wp_error($terms) && is_array($terms) && count($terms) ? $terms[0] : null;
 
         if ($existing instanceof WP_Term)
         {
@@ -95,8 +103,6 @@ class LSD_Actions_Create_Category extends LSD_Actions_Action
         $term_id = (int) ($input['existing_term_id'] ?? 0);
         if (!empty($input['reuse_existing_mode']) && $term_id > 0)
         {
-            $this->mark_term($term_id, $context);
-
             return $this->success(esc_html__('Existing category reused.', 'listdom'), [
                 'term_id' => $term_id,
                 'taxonomy' => $input['taxonomy'],
@@ -140,6 +146,7 @@ class LSD_Actions_Create_Category extends LSD_Actions_Action
         if ($input['icon'] !== '') update_term_meta($term_id, 'lsd_icon', $input['icon']);
         if ($input['color'] !== '') update_term_meta($term_id, 'lsd_color', $input['color']);
         $this->mark_term($term_id, $context);
+        if ($creating && $context->source() === 'blueprint') update_term_meta((int) $term_id, 'lsd_blueprint_owned', '1');
 
         return $this->success(
             $creating ? esc_html__('Category created successfully.', 'listdom') : esc_html__('Category updated successfully.', 'listdom'),
