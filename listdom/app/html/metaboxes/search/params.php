@@ -54,7 +54,7 @@ $level_status = $data['level_status'] ?? 'dependant';
 $ai_options = LSD_Options::ai();
 $has_ai_profiles = isset($ai_options['profiles']) && is_array($ai_options['profiles']) && count($ai_options['profiles']);
 $method = isset($methods[$method]) ? $method : ((string) array_key_first($methods) ?: 'text-input');
-$ai_method_available = isset($methods['ai-search']) && class_exists(\LSDPACAPS\AI::class) && (new \LSDPACAPS\AI())->search_enabled();
+$ai_method_available = isset($methods['ai-search']) && class_exists(\LSDPACAPS\AI::class) && method_exists(\LSDPACAPS\AI::class, 'search_enabled') && (new \LSDPACAPS\AI())->search_enabled();
 
 $label = isset($field['title']) && trim($field['title']) ? $field['title'] : ($data['title'] ?? 'N/A');
 ?>

@@ -1170,7 +1170,7 @@ class LSD_Dashboard_Payments extends LSD_Base
 
     public function get_topup_activity(int $user_id, array $order_ids = []): array
     {
-        if ($user_id < 1 || !class_exists('\LSDPACTUP\Topup')) return [];
+        if ($user_id < 1 || !class_exists('\LSDPACTUP\Topup') || !method_exists(\LSDPACTUP\Topup::class, 'options')) return [];
 
         $listings = $this->get_user_listings($user_id);
         if (!count($listings)) return [];
@@ -1395,12 +1395,12 @@ class LSD_Dashboard_Payments extends LSD_Base
         $plan_id = (int) ($item['plan_id'] ?? 0);
         $listing_id = (int) ($meta['lsd_listing_id'] ?? 0);
 
-        if ($listing_id && $plan_id && class_exists('\LSDPACLBL\Addon') && count(\LSDPACLBL\Addon::get_terms_id($plan_id)))
+        if ($listing_id && $plan_id && class_exists('\LSDPACLBL\Addon') && is_callable([\LSDPACLBL\Addon::class, 'get_terms_id']) && count(\LSDPACLBL\Addon::get_terms_id($plan_id)))
         {
             return 'labelize';
         }
 
-        if ($listing_id && $plan_id && class_exists('\LSDPACTUP\Topup'))
+        if ($listing_id && $plan_id && class_exists('\LSDPACTUP\Topup') && method_exists(\LSDPACTUP\Topup::class, 'options'))
         {
             $topup = new \LSDPACTUP\Topup();
             $product = $topup->options()['product'] ?? [];

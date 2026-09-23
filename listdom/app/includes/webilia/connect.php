@@ -89,6 +89,24 @@ class LSD_Webilia_Connect
         }
     }
 
+    /**
+     * Check the locally stored connection without making a status request.
+     */
+    public static function hasConnection(): bool
+    {
+        if (!self::enabled()) return false;
+
+        try
+        {
+            return self::client()->isConnected();
+        }
+        catch (Throwable $e)
+        {
+            self::$error = $e->getMessage();
+            return false;
+        }
+    }
+
     public static function isAllowed(string $basename, string $type = 'use'): bool
     {
         if (!self::enabled() || !self::integration($basename) || !self::isConnected()) return false;
@@ -258,9 +276,12 @@ class LSD_Webilia_Connect
         return $integration === '' ? '' : $integration . '.' . $type;
     }
 
-    public static function updateClient(string $basename, string $version): void
+    /**
+     * @param callable(): array|object|false|null $fallback
+     */
+    public static function updateClient(string $basename, string $version, ?callable $fallback = null): bool
     {
-        if (!self::enabled() || self::integration($basename) === '') return;
+        if (!self::enabled() || self::integration($basename) === '') return false;
 
         // Update delivery is an enhancement to the existing licensing path.
         // Never let a missing or incompatible SDK build prevent Listdom (or a
@@ -269,18 +290,27 @@ class LSD_Webilia_Connect
         if (!class_exists($update_client))
         {
             self::$error = 'Webilia Connect update support is unavailable.';
-            return;
+            return false;
         }
 
         try
         {
-            new $update_client(self::client(), self::integration($basename), $version, $basename, LSD_VERSION, self::capability($basename, 'update'));
+            // Older SDKs do not support the controlled legacy fallback. Keep their
+            // existing updater path rather than registering an incomplete one.
+            $constructor = new ReflectionMethod($update_client, '__construct');
+            if ($constructor->getNumberOfParameters() < 7) return false;
+
+            new $update_client(self::client(), self::integration($basename), $version, $basename, LSD_VERSION, self::capability($basename, 'update'), $fallback);
+
+            return true;
         }
         catch (Throwable $e)
         {
             // Keep the established update client and all legacy licensing
             // behaviour available when Connect cannot initialize.
             self::$error = $e->getMessage();
+
+            return false;
         }
     }
 

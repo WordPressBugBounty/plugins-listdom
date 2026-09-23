@@ -226,6 +226,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
                     ($filter['key'] ?? '') === 's'
                     && (($filter['method'] ?? 'text-input') === 'ai-search')
                     && class_exists(\LSDPACAPS\AI::class)
+                    && method_exists(\LSDPACAPS\AI::class, 'search_enabled')
                     && (new \LSDPACAPS\AI())->search_enabled()
                     && (!isset($filter['ai_fancy_style']) || (int) $filter['ai_fancy_style'] === 1)
                 ) $extra_classes[] = 'lsd-search-filter-ai-fancy';
@@ -475,7 +476,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         $default = $filter['default_value'] ?? '';
         $current = $this->current($name, $default);
 
-        $is_ai_mode = $method === 'ai-search' && class_exists(\LSDPACAPS\AI::class) && (new \LSDPACAPS\AI())->search_enabled();
+        $is_ai_mode = $method === 'ai-search' && class_exists(\LSDPACAPS\AI::class) && method_exists(\LSDPACAPS\AI::class, 'search_enabled') && (new \LSDPACAPS\AI())->search_enabled();
         $fancy_style = !isset($filter['ai_fancy_style']) || (int) $filter['ai_fancy_style'] === 1;
 
         $wrapper_classes = ['lsd-search-input-clear-wrap'];

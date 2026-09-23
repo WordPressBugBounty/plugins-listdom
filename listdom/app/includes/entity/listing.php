@@ -715,7 +715,7 @@ class LSD_Entity_Listing extends LSD_Entity
     public function is_verified(): bool
     {
         // Verified labels follow the claim badge lifecycle, not permanent ownership.
-        return class_exists(\LSDPACCLM\Claim::class) && \LSDPACCLM\Claim::badge_active($this->post->ID);
+        return class_exists(\LSDPACCLM\Claim::class) && is_callable([\LSDPACCLM\Claim::class, 'badge_active']) && \LSDPACCLM\Claim::badge_active($this->post->ID);
     }
 
     public function get_claim_button()

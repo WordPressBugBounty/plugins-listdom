@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 4.2
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 6.1.0
+Stable tag: 6.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -445,6 +445,11 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 6.1.1 =
+* Improved Webilia Connect update checks to reduce unnecessary requests.
+* Improved compatibility with installed add-ons when their versions differ.
+* Fixed guest dashboard listing changes to honor guest-submission permissions.
 
 = 6.1.0 =
 * Added an interactive setup wizard to help launch a directory site.

@@ -216,7 +216,6 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         // Delete Listing
         add_action('wp_ajax_lsd_dashboard_listing_delete', [$this, 'delete']);
-        add_action('wp_ajax_nopriv_lsd_dashboard_listing_delete', [$this, 'delete']);
 
         // Change Listing Status
         add_action('wp_ajax_lsd_dashboard_listing_status', [$this, 'status_action']);
@@ -948,6 +947,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Nonce is not valid!
         if (!wp_verify_nonce(sanitize_text_field($_POST['_wpnonce']), 'lsd_dashboard')) $this->response(['success' => 0, 'message' => esc_html__('Security nonce is not valid!', 'listdom')]);
 
+        // Guest submissions are disabled!
+        if (!get_current_user_id() && !$this->guest_status) $this->response(['success' => 0, 'message' => esc_html__('Guest submission is not allowed!', 'listdom')]);
+
         $g_recaptcha_response = isset($_POST['g-recaptcha-response']) ? sanitize_text_field($_POST['g-recaptcha-response']) : null;
         if (!LSD_Main::grecaptcha_check($g_recaptcha_response)) $this->response(['success' => 0, 'message' => esc_html__("Google recaptcha is invalid.", 'listdom')]);
 
@@ -1385,7 +1387,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             if (class_exists('\LSDPACLBL\Access'))
             {
                 $access = new \LSDPACLBL\Access();
-                $package_labels = class_exists('\LSDPACLBL\Addon') ? \LSDPACLBL\Addon::package_label_ids((int) $id) : [];
+                $package_labels = class_exists('\LSDPACLBL\Addon') && is_callable([\LSDPACLBL\Addon::class, 'package_label_ids']) ? \LSDPACLBL\Addon::package_label_ids((int) $id) : [];
                 $labels = array_values(array_unique(array_merge($labels, $package_labels)));
                 $labels = array_values(array_filter(array_map('absint', $labels), static function (int $label_id) use ($id, $access, $package_labels): bool
                 {
@@ -1667,7 +1669,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $listing = get_post($id);
 
         // Listing not Found!
-        if (!isset($listing->ID)) $this->response(['success' => 0]);
+        if (!isset($listing->ID) || $listing->post_type !== LSD_Base::PTYPE_LISTING) $this->response(['success' => 0]);
 
         // Current User Cannot Remove Listing of Others
         if ($listing->post_author != get_current_user_id() && !current_user_can('delete_others_posts')) $this->response(['success' => 0]);

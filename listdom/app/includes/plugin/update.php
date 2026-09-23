@@ -20,6 +20,16 @@ class LSD_Plugin_Update
     private $license_gate;
 
     /**
+     * @var string
+     */
+    private $version;
+
+    /**
+     * @var string
+     */
+    private $server;
+
+    /**
      * Initialize a new instance of the WordPress Auto-Update class
      *
      * @param array $args
@@ -29,19 +39,28 @@ class LSD_Plugin_Update
         $this->basename = $args['basename'];
         $this->prefix = $args['prefix'] ?? '';
         $this->license_gate = $args['license_gate'] ?? true;
+        $this->version = $args['version'];
+        $this->server = $args['server'] ?? 'https://api.webilia.com/update';
 
-        // Webilia Update Server
-        new Update(
-            $args['version'],
-            $this->basename,
-            null,
-            LSD_VERSION,
-            $args['server'] ?? 'https://api.webilia.com/update'
-        );
+        // A connected site uses one Connect request per product. The API
+        // performs the update-capability check as part of that request; the
+        // legacy endpoint is contacted only when Connect cannot serve it.
+        $connect_update_client = LSD_Webilia_Connect::enabled()
+            && LSD_Webilia_Connect::hasConnection()
+            && LSD_Webilia_Connect::updateClient($this->basename, $this->version, function () {
+                return $this->legacyRemoteInformation();
+            });
 
-        // Connect registers after legacy metadata and only overrides its
-        // package when the configured update capability is authorized.
-        LSD_Webilia_Connect::updateClient($this->basename, $args['version']);
+        if (!$connect_update_client)
+        {
+            new Update(
+                $this->version,
+                $this->basename,
+                null,
+                LSD_VERSION,
+                $this->server
+            );
+        }
 
         if ($this->license_gate)
         {
@@ -112,5 +131,32 @@ class LSD_Plugin_Update
             '<br>%s',
             $message
         );
+    }
+
+    /**
+     * Keep the legacy update channel available for a connected site when
+     * Connect denies the product or its service is temporarily unavailable.
+     *
+     * @return object|false
+     */
+    private function legacyRemoteInformation()
+    {
+        $request = wp_remote_post($this->server, [
+            'body' => [
+                'action' => 'info',
+                'basename' => $this->basename,
+                'current' => $this->version,
+                'core' => LSD_VERSION,
+                'code' => '',
+                'url' => get_site_url(),
+            ],
+        ]);
+
+        if (!is_wp_error($request) && wp_remote_retrieve_response_code($request) === 200)
+        {
+            return json_decode(wp_remote_retrieve_body($request));
+        }
+
+        return false;
     }
 }

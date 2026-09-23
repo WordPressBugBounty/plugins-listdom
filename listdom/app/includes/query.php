@@ -43,7 +43,7 @@ class LSD_Query extends LSD_Base
         else if ($id == 'rate') $field = 'lsd_rate';
         else if (strpos($id, 'revf-') === 0)
         {
-            if (!class_exists(\LSDPACREV\Reviews::class)) return false;
+            if (!class_exists(\LSDPACREV\Reviews::class) || !is_callable([\LSDPACREV\Reviews::class, 'review_field_meta_key'])) return false;
 
             $field = \LSDPACREV\Reviews::review_field_meta_key(substr($id, 5));
         }

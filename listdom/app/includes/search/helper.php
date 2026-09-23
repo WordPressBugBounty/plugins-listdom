@@ -179,7 +179,7 @@ class LSD_Search_Helper extends LSD_Base
         }
         else if (in_array($key, ['booking_guests', 'booking_capacity', 'booking_available_slots'], true))
         {
-            if (!class_exists(\LSDPACBOK\Index::class)) return [];
+            if (!class_exists(\LSDPACBOK\Index::class) || !is_callable([\LSDPACBOK\Index::class, 'install']) || !is_callable([\LSDPACBOK\Index::class, 'table_name'])) return [];
             \LSDPACBOK\Index::install();
 
             global $wpdb;

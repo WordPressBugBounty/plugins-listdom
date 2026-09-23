@@ -244,7 +244,7 @@ class LSD_Fields extends LSD_Base
                 break;
 
             case 'claim':
-                $output = $listing->is_verified() && \LSDPACCLM\Claim::display_verified()
+                $output = $listing->is_verified() && is_callable([\LSDPACCLM\Claim::class, 'display_verified']) && \LSDPACCLM\Claim::display_verified()
                     ? '<span class="lsd-tooltip" data-lsd-tooltip="' . esc_attr__('Verified', 'listdom') . '"><i class="lsd-fe-icon fas fa-check-circle lsd-claimed-icon"></i></span>'
                     : LSD_Kses::element($listing->get_claim_button());
                 break;

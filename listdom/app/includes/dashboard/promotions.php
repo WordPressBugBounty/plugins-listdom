@@ -66,12 +66,36 @@ class LSD_Dashboard_Promotions extends LSD_Base
 
     public function is_topup_available(): bool
     {
-        return class_exists('\LSDPACTUP\Topup') && $this->is_toolkit_addon_enabled('topup');
+        if (!class_exists('\LSDPACTUP\Topup') || !class_exists('\LSDPACTUP\Access') || !$this->is_toolkit_addon_enabled('topup')) return false;
+
+        foreach (['get_product', 'get_product_id', 'is_valid_product', 'add_to_cart'] as $method)
+        {
+            if (!method_exists(\LSDPACTUP\Topup::class, $method)) return false;
+        }
+
+        foreach (['is_active', 'has_access', 'cancel'] as $method)
+        {
+            if (!method_exists(\LSDPACTUP\Access::class, $method)) return false;
+        }
+
+        return true;
     }
 
     public function is_labelize_available(): bool
     {
-        return class_exists('\LSDPACLBL\Addon') && $this->is_toolkit_addon_enabled('labelize');
+        if (!class_exists('\LSDPACLBL\Addon') || !class_exists('\LSDPACLBL\Access') || !$this->is_toolkit_addon_enabled('labelize')) return false;
+
+        foreach (['is_valid_product', 'normalize_labels', 'partition_labels', 'cart'] as $method)
+        {
+            if (!is_callable([\LSDPACLBL\Addon::class, $method])) return false;
+        }
+
+        foreach (['is_active', 'has_access', 'cancel'] as $method)
+        {
+            if (!method_exists(\LSDPACLBL\Access::class, $method)) return false;
+        }
+
+        return true;
     }
 
     public function get_available_labels(): array

@@ -1656,7 +1656,7 @@ class LSD_Skins extends LSD_Base
 
         $title = $listing->get_title_tag($method, $style);
 
-        if ($this->skin === 'table' || !$this->display_is_claimed || !$listing->is_verified() || !\LSDPACCLM\Claim::display_verified()) return $title;
+        if ($this->skin === 'table' || !$this->display_is_claimed || !$listing->is_verified() || !is_callable([\LSDPACCLM\Claim::class, 'display_verified']) || !\LSDPACCLM\Claim::display_verified()) return $title;
 
         $icon = '<span class="lsd-tooltip" data-lsd-tooltip="' . esc_attr__('Verified', 'listdom') . '"><i class="lsd-fe-icon fas fa-check-circle lsd-claimed-icon"></i></span>';
 
