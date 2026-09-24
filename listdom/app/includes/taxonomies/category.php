@@ -257,6 +257,7 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
             </td>
         </tr>
         <?php endif;
+        $this->seo_schema_edit_warning();
         wp_nonce_field('lsd_save_category_meta', 'lsd_category_meta_nonce');
     }
 

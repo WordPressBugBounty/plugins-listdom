@@ -15414,6 +15414,11 @@ body.lsd-template-editor .lsd-template-editor-workspace__content .lsd-template-e
   margin-top: 10px;
 }
 
+body.taxonomy-listdom-category .form-field .lsd-imagepicker-image-placeholder,
+body.taxonomy-listdom-location .form-field .lsd-imagepicker-image-placeholder {
+  width: 95%;
+}
+
 body.taxonomy-listdom-category .wp-list-table .manage-column.column-image {
   width: 9%;
 }

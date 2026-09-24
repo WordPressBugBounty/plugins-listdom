@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 final class Listdom
 {
-    public string $version = '6.1.1';
+    public string $version = '6.1.2';
     protected static ?Listdom $instance = null;
 
     /**

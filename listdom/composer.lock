@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "668ea4e6b831c1b896c1e90ddfbe12e6",
+    "content-hash": "8b4e68644fd6fb60ea948953aee781f5",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -1620,16 +1620,16 @@
         },
         {
             "name": "webilia/connect",
-            "version": "v1.1.2",
+            "version": "v1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webilia/webilia-connect.git",
-                "reference": "5ea37f6788019466fc234dfd6730f2a14de0e267"
+                "reference": "18820a395b993e0f195b2201bd89b303d1036f45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webilia/webilia-connect/zipball/5ea37f6788019466fc234dfd6730f2a14de0e267",
-                "reference": "5ea37f6788019466fc234dfd6730f2a14de0e267",
+                "url": "https://api.github.com/repos/webilia/webilia-connect/zipball/18820a395b993e0f195b2201bd89b303d1036f45",
+                "reference": "18820a395b993e0f195b2201bd89b303d1036f45",
                 "shasum": ""
             },
             "require": {
@@ -1653,9 +1653,9 @@
             "description": "Webilia Connect SDK for WordPress products.",
             "support": {
                 "issues": "https://github.com/webilia/webilia-connect/issues",
-                "source": "https://github.com/webilia/webilia-connect/tree/v1.1.2"
+                "source": "https://github.com/webilia/webilia-connect/tree/v1.1.3"
             },
-            "time": "2026-09-22T17:22:06+00:00"
+            "time": "2026-09-23T21:58:29+00:00"
         },
         {
             "name": "webilia/icons",

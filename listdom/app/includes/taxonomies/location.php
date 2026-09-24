@@ -88,6 +88,11 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
         </div>
         <?php endif; ?>
         <?php $this->archive_shortcode_add_field(); ?>
+        <?php if (!$this->isPro()): ?>
+        <div class="form-field">
+            <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
+        </div>
+        <?php endif; ?>
         <?php
         wp_nonce_field('lsd_save_location_meta', 'lsd_location_meta_nonce');
     }
@@ -127,6 +132,7 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
         <?php endif; ?>
         <?php $this->archive_shortcode_edit_field($term); ?>
         <?php
+        $this->seo_schema_edit_warning();
         wp_nonce_field('lsd_save_location_meta', 'lsd_location_meta_nonce');
     }
 

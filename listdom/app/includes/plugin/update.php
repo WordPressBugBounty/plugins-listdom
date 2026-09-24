@@ -135,7 +135,8 @@ class LSD_Plugin_Update
 
     /**
      * Keep the legacy update channel available for a connected site when
-     * Connect denies the product or its service is temporarily unavailable.
+     * Connect denies the product or cannot serve it through its update channel.
+     * The SDK skips this callback for transient API failures.
      *
      * @return object|false
      */

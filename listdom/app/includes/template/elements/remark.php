@@ -113,7 +113,7 @@ class LSD_Template_Elements_Remark extends LSD_Template
         $content_settings = isset($settings['content']) && is_array($settings['content']) ? $settings['content'] : [];
 
         $listing = new LSD_Entity_Listing($listing_id);
-        $output = $listing->get_remark();
+        $output = LSD_Kses::element($listing->get_remark());
         if (trim($output) === '') return '';
 
         $auto_p = !empty($content_settings['auto_p']);

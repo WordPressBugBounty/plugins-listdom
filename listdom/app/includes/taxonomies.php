@@ -200,52 +200,69 @@ class LSD_Taxonomies extends LSD_Base
     protected function archive_shortcode_add_field(): void
     {
         ?>
+        <?php if ($this->isPro()): ?>
         <div class="form-field">
             <h3><?php esc_html_e('Archive Shortcode Settings', 'listdom'); ?></h3>
             <div class="lsd-border lsd-border-radius lsd-p-4 lsd-flex lsd-flex-col lsd-flex-items-stretch lsd-gap-4 width-95-percent">
                 <div>
                     <label for="lsd_archive_shortcode"><?php esc_html_e('Archive Shortcode', 'listdom'); ?></label>
-                    <?php if ($this->isPro()): ?>
-                        <?php echo LSD_Form::shortcodes([
-                            'id' => 'lsd_archive_shortcode',
-                            'name' => 'lsd_archive_shortcode',
-                            'value' => '',
-                            'only_archive_skins' => '1',
-                            'show_empty' => '1',
-                            'empty_label' => esc_html__('Inherit from global archive settings', 'listdom'),
-                        ]); ?>
-                        <p class="description"><?php esc_html_e('Select a shortcode to override the archive design for this term. This has priority over Settings > General > Archives.', 'listdom'); ?></p>
-                    <?php else: ?>
-                        <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Archive Shortcode', 'listdom')), 'warning'); ?>
-                    <?php endif; ?>
+                    <?php echo LSD_Form::shortcodes([
+                        'id' => 'lsd_archive_shortcode',
+                        'name' => 'lsd_archive_shortcode',
+                        'value' => '',
+                        'only_archive_skins' => '1',
+                        'show_empty' => '1',
+                        'empty_label' => esc_html__('Inherit from global archive settings', 'listdom'),
+                    ]); ?>
+                    <p class="description"><?php esc_html_e('Select a shortcode to override the archive design for this term. This has priority over Settings > General > Archives.', 'listdom'); ?></p>
                 </div>
             </div>
         </div>
+        <?php else: ?>
+        <div class="form-field">
+            <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Archive Shortcode', 'listdom')), 'warning'); ?>
+        </div>
+        <?php endif; ?>
         <?php
     }
 
     protected function archive_shortcode_edit_field($term): void
     {
         ?>
+        <?php if ($this->isPro()): ?>
         <tr class="form-field">
             <th scope="row">
                 <label for="lsd_archive_shortcode"><?php esc_html_e('Archive Shortcode', 'listdom'); ?></label>
             </th>
             <td>
-                <?php if ($this->isPro()): ?>
-                    <?php echo LSD_Form::shortcodes([
-                        'id' => 'lsd_archive_shortcode',
-                        'name' => 'lsd_archive_shortcode',
-                        'value' => get_term_meta($term->term_id, 'lsd_archive_shortcode', true),
-                        'only_archive_skins' => '1',
-                        'show_empty' => '1',
-                        'empty_label' => esc_html__('Inherit from global archive settings', 'listdom'),
-                    ]); ?>
-                    <p class="description"><?php esc_html_e('Select a shortcode to override the archive design for this term. This has priority over Settings > General > Archives.', 'listdom'); ?></p>
-                <?php else: ?>
-                    <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Archive Shortcode', 'listdom')), 'warning'); ?>
-                <?php endif; ?>
+                <?php echo LSD_Form::shortcodes([
+                    'id' => 'lsd_archive_shortcode',
+                    'name' => 'lsd_archive_shortcode',
+                    'value' => get_term_meta($term->term_id, 'lsd_archive_shortcode', true),
+                    'only_archive_skins' => '1',
+                    'show_empty' => '1',
+                    'empty_label' => esc_html__('Inherit from global archive settings', 'listdom'),
+                ]); ?>
+                <p class="description"><?php esc_html_e('Select a shortcode to override the archive design for this term. This has priority over Settings > General > Archives.', 'listdom'); ?></p>
             </td>
+        </tr>
+        <?php else: ?>
+        <tr class="form-field">
+            <th scope="row"><span class="screen-reader-text"><?php esc_html_e('Archive Shortcode', 'listdom'); ?></span></th>
+            <td><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('Archive Shortcode', 'listdom')), 'warning'); ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php
+    }
+
+    protected function seo_schema_edit_warning(): void
+    {
+        if ($this->isPro()) return;
+
+        ?>
+        <tr class="form-field">
+            <th scope="row"><span class="screen-reader-text"><?php esc_html_e('SEO Schema', 'listdom'); ?></span></th>
+            <td><?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?></td>
         </tr>
         <?php
     }

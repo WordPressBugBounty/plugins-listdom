@@ -948,6 +948,7 @@ return array(
     'Webilia\\Connect\\Contracts\\UpdateClient' => $vendorDir . '/webilia/connect/src/Contracts/UpdateClient.php',
     'Webilia\\Connect\\Exception\\RequestException' => $vendorDir . '/webilia/connect/src/Exception/RequestException.php',
     'Webilia\\Connect\\Exception\\TransientException' => $vendorDir . '/webilia/connect/src/Exception/TransientException.php',
+    'Webilia\\Connect\\WordPress\\ConnectionStatus' => $vendorDir . '/webilia/connect/src/WordPress/ConnectionStatus.php',
     'Webilia\\Connect\\WordPress\\UpdateClient' => $vendorDir . '/webilia/connect/src/WordPress/UpdateClient.php',
     'Webilia\\Connect\\WordPress\\WordPressHttpClient' => $vendorDir . '/webilia/connect/src/WordPress/WordPressHttpClient.php',
     'Webilia\\Connect\\WordPress\\WordPressStorage' => $vendorDir . '/webilia/connect/src/WordPress/WordPressStorage.php',

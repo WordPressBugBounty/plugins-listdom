@@ -197,7 +197,7 @@ class LSD_Entity_Listing extends LSD_Entity
         add_post_meta($this->id(), 'lsd_visits', 0, true);
 
         // Remark
-        update_post_meta($this->post->ID, 'lsd_remark', $data['remark'] ?? '');
+        update_post_meta($this->post->ID, 'lsd_remark', isset($data['remark']) && is_scalar($data['remark']) ? wp_kses_post((string) $data['remark']) : '');
 
         // Display Options
         $display_options = isset($data['displ']) && is_array($data['displ']) ? $data['displ'] : [];

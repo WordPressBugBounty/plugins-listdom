@@ -3,9 +3,15 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v6.1.2 <span>September 24th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Improved Webilia Connect system.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved user interface of taxonomy editing screens.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed listing creation permissions in the frontend dashboard.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed unsafe listing remarks in the frontend dashboard and Template Builder.', 'listdom'); ?></li>
+    </ul>
     <h2>v6.1.1 <span>September 23rd, 2026</span></h2>
     <ul class="lsd-changelog">
-        <li><?php esc_html_e('Improved Webilia Connect update checks to reduce unnecessary requests.', 'listdom'); ?></li>
         <li><?php esc_html_e('Improved compatibility with installed add-ons when their versions differ.', 'listdom'); ?></li>
         <li><?php esc_html_e('Fixed guest dashboard listing changes to honor guest-submission permissions.', 'listdom'); ?></li>
     </ul>

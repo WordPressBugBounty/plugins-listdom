@@ -75,7 +75,10 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
             <p class="description"><?php esc_html_e("The icon will show on the website frontend next to the feature.", 'listdom'); ?></p>
         </div>
         <?php $this->archive_shortcode_add_field(); ?>
-        <?php if (!$this->isPro()): echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
+        <?php if (!$this->isPro()): ?>
+            <div class="form-field">
+                <?php echo LSD_Base::alert($this->missFeatureMessage(esc_html__('SEO Schema', 'listdom')), 'warning'); ?>
+            </div>
         <?php else: ?>
             <div class="form-field">
                 <label for="lsd_schema"><?php esc_html_e('Schema Type', 'listdom'); ?></label>
@@ -149,6 +152,7 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
             </td>
         </tr>
         <?php endif;
+        $this->seo_schema_edit_warning();
         wp_nonce_field('lsd_save_feature_meta', 'lsd_feature_meta_nonce');
     }
 

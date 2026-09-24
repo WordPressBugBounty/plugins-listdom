@@ -950,6 +950,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Guest submissions are disabled!
         if (!get_current_user_id() && !$this->guest_status) $this->response(['success' => 0, 'message' => esc_html__('Guest submission is not allowed!', 'listdom')]);
 
+        // Authenticated users must have permission to create listings unless guest submissions are enabled.
+        if (get_current_user_id() && !$this->guest_status && !LSD_Capability::can('edit_listings', 'edit_posts')) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to create listings!', 'listdom')]);
+
         $g_recaptcha_response = isset($_POST['g-recaptcha-response']) ? sanitize_text_field($_POST['g-recaptcha-response']) : null;
         if (!LSD_Main::grecaptcha_check($g_recaptcha_response)) $this->response(['success' => 0, 'message' => esc_html__("Google recaptcha is invalid.", 'listdom')]);
 
@@ -973,6 +976,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         $lsd = $_POST['lsd'] ?? [];
         $raw_lsd = $lsd;
+        $lsd['remark'] = isset($lsd['remark']) && is_scalar($lsd['remark']) ? wp_kses_post(wp_unslash((string) $lsd['remark'])) : '';
         $social = $lsd['sc'] ?? []; // Social
         $tax = isset($_POST['tax_input']) && is_array($_POST['tax_input']) ? $_POST['tax_input'] : [];
         $listing_categories = isset($lsd['listing_categories']) && is_array($lsd['listing_categories'])

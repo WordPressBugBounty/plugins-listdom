@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6
+class ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -1129,6 +1129,7 @@ class ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6
         'Webilia\\Connect\\Contracts\\UpdateClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/UpdateClient.php',
         'Webilia\\Connect\\Exception\\RequestException' => __DIR__ . '/..' . '/webilia/connect/src/Exception/RequestException.php',
         'Webilia\\Connect\\Exception\\TransientException' => __DIR__ . '/..' . '/webilia/connect/src/Exception/TransientException.php',
+        'Webilia\\Connect\\WordPress\\ConnectionStatus' => __DIR__ . '/..' . '/webilia/connect/src/WordPress/ConnectionStatus.php',
         'Webilia\\Connect\\WordPress\\UpdateClient' => __DIR__ . '/..' . '/webilia/connect/src/WordPress/UpdateClient.php',
         'Webilia\\Connect\\WordPress\\WordPressHttpClient' => __DIR__ . '/..' . '/webilia/connect/src/WordPress/WordPressHttpClient.php',
         'Webilia\\Connect\\WordPress\\WordPressStorage' => __DIR__ . '/..' . '/webilia/connect/src/WordPress/WordPressStorage.php',
@@ -1195,9 +1196,9 @@ class ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit668ea4e6b831c1b896c1e90ddfbe12e6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5::$classMap;
 
         }, null, ClassLoader::class);
     }
