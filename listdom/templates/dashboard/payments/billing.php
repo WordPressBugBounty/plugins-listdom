@@ -11,15 +11,28 @@ $billing_profile = $this->get_billing_profile($orders);
 $billing_countries = $this->get_billing_countries();
 $billing_states_list = $this->get_billing_states_list();
 $billing_states = $this->get_billing_states((string) ($billing_profile['country'] ?? ''));
+$billing_state_text = !empty($billing_profile['country']) && !$billing_states;
 $billing_form_id = $dashboard->form_id('lsd_dashboard_payments_billing_form');
+$return_checkout = !empty($_GET['lsd_checkout_return']) || !empty($billing_inline);
+$missing_billing = $return_checkout ? LSD_Payments_Helper::missing_billing_fields($user_id) : [];
 ?>
 <div class="lsd-row">
     <div class="lsd-col-12">
         <div class="lsd-fe-box-white">
             <h3 class="lsd-fe-title"><?php esc_html_e('Billing Information', 'listdom'); ?></h3>
+            <?php if ($return_checkout): ?>
+                <div class="lsd-alert <?php echo $missing_billing ? 'lsd-warning' : 'lsd-info'; ?>">
+                    <?php if ($missing_billing): ?>
+                        <?php echo sprintf(esc_html__('Complete these fields to continue to payment: %s.', 'listdom'), implode(', ', $missing_billing)); ?>
+                    <?php else: ?>
+                        <?php esc_html_e('Confirm your billing information, then save to continue to payment.', 'listdom'); ?>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
             <form id="<?php echo esc_attr($billing_form_id); ?>" class="lsd-dashboard-payments-billing-form" method="post">
                 <?php wp_nonce_field('lsd_dashboard_payments_billing', 'lsd_dashboard_payments_billing_nonce'); ?>
+                <?php if (!empty($billing_inline)): ?><input type="hidden" name="lsd_billing_checkout" value="1"><?php endif; ?>
 
                 <div class="lsd-row lsd-dashboard-payments-billing-rows">
                     <div class="lsd-col-12">
@@ -99,12 +112,13 @@ $billing_form_id = $dashboard->form_id('lsd_dashboard_payments_billing_form');
                     <div class="lsd-col-6">
                         <div class="lsd-form-row">
                             <label class="lsd-fields-label" for="<?php echo esc_attr($dashboard->form_id('lsd_billing_state')); ?>"><?php esc_html_e('State / Province', 'listdom'); ?></label>
-                            <select class="lsd-billing-state" id="<?php echo esc_attr($dashboard->form_id('lsd_billing_state')); ?>" name="lsd_billing[state]" data-selected="<?php echo esc_attr($billing_profile['state'] ?? ''); ?>">
+                            <select class="lsd-billing-state<?php echo $billing_state_text ? ' lsd-util-hide' : ''; ?>" id="<?php echo esc_attr($dashboard->form_id('lsd_billing_state')); ?>" name="lsd_billing[state]" data-selected="<?php echo esc_attr($billing_profile['state'] ?? ''); ?>"<?php disabled($billing_state_text); ?>>
                                 <option value=""><?php esc_html_e('Select state / province', 'listdom'); ?></option>
                                 <?php foreach ($billing_states as $state_code => $state_label): ?>
                                     <option value="<?php echo esc_attr($state_code); ?>"<?php selected($billing_profile['state'] ?? '', $state_code); ?>><?php echo esc_html($state_label); ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <input type="text" class="lsd-billing-state-text lsd-fe-input<?php echo $billing_state_text ? '' : ' lsd-util-hide'; ?>" id="<?php echo esc_attr($dashboard->form_id('lsd_billing_state_text')); ?>" name="lsd_billing[state]" value="<?php echo esc_attr($billing_profile['state'] ?? ''); ?>"<?php disabled(!$billing_state_text); ?>>
                         </div>
                     </div>
 
@@ -166,6 +180,8 @@ $billing_form_id = $dashboard->form_id('lsd_dashboard_payments_billing_form');
     const $form = $('#<?php echo esc_js($billing_form_id); ?>');
     const $country = $form.find('.lsd-billing-country');
     const $state = $form.find('.lsd-billing-state');
+    const $stateText = $form.find('.lsd-billing-state-text');
+    const $stateLabel = $form.find('label[for="' + $state.attr('id') + '"]');
 
     function initStyledSelect($select)
     {
@@ -194,8 +210,13 @@ $billing_form_id = $dashboard->form_id('lsd_dashboard_payments_billing_form');
             options += '<option value="' + code + '"' + isSelected + '>' + label + '</option>';
         });
 
+        const useText = country !== '' && !Object.keys(countryStates).length;
+        if (useText && $state.hasClass('select2-hidden-accessible')) $state.select2('destroy');
         $state.html(options);
-        initStyledSelect($state);
+        $state.toggleClass('lsd-util-hide', useText).prop('disabled', useText);
+        $stateText.toggleClass('lsd-util-hide', !useText).prop('disabled', !useText);
+        $stateLabel.attr('for', useText ? $stateText.attr('id') : $state.attr('id'));
+        if (!useText) initStyledSelect($state);
     }
 
     initStyledSelect($country);
@@ -204,6 +225,7 @@ $billing_form_id = $dashboard->form_id('lsd_dashboard_payments_billing_form');
     $country.on('change', function()
     {
         $state.data('selected', '');
+        $stateText.val('');
         refreshStates($(this).val());
     });
 })(jQuery);

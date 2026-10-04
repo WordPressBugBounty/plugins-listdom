@@ -102,12 +102,14 @@ class LSD_Options extends LSD_Base
         );
     }
 
-    public static function details_page(): array
+    public static function details_page(bool $include_disabled = false): array
     {
         $options = self::parse_args(
             get_option('lsd_details_page', []),
             self::defaults('details_page')
         );
+
+        if ($include_disabled) return $options;
 
         if (!LSD_Components::work_hours())
         {
@@ -152,6 +154,19 @@ class LSD_Options extends LSD_Base
             unset($options['elements']['cta']);
             foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $sec)
                 if (isset($options['builder'][$sec]['elements']['cta'])) unset($options['builder'][$sec]['elements']['cta']);
+        }
+
+        foreach (['remark' => LSD_Components::remark(), 'embed' => LSD_Components::embed(), 'faq' => LSD_Components::faq()] as $component => $enabled)
+        {
+            if ($enabled) continue;
+
+            $elements = $component === 'embed' ? ['embed', 'video'] : [$component];
+            foreach ($elements as $element)
+            {
+                unset($options['elements'][$element]);
+                foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $sec)
+                    if (isset($options['builder'][$sec]['elements'][$element])) unset($options['builder'][$sec]['elements'][$element]);
+            }
         }
 
         return $options;
@@ -437,6 +452,7 @@ class LSD_Options extends LSD_Base
                     'pc_enabled' => 0,
                     'pc_label' => 'I agree to the {{privacy_policy}}.',
                     'free_checkout_comment' => '',
+                    'required_billing_fields' => [],
                     'taxes' => [
                         'enable' => 0,
                         'prices_include_tax' => 0,
@@ -729,6 +745,9 @@ class LSD_Options extends LSD_Base
                         'related' => 1,
                         'socials' => 1,
                         'cta' => 1,
+                        'remark' => 1,
+                        'embed' => 1,
+                        'faq' => 1,
                     ],
                     'block_admin_subscriber' => 1,
                     'block_admin_contributor' => 1,
@@ -903,6 +922,13 @@ class LSD_Options extends LSD_Base
         {
             $current_ai_visibility = isset($current['ai_visibility']) && is_array($current['ai_visibility']) ? $current['ai_visibility'] : [];
             $options['ai_visibility'] = self::merge_nested($current_ai_visibility, $options['ai_visibility']);
+        }
+
+        // The setup wizard edits only some component switches; retain the others.
+        if ($key === 'lsd_settings' && isset($options['components']) && is_array($options['components']))
+        {
+            $current_components = isset($current['components']) && is_array($current['components']) ? $current['components'] : [];
+            $options['components'] = array_merge($current_components, $options['components']);
         }
 
         // Merge new options with previous options

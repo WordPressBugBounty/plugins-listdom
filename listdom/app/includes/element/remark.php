@@ -14,6 +14,8 @@ class LSD_Element_Remark extends LSD_Element
 
     public function get($post_id)
     {
+        if (!LSD_Components::remark()) return '';
+
         if (is_null($post_id))
         {
             global $post;

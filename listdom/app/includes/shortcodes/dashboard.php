@@ -170,6 +170,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $this->reset_layout();
         }
 
+        // Keep Elementor's content settings in the shortcode request on published pages.
+        if (!empty($this->atts['default_active_section'])) $this->widget_options['default_active_section'] = sanitize_key($this->atts['default_active_section']);
+        if (isset($this->atts['content_loading']) && in_array($this->atts['content_loading'], ['reload', 'ajax'], true))
+            $this->widget_options['content_loading'] = $this->atts['content_loading'];
+
         if (($this->widget_options['content_loading'] ?? '') === 'ajax')
         {
             if (function_exists('wp_enqueue_editor')) wp_enqueue_editor();
@@ -547,6 +552,10 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function is_enabled($module, $listing_id = 0)
     {
+        if ($module === 'remark' && !LSD_Components::remark()) return false;
+        if ($module === 'embed' && !LSD_Components::embed()) return false;
+        if ($module === 'faq' && !LSD_Components::faq()) return false;
+
         $enabled = true;
 
         // Module is disabled
@@ -976,7 +985,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         $lsd = $_POST['lsd'] ?? [];
         $raw_lsd = $lsd;
-        $lsd['remark'] = isset($lsd['remark']) && is_scalar($lsd['remark']) ? wp_kses_post(wp_unslash((string) $lsd['remark'])) : '';
+        if (LSD_Components::remark() || array_key_exists('remark', $lsd))
+            $lsd['remark'] = isset($lsd['remark']) && is_scalar($lsd['remark']) ? wp_kses_post(wp_unslash((string) $lsd['remark'])) : '';
         $social = $lsd['sc'] ?? []; // Social
         $tax = isset($_POST['tax_input']) && is_array($_POST['tax_input']) ? $_POST['tax_input'] : [];
         $listing_categories = isset($lsd['listing_categories']) && is_array($lsd['listing_categories'])

@@ -15,6 +15,7 @@ $engine = LSD_Payments_Engine::instance();
 // Is Listdom?
 $is_listdom = (int) $engine->listdom();
 $tax_settings = $payments['taxes'] ?? [];
+$required_billing_fields = $payments['required_billing_fields'] ?? [];
 ?>
 <div class="lsd-settings-wrap">
     <form id="lsd_payments_form">
@@ -297,6 +298,28 @@ $tax_settings = $payments['taxes'] ?? [];
             <h3 class="lsd-mt-0 lsd-admin-title"><?php esc_html_e('Invoice', 'listdom'); ?></h3>
 
             <div class="lsd-settings-group-wrapper">
+                <div class="lsd-settings-fields-wrapper">
+                    <div class="lsd-admin-section-heading">
+                        <h4 class="lsd-admin-title lsd-m-0"><?php esc_html_e('Required Billing Fields', 'listdom'); ?></h4>
+                        <p class="lsd-admin-description-tiny lsd-m-0"><?php esc_html_e('Choose the fields customers must complete before a paid Listdom checkout. Free checkouts and registration are unaffected.', 'listdom'); ?></p>
+                    </div>
+                    <div class="lsd-grid lsd-g-3-columns">
+                        <?php foreach (LSD_Payments_Helper::billing_fields() as $field => $label): ?>
+                            <div class="lsd-form-row">
+                                <div class="lsd-col-6"><?php echo LSD_Form::label([
+                                    'class' => 'lsd-fields-label',
+                                    'title' => $label,
+                                    'for' => 'lsd_required_billing_' . $field,
+                                ]); ?></div>
+                                <div class="lsd-col-6"><?php echo LSD_Form::switcher([
+                                    'id' => 'lsd_required_billing_' . $field,
+                                    'name' => 'lsd[payments][required_billing_fields][' . $field . ']',
+                                    'value' => $required_billing_fields[$field] ?? 0,
+                                ]); ?></div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
                 <div class="lsd-settings-fields-wrapper">
                     <h4 class="lsd-admin-title lsd-m-0"><?php esc_html_e('Logo', 'listdom'); ?></h4>
                     <div class="lsd-row">

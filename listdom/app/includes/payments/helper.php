@@ -4,6 +4,73 @@ class LSD_Payments_Helper extends LSD_Base
 {
     private $engine;
 
+    public static function billing_fields(): array
+    {
+        return [
+            'name' => esc_html__('Full Name', 'listdom'),
+            'email' => esc_html__('Email', 'listdom'),
+            'phone' => esc_html__('Phone', 'listdom'),
+            'company_name' => esc_html__('Company Name', 'listdom'),
+            'tax_vat_id' => esc_html__('Tax/VAT ID', 'listdom'),
+            'country' => esc_html__('Country', 'listdom'),
+            'state' => esc_html__('State / Province', 'listdom'),
+            'address' => esc_html__('Address', 'listdom'),
+            'city' => esc_html__('City', 'listdom'),
+            'postal_code' => esc_html__('Postal Code', 'listdom'),
+        ];
+    }
+
+    public static function required_billing_fields(): array
+    {
+        $payments = LSD_Options::payments();
+        $configured = isset($payments['required_billing_fields']) && is_array($payments['required_billing_fields']) ? $payments['required_billing_fields'] : [];
+        $required = array_intersect_key(self::billing_fields(), array_filter($configured));
+
+        /**
+         * Filter the billing fields required for a paid Listdom Payment Engine checkout.
+         *
+         * Return an array of keys from billing_fields(). This does not affect registration,
+         * free memberships, or zero-total checkouts. The existing
+         * lsd_payments_checkout_validation_error filter can stop checkout with a custom
+         * message before order creation.
+         *
+         * @param string[] $required Required billing field keys.
+         */
+        $keys = apply_filters('lsd_payments_required_billing_fields', array_keys($required));
+        return is_array($keys) ? array_intersect_key(self::billing_fields(), array_fill_keys($keys, true)) : $required;
+    }
+
+    public static function missing_billing_fields(int $user_id): array
+    {
+        $required = self::required_billing_fields();
+        if (!$required) return [];
+        if ($user_id < 1) return $required;
+
+        $user = get_userdata($user_id);
+        $meta = [
+            'name' => 'billing_name',
+            'email' => 'billing_email',
+            'phone' => 'billing_phone',
+            'company_name' => 'billing_company',
+            'tax_vat_id' => 'billing_tax_vat_id',
+            'country' => 'billing_country',
+            'state' => 'billing_state',
+            'address' => 'billing_address_1',
+            'city' => 'billing_city',
+            'postal_code' => 'billing_postcode',
+        ];
+
+        foreach ($required as $key => $label)
+        {
+            $value = trim((string) get_user_meta($user_id, $meta[$key], true));
+            if ($key === 'name' && $value === '' && $user instanceof WP_User) $value = trim($user->display_name);
+            if ($key === 'email' && $value === '' && $user instanceof WP_User) $value = trim($user->user_email);
+            if ($value !== '' && ($key !== 'email' || is_email($value))) unset($required[$key]);
+        }
+
+        return $required;
+    }
+
     public function __construct()
     {
         $this->engine = LSD_Payments_Engine::instance()->engine();

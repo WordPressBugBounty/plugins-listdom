@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 final class Listdom
 {
-    public string $version = '6.1.2';
+    public string $version = '6.2.0';
     protected static ?Listdom $instance = null;
 
     /**
@@ -135,6 +135,9 @@ final class Listdom
         // Listdom Assets
         $assets = new LSD_Assets();
         $assets->init();
+
+        // Admin Command Palette REST search
+        (new LSD_API_Controllers_CommandPalette())->init();
 
         // Listdom Social Networks
         $socials = new LSD_Socials();

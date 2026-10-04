@@ -41,7 +41,7 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
         // Media
         $thumbnail_id = get_post_thumbnail_id($listing);
         $gallery = isset($metas['lsd_gallery']) && is_array($metas['lsd_gallery']) ? $metas['lsd_gallery'] : [];
-        $embeds = isset($metas['lsd_embeds']) && is_array($metas['lsd_embeds']) ? $metas['lsd_embeds'] : [];
+        $embeds = LSD_Components::embed() && isset($metas['lsd_embeds']) && is_array($metas['lsd_embeds']) ? $metas['lsd_embeds'] : [];
 
         $status = get_post_status_object($listing->post_status);
 
@@ -73,7 +73,7 @@ class LSD_API_Resources_Listing extends LSD_API_Resource
                 'phone' => $metas['lsd_phone'] ?? null,
                 'website' => $metas['lsd_website'] ?? null,
                 'contact_address' => $metas['lsd_contact_address'] ?? null,
-                'remark' => $metas['lsd_remark'] ?? null,
+                'remark' => LSD_Components::remark() ? ($metas['lsd_remark'] ?? null) : null,
                 'availability' => LSD_API_Resources_Availability::get($listing->ID),
                 'favorite' => apply_filters('lsd_is_favorite', 0, $listing->ID),
                 'claimed' => apply_filters('lsd_is_claimed', 0, $listing->ID),

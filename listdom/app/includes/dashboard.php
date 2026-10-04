@@ -40,6 +40,10 @@ class LSD_Dashboard extends LSD_Base
         if (LSD_Components::related())
             $modules[] = ['label' => esc_html__('Related Listings', 'listdom'), 'key' => 'related'];
 
+        if (!LSD_Components::remark()) $modules = array_values(array_filter($modules, function ($module) { return $module['key'] !== 'remark'; }));
+        if (!LSD_Components::embed()) $modules = array_values(array_filter($modules, function ($module) { return $module['key'] !== 'embed'; }));
+        if (!LSD_Components::faq()) $modules = array_values(array_filter($modules, function ($module) { return $module['key'] !== 'faq'; }));
+
         // Map Module
         if (LSD_Components::map()) $modules[] = ['label' => esc_html__('Address / Map', 'listdom'), 'key' => 'address'];
 
@@ -83,6 +87,10 @@ class LSD_Dashboard extends LSD_Base
 
         if (LSD_Components::related())
             $fields['related_listings'] = ['label' => esc_html__('Related Listings', 'listdom'), 'module' => 'related'];
+
+        if (!LSD_Components::remark()) unset($fields['remark']);
+        if (!LSD_Components::embed()) unset($fields['_embeds']);
+        if (!LSD_Components::faq()) unset($fields['_faqs']);
 
         if (LSD_Components::map()) $fields['address'] = ['label' => esc_html__('Address', 'listdom'), 'module' => 'address'];
 

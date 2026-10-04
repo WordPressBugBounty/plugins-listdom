@@ -15,6 +15,7 @@ class LSD_Assets extends LSD_Base
     {
         // Include needed assets (CSS, JavaScript etc.) in the WordPress backend
         add_action('admin_enqueue_scripts', [$this, 'admin'], 0);
+        add_action('admin_enqueue_scripts', [$this, 'command_palette'], 20);
 
         // Include needed assets (CSS, JavaScript etc.) in the WordPress frontend
         add_action('wp_enqueue_scripts', [$this, 'site'], 0);
@@ -118,6 +119,30 @@ class LSD_Assets extends LSD_Base
         $this->icons();
     }
 
+    /**
+     * Enqueue the core frontend assets for an isolated builder preview.
+     *
+     * The Divi 5 preview is rendered through a REST request, so the normal
+     * wp_enqueue_scripts hook is not guaranteed to run. Keep the same script
+     * dependencies and localized runtime data as the regular frontend path.
+     */
+    public function divi5_preview(): void
+    {
+        $frontend_dependencies = ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'];
+
+        if ($this->advanced_datetimepicker_enabled())
+        {
+            $this->flatpickr();
+            $frontend_dependencies[] = 'lsd-flatpickr';
+        }
+
+        wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), $frontend_dependencies, $this->version(), true);
+        $this->localize();
+        wp_enqueue_style('lsd-frontend', $this->lsd_asset_url('css/frontend.min.css'), [], $this->version());
+
+        if (is_rtl()) wp_enqueue_style('lsd-frontend-rtl', $this->lsd_asset_url('css/frontend-rtl.min.css'), ['lsd-frontend'], $this->version());
+    }
+
     public function admin()
     {
         // Include Listdom backend CSS file for WordPress
@@ -192,6 +217,23 @@ class LSD_Assets extends LSD_Base
 
         // Include Assets
         do_action('lsd_admin_assets');
+    }
+
+    public function command_palette()
+    {
+        if (!function_exists('wp_enqueue_command_palette_assets') || !wp_script_is('wp-core-commands', 'enqueued')) return;
+
+        wp_enqueue_script(
+            'lsd-command-palette',
+            $this->lsd_asset_url('js/command-palette.min.js'),
+            ['wp-core-commands', 'wp-data', 'wp-element', 'wp-api-fetch'],
+            $this->version(),
+            true
+        );
+
+        wp_localize_script('lsd-command-palette', 'lsdCommandPalette', [
+            'nonce' => wp_create_nonce('wp_rest'),
+        ]);
     }
 
     protected function is_template_builder_screen($screen = null): bool
@@ -585,7 +627,8 @@ class LSD_Assets extends LSD_Base
 
     public static function footerOrPreview($string)
     {
-        if (class_exists(\Elementor\Plugin::class) && \Elementor\Plugin::instance()->editor->is_edit_mode()) echo $string;
+        global $lsd_divi5_preview_request;
+        if (!empty($lsd_divi5_preview_request) || (class_exists(\Elementor\Plugin::class) && \Elementor\Plugin::instance()->editor->is_edit_mode())) echo $string;
         else self::footer($string);
     }
 

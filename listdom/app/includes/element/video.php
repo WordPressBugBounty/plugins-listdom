@@ -16,6 +16,8 @@ class LSD_Element_Video extends LSD_Element
 
     public function get($post_id = null)
     {
+        if (!LSD_Components::embed()) return '';
+
         // Disabled in Lite
         if ($this->isLite()) return false;
 

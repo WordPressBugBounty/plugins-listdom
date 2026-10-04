@@ -2,10 +2,10 @@
 Contributors: webilia
 Donate link: https://listdom.net
 Tags: business directory, listings, classifieds, local business directory, directory plugin
-Requires at least: 4.2
+Requires at least: 5.0
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 6.1.2
+Stable tag: 6.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -164,6 +164,7 @@ Listdom Free includes the core features needed to launch a searchable directory,
 *   WordPress block editor compatibility
 *   Page builders compatibility
 *   Listing image
+*   Listing-specific alt text for featured and gallery images
 *   Comment for listings
 *   Numeric, Load more button, and infinite scroll pagination methods
 *   Advanced components system to disable unused Listdom Core features
@@ -445,6 +446,14 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 6.2.0 =
+* Added Webilia Business Data to discover businesses worldwide and import selected results as Listdom draft listings, with taxonomy assignment, duplicate protection, and optional enrichment of missing business details.
+* Added native Divi 5 integration for all Listdom Divi modules, while preserving support for existing Divi 4 layouts.
+* Added Listdom records to the WordPress admin Command Palette, making it faster to find and edit listings, shortcodes, taxonomy terms, and supported add-on content.
+* Added reversible switches for Remark, Embed & Featured Video, and FAQ components, allowing them to be disabled without deleting saved data and re-enabled at any time.
+* Improved paid checkout with configurable required billing fields, Business Data map preference saving, listing editor forms, comparison table styling, and Frontend Dashboard widget settings.
+* Fixed file validation for JSON, CSV, and Excel imports and resolved several listing workflow, dashboard, and interface issues.
 
 = 6.1.2 =
 * Improved Webilia Connect system.

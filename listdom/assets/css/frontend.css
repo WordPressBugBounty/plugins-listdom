@@ -17196,7 +17196,7 @@ body.rtl .lsd-listing-googlemap .lsd-direction .lsd-direction-reset {
   height: auto;
   max-height: 300px;
   min-height: 300px;
-  border-radius: 0 !important;
+  border-radius: 0;
 }
 .lsd-gallery-linear .lsd-all-photos-button {
   position: absolute;
@@ -50648,6 +50648,9 @@ form.fed_form_post .form-group .lsd-membership-active-package-tab-panels .lsd-da
   margin: 0 auto;
 }
 
+.lsdaddelm-comparison-table .lsdaddcmp-compare .lsdaddcmp-compare-table td {
+  padding: 10px 14px;
+}
 .lsdaddelm-comparison-table .lsdaddcmp-row-features.lsdaddcmp-features-display-checkmarks .lsd-fe-icon-wrapper {
   display: flex;
   align-items: center;
@@ -56023,6 +56026,13 @@ form.fed_form_post .form-group .lsd-booking-form-wrapper .lsd-booking-bookables 
   flex-wrap: wrap;
   column-gap: 16px;
 }
+.lsdadddiv-card-attributes .lsdadddiv-attr-key {
+  display: inline-flex;
+  align-items: center;
+}
+.lsdadddiv-card-attributes.lsdadddiv-attributes-custom {
+  color: var(--lsdadddiv-attributes-text-color) !important;
+}
 
 .lsdadddiv-card-acf .lsd-row .lsd-col-6 {
   width: unset;
@@ -56035,6 +56045,11 @@ form.fed_form_post .form-group .lsd-booking-form-wrapper .lsd-booking-bookables 
 
 .lsdadddiv-card-features ul, .lsdadddiv-card-labels ul, .lsdadddiv-card-locations ul, .lsdadddiv-card-share ul, .lsdadddiv-card-tags ul {
   list-style: none;
+}
+
+.lsdadddiv-card-features.lsdadddiv-native-list ul,
+.lsdadddiv-card-tags.lsdadddiv-native-list ul {
+  display: flex;
 }
 
 .lsdadddiv-card-labels ul {
@@ -56188,6 +56203,41 @@ form.fed_form_post .form-group .lsd-booking-form-wrapper .lsd-booking-bookables 
   margin: 0;
 }
 
+.lsdadddiv-card-compare {
+  text-align: var(--lsdadddiv-compare-alignment, left);
+}
+.lsdadddiv-card-compare > .lsd-compare > .lsd-compare-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--lsdadddiv-compare-background-color, transparent);
+  padding: var(--lsdadddiv-compare-padding, 5px);
+  border-radius: var(--lsdadddiv-compare-border-radius, 3px);
+}
+.lsdadddiv-card-compare .lsd-compare-toggle.lsd-compare-off i.fas.fa-random-empty:before {
+  color: var(--lsdadddiv-compare-inactive-icon-color, inherit) !important;
+}
+.lsdadddiv-card-compare .lsd-compare-toggle.lsd-compare-on i.fas.fa-random:before {
+  color: var(--lsdadddiv-compare-active-icon-color, inherit) !important;
+}
+
+.lsdadddiv-card-rate .lsd-listing-rate {
+  color: var(--lsdadddiv-rate-text-color, inherit);
+}
+.lsdadddiv-card-rate .lsd-stars {
+  display: flex;
+  align-items: center;
+  gap: var(--lsdadddiv-rate-stars-spacing, 1px);
+}
+.lsdadddiv-card-rate .lsd-stars span {
+  background-color: var(--lsdadddiv-rate-stars-background, transparent);
+  padding: var(--lsdadddiv-rate-stars-padding, 0);
+  border-radius: var(--lsdadddiv-rate-stars-border-radius, 0);
+}
+.lsdadddiv-card-rate .lsd-stars i {
+  color: var(--lsdadddiv-rate-stars-color, inherit);
+}
+
 .lsdadddiv-card-categories {
   display: flex;
   flex-wrap: wrap;
@@ -56208,7 +56258,71 @@ form.fed_form_post .form-group .lsd-booking-form-wrapper .lsd-booking-bookables 
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  gap: 0;
+  gap: var(--lsdadddiv-contact-gap, 0);
+  flex-direction: var(--lsdadddiv-contact-layout, column);
+}
+
+.lsdadddiv-card-address .lsd-fe-icon {
+  color: var(--lsdadddiv-address-icon-color, inherit);
+}
+
+.lsdadddiv-card-attributes {
+  color: inherit;
+}
+.lsdadddiv-card-attributes.lsd-layout-table .lsdadddiv-attr-key {
+  width: var(--lsdadddiv-table-label-width, var(--lsd-attr-label-width));
+  flex-basis: var(--lsdadddiv-table-label-width, var(--lsd-attr-label-width));
+  min-width: var(--lsdadddiv-table-label-width, 180px);
+}
+.lsdadddiv-card-attributes .lsdadddiv-attr-key i,
+.lsdadddiv-card-attributes .lsdadddiv-attr-key .lsd-fe-icon {
+  color: var(--lsdadddiv-attributes-icon-color, inherit);
+  transform: scale(var(--lsdadddiv-attributes-icon-scale));
+}
+
+.lsdadddiv-back-button {
+  display: flex;
+  justify-content: var(--lsdadddiv-back-alignment, flex-start);
+}
+
+.lsdadddiv-card-am-direction .lsd-external-geo-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+.lsdadddiv-card-gallery .lsd-image-gallery img,
+.lsdadddiv-card-gallery .lsd-gallery-slider img {
+  object-fit: var(--lsdadddiv-gallery-image-fit, cover);
+}
+.lsdadddiv-card-gallery .lsd-gallery-linear img {
+  object-fit: var(--lsdadddiv-gallery-image-fit, cover);
+}
+.lsdadddiv-card-gallery .lsd-image-gallery,
+.lsdadddiv-card-gallery .lsd-gallery-slider,
+.lsdadddiv-card-gallery .lsd-gallery-linear {
+  justify-content: var(--lsdadddiv-gallery-image-align, start);
+}
+
+.lsdadddiv-card-owner .lsd-owner-image-wrapper img {
+  border-radius: var(--lsdadddiv-owner-image-radius, 50%);
+}
+
+.lsdadddiv-card-breadcrumb .lsd-breadcrumb-list {
+  gap: var(--lsdadddiv-breadcrumb-item-gap, 5px);
+}
+.lsdadddiv-card-breadcrumb .lsd-breadcrumb-item {
+  gap: var(--lsdadddiv-breadcrumb-item-gap, 5px);
+}
+.lsdadddiv-card-breadcrumb .lsd-breadcrumb-item::after {
+  font-size: var(--lsdadddiv-breadcrumb-separator-size, inherit);
+}
+.lsdadddiv-card-breadcrumb .lsd-home-page i {
+  font-size: var(--lsdadddiv-breadcrumb-home-icon-size, inherit);
+}
+
+.lsdadddiv-card-locations.lsdadddiv-native-list .lsd-locations-list {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .lsd-modal-scroll-locked {

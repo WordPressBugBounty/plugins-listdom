@@ -359,6 +359,19 @@ class LSD_Menus_Settings extends LSD_Menus
         $current = get_option('lsd_settings', []);
         if (!is_array($current)) $current = [];
 
+        // Hidden dashboard controls are absent from the form; retain their saved access and required settings.
+        foreach (['remark' => LSD_Components::remark(), 'embed' => LSD_Components::embed(), 'faq' => LSD_Components::faq()] as $module => $enabled)
+        {
+            if ($enabled) continue;
+
+            if (isset($current['submission_module'][$module]))
+                $lsd['submission_module'][$module] = $current['submission_module'][$module];
+
+            $field = $module === 'embed' ? '_embeds' : ($module === 'faq' ? '_faqs' : 'remark');
+            if (isset($current['submission_fields'][$field]))
+                $lsd['submission_fields'][$field] = $current['submission_fields'][$field];
+        }
+
         // Clear existing custom menus values if present and sanitize shortcode
         if (isset($current['dashboard_menu_custom'])) $current['dashboard_menu_custom'] = [];
 
@@ -462,17 +475,47 @@ class LSD_Menus_Settings extends LSD_Menus
         $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
         $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
 
+        // Hidden component controls are absent from the form. Keep their layout settings for re-enabling.
+        $stored = get_option('lsd_details_page', []);
+        $stored = is_array($stored) ? $stored : [];
+        $disabled_elements = [];
+        if (!LSD_Components::remark()) $disabled_elements[] = 'remark';
+        if (!LSD_Components::embed()) $disabled_elements = array_merge($disabled_elements, ['embed', 'video']);
+        if (!LSD_Components::faq()) $disabled_elements[] = 'faq';
+
+        if ($disabled_elements)
+        {
+            $lsd['elements'] = self::preserve_disabled_element_positions(
+                isset($lsd['elements']) && is_array($lsd['elements']) ? $lsd['elements'] : [],
+                isset($stored['elements']) && is_array($stored['elements']) ? $stored['elements'] : [],
+                $disabled_elements
+            );
+
+            foreach (['head1','head2','head3','col1','col2','col3','foot1','foot2','foot3'] as $section)
+            {
+                $submitted = $lsd['builder'][$section]['elements'] ?? [];
+                $previous = $stored['builder'][$section]['elements'] ?? [];
+                if (!is_array($submitted) || !is_array($previous)) continue;
+                if (!$submitted && !$previous) continue;
+
+                $lsd['builder'][$section]['elements'] = self::preserve_disabled_element_positions($submitted, $previous, $disabled_elements);
+            }
+        }
+
         $pattern = '';
         if (isset($lsd['elements']) && is_array($lsd['elements']))
         {
             // Element is disabled
             foreach ($lsd['elements'] as $key => $element)
             {
+                if (in_array($key, $disabled_elements, true)) continue;
                 if (!isset($element['enabled']) || !$element['enabled']) continue;
 
                 $pattern .= '{' . $key . '}';
             }
         }
+
+        $pattern = self::preserve_disabled_pattern_positions($pattern, LSD_Options::details_page_pattern(), $disabled_elements);
 
         // Save single listing pattern
         update_option('lsd_details_page_pattern', trim($pattern));
@@ -482,6 +525,54 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Print the response
         $this->response(['success' => 1]);
+    }
+
+    private static function preserve_disabled_pattern_positions(string $pattern, string $stored_pattern, array $disabled_elements): string
+    {
+        if (!$disabled_elements) return $pattern;
+
+        preg_match_all('/\{([^{}]+)\}/', $stored_pattern, $stored_tokens);
+        preg_match_all('/\{[^{}]+\}/', $pattern, $visible_tokens);
+
+        // Fill the old visible slots in their new order while leaving hidden components in place.
+        $merged = [];
+        $visible_index = 0;
+        foreach ($stored_tokens[0] as $index => $token)
+        {
+            if (in_array($stored_tokens[1][$index], $disabled_elements, true)) $merged[] = $token;
+            else if (isset($visible_tokens[0][$visible_index])) $merged[] = $visible_tokens[0][$visible_index++];
+        }
+
+        while (isset($visible_tokens[0][$visible_index])) $merged[] = $visible_tokens[0][$visible_index++];
+
+        return implode('', $merged);
+    }
+
+    private static function preserve_disabled_element_positions(array $submitted, array $stored, array $disabled_elements): array
+    {
+        $visible = array_diff_key($submitted, array_flip($disabled_elements));
+        $visible_keys = array_keys($visible);
+        $merged = [];
+        $visible_index = 0;
+
+        // Keep hidden entries in their previous slots while applying the submitted visible order.
+        foreach ($stored as $key => $value)
+        {
+            if (in_array($key, $disabled_elements, true)) $merged[$key] = $value;
+            else if (isset($visible_keys[$visible_index]))
+            {
+                $visible_key = $visible_keys[$visible_index++];
+                $merged[$visible_key] = $visible[$visible_key];
+            }
+        }
+
+        while (isset($visible_keys[$visible_index]))
+        {
+            $visible_key = $visible_keys[$visible_index++];
+            $merged[$visible_key] = $visible[$visible_key];
+        }
+
+        return $merged;
     }
 
     public function save_addons()
@@ -695,7 +786,10 @@ class LSD_Menus_Settings extends LSD_Menus
         $tax_prices_include_tax = isset($taxes['prices_include_tax']) && $taxes['prices_include_tax'] ? 1 : 0;
         $tax_locations = isset($taxes['locations']) ? (new LSD_Payments_Tax())->sanitize_locations($taxes['locations']) : [];
 
-        unset($lsd['appreciation_message'], $lsd['agreement'], $lsd['free_checkout_comment'], $lsd['invoice'], $lsd['empty'], $lsd['taxes'], $lsd['consent']);
+        $billing_fields = isset($lsd['required_billing_fields']) && is_array($lsd['required_billing_fields']) ? $lsd['required_billing_fields'] : [];
+        $billing_fields = array_filter(array_intersect_key($billing_fields, LSD_Payments_Helper::billing_fields()));
+
+        unset($lsd['appreciation_message'], $lsd['agreement'], $lsd['free_checkout_comment'], $lsd['invoice'], $lsd['empty'], $lsd['taxes'], $lsd['consent'], $lsd['required_billing_fields']);
 
         // Sanitization
         array_walk_recursive($lsd, 'sanitize_text_field');
@@ -705,6 +799,7 @@ class LSD_Menus_Settings extends LSD_Menus
         $lsd['pc_enabled'] = $consent_enabled ? 1 : 0;
         $lsd['pc_label'] = sanitize_text_field((string) $consent_label);
         $lsd['free_checkout_comment'] = $free_checkout_comment;
+        $lsd['required_billing_fields'] = array_fill_keys(array_keys($billing_fields), 1);
         $lsd['invoice'] = [
             'logo' => $invoice_logo,
             'from' => $invoice_from,

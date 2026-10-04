@@ -59,6 +59,7 @@ class LSD_PTypes_Listing_Archive extends LSD_PTypes_Listing
                     'paths' => $shape_paths,
                     'radius' => $shape_radius,
                 ]);
+                if (!is_array($object)) $object = [];
 
                 $object['marker'] = null;
                 $object['fill_color'] = $entity->get_shape_fill_color();

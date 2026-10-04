@@ -6,6 +6,7 @@ defined('ABSPATH') || die();
 ?>
 <div class="lsd-nav-wrapper">
     <ul class="lsd-nav-tab-wrapper">
+        <?php (new LSD_Menus_IX_Business_Data())->tab($this->tab); ?>
         <li class="lsd-has-children lsd-csv-nav <?php echo $this->tab === 'csv' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'csv' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=csv')); ?>">
                 <i class="webilia-icon wbli-csv lsd-m-0"></i>

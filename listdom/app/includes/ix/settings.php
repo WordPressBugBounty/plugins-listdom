@@ -50,7 +50,7 @@ class LSD_IX_Settings extends LSD_Base
             'auth' => LSD_Options::auth(),
             'payments' => $payments,
             'styles' => LSD_Options::styles(),
-            'details_page' => LSD_Options::details_page(),
+            'details_page' => LSD_Options::details_page(true),
             'socials' => LSD_Options::socials(),
             'details_page_pattern' => LSD_Options::details_page_pattern(),
             'addons' => LSD_Options::addons(),
@@ -161,7 +161,7 @@ class LSD_IX_Settings extends LSD_Base
 
         // Merge Single Listing
         update_option('lsd_details_page', array_merge(
-            LSD_Options::details_page(), isset($options['details_page']) && is_array($options['details_page']) ? $options['details_page'] : []
+            LSD_Options::details_page(true), isset($options['details_page']) && is_array($options['details_page']) ? $options['details_page'] : []
         ));
 
         // Merge Socials

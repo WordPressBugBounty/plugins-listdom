@@ -111,6 +111,8 @@ class LSD_AI_Visibility_Schema extends LSD_Base
      */
     public function replaces_listing_faq_schema(int $listing_id = 0): bool
     {
+        if (!LSD_Components::faq()) return false;
+
         // Listing Context
         if ($listing_id <= 0) $listing_id = get_queried_object_id();
         if ($listing_id <= 0) return false;
@@ -357,9 +359,9 @@ class LSD_AI_Visibility_Schema extends LSD_Base
             if (count($opening_hours)) $schema['openingHoursSpecification'] = $opening_hours;
         }
 
-        if ($this->payload->listing_element_enabled($post->ID, 'video')) $this->append_video_object_schema($schema, $post->ID, true);
+        if (LSD_Components::embed() && $this->payload->listing_element_enabled($post->ID, 'video')) $this->append_video_object_schema($schema, $post->ID, true);
 
-        if ($this->payload->listing_element_enabled($post->ID, 'embed')) $this->append_video_object_schema($schema, $post->ID, false);
+        if (LSD_Components::embed() && $this->payload->listing_element_enabled($post->ID, 'embed')) $this->append_video_object_schema($schema, $post->ID, false);
     }
 
     /**
@@ -880,6 +882,8 @@ class LSD_AI_Visibility_Schema extends LSD_Base
      */
     public function faq_schema(int $listing_id): array
     {
+        if (!LSD_Components::faq()) return [];
+
         // FAQ Config
         $faq_config = $this->payload->listing_element_config($listing_id, 'faq');
         if (empty($faq_config['enabled'])) return [];
@@ -1145,6 +1149,8 @@ class LSD_AI_Visibility_Schema extends LSD_Base
      */
     protected function video_object_schema(int $listing_id, bool $featured): array
     {
+        if (!LSD_Components::embed()) return [];
+
         // Stored Embeds
         $stored = get_post_meta($listing_id, 'lsd_embeds', true);
         if (!is_array($stored) || !count($stored)) return [];

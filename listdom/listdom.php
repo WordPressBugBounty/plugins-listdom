@@ -3,10 +3,10 @@
  * Plugin Name: Listdom
  * Plugin URI: https://listdom.net
  * Description: Listdom is a powerful yet easy-to-use tool for listing anything on your website. It offers modern, responsive skins such as List, Grid, Map, and Masonry to showcase your content beautifully.
- * Version: 6.1.2
+ * Version: 6.2.0
  * Author: Webilia
  * Author URI: https://webilia.com/
- * Requires at least: 4.2
+ * Requires at least: 5.0
  * Requires PHP: 7.4
  * Tested up to: 7.1
  * License: GPLv2 or later
@@ -43,7 +43,7 @@ if (version_compare(phpversion(), '7.4', '<'))
 
 // Check Minimum WP version
 global $wp_version;
-if (version_compare($wp_version, '4.0.0', '<'))
+if (version_compare($wp_version, '5.0', '<'))
 {
     $init = false;
     add_action('admin_notices', function () use ($wp_version)
@@ -52,7 +52,7 @@ if (version_compare($wp_version, '4.0.0', '<'))
         <div class="notice notice-error is-dismissible">
             <p><?php echo sprintf(
                 /* translators: 1: Plugin name, 2: Current WordPress version. */
-                esc_html__("%1\$s requires at least WordPress 4.0.0 or higher, but your current version is %2\$s. Please update WordPress to the latest version first.", 'listdom'),
+                esc_html__("%1\$s requires at least WordPress 5.0 or higher, but your current version is %2\$s. Please update WordPress to the latest version first.", 'listdom'),
                 '<strong>Listdom</strong>',
                 '<strong>' . esc_html($wp_version) . '</strong>'
             ); ?></p>

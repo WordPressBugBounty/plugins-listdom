@@ -380,6 +380,8 @@ class LSD_Meta extends LSD_Base
             ],
         ];
 
+        if (!LSD_Components::remark()) unset($metas['lsd_remark']);
+
         // Socials
         $sc = new LSD_Socials();
 

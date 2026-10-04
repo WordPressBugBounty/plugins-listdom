@@ -79,6 +79,7 @@ class LSD_Fields extends LSD_Base
         if (!LSD_Components::cta()) unset($fields['cta']);
         if (!LSD_Components::work_hours()) unset($fields['availability']);
         if (!LSD_Components::map()) unset($fields['address'], $fields['map']);
+        if (!LSD_Components::remark()) unset($fields['remark']);
 
         // Conditionally include or exclude fields based on specific class existence
         if (class_exists(LSDADDREV::class) || class_exists(\LSDPACREV\Base::class)) $fields['review_stars'] = ['label' => esc_html__('Review Rates', 'listdom'), 'enabled' => 0];

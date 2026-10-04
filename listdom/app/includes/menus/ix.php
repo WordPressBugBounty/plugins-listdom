@@ -26,12 +26,17 @@ class LSD_Menus_IX extends LSD_Menus
 
         // CSV
         (new LSD_Menus_IX_CSV())->init();
+
+        (new LSD_Menus_IX_Business_Data())->init();
     }
 
     public function output()
     {
         // Get the current tab
-        $this->tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : 'csv';
+        $integration_enabled = LSD_Webilia_Connect::enabled();
+        $default_tab = $integration_enabled ? 'business-data' : 'csv';
+        $this->tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : $default_tab;
+        if (!$integration_enabled && $this->tab === 'business-data') $this->tab = 'csv';
         $this->subtab = isset($_GET['subtab']) ? sanitize_text_field(wp_unslash($_GET['subtab'])) : 'import';
         if ($this->tab === 'dummy-data' && !in_array($this->subtab, ['dummy-data', 'blueprint'], true)) $this->subtab = 'dummy-data';
 
@@ -152,16 +157,16 @@ class LSD_Menus_IX extends LSD_Menus
         array_walk_recursive($ix, 'sanitize_text_field');
 
         // File
-        $file = $ix['file'] ?? null;
+        $file = isset($ix['file']) && is_string($ix['file']) ? $ix['file'] : '';
 
         // No File
-        if (trim($file) == '') $this->response(['success' => 0, 'code' => 'FILE_MISSED']);
+        if (trim($file) === '') $this->response(['success' => 0, 'code' => 'FILE_MISSED']);
 
         // Full File Path
-        $path = $this->get_upload_path() . $file;
+        $path = LSD_IX_File::resolve_upload($file, 'json');
 
         // File Not Found
-        if (!LSD_File::exists($path)) $this->response(['success' => 0, 'code' => 'FILE_NOT_FOUND']);
+        if ($path === null) $this->response(['success' => 0, 'code' => 'FILE_NOT_FOUND']);
 
         $type = $ix['type'] ?? 'listings';
         $type = LSD_IX::normalize_import_type($type);

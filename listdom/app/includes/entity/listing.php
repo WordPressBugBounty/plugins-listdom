@@ -196,8 +196,9 @@ class LSD_Entity_Listing extends LSD_Entity
         // add zero Visits
         add_post_meta($this->id(), 'lsd_visits', 0, true);
 
-        // Remark
-        update_post_meta($this->post->ID, 'lsd_remark', isset($data['remark']) && is_scalar($data['remark']) ? wp_kses_post((string) $data['remark']) : '');
+        // Keep hidden data on ordinary saves, but accept values explicitly supplied by an importer.
+        if (LSD_Components::remark() || array_key_exists('remark', $data))
+            update_post_meta($this->post->ID, 'lsd_remark', isset($data['remark']) && is_scalar($data['remark']) ? wp_kses_post((string) $data['remark']) : '');
 
         // Display Options
         $display_options = isset($data['displ']) && is_array($data['displ']) ? $data['displ'] : [];
@@ -234,8 +235,8 @@ class LSD_Entity_Listing extends LSD_Entity
             update_post_meta($this->post->ID, 'lsd_embeds', is_array($data['embeds']) ? $this->indexify($data['embeds']) : []);
         }
 
-        // FAQs
-        update_post_meta($this->post->ID, 'lsd_faqs', isset($data['faqs']) && is_array($data['faqs']) ? $this->indexify($data['faqs']) : []);
+        if (LSD_Components::faq() || array_key_exists('faqs', $data))
+            update_post_meta($this->post->ID, 'lsd_faqs', isset($data['faqs']) && is_array($data['faqs']) ? $this->indexify($data['faqs']) : []);
 
         // Guest Data
         if (isset($data['guest_email']))

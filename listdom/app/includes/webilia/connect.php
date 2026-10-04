@@ -1,6 +1,8 @@
 <?php
 
 use Webilia\Connect\Client;
+use Webilia\Connect\Exception\RequestException;
+use Webilia\Connect\Exception\TransientException;
 use Webilia\Connect\WordPress\ConnectionStatus;
 use Webilia\Connect\WordPress\WordPressHttpClient;
 use Webilia\Connect\WordPress\WordPressStorage;
@@ -53,6 +55,37 @@ class LSD_Webilia_Connect
         {
             self::$error = $e->getMessage();
             return false;
+        }
+    }
+
+    public static function maskedAccountEmail(): string
+    {
+        if (!self::isConnected()) return '';
+
+        try
+        {
+            $connection = self::client()->connection();
+            if (!$connection) return '';
+
+            $cacheKey = 'lsd_webilia_email_' . hash('sha256', $connection->credential());
+            $cached = get_transient($cacheKey);
+            if (is_string($cached)) return $cached;
+
+            $response = (new WordPressHttpClient())->get('https://api.webilia.com/v1/connect/connection', [], [
+                'Authorization' => 'Bearer ' . $connection->credential(),
+            ]);
+            $email = $response['data']['email'] ?? '';
+            if (!is_string($email) || !is_email($email)) return '';
+
+            [$local, $domain] = explode('@', $email, 2);
+            $masked = substr($local, 0, strlen($local) > 2 ? 2 : 1) . '***'
+                . (strlen($local) > 3 ? substr($local, -1) : '') . '@' . $domain;
+            set_transient($cacheKey, $masked, 5 * MINUTE_IN_SECONDS);
+            return $masked;
+        }
+        catch (Throwable $e)
+        {
+            return '';
         }
     }
 
@@ -309,7 +342,7 @@ class LSD_Webilia_Connect
         $client = self::client();
         if (!method_exists($client, 'overturePlaceCategories'))
         {
-            throw new RuntimeException('Overture Places requires Webilia Connect SDK 1.1.0 or newer.');
+            throw new RuntimeException('Webilia Business Data requires Webilia Connect SDK 1.1.0 or newer.');
         }
 
         try
@@ -319,7 +352,36 @@ class LSD_Webilia_Connect
         catch (Throwable $e)
         {
             self::$error = $e->getMessage();
-            throw new RuntimeException('Webilia could not provide Overture categories.', 0, $e);
+            throw new RuntimeException('Webilia could not provide Business Data categories.', 0, $e);
+        }
+    }
+
+    /**
+     * Retrieve the current Webilia Credits balance for the connected website owner.
+     *
+     * @throws RuntimeException
+     */
+    public static function creditBalance(): array
+    {
+        if (!self::enabled() || !self::isConnected())
+        {
+            throw new RuntimeException('Webilia Connect is unavailable.');
+        }
+
+        $client = self::client();
+        if (!method_exists($client, 'creditBalance'))
+        {
+            throw new RuntimeException('Webilia Business Data requires Webilia Connect SDK 1.1.1 or newer.');
+        }
+
+        try
+        {
+            return $client->creditBalance();
+        }
+        catch (Throwable $e)
+        {
+            self::$error = $e->getMessage();
+            throw new RuntimeException('Webilia could not provide your credit balance.', 0, $e);
         }
     }
 
@@ -338,7 +400,7 @@ class LSD_Webilia_Connect
         $client = self::client();
         if (!method_exists($client, 'overturePlacesSearch'))
         {
-            throw new RuntimeException('Overture Places requires Webilia Connect SDK 1.1.0 or newer.');
+            throw new RuntimeException('Webilia Business Data requires Webilia Connect SDK 1.1.0 or newer.');
         }
 
         try
@@ -348,7 +410,9 @@ class LSD_Webilia_Connect
         catch (Throwable $e)
         {
             self::$error = $e->getMessage();
-            throw new RuntimeException('Webilia could not complete the Overture Places search.', 0, $e);
+            if ($e instanceof RequestException) throw new RuntimeException($e->getMessage(), (int) $e->getCode(), $e);
+            if ($e instanceof TransientException && in_array($e->getMessage(), ['Overture Places search rate limit exceeded.', 'Overture Places is temporarily unavailable.', 'Overture Places search is not enabled.'], true)) throw new RuntimeException($e->getMessage(), 503, $e);
+            throw new RuntimeException('Webilia could not complete the Webilia Business Data search.', 0, $e);
         }
     }
 
@@ -357,7 +421,7 @@ class LSD_Webilia_Connect
         if (self::$client instanceof Client) return self::$client;
 
         self::ensureStorageKey();
-        self::$client = new Client(new WordPressHttpClient(), new WordPressStorage(), defined('LSD_WEBILIA_CONNECT_API') ? LSD_WEBILIA_CONNECT_API : 'https://api.webilia.com', get_site_url());
+        self::$client = new Client(new WordPressHttpClient(), new WordPressStorage(), 'https://api.webilia.com', get_site_url());
         return self::$client;
     }
 

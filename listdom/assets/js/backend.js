@@ -4636,6 +4636,927 @@ jQuery(function ($)
     updateEmptyStates();
 })(jQuery);
 
+// Webilia Business Data Importer
+(function ($)
+{
+    'use strict';
+
+    window.LSD_Business_Data = {
+        init: function (config)
+        {
+            if (!config) return;
+
+            $(function ()
+            {
+            const $root = $('#lsd-business-data');
+            if (!$root.length || $root.data('lsdBusinessDataInitialized')) return;
+
+            $root.data('lsdBusinessDataInitialized', true);
+
+    const state = {
+        selectedCategories: [],
+        entry: null,
+        map: null,
+        marker: null,
+        circle: null,
+        resultMarkers: null,
+        categoryQuery: '',
+        categoryCursor: null,
+        categoryLoading: false,
+        categoryRequest: null,
+        categoryVersion: null,
+        categoryLabels: {},
+        terms: null,
+        modalTrigger: null,
+        importing: false,
+        history: [],
+        saveTimer: null,
+        pendingPreferences: null,
+        savingPreferences: false,
+        preferencesErrorShown: false,
+        activityToast: null,
+        creditsBalance: null
+    };
+    const $message = $root.find('[data-business-data-message]');
+    const $categories = $root.find('[data-business-data-categories]');
+    const $importModal = $root.find('[data-business-data-import-modal]');
+    const preferences = config.preferences || {};
+    const resultsPerCredit = Math.max(1, parseInt(config.resultsPerCredit, 10) || 5);
+    const $showResults = $root.find('[data-business-data-show-results]').prop('checked', Number(preferences.show_results) === 1);
+
+    const request = function (action, data)
+    {
+        return $.post(config.ajaxurl, $.extend({action: action, _wpnonce: config.nonce}, data || {}));
+    };
+
+    const escapeHtml = function (value)
+    {
+        return $('<div>').text(value || '').html();
+    };
+
+    const countLabel = function (count, type)
+    {
+        const canTranslate = typeof wp !== 'undefined' && wp.i18n && typeof wp.i18n._n === 'function' && typeof wp.i18n.sprintf === 'function';
+        let singular = '';
+        let plural = '';
+
+        if (type === 'results')
+        {
+            singular = '%d result';
+            plural = '%d results';
+            if (canTranslate) return wp.i18n.sprintf(wp.i18n._n('%d result', '%d results', count, 'listdom'), count);
+        }
+        else if (type === 'charged')
+        {
+            singular = '%d credit charged';
+            plural = '%d credits charged';
+            if (canTranslate) return wp.i18n.sprintf(wp.i18n._n('%d credit charged', '%d credits charged', count, 'listdom'), count);
+        }
+        else if (type === 'remaining')
+        {
+            singular = '%d credit remaining';
+            plural = '%d credits remaining';
+            if (canTranslate) return wp.i18n.sprintf(wp.i18n._n('%d credit remaining', '%d credits remaining', count, 'listdom'), count);
+        }
+        else if (type === 'credits')
+        {
+            singular = '%d credit';
+            plural = '%d credits';
+            if (canTranslate) return wp.i18n.sprintf(wp.i18n._n('%d credit', '%d credits', count, 'listdom'), count);
+        }
+
+        return (count === 1 ? singular : plural).replace('%d', count);
+    };
+
+    const categoryLabel = function (code)
+    {
+        if (state.categoryLabels[code]) return state.categoryLabels[code];
+
+        return String(code || '').split('_').map(function (word, index)
+        {
+            return index > 0 && ['and', 'or', 'of', 'the'].indexOf(word) !== -1 ? word : word.charAt(0).toUpperCase() + word.slice(1);
+        }).join(' ');
+    };
+
+    const websiteUrl = function (value)
+    {
+        const website = String(value || '').trim();
+        if (!website) return '';
+
+        try
+        {
+            const url = new URL(/^[a-z][a-z\d+.-]*:/i.test(website) ? website : 'https://' + website);
+            return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : '';
+        }
+        catch (error) { return ''; }
+    };
+
+    const notify = function (text, type, options)
+    {
+        if (text && typeof window.listdom_toastify === 'function') return window.listdom_toastify(escapeHtml(text), type || 'lsd-info', options || {});
+        return null;
+    };
+
+    const showMessage = function (text, type)
+    {
+        $message.text(text || '');
+        if (text) notify(text, type || 'lsd-error');
+    };
+
+    const startActivity = function (text)
+    {
+        $message.text(text);
+        state.activityToast = notify(text, 'lsd-in-progress', {hideTime: 0, showClose: false, progress: false});
+    };
+
+    const finishActivity = function (text, type)
+    {
+        if (state.activityToast) state.activityToast.remove();
+        state.activityToast = null;
+        showMessage(text, type);
+    };
+
+    const stopActivity = function ()
+    {
+        if (state.activityToast) state.activityToast.remove();
+        state.activityToast = null;
+        $message.text('');
+    };
+
+    const uuid = function ()
+    {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (character)
+        {
+            const random = Math.random() * 16 | 0;
+            const value = character === 'x' ? random : (random & 3 | 8);
+
+            return value.toString(16);
+        });
+    };
+
+    const maxAffordableResults = function ()
+    {
+        return state.creditsBalance === null ? 100 : Math.min(100, Math.max(0, state.creditsBalance * resultsPerCredit));
+    };
+
+    const updateResultLimit = function ()
+    {
+        const maximum = maxAffordableResults();
+        const $limit = $root.find('#lsd-business-data-limit').attr('max', Math.max(1, maximum));
+        if (maximum > 0 && Number($limit.val()) > maximum) $limit.val(maximum);
+
+        const $help = $root.find('[data-business-data-limit-help]');
+        $help.prop('hidden', maximum === 0 || maximum >= 100).text(maximum > 0 && maximum < 100
+            ? config.strings.limitForCredits.replace('%1$d', state.creditsBalance).replace('%2$d', maximum) : '');
+    };
+
+    const setBalanceState = function (balance)
+    {
+        const $workspace = $root.find('[data-business-data-search-workspace]');
+        const showWorkspace = config.connected && config.mapEnabled && (balance === null || balance > 0 || !!state.entry);
+        $root.find('[data-business-data-checking]').prop('hidden', true);
+        $root.find('[data-business-data-no-credits]').prop('hidden', balance !== 0);
+        $root.find('[data-business-data-balance-error]').prop('hidden', balance !== null);
+        $root.find('[data-business-data-map-disabled]').prop('hidden', balance === null || balance === 0 || config.mapEnabled);
+        $workspace.prop('hidden', !showWorkspace);
+        $root.find('[data-business-data-search]').prop('disabled', !config.connected || balance === 0);
+        state.creditsBalance = balance;
+
+        if (showWorkspace)
+        {
+            if (!state.map)
+            {
+                initializeMap();
+                searchCategories('');
+            }
+            else state.map.invalidateSize();
+        }
+        updateResultLimit();
+    };
+
+    const showBalance = function (value)
+    {
+        $root.find('[data-business-data-balance-value]').text(value).prop('hidden', false);
+        $root.find('[data-business-data-balance-loader]').prop('hidden', true);
+    };
+
+    const refreshBalance = function ()
+    {
+        $root.find('[data-business-data-balance-value]').prop('hidden', true);
+        $root.find('[data-business-data-balance-loader]').prop('hidden', false);
+        $root.find('[data-business-data-checking]').prop('hidden', false);
+        $root.find('[data-business-data-no-credits], [data-business-data-balance-error]').prop('hidden', true);
+        request('lsd_business_data_balance').done(function (response)
+        {
+            if (response.success)
+            {
+                const balance = Math.max(0, parseInt(response.credits_balance, 10) || 0);
+                showBalance(balance);
+                setBalanceState(balance);
+                return;
+            }
+
+            showBalance('—');
+            $root.find('[data-business-data-balance-error-message]').text(response.message || config.strings.balanceUnavailable);
+            setBalanceState(null);
+        }).fail(function (xhr)
+        {
+            showBalance('—');
+            $root.find('[data-business-data-balance-error-message]').text((xhr.responseJSON || {}).message || config.strings.balanceUnavailable);
+            setBalanceState(null);
+        });
+    };
+
+    const flushPreferences = function ()
+    {
+        if (state.savingPreferences || !state.pendingPreferences) return;
+
+        const values = state.pendingPreferences;
+        state.pendingPreferences = null;
+        state.savingPreferences = true;
+        request('lsd_business_data_save_preferences', values)
+            .done(function () { state.preferencesErrorShown = false; })
+            .fail(function ()
+            {
+                if (!state.pendingPreferences && !state.preferencesErrorShown)
+                {
+                    showMessage(config.strings.preferencesFailed);
+                    state.preferencesErrorShown = true;
+                }
+            })
+            .always(function ()
+            {
+                state.savingPreferences = false;
+                flushPreferences();
+            });
+    };
+
+    const savePreferences = function ()
+    {
+        if (!state.map || !state.marker) return;
+
+        const settings = normalizeSearchInputs();
+        const center = state.map.getCenter().wrap();
+        const marker = state.marker.getLatLng().wrap();
+        state.pendingPreferences = {
+            latitude: center.lat,
+            longitude: center.lng,
+            marker_latitude: marker.lat,
+            marker_longitude: marker.lng,
+            zoom: state.map.getZoom(),
+            radius_km: settings.radius,
+            limit: settings.limit,
+            show_results: $showResults.prop('checked') ? 1 : 0
+        };
+        flushPreferences();
+    };
+
+    const scheduleSavePreferences = function ()
+    {
+        window.clearTimeout(state.saveTimer);
+        state.saveTimer = window.setTimeout(savePreferences, 350);
+    };
+
+    const updateCircle = function ()
+    {
+        if (!state.marker) return;
+
+        const radius = Math.max(.1, Math.min(25, parseFloat($root.find('#lsd-business-data-radius').val()) || 25));
+        state.circle.setLatLng(state.marker.getLatLng()).setRadius(radius * 1000);
+    };
+
+    const normalizeSearchInputs = function ()
+    {
+        const $radius = $root.find('#lsd-business-data-radius');
+        const $limit = $root.find('#lsd-business-data-limit');
+        const radiusValue = $radius.val();
+        const limitValue = $limit.val();
+        const parsedRadius = Number(radiusValue);
+        const parsedLimit = Number(limitValue);
+        const radius = radiusValue !== '' && Number.isFinite(parsedRadius) ? Math.min(25, Math.max(.1, Math.round(parsedRadius * 10) / 10)) : 25;
+        const limit = Math.min(Math.max(1, maxAffordableResults()), limitValue !== '' && Number.isFinite(parsedLimit) ? Math.max(1, Math.round(parsedLimit)) : 20);
+
+        $radius.val(radius);
+        $limit.val(limit);
+        updateCircle();
+
+        return {radius: radius, limit: limit};
+    };
+
+    const renderMapResults = function (fitBounds)
+    {
+        if (!state.map || !state.resultMarkers) return;
+
+        state.resultMarkers.clearLayers();
+        if (state.map.hasLayer(state.resultMarkers)) state.map.removeLayer(state.resultMarkers);
+        if (!$showResults.prop('checked') || !state.entry) return;
+
+        const icon = new L.Icon.Default({className: 'lsd-business-data-result-pin'});
+        const markers = (state.entry.places || []).map(function (place)
+        {
+            if (place.latitude === null || place.latitude === undefined || place.longitude === null || place.longitude === undefined) return null;
+            const latitude = Number(place.latitude);
+            const longitude = Number(place.longitude);
+            if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return null;
+
+            const name = String(place.name || config.strings.untitledBusiness);
+            return L.marker([latitude, longitude], {icon: icon, title: name, bubblingMouseEvents: false}).bindPopup(escapeHtml(name));
+        }).filter(Boolean);
+
+        if (!markers.length) return;
+        markers.forEach(function (marker) { state.resultMarkers.addLayer(marker); });
+        state.resultMarkers.addTo(state.map);
+
+        if (fitBounds)
+        {
+            const bounds = L.latLngBounds(markers.map(function (marker) { return marker.getLatLng(); }));
+            state.map.fitBounds(bounds.pad(.12), {maxZoom: 14});
+        }
+    };
+
+    const initializeMap = function ()
+    {
+        const latitude = parseFloat(preferences.latitude);
+        const longitude = parseFloat(preferences.longitude);
+        const center = [Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 ? latitude : config.center.lat,
+            Number.isFinite(longitude) && longitude >= -180 && longitude <= 180 ? longitude : config.center.lng];
+        const markerLatitude = parseFloat(preferences.marker_latitude);
+        const markerLongitude = parseFloat(preferences.marker_longitude);
+        const markerCenter = [Number.isFinite(markerLatitude) && markerLatitude >= -90 && markerLatitude <= 90 ? markerLatitude : center[0],
+            Number.isFinite(markerLongitude) && markerLongitude >= -180 && markerLongitude <= 180 ? markerLongitude : center[1]];
+        const zoom = parseInt(preferences.zoom, 10);
+        const radius = parseFloat(preferences.radius_km);
+        const limit = parseInt(preferences.limit, 10);
+        // Older map/radius saves also stored the former default limit of 100.
+        const legacyDefaultLimit = limit === 100 && !preferences.limit_default_version;
+        $root.find('#lsd-business-data-radius').val(Number.isFinite(radius) && radius > 0 && radius <= 25 ? radius : 25);
+        $root.find('#lsd-business-data-limit').val(legacyDefaultLimit ? 20 : (Number.isInteger(limit) && limit >= 1 && limit <= 100 ? limit : 20));
+        state.map = L.map('lsd-business-data-map', {minZoom: 1, maxZoom: 18}).setView(center, Number.isInteger(zoom) && zoom >= 1 && zoom <= 18 ? zoom : config.center.zoom || 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(state.map);
+
+        state.marker = L.marker(markerCenter, {draggable: true}).addTo(state.map);
+        state.circle = L.circle(markerCenter, {radius: 25000, color: '#2271b1', fillOpacity: .08}).addTo(state.map);
+        state.resultMarkers = typeof L.markerClusterGroup === 'function'
+            ? L.markerClusterGroup({showCoverageOnHover: false})
+            : L.layerGroup();
+        updateCircle();
+        state.marker.on('drag', updateCircle);
+        state.marker.on('dragend', scheduleSavePreferences);
+        state.map.on('moveend', scheduleSavePreferences);
+        state.map.on('click', function (event)
+        {
+            state.marker.setLatLng(event.latlng);
+            updateCircle();
+            scheduleSavePreferences();
+        });
+
+        if (typeof ResizeObserver !== 'undefined') new ResizeObserver(function () { state.map.invalidateSize(); }).observe(document.getElementById('lsd-business-data-map'));
+    };
+
+    const renderCategories = function (categories, append)
+    {
+        const html = categories.map(function (item)
+        {
+            state.categoryLabels[item.code] = item.label;
+            return '<button type="button" data-code="' + escapeHtml(item.code) + '" data-label="' + escapeHtml(item.label) + '">' + escapeHtml(item.label) + ' <small>(' + escapeHtml(item.code) + ')</small></button>';
+        }).join('');
+
+        $categories.find('.lsd-business-data-category-status').remove();
+        if (append) $categories.append(html);
+        else $categories.html(html || '<p>' + escapeHtml(config.strings.categoryEmpty) + '</p>');
+    };
+
+    const renderSelected = function ()
+    {
+        $root.find('[data-business-data-selected]').html(state.selectedCategories.map(function (item)
+        {
+            return '<button type="button" data-remove-category="' + escapeHtml(item.code) + '">× ' + escapeHtml(item.label) + '</button>';
+        }).join(''));
+    };
+
+    const searchCategories = function (query, append, refresh)
+    {
+        if (state.categoryLoading && append) return;
+        if (!append)
+        {
+            if (state.categoryRequest) state.categoryRequest.abort();
+            state.categoryQuery = query;
+            state.categoryCursor = null;
+            if (!refresh) $categories.empty().scrollTop(0);
+            if (query.length === 1)
+            {
+                $categories.html('<p>' + escapeHtml(config.strings.categoryPrompt) + '</p>');
+                return;
+            }
+        }
+
+        state.categoryLoading = true;
+        $categories.append('<p class="lsd-business-data-category-status">' + escapeHtml(config.strings.categoryLoading) + '</p>');
+        const pending = request('lsd_business_data_categories', {q: query, limit: 100, cursor: append ? state.categoryCursor : '', refresh: refresh ? 1 : 0});
+        state.categoryRequest = pending;
+        pending.done(function (response)
+        {
+            if (state.categoryRequest !== pending || query !== state.categoryQuery) return;
+            if (response.success)
+            {
+                const data = response.data || {};
+                const version = String(data.taxonomy_version || '');
+                if (state.categoryVersion && version && version !== state.categoryVersion)
+                {
+                    state.selectedCategories = [];
+                    state.categoryLabels = {};
+                    renderSelected();
+                }
+                if (version) state.categoryVersion = version;
+                state.categoryCursor = data.next_cursor || null;
+                renderCategories(data.categories || [], append);
+                if (refresh) $categories.scrollTop(0);
+            }
+            else showMessage(response.message || config.strings.categoriesUnavailable);
+        }).fail(function (xhr, status)
+        {
+            if (status !== 'abort' && state.categoryRequest === pending && query === state.categoryQuery) showMessage((xhr.responseJSON || {}).message || config.strings.categoriesUnavailable);
+        }).always(function ()
+        {
+            if (state.categoryRequest === pending)
+            {
+                state.categoryLoading = false;
+                state.categoryRequest = null;
+                $categories.find('.lsd-business-data-category-status').remove();
+            }
+        });
+    };
+
+    const updateSelectionCount = function ()
+    {
+        const selected = $root.find('[data-place-id]:checked').length;
+        const total = $root.find('[data-place-id]').length;
+        $root.find('[data-business-data-next]').text(config.strings.nextDrafts.replace('%d', selected)).prop('disabled', selected === 0);
+        $importModal.find('[data-business-data-import]').text(config.strings.createDrafts.replace('%d', selected)).prop('disabled', selected === 0 || !state.terms || state.importing);
+        $importModal.find('[data-business-data-import-summary]').text(config.strings.selectedBusinesses.replace('%d', selected));
+        $root.find('[data-business-data-select-all]').prop('checked', total > 0 && selected === total);
+    };
+
+    const renderEntry = function (entry)
+    {
+        state.entry = entry;
+        const search = entry.request || {};
+        const latitude = search.latitude === undefined || search.latitude === null || search.latitude === '' ? NaN : Number(search.latitude);
+        const longitude = search.longitude === undefined || search.longitude === null || search.longitude === '' ? NaN : Number(search.longitude);
+        const radius = Number(search.radius_km);
+        if (state.map && state.marker && Number.isFinite(latitude) && latitude >= -90 && latitude <= 90
+            && Number.isFinite(longitude) && longitude >= -180 && longitude <= 180)
+        {
+            state.marker.setLatLng([latitude, longitude]);
+            state.map.setView([latitude, longitude], state.map.getZoom());
+        }
+        if (Number.isFinite(radius) && radius > 0 && radius <= 25)
+        {
+            $root.find('#lsd-business-data-radius').val(radius);
+        }
+        updateCircle();
+        setBalanceState(state.creditsBalance);
+        renderMapResults(true);
+
+        const places = entry.places || [];
+        const meta = entry.meta || {};
+        $root.find('[data-business-data-import-result]').prop('hidden', true);
+        const $resultsWrap = $root.find('.lsd-business-data-results-wrap').prop('hidden', false);
+        const resultCount = Number(meta.result_count ?? places.length);
+        const creditsCharged = Number(meta.credits_charged || 0);
+        const creditsRemaining = Number(meta.credits_balance || 0);
+        $root.find('[data-business-data-meta]').text([
+            countLabel(resultCount, 'results'),
+            countLabel(creditsCharged, 'charged'),
+            countLabel(creditsRemaining, 'remaining')
+        ].join(' · '));
+        $root.find('[data-business-data-results]').html(places.map(function (place)
+        {
+            const category = String(place.primary_category || place.category || '');
+            const status = String(place.operating_status || '');
+            const website = websiteUrl(place.website);
+            const categoryHtml = category ? '<span class="lsd-business-data-result-category">' + escapeHtml(categoryLabel(category)) + ' <small>(' + escapeHtml(category) + ')</small></span>' : '';
+            const distanceHtml = place.distance_meters !== null && place.distance_meters !== undefined ? '<span>' + escapeHtml(config.strings.metersAway.replace('%d', Math.round(place.distance_meters))) + '</span>' : '';
+            const websiteHtml = website ? '<a href="' + escapeHtml(website) + '" target="_blank" rel="nofollow noopener noreferrer">' + escapeHtml(place.website) + '</a>' : '';
+            const statusLabel = {open: config.strings.operatingOpen, temporarily_closed: config.strings.operatingTemporarilyClosed, permanently_closed: config.strings.operatingPermanentlyClosed}[status];
+
+            return '<article><label class="lsd-business-data-result-title"><input type="checkbox" data-place-id="' + escapeHtml(place.id) + '"><strong>' + escapeHtml(place.name || config.strings.untitledBusiness) + '</strong></label>'
+                + '<div class="lsd-business-data-result-details">'
+                + (place.address ? '<div class="lsd-business-data-result-address">' + escapeHtml(place.address) + '</div>' : '')
+                + (place.brand && place.brand.name ? '<div>' + escapeHtml(place.brand.name) + '</div>' : '')
+                + (categoryHtml || distanceHtml || statusLabel ? '<div class="lsd-business-data-result-category-line">' + [categoryHtml, distanceHtml, statusLabel ? '<span>' + escapeHtml(statusLabel) + '</span>' : ''].filter(Boolean).join(' · ') + '</div>' : '')
+                + (place.phone || place.email || websiteHtml ? '<div class="lsd-business-data-result-contacts">' + (place.phone ? '<span>' + escapeHtml(place.phone) + '</span>' : '') + (place.email ? '<span>' + escapeHtml(place.email) + '</span>' : '') + websiteHtml + '</div>' : '')
+                + '</div></article>';
+        }).join('') || '<p>' + escapeHtml(config.strings.noResults) + '</p>');
+        $resultsWrap.find('.lsd-business-data-results-scroll').scrollTop(0);
+        updateSelectionCount();
+    };
+
+    const showImportSummary = function (created, updated, skipped)
+    {
+        const $summary = $root.find('[data-business-data-import-result]');
+        const names = Object.create(null);
+        (state.entry.places || []).forEach(function (place) { names[place.id] = place.name || place.id; });
+        const details = function (items, title, linkLabel)
+        {
+            if (!items.length) return '';
+
+            return '<section><h4>' + escapeHtml(title) + '</h4><div class="lsd-business-data-import-result-list">' + items.map(function (item)
+            {
+                const link = item.edit_url ? '<a href="' + escapeHtml(item.edit_url) + '">' + escapeHtml(linkLabel) + '</a>' : '';
+                return '<div><span><strong>' + escapeHtml(names[item.id] || item.id) + '</strong>' + (item.reason ? '<small>' + escapeHtml(item.reason) + '</small>' : '') + '</span>' + link + '</div>';
+            }).join('') + '</div></section>';
+        };
+        const changed = created.length + updated.length;
+        const title = changed ? (skipped.length ? config.strings.importPartialTitle : created.length && updated.length ? config.strings.importMixedTitle : created.length ? config.strings.importSuccessTitle : config.strings.importUpdatedTitle) : config.strings.importFailedTitle;
+        const description = changed ? (skipped.length ? config.strings.importPartialDescription : created.length && updated.length ? config.strings.importMixedDescription : created.length ? config.strings.importSuccessDescription : config.strings.importUpdatedDescription) : config.strings.importFailedDescription;
+
+        $summary.toggleClass('has-skips', skipped.length > 0).find('[data-business-data-import-result-title]').text(title);
+        $summary.find('.lsd-business-data-import-result-icon .lsd-icon').toggleClass('fa-check', skipped.length === 0).toggleClass('fa-exclamation-triangle', skipped.length > 0);
+        $summary.find('[data-business-data-import-result-description]').text(description);
+        $summary.find('[data-business-data-created-count]').text(created.length);
+        $summary.find('[data-business-data-updated-count]').text(updated.length);
+        $summary.find('[data-business-data-skipped-count]').text(skipped.length);
+        $summary.find('[data-business-data-import-result-details]').html(
+            details(created, config.strings.createdDetails, config.strings.editDraft) +
+            details(updated, config.strings.updatedDetails, config.strings.editListing) +
+            details(skipped, config.strings.skippedDetails, config.strings.reviewListing)
+        );
+        $root.find('.lsd-business-data-results-wrap').prop('hidden', true);
+        $summary.prop('hidden', false);
+        $summary.find('[data-business-data-import-result-title]')[0].focus({preventScroll: true});
+        $summary[0].scrollIntoView({behavior: 'smooth', block: 'start'});
+    };
+
+    const renderTermLists = function ()
+    {
+        Object.keys(state.terms || {}).forEach(function (key)
+        {
+            const $list = $importModal.find('[data-business-data-term-list="' + key + '"]');
+            const terms = state.terms[key] || [];
+            $list.html(terms.map(function (term)
+            {
+                return '<label><input type="checkbox" value="' + escapeHtml(term.id) + '"> <span>' + escapeHtml(term.label) + '</span></label>';
+            }).join('') || '<p>' + escapeHtml(config.strings.noTerms) + '</p>');
+        });
+        $importModal.find('[data-business-data-terms-status]').removeClass('is-error').text('');
+        updateSelectionCount();
+    };
+
+    const loadTerms = function ()
+    {
+        if (state.terms) return updateSelectionCount();
+
+        $importModal.find('[data-business-data-terms-status]').removeClass('is-error').text(config.strings.loadingTerms);
+        request('lsd_business_data_terms').done(function (response)
+        {
+            if (!response.success)
+            {
+                $importModal.find('[data-business-data-terms-status]').addClass('is-error').text(response.message || config.strings.termsUnavailable);
+                return;
+            }
+            state.terms = response.terms || {};
+            renderTermLists();
+        }).fail(function (xhr)
+        {
+            $importModal.find('[data-business-data-terms-status]').addClass('is-error').text((xhr.responseJSON || {}).message || config.strings.termsUnavailable);
+        });
+    };
+
+    const closeImportModal = function ()
+    {
+        if (state.importing) return;
+        $importModal.css('display', '').attr('aria-hidden', 'true');
+        $('body').removeClass('lsd-modal-scroll-locked');
+        if (state.modalTrigger) state.modalTrigger.focus();
+    };
+
+    const selectedTermIds = function ()
+    {
+        const selected = {};
+        ['categories', 'locations', 'features', 'tags', 'labels'].forEach(function (key)
+        {
+            selected[key] = $importModal.find('[data-business-data-term-list="' + key + '"] input:checked').map(function () { return Number(this.value); }).get();
+        });
+        return selected;
+    };
+
+    const loadHistory = function ()
+    {
+        request('lsd_business_data_history').done(function (response)
+        {
+            if (!response.success) return showMessage(response.message || config.strings.historyUnavailable);
+            const history = response.history || [];
+            const canDeleteHistory = !!response.can_delete_history;
+            $root.find('[data-business-data-history]').html(history.map(function (entry)
+            {
+                const meta = entry.meta || {};
+
+                const categories = (entry.request.categories || []).map(categoryLabel).join(', ');
+
+                const resultCount = Number(meta.result_count || 0);
+                const creditsCharged = Number(meta.credits_charged || 0);
+                const details = [new Date(entry.created_at * 1000).toLocaleString(), countLabel(resultCount, 'results'), countLabel(creditsCharged, 'credits')].join(' · ');
+                const deleteAction = canDeleteHistory ? '<div class="lsd-business-data-history-actions"><button type="button" class="lsd-secondary-button lsd-business-data-history-delete" data-clear-history="' + escapeHtml(entry.id) + '" aria-label="' + escapeHtml(config.strings.removeSearch) + '" title="' + escapeHtml(config.strings.removeSearch) + '"><i class="lsd-icon fas fa-trash-alt" aria-hidden="true"></i></button></div>' : '';
+                return '<div class="lsd-business-data-history-item"><div class="lsd-business-data-history-details"><a href="#lsd-business-data-results" class="lsd-business-data-history-title" data-open-history="' + escapeHtml(entry.id) + '"><strong>' + escapeHtml(categories) + '</strong></a><span>' + escapeHtml(details) + '</span></div>' + deleteAction + '</div>';
+            }).join('') || '<p>' + escapeHtml(config.strings.noRecentSearches) + '</p>');
+            state.history = history;
+            $root.find('.lsd-business-data-history-wrap').prop('hidden', !config.connected && history.length === 0);
+            $root.find('[data-business-data-clear-history]').prop('hidden', !canDeleteHistory || history.length === 0);
+        }).fail(function () { showMessage(config.strings.historyUnavailable); });
+    };
+
+    let categorySearchTimer;
+    $root.on('click', '[data-business-data-refresh-categories]', function ()
+    {
+        const $button = $(this).prop('disabled', true).attr('aria-busy', 'true');
+        $button.find('i').addClass('fa-spin');
+        window.clearTimeout(categorySearchTimer);
+        $root.find('#lsd-business-data-category-search').val('');
+        searchCategories('', false, true);
+        if (state.categoryRequest) state.categoryRequest.always(function ()
+        {
+            $button.prop('disabled', false).removeAttr('aria-busy');
+            $button.find('i').removeClass('fa-spin');
+        });
+    });
+
+    $root.on('input', '#lsd-business-data-category-search', function ()
+    {
+        const value = $(this).val().trim();
+        window.clearTimeout(categorySearchTimer);
+        categorySearchTimer = window.setTimeout(function () { searchCategories(value, false); }, 250);
+    });
+
+    $categories.on('scroll', function ()
+    {
+        if (state.categoryCursor && !state.categoryLoading && this.scrollTop + this.clientHeight >= this.scrollHeight - 50) searchCategories(state.categoryQuery, true);
+    });
+
+    $root.on('click', '[data-business-data-categories] button', function ()
+    {
+        const code = $(this).data('code');
+        const label = $(this).data('label');
+        if (state.selectedCategories.some(function (item) { return item.code === code; })) return;
+        if (state.selectedCategories.length >= 5) return showMessage(config.strings.maxCategories);
+
+        state.selectedCategories.push({code: code, label: label});
+        renderSelected();
+    });
+
+    $root.on('click', '[data-remove-category]', function ()
+    {
+        const code = $(this).data('remove-category');
+        state.selectedCategories = state.selectedCategories.filter(function (item) { return item.code !== code; });
+        renderSelected();
+    });
+
+    $root.on('input', '#lsd-business-data-radius', updateCircle);
+    $root.on('change', '#lsd-business-data-radius, #lsd-business-data-limit', function ()
+    {
+        normalizeSearchInputs();
+        scheduleSavePreferences();
+    });
+
+    $root.on('change', '[data-business-data-show-results]', function ()
+    {
+        renderMapResults(true);
+        scheduleSavePreferences();
+    });
+
+    $root.on('click', '[data-business-data-search]', function ()
+    {
+        if (state.creditsBalance === 0 || !state.marker) return;
+        if (!state.selectedCategories.length) return showMessage(config.strings.selectCategory);
+
+        const settings = normalizeSearchInputs();
+        const $button = $(this).prop('disabled', true);
+        const point = state.marker.getLatLng().wrap();
+        startActivity(config.strings.searching);
+        request('lsd_business_data_search', {
+            categories: state.selectedCategories.map(function (item) { return item.code; }),
+            latitude: point.lat,
+            longitude: point.lng,
+            radius_km: settings.radius,
+            limit: settings.limit,
+            idempotency_key: uuid()
+        }).done(function (response)
+        {
+            if (response.success)
+            {
+                const appliedLimit = Number((response.entry.request || {}).limit);
+                if (Number.isInteger(appliedLimit) && appliedLimit > 0) $root.find('#lsd-business-data-limit').val(appliedLimit);
+                renderEntry(response.entry);
+                const remaining = (response.entry.meta || {}).credits_balance;
+                if (remaining !== undefined)
+                {
+                    showBalance(remaining);
+                    setBalanceState(Math.max(0, parseInt(remaining, 10) || 0));
+                }
+                loadHistory();
+                finishActivity(config.strings.searchComplete, 'lsd-success');
+            }
+            else finishActivity(response.message || config.strings.searchFailed, 'lsd-error');
+        }).fail(function (xhr)
+        {
+            const error = xhr.responseJSON || {};
+            if (xhr.status === 402 && Number.isInteger(Number(error.credits_balance)))
+            {
+                const balance = Math.max(0, Number(error.credits_balance));
+                showBalance(balance);
+                setBalanceState(balance);
+            }
+            finishActivity(error.message || config.strings.searchFailed, 'lsd-error');
+        }).always(function ()
+        {
+            $button.prop('disabled', state.creditsBalance === 0);
+        });
+    });
+
+    $root.on('change', '[data-business-data-select-all]', function ()
+    {
+        $root.find('[data-place-id]').prop('checked', this.checked);
+        updateSelectionCount();
+    });
+
+    $root.on('change', '[data-place-id]', updateSelectionCount);
+
+    $root.on('click', '[data-business-data-next]', function ()
+    {
+        if (!state.entry || !$root.find('[data-place-id]:checked').length) return showMessage(config.strings.selectBusiness);
+        state.modalTrigger = this;
+        $importModal.css('display', 'flex').attr('aria-hidden', 'false');
+        $('body').addClass('lsd-modal-scroll-locked');
+        $importModal.find('[data-business-data-terms-status]').removeClass('is-error').text('');
+        updateSelectionCount();
+        loadTerms();
+        $importModal.find('[data-business-data-modal-close]').first().trigger('focus');
+    });
+
+    $importModal.on('click', '[data-business-data-modal-close]', closeImportModal);
+    $importModal.on('click', function (event)
+    {
+        if (event.target === this) closeImportModal();
+    });
+    $importModal.on('keydown', function (event)
+    {
+        if (event.key === 'Escape') closeImportModal();
+        if (event.key !== 'Tab') return;
+
+        const $focusable = $importModal.find('button:not(:disabled), input:not(:disabled)').filter(':visible');
+        if (!$focusable.length) return;
+        if (event.shiftKey && document.activeElement === $focusable[0])
+        {
+            event.preventDefault();
+            $focusable[$focusable.length - 1].focus();
+        }
+        else if (!event.shiftKey && document.activeElement === $focusable[$focusable.length - 1])
+        {
+            event.preventDefault();
+            $focusable[0].focus();
+        }
+    });
+    $importModal.on('change', '[data-business-data-auto-category]', function ()
+    {
+        $importModal.find('.lsd-business-data-manual-categories').prop('hidden', this.checked);
+        $importModal.find('[data-business-data-terms-status]').removeClass('is-error').text('');
+    });
+    $importModal.on('input', '[data-business-data-term-search]', function ()
+    {
+        const query = String($(this).val() || '').toLowerCase().trim();
+        $(this).siblings('.lsd-business-data-term-list').find('label').each(function ()
+        {
+            $(this).toggle($(this).text().toLowerCase().indexOf(query) !== -1);
+        });
+    });
+
+    $root.on('click', '[data-business-data-import]', function ()
+    {
+        if (!state.entry || !state.terms || state.importing) return;
+
+        const ids = $root.find('[data-place-id]:checked').map(function () { return $(this).data('place-id'); }).get();
+        if (!ids.length) return showMessage(config.strings.selectBusiness);
+        const autoCategory = $importModal.find('[data-business-data-auto-category]').prop('checked');
+        const enrichExisting = $importModal.find('[data-business-data-enrich-existing]').prop('checked');
+        const terms = selectedTermIds();
+        if (!autoCategory && !terms.categories.length)
+        {
+            $importModal.find('[data-business-data-terms-status]').addClass('is-error').text(config.strings.selectManualCategory);
+            return;
+        }
+
+        $(this).prop('disabled', true);
+        state.importing = true;
+        $importModal.find('[data-business-data-modal-close]').prop('disabled', true);
+        $importModal.find('[data-business-data-terms-status]').removeClass('is-error').text(config.strings.importing);
+        const batches = [];
+        while (ids.length) batches.push(ids.splice(0, 20));
+        startActivity(config.strings.importing);
+
+        const created = [];
+        const updated = [];
+        const skipped = [];
+        const skipBatch = function (batch, reason)
+        {
+            batch.forEach(function (id) { skipped.push({id: id, reason: reason}); });
+        };
+        const next = function ()
+        {
+            const batch = batches.shift();
+            if (!batch)
+            {
+                state.importing = false;
+                $importModal.find('[data-business-data-modal-close]').prop('disabled', false);
+                $importModal.find('[data-business-data-terms-status]').text('');
+                stopActivity();
+                closeImportModal();
+                showImportSummary(created, updated, skipped);
+                updateSelectionCount();
+                loadHistory();
+                return;
+            }
+
+            request('lsd_business_data_import', {history_id: state.entry.id, place_ids: batch, auto_category: autoCategory ? 1 : 0, enrich_existing: enrichExisting ? 1 : 0, terms: terms}).done(function (response)
+            {
+                if (response.success)
+                {
+                    const batchCreated = response.created || [];
+                    const batchUpdated = response.updated || [];
+                    const batchSkipped = response.skipped || [];
+                    const reported = Object.create(null);
+                    batchCreated.concat(batchUpdated, batchSkipped).forEach(function (item) { reported[item.id] = true; });
+                    created.push.apply(created, batchCreated);
+                    updated.push.apply(updated, batchUpdated);
+                    skipped.push.apply(skipped, batchSkipped);
+                    skipBatch(batch.filter(function (id) { return !reported[id]; }), config.strings.importFailed);
+                }
+                else skipBatch(batch, response.message || config.strings.importFailed);
+
+                next();
+            }).fail(function (xhr)
+            {
+                skipBatch(batch, (xhr.responseJSON || {}).message || config.strings.importFailed);
+                next();
+            });
+        };
+
+        next();
+    });
+
+    $root.on('click', '[data-open-history]', function (event)
+    {
+        event.preventDefault();
+        const id = $(this).data('open-history');
+        const entry = (state.history || []).filter(function (item) { return item.id === id; })[0];
+        if (entry)
+        {
+            renderEntry(entry);
+            notify(config.strings.openSaved, 'lsd-info');
+            $root.find('.lsd-business-data-results-wrap')[0].scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+    });
+
+    $root.on('click', '[data-clear-history], [data-business-data-clear-history]', function ()
+    {
+        const id = $(this).data('clear-history') || '';
+        notify(id ? config.strings.removeConfirm : config.strings.clearConfirm, 'lsd-confirm', {
+            position: 'lsd-center-center',
+            confirm: {
+                confirmText: config.strings.confirm,
+                cancelText: config.strings.cancel,
+                onConfirm: function ()
+                {
+                    request('lsd_business_data_clear_history', {id: id}).done(function (response)
+                    {
+                        if (!response.success) return showMessage(response.message || config.strings.historyFailed);
+                        if (state.entry && (!id || state.entry.id === id))
+                        {
+                            state.entry = null;
+                            $root.find('.lsd-business-data-results-wrap').prop('hidden', true);
+                            renderMapResults(false);
+                            setBalanceState(state.creditsBalance);
+                        }
+                        loadHistory();
+                        notify(config.strings.historyRemoved, 'lsd-success');
+                    }).fail(function (xhr) { showMessage((xhr.responseJSON || {}).message || config.strings.historyFailed); });
+                }
+            }
+        });
+    });
+
+            $root.on('click', '[data-business-data-retry-balance]', refreshBalance);
+            if (config.connected) refreshBalance();
+            loadHistory();
+            });
+        }
+    };
+
+    if (window.lsdBusinessDataConfig) window.LSD_Business_Data.init(window.lsdBusinessDataConfig);
+})(jQuery);
+
 // Claim Payment Settings
 (function ($)
 {

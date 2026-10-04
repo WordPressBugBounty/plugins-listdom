@@ -46,7 +46,7 @@ $dashboard = LSD_Payload::get('dashboard');
             ]);
         }
 
-        if (!$dashboard || $dashboard->is_enabled('remark'))
+        if (LSD_Components::remark() && (!$dashboard || $dashboard->is_enabled('remark')))
         {
             $this->include_html_file('metaboxes/listing/details/remark.php', [
                 'parameters' => compact('dashboard', 'post'),
@@ -60,14 +60,14 @@ $dashboard = LSD_Payload::get('dashboard');
             ]);
         }
 
-        if ($this->isPro() && (!$dashboard || $dashboard->is_enabled('embed')))
+        if ($this->isPro() && LSD_Components::embed() && (!$dashboard || $dashboard->is_enabled('embed')))
         {
             $this->include_html_file('metaboxes/listing/details/embed.php', [
                 'parameters' => compact('dashboard', 'post'),
             ]);
         }
 
-        if (!$dashboard || $dashboard->is_enabled('faq'))
+        if (LSD_Components::faq() && (!$dashboard || $dashboard->is_enabled('faq')))
         {
             $this->include_html_file('metaboxes/listing/details/faq.php', [
                 'parameters' => compact('dashboard', 'post'),

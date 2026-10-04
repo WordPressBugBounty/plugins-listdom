@@ -3,6 +3,15 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v6.2.0 <span>October 3rd, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added Webilia Business Data to discover businesses worldwide and import selected results as Listdom draft listings, with taxonomy assignment, duplicate protection, and optional enrichment of missing business details.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added native Divi 5 integration for all Listdom Divi modules, while preserving support for existing Divi 4 layouts.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added Listdom records to the WordPress admin Command Palette, making it faster to find and edit listings, shortcodes, taxonomy terms, and supported add-on content.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added reversible switches for Remark, Embed & Featured Video, and FAQ components, allowing them to be disabled without deleting saved data and re-enabled at any time.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved paid checkout with configurable required billing fields, Business Data map preference saving, listing editor forms, comparison table styling, and Frontend Dashboard widget settings.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed file validation for JSON, CSV, and Excel imports and resolved several listing workflow, dashboard, and interface issues.', 'listdom'); ?></li>
+    </ul>
     <h2>v6.1.2 <span>September 24th, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Improved Webilia Connect system.', 'listdom'); ?></li>

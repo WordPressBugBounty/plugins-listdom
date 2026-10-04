@@ -1004,15 +1004,15 @@ class LSD_IX extends LSD_Base
             'phone' => $metas['lsd_phone'] ?? '',
             'website' => $metas['lsd_website'] ?? '',
             'contact_address' => $metas['lsd_contact_address'] ?? '',
-            'remark' => $metas['lsd_remark'] ?? '',
             'displ' => $metas['lsd_displ'] ?? [],
             'featured_image_alt' => $metas['lsd_featured_image_alt'] ?? '',
             'gallery' => $gallery,
             'gallery_alt' => $gallery_alt,
-            'faqs' => $faqs,
             'sc' => [], // Social Networks
         ];
 
+        if (array_key_exists('lsd_remark', $metas)) $data['remark'] = $metas['lsd_remark'];
+        if (isset($listing['faqs']) || isset($metas['lsd_faqs'])) $data['faqs'] = $faqs;
         if (LSD_Base::isPro() && $has_embeds) $data['embeds'] = $embeds;
 
         // Social Networks

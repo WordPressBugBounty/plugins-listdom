@@ -105,7 +105,7 @@ class LSD_AI_Visibility_Payload extends LSD_Base
 
         if ($this->settings->field_enabled('excerpt') && $excerpt_enabled && $excerpt !== '') $payload['excerpt'] = $excerpt;
 
-        if ($this->settings->field_enabled('faqs'))
+        if (LSD_Components::faq() && $this->settings->field_enabled('faqs'))
         {
             $faqs = $this->public_faq_payload($post->ID);
             if (count($faqs)) $payload['faqs'] = $faqs;
@@ -592,6 +592,8 @@ class LSD_AI_Visibility_Payload extends LSD_Base
      */
     public function public_faq_payload(int $listing_id): array
     {
+        if (!LSD_Components::faq()) return [];
+
         // FAQ Config
         $faq_config = $this->listing_element_config($listing_id, 'faq');
         if (empty($faq_config['enabled'])) return [];

@@ -14,6 +14,7 @@ class LSD_Dashboard_Payments extends LSD_Base
 
     public function init()
     {
+        add_action('template_redirect', [$this, 'maybe_save_billing_profile']);
         add_filter('lsd_dashboard_menus', [$this, 'menu'], 15, 2);
         add_filter('lsd_dashboard_modes', [$this, 'dashboard'], 15, 2);
         add_action('wp_ajax_lsd_dashboard_payments_load_more', [$this, 'load_more']);
@@ -48,8 +49,6 @@ class LSD_Dashboard_Payments extends LSD_Base
     {
         if ($dashboard->mode !== self::MODE) return $output;
         if (!get_current_user_id()) return $dashboard->auth();
-
-        $this->maybe_save_billing_profile();
 
         ob_start();
         include lsd_template('dashboard/payments.php');
@@ -1982,10 +1981,21 @@ class LSD_Dashboard_Payments extends LSD_Base
         return (new LSD_Payments_Tax())->get_states($country);
     }
 
-    protected function maybe_save_billing_profile(): void
+    public function checkout_billing_form(): string
+    {
+        $dashboard = new LSD_Shortcodes_Dashboard();
+        $billing_inline = true;
+
+        ob_start();
+        include lsd_template('dashboard/payments/billing.php');
+        return ob_get_clean();
+    }
+
+    public function maybe_save_billing_profile(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') return;
-        if ($this->get_section() !== 'billing') return;
+        $dashboard_billing = isset($_GET['mode']) && sanitize_key(wp_unslash($_GET['mode'])) === self::MODE && $this->get_section() === 'billing';
+        if (!$dashboard_billing && empty($_POST['lsd_billing_checkout'])) return;
         if (!isset($_POST['lsd_dashboard_payments_billing_nonce'])) return;
 
         $nonce = sanitize_text_field(wp_unslash($_POST['lsd_dashboard_payments_billing_nonce']));
@@ -2002,8 +2012,13 @@ class LSD_Dashboard_Payments extends LSD_Base
         if ($country !== '' && !isset($countries[$country])) $country = '';
 
         $states = $tax_helper->get_states($country);
-        $state = isset($raw['state']) ? strtoupper(sanitize_text_field((string) $raw['state'])) : '';
-        if ($state !== '' && !isset($states[$state])) $state = '';
+        $state = isset($raw['state']) ? sanitize_text_field((string) $raw['state']) : '';
+        if ($states)
+        {
+            $state = strtoupper($state);
+            if ($state !== '' && !isset($states[$state])) $state = '';
+        }
+        else if ($country === '') $state = '';
 
         $profile = [
             'billing_name' => isset($raw['name']) ? sanitize_text_field((string) $raw['name']) : '',
@@ -2021,6 +2036,13 @@ class LSD_Dashboard_Payments extends LSD_Base
         foreach ($profile as $meta_key => $value)
         {
             update_user_meta($user_id, $meta_key, $value);
+        }
+
+        if (!empty($_GET['lsd_checkout_return']) && !LSD_Payments_Helper::missing_billing_fields($user_id))
+        {
+            $return_url = wp_validate_redirect(esc_url_raw(wp_unslash($_GET['lsd_checkout_return'])), (new LSD_Payments_Helper())->checkout_url());
+            wp_safe_redirect($return_url);
+            exit;
         }
     }
 

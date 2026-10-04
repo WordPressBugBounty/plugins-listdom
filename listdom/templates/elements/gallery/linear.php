@@ -19,6 +19,7 @@ $include_thumbnail = $params['include_thumbnail'] ?? false;
 $image_limit = $params['image_limit'] ?? 4;
 $image_fit = $params['image_fit'] ?? 'cover';
 $image_height = $params['image_height'] ?? '300';
+$native_image_styles = !empty($params['native_image_styles']);
 $image_itemprop = LSD_Schema::suppressing_markup() ? '' : ' itemprop="https://schema.org/image"';
 
 $gallery = $this->get_gallery($post_id, $include_thumbnail);
@@ -44,7 +45,7 @@ if (!count($gallery)) return '';
             $alt = LSD_Entity_Listing::image_alt($post_id, $id, $include_thumbnail && $index === 0 && (int) $id === (int) $featured_image_id);
             ?>
             <div class="lsd-gallery-grid-item" style="width: <?php echo esc_attr($item_width); ?>%;">
-                <img style="object-fit: <?php echo esc_attr($image_fit); ?>; max-height: <?php echo esc_attr($image_height); ?>px; min-height: <?php echo esc_attr($image_height); ?>px;" alt="<?php echo esc_attr($alt); ?>" src="<?php echo esc_url($thumb[0]); ?>" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>"<?php echo $image_itemprop; ?>>
+                <img<?php if (!$native_image_styles): ?> style="object-fit: <?php echo esc_attr($image_fit); ?>; max-height: <?php echo esc_attr($image_height); ?>px; min-height: <?php echo esc_attr($image_height); ?>px;"<?php endif; ?> alt="<?php echo esc_attr($alt); ?>" src="<?php echo esc_url($thumb[0]); ?>" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>"<?php echo $image_itemprop; ?>>
             </div>
             <?php
         }

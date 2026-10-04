@@ -247,11 +247,11 @@ class LSD_Menus_IX_CSV extends LSD_Base
             $ix = isset($_POST['ix']) && is_array($_POST['ix']) ? wp_unslash($_POST['ix']) : [];
             array_walk_recursive($ix, 'sanitize_text_field');
 
-            $file = isset($ix['file']) ? sanitize_file_name($ix['file']) : '';
+            $file = isset($ix['file']) && is_string($ix['file']) ? $ix['file'] : '';
             if ($file === '') $this->response(['success' => 0, 'message' => esc_html__('The import file is missing.', 'listdom'), 'code' => 'FILE_MISSED']);
 
-            $path = $this->get_upload_path() . $file;
-            if (!LSD_File::exists($path)) $this->response(['success' => 0, 'message' => esc_html__('The import file could not be found.', 'listdom'), 'code' => 'FILE_NOT_FOUND']);
+            $path = LSD_IX_File::resolve_upload($file, 'csv');
+            if ($path === null) $this->response(['success' => 0, 'message' => esc_html__('The import file could not be found.', 'listdom'), 'code' => 'FILE_NOT_FOUND']);
 
             $type = isset($ix['type']) ? LSD_IX::normalize_import_type($ix['type']) : 'listings';
             $limit = isset($ix['size']) ? absint($ix['size']) : 20;
@@ -286,9 +286,9 @@ class LSD_Menus_IX_CSV extends LSD_Base
             if (!$session) $this->response(['success' => 0, 'message' => esc_html__('An import is waiting to be resumed or discarded.', 'listdom'), 'code' => 'IMPORT_IN_PROGRESS']);
         }
 
-        $file = sanitize_file_name($session['file'] ?? '');
-        $path = $this->get_upload_path() . $file;
-        if (!LSD_File::exists($path))
+        $file = $session['file'] ?? '';
+        $path = LSD_IX_File::resolve_upload($file, 'csv');
+        if ($path === null)
         {
             $sessions->delete('csv', $session['id'] ?? '');
             $this->response(['success' => 0, 'message' => esc_html__('The import file could not be found. Upload it again to start over.', 'listdom'), 'code' => 'FILE_NOT_FOUND']);
@@ -352,8 +352,8 @@ class LSD_Menus_IX_CSV extends LSD_Base
         $session = (new LSD_IX_Import_Session())->get('csv');
         if (!$session) $this->response(['success' => 1, 'active' => 0]);
 
-        $file = sanitize_file_name($session['file'] ?? '');
-        if (!LSD_File::exists($this->get_upload_path() . $file))
+        $file = $session['file'] ?? '';
+        if (LSD_IX_File::resolve_upload($file, 'csv') === null)
         {
             (new LSD_IX_Import_Session())->delete('csv', $session['id'] ?? '');
             $this->response(['success' => 1, 'active' => 0, 'expired' => 1]);
@@ -438,12 +438,13 @@ class LSD_Menus_IX_CSV extends LSD_Base
         if (!current_user_can('manage_options')) $this->response(['success' => 0, 'code' => 'NO_ACCESS']);
 
         // Parameters
-        $file = isset($_POST['file']) ? sanitize_text_field(wp_unslash($_POST['file'])) : '';
+        $file = isset($_POST['file']) && is_string($_POST['file']) ? wp_unslash($_POST['file']) : '';
         $ai_profile = isset($_POST['ai_profile']) ? sanitize_text_field(wp_unslash($_POST['ai_profile'])) : '';
         $type = isset($_POST['type']) ? LSD_IX::normalize_import_type(sanitize_text_field(wp_unslash($_POST['type']))) : 'listings';
 
         // Feed Path / URL
-        $path = $this->get_upload_path().$file;
+        $path = LSD_IX_File::resolve_upload($file, 'csv');
+        if ($path === null) $this->response(['success' => 0, 'code' => 'FILE_NOT_FOUND']);
 
         // Mapping Library
         $mapping = new LSD_IX_Mapping();
@@ -473,7 +474,7 @@ class LSD_Menus_IX_CSV extends LSD_Base
         if (!current_user_can('manage_categories')) $this->response(['success' => 0, 'code' => 'NO_CUSTOM_FIELD_ACCESS']);
 
         $ix = isset($_POST['ix']) && is_array($_POST['ix']) ? wp_unslash($_POST['ix']) : [];
-        $file = isset($ix['file']) ? sanitize_file_name($ix['file']) : '';
+        $file = isset($ix['file']) && is_string($ix['file']) ? $ix['file'] : '';
         $type = isset($ix['type']) ? LSD_IX::normalize_import_type(sanitize_text_field($ix['type'])) : 'listings';
         $fields = isset($ix['custom_fields']) && is_array($ix['custom_fields']) ? $ix['custom_fields'] : [];
         $mapping = isset($ix['mapping']) && is_array($ix['mapping']) ? $ix['mapping'] : [];
@@ -482,8 +483,8 @@ class LSD_Menus_IX_CSV extends LSD_Base
         if (!$file) $this->response(['success' => 0, 'code' => 'FILE_MISSED']);
         if ($type !== 'listings') $this->response(['success' => 0, 'code' => 'INVALID_IMPORT_TYPE']);
 
-        $path = $this->get_upload_path() . $file;
-        if (!LSD_File::exists($path)) $this->response(['success' => 0, 'code' => 'FILE_NOT_FOUND']);
+        $path = LSD_IX_File::resolve_upload($file, 'csv');
+        if ($path === null) $this->response(['success' => 0, 'code' => 'FILE_NOT_FOUND']);
 
         $result = (new LSD_IX_Custom_Fields())->provision($fields, $mapping);
         if (empty($result['success']))

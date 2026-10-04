@@ -70,7 +70,11 @@ class LSD_IX_Import_Session extends LSD_Base
 
         delete_transient($this->key($format));
 
-        if ($file !== '') LSD_File::delete($this->get_upload_path() . sanitize_file_name($file));
+        if ($file !== '')
+        {
+            $path = LSD_IX_File::resolve_upload($file, $format === 'excel' ? 'xlsx' : 'csv');
+            if ($path !== null) LSD_File::delete($path);
+        }
     }
 
     public static function cleanup(string $format, int $user_id, string $id, string $file): void
@@ -84,7 +88,11 @@ class LSD_IX_Import_Session extends LSD_Base
         if (is_array($state) && ($state['id'] ?? '') !== $id) return;
 
         delete_transient($key);
-        if ($file !== '') LSD_File::delete((new LSD_Main())->get_upload_path() . sanitize_file_name($file));
+        if ($file !== '')
+        {
+            $path = LSD_IX_File::resolve_upload($file, $format === 'excel' ? 'xlsx' : 'csv');
+            if ($path !== null) LSD_File::delete($path);
+        }
     }
 
     protected function save(array $state): void

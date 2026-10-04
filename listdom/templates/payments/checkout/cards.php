@@ -15,6 +15,9 @@ defined('ABSPATH') || die();
 /** @var string $gateway_warning */
 /** @var int $gateway_tabs_count */
 /** @var array $checkout_auth */
+/** @var array $billing_missing */
+/** @var string $billing_url */
+/** @var string $billing_form */
 
 $checkout_auth_required = !empty($checkout_auth['required']);
 ?>
@@ -71,6 +74,16 @@ $checkout_auth_required = !empty($checkout_auth['required']);
                     <div class="lsd-alert lsd-warning"><?php echo esc_html($gateway_warning); ?></div>
                 <?php elseif ($checkout_auth_required): ?>
                     <div class="lsd-alert lsd-info"><?php esc_html_e('Log in or register above to continue to payment.', 'listdom'); ?></div>
+                <?php elseif ($billing_missing): ?>
+                    <div class="lsd-alert lsd-warning">
+                        <?php echo sprintf(esc_html__('Complete your billing information before payment: %s.', 'listdom'), implode(', ', $billing_missing)); ?>
+                        <?php if ($billing_url): ?>
+                            <a href="<?php echo esc_url($billing_url); ?>"><?php esc_html_e('Complete Billing', 'listdom'); ?></a>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($billing_form): ?>
+                        <div class="lsd-dashboard lsd-dashboard-payments"><?php echo LSD_Kses::full($billing_form); ?></div>
+                    <?php endif; ?>
                 <?php elseif ($requires_payment): ?>
                     <div class="lsd-fe-tabs lsd-fe-subsections">
                         <?php if ($gateway_tabs_count > 1): ?>

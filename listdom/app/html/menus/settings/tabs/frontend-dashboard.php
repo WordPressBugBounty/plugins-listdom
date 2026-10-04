@@ -811,7 +811,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <div class="lsd-settings-fields-wrapper">
+                    <div class="lsd-settings-fields-wrapper lsd-settings-required-fields">
                         <h3 class="lsd-admin-title"><?php esc_html_e('Required Fields', 'listdom'); ?></h3>
                         <div class="lsd-form-row">
                             <div class="lsd-col-12">

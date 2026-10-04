@@ -731,6 +731,10 @@ abstract class LSD_Template extends LSD_Base
             'discussion',
         ]);
 
+        if (!LSD_Components::remark()) $keys = array_diff($keys, ['remark']);
+        if (!LSD_Components::embed()) $keys = array_diff($keys, ['embed', 'video']);
+        if (!LSD_Components::faq()) $keys = array_diff($keys, ['faq']);
+
         $elements = [];
 
         foreach ($keys as $key)

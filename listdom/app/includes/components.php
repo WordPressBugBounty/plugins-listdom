@@ -18,6 +18,9 @@ class LSD_Components
             'related' => true,
             'socials' => true,
             'cta' => true,
+            'remark' => true,
+            'embed' => true,
+            'faq' => true,
         ], $current);
     }
 
@@ -62,5 +65,22 @@ class LSD_Components
         $components = self::get();
         return (bool) ($components['cta'] ?? true);
     }
-}
 
+    public static function remark(): bool
+    {
+        $components = self::get();
+        return (bool) ($components['remark'] ?? true);
+    }
+
+    public static function embed(): bool
+    {
+        $components = self::get();
+        return (bool) ($components['embed'] ?? true);
+    }
+
+    public static function faq(): bool
+    {
+        $components = self::get();
+        return (bool) ($components['faq'] ?? true);
+    }
+}

@@ -212,6 +212,32 @@ class LSD_Shortcodes_Checkout extends LSD_Base
 
         $requires_payment = $total > 0;
         $checkout_auth = $this->auth_requirement($items);
+        $billing_missing = $requires_payment ? LSD_Payments_Helper::missing_billing_fields(get_current_user_id()) : [];
+        $billing_url = '';
+        $billing_form = '';
+        if ($billing_missing && is_user_logged_in())
+        {
+            $settings = LSD_Options::settings();
+            $dashboard_page_id = (int) ($settings['submission_page'] ?? 0);
+            $dashboard_page_url = $dashboard_page_id ? get_permalink($dashboard_page_id) : '';
+            if ($dashboard_page_url)
+            {
+                $billing_url = add_query_arg([
+                    'mode' => 'payments-billing',
+                    'payment_section' => 'billing',
+                    'lsd_checkout_return' => rawurlencode((new LSD_Main())->current_url()),
+                ], $dashboard_page_url);
+            }
+        }
+        else if ($billing_missing && !$checkout_auth['required'])
+        {
+            $checkout_auth = [
+                'required' => true,
+                'message' => esc_html__('Log in or register to complete billing before payment.', 'listdom'),
+                'auth_html' => $this->auth_form(),
+            ];
+        }
+        if ($billing_missing && is_user_logged_in() && !$billing_url) $billing_form = (new LSD_Dashboard_Payments())->checkout_billing_form();
 
         ob_start();
         include lsd_template($tpl);
@@ -349,6 +375,17 @@ class LSD_Shortcodes_Checkout extends LSD_Base
         $tax = $totals['tax'];
         $tax_items = $totals['taxes'] ?? [];
         $total = $totals['total'];
+        if ($total > 0)
+        {
+            $missing = LSD_Payments_Helper::missing_billing_fields(get_current_user_id());
+            if ($missing)
+            {
+                wp_send_json(['success' => 0, 'message' => sprintf(
+                    esc_html__('Complete your billing information before payment: %s.', 'listdom'),
+                    implode(', ', $missing)
+                )]);
+            }
+        }
         $tax_location = $cart->get_tax_location();
         $tax_helper = new LSD_Payments_Tax();
         $tax_prices_include = $tax_helper->prices_include_tax() ? 1 : 0;

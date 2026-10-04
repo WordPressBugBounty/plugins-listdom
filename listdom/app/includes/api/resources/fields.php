@@ -447,6 +447,10 @@ class LSD_API_Resources_Fields extends LSD_API_Resource
 
     public static function is_enabled($module): bool
     {
+        if ($module === 'remark' && !LSD_Components::remark()) return false;
+        if ($module === 'embed' && !LSD_Components::embed()) return false;
+        if ($module === 'faq' && !LSD_Components::faq()) return false;
+
         // Listdom Options
         $settings = LSD_Options::settings();
 

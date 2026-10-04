@@ -14,6 +14,8 @@ class LSD_Element_Faq extends LSD_Element
 
     public function get($post_id = null, $limit = 0)
     {
+        if (!LSD_Components::faq()) return '';
+
         if (is_null($post_id))
         {
             global $post;
@@ -47,6 +49,8 @@ class LSD_Element_Faq extends LSD_Element
      */
     public function items(int $post_id, int $limit = 0): array
     {
+        if (!LSD_Components::faq()) return [];
+
         // Stored FAQs
         $stored = get_post_meta($post_id, 'lsd_faqs', true);
         if (!is_array($stored)) return [];

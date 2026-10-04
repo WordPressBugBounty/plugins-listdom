@@ -224,110 +224,39 @@ $did_taxonomies = [];
 
             <div class="lsd-settings-group-wrapper">
                 <div class="lsd-settings-fields-wrapper">
-                    <p class="lsd-admin-description lsd-m-0"><?php esc_html_e("If you deactivate a listing component it will be hidden across all Listdom backend and frontend areas. Disable the components you don't need to simplify your website.", 'listdom'); ?></p>
-                    <div class="lsd-alert lsd-info lsd-my-0"><?php esc_html_e('Disabling any listing component removes its related fields, filters, and views throughout Listdom.', 'listdom'); ?></div>
+                    <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Choose the listing components you need for your website.', 'listdom'); ?></p>
+                    <div class="lsd-alert lsd-info lsd-my-0"><?php esc_html_e('Turning a component off hides its related fields, filters, and views throughout Listdom. You can turn it back on here at any time.', 'listdom'); ?></div>
 
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                'class' => 'lsd-fields-label',
-                                'title' => esc_html__('Map & Address', 'listdom'),
-                                'for' => 'lsd_component_map',
-                            ]); ?></div>
-                        <div class="lsd-col-5">
-                            <?php echo LSD_Form::switcher([
-                                'id' => 'lsd_component_map',
-                                'name' => 'lsd[components][map]',
-                                'value' => $settings['components']['map'] ?? '1',
-                            ]); ?>
+                    <?php foreach ([
+                        'map' => [esc_html__('Map & Address', 'listdom'), esc_html__('Show listing addresses and maps.', 'listdom')],
+                        'pricing' => [esc_html__('Pricing', 'listdom'), esc_html__('Show listing prices and price filters.', 'listdom')],
+                        'work_hours' => [esc_html__('Work Hours', 'listdom'), esc_html__('Show opening hours and availability.', 'listdom')],
+                        'visibility' => [esc_html__('Visibility', 'listdom'), esc_html__('Control visibility settings for listings.', 'listdom')],
+                        'related' => [esc_html__('Related Listings', 'listdom'), esc_html__('Show related listings on listing pages.', 'listdom')],
+                        'socials' => [esc_html__('Social Networks', 'listdom'), esc_html__('Show social network links and sharing options.', 'listdom')],
+                        'cta' => [esc_html__('Call to Action', 'listdom'), esc_html__('Show call to action buttons on listings and search results.', 'listdom')],
+                        'remark' => [esc_html__('Remark', 'listdom'), esc_html__('Show the listing owner message.', 'listdom')],
+                        'embed' => [esc_html__('Embed & Featured Video', 'listdom'), esc_html__('Show embed codes and videos marked as featured.', 'listdom')],
+                        'faq' => [esc_html__('FAQ', 'listdom'), esc_html__('Show listing questions and answers.', 'listdom')],
+                    ] as $component => $details): ?>
+                        <div class="lsd-form-row">
+                            <div class="lsd-col-3">
+                                <?php echo LSD_Form::label([
+                                    'class' => 'lsd-fields-label',
+                                    'title' => $details[0],
+                                    'for' => 'lsd_component_' . $component,
+                                ]); ?>
+                            </div>
+                            <div class="lsd-col-5">
+                                <?php echo LSD_Form::switcher([
+                                    'id' => 'lsd_component_' . $component,
+                                    'name' => 'lsd[components][' . $component . ']',
+                                    'value' => $settings['components'][$component] ?? '1',
+                                ]); ?>
+                                <p class="lsd-admin-description-tiny lsd-mt-2 lsd-mb-0"><?php echo $details[1]; ?></p>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                'class' => 'lsd-fields-label',
-                                'title' => esc_html__('Pricing', 'listdom'),
-                                'for' => 'lsd_component_pricing',
-                            ]); ?></div>
-                        <div class="lsd-col-5">
-                            <?php echo LSD_Form::switcher([
-                                'id' => 'lsd_component_pricing',
-                                'name' => 'lsd[components][pricing]',
-                                'value' => $settings['components']['pricing'] ?? '1',
-                            ]); ?>
-                        </div>
-                    </div>
-
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                'class' => 'lsd-fields-label',
-                                'title' => esc_html__('Work Hours', 'listdom'),
-                                'for' => 'lsd_component_work_hours',
-                            ]); ?></div>
-                        <div class="lsd-col-5">
-                            <?php echo LSD_Form::switcher([
-                                'id' => 'lsd_component_work_hours',
-                                'name' => 'lsd[components][work_hours]',
-                                'value' => $settings['components']['work_hours'] ?? '1',
-                            ]); ?>
-                        </div>
-                    </div>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                'class' => 'lsd-fields-label',
-                                'title' => esc_html__('Visibility', 'listdom'),
-                                'for' => 'lsd_component_visibility',
-                            ]); ?></div>
-                        <div class="lsd-col-5">
-                            <?php echo LSD_Form::switcher([
-                                'id' => 'lsd_component_visibility',
-                                'name' => 'lsd[components][visibility]',
-                                'value' => $settings['components']['visibility'] ?? '1',
-                            ]); ?>
-                        </div>
-                    </div>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                'class' => 'lsd-fields-label',
-                                'title' => esc_html__('Related Listings', 'listdom'),
-                                'for' => 'lsd_component_related',
-                            ]); ?></div>
-                        <div class="lsd-col-5">
-                            <?php echo LSD_Form::switcher([
-                                'id' => 'lsd_component_related',
-                                'name' => 'lsd[components][related]',
-                                'value' => $settings['components']['related'] ?? '1',
-                            ]); ?>
-                        </div>
-                    </div>
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                'class' => 'lsd-fields-label',
-                                'title' => esc_html__('Social Networks', 'listdom'),
-                                'for' => 'lsd_component_socials',
-                            ]); ?></div>
-                        <div class="lsd-col-5">
-                            <?php echo LSD_Form::switcher([
-                                'id' => 'lsd_component_socials',
-                                'name' => 'lsd[components][socials]',
-                                'value' => $settings['components']['socials'] ?? '1',
-                            ]); ?>
-                        </div>
-                    </div>
-
-                    <div class="lsd-form-row">
-                        <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                'class' => 'lsd-fields-label',
-                                'title' => esc_html__('Call to Action', 'listdom'),
-                                'for' => 'lsd_component_cta',
-                            ]); ?></div>
-                        <div class="lsd-col-5">
-                            <?php echo LSD_Form::switcher([
-                                'id' => 'lsd_component_cta',
-                                'name' => 'lsd[components][cta]',
-                                'value' => $settings['components']['cta'] ?? '1',
-                            ]); ?>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
