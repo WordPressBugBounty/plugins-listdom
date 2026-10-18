@@ -19,7 +19,7 @@ class LSD_API_Controllers_Listings extends LSD_API_Controller
         (new LSD_Entity_Listing($listing))->update_visits();
 
         // Trigger Action
-        do_action('lsd_listing_visited', $listing);
+        do_action('lsd_listing_visited', $listing, 'rest');
 
         // Response
         return $this->response([

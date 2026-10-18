@@ -45,10 +45,12 @@ class LSD_Actions_Audit_Directory_Setup extends LSD_Actions_Action
         $pages = [
             'submission_page' => [
                 'enabled' => true,
+                'optional' => true,
                 'page_id' => (int) ($settings['submission_page'] ?? 0),
             ],
             'add_listing_page' => [
                 'enabled' => true,
+                'optional' => true,
                 'page_id' => (int) ($settings['add_listing_page'] ?? 0),
             ],
             'login_page' => [
@@ -75,11 +77,14 @@ class LSD_Actions_Audit_Directory_Setup extends LSD_Actions_Action
 
             $page_id = (int) ($page['page_id'] ?? 0);
             if ($page_id > 0 && get_post_status($page_id) === 'publish') continue;
+            $optional = !empty($page['optional']) && $page_id === 0;
             $findings[] = [
-                'type' => 'warning',
+                'type' => $optional ? 'optional' : 'warning',
                 'code' => 'missing_page',
                 'target' => $key,
-                'message' => sprintf(esc_html__('The configured %s is missing or unpublished.', 'listdom'), $key),
+                'message' => $optional
+                    ? sprintf(esc_html__('The optional %s is not assigned to a published page. Configure it only if you need frontend dashboard or listing submission features; it does not affect directory health.', 'listdom'), $key)
+                    : sprintf(esc_html__('The configured %s is missing or unpublished.', 'listdom'), $key),
             ];
         }
 
@@ -138,7 +143,10 @@ class LSD_Actions_Audit_Directory_Setup extends LSD_Actions_Action
                     'payments_enabled' => $payment_enabled ? 1 : 0,
                 ],
                 'findings' => $findings,
-                'healthy' => !count($findings),
+                'healthy' => !count(array_filter($findings, static function ($finding)
+                {
+                    return $finding['type'] !== 'optional';
+                })),
             ]
         );
     }

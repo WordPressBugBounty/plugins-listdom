@@ -50,6 +50,11 @@ class LSD_Ajax extends LSD_Base
         // Get Skin Object
         $SKO = $LSD->SKO($skin);
 
+        $track_search = isset($post['lsd_search_submit']) && (string) $post['lsd_search_submit'] === '1' && absint($post['page'] ?? 1) <= 1;
+
+        // Preserve submitted filters before search add-ons rewrite request parameters.
+        $tracking_filters = $track_search ? (isset($post['sf']) && is_array($post['sf']) ? $post['sf'] : $SKO->get_sf()) : [];
+
         // Start the skin
         $SKO->start($atts);
         $SKO->after_start();
@@ -85,6 +90,8 @@ class LSD_Ajax extends LSD_Base
         $listings = $SKO->listings_html();
         $total = $SKO->getField('found_listings');
         $next_page = $SKO->getField('next_page');
+
+        if ($track_search) do_action('lsd_search_executed', (int) $total, 'ajax', $tracking_filters);
 
         $filters = '';
         if (method_exists($SKO, 'filters'))

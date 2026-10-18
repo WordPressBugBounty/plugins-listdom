@@ -7,6 +7,8 @@ defined('ABSPATH') || die();
 /** @var bool $hover */
 /** @var string $align */
 /** @var array $role_tabs */
+/** @var string $redirect */
+/** @var bool $explicit_redirect */
 /** @var string $account_redirect */
 /** @var string $logout_redirect */
 /** @var string $form_type */
@@ -22,7 +24,7 @@ $wrapper_classes = [
 ];
 ?>
 <div class="<?php echo esc_attr(implode(' ', array_filter($wrapper_classes))); ?>" id="<?php echo esc_attr($id); ?>" data-hover="<?php echo $hover ? 1 : 0; ?>">
-    <a class="lsd-auth-dropdown-toggle" aria-expanded="false" aria-controls="<?php echo esc_attr($panel_id); ?>">
+    <button type="button" class="lsd-auth-dropdown-toggle" aria-label="<?php echo esc_attr($is_logged_in ? ($user_info['display_name'] ?? $button_label) : $button_label); ?>" aria-expanded="false" aria-controls="<?php echo esc_attr($panel_id); ?>">
         <span class="lsd-auth-dropdown-toggle-content">
             <?php if ($is_logged_in && $avatar): ?>
                 <span class="lsd-auth-dropdown-toggle-avatar"><?php echo wp_kses_post($avatar); ?></span>
@@ -36,7 +38,7 @@ $wrapper_classes = [
         <span class="lsd-auth-dropdown-caret" aria-hidden="true">
             <i class="fa-solid fa-chevron-down"></i>
         </span>
-    </a>
+    </button>
     <div class="lsd-auth-dropdown-panel" id="<?php echo esc_attr($panel_id); ?>" aria-hidden="true">
         <?php if ($is_logged_in): ?>
             <div class="lsd-auth-dropdown-logged-in">
@@ -77,10 +79,10 @@ $wrapper_classes = [
                     $panel_target = $id . '-tab-' . $index;
 
                     $role = $tab['role'] ?? '';
-                    $redirect = $atts['redirect'] ?? '';
-
                     $attributes = $role ? ' role="' . esc_attr($role) . '"' : '';
-                    $attributes .= $redirect ? ' redirect="' . esc_attr($redirect) . '"' : '';
+                    // This is shortcode syntax, so keep the validated URL's query separators unencoded.
+                    $attributes .= $redirect !== '' ? ' redirect="' . $redirect . '"' : '';
+                    $attributes .= ' explicit_redirect="' . ($explicit_redirect ? '1' : '0') . '"';
 
                     switch ($form_type) {
                         case 'login':

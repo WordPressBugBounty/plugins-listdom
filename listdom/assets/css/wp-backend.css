@@ -1313,6 +1313,21 @@ ul.lsd-boxed-list li label .lsd-inline-checkbox {
 #toplevel_page_listdom img {
   width: 18px;
 }
+#toplevel_page_listdom .lsd-admin-menu-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+#toplevel_page_listdom .lsd-admin-menu-new-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 12px;
+  background: #8241ff;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1rem;
+}
 
 button.lsd-primary-button,
 button[type="button"].lsd-primary-button,
@@ -1770,6 +1785,19 @@ body[class*="_page_listdom-connect"] .notice {
   color: #000000;
   margin: 0;
 }
+.lsd-admin-title-small {
+  font-size: 16px;
+  line-height: 1.4rem;
+  font-weight: 500;
+  color: #000;
+  margin: 0;
+}
+.lsd-admin-title-tiny {
+  margin: 0;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4rem;
+}
 
 .lsd-fields-label {
   font-family: Poppins, sans-serif;
@@ -1778,7 +1806,6 @@ body[class*="_page_listdom-connect"] .notice {
   line-height: 1.4em;
   color: #000;
 }
-
 .lsd-fields-label-tiny {
   font-family: Poppins, sans-serif;
   font-weight: 400;
@@ -1797,7 +1824,6 @@ body[class*="_page_listdom-connect"] .notice {
   color: #000;
   margin: 0;
 }
-
 .lsd-admin-subtitle-tiny {
   font-family: Inter, sans-serif;
   font-weight: 500;
@@ -1814,7 +1840,6 @@ body[class*="_page_listdom-connect"] .notice {
   line-height: 22px;
   margin: 0;
 }
-
 .lsd-admin-description-tiny {
   font-family: Inter, Poppins, sans-serif;
   font-weight: 400;
@@ -2775,16 +2800,6 @@ input[type='file'].lsd-admin-input::file-selector-button:hover {
   }
 }
 
-[data-type^="listdom/shortcodes"] {
-  box-sizing: border-box;
-  padding: 16px;
-  box-shadow: inset 0 0 0 1px #1e1e1e;
-  border-radius: 2px;
-  width: auto-32px;
-  font-family: monospace !important;
-  font-size: 13px;
-}
-
 .lsd-ask-review-wrapper {
   background-color: #ffffff !important;
   border-radius: 12px;
@@ -2856,6 +2871,15 @@ input[type='file'].lsd-admin-input::file-selector-button:hover {
 .lsd-dashboard-widget .lsd-news-links a .dashicons {
   font-size: 16px;
   color: #606a73;
+}
+
+[data-type^="listdom/listing-"] .lsd-listing-block-placeholder {
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px dashed #c3c4c7;
+  border-radius: 2px;
+  color: inherit;
+  font-family: inherit;
 }
 
 /*# sourceMappingURL=wp-backend.css.map */

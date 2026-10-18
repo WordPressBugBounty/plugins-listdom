@@ -270,7 +270,7 @@ class LSD_Template_Elements_Stats extends LSD_Template
 
         if (!class_exists(\LSDPACSTS\Base::class))
         {
-            return LSD_Main::alert(esc_html__('Stats addon should be installed and activated!', 'listdom'), 'warning');
+            return LSD_Main::alert(esc_html__('Stats Addon should be installed and activated!', 'listdom'), 'warning');
         }
 
         $settings = isset($args['settings']) && is_array($args['settings']) ? $args['settings'] : [];

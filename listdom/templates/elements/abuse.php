@@ -6,13 +6,12 @@ defined('ABSPATH') || die();
 /** @var int $post_id */
 
 $owner_id = get_post_field('post_author', $post_id);
+$form_id = wp_unique_id('lsd_report_abuse_form_' . $post_id . '_');
 
 $field_name = !isset($this->args['name_field']) || $this->args['name_field'];
 $field_phone = !isset($this->args['phone_field']) || $this->args['phone_field'];
 $pc_context = 'report';
-$pc_enabled = array_key_exists('pc_enabled', $this->args)
-    ? (bool) $this->args['pc_enabled']
-    : LSD_Privacy::is_consent_enabled($pc_context);
+$pc_enabled = array_key_exists('pc_enabled', $this->args) ? (bool) $this->args['pc_enabled'] : LSD_Privacy::is_consent_enabled($pc_context);
 $pc_enabled_value = $pc_enabled ? '1' : '0';
 $pc_enabled_nonce = wp_create_nonce('lsd_privacy_consent_' . absint($post_id) . '_' . $pc_context . '_' . $pc_enabled_value);
 $pc_label = isset($this->args['pc_label']) ? (string) $this->args['pc_label'] : '';
@@ -25,7 +24,7 @@ $report_privacy_field = '';
 if ($pc_enabled)
 {
     $report_privacy_field = LSD_Privacy::consent_field([
-        'id' => 'lsd_abuse_privacy_consent_' . absint($post_id),
+        'id' => $form_id . '_consent',
         'wrapper_class' => 'lsd-report-abuse-privacy-consent-field',
         'context' => 'report',
         'label' => $pc_label,
@@ -33,8 +32,8 @@ if ($pc_enabled)
 }
 ?>
 <div class="lsd-report-abuse-form-wrapper">
-	<form class="lsd-report-abuse-form" id="lsd_report_abuse_form_<?php echo esc_attr($post_id); ?>" data-id="<?php echo esc_attr($post_id); ?>">
-		
+    <form class="lsd-report-abuse-form" id="<?php echo esc_attr($form_id); ?>" data-id="<?php echo esc_attr($post_id); ?>">
+
 		<div class="lsd-report-abuse-form-name-email-phone-wrapper">
 			<?php if ($field_name): ?>
 			<div class="lsd-report-abuse-form-row lsd-report-abuse-form-row-name">
@@ -98,7 +97,7 @@ if ($pc_enabled)
                 <?php echo $report_privacy_field; ?>
             </div>
         <?php endif; ?>
-		
+
 		<div class="lsd-report-abuse-form-row lsd-report-abuse-form-third-row">
 			<?php echo LSD_Main::grecaptcha_field('transform-95'); ?>
 			<button type="submit" class="lsd-general-button"><?php esc_html_e('Send', 'listdom'); ?></button>
@@ -109,5 +108,5 @@ if ($pc_enabled)
 		</div>
 	</form>
 
-    <div class="lsd-report-abuse-form-alert"></div>
+    <div class="lsd-report-abuse-form-alert" role="status" aria-live="polite"></div>
 </div>

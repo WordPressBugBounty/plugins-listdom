@@ -24,10 +24,11 @@ class LSD_Personalize extends LSD_Base
         $blog_id = get_current_blog_id();
 
         // Write the generated CSS file
-        LSD_File::write($main->get_listdom_path() . '/assets/css/personalized' . ($blog_id > 1 ? '-' . $blog_id : '') . '.css', $CSS);
+        $written = LSD_File::write($main->get_listdom_path() . '/assets/css/personalized' . ($blog_id > 1 ? '-' . $blog_id : '') . '.css', $CSS);
 
         // Delete Fonts
         delete_transient('lsd-customizer-fonts');
+        return $written !== false;
     }
 
     public function assets()

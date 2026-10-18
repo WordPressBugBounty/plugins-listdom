@@ -111,6 +111,9 @@ class LSD_Compatibility extends LSD_Base
 
     public function body_class($classes)
     {
+        // The active block template is available by the time the body classes are printed.
+        $this->page_has_listdom_shortcode();
+
         // WP Template
         $template = get_template();
 
@@ -136,10 +139,13 @@ class LSD_Compatibility extends LSD_Base
         if (is_array($elementor_data)) $elementor_data = wp_json_encode($elementor_data);
         if (is_string($elementor_data) && trim($elementor_data) !== '') $content_sources[] = $elementor_data;
 
+        global $_wp_current_template_content;
+        if (is_string($_wp_current_template_content)) $content_sources[] = $_wp_current_template_content;
+
         foreach ($content_sources as $source)
         {
             // Check for Listdom shortcode directly here
-            if (has_shortcode($source, 'listdom') || stripos($source, '[listdom') !== false)
+            if (has_shortcode($source, 'listdom') || stripos($source, '[listdom') !== false || LSD_Integrations_Blockeditor_Content::has_block($source, 'listdom/layout'))
             {
                 if (!in_array('listdom-fe-shortcode-page', $this->body_classes, true)) $this->body_classes[] = 'listdom-fe-shortcode-page';
                 return;

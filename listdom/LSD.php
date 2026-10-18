@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 final class Listdom
 {
-    public string $version = '6.2.0';
+    public string $version = '6.3.0';
     protected static ?Listdom $instance = null;
 
     /**
@@ -209,6 +209,9 @@ final class Listdom
 
         // Internal Actions
         LSD_Actions::instance()->init();
+
+        // Native abilities are optional on older supported WordPress versions.
+        (new LSD_Abilities())->init();
 
         // Directory Blueprints
         LSD_Blueprints::instance()->init();

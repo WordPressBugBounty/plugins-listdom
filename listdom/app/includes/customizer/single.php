@@ -35,6 +35,35 @@ class LSD_Customizer_Single extends LSD_Customizer
                     'reviews' => [
                         'title' => esc_html__('Reviews', 'listdom'),
                         'groups' => [
+                            'summary' => [
+                                'title' => esc_html__('Summary', 'listdom'),
+                                'divisions' => [
+                                    '_' => [
+                                        'fields' => [
+                                            'score_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Score Color', 'listdom'),
+                                                'default' => '#855e00',
+                                            ],
+                                            'stars_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Stars Color', 'listdom'),
+                                                'default' => '#855e00',
+                                            ],
+                                            'empty_stars_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Empty Stars Color', 'listdom'),
+                                                'default' => '#767676',
+                                            ],
+                                            'count_color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Count Color', 'listdom'),
+                                                'default' => '#595959',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
                             'review_tabs' => [
                                 'title' => esc_html__('Tabs', 'listdom'),
                                 'divisions' => [

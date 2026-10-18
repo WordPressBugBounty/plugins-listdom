@@ -56,7 +56,7 @@ class LSD_Action_Result
         return $this->warnings;
     }
 
-    public function get_meta(string $key = null, $default = null)
+    public function get_meta(?string $key = null, $default = null)
     {
         if ($key === null) return $this->meta;
         return $this->meta[$key] ?? $default;

@@ -53,7 +53,13 @@ class LSD_Customizer_Forms extends LSD_Customizer
                 'sub_title' => esc_html__("Define the form's appearance.", 'listdom'),
                 'divisions' => [
                     '_' => [
-                        'fields' => $this->fields([], ['form_bg_color']),
+                        'fields' => array_merge($this->fields([], ['form_bg_color']), [
+                            'field_padding' => [
+                                'type' => 'padding',
+                                'title' => esc_html__('Field Padding', 'listdom'),
+                                'default' => ['top' => 2, 'right' => 2, 'bottom' => 2, 'left' => 2],
+                            ],
+                        ]),
                     ],
                 ]
             ],

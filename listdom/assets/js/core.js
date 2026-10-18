@@ -1487,8 +1487,9 @@ jQuery(function($)
             const $tab = $(this);
             const key = $tab.data('key');
             const $tabs = $tab.closest('.lsd-tabs');
-            const $scope = $tabs.closest('.lsd-metabox');
-            const $contents = $scope.length ? $scope.find('.lsd-tab-content') : $('.lsd-tab-content');
+            const $discussion = $tabs.closest('.lsd-discussion');
+            const $scope = $discussion.length ? $discussion : $tabs.closest('.lsd-metabox');
+            const $contents = $discussion.length ? $discussion.children('.lsd-tab-contents').children('.lsd-tab-content') : ($scope.length ? $scope.find('.lsd-tab-content') : $('.lsd-tab-content'));
             let $target = $contents.filter(function()
             {
                 return $(this).data('key') === key;
@@ -1496,10 +1497,27 @@ jQuery(function($)
 
             $tabs.find('.nav-tab').removeClass('nav-tab-active');
             $tab.addClass('nav-tab-active');
+            $tabs.find('[role="tab"]').attr({'aria-selected': 'false', tabindex: '-1'});
+            if ($tab.is('[role="tab"]')) $tab.attr({'aria-selected': 'true', tabindex: '0'});
 
             $contents.removeClass('lsd-tab-content-active');
-            if (!$target.length) $target = $('#lsd_tab_content_' + key);
+            if (!$target.length && !$discussion.length) $target = $('#lsd_tab_content_' + key);
             $target.addClass('lsd-tab-content-active');
+        });
+
+        $(document).off('keydown.lsdDiscussionTabs', '.lsd-discussion [role="tab"]').on('keydown.lsdDiscussionTabs', '.lsd-discussion [role="tab"]', function(event)
+        {
+            const $tab = $(this);
+            const $tabs = $tab.closest('[role="tablist"]').children('[role="tab"]');
+            let index = $tabs.index(this);
+            if (event.key === 'ArrowRight') index = (index + 1) % $tabs.length;
+            else if (event.key === 'ArrowLeft') index = (index - 1 + $tabs.length) % $tabs.length;
+            else if (event.key === 'Home') index = 0;
+            else if (event.key === 'End') index = $tabs.length - 1;
+            else if (event.key !== 'Enter' && event.key !== ' ') return;
+
+            event.preventDefault();
+            $tabs.eq(index).trigger('click').trigger('focus');
         });
 
         /**
@@ -4313,22 +4331,15 @@ function listdom_toastify(alert, type, options = {})
         dropdown.find(target).addClass("lsd-active").removeAttr("hidden");
     });
 
-    $(document).ready(function () {
-        $(".lsd-auth-dropdown").each(function () {
-            const dropdown = $(this);
-            const hoverEnabled = parseInt(dropdown.data("hover"), 10) === 1;
-            if (!hoverEnabled) return;
+    $(document).on("mouseenter", ".lsd-auth-dropdown[data-hover='1']", function () {
+        const dropdown = $(this);
+        closeAll(dropdown);
+        dropdown.addClass("lsd-open");
+        dropdown.find(".lsd-auth-dropdown-panel").attr("aria-hidden", "false");
+        dropdown.find(".lsd-auth-dropdown-toggle").attr("aria-expanded", "true");
+    });
 
-            dropdown.on("mouseenter", function () {
-                closeAll(dropdown);
-                dropdown.addClass("lsd-open");
-                dropdown.find(".lsd-auth-dropdown-panel").attr("aria-hidden", "false");
-                dropdown.find(".lsd-auth-dropdown-toggle").attr("aria-expanded", "true");
-            });
-
-            dropdown.on("mouseleave", function () {
-                closeAll();
-            });
-        });
+    $(document).on("mouseleave", ".lsd-auth-dropdown[data-hover='1']", function () {
+        closeAll();
     });
 })(jQuery);

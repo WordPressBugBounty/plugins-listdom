@@ -48,7 +48,13 @@ class LSD_Activation extends LSD_Base
         try { wp_redirect(LSD_Webilia_Connect::begin($return_url)); exit; }
         catch (Throwable $e)
         {
-            LSD_Webilia_Connect::setNotice('error', esc_html__('Unable to start the Webilia connection. Please try again.', 'listdom'));
+            $reference = $this->logConnectFailure($e, 'Start');
+            LSD_Webilia_Connect::setNotice('error', sprintf(
+                /* translators: 1: reason for connection failure, 2: support reference */
+                __('Unable to start the Webilia connection: %1$s Reference: %2$s', 'listdom'),
+                $this->connectFailureReason($e),
+                $reference
+            ));
             wp_safe_redirect($return_url);
             exit;
         }
@@ -71,9 +77,101 @@ class LSD_Activation extends LSD_Base
             LSD_Webilia_Connect::complete($code, $state);
             LSD_Webilia_Connect::setNotice('success', esc_html__('This website is now connected to Webilia. Eligible Listdom products will activate automatically.', 'listdom'));
         }
-        catch (Throwable $e) { LSD_Webilia_Connect::setNotice('error', esc_html__('Unable to complete the Webilia connection. Please start the connection again.', 'listdom')); }
+        catch (Throwable $e)
+        {
+            $reference = $this->logConnectFailure($e, 'Completion');
+            LSD_Webilia_Connect::setNotice('error', sprintf(
+                /* translators: 1: reason for connection failure, 2: support reference */
+                __('Unable to complete the Webilia connection: %1$s Reference: %2$s', 'listdom'),
+                $this->connectFailureReason($e),
+                $reference
+            ));
+        }
         wp_safe_redirect($return_url);
         exit;
+    }
+
+    private function logConnectFailure(Throwable $e, string $step): string
+    {
+        $reference = substr(wp_generate_uuid4(), 0, 8);
+
+        // Keep credentials and server paths out of logs. The exception location
+        // identifies unexpected local errors without recording request data.
+        error_log(sprintf('[Listdom Webilia Connect] %s failed (reference %s): %s (%d) at %s:%d', $step, $reference, get_class($e), (int) $e->getCode(), basename($e->getFile()), $e->getLine()));
+
+        return $reference;
+    }
+
+    private function connectFailureReason(Throwable $e): string
+    {
+        $message = $e->getMessage();
+
+        if (in_array($message, [
+            'Your Webilia Connect request has expired. Please try again.',
+            'This Webilia Connect authorization code is invalid or expired.',
+        ], true)) return __('The request is missing or expired. Start again from this WordPress admin and finish within 10 minutes.', 'listdom');
+
+        if (in_array($message, [
+            'Webilia Connect returned an invalid state.',
+            'The Webilia Connect PKCE verification failed.',
+        ], true)) return __('The connection verification failed. Please start the connection again.', 'listdom');
+
+        if (in_array($message, [
+            'Webilia Connect can only connect the current website.',
+            'This Webilia Connect request belongs to a different website.',
+            'Webilia Connect returned a connection for a different website.',
+        ], true)) return __('The connection did not match this website. Check the WordPress Address in Settings > General, then try again.', 'listdom');
+
+        if ($e instanceof \Webilia\Connect\Exception\TransientException)
+        {
+            return sprintf(
+                /* translators: %s: reason returned by the Webilia HTTP client */
+                __('The request to Webilia failed: %s. Try again; if it continues, ask your host to check outbound HTTPS access to api.webilia.com.', 'listdom'),
+                rtrim(sanitize_text_field($message), '. ')
+            );
+        }
+
+        if ($message === 'Unable to replace the existing Webilia connection until its previous credential is revoked.')
+        {
+            return __('The previous connection could not be revoked. Check outgoing HTTP requests before trying again.', 'listdom');
+        }
+
+        if ($e instanceof \Webilia\Connect\Exception\RequestException)
+        {
+            $detail = rtrim(sanitize_text_field($message), '. ');
+            if ($e->getCode() <= 0) return sprintf(
+                /* translators: %s: reason returned by the Webilia API */
+                __('Webilia rejected the connection request: %s. Please try again or contact Webilia support with this error.', 'listdom'),
+                $detail
+            );
+
+            return sprintf(
+                /* translators: 1: HTTP status code, 2: reason returned by the Webilia API */
+                __('Webilia rejected the connection request (HTTP %1$d): %2$s. Please try again or contact Webilia support with this error.', 'listdom'),
+                (int) $e->getCode(),
+                $detail
+            );
+        }
+
+        if (in_array($message, [
+            'Webilia Connect requires a writable WordPress content directory.',
+            'Unable to create the Webilia connection encryption key.',
+            'Unable to secure the Webilia connection encryption key.',
+            'The existing Webilia connection encryption key cannot be read securely.',
+        ], true)) return __('This website could not create or read its private Webilia key. Ask your host to check write access to wp-content and the permissions of .webilia-connect-key.php.', 'listdom');
+
+        if (in_array($message, [
+            'Unable to save the pending Webilia Connect request.',
+            'Unable to remove the pending Webilia Connect request.',
+            'Unable to save the Webilia connection credential.',
+        ], true)) return __('This website could not save the connection in its WordPress database. Ask your host to check database writes, then try again.', 'listdom');
+
+        if ($message === 'Unable to obtain the Webilia Connect storage lock.')
+        {
+            return __('This website could not access its connection data. Try again; if it continues, ask your host to check WordPress database writes.', 'listdom');
+        }
+
+        return __('Check the WordPress and PHP error logs for the reference below.', 'listdom');
     }
 
     public function disconnectConnect(): void

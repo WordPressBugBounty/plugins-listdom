@@ -9,6 +9,25 @@ class LSD_Customizer_Skins extends LSD_Customizer
                 'title' => esc_html__('Skins', 'listdom'),
                 'display_sections_force' => 1,
                 'sections' => [
+                    'timeline' => [
+                        'title' => esc_html__('Timeline', 'listdom'),
+                        'groups' => [
+                            'connector' => [
+                                'title' => esc_html__('Connector and Markers', 'listdom'),
+                                'divisions' => [
+                                    '_' => [
+                                        'fields' => [
+                                            'color' => [
+                                                'type' => 'color',
+                                                'title' => esc_html__('Color', 'listdom'),
+                                                'default' => '',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                     'masonry' => [
                         'title' => esc_html__('Masonry', 'listdom'),
                         'groups' => [

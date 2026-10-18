@@ -56,10 +56,10 @@ class LSD_Assets extends LSD_Base
         }, 0);
     }
 
-    public function site()
+    public function site(bool $force = false)
     {
         // Check to see if we should include the assets or not
-        if (!$this->should_include()) return;
+        if (!$force && !$this->should_include()) return;
 
         $frontend_dependencies = ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'];
 
@@ -145,17 +145,24 @@ class LSD_Assets extends LSD_Base
 
     public function admin()
     {
+        $screen = get_current_screen();
+        $block_editor = $screen && method_exists($screen, 'is_block_editor') && $screen->is_block_editor();
+        $include_backend = $this->should_include('backend');
+
+        // Listdom block previews may use the shared icon font.
+        if ($block_editor || $include_backend) $this->icons();
+
+        // Native Listdom blocks provide their own editor assets on unrelated post types.
+        if ($block_editor && !$include_backend) return;
+
         // Include Listdom backend CSS file for WordPress
         wp_enqueue_style('lsd-wp-backend', $this->lsd_asset_url('css/wp-backend.min.css'), [], $this->version());
 
         // Listdom Toast
         $this->toast();
 
-        // Webilia Icons
-        $this->icons();
-
         // Check to see if we should include the assets or not
-        if (!$this->should_include('backend')) return;
+        if (!$include_backend) return;
 
         $backend_dependencies = ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-autocomplete'];
 
@@ -163,6 +170,16 @@ class LSD_Assets extends LSD_Base
         {
             $this->flatpickr();
             $backend_dependencies[] = 'lsd-flatpickr';
+        }
+
+        // Charts in the Analytics backend bundle need Chart.js before they initialize.
+        $screen = get_current_screen();
+        if ($screen && $screen->id === 'listdom_page_listdom-analytics'
+            && isset(apply_filters('lsd_addons', [])['stats'])
+            && class_exists(\LSDPACSTS\Aggregates::class) && method_exists(\LSDPACSTS\Aggregates::class, 'series'))
+        {
+            wp_enqueue_script('lsd-chartjs', $this->lsd_asset_url('packages/chartjs/chart.umd.min.js'), [], '4.5.1', true);
+            $backend_dependencies[] = 'lsd-chartjs';
         }
 
         // Include Listdom backend script file
@@ -205,6 +222,9 @@ class LSD_Assets extends LSD_Base
 
         // Include Listdom font-awesome assets
         $this->fontawesome();
+
+        // Include Webilia icon assets used throughout the backend.
+        $this->icons();
 
         // Include Color Picker
         $this->colorpicker();
@@ -339,7 +359,7 @@ class LSD_Assets extends LSD_Base
         $base = new LSD_Base();
 
         // Include Select2 JavaScript file
-        wp_enqueue_script('select2', $base->lsd_asset_url('packages/select2/select2.full.min.js'), [], LSD_Assets::version());
+        wp_enqueue_script('select2', $base->lsd_asset_url('packages/select2/select2.full.min.js'), ['jquery'], LSD_Assets::version());
 
         // Include Select2 CSS file
         wp_enqueue_style('select2', $base->lsd_asset_url('packages/select2/select2.min.css'), [], LSD_Assets::version());
@@ -462,14 +482,16 @@ class LSD_Assets extends LSD_Base
 
     protected function localize(): void
     {
-        wp_localize_script('lsd-frontend', 'lsd', [
+        wp_localize_script('lsd-frontend', 'lsd', apply_filters('lsd_frontend_options', [
             'ajaxurl' => admin_url('admin-ajax.php'),
             'advanced_datetimepicker' => $this->advanced_datetimepicker_enabled() ? 1 : 0,
             'startOfWeek' => (int) get_option('start_of_week', 0),
             'datepicker_format' => (isset($this->settings['datepicker_format']) && trim((string) $this->settings['datepicker_format']) ? $this->settings['datepicker_format'] : 'yyyy-mm-dd'),
             'timepicker_format' => (isset($this->settings['timepicker_format']) ? (int) $this->settings['timepicker_format'] : 24),
+            'i18n_message_send_failed' => esc_html__('Unable to send your message. Please try again.', 'listdom'),
+            'i18n_review_submit_failed' => esc_html__('Unable to submit your review. Please try again.', 'listdom'),
             'i18n_checkout_failed' => esc_html__('Unable to complete checkout. Please try again.', 'listdom'),
-        ]);
+        ]));
     }
 
     protected function advanced_datetimepicker_enabled(): bool
@@ -748,6 +770,7 @@ class LSD_Assets extends LSD_Base
                     'listdom-ix',
                     LSD_Base::WELCOME_SLUG,
                     'listdom-connect',
+                    'listdom-analytics',
                     'listdom-launch-checklist',
                     'toplevel_page_listdom',
                     'widgets',

@@ -13,24 +13,29 @@ class LSD_Shortcodes_Simplemap extends LSD_Shortcodes
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom_simplemap');
         if (trim($pre)) return $pre;
 
-        $lat = isset($atts['lat']) ? (float) $atts['lat'] : 0;
-        $lng = isset($atts['lng']) ? (float) $atts['lng'] : 0;
+        $has_coordinates = isset($atts['lat'], $atts['lng']) && is_numeric($atts['lat']) && is_numeric($atts['lng']);
+        $lat = $has_coordinates ? (float) $atts['lat'] : 0;
+        $lng = $has_coordinates ? (float) $atts['lng'] : 0;
 
         $address = $atts['address'] ?? '';
         $title = $atts['title'] ?? $address;
 
         // Convert the Address to geo point
-        if ((!$lat || !$lng) && trim($address))
+        if (!$has_coordinates && trim($address))
         {
             $main = new LSD_Main();
             $geopoint = $main->geopoint($address);
 
-            if (isset($geopoint[0])) $lat = $geopoint[0];
-            if (isset($geopoint[1])) $lng = $geopoint[1];
+            if (isset($geopoint[0], $geopoint[1]) && is_numeric($geopoint[0]) && is_numeric($geopoint[1]))
+            {
+                $lat = (float) $geopoint[0];
+                $lng = (float) $geopoint[1];
+                $has_coordinates = true;
+            }
         }
 
         // Return an error if the marker location couldn't find!
-        if (!$lat || !$lng) return $this->alert(esc_html__("The marker location couldn't find. Please specify address or lat/lng parameters.", 'listdom'));
+        if (!$has_coordinates) return $this->alert(esc_html__("The marker location couldn't find. Please specify address or lat/lng parameters.", 'listdom'));
 
         $assets = new LSD_Assets();
 

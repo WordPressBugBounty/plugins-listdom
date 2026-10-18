@@ -7,6 +7,7 @@ use Webilia\Connect\Contracts\ConditionalConnectionStorage;
 use Webilia\Connect\Contracts\GetHttpClient;
 use Webilia\Connect\Contracts\HttpClient;
 use Webilia\Connect\Contracts\Storage;
+use Webilia\Connect\Contracts\TimeoutHttpClient;
 use Webilia\Connect\Exception\RequestException;
 use Webilia\Connect\Exception\TransientException;
 
@@ -319,6 +320,36 @@ final class Client
     }
 
     /**
+     * Obtain a short-lived identity token for an approved Webilia service.
+     * The token is returned to the caller and is never persisted by this SDK.
+     *
+     * @return array<string, mixed>
+     */
+    public function serviceToken(string $audience): array
+    {
+        $connection = $this->requiredConnection();
+        $this->retryPendingRevocation($connection);
+        $connection = $this->requiredConnection();
+
+        try {
+            $data = $this->data($this->http->post($this->endpoint('/v1/connect/service-tokens'), [
+                'audience' => $audience,
+            ], $this->bearer($connection)));
+            if (! is_string($data['token'] ?? null) || trim($data['token']) === '') {
+                throw new RuntimeException('Webilia Connect did not return a service token.');
+            }
+
+            return $data;
+        } catch (RequestException $exception) {
+            if ($exception->getCode() === 401) {
+                $this->forgetRejectedConnection($connection);
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
      * Execute one bounded, metered Overture Places search for the connected site.
      *
      * @param array<string, mixed> $request
@@ -336,6 +367,46 @@ final class Client
             if ($exception->getCode() === 401) {
                 $this->forgetRejectedConnection($connection);
             }
+
+            throw $exception;
+        }
+    }
+
+    /** @return array<string, mixed> */
+    public function overtureMaintenanceQuote(string $operation, int $count): array
+    {
+        return $this->overtureMaintenancePost('quote', ['operation' => $operation, 'count' => $count]);
+    }
+
+    /** @param array<int, array<string, mixed>> $listings @return array<string, mixed> */
+    public function overturePlacesMatch(string $idempotencyKey, array $listings): array
+    {
+        return $this->overtureMaintenancePost('match', ['idempotency_key' => $idempotencyKey, 'listings' => array_values($listings)]);
+    }
+
+    /** @param array<int, string> $placeIds @return array<string, mixed> */
+    public function overturePlacesLookup(string $idempotencyKey, array $placeIds): array
+    {
+        return $this->overtureMaintenancePost('lookup', ['idempotency_key' => $idempotencyKey, 'place_ids' => array_values($placeIds)]);
+    }
+
+    /** @param array<string, mixed> $request @return array<string, mixed> */
+    private function overtureMaintenancePost(string $path, array $request): array
+    {
+        $connection = $this->requiredConnection();
+        $this->retryPendingRevocation($connection);
+        $connection = $this->requiredConnection();
+
+        try {
+            $url = $this->endpoint('/v1/connect/overture/places/'.$path);
+            $headers = $this->bearer($connection);
+            $response = $this->http instanceof TimeoutHttpClient
+                ? $this->http->postWithTimeout($url, $request, $headers, 30)
+                : $this->http->post($url, $request, $headers);
+
+            return $this->data($response);
+        } catch (RequestException $exception) {
+            if ($exception->getCode() === 401) $this->forgetRejectedConnection($connection);
 
             throw $exception;
         }

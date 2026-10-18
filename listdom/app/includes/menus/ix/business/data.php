@@ -15,6 +15,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
     private const RESULTS_PER_CREDIT = 5;
     private const PREFERENCES_META = 'lsd_business_data_preferences';
     private const NONCE = 'lsd_business_data';
+    private const MAINTENANCE_HISTORY_OPTION = 'lsd_business_data_maintenance_history';
     private const TERM_TAXONOMIES = [
         'categories' => LSD_Base::TAX_CATEGORY,
         'locations' => LSD_Base::TAX_LOCATION,
@@ -33,8 +34,16 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
         add_action('wp_ajax_lsd_business_data_import', [$this, 'import']);
         add_action('wp_ajax_lsd_business_data_clear_history', [$this, 'clear_history']);
         add_action('wp_ajax_lsd_business_data_save_preferences', [$this, 'save_preferences']);
+        add_action('wp_ajax_lsd_business_data_maintenance_list', [$this, 'maintenance_list']);
+        add_action('wp_ajax_lsd_business_data_maintenance_quote', [$this, 'maintenance_quote']);
+        add_action('wp_ajax_lsd_business_data_maintenance_fetch', [$this, 'maintenance_fetch']);
+        add_action('wp_ajax_lsd_business_data_maintenance_apply', [$this, 'maintenance_apply']);
+        add_action('wp_ajax_lsd_business_data_maintenance_history', [$this, 'maintenance_history']);
         add_action('admin_enqueue_scripts', [$this, 'assets']);
         add_action('add_meta_boxes_' . LSD_Base::PTYPE_LISTING, [$this, 'register_metabox']);
+        add_filter('post_row_actions', [$this, 'listing_row_actions'], 10, 2);
+        add_filter('bulk_actions-edit-' . LSD_Base::PTYPE_LISTING, [$this, 'listing_bulk_actions']);
+        add_filter('handle_bulk_actions-edit-' . LSD_Base::PTYPE_LISTING, [$this, 'handle_listing_bulk_action'], 10, 3);
     }
 
     public function assets(string $hook): void
@@ -121,14 +130,86 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
         ];
 
         wp_localize_script('lsd-backend', 'lsdBusinessDataConfig', $config);
+        wp_enqueue_script('lsd-business-data-maintenance', $this->lsd_asset_url('js/business-data-maintenance.js'), ['jquery', 'lsd-backend'], LSD_Assets::version(), true);
+        wp_enqueue_style('lsd-business-data-maintenance', $this->lsd_asset_url('css/business-data-maintenance.css'), ['lsd-backend'], LSD_Assets::version());
+        wp_localize_script('lsd-business-data-maintenance', 'lsdBusinessMaintenance', [
+            'ajaxurl' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce(self::NONCE),
+            'connected' => $connected,
+            'storageScope' => md5(home_url('/') . '|' . get_current_blog_id() . '|' . get_current_user_id()),
+            'mode' => isset($_GET['mode']) ? sanitize_key(wp_unslash($_GET['mode'])) : 'find',
+            'listingIds' => $this->maintenance_initial_ids(),
+            'fieldLabels' => [
+                'phone' => __('Phone', 'listdom'), 'email' => __('Email', 'listdom'), 'website' => __('Website', 'listdom'),
+                'address' => __('Address', 'listdom'), 'coordinates' => __('Coordinates', 'listdom'),
+                'socials' => __('Social profiles', 'listdom'), 'categories' => __('Categories', 'listdom'),
+                'brand' => __('Brand', 'listdom'), 'operating_status' => __('Operating status', 'listdom'),
+            ],
+            'strings' => [
+                'unavailable' => __('Business Data maintenance is unavailable. Update Webilia Connect and activate a maintenance-ready Business Data index.', 'listdom'),
+                'selectListings' => __('Select at least one listing.', 'listdom'),
+                'cost' => __('Estimated cost: %s Webilia Credits for %d listings.', 'listdom'),
+                'ready' => __('Business Data is ready for review.', 'listdom'),
+                'selectionRemoved' => __('Some selected listings are no longer eligible and were removed.', 'listdom'),
+                'removeListing' => __('Remove %s from selection', 'listdom'),
+                'listingId' => __('Listing #%d', 'listdom'),
+                'historyOperations' => ['search' => __('Search', 'listdom'), 'enrich' => __('Enrichment lookup', 'listdom'), 'refresh' => __('Refresh lookup', 'listdom'), 'apply' => __('Apply changes', 'listdom')],
+                'historyResults' => __('%d results', 'listdom'),
+                'historyListings' => __('%d listings', 'listdom'),
+                'historyCredits' => __('%s Webilia Credits', 'listdom'),
+                'historyImports' => __('%d recorded import outcomes (created, updated, or skipped).', 'listdom'),
+                'charged' => __('Charged %s Webilia Credits.', 'listdom'),
+                'replayed' => __('Earlier paid results were restored without another charge.', 'listdom'),
+                'apply' => __('Apply selected changes', 'listdom'),
+                'noMatch' => __('No suitable match found. Check the listing name and address before trying again.', 'listdom'),
+                'notFound' => __('The linked business was not found in the current provider release. Match it again manually.', 'listdom'),
+                'error' => __('The Business Data operation could not be completed.', 'listdom'),
+                'selectionCount' => __('%d / 100 selected', 'listdom'),
+                'enrichTitle' => __('Enrich existing listings', 'listdom'),
+                'refreshTitle' => __('Refresh linked listings', 'listdom'),
+                'historyTitle' => __('Business Data history', 'listdom'),
+                'enrichDescription' => __('Choose listings, review possible business matches, then select the fields to apply.', 'listdom'),
+                'refreshDescription' => __('Choose linked listings, review source changes, then select fields to apply. Closed businesses remain published until you decide otherwise.', 'listdom'),
+                'loadingListings' => __('Loading listings…', 'listdom'),
+                'noEligible' => __('No eligible listings found.', 'listdom'),
+                'page' => __('Page %1$d of %2$d', 'listdom'),
+                'linkedTo' => __('Linked to %s', 'listdom'),
+                'noHistory' => __('No recent Business Data activity.', 'listdom'),
+                'loadingHistory' => __('Loading history…', 'listdom'),
+                'fetching' => __('Fetching %1$d–%2$d of %3$d listings…', 'listdom'),
+                'fetch' => __('Fetch Business Data and review', 'listdom'),
+                'resume' => __('Resume remaining batches', 'listdom'),
+                'noneSaved' => __('No listings were saved.', 'listdom'),
+                'saved' => __('%d listings reviewed and saved.', 'listdom'),
+                'skipped' => __('%d listings were skipped because their data changed, they are locked, or the business is already linked elsewhere.', 'listdom'),
+                'skip' => __('Skip this listing', 'listdom'),
+                'match' => __('Business match', 'listdom'),
+                'rematch' => __('Match this listing again', 'listdom'),
+                'applyColumn' => __('Apply', 'listdom'),
+                'currentColumn' => __('Current', 'listdom'),
+                'sourceColumn' => __('Business Data', 'listdom'),
+                'primary' => __('primary', 'listdom'),
+                'noDifferences' => __('No field differences found. You can still confirm the business link.', 'listdom'),
+                'closed' => __('Source reports this business as %s. The listing will not be unpublished or deleted.', 'listdom'),
+            ],
+        ]);
     }
 
     public function tab(string $current): void
     {
         if (!LSD_Webilia_Connect::enabled()) return;
+        $active = $current === self::TAB;
+        $mode = isset($_GET['mode']) ? sanitize_key(wp_unslash($_GET['mode'])) : 'find';
+        if (!in_array($mode, ['find', 'enrich', 'refresh', 'history'], true)) $mode = 'find';
 
-        echo '<li><a class="lsd-nav-tab ' . ($current === self::TAB ? 'lsd-nav-tab-active' : '') . '" href="' . esc_url(admin_url('admin.php?page=listdom-ix&tab=' . self::TAB)) . '">';
-        echo '<i class="webilia-icon wbli-database lsd-m-0"></i>' . esc_html__('Business Data', 'listdom') . '</a></li>';
+        echo '<li class="lsd-has-children lsd-business-data-nav' . ($active ? ' lsd-nav-expanded' : '') . '">';
+        echo '<a class="lsd-nav-tab ' . ($active ? 'lsd-nav-tab-active' : '') . '" href="' . esc_url(admin_url('admin.php?page=listdom-ix&tab=' . self::TAB . '&mode=find')) . '">';
+        echo '<i class="webilia-icon wbli-database lsd-m-0"></i>' . esc_html__('Business Data', 'listdom') . '</a>';
+        echo '<ul class="lsd-nav-sub-tabs" data-parent="business-data"' . ($active ? '' : ' hidden') . '>';
+        foreach (['find' => __('Find Businesses', 'listdom'), 'enrich' => __('Enrich Listings', 'listdom'), 'refresh' => __('Refresh Listings', 'listdom'), 'history' => __('History', 'listdom')] as $key => $label)
+        {
+            echo '<li class="lsd-business-data-sub-tab' . ($active && $mode === $key ? ' lsd-nav-tab-active' : '') . '"><a' . ($active && $mode === $key ? ' aria-current="page"' : '') . ' href="' . esc_url(admin_url('admin.php?page=listdom-ix&tab=' . self::TAB . '&mode=' . $key)) . '">' . esc_html($label) . '</a></li>';
+        }
+        echo '</ul></li>';
     }
 
     public function content(string $tab): void
@@ -143,7 +224,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
         try
         {
             $balance = LSD_Webilia_Connect::creditBalance();
-            $this->respond(['success' => 1, 'credits_balance' => max(0, (int) ($balance['credits_balance'] ?? 0))]);
+            $this->respond(['success' => 1, 'credits_balance' => $this->credit_balance($balance)]);
         }
         catch (Throwable $e)
         {
@@ -197,7 +278,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
         $limit = isset($_POST['limit']) ? (int) wp_unslash($_POST['limit']) : 0;
         $key = isset($_POST['idempotency_key']) ? sanitize_text_field(wp_unslash($_POST['idempotency_key'])) : '';
 
-        if (count($categories) < 1 || count($categories) > 5 || $lat === null || $lat < -90 || $lat > 90 || $lng === null || $lng < -180 || $lng > 180 || $radius <= 0 || $radius > 25 || $limit < 1 || $limit > 100 || !preg_match('/^[0-9a-f-]{36}$/i', $key))
+        if (count($categories) < 1 || count($categories) > 5 || $lat === null || $lat < -90 || $lat > 90 || $lng === null || $lng < -180 || $lng > 180 || $radius <= 0 || $radius > 50 || $limit < 1 || $limit > 100 || !preg_match('/^[0-9a-f-]{36}$/i', $key))
         {
             $this->respond(['success' => 0, 'message' => esc_html__('Please provide one to five categories, a valid map area, and a result limit between 1 and 100.', 'listdom')], 422);
         }
@@ -205,10 +286,12 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
         // The API reserves credits for the requested limit before running the search.
         // If the balance check is unavailable, let the API make the authoritative decision.
         $available = null;
+        $balanceText = null;
         try
         {
             $balance = LSD_Webilia_Connect::creditBalance();
-            $available = max(0, (int) ($balance['credits_balance'] ?? 0));
+            $balanceText = $this->credit_balance($balance);
+            $available = max(0, (int) $balanceText);
         }
         catch (Throwable $balanceError)
         {
@@ -217,7 +300,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
 
         if ($available !== null)
         {
-            if ($available === 0) $this->respond(['success' => 0, 'message' => esc_html__('You have no Webilia Credits available for a new search.', 'listdom'), 'credits_balance' => 0], 402);
+            if ($available === 0) $this->respond(['success' => 0, 'message' => esc_html__('A Business Data search requires at least one Webilia Credit.', 'listdom'), 'credits_balance' => $balanceText], 402);
             $limit = min($limit, 100, $available * self::RESULTS_PER_CREDIT);
         }
 
@@ -249,14 +332,16 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
             {
                 $required = (int) ceil($limit / self::RESULTS_PER_CREDIT);
                 $available = null;
+                $balanceText = null;
                 try
                 {
                     $balance = LSD_Webilia_Connect::creditBalance();
-                    $available = max(0, (int) ($balance['credits_balance'] ?? 0));
+                    $balanceText = $this->credit_balance($balance);
+                    $available = max(0, (int) $balanceText);
                     $maximum = min(100, $available * self::RESULTS_PER_CREDIT);
                     $message = $maximum > 0
-                        ? sprintf(__('Requesting up to %1$d results requires %2$d Webilia Credits, but you have %3$d. Reduce Maximum results to %4$d or less.', 'listdom'), $limit, $required, $available, $maximum)
-                        : sprintf(__('Requesting up to %1$d results requires %2$d Webilia Credits, but you have none. Add credits before searching again.', 'listdom'), $limit, $required);
+                        ? sprintf(__('Requesting up to %1$d results requires %2$d Webilia Credits, but you have %3$s. Reduce Maximum results to %4$d or less.', 'listdom'), $limit, $required, $balanceText, $maximum)
+                        : sprintf(__('Requesting up to %1$d results requires %2$d Webilia Credits, but your balance is %3$s. Add credits before searching again.', 'listdom'), $limit, $required, $balanceText);
                 }
                 catch (Throwable $balanceError)
                 {
@@ -264,7 +349,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
                 }
 
                 $response = ['success' => 0, 'message' => $message];
-                if ($available !== null) $response['credits_balance'] = $available;
+                if ($balanceText !== null) $response['credits_balance'] = $balanceText;
                 $this->respond($response, 402);
             }
             $this->failure($e);
@@ -340,7 +425,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
 
         if ($values['latitude'] < -90 || $values['latitude'] > 90 || $values['longitude'] < -180 || $values['longitude'] > 180
             || $values['marker_latitude'] < -90 || $values['marker_latitude'] > 90 || $values['marker_longitude'] < -180 || $values['marker_longitude'] > 180
-            || $values['zoom'] < 1 || $values['zoom'] > 20 || $values['radius_km'] <= 0 || $values['radius_km'] > 25
+            || $values['zoom'] < 1 || $values['zoom'] > 20 || $values['radius_km'] <= 0 || $values['radius_km'] > 50
             || $values['limit'] < 1 || $values['limit'] > 100 || floor($values['limit']) !== $values['limit']) $this->respond(['success' => 0], 422);
 
         $showResults = isset($_POST['show_results']) ? wp_unslash($_POST['show_results']) : null;
@@ -391,7 +476,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
         foreach ($places as $place)
         {
             $placeId = sanitize_text_field((string) ($place['id'] ?? ''));
-            $title = sanitize_text_field((string) ($place['name'] ?? ''));
+            $title = sanitize_text_field($this->decode_business_title((string) ($place['name'] ?? '')));
             if ($placeId === '' || $title === '')
             {
                 $skipped[] = ['id' => $placeId, 'reason' => esc_html__('This result has no usable name or provider ID.', 'listdom')];
@@ -408,6 +493,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
             }
 
             $listingCategories = $selectedTerms['categories'];
+            $listingCategoryCodes = [];
             if ($autoCategory)
             {
                 $code = $details['primary_category'] ?: sanitize_key((string) ($place['category'] ?? ''));
@@ -425,10 +511,15 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
                 }
 
                 $listingCategories = [$categoryIds[$code]];
+                $listingCategoryCodes[(string) $categoryIds[$code]] = $code;
                 foreach ($details['alternate_categories'] as $alternate)
                 {
                     if (!isset($categoryIds[$alternate])) $categoryIds[$alternate] = $this->business_category_term($alternate);
-                    if ($categoryIds[$alternate] && !in_array($categoryIds[$alternate], $listingCategories, true)) $listingCategories[] = $categoryIds[$alternate];
+                    if ($categoryIds[$alternate] && !in_array($categoryIds[$alternate], $listingCategories, true))
+                    {
+                        $listingCategories[] = $categoryIds[$alternate];
+                        $listingCategoryCodes[(string) $categoryIds[$alternate]] = $alternate;
+                    }
                 }
             }
 
@@ -456,6 +547,8 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
             update_post_meta($postId, 'lsd_business_data_metadata', array_merge($details['metadata'], [
                 'source' => sanitize_text_field((string) ($history[$index]['meta']['source'] ?? '')), 'attribution' => sanitize_text_field((string) ($history[$index]['meta']['attribution'] ?? '')),
                 'provider_release' => sanitize_text_field((string) ($history[$index]['meta']['provider_release'] ?? '')), 'search_id' => sanitize_text_field((string) ($history[$index]['meta']['search_id'] ?? '')),
+                'category_term_codes' => $listingCategoryCodes,
+                'last_checked_at' => gmdate('c'), 'last_synced_at' => gmdate('c'),
             ]));
 
             $created[] = ['id' => $placeId, 'post_id' => $postId, 'edit_url' => get_edit_post_link($postId, 'raw')];
@@ -469,7 +562,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
 
     public function register_metabox(WP_Post $post): void
     {
-        if (!current_user_can('manage_options') || !get_post_meta($post->ID, 'lsd_business_data_place_id', true)) return;
+        if (!current_user_can('manage_options') || !LSD_Webilia_Connect::enabled()) return;
 
         add_meta_box('lsd_metabox_business_data', esc_html__('Webilia Business Data', 'listdom'), [$this, 'metabox'], LSD_Base::PTYPE_LISTING, 'side', 'default');
     }
@@ -479,12 +572,15 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
         if (!current_user_can('manage_options') || !$post instanceof WP_Post) return;
 
         $placeId = (string) get_post_meta($post->ID, 'lsd_business_data_place_id', true);
+        $mode = $placeId === '' ? 'enrich' : 'refresh';
+        if ($this->maintenance_eligible($post->ID, $mode)) echo '<p><a class="button" href="' . esc_url(admin_url('admin.php?page=listdom-ix&tab=business-data&mode=' . $mode . '&listing_ids=' . $post->ID)) . '">' . esc_html($placeId === '' ? __('Enrich with Business Data', 'listdom') : __('Refresh Business Data', 'listdom')) . '</a></p>';
         if ($placeId === '') return;
 
         $meta = (array) get_post_meta($post->ID, 'lsd_business_data_metadata', true);
         echo '<div class="lsd-business-data-metabox">';
         $this->metabox_text(__('Provider ID', 'listdom'), $placeId);
         foreach (['source' => __('Source', 'listdom'), 'attribution' => __('Attribution', 'listdom'), 'provider_release' => __('Provider release', 'listdom'), 'search_id' => __('Search ID', 'listdom')] as $key => $label) if (!empty($meta[$key])) $this->metabox_text($label, (string) $meta[$key]);
+        foreach (['last_checked_at' => __('Last checked', 'listdom'), 'last_synced_at' => __('Last synced', 'listdom')] as $key => $label) if (!empty($meta[$key])) $this->metabox_text($label, (string) $meta[$key]);
 
         if (!empty($meta['place_version'])) $this->metabox_text(__('Place version', 'listdom'), (string) $meta['place_version']);
         if (!empty($meta['brand']['name'])) $this->metabox_text(__('Brand', 'listdom'), (string) $meta['brand']['name']);
@@ -514,15 +610,437 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
         echo '<div class="lsd-business-data-metabox-field"><strong>' . esc_html($label) . '</strong><span>' . esc_html($value) . '</span></div>';
     }
 
+    public function listing_row_actions(array $actions, WP_Post $post): array
+    {
+        if ($post->post_type !== LSD_Base::PTYPE_LISTING || !current_user_can('manage_options') || !LSD_Webilia_Connect::enabled()) return $actions;
+        $linked = (string) get_post_meta($post->ID, 'lsd_business_data_place_id', true) !== '';
+        $mode = $linked ? 'refresh' : 'enrich';
+        if (!$this->maintenance_eligible($post->ID, $mode)) return $actions;
+        $actions['lsd-business-data'] = '<a href="' . esc_url(admin_url('admin.php?page=listdom-ix&tab=business-data&mode=' . $mode . '&listing_ids=' . $post->ID)) . '">'
+            . esc_html($linked ? __('Refresh Business Data', 'listdom') : __('Enrich with Business Data', 'listdom')) . '</a>';
+
+        return $actions;
+    }
+
+    public function listing_bulk_actions(array $actions): array
+    {
+        if (current_user_can('manage_options') && LSD_Webilia_Connect::enabled())
+        {
+            $actions['lsd_business_data_enrich'] = __('Enrich with Business Data', 'listdom');
+            $actions['lsd_business_data_refresh'] = __('Refresh Business Data', 'listdom');
+        }
+
+        return $actions;
+    }
+
+    public function handle_listing_bulk_action(string $redirect, string $action, array $postIds): string
+    {
+        if (!in_array($action, ['lsd_business_data_enrich', 'lsd_business_data_refresh'], true) || !current_user_can('manage_options') || !LSD_Webilia_Connect::enabled()) return $redirect;
+        $ids = array_values(array_unique(array_filter(array_map('absint', $postIds))));
+        $mode = $action === 'lsd_business_data_enrich' ? 'enrich' : 'refresh';
+        $ids = array_values(array_filter($ids, fn(int $id): bool => $this->maintenance_eligible($id, $mode)));
+        $ids = array_slice($ids, 0, 100);
+
+        return admin_url('admin.php?page=listdom-ix&tab=business-data&mode=' . $mode . '&listing_ids=' . implode(',', $ids));
+    }
+
+    public function maintenance_list(): void
+    {
+        $this->guard();
+        $mode = isset($_POST['mode']) ? sanitize_key(wp_unslash($_POST['mode'])) : '';
+        if (!in_array($mode, ['enrich', 'refresh'], true)) $this->respond(['success' => 0], 422);
+        $page = max(1, (int) ($_POST['page'] ?? 1));
+        $search = isset($_POST['search']) ? sanitize_text_field(wp_unslash($_POST['search'])) : '';
+        $query = new WP_Query([
+            'post_type' => LSD_Base::PTYPE_LISTING, 'post_status' => ['draft', 'pending', 'publish', 'future', 'private'],
+            'posts_per_page' => -1, 's' => $search, 'no_found_rows' => true,
+            'orderby' => 'title', 'order' => 'ASC', 'fields' => 'ids',
+        ]);
+        $eligibleIds = [];
+        foreach ($query->posts as $postId)
+        {
+            $postId = (int) $postId;
+            if (!$this->maintenance_eligible($postId, $mode)) continue;
+            $eligibleIds[] = $postId;
+        }
+        $listings = [];
+        foreach (array_slice($eligibleIds, ($page - 1) * 100, 100) as $postId)
+        {
+            $listings[] = ['id' => $postId, 'title' => $this->maintenance_title($postId), 'address' => (string) get_post_meta($postId, 'lsd_address', true), 'place_id' => (string) get_post_meta($postId, 'lsd_business_data_place_id', true)];
+        }
+        $selectedIds = isset($_POST['selected_ids']) ? array_slice(array_values(array_unique(array_filter(array_map('absint', (array) wp_unslash($_POST['selected_ids']))))), 0, 100) : [];
+        $selected = [];
+        foreach ($selectedIds as $postId)
+        {
+            if (get_post_type($postId) === LSD_Base::PTYPE_LISTING && $this->maintenance_eligible($postId, $mode)) $selected[] = ['id' => $postId, 'title' => $this->maintenance_title($postId)];
+        }
+        $this->respond(['success' => 1, 'listings' => $listings, 'selected' => $selected, 'pages' => max(1, (int) ceil(count($eligibleIds) / 100))]);
+    }
+
+    public function maintenance_quote(): void
+    {
+        $this->guard();
+        $mode = isset($_POST['mode']) ? sanitize_key(wp_unslash($_POST['mode'])) : '';
+        $count = (int) ($_POST['count'] ?? 0);
+        if (!in_array($mode, ['enrich', 'refresh'], true) || $count < 1 || $count > 100) $this->respond(['success' => 0], 422);
+        try
+        {
+            $quote = LSD_Webilia_Connect::businessDataMaintenance('quote', ['operation' => $mode === 'enrich' ? 'match' : 'lookup', 'count' => $count]);
+            $this->respond(['success' => 1, 'quote' => $quote]);
+        }
+        catch (Throwable $e) { $this->maintenance_failure($e); }
+    }
+
+    public function maintenance_fetch(): void
+    {
+        $this->guard();
+        $mode = isset($_POST['mode']) ? sanitize_key(wp_unslash($_POST['mode'])) : '';
+        $ids = isset($_POST['listing_ids']) ? array_values(array_unique(array_filter(array_map('absint', (array) wp_unslash($_POST['listing_ids']))))) : [];
+        $key = isset($_POST['idempotency_key']) ? sanitize_text_field(wp_unslash($_POST['idempotency_key'])) : '';
+        if (!in_array($mode, ['enrich', 'refresh'], true) || count($ids) < 1 || count($ids) > 20 || !preg_match('/^[0-9a-f-]{36}$/i', $key)) $this->respond(['success' => 0], 422);
+
+        $listings = [];
+        $placeIds = [];
+        foreach ($ids as $id)
+        {
+            $post = get_post($id);
+            if (!$post || $post->post_type !== LSD_Base::PTYPE_LISTING || !$this->maintenance_eligible($id, $mode)) continue;
+            $placeId = (string) get_post_meta($id, 'lsd_business_data_place_id', true);
+            $current = $this->maintenance_fields($id);
+            $listings[$id] = ['id' => $id, 'title' => $this->maintenance_title($id), 'place_id' => $placeId, 'current' => $current];
+            if ($mode === 'refresh') $placeIds[] = $placeId;
+        }
+        if (!$listings) $this->respond(['success' => 0, 'message' => esc_html__('No eligible listings were selected.', 'listdom')], 422);
+
+        try
+        {
+            $request = ['idempotency_key' => $key];
+            if ($mode === 'enrich')
+            {
+                $request['listings'] = [];
+                foreach ($listings as $listing)
+                {
+                    $entry = ['reference' => (string) $listing['id'], 'name' => $listing['title'], 'address' => $listing['current']['address']];
+                    $metadata = (array) get_post_meta($listing['id'], 'lsd_business_data_metadata', true);
+                    $category = sanitize_key((string) ($metadata['primary_category'] ?? $metadata['category'] ?? ''));
+                    if ($category === '')
+                    {
+                        $slugs = wp_get_post_terms($listing['id'], LSD_Base::TAX_CATEGORY, ['fields' => 'slugs']);
+                        if (!is_wp_error($slugs) && $slugs) $category = sanitize_key(str_replace('-', '_', (string) $slugs[0]));
+                    }
+                    if ($category !== '') $entry['category'] = $category;
+                    if ($this->maintenance_valid_coordinates($listing['current']['latitude'], $listing['current']['longitude']))
+                    {
+                        $entry['latitude'] = (float) $listing['current']['latitude'];
+                        $entry['longitude'] = (float) $listing['current']['longitude'];
+                    }
+                    $request['listings'][] = $entry;
+                }
+            }
+            else $request['place_ids'] = $placeIds;
+
+            $result = LSD_Webilia_Connect::businessDataMaintenance($mode === 'enrich' ? 'match' : 'lookup', $request);
+            $preview = [];
+            foreach ($listings as $listing)
+            {
+                $id = $listing['id'];
+                $candidates = $mode === 'enrich' ? (array) ($result['matches'][(string) $id] ?? []) : [];
+                if ($mode === 'refresh' && isset($result['places'][$listing['place_id']])) $candidates = [['place' => $result['places'][$listing['place_id']], 'score' => 1]];
+                foreach ($candidates as &$candidate)
+                {
+                    if (isset($candidate['place']['name'])) $candidate['place']['name'] = $this->decode_business_title((string) $candidate['place']['name']);
+                    $candidate['fields'] = $this->maintenance_source_fields((array) ($candidate['place'] ?? []));
+                }
+                unset($candidate);
+                $preview[$id] = ['listing' => $listing, 'candidates' => $candidates];
+                $metadata = (array) get_post_meta($id, 'lsd_business_data_metadata', true);
+                $metadata['last_checked_at'] = gmdate('c');
+                $metadata['last_check_provider_release'] = sanitize_text_field((string) ($result['meta']['provider_release'] ?? ''));
+                update_post_meta($id, 'lsd_business_data_metadata', $metadata);
+            }
+            $token = wp_generate_uuid4();
+            set_transient('lsd_bd_preview_' . get_current_user_id() . '_' . $token, ['mode' => $mode, 'entries' => $preview, 'provider_release' => $result['meta']['provider_release'] ?? ''], 1800);
+            $this->record_maintenance_history(['created_at' => time(), 'operation' => $mode, 'count' => count($listings), 'credits_charged' => !empty($result['meta']['replayed']) ? '0.000' : ($result['meta']['credits_charged'] ?? '0.000')]);
+            $this->respond(['success' => 1, 'token' => $token, 'entries' => $preview, 'meta' => $result['meta'] ?? []]);
+        }
+        catch (Throwable $e) { $this->maintenance_failure($e); }
+    }
+
+    public function maintenance_apply(): void
+    {
+        $this->guard();
+        $token = isset($_POST['token']) ? sanitize_text_field(wp_unslash($_POST['token'])) : '';
+        $choices = isset($_POST['choices']) && is_array($_POST['choices']) ? wp_unslash($_POST['choices']) : [];
+        $preview = preg_match('/^[0-9a-f-]{36}$/i', $token) ? get_transient('lsd_bd_preview_' . get_current_user_id() . '_' . $token) : false;
+        if (!is_array($preview) || count($choices) > 20) $this->respond(['success' => 0, 'message' => esc_html__('The review expired. Fetch current Business Data again.', 'listdom')], 422);
+
+        $updated = [];
+        $skipped = [];
+        foreach ($choices as $choice)
+        {
+            $id = absint($choice['listing_id'] ?? 0);
+            $placeId = sanitize_text_field((string) ($choice['place_id'] ?? ''));
+            $fields = array_values(array_intersect((array) ($choice['fields'] ?? []), ['phone', 'email', 'website', 'address', 'coordinates', 'socials', 'categories', 'brand', 'operating_status']));
+            $entry = $preview['entries'][$id] ?? null;
+            $post = get_post($id);
+            if (!$entry || !$post || $post->post_type !== LSD_Base::PTYPE_LISTING || !$this->maintenance_eligible($id, $preview['mode'])) { $skipped[] = $id; continue; }
+            if ($this->maintenance_fields($id) !== $entry['listing']['current']) { $skipped[] = $id; continue; }
+            $candidate = null;
+            foreach ($entry['candidates'] as $possible) if ((string) ($possible['place']['id'] ?? '') === $placeId) $candidate = $possible['place'];
+            if (!$candidate || ($preview['mode'] === 'refresh' && (string) get_post_meta($id, 'lsd_business_data_place_id', true) !== $placeId)) { $skipped[] = $id; continue; }
+            if ($preview['mode'] === 'enrich' && (string) get_post_meta($id, 'lsd_business_data_place_id', true) !== (string) $entry['listing']['place_id']) { $skipped[] = $id; continue; }
+            if ($this->existing_listing($placeId, $id)) { $skipped[] = $id; continue; }
+
+            $changed = $this->apply_maintenance_fields($id, $candidate, $fields);
+            $linked = $preview['mode'] === 'enrich' && (string) get_post_meta($id, 'lsd_business_data_place_id', true) !== $placeId;
+            if ($linked) update_post_meta($id, 'lsd_business_data_place_id', $placeId);
+            $changed = $changed || $linked;
+            $sourceDetails = $this->place_details($candidate);
+            $sourceMetadata = $sourceDetails['metadata'];
+            $metadata = (array) get_post_meta($id, 'lsd_business_data_metadata', true);
+            $metadataFields = [
+                'phone' => ['phones'], 'email' => ['emails'], 'website' => ['websites'], 'address' => ['addresses'],
+                'socials' => ['socials'], 'categories' => ['category', 'primary_category', 'taxonomy', 'alternate_categories'],
+                'brand' => ['brand'], 'operating_status' => ['operating_status'],
+            ];
+            foreach ($fields as $field) foreach ($metadataFields[$field] ?? [] as $key)
+            {
+                $value = $sourceMetadata[$key] ?? null;
+                if ($value !== null && $value !== '' && $value !== [] && $value !== ['name' => '', 'wikidata' => '']) $metadata[$key] = $value;
+            }
+            if (in_array('address', $fields, true) && empty($sourceMetadata['addresses']) && $sourceDetails['address'] !== '') unset($metadata['addresses']);
+            if (in_array('categories', $fields, true) && !empty($sourceMetadata['category']) && empty($sourceMetadata['primary_category'])) unset($metadata['primary_category']);
+            if (isset($sourceMetadata['confidence'])) $metadata['confidence'] = $sourceMetadata['confidence'];
+            $metadata['source'] = sanitize_text_field((string) ($candidate['source'] ?? 'Overture Maps Places'));
+            $metadata['attribution'] = sanitize_text_field((string) ($candidate['attribution'] ?? '© Overture Maps Foundation'));
+            $metadata['provider_release'] = sanitize_text_field((string) $preview['provider_release']);
+            $metadata['place_version'] = isset($candidate['place_version']) ? absint($candidate['place_version']) : null;
+            if ($changed) $metadata['last_synced_at'] = gmdate('c');
+            update_post_meta($id, 'lsd_business_data_metadata', $metadata);
+            $updated[] = ['id' => $id, 'changed' => $changed];
+        }
+        delete_transient('lsd_bd_preview_' . get_current_user_id() . '_' . $token);
+        $this->record_maintenance_history(['created_at' => time(), 'operation' => 'apply', 'count' => count($updated), 'credits_charged' => '0.000']);
+        $this->respond(['success' => 1, 'updated' => $updated, 'skipped' => $skipped]);
+    }
+
+    public function maintenance_history(): void
+    {
+        $this->guard();
+        $history = (array) get_option(self::MAINTENANCE_HISTORY_OPTION, []);
+        foreach ($this->pruned_history() as $entry)
+        {
+            $history[] = [
+                'created_at' => $entry['created_at'], 'operation' => 'search',
+                'count' => $entry['meta']['result_count'] ?? count((array) ($entry['places'] ?? [])),
+                'credits_charged' => $entry['meta']['credits_charged'] ?? null,
+                'import_count' => count((array) ($entry['imports'] ?? [])),
+            ];
+        }
+        usort($history, static fn(array $a, array $b): int => (int) $b['created_at'] <=> (int) $a['created_at']);
+        $this->respond(['success' => 1, 'history' => $history]);
+    }
+
+    private function maintenance_fields(int $id): array
+    {
+        $metadata = (array) get_post_meta($id, 'lsd_business_data_metadata', true);
+        $socials = [];
+        foreach (['facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'tiktok'] as $network) $socials[$network] = (string) get_post_meta($id, 'lsd_' . $network, true);
+
+        $categoryTerms = wp_get_post_terms($id, LSD_Base::TAX_CATEGORY);
+        if (is_wp_error($categoryTerms)) $categoryTerms = [];
+        $categoryCodes = (array) ($metadata['category_term_codes'] ?? []);
+        $storedCategories = array_filter(array_merge([(string) ($metadata['primary_category'] ?? $metadata['category'] ?? '')], (array) ($metadata['alternate_categories'] ?? [])));
+        $categories = array_map(static function ($term) use ($categoryCodes, $storedCategories): string
+        {
+            if (isset($categoryCodes[(string) $term->term_id])) return sanitize_key((string) $categoryCodes[(string) $term->term_id]);
+            $nameCode = str_replace('-', '_', sanitize_title($term->name));
+            if (in_array($nameCode, $storedCategories, true)) return $nameCode;
+            return str_replace('-', '_', (string) $term->slug);
+        }, $categoryTerms);
+        $categoryLabels = array_map(static function ($term): string { return (string) $term->name; }, $categoryTerms);
+        $primarySlug = (string) get_post_meta($id, 'lsd_primary_category', true);
+        $primaryCategory = str_replace('-', '_', $primarySlug);
+        foreach ($categoryTerms as $index => $term) if ($term->slug === $primarySlug) { $primaryCategory = $categories[$index]; break; }
+
+        return [
+            'phone' => (string) get_post_meta($id, 'lsd_phone', true), 'email' => (string) get_post_meta($id, 'lsd_email', true),
+            'website' => (string) get_post_meta($id, 'lsd_website', true), 'address' => (string) get_post_meta($id, 'lsd_address', true),
+            'latitude' => (string) get_post_meta($id, 'lsd_latitude', true), 'longitude' => (string) get_post_meta($id, 'lsd_longitude', true),
+            'socials' => $socials, 'categories' => $categories, 'category_labels' => $categoryLabels, 'primary_category' => $primaryCategory,
+            'brand' => (string) ($metadata['brand']['name'] ?? ''), 'operating_status' => (string) ($metadata['operating_status'] ?? ''),
+        ];
+    }
+
+    private function maintenance_initial_ids(): array
+    {
+        $mode = isset($_GET['mode']) ? sanitize_key(wp_unslash($_GET['mode'])) : '';
+        if (!in_array($mode, ['enrich', 'refresh'], true) || !isset($_GET['listing_ids'])) return [];
+
+        $ids = array_values(array_unique(array_filter(array_map('absint', explode(',', sanitize_text_field(wp_unslash($_GET['listing_ids'])))))));
+        $ids = array_filter($ids, function (int $id) use ($mode): bool
+        {
+            $post = get_post($id);
+            return $post && $post->post_type === LSD_Base::PTYPE_LISTING && $this->maintenance_eligible($id, $mode);
+        });
+
+        return array_slice(array_values($ids), 0, 100);
+    }
+
+    private function decode_business_title(string $title): string
+    {
+        return html_entity_decode($title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
+    private function maintenance_title(int $id): string
+    {
+        return $this->decode_business_title((string) get_post_field('post_title', $id, 'raw'));
+    }
+
+    private function maintenance_eligible(int $id, string $mode): bool
+    {
+        if (!in_array(get_post_status($id), ['draft', 'pending', 'publish', 'future', 'private'], true)) return false;
+        if (get_post_meta($id, 'lsd_lock_edit', true)) return false;
+        if ($mode === 'refresh') return (string) get_post_meta($id, 'lsd_business_data_place_id', true) !== '';
+
+        return trim($this->maintenance_title($id)) !== ''
+            && (trim((string) get_post_meta($id, 'lsd_address', true)) !== ''
+                || $this->maintenance_valid_coordinates((string) get_post_meta($id, 'lsd_latitude', true), (string) get_post_meta($id, 'lsd_longitude', true)));
+    }
+
+    private function maintenance_valid_coordinates(string $latitude, string $longitude): bool
+    {
+        return is_numeric($latitude) && is_numeric($longitude)
+            && (float) $latitude >= -90 && (float) $latitude <= 90
+            && (float) $longitude >= -180 && (float) $longitude <= 180;
+    }
+
+    private function maintenance_categories(array $details): array
+    {
+        $primary = $details['primary_category'] ?: ($details['metadata']['category'] ?? '');
+        return array_values(array_unique(array_filter(array_merge([$primary], $details['alternate_categories']))));
+    }
+
+    private function maintenance_source_fields(array $place): array
+    {
+        $details = $this->place_details($place);
+        $categories = $this->maintenance_categories($details);
+        return [
+            'phone' => $details['phones'][0] ?? '', 'email' => $details['emails'][0] ?? '',
+            'website' => $details['websites'][0] ?? '', 'address' => $details['address'],
+            'coordinates' => isset($place['latitude'], $place['longitude']) && is_numeric($place['latitude']) && is_numeric($place['longitude'])
+                ? [(float) $place['latitude'], (float) $place['longitude']] : '',
+            'socials' => array_values($details['social_channels']), 'categories' => $categories, 'primary_category' => $categories[0] ?? '',
+            'brand' => $details['metadata']['brand']['name'], 'operating_status' => $details['metadata']['operating_status'],
+        ];
+    }
+
+    private function apply_maintenance_fields(int $id, array $place, array $fields): bool
+    {
+        $details = $this->place_details($place);
+        $changed = false;
+        $resolvedCategoryCodes = null;
+        foreach (['phone' => ['lsd_phone', $details['phones'][0] ?? ''], 'email' => ['lsd_email', $details['emails'][0] ?? ''],
+            'website' => ['lsd_website', $details['websites'][0] ?? ''], 'address' => ['lsd_address', $details['address']]] as $field => [$key, $value])
+        {
+            if (in_array($field, $fields, true) && $value !== '' && (string) get_post_meta($id, $key, true) !== $value)
+            {
+                update_post_meta($id, $key, $value);
+                $changed = true;
+            }
+        }
+        if (in_array('coordinates', $fields, true) && isset($place['latitude'], $place['longitude']) && is_numeric($place['latitude']) && is_numeric($place['longitude']))
+        {
+            $lat = (float) $place['latitude']; $lng = (float) $place['longitude'];
+            if ((string) get_post_meta($id, 'lsd_latitude', true) !== (string) $lat || (string) get_post_meta($id, 'lsd_longitude', true) !== (string) $lng)
+            {
+                update_post_meta($id, 'lsd_latitude', $lat);
+                update_post_meta($id, 'lsd_longitude', $lng);
+                (new LSD_Entity_Listing($id))->update_geopoint($id, $lat, $lng);
+                $changed = true;
+            }
+        }
+        if (in_array('socials', $fields, true) && $details['social_channels']) foreach (['facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'tiktok'] as $network)
+        {
+            $key = 'lsd_' . $network;
+            $current = (string) get_post_meta($id, $key, true);
+            $source = $details['social_channels'][$network] ?? '';
+            if ($current === $source) continue;
+            if ($source === '') delete_post_meta($id, $key);
+            else update_post_meta($id, $key, $source);
+            $changed = true;
+        }
+        if (in_array('categories', $fields, true))
+        {
+            $categories = $this->maintenance_categories($details);
+            $terms = [];
+            $categoryCodes = [];
+            foreach ($categories as $category)
+            {
+                $term = $this->business_category_term($category);
+                if ($term)
+                {
+                    $terms[] = $term;
+                    if (!isset($categoryCodes[(string) $term])) $categoryCodes[(string) $term] = $category;
+                }
+            }
+            if ($categories && count($terms) === count($categories))
+            {
+                $terms = array_values(array_unique($terms));
+                $primary = get_term($terms[0], LSD_Base::TAX_CATEGORY);
+                $existing = wp_get_post_terms($id, LSD_Base::TAX_CATEGORY, ['fields' => 'ids']);
+                $current = is_wp_error($existing) ? [] : array_map('intval', $existing);
+                $sortedCurrent = $current; $sortedTerms = $terms;
+                sort($sortedCurrent); sort($sortedTerms);
+                $assigned = $sortedCurrent === $sortedTerms || !is_wp_error(wp_set_object_terms($id, $terms, LSD_Base::TAX_CATEGORY));
+                if ($assigned) $resolvedCategoryCodes = $categoryCodes;
+                if ($assigned && $sortedCurrent !== $sortedTerms) $changed = true;
+                if ($assigned && $primary && !is_wp_error($primary) && (string) get_post_meta($id, 'lsd_primary_category', true) !== $primary->slug)
+                {
+                    update_post_meta($id, 'lsd_primary_category', $primary->slug);
+                    $changed = true;
+                }
+            }
+        }
+        $metadata = (array) get_post_meta($id, 'lsd_business_data_metadata', true);
+        if ($resolvedCategoryCodes !== null && ($metadata['category_term_codes'] ?? null) !== $resolvedCategoryCodes)
+        {
+            $metadata['category_term_codes'] = $resolvedCategoryCodes;
+            $changed = true;
+        }
+        foreach (['brand', 'operating_status'] as $field) if (in_array($field, $fields, true) && !empty($details['metadata'][$field]) && ($metadata[$field] ?? null) !== $details['metadata'][$field])
+        {
+            $metadata[$field] = $details['metadata'][$field];
+            $changed = true;
+        }
+        if ($changed) update_post_meta($id, 'lsd_business_data_metadata', $metadata);
+
+        return $changed;
+    }
+
+    private function record_maintenance_history(array $entry): void
+    {
+        $history = (array) get_option(self::MAINTENANCE_HISTORY_OPTION, []);
+        array_unshift($history, $entry);
+        update_option(self::MAINTENANCE_HISTORY_OPTION, array_slice($history, 0, 50), false);
+    }
+
+    private function maintenance_failure(Throwable $e): void
+    {
+        $status = in_array((int) $e->getCode(), [402, 409, 422, 429, 503], true) ? (int) $e->getCode() : 502;
+        $this->respond(['success' => 0, 'message' => esc_html($e->getMessage())], $status);
+    }
+
     private function guard(): void
     {
         $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
         if (!wp_verify_nonce($nonce, self::NONCE) || !current_user_can('manage_options')) $this->respond(['success' => 0, 'message' => esc_html__('You are not allowed to use Webilia Business Data.', 'listdom')], 403);
     }
 
-    private function existing_listing(string $placeId): int
+    private function existing_listing(string $placeId, int $exceptId = 0): int
     {
-        $ids = get_posts(['post_type' => LSD_Base::PTYPE_LISTING, 'post_status' => ['draft', 'pending', 'publish', 'future', 'private'], 'fields' => 'ids', 'posts_per_page' => 1, 'meta_query' => [['key' => 'lsd_business_data_place_id', 'value' => $placeId]]]);
+        $ids = get_posts(['post_type' => LSD_Base::PTYPE_LISTING, 'post_status' => ['draft', 'pending', 'publish', 'future', 'private'], 'fields' => 'ids', 'posts_per_page' => 1,
+            'post__not_in' => $exceptId ? [$exceptId] : [], 'meta_query' => [['key' => 'lsd_business_data_place_id', 'value' => $placeId]]]);
         return isset($ids[0]) ? (int) $ids[0] : 0;
     }
 
@@ -635,7 +1153,12 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
             }
         }
 
-        if ($changed) update_post_meta($postId, 'lsd_business_data_metadata', $metadata);
+        if ($changed)
+        {
+            $metadata['last_checked_at'] = gmdate('c');
+            $metadata['last_synced_at'] = gmdate('c');
+            update_post_meta($postId, 'lsd_business_data_metadata', $metadata);
+        }
         return $changed;
     }
 
@@ -682,6 +1205,14 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
     private function failure(Throwable $e): void
     {
         $this->respond(['success' => 0, 'message' => esc_html($e->getMessage())], 502);
+    }
+
+    private function credit_balance(array $balance): string
+    {
+        $value = (string) ($balance['credits_balance'] ?? '0');
+        if (!preg_match('/^-?(?:0|[1-9][0-9]*)(?:\.([0-9]{1,3}))?$/D', $value, $parts)) return '0.000';
+
+        return $value . (strpos($value, '.') !== false ? str_repeat('0', 3 - strlen($parts[1])) : '.000');
     }
 
     private function respond(array $data, int $status = 200): void

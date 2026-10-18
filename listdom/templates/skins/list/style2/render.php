@@ -7,7 +7,7 @@ defined('ABSPATH') || die();
 $ids = $this->listings;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
-<div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
+<div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
 
 	<?php if($this->display_image || $this->display_review_stars || $this->display_labels) : ?>
         <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">

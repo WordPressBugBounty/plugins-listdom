@@ -208,16 +208,13 @@ class LSD_Menus_Settings extends LSD_Menus
         $lsd = array_diff_key($lsd, $social_settings);
 
         // Save Settings
-        LSD_Options::merge('lsd_settings', $lsd);
+        LSD_Settings_Service::persist_admin($lsd);
 
         // Save social settings only when the submitted form includes them.
         if ($has_social_settings) update_option('lsd_socials', $social_settings);
 
-        // Generate personalized CSS File
-        LSD_Personalize::generate();
-
-        // Add WordPress flush rewrite rules in to-do list
-        LSD_RewriteRules::todo();
+        // Share settings side effects with native abilities.
+        LSD_Settings_Service::after_save(true);
 
         // Print the response
         $this->response(['success' => 1]);
@@ -259,13 +256,10 @@ class LSD_Menus_Settings extends LSD_Menus
         LSD_Options::merge('lsd_styles', $lsd);
 
         // Save Settings
-        LSD_Options::merge('lsd_settings', $lsd);
+        LSD_Settings_Service::persist_admin($lsd);
 
-        // Generate personalized CSS File
-        LSD_Personalize::generate();
-
-        // Add WordPress flush rewrite rules in to do list
-        LSD_RewriteRules::todo();
+        // Share settings side effects with native abilities.
+        LSD_Settings_Service::after_save(true);
 
         // Print the response
         $this->response(['success' => 1]);
@@ -378,11 +372,8 @@ class LSD_Menus_Settings extends LSD_Menus
         // Merge new options with previous options
         $final = array_merge($current, $lsd);
 
-        // Save final options
-        update_option('lsd_settings', $final);
-
-        // Generate personalized CSS File
-        LSD_Personalize::generate();
+        // Canonical persistence also clears the current site's settings cache.
+        LSD_Settings_Service::save_admin($final, false);
 
         // Print the response
         $this->response(['success' => 1]);
@@ -603,6 +594,9 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Save options
         update_option('lsd_addons', $final);
+
+        // Let active addons synchronize settings used by their own services.
+        do_action('lsd_addons_saved', $final);
 
         // Print the response
         $this->response(['success' => 1]);

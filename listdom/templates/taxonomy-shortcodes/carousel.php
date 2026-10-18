@@ -47,11 +47,13 @@ jQuery(document).ready(function()
 			<div class="lsd-term-carousel-item-wrapper">
 				<a href="<?php echo esc_url(get_term_link($term->term_id)); ?>">
 
+                    <?php if (!isset($this->atts['show_icon']) || $this->atts['show_icon']): ?>
 					<div class="lsd-term-circle" style="background-color: <?php echo esc_attr(LSD_Color::lighter($color, 80)); ?>;">
 						<?php if(trim($icon)): ?>
 						<div class="lsd-fe-icon-wrapper" style="color: <?php echo esc_attr($color); ?>;"><?php echo LSD_Kses::element($icon); ?></div>
 						<?php endif; ?>
 					</div>
+                    <?php endif; ?>
 
 					<span class="lsd-term-name"><?php echo esc_html($term->name); ?></span>
 				</a>

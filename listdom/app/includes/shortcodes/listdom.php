@@ -41,6 +41,11 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
             $SKO->collection_schema_fragment_id = 'inline-' . $inline_shortcode_sequence;
         }
 
+        $track_search = isset($_GET['lsd_search_submit']) && (string) $_GET['lsd_search_submit'] === '1' && absint($_GET['page'] ?? 1) <= 1 && (!isset($_GET['lsd_search_target']) || absint($_GET['lsd_search_target']) === 0 || absint($_GET['lsd_search_target']) === $shortcode_id);
+
+        // Preserve submitted filters before search add-ons rewrite request parameters.
+        $tracking_filters = $track_search ? (isset($_GET['sf']) && is_array($_GET['sf']) ? wp_unslash($_GET['sf']) : $SKO->get_sf()) : [];
+
         // Start the skin
         $SKO->start($atts);
         $SKO->after_start();
@@ -53,8 +58,9 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
 
         // Fetch the listings
         $SKO->fetch();
-        $suppress_legacy_schema = $ai_visibility instanceof LSD_AI_Visibility
-            && $ai_visibility->schema_service()->replaces_shortcode_collection_schema($SKO);
+        if ($track_search) do_action('lsd_search_executed', (int) $SKO->found_listings, 'page', $tracking_filters);
+
+        $suppress_legacy_schema = $ai_visibility instanceof LSD_AI_Visibility && $ai_visibility->schema_service()->replaces_shortcode_collection_schema($SKO);
 
         if ($suppress_legacy_schema)
         {

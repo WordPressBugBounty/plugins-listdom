@@ -241,6 +241,12 @@ $infowindow_trigger = $list['mapobject_infowindow_trigger'] ?? 'click';
                                 ]); ?>
                             </div>
                         </div>
+                        <?php $this->include_html_file('metaboxes/shortcode/display-options/map/cluster.php', [
+                            'parameters' => [
+                                'skin' => 'list',
+                                'settings' => $list,
+                            ],
+                        ]); ?>
                     </div>
                 </div>
         </div>

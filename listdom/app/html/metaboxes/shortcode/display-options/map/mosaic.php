@@ -225,6 +225,12 @@ $infowindow_trigger = $mosaic['mapobject_infowindow_trigger'] ?? 'click';
                             </div>
                         </div>
                         <div class="lsd-form-row"><div class="lsd-col-3"><?php echo LSD_Form::label(['class' => 'lsd-fields-label', 'title' => esc_html__('Cluster Color', 'listdom'), 'for' => 'lsd_display_options_skin_mosaic_clustering_color']); ?></div><div class="lsd-col-7"><?php echo LSD_Form::colorpicker(['class' => 'lsd-colorpicker', 'id' => 'lsd_display_options_skin_mosaic_clustering_color', 'name' => 'lsd[display][mosaic][clustering_color]', 'value' => $mosaic['clustering_color'] ?? '#3f51b5', 'default' => '#3f51b5']); ?></div></div>
+                        <?php $this->include_html_file('metaboxes/shortcode/display-options/map/cluster.php', [
+                            'parameters' => [
+                                'skin' => 'mosaic',
+                                'settings' => $mosaic,
+                            ],
+                        ]); ?>
                     </div>
             </div>
         </div>

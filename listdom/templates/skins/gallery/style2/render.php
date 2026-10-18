@@ -9,7 +9,7 @@ $index = 0;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); $index++; ?>
     <div class="<?php echo in_array($index % 9, [0, 1, 5]) ? 'lsd-col-span-2' : ''; ?>">
-        <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" data-url="<?php echo esc_url(get_the_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
+        <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" data-url="<?php echo esc_url(get_the_permalink($id)); ?>" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
             <div class="lsd-gallery-front">
                 <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
                     <?php if ($this->display_image): ?>

@@ -153,7 +153,7 @@ class LSD_Fields extends LSD_Base
         if ($attribute_id > 0)
         {
             $att = new LSD_Entity_Attribute($attribute_id);
-            return LSD_Kses::element($att->render($att->value($listing->id())));
+            return LSD_Kses::element($att->render($att->value($listing->id()), ['listing_id' => $listing->id()]));
         }
 
         switch ($key)

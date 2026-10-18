@@ -18,7 +18,7 @@ jQuery(document).ready(function()
         load_more: "'.($this->pagination === 'loadmore' ? '1' : '0').'",
         infinite_scroll: "'.($this->pagination === 'scroll' ? '1' : '0').'",
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
-        atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
+        atts: "'.http_build_query(['atts'=>$this->get_atts()], '', '&').'",
         next_page: "'.$this->next_page.'",
         limit: "'.$this->limit.'",
         view: "'.$this->default_view.'",

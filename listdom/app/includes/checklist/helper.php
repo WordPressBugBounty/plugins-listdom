@@ -557,6 +557,85 @@ class LSD_Checklist_Helper
         return false;
     }
 
+    private function content_has_shortcode_or_block(string $content, string $shortcode): bool
+    {
+        if ($this->content_has_unescaped_shortcode($content, $shortcode)) return true;
+        if (!function_exists('has_block')) return false;
+        if ($shortcode === 'listdom-add-listing' && !shortcode_exists($shortcode)) return false;
+
+        $blocks = [
+            'listdom' => 'listdom/layout',
+            'listdom-search' => 'listdom/search',
+            'listdom-add-listing' => 'listdom/add-listing',
+            'listdom-dashboard' => 'listdom/dashboard',
+            'listdom-auth' => 'listdom/auth',
+            'listdom-login' => 'listdom/auth',
+            'listdom-register' => 'listdom/auth',
+            'listdom-forgot-password' => 'listdom/auth',
+            'listdom-profile' => 'listdom/profile',
+            'listdom-checkout' => 'listdom/checkout',
+            'listdom-order-summary' => 'listdom/order-summary',
+            'listdom_simplemap' => 'listdom/simple-map',
+        ];
+
+        if (!isset($blocks[$shortcode])) return false;
+        if (has_block($blocks[$shortcode], $content))
+        {
+            if ($shortcode === 'listdom') return $this->parsed_blocks_have_published_layout(parse_blocks($content));
+            return true;
+        }
+
+        if (!has_block('core/block', $content)) return false;
+
+        $seen = [];
+        return $this->synced_pattern_has_block(parse_blocks($content), $blocks[$shortcode], $seen);
+    }
+
+    private function synced_pattern_has_block(array $blocks, string $name, array &$seen): bool
+    {
+        foreach ($blocks as $block)
+        {
+            if (($block['blockName'] ?? '') === 'core/block' && !empty($block['attrs']['ref']))
+            {
+                $id = absint($block['attrs']['ref']);
+                if ($id && !isset($seen[$id]))
+                {
+                    $seen[$id] = true;
+                    $pattern = get_post($id);
+                    if ($pattern instanceof WP_Post && $pattern->post_type === 'wp_block' && $pattern->post_status === 'publish' && empty($pattern->post_password))
+                    {
+                        if (has_block($name, $pattern->post_content))
+                        {
+                            if ($name !== 'listdom/layout' || $this->parsed_blocks_have_published_layout(parse_blocks($pattern->post_content))) return true;
+                        }
+                        if (has_block('core/block', $pattern->post_content) && $this->synced_pattern_has_block(parse_blocks($pattern->post_content), $name, $seen)) return true;
+                    }
+                }
+            }
+
+            if (!empty($block['innerBlocks']) && $this->synced_pattern_has_block($block['innerBlocks'], $name, $seen)) return true;
+        }
+
+        return false;
+    }
+
+    private function parsed_blocks_have_published_layout(array $blocks): bool
+    {
+        foreach ($blocks as $block)
+        {
+            if (($block['blockName'] ?? '') === 'listdom/layout')
+            {
+                $id = absint($block['attrs']['layoutId'] ?? 0);
+                $layout = $id ? get_post($id) : null;
+                if ($layout instanceof WP_Post && $layout->post_type === LSD_Base::PTYPE_SHORTCODE && $layout->post_status === 'publish') return true;
+            }
+
+            if (!empty($block['innerBlocks']) && $this->parsed_blocks_have_published_layout($block['innerBlocks'])) return true;
+        }
+
+        return false;
+    }
+
     /**
      * Remove HTML comments before shortcode checks.
      * @param string $content
@@ -617,6 +696,18 @@ class LSD_Checklist_Helper
         return apply_filters('lsd_checklist_post_content_sources', array_values($sources), $post_id);
     }
 
+    public function dashboard_status(): array
+    {
+        $page_id = (int) LSD_Options::post_id('submission_page');
+        $post = $page_id > 0 ? get_post($page_id) : null;
+        $exists = $post instanceof WP_Post && $post->post_type === 'page';
+        $published = $exists && $post->post_status === 'publish';
+        $shortcode = $published && $this->is_published_post($page_id) && ($this->published_post_has_shortcodes($page_id, ['listdom-dashboard'])
+            || LSD_Dashboard::post_has_elementor_dashboard($page_id));
+        return ['submissionPage' => $page_id, 'exists' => $exists, 'published' => $published,
+            'shortcodeReady' => (bool) $shortcode, 'ready' => $published && $shortcode, 'pageStatus' => $exists ? $post->post_status : 'missing'];
+    }
+
     public function published_post_has_shortcodes(int $post_id, array $shortcodes): bool
     {
         if (!$this->is_published_post($post_id)) return false;
@@ -625,7 +716,7 @@ class LSD_Checklist_Helper
         {
             foreach ($shortcodes as $shortcode)
             {
-                if ($this->content_has_unescaped_shortcode($content, (string) $shortcode)) return true;
+                if ($this->content_has_shortcode_or_block($content, (string) $shortcode)) return true;
             }
         }
 
@@ -644,7 +735,7 @@ class LSD_Checklist_Helper
                 {
                     foreach ($shortcodes as $shortcode)
                     {
-                        if (!$this->content_has_unescaped_shortcode((string) $content, (string) $shortcode)) continue;
+                        if (!$this->content_has_shortcode_or_block((string) $content, (string) $shortcode)) continue;
 
                         $count++;
                         continue 3;

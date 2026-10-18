@@ -37,7 +37,14 @@ class LSD_Statuses extends LSD_Base
             }
 
             $statuses = $this->statuses();
-            foreach ($statuses as $key => $params) register_post_status($key, $params['args']);
+            foreach ($statuses as $key => $params)
+            {
+                // Built-in statuses are shared by all post types, including Pages.
+                $existing = get_post_status_object($key);
+                if ($existing && $existing->_builtin) continue;
+
+                register_post_status($key, $params['args']);
+            }
         });
 
         add_action('admin_footer-post.php', function ()

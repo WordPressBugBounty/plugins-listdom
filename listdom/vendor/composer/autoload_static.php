@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5
+class ComposerStaticInita3652d8ed06242db6ed93a4afb813f74
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -1126,6 +1126,7 @@ class ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5
         'Webilia\\Connect\\Contracts\\GetHttpClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/GetHttpClient.php',
         'Webilia\\Connect\\Contracts\\HttpClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/HttpClient.php',
         'Webilia\\Connect\\Contracts\\Storage' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/Storage.php',
+        'Webilia\\Connect\\Contracts\\TimeoutHttpClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/TimeoutHttpClient.php',
         'Webilia\\Connect\\Contracts\\UpdateClient' => __DIR__ . '/..' . '/webilia/connect/src/Contracts/UpdateClient.php',
         'Webilia\\Connect\\Exception\\RequestException' => __DIR__ . '/..' . '/webilia/connect/src/Exception/RequestException.php',
         'Webilia\\Connect\\Exception\\TransientException' => __DIR__ . '/..' . '/webilia/connect/src/Exception/TransientException.php',
@@ -1196,9 +1197,9 @@ class ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit8b4e68644fd6fb60ea948953aee781f5::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInita3652d8ed06242db6ed93a4afb813f74::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInita3652d8ed06242db6ed93a4afb813f74::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInita3652d8ed06242db6ed93a4afb813f74::$classMap;
 
         }, null, ClassLoader::class);
     }

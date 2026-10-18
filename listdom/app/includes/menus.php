@@ -3,6 +3,7 @@
 class LSD_Menus extends LSD_Base
 {
     protected LSD_Menus_Dashboard $dashboard;
+    protected LSD_Menus_Analytics $analytics;
     protected LSD_Menus_Settings $settings;
     protected LSD_Menus_IX $ix;
     protected LSD_Menus_Addons $addons;
@@ -15,6 +16,7 @@ class LSD_Menus extends LSD_Base
     {
         // Initialize menus
         $this->dashboard = new LSD_Menus_Dashboard();
+        $this->analytics = new LSD_Menus_Analytics();
         $this->settings = new LSD_Menus_Settings();
         $this->ix = new LSD_Menus_IX();
         $this->addons = new LSD_Menus_Addons();
@@ -24,6 +26,10 @@ class LSD_Menus extends LSD_Base
 
         // Register Listdom Menus
         add_action('admin_menu', [$this, 'register_menus'], 1);
+        add_action('admin_post_lsd_analytics_export', [$this->analytics, 'export']);
+        add_action('wp_ajax_lsd_analytics_listings', [$this->analytics, 'moreListings']);
+        add_action('wp_ajax_lsd_analytics_terms', [$this->analytics, 'moreTerms']);
+        add_action('wp_ajax_lsd_analytics_activate_stats', [$this->analytics, 'activateStats']);
         add_action('admin_menu', [$this, 'update_main_menu_badge'], 100);
         add_action('parent_file', [$this, 'mainmenu_selection']);
         add_action('submenu_file', [$this, 'submenu_selection']);
@@ -59,7 +65,6 @@ class LSD_Menus extends LSD_Base
         add_submenu_page('listdom', esc_html__('Shortcodes', 'listdom'), esc_html__('Shortcodes', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SHORTCODE, null, 2);
         add_submenu_page('listdom', esc_html__('Template Builder', 'listdom'), esc_html__('Template Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_TEMPLATE, null, 2.5);
         add_submenu_page('listdom', esc_html__('Search Builder', 'listdom'), esc_html__('Search and Filter Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SEARCH, null, 3);
-        add_submenu_page('listdom', esc_html__('Notifications', 'listdom'), esc_html__('Notifications', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_NOTIFICATION, null, 4);
 
         if (LSD_Payments_Engine::instance()->listdom())
         {
@@ -70,10 +75,12 @@ class LSD_Menus extends LSD_Base
         }
 
         add_submenu_page('listdom', esc_html__('Settings', 'listdom'), esc_html__('Settings', 'listdom'), 'manage_options', 'listdom-settings', [$this->settings, 'output'], 5);
-        add_submenu_page('listdom', esc_html__('Import / Export', 'listdom'), esc_html__('Import / Export', 'listdom'), 'manage_options', 'listdom-ix', [$this->ix, 'output'], 6);
-
+        $import_export = '<span class="lsd-admin-menu-new">' . esc_html__('Import / Export', 'listdom') . ' <span class="lsd-admin-menu-new-badge">' . esc_html__('New', 'listdom') . '</span></span>';
+        add_submenu_page('listdom', esc_html__('Import / Export', 'listdom'), $import_export, 'manage_options', 'listdom-ix', [$this->ix, 'output'], 6);
+        add_submenu_page('listdom', esc_html__('Notifications', 'listdom'), esc_html__('Notifications', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_NOTIFICATION, null, 7);
+        $analytics = '<span class="lsd-admin-menu-new">' . esc_html__('Analytics', 'listdom') . ' <span class="lsd-admin-menu-new-badge">' . esc_html__('New', 'listdom') . '</span></span>';
+        add_submenu_page('listdom', esc_html__('Analytics', 'listdom'), $analytics, 'manage_options', 'listdom-analytics', [$this->analytics, 'output'], 8);
         add_submenu_page('listdom', esc_html__('Webilia Connect', 'listdom'), $webilia, 'manage_options', 'listdom-connect', [$this, 'connect'], 31);
-
         add_submenu_page('listdom', esc_html__('Help', 'listdom'), $help, 'manage_options', LSD_Checklist::MENU_SLUG, [$this->launch_checklist, 'output'], 33);
         add_submenu_page(LSD_Checklist::MENU_SLUG, esc_html__('Welcome to Listdom Setup Wizard', 'listdom'), esc_html__('Wizard', 'listdom'), 'manage_options', LSD_Base::WELCOME_SLUG, [$this->welcome, 'output'], 1);
 

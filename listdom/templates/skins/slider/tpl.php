@@ -16,7 +16,7 @@ jQuery(document).ready(function()
     {
         id: "' . $this->id . '",
         ajax_url: "' . admin_url('admin-ajax.php', null) . '",
-        atts: "' . http_build_query(['atts' => $this->atts], '', '&') . '",
+        atts: "' . http_build_query(['atts' => $this->get_atts()], '', '&') . '",
         items: 1,
         loop: 1,
         autoplay: '.($this->autoplay ? 'true' : 'false').',

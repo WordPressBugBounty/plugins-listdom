@@ -823,12 +823,53 @@ class ClientTest extends TestCase
         ]);
 
         $this->assertSame('restaurant', $categories['categories'][0]['code']);
-        $this->assertSame(1, $search['meta']['credits_charged']);
+        $this->assertSame('1.000', $search['meta']['credits_charged']);
         $this->assertSame('/v1/connect/overture/places/categories', parse_url($http->getUrl, PHP_URL_PATH));
         $this->assertSame(['q' => 'restaurant', 'limit' => 10], $http->query);
         $this->assertSame('Bearer wcx_test', $http->headers['Authorization']);
         $this->assertSame('/v1/connect/overture/places/search', parse_url($http->postUrl, PHP_URL_PATH));
         $this->assertSame(['restaurant'], $http->payload['categories']);
+    }
+
+    public function test_overture_maintenance_methods_use_connected_site_and_expected_paths(): void
+    {
+        $http = new class extends OvertureHttpClient implements \Webilia\Connect\Contracts\TimeoutHttpClient {
+            public int $timeout = 0;
+
+            public function postWithTimeout(string $url, array $payload, array $headers, int $timeout): array
+            {
+                $this->timeout = $timeout;
+
+                return $this->post($url, $payload, $headers);
+            }
+        };
+        $client = new Client($http, new InMemoryStorage($this->connection()));
+
+        $client->overtureMaintenanceQuote('match', 3);
+        $this->assertSame('/v1/connect/overture/places/quote', parse_url($http->postUrl, PHP_URL_PATH));
+        $this->assertSame(['operation' => 'match', 'count' => 3], $http->payload);
+        $this->assertSame(30, $http->timeout);
+
+        $client->overturePlacesMatch('c17d7103-4961-4eba-b1b8-c9733eafaf36', [4 => ['reference' => '1', 'name' => 'Cafe', 'address' => 'Main Street']]);
+        $this->assertSame('/v1/connect/overture/places/match', parse_url($http->postUrl, PHP_URL_PATH));
+        $this->assertSame('Bearer wcx_test', $http->headers['Authorization']);
+        $this->assertSame([['reference' => '1', 'name' => 'Cafe', 'address' => 'Main Street']], $http->payload['listings']);
+
+        $client->overturePlacesLookup('a9d30794-b47e-4d57-9fb4-2b77d9d90a61', [3 => 'place-1']);
+        $this->assertSame('/v1/connect/overture/places/lookup', parse_url($http->postUrl, PHP_URL_PATH));
+        $this->assertSame(['place-1'], $http->payload['place_ids']);
+    }
+
+    public function test_maintenance_uses_standard_post_for_clients_without_the_timeout_contract(): void
+    {
+        $http = new class extends OvertureHttpClient {
+            private function postWithTimeout(): void {}
+        };
+        $client = new Client($http, new InMemoryStorage($this->connection()));
+
+        $client->overtureMaintenanceQuote('lookup', 1);
+
+        $this->assertSame('/v1/connect/overture/places/quote', parse_url($http->postUrl, PHP_URL_PATH));
     }
 
     public function test_credit_balance_uses_the_connected_sites_bearer_credential(): void
@@ -838,10 +879,74 @@ class ClientTest extends TestCase
 
         $balance = $client->creditBalance();
 
-        $this->assertSame(42, $balance['credits_balance']);
+        $this->assertSame('42.000', $balance['credits_balance']);
         $this->assertSame('/v1/connect/credits/balance', parse_url($http->getUrl, PHP_URL_PATH));
         $this->assertSame([], $http->query);
         $this->assertSame('Bearer wcx_test', $http->headers['Authorization']);
+    }
+
+    public function test_service_token_exchange_uses_connect_credential_without_storing_token(): void
+    {
+        $http = new class implements HttpClient {
+            public string $url = '';
+            public array $payload = [];
+            public array $headers = [];
+
+            public function post(string $url, array $payload, array $headers = []): array
+            {
+                $this->url = $url;
+                $this->payload = $payload;
+                $this->headers = $headers;
+
+                return ['data' => ['token' => 'short-lived-token', 'expires_at' => 123456]];
+            }
+        };
+        $storage = new InMemoryStorage($this->connection());
+
+        $result = (new Client($http, $storage))->serviceToken('service-a');
+
+        $this->assertSame('short-lived-token', $result['token']);
+        $this->assertSame('/v1/connect/service-tokens', parse_url($http->url, PHP_URL_PATH));
+        $this->assertSame(['audience' => 'service-a'], $http->payload);
+        $this->assertSame('Bearer wcx_test', $http->headers['Authorization']);
+        $this->assertArrayNotHasKey('token', $storage->connection());
+    }
+
+    /** @dataProvider invalidServiceTokenResponses */
+    public function test_service_token_exchange_rejects_a_successful_response_without_a_usable_token(array $response): void
+    {
+        $storage = new InMemoryStorage($this->connection());
+
+        try {
+            (new Client(new SuccessfulHttpClient($response), $storage))->serviceToken('service-a');
+            $this->fail('A missing service token must not be reported as a successful exchange.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Webilia Connect did not return a service token.', $exception->getMessage());
+            $this->assertSame('wcx_test', $storage->connection()['credential']);
+        }
+    }
+
+    public function invalidServiceTokenResponses(): array
+    {
+        return [
+            'empty response' => [[]],
+            'null data' => [['data' => null]],
+            'missing token' => [['data' => ['expires_at' => 123456]]],
+            'non-string token' => [['data' => ['token' => 123]]],
+            'blank token' => [['data' => ['token' => '  ']]],
+        ];
+    }
+
+    public function test_rejected_service_token_exchange_forgets_revoked_connection(): void
+    {
+        $storage = new InMemoryStorage($this->connection());
+
+        $this->expectException(RequestException::class);
+        try {
+            (new Client(new RevokedHttpClient(), $storage))->serviceToken('service-a');
+        } finally {
+            $this->assertNull($storage->connection());
+        }
     }
 
     private function connection(): array
@@ -1369,7 +1474,7 @@ class OvertureHttpClient implements GetHttpClient
         $this->headers = $headers;
 
         if (substr($url, -strlen('/credits/balance')) === '/credits/balance') {
-            return ['data' => ['credits_balance' => 42]];
+            return ['data' => ['credits_balance' => '42.000']];
         }
 
         return ['data' => ['taxonomy_version' => '2026-03-04', 'categories' => [['code' => 'restaurant']]]];
@@ -1381,6 +1486,6 @@ class OvertureHttpClient implements GetHttpClient
         $this->payload = $payload;
         $this->headers = $headers;
 
-        return ['data' => ['places' => [], 'meta' => ['credits_charged' => 1]]];
+        return ['data' => ['places' => [], 'meta' => ['credits_charged' => '1.000']]];
     }
 }

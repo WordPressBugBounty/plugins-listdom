@@ -69,6 +69,7 @@ jQuery(document).ready(function()
         clustering: '.(isset($args['clustering']) && $args['clustering'] ? 'true' : 'false').',
         clustering_images: "'.(isset($args['clustering_images']) && strpos($args['clustering_images'], 'cluster-color') === 0 ? esc_js($args['clustering_images']) : $assets->lsd_asset_url(isset($args['clustering_images']) && trim($args['clustering_images']) ? $args['clustering_images'] : 'img/cluster1/m')).'",
         clustering_color: "'.esc_js($args['clustering_color'] ?? '#3f51b5').'",
+        clustering_text_color: "'.esc_js(sanitize_hex_color($args['clustering_text_color'] ?? '') ?: '').'",
         styles: "",
         mapcontrols: "",
         fill_color: "'.$settings['map_shape_fill_color'].'",

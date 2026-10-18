@@ -26,18 +26,24 @@ function lsdGetClusterColor(style, color) {
 
 function lsdGetClusterTextColor(background) {
     const hex = background.replace("#", "");
-    const red = parseInt(hex.substring(0, 2), 16);
-    const green = parseInt(hex.substring(2, 4), 16);
-    const blue = parseInt(hex.substring(4, 6), 16);
-    const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+    const channels = [0, 2, 4].map(function (offset) {
+        const channel = parseInt(hex.substring(offset, offset + 2), 16) / 255;
+        return channel <= 0.04045 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
+    });
+    const luminance = 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    const dark = 17 / 255;
+    const darkLuminance = Math.pow((dark + 0.055) / 1.055, 2.4);
+    const darkContrast = (luminance + 0.05) / (darkLuminance + 0.05);
+    const lightContrast = 1.05 / (luminance + 0.05);
 
-    return luminance > 0.6 ? "#111111" : "#ffffff";
+    if (darkContrast >= 4.5 && darkContrast >= lightContrast) return "#111111";
+    return lightContrast >= 4.5 ? "#ffffff" : "#000000";
 }
 
 function lsdGetClusterSvgUrl(color, size) {
     const center = size / 2;
     const radius = (size - 2) / 2;
-    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '"><circle cx="' + center + '" cy="' + center + '" r="' + radius + '" fill="' + color + '" opacity=".22"/><circle cx="' + center + '" cy="' + center + '" r="' + (radius * .78) + '" fill="' + color + '" opacity=".58"/><circle cx="' + center + '" cy="' + center + '" r="' + (radius * .58) + '" fill="' + color + '" opacity=".96" stroke="#ffffff" stroke-opacity=".45" stroke-width="1"/></svg>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '"><circle cx="' + center + '" cy="' + center + '" r="' + radius + '" fill="' + color + '" opacity=".22"/><circle cx="' + center + '" cy="' + center + '" r="' + (radius * .78) + '" fill="' + color + '" opacity=".58"/><circle cx="' + center + '" cy="' + center + '" r="' + (radius * .58) + '" fill="' + color + '" opacity="1" stroke="#ffffff" stroke-opacity=".45" stroke-width="1"/></svg>';
 
     return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
 }
@@ -285,6 +291,10 @@ function ListdomPageHistory() {
         let new_qs_sp = new URLSearchParams(new_qs);
         let requestClearKeys = lsdNormalizeQueryKeys(clearKeys);
 
+        // The submission marker belongs only to the AJAX request, never to history.
+        url.searchParams.delete("lsd_search_submit");
+        new_qs_sp.delete("lsd_search_submit");
+
         if (scope !== null) {
             requestClearKeys = [...new Set([
                 ...requestClearKeys,
@@ -377,6 +387,19 @@ function lsdResetTimelineCarousel($skin) {
 // Requests Object for Skins
 let listdomRequests = {};
 
+function lsdSearchSubmitted(request) {
+    return new URLSearchParams(request).get("lsd_search_submit") === "1";
+}
+
+function lsdHasListingSync(id) {
+    return jQuery('#lsd_skin' + id).is(
+        '.lsd-list-view-wrapper, .lsd-grid-view-wrapper, .lsd-table-view-wrapper, ' +
+        '.lsd-accordion-view-wrapper, .lsd-gallery-view-wrapper, .lsd-timeline-view-wrapper, ' +
+        '.lsd-mosaic-view-wrapper, .lsd-side-view-wrapper, .lsd-listgrid-view-wrapper, ' +
+        '.lsd-masonry-view-wrapper'
+    );
+}
+
 // Listdom REQUEST PLUGIN
 function ListdomRequest(id, settings) {
     this.id = id;
@@ -390,7 +413,8 @@ function ListdomRequest(id, settings) {
 
         if (requestFromLocation) {
             let url = new URL(window.location.href);
-            request = url.search ? url.search.substring(1) : "";
+            url.searchParams.delete("lsd_search_submit");
+            request = url.searchParams.toString();
         }
 
         lsdHydrateDistanceReferenceFromQuery(request, this.id, requestFromLocation);
@@ -405,7 +429,9 @@ function ListdomRequest(id, settings) {
         let rendered = this.apply(cached, newParameters, requestClearKeys);
 
         // Push to Object
-        listdomRequests[this.id] = rendered;
+        const cachedParameters = new URLSearchParams(rendered);
+        cachedParameters.delete("lsd_search_submit");
+        listdomRequests[this.id] = cachedParameters.toString();
 
         // Return Rendered Parameters
         return rendered;
@@ -748,11 +774,11 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -771,7 +797,7 @@ function ListdomDetails(id, link, settings) {
                 url: settings.ajax_url,
                 data:
                     "action=lsd_list_load_more&" +
-                    req.get("page=" + next_page, settings.atts),
+                    req.get("page=" + next_page + (submitted ? "&lsd_search_submit=1" : ""), settings.atts),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -1012,11 +1038,11 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -1035,7 +1061,7 @@ function ListdomDetails(id, link, settings) {
                 url: settings.ajax_url,
                 data:
                     "action=lsd_grid_load_more&" +
-                    req.get("page=" + next_page, settings.atts),
+                    req.get("page=" + next_page + (submitted ? "&lsd_search_submit=1" : ""), settings.atts),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -1294,7 +1320,7 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
         }
 
@@ -1439,7 +1465,7 @@ function ListdomDetails(id, link, settings) {
             });
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -1458,7 +1484,7 @@ function ListdomDetails(id, link, settings) {
                 url: settings.ajax_url,
                 data:
                     "action=lsd_table_load_more&" +
-                    req.get("page=" + next_page, settings.atts),
+                    req.get("page=" + next_page + (submitted ? "&lsd_search_submit=1" : ""), settings.atts),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -1698,7 +1724,7 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
 
             $("#lsd_skin" + settings.id + " .lsd-accordion-body").hide();
@@ -1723,7 +1749,7 @@ function ListdomDetails(id, link, settings) {
             });
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -1742,7 +1768,7 @@ function ListdomDetails(id, link, settings) {
                 url: settings.ajax_url,
                 data:
                     "action=lsd_accordion_load_more&" +
-                    req.get("page=" + next_page, settings.atts),
+                    req.get("page=" + next_page + (submitted ? "&lsd_search_submit=1" : ""), settings.atts),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -1978,11 +2004,11 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             // Get button and wrapper
             let $button = $("#lsd_skin" + settings.id + " .lsd-load-more");
             let $loadMoreWrapper = $("#lsd_skin" + settings.id + " .lsd-load-more-wrapper");
@@ -1997,7 +2023,7 @@ function ListdomDetails(id, link, settings) {
 
             $.ajax({
                 url: settings.ajax_url,
-                data: "action=lsd_gallery_load_more&" + req.get("page=" + next_page, settings.atts),
+                data: "action=lsd_gallery_load_more&" + req.get("page=" + next_page + (submitted ? "&lsd_search_submit=1" : ""), settings.atts),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -2258,7 +2284,7 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
         }
 
@@ -2397,7 +2423,7 @@ function ListdomDetails(id, link, settings) {
             listdom_onload();
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -2417,7 +2443,7 @@ function ListdomDetails(id, link, settings) {
                 data:
                     "action=lsd_timeline_load_more&" +
                     req.get(
-                        "page=" + next_page + "&limit=" + settings.limit,
+                        "page=" + next_page + "&limit=" + settings.limit + (submitted ? "&lsd_search_submit=1" : ""),
                         settings.atts
                     ),
                 dataType: "json",
@@ -2654,11 +2680,11 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -2677,7 +2703,7 @@ function ListdomDetails(id, link, settings) {
                 url: settings.ajax_url,
                 data:
                     "action=lsd_mosaic_load_more&" +
-                    req.get("page=" + next_page, settings.atts),
+                    req.get("page=" + next_page + (submitted ? "&lsd_search_submit=1" : ""), settings.atts),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -2931,7 +2957,7 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
         }
 
@@ -3028,7 +3054,7 @@ function ListdomDetails(id, link, settings) {
             $body.addClass('lsd-small-not-scrollable');
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -3045,7 +3071,7 @@ function ListdomDetails(id, link, settings) {
 
             $.ajax({
                 url: settings.ajax_url,
-                data: "action=lsd_side_load_more&" + req.get("page=" + next_page, settings.atts),
+                data: "action=lsd_side_load_more&" + req.get("page=" + next_page + (submitted ? "&lsd_search_submit=1" : ""), settings.atts),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -3296,11 +3322,11 @@ function ListdomDetails(id, link, settings) {
                 req.get(request, '', clearKeys);
                 $("#lsd_skin" + settings.id).data("next-page", 1);
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(request));
             });
         }
 
-        function loadMore(append = true, page = null) {
+        function loadMore(append = true, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -3322,7 +3348,7 @@ function ListdomDetails(id, link, settings) {
                 data:
                     "action=lsd_listgrid_load_more&" +
                     req.get(
-                        "page=" + next_page + "&view=" + $wrapper.data("view"),
+                        "page=" + next_page + "&view=" + $wrapper.data("view") + (submitted ? "&lsd_search_submit=1" : ""),
                         settings.atts
                     ),
                 dataType: "json",
@@ -4111,11 +4137,11 @@ function ListdomDetails(id, link, settings) {
                 $("#lsd_skin" + settings.id).data("next-page", 1);
                 $list_wrapper.addClass('lsd-loading');
 
-                loadMore(false);
+                loadMore(false, null, lsdSearchSubmitted(requestString));
             });
         }
 
-        function loadMore(append, page = null) {
+        function loadMore(append, page = null, submitted = false) {
             if (typeof append === 'undefined') append = true;
 
             // Get button and wrapper
@@ -4135,7 +4161,7 @@ function ListdomDetails(id, link, settings) {
                 url: settings.ajax_url,
                 data:
                     "action=lsd_masonry_load_more&" +
-                    req.get("page=" + next_page, settings.atts),
+                    req.get("page=" + next_page + (submitted ? "&lsd_search_submit=1" : ""), settings.atts),
                 dataType: "json",
                 type: "post",
                 success: function (response) {
@@ -4295,6 +4321,7 @@ function ListdomDetails(id, link, settings) {
         let $wrapper = $("#lsd_skin" + settings.id);
 
         let mapsearchFreez = false;
+        let autoGpsMovePending = false;
 
         // Disable clustering if undefined
         if (settings.clustering && typeof L.markerClusterGroup === "undefined")
@@ -4346,6 +4373,7 @@ function ListdomDetails(id, link, settings) {
         // Load Clustering
         if (settings.clustering) {
             const clusterColor = lsdGetClusterColor(settings.clustering_images, settings.clustering_color);
+            const clusterTextColor = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(settings.clustering_text_color || "") ? settings.clustering_text_color : "";
             clustering = L.markerClusterGroup({
                 chunkedLoading: true,
                 spiderfyOnMaxZoom: true,
@@ -4354,7 +4382,7 @@ function ListdomDetails(id, link, settings) {
                     const clusterSizes = [53, 56, 66, 78, 90];
                     const clusterSize = clusterSizes[Math.min(String(count).length, clusterSizes.length) - 1];
                     const clusterInnerSize = Math.round(clusterSize * 0.65);
-                    const textColor = lsdGetClusterTextColor(clusterColor);
+                    const textColor = clusterTextColor || lsdGetClusterTextColor(clusterColor);
 
                     return new L.DivIcon({
                         html: '<div class="lsd-cluster-color-ring" style="--lsd-cluster-size:' + clusterSize + 'px;--lsd-cluster-inner-size:' + clusterInnerSize + 'px;border-color:' + clusterColor + ';background-color:' + clusterColor + '38;"><div style="background-color:' + clusterColor + ';color:' + textColor + ';">' + count + '</div></div>',
@@ -4363,6 +4391,14 @@ function ListdomDetails(id, link, settings) {
                     });
                 } : null,
             });
+            if (!clusterColor && clusterTextColor) {
+                const createIcon = clustering.options.iconCreateFunction;
+                clustering.options.iconCreateFunction = function (cluster) {
+                    const icon = createIcon.call(this, cluster);
+                    icon.options.html = icon.options.html.replace('<span>', '<span style="color:' + clusterTextColor + ';">');
+                    return icon;
+                };
+            }
         }
 
         // Tile Server
@@ -4426,6 +4462,9 @@ function ListdomDetails(id, link, settings) {
         // Sync
         $('body').on('lsd-sync', function (e, { id, request, clearKeys = [] }) {
             if (id !== parseInt(settings.id)) return;
+
+            // The listing request records this submission when the skin also has a map.
+            if (lsdHasListingSync(settings.id)) request = request.replace(/(^|&)lsd_search_submit=1(?=&|$)/, "");
             mapsearch_request(request, clearKeys);
         });
 
@@ -4509,6 +4548,9 @@ function ListdomDetails(id, link, settings) {
             marker.listing_id = markerData.id;
             marker.is_marker = true;
             marker.lsd_infowindow = markerData.infowindow;
+            marker.on("click", function () {
+                listdom_stats_map_event("map_marker_click", markerData.id);
+            });
 
             if (settings.display_infowindow) {
                 // InfoWindow
@@ -4906,10 +4948,148 @@ function ListdomDetails(id, link, settings) {
         }
 
         function mapsearch() {
+            let initialized = false;
+            let userMoved = false;
+            let pendingInput = null;
+            let touchInput = false;
+            let pendingTimer = null;
+            let resizeTimer = null;
+            let resizePending = false;
+            let resizeInputTimer = null;
+            let touchClickPending = false;
+            let lastTouchClick = 0;
+            const container = map.getContainer();
+
+            function expectMovement(type, delay) {
+                pendingInput = type;
+                if (pendingTimer) clearTimeout(pendingTimer);
+
+                // Wheel zoom and animated zoom can start after the input event.
+                if (typeof delay === 'number') {
+                    pendingTimer = setTimeout(function () {
+                        pendingInput = null;
+                        pendingTimer = null;
+                    }, delay);
+                }
+            }
+
+            function confirmMovement(type) {
+                if (pendingInput !== type && !touchInput) return;
+
+                pendingInput = null;
+                touchInput = false;
+                if (pendingTimer) clearTimeout(pendingTimer);
+                pendingTimer = null;
+                userMoved = true;
+            }
+
+            map.whenReady(function () {
+                initialized = true;
+            });
+
+            function expectResize() {
+                resizePending = true;
+                if (resizeInputTimer) clearTimeout(resizeInputTimer);
+                resizeInputTimer = setTimeout(function () {
+                    resizePending = false;
+                    resizeInputTimer = null;
+                }, 500);
+            }
+
+            window.addEventListener('resize', expectResize, true);
+            window.addEventListener('orientationchange', expectResize, true);
+
+            map.on('zoomstart', function () {
+                confirmMovement('zoom');
+            });
+            map.on('movestart', function () {
+                confirmMovement('pan');
+            });
+
+            map.on('dragstart', function () {
+                userMoved = true;
+            });
+            map.on('boxzoomstart', function () {
+                userMoved = true;
+            });
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && map.boxZoom.moved()) userMoved = false;
+            }, true);
+
+            container.addEventListener('wheel', function (event) {
+                if (!map.scrollWheelZoom.enabled()) return;
+                if (event.deltaY < 0 && map.getZoom() >= map.getMaxZoom()) return;
+                if (event.deltaY > 0 && map.getZoom() <= map.getMinZoom()) return;
+                if (!event.deltaY) return;
+
+                expectMovement('zoom', map.options.wheelDebounceTime + 250);
+            }, true);
+            container.addEventListener('dblclick', function (event) {
+                if (event.shiftKey && map.getZoom() <= map.getMinZoom()) return;
+                if (!event.shiftKey && map.getZoom() >= map.getMaxZoom()) return;
+
+                expectMovement('zoom', 250);
+            }, true);
+            container.addEventListener('touchstart', function (event) {
+                touchClickPending = false;
+                if (event.touches.length > 1) {
+                    touchInput = true;
+                    lastTouchClick = 0;
+                }
+            }, true);
+            container.addEventListener('touchend', function (event) {
+                if (!event.touches.length) {
+                    touchClickPending = true;
+                    setTimeout(function () { touchInput = false; }, 0);
+                }
+            }, true);
+            container.addEventListener('touchcancel', function () {
+                touchInput = false;
+                touchClickPending = false;
+                lastTouchClick = 0;
+            }, true);
+            container.addEventListener('keydown', function (event) {
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
+                    (event.key === 'Enter' && event.target.closest('.marker-cluster'))) expectMovement('pan', 250);
+                else if (['+', '-', '=', '_'].includes(event.key)) expectMovement('zoom', 250);
+            }, true);
+            container.addEventListener('click', function (event) {
+                const touchClick = touchClickPending || event.pointerType === 'touch' ||
+                    (event.sourceCapabilities && event.sourceCapabilities.firesTouchEvents);
+                touchClickPending = false;
+                if (touchClick) {
+                    const now = Date.now();
+                    if (event.detail === 1 && lastTouchClick && now - lastTouchClick <= 200 && map.doubleClickZoom.enabled())
+                        expectMovement('zoom', 250);
+                    lastTouchClick = event.detail === 1 ? now : 0;
+                }
+
+                if (event.target.closest('.marker-cluster')) expectMovement('pan', 250);
+                else if (event.target.closest('.leaflet-control-zoom') && !event.target.closest('.leaflet-disabled')) expectMovement('zoom', 250);
+            }, true);
+
             map.on('moveend', function () {
-                if (!mapsearchFreez) {
+                const shouldSearch = initialized && (userMoved || autoGpsMovePending) && !mapsearchFreez;
+                userMoved = false;
+                autoGpsMovePending = false;
+
+                if (shouldSearch) {
+                    if (resizeTimer) clearTimeout(resizeTimer);
+                    resizeTimer = null;
                     mapsearch_boundary();
                 }
+            });
+            map.on('resize', function () {
+                // Ignore map-only invalidations during setup.
+                if (!resizePending) return;
+                resizePending = false;
+                if (resizeInputTimer) clearTimeout(resizeInputTimer);
+                resizeInputTimer = null;
+                if (resizeTimer) clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function () {
+                    resizeTimer = null;
+                    if (initialized && !mapsearchFreez) mapsearch_boundary();
+                }, 200);
             });
         }
 
@@ -5039,7 +5219,7 @@ function ListdomDetails(id, link, settings) {
                             const shortcode_id = settings.connected_shortcodes[i];
                             $('body').trigger('lsd-sync', {
                                 id: shortcode_id,
-                                request: request,
+                                request: request.replace(/(^|&)lsd_search_submit=1(?=&|$)/, ""),
                                 clearKeys: clearKeys
                             });
                         }
@@ -5067,12 +5247,17 @@ function ListdomDetails(id, link, settings) {
                         lng: position.coords.longitude,
                     }, distanceReferenceScopes);
 
+                    const previousCenter = map.getCenter();
+                    const previousZoom = map.getZoom();
+                    autoGpsMovePending = settings.mapsearch;
                     map.setView(
                         [position.coords.latitude, position.coords.longitude],
                         map.getZoom() <= settings.gps_zoom.current
                             ? settings.gps_zoom.zl
                             : map.getZoom()
                     );
+                    if (autoGpsMovePending && previousCenter.equals(map.getCenter()) && previousZoom === map.getZoom())
+                        autoGpsMovePending = false;
 
                     if (!settings.mapsearch) lsdRefreshDistanceReference(settings.id, settings.id);
                     lsdSyncDistanceReference(settings.connected_shortcodes, settings.id);
@@ -5233,6 +5418,7 @@ function ListdomDetails(id, link, settings) {
         let loadedObjectsById = {};
         let openListingTimer = null;
         let markerCluster;
+        let gpsMovePending = false;
 
         // Load Layers
         loadLayers(settings.layers);
@@ -5256,7 +5442,7 @@ function ListdomDetails(id, link, settings) {
                     url: clusterColor ? lsdGetClusterSvgUrl(clusterColor, size) : settings.clustering_images + (index + 1) + ".png",
                     height: size,
                     width: size,
-                    textColor: clusterColor ? lsdGetClusterTextColor(clusterColor) : settings.clustering_text_color || "#ffffff",
+                    textColor: /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(settings.clustering_text_color || "") ? settings.clustering_text_color : (clusterColor ? lsdGetClusterTextColor(clusterColor) : "#ffffff"),
                     textSize: 11,
                 };
             });
@@ -5288,6 +5474,9 @@ function ListdomDetails(id, link, settings) {
         // Sync
         $('body').on('lsd-sync', function (e, {id, request, clearKeys = []}) {
             if (id !== parseInt(settings.id)) return;
+
+            // The listing request records this submission when the skin also has a map.
+            if (lsdHasListingSync(settings.id)) request = request.replace(/(^|&)lsd_search_submit=1(?=&|$)/, "");
             mapsearch_request(request, clearKeys);
         });
 
@@ -5373,6 +5562,9 @@ function ListdomDetails(id, link, settings) {
 
             marker.lsd_infowindow = markerData.infowindow;
             marker.is_marker = true;
+            google.maps.event.addListener(marker, "click", function () {
+                listdom_stats_map_event("map_marker_click", markerData.id);
+            });
 
             // Marker Info-Window
             if (settings.display_infowindow) {
@@ -6097,6 +6289,9 @@ function ListdomDetails(id, link, settings) {
                     suppressMarkers: true,
                 });
 
+                document.dispatchEvent(new CustomEvent("lsd_stats_action", {
+                    detail: { action: "direction_request", listing: settings.direction.listing_id }
+                }));
                 directionsService.route(
                     {
                         origin: from,
@@ -6270,6 +6465,10 @@ function ListdomDetails(id, link, settings) {
                             lng: position.coords.longitude,
                         }, distanceReferenceScopes);
 
+                        const previousCenter = map.getCenter();
+                        const previousZoom = map.getZoom();
+                        gpsMovePending = settings.mapsearch;
+
                         // Set the Map Center
                         map.setCenter(
                             new google.maps.LatLng(
@@ -6281,6 +6480,9 @@ function ListdomDetails(id, link, settings) {
                         // Set the Zoom Level
                         if (map.getZoom() <= settings.gps_zoom.current)
                             map.setZoom(settings.gps_zoom.zl);
+
+                        if (gpsMovePending && previousCenter && previousCenter.equals(map.getCenter()) && previousZoom === map.getZoom())
+                            gpsMovePending = false;
 
                         if (!settings.mapsearch) lsdRefreshDistanceReference(settings.id, settings.id);
                         lsdSyncDistanceReference(settings.connected_shortcodes, settings.id);
@@ -6317,6 +6519,10 @@ function ListdomDetails(id, link, settings) {
 
                     let GPSInterval = setInterval(function () {
                         if (!mapsearchFreez) {
+                            const previousCenter = map.getCenter();
+                            const previousZoom = map.getZoom();
+                            gpsMovePending = settings.mapsearch;
+
                             // Set the Map Center
                             map.setCenter(
                                 new google.maps.LatLng(
@@ -6328,6 +6534,8 @@ function ListdomDetails(id, link, settings) {
                             // Set the Zoom Level
                             if (map.getZoom() <= settings.gps_zoom.current)
                                 map.setZoom(settings.gps_zoom.zl);
+                            if (gpsMovePending && previousCenter && previousCenter.equals(map.getCenter()) && previousZoom === map.getZoom())
+                                gpsMovePending = false;
 
                             // Clear The Loop
                             clearInterval(GPSInterval);
@@ -6609,6 +6817,159 @@ function ListdomDetails(id, link, settings) {
         let firstRun = true;
 
         function mapsearch() {
+            let userMoved = false;
+            let controlClicked = false;
+            let controlTimer = null;
+            let pendingInput = null;
+            let touchInput = false;
+            let touchTimer = null;
+            let lastTouchStart = 0;
+            let pendingTimer = null;
+            let mapFullscreen = false;
+            let fullscreenChanged = false;
+            let fullscreenTimer = null;
+            const container = map.getDiv();
+            let lastWidth = container.clientWidth;
+            let lastHeight = container.clientHeight;
+
+            function expectMovement(type, delay) {
+                pendingInput = type;
+                if (pendingTimer) clearTimeout(pendingTimer);
+
+                if (typeof delay === 'number') {
+                    pendingTimer = setTimeout(function () {
+                        pendingInput = null;
+                        pendingTimer = null;
+                    }, delay);
+                }
+            }
+
+            function confirmMovement(type) {
+                if (pendingInput !== type && !touchInput) return;
+
+                pendingInput = null;
+                touchInput = false;
+                if (pendingTimer) clearTimeout(pendingTimer);
+                pendingTimer = null;
+                userMoved = true;
+            }
+
+            function keepTouchInput() {
+                touchInput = true;
+                if (touchTimer) clearTimeout(touchTimer);
+                touchTimer = setTimeout(function () {
+                    touchInput = false;
+                    touchTimer = null;
+                }, 500);
+            }
+
+            function checkFullscreen() {
+                const element = document.fullscreenElement;
+                const isFullscreen = !!element && (element.contains(container) || container.contains(element));
+                if (isFullscreen === mapFullscreen) return;
+
+                mapFullscreen = isFullscreen;
+                fullscreenChanged = true;
+                if (fullscreenTimer) clearTimeout(fullscreenTimer);
+                fullscreenTimer = setTimeout(function () {
+                    fullscreenChanged = false;
+                    fullscreenTimer = null;
+                }, 250);
+            }
+
+            function clearControlClick() {
+                controlClicked = false;
+                if (controlTimer) clearTimeout(controlTimer);
+                controlTimer = null;
+            }
+
+            document.addEventListener('fullscreenchange', checkFullscreen);
+            google.maps.event.addListener(map, "bounds_changed", function () {
+                checkFullscreen();
+                // Container resizing changes the visible bounds without a center or zoom event.
+                const resized = container.clientWidth !== lastWidth || container.clientHeight !== lastHeight;
+                lastWidth = container.clientWidth;
+                lastHeight = container.clientHeight;
+                if ((!fullscreenChanged && !resized) || firstRun) return;
+
+                if (fullscreenTimer) clearTimeout(fullscreenTimer);
+                fullscreenTimer = setTimeout(function () {
+                    fullscreenChanged = false;
+                    fullscreenTimer = null;
+                    if (firstRun || mapsearchFreez) return;
+
+                    userMoved = false;
+                    drawsearch_delete_overlays();
+                    mapsearch_boundary();
+                }, 200);
+            });
+
+            google.maps.event.addListener(map, "dragstart", function () {
+                userMoved = true;
+            });
+
+            if (settings.clustering && markerCluster) {
+                google.maps.event.addListener(markerCluster, "clusterclick", function () {
+                    if (markerCluster.isZoomOnClick()) userMoved = true;
+                });
+            }
+
+            container.addEventListener('wheel', function () {
+                if (settings.mousewheel_zoom) expectMovement('zoom', 250);
+            }, true);
+            container.addEventListener('dblclick', function () {
+                expectMovement('zoom', 250);
+            }, true);
+            container.addEventListener('touchstart', function (event) {
+                if (event.touches.length > 1) {
+                    keepTouchInput();
+                    lastTouchStart = 0;
+                } else if (event.touches.length === 1) {
+                    const now = Date.now();
+                    if (lastTouchStart && now - lastTouchStart <= 300) keepTouchInput();
+                    lastTouchStart = now;
+                }
+            }, true);
+            container.addEventListener('touchmove', function (event) {
+                if (event.touches.length === 1) keepTouchInput();
+            }, true);
+            container.addEventListener('touchend', function (event) {
+                if (!event.touches.length && touchInput) keepTouchInput();
+            }, true);
+            container.addEventListener('touchcancel', function () {
+                touchInput = false;
+                lastTouchStart = 0;
+                if (touchTimer) clearTimeout(touchTimer);
+                touchTimer = null;
+            }, true);
+            container.addEventListener('keydown', function (event) {
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) expectMovement('pan', 250);
+                else if (['+', '-', '='].includes(event.key)) expectMovement('zoom', 250);
+            }, true);
+            container.addEventListener('click', function (event) {
+                const button = event.target.closest('gmp-internal-camera-control, .gmnoprint button, .gmnoprint [role="button"], .gm-control-active');
+                clearControlClick();
+                if (!button || button.closest('.gm-ui-hover-effect, .gm-style-iw')) return;
+
+                controlClicked = true;
+                controlTimer = setTimeout(clearControlClick, 250);
+            }, true);
+
+            google.maps.event.addListener(map, "zoom_changed", function () {
+                if (controlClicked) {
+                    userMoved = true;
+                    clearControlClick();
+                }
+                confirmMovement('zoom');
+            });
+            google.maps.event.addListener(map, "center_changed", function () {
+                if (controlClicked) {
+                    userMoved = true;
+                    clearControlClick();
+                }
+                confirmMovement('pan');
+            });
+
             // Boundary Search
             google.maps.event.addListener(map, "idle", function () {
                 /**
@@ -6621,7 +6982,14 @@ function ListdomDetails(id, link, settings) {
                     mapsearchFreez = true;
                 }
 
-                if (!mapsearchFreez) {
+                const shouldSearch = !firstRun && (userMoved || gpsMovePending) && !mapsearchFreez;
+                userMoved = false;
+                gpsMovePending = false;
+
+                if (shouldSearch) {
+                    if (fullscreenTimer) clearTimeout(fullscreenTimer);
+                    fullscreenTimer = null;
+                    fullscreenChanged = false;
                     drawsearch_delete_overlays();
                     mapsearch_boundary();
                 } else if (firstRun) {
@@ -6761,7 +7129,7 @@ function ListdomDetails(id, link, settings) {
                             const shortcode_id = settings.connected_shortcodes[i];
                             $('body').trigger('lsd-sync', {
                                 id: shortcode_id,
-                                request: request,
+                                request: request.replace(/(^|&)lsd_search_submit=1(?=&|$)/, ""),
                                 clearKeys: clearKeys
                             });
                         }
@@ -6777,8 +7145,105 @@ function ListdomDetails(id, link, settings) {
                 // Layer Data
                 let layer = layers[i];
 
-                if (layer.type === "KML") {
-                    // Add Layer
+                if (layer.type === "KML" && layer.geojson_url) {
+                    $.getJSON(layer.geojson_url).done(function (geojson) {
+                        const data = new google.maps.Data({ map: map });
+                        data.addGeoJson({ type: 'FeatureCollection', features: geojson.features });
+                        data.setStyle(function (feature) {
+                            const style = $.extend({ visible: feature.getProperty('visible') !== false }, feature.getProperty('style') || {});
+                            if (style.icon && geojson.images && geojson.images[style.icon]) style.icon = geojson.images[style.icon];
+                            return style;
+                        });
+
+                        const infoWindow = new google.maps.InfoWindow();
+                        function showKmlInfo(name, description, snippet, balloon, position) {
+                            if (!name && !description && !snippet && !balloon) return;
+
+                            const content = $('<div>');
+                            if (balloon) content.html(balloon);
+                            else {
+                                if (name) content.append($('<strong>').text(name));
+                                if (description) content.append($('<div>').html(description));
+                                else if (snippet) content.append($('<div>').text(snippet));
+                            }
+                            infoWindow.setContent(content[0]);
+                            infoWindow.setPosition(position);
+                            infoWindow.open(map);
+                        }
+
+                        data.addListener('click', function (event) {
+                            showKmlInfo(event.feature.getProperty('name'), event.feature.getProperty('description'), event.feature.getProperty('snippet'), event.feature.getProperty('balloon'), event.latLng);
+                        });
+
+                        (geojson.overlays || []).forEach(function (overlay) {
+                            if (!overlay.visible) return;
+                            const url = geojson.images && geojson.images[overlay.url] ? geojson.images[overlay.url] : overlay.url;
+                            const image = new google.maps.GroundOverlay(url, overlay.bounds, {
+                                map: map,
+                                opacity: typeof overlay.opacity === 'number' ? overlay.opacity : 1,
+                                clickable: !!(overlay.name || overlay.description || overlay.snippet || overlay.balloon)
+                            });
+                            if (overlay.name || overlay.description || overlay.snippet || overlay.balloon) image.addListener('click', function (event) {
+                                showKmlInfo(overlay.name, overlay.description, overlay.snippet, overlay.balloon, event.latLng);
+                            });
+                        });
+
+                        (geojson.screen_overlays || []).forEach(function (screen) {
+                            if (!screen.visible) return;
+
+                            const image = document.createElement('img');
+                            image.alt = '';
+                            image.style.display = 'block';
+                            const element = document.createElement('div');
+                            element.style.position = 'absolute';
+                            element.style.pointerEvents = 'none';
+                            element.style.zIndex = '10';
+                            element.style.opacity = typeof screen.opacity === 'number' ? screen.opacity : 1;
+                            element.appendChild(image);
+
+                            function coordinate(value, units, extent) {
+                                if (units === 'fraction') return value * extent;
+                                if (units === 'insetPixels') return extent - value;
+                                return value;
+                            }
+
+                            const view = new google.maps.OverlayView();
+                            image.addEventListener('load', function () { view.draw(); });
+                            view.onAdd = function () {
+                                map.getDiv().appendChild(element);
+                                if (image.complete) view.draw();
+                            };
+                            view.draw = function () {
+                                if (!image.naturalWidth || !image.naturalHeight) return;
+                                const mapDiv = map.getDiv();
+                                const size = screen.size;
+                                let width = size.x === -1 ? image.naturalWidth : coordinate(size.x, size.xunits, mapDiv.clientWidth);
+                                let height = size.y === -1 ? image.naturalHeight : coordinate(size.y, size.yunits, mapDiv.clientHeight);
+                                if (size.x === 0) width = height * image.naturalWidth / image.naturalHeight;
+                                if (size.y === 0) height = width * image.naturalHeight / image.naturalWidth;
+                                image.style.width = width + 'px';
+                                image.style.height = height + 'px';
+
+                                const imageX = coordinate(screen.overlayXY.x, screen.overlayXY.xunits, width);
+                                const imageY = height - coordinate(screen.overlayXY.y, screen.overlayXY.yunits, height);
+                                const screenX = coordinate(screen.screenXY.x, screen.screenXY.xunits, mapDiv.clientWidth);
+                                const screenY = mapDiv.clientHeight - coordinate(screen.screenXY.y, screen.screenXY.yunits, mapDiv.clientHeight);
+                                element.style.left = screenX - imageX + 'px';
+                                element.style.top = screenY - imageY + 'px';
+                                element.style.transformOrigin = coordinate(screen.rotationXY.x, screen.rotationXY.xunits, width) + 'px ' + (height - coordinate(screen.rotationXY.y, screen.rotationXY.yunits, height)) + 'px';
+                                element.style.transform = 'rotate(' + -screen.rotation + 'deg)';
+                            };
+                            view.onRemove = function () {
+                                element.remove();
+                            };
+                            view.setMap(map);
+                            image.src = geojson.images && geojson.images[screen.url] ? geojson.images[screen.url] : screen.url;
+                        });
+                    }).fail(function (xhr) {
+                        console.error('Unable to load KML layer', layer.src, xhr.status);
+                    });
+                } else if (layer.type === "KML" && typeof google.maps.KmlLayer === "function") {
+                    // Older KML add-ons only provide src. Keep their layers working where supported.
                     new google.maps.KmlLayer(layer.src, {
                         map: map,
                         preserveViewport: true,
@@ -6859,6 +7324,8 @@ function ListdomDetails(id, link, settings) {
 
         let $container = $(this);
         let $form = $container.find("form:visible").first();
+        let autoSearchTimer = null;
+        let lastTrackedRequest = null;
         const distanceReferenceScopes = lsdResolveDistanceReferenceScopes(settings.shortcode, settings.connected_shortcodes);
         lsdHydrateDistanceReferenceFromQuery(window.location.search, distanceReferenceScopes, true);
 
@@ -7385,7 +7852,8 @@ function ListdomDetails(id, link, settings) {
                 });
 
                 if (settings.ajax) {
-                    search();
+                    if (settings.ajax === 2) queueAutoSearch($form);
+                    else search();
                 } else {
                     $form.trigger("submit");
                 }
@@ -8036,15 +8504,29 @@ function ListdomDetails(id, link, settings) {
             return requests.length ? Promise.all(requests) : Promise.resolve();
         }
 
+        function queueAutoSearch($activeForm, delay = 200) {
+            clearTimeout(autoSearchTimer);
+            autoSearchTimer = setTimeout(function () {
+                autoSearchTimer = null;
+                search($activeForm, true);
+            }, delay);
+        }
+
         function ajax() {
             // On The Fly
             if (settings.ajax === 2) {
+                $container
+                .off("input.lsdSearchAjax", 'form input[name="sf-s"]')
+                .on("input.lsdSearchAjax", 'form input[name="sf-s"]', function () {
+                    queueAutoSearch($(this).closest("form"), 500);
+                });
+
                 $container
                 .off("change.lsdSearchAjax", "form :input")
                 .on("change.lsdSearchAjax", "form :input", function (e) {
                     e.preventDefault();
 
-                    search($(this).closest("form"));
+                    queueAutoSearch($(this).closest("form"));
                 });
 
                 $container
@@ -8053,7 +8535,7 @@ function ListdomDetails(id, link, settings) {
                     const $activeForm = $(this).closest("form");
 
                     setTimeout(() => {
-                        search($activeForm);
+                        queueAutoSearch($activeForm);
                     }, 50);
                 });
             }
@@ -8077,17 +8559,26 @@ function ListdomDetails(id, link, settings) {
             .on("submit.lsdSearchAjax", "form", function (e) {
                 e.preventDefault();
 
-                search($(this));
+                clearTimeout(autoSearchTimer);
+                autoSearchTimer = null;
+                search($(this), true, true);
 
                 closeSearchPopups();
             });
         }
 
-        function search($activeForm = $form) {
+        function search($activeForm = $form, submitted = false, explicit = false) {
             return prepareDistanceSearchFields($activeForm).then(function () {
+                const formRequest = $activeForm.serialize().replace(/(^|&)lsd_search_submit=1(?=&|$)/, "");
+
+                // Skip duplicate automatic changes, but count each deliberate form submission.
+                if (settings.ajax === 2 && !explicit && formRequest === lastTrackedRequest) return;
+                if (submitted) lastTrackedRequest = formRequest;
+
                 // Listdom Request Plugin
                 let req = new ListdomRequest(settings.shortcode, settings);
                 let clearKeys = getManagedQueryKeys($activeForm);
+                clearKeys.push("lsd_search_submit");
 
                 let $skin = $("#lsd_skin" + settings.shortcode);
                 let $wrapper = $("#lsd_skin" + settings.shortcode + " .lsd-listing-wrapper");
@@ -8099,7 +8590,7 @@ function ListdomDetails(id, link, settings) {
 
                 // Push to History
                 new ListdomPageHistory().push(
-                    "?" + $activeForm.serialize(),
+                    "?" + formRequest,
                     lsdShouldUpdateAddressBar(settings.id),
                     clearKeys,
                     distanceReferenceScopes.length ? distanceReferenceScopes[0] : settings.shortcode
@@ -8111,7 +8602,7 @@ function ListdomDetails(id, link, settings) {
                         const shortcode_id = settings.connected_shortcodes[i];
                         $('body').trigger('lsd-sync', {
                             id: shortcode_id,
-                            request: $activeForm.serialize() + "&page=1",
+                            request: formRequest + "&page=1" + (submitted && Number(i) === 0 ? "&lsd_search_submit=1" : ""),
                             clearKeys: clearKeys
                         });
                     }
@@ -8121,7 +8612,7 @@ function ListdomDetails(id, link, settings) {
                         url: settings.ajax_url,
                         data:
                             "action=lsd_ajax_search&" +
-                            req.get($activeForm.serialize() + "&page=1&view=" + $skin.data('view'), "", clearKeys),
+                            req.get(formRequest + "&page=1&view=" + $skin.data('view') + (submitted ? "&lsd_search_submit=1" : ""), "", clearKeys),
                         dataType: "json",
                         type: "post",
                         success: function (response) {
@@ -12378,16 +12869,17 @@ function listdom_trigger_favorites() {
                 $button.removeClass("lsd-favorite-loading");
 
                 if (response.success) {
-                    $button.data("status", response.status);
+                    const $toggles = jQuery(`.lsd-favorite-toggle[data-id="${id}"]`);
+                    $toggles.data("status", response.status);
 
                     // Added
                     if (response.status)
-                        $button
+                        $toggles
                         .removeClass("lsd-favorite-off")
                         .addClass("lsd-favorite-on");
                     // Removed
                     else
-                        $button
+                        $toggles
                         .removeClass("lsd-favorite-on")
                         .addClass("lsd-favorite-off");
 
@@ -12408,7 +12900,10 @@ function listdom_trigger_share_modal() {
         const dataId = jQuery(this).data('id');
         if (!dataId || typeof ListdomModal === 'undefined') return;
 
-        ListdomModal.open(`#lsd-share-modal-${dataId}`, { appendToBody: true });
+        const $share = jQuery(this).closest('.lsd-share');
+        let $modal = $share.find(`#lsd-share-modal-${dataId}`);
+        if (!$modal.length) $modal = jQuery(`body > #lsd-share-modal-${dataId}`);
+        ListdomModal.open($modal, { appendToBody: !$share.closest('.lsdaddelm-card-share').length });
     });
 }
 
@@ -13059,7 +13554,7 @@ function lsdaddrev_trigger_delete() {
         }
 
         // Review
-        let $review = jQuery("#lsdaddrev_review" + id);
+        let $review = $button.closest(".lsd-review-item");
 
         // Loading Style
         $review.addClass("lsd-loading");
@@ -13078,8 +13573,8 @@ function lsdaddrev_trigger_delete() {
             dataType: "json",
             success: function (response) {
                 if (response.success) {
-                    // Remove Review Item
-                    $review.remove();
+                    // Remove every visible copy of the deleted review.
+                    jQuery('.lsd-review-item[id="lsdaddrev_review' + id + '"]').remove();
                 }
             },
             error: function () {
@@ -13458,7 +13953,7 @@ function listdom_trigger_pickr(element)
         const colorPickerInput = jQuery('.lsd-color-picker-input');
 
         colorPickerInput.val('#1d7ed3');
-        
+
         const picker = Pickr.create({
             el: this,
             theme: 'classic',
@@ -13490,14 +13985,19 @@ function listdom_trigger_pickr(element)
 
 function listdom_linear_gallery_modal() {
     jQuery('.lsd-all-photos-button').off('click.lsdLinearGallery').on('click.lsdLinearGallery', function() {
-        jQuery('#lsd-gallery-modal').fadeIn();
+        const modalId = jQuery(this).attr('data-modal-id');
+        // Theme template overrides may still use the original modal ID.
+        const $modal = modalId ? jQuery(document.getElementById(modalId)) : jQuery('#lsd-gallery-modal');
+        if (!$modal.length) return;
+
+        $modal.fadeIn();
         if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.stop();
     });
 
-    jQuery('.lsd-gallery-modal-close, #lsd-gallery-modal').off('click.lsdLinearGallery').on('click.lsdLinearGallery', function(e) {
+    jQuery('.lsd-gallery-modal-close, .lsd-gallery-modal').off('click.lsdLinearGallery').on('click.lsdLinearGallery', function(e) {
         if (e.target !== this) return;
 
-        jQuery('#lsd-gallery-modal').fadeOut(() => {
+        jQuery(this).closest('.lsd-gallery-modal').fadeOut(() => {
             if (typeof ListdomPageScroll !== 'undefined') ListdomPageScroll.start();
         });
     });
@@ -14230,7 +14730,7 @@ function lsdCheckoutComplete(orderKey)
 
         $(document).on('click', '.lsd-membership-active-package-tabs .lsd-fe-tabs-nav a', function (e) {
             e.preventDefault();
-            
+
             const $a = $(this);
             const $li = $a.parent('li');
             const tab = $li.data('tab');
@@ -14393,20 +14893,16 @@ function lsdCheckoutComplete(orderKey)
             e.preventDefault();
 
             let $form = $(this);
-            let $alert = $(".lsd-owner-contact-form-alert");
+            let $alert = $form.siblings(".lsd-owner-contact-form-alert");
+            let $button = $form.find('button[type="submit"]');
 
-            let id = $form.data("id");
             let data = $form.serialize();
 
             // Loading Style
             $form.addClass("lsd-loading");
 
             // Disable the Button
-            $(
-                "#lsd_owner_contact_form_" +
-                id +
-                " .lsd-owner-contact-form-button button"
-            ).prop("disabled", "disabled");
+            $button.prop("disabled", true);
 
             // Alert
             $alert.html("");
@@ -14421,11 +14917,7 @@ function lsdCheckoutComplete(orderKey)
                     $form.removeClass("lsd-loading");
 
                     // Enable the Button
-                    $(
-                        "#lsd_owner_contact_form_" +
-                        id +
-                        " .lsd-owner-contact-form-button button"
-                    ).removeProp("disabled");
+                    $button.prop("disabled", false);
 
                     if (response.success) {
                         $form.hide();
@@ -14437,32 +14929,27 @@ function lsdCheckoutComplete(orderKey)
                     $form.removeClass("lsd-loading");
 
                     // Enable the Button
-                    $(
-                        "#lsd_owner_contact_form_" +
-                        id +
-                        " .lsd-owner-contact-form-button button"
-                    ).removeProp("disabled");
+                    $button.prop("disabled", false);
+                    $alert.html(listdom_alertify(lsd.i18n_message_send_failed || "Unable to send your message. Please try again.", "lsd-error"));
                 },
             });
         });
 
         // Report Abuse
-        $(".lsd-report-abuse-form").on("submit", function (e) {
+        $(document).off("submit.lsdReportAbuseForm", ".lsd-report-abuse-form").on("submit.lsdReportAbuseForm", ".lsd-report-abuse-form", function (e) {
             e.preventDefault();
 
             let $form = $(this);
-            let $alert = $(".lsd-report-abuse-form-alert");
+            let $alert = $form.siblings(".lsd-report-abuse-form-alert");
+            let $button = $form.find('button[type="submit"]');
 
-            let id = $form.data("id");
             let data = $form.serialize();
 
             // Loading Style
             $form.addClass("lsd-loading");
 
             // Disable the Button
-            $(
-                "#lsd_report_abuse_form_" + id + " .lsd-report-abuse-form-button button"
-            ).prop("disabled", "disabled");
+            $button.prop("disabled", true);
 
             // Alert
             $alert.html("");
@@ -14477,11 +14964,7 @@ function lsdCheckoutComplete(orderKey)
                     $form.removeClass("lsd-loading");
 
                     // Enable the Button
-                    $(
-                        "#lsd_report_abuse_form_" +
-                        id +
-                        " .lsd-report-abuse-form-button button"
-                    ).removeProp("disabled");
+                    $button.prop("disabled", false);
 
                     if (response.success) {
                         $form.hide();
@@ -14493,11 +14976,8 @@ function lsdCheckoutComplete(orderKey)
                     $form.removeClass("lsd-loading");
 
                     // Enable the Button
-                    $(
-                        "#lsd_report_abuse_form_" +
-                        id +
-                        " .lsd-report-abuse-form-button button"
-                    ).removeProp("disabled");
+                    $button.prop("disabled", false);
+                    $alert.html(listdom_alertify(lsd.i18n_message_send_failed || "Unable to send your message. Please try again.", "lsd-error"));
                 },
             });
         });
@@ -14636,13 +15116,12 @@ function lsdCheckoutComplete(orderKey)
         $(".lsdaddtup-topup-checkout-form").on("submit", function (e) {
             e.preventDefault();
 
-            let id = $(this).data("id");
-            let data = $(this).serialize();
+            let $form = $(this);
+            let data = $form.serialize();
 
             // Elements
-            let $form = $("#lsd_topup_form_checkout_" + id);
             let $button = $form.find("button");
-            let $alert = $(".lsd-topup-checkout-form-alert");
+            let $alert = $form.closest(".lsd-topup-form").find(".lsd-topup-checkout-form-alert");
 
             // Loading Style
             $form.addClass("lsd-loading");
@@ -14810,15 +15289,14 @@ function lsdCheckoutComplete(orderKey)
         });
 
         // Review Form
-        $(".lsdaddrev-review-form").on("submit", function (e) {
+        $(document).off("submit.lsdReviewForm", ".lsdaddrev-review-form").on("submit.lsdReviewForm", ".lsdaddrev-review-form", function (e) {
             e.preventDefault();
 
-            let id = $(this).data("id");
             let image_module = $(this).data("images");
 
-            let $alert = $(".lsd-review-form-alert");
-            let $form = $("#lsd_review_form_" + id);
-            let $button = $form.find($(".lsd-row-submit button"));
+            let $form = $(this);
+            let $alert = $form.closest(".lsd-reviews-form").find(".lsd-review-form-alert");
+            let $button = $form.find('button[type="submit"]');
 
             // Form Data
             let fd = new FormData();
@@ -14829,7 +15307,7 @@ function lsdCheckoutComplete(orderKey)
             });
 
             // Append Images
-            let $images = $form.find($(".lsd-review-form-images-input"));
+            let $images = $form.find(".lsd-review-form-images-input");
             if (image_module && typeof $images.prop("files") !== "undefined") {
                 jQuery.each($images.prop("files"), function (i, file) {
                     fd.append("review-images[]", file);
@@ -14840,7 +15318,7 @@ function lsdCheckoutComplete(orderKey)
             $form.addClass("lsd-loading");
 
             // Disable the Button
-            $button.prop("disabled", "disabled");
+            $button.prop("disabled", true);
 
             // Remove Alert
             $alert.html("");
@@ -14854,7 +15332,7 @@ function lsdCheckoutComplete(orderKey)
                 contentType: false,
                 success: function (response) {
                     // Enable the Button
-                    $button.removeProp("disabled");
+                    $button.prop("disabled", false);
 
                     // Loading Style
                     $form.removeClass("lsd-loading");
@@ -14874,11 +15352,10 @@ function lsdCheckoutComplete(orderKey)
                     // Loading Style
                     $form.removeClass("lsd-loading");
 
-                    // Hide Form
-                    $form.hide();
+                    $alert.html(listdom_alertify(lsd.i18n_review_submit_failed || "Unable to submit your review. Please try again.", "lsd-error"));
 
                     // Enable the Button
-                    $button.removeProp("disabled");
+                    $button.prop("disabled", false);
                 },
             });
         });
@@ -15053,8 +15530,8 @@ function lsdCheckoutComplete(orderKey)
             let $form = $(this);
             let $module = $form.parent();
             let $message = $module.find($(".lsdaddjob-application-message"));
-            let $resume = $form.find($("#lsdaddjob_application_resume"));
-            let $cover = $form.find($("#lsdaddjob_application_cover"));
+            let $resume = $form.find('input[name="resume"]');
+            let $cover = $form.find('input[name="cover"]');
 
             // Form Data
             let fd = new FormData();
@@ -15135,7 +15612,7 @@ function lsdCheckoutComplete(orderKey)
 
             let $star = $(this);
             let $wrapper = $star.parent().parent();
-            let $input = $wrapper.find($("input.lsd-rate-input"));
+            let $input = $wrapper.find("input.lsd-rate-input");
 
             // New Rate
             let rate = $star.data("rating-value");
@@ -15144,8 +15621,9 @@ function lsdCheckoutComplete(orderKey)
             $input.val(rate).trigger("change");
 
             // Update Stars
-            $wrapper.find($(".lsd-rate-stars a")).each(function () {
+            $wrapper.find(".lsd-rate-stars a").each(function () {
                 let stars = $(this).data("rating-value");
+                $(this).attr({'aria-checked': rate === stars ? 'true' : 'false', tabindex: rate === stars ? '0' : '-1'});
                 if (rate >= stars) {
                     $(this).addClass("lsd-rate-selected");
                     $(this).find("i").removeClass("far").addClass("fas");
@@ -15154,6 +15632,19 @@ function lsdCheckoutComplete(orderKey)
                     $(this).find("i").removeClass("fas").addClass("far");
                 }
             });
+        });
+
+        $(document).off('keydown.lsdRateField', '.lsd-rate-stars [role="radio"]').on('keydown.lsdRateField', '.lsd-rate-stars [role="radio"]', function (event) {
+            const $stars = $(this).parent().children('[role="radio"]');
+            let index = $stars.index(this);
+            if (event.key === 'ArrowRight' || event.key === 'ArrowUp') index = (index + 1) % $stars.length;
+            else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') index = (index - 1 + $stars.length) % $stars.length;
+            else if (event.key === 'Home') index = 0;
+            else if (event.key === 'End') index = $stars.length - 1;
+            else if (event.key !== ' ') return;
+
+            event.preventDefault();
+            $stars.eq(index).trigger('click').trigger('focus');
         });
 
         // Open iframe links in new window
@@ -15504,3 +15995,223 @@ function lsdCheckoutComplete(orderKey)
         });
     });
 })(jQuery);
+function listdom_stats_map_event(action, listing) {
+    document.dispatchEvent(new CustomEvent("lsd_stats_action", {
+        detail: { action: action, listing: listing },
+    }));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // The server has already counted this native GET submission. Refreshes must not count it again.
+    const currentUrl = new URL(window.location.href);
+    if (currentUrl.searchParams.get("lsd_search_submit") === "1") {
+        currentUrl.searchParams.delete("lsd_search_submit");
+        window.history.replaceState(window.history.state, "", currentUrl.toString());
+    }
+
+    // Stats telemetry is available only when the active add-on supplies a consented nonce.
+    if (typeof lsd === "undefined" || !lsd.stats || !lsd.stats.nonce) return;
+
+    // Share one uncached nonce request only when the page has trackable activity.
+    let statsNonce;
+    function currentStatsNonce() {
+        if (!statsNonce) statsNonce = fetch(lsd.ajaxurl, {
+            method: "POST",
+            body: new URLSearchParams({ action: "lsd_stats_event_nonce" }),
+            // The beacon also sends cookies to the admin origin.
+            credentials: "include",
+            cache: "no-store",
+            keepalive: true,
+        }).then(function (response) {
+            return response.ok ? response.json() : null;
+        }).then(function (response) {
+            return response && response.success && response.data && response.data.nonce ? response.data.nonce : lsd.stats.nonce;
+        }).catch(function () {
+            return lsd.stats.nonce;
+        });
+
+        return statsNonce;
+    }
+
+    function submitStats(data) {
+        currentStatsNonce().then(function (nonce) {
+            data.append("nonce", nonce);
+            if (!navigator.sendBeacon || !navigator.sendBeacon(lsd.ajaxurl, data))
+                fetch(lsd.ajaxurl, { method: "POST", body: data, credentials: "include", keepalive: true });
+        });
+    }
+
+    function actionEnabled(action, listing) {
+        return lsd.stats.actions && lsd.stats.actions[action] === 1 && !!listing;
+    }
+
+    function sendAction(action, listing, network, source) {
+        if (!actionEnabled(action, listing)) return;
+
+        const data = new FormData();
+        data.append("action", "lsd_stats_action_event");
+        data.append("event", action);
+        data.append("listing_id", listing);
+        if (action === "social_click") data.append("network", network || "");
+        if (source === "author" && lsd.stats.author_source === 1) data.append("source", source);
+
+        submitStats(data);
+    }
+
+    // Capture action links and map events without delaying navigation.
+    document.addEventListener("click", function (event) {
+        const link = event.target.closest ? event.target.closest("a[href]") : null;
+        const marker = link && link.closest("[data-lsd-stats-action][data-lsd-stats-listing]");
+        if (marker) sendAction(marker.dataset.lsdStatsAction, marker.dataset.lsdStatsListing, marker.dataset.lsdStatsNetwork, marker.dataset.lsdStatsSource);
+    });
+    document.addEventListener("lsd_stats_action", function (event) {
+        const data = event.detail || {};
+        sendAction(data.action, data.listing);
+    });
+
+    const cardTracking = lsd.stats.impressions === 1 || lsd.stats.clicks === 1;
+    const selector = ".lsd-skin-wrapper [data-lsd-stats-listing][data-lsd-stats-url]";
+    const actionSelector = "[data-lsd-stats-action][data-lsd-stats-listing]";
+    const actionsEnabled = lsd.stats.actions && Object.values(lsd.stats.actions).some(function (enabled) {
+        return enabled === 1;
+    });
+
+    function prewarmTargets(root) {
+        if (statsNonce) return;
+
+        if (actionsEnabled) {
+            if (root.matches && root.matches(actionSelector) && actionEnabled(root.dataset.lsdStatsAction, root.dataset.lsdStatsListing)) {
+                currentStatsNonce();
+                return;
+            }
+            if (root.querySelectorAll && Array.from(root.querySelectorAll(actionSelector)).some(function (marker) {
+                return actionEnabled(marker.dataset.lsdStatsAction, marker.dataset.lsdStatsListing);
+            })) {
+                currentStatsNonce();
+                return;
+            }
+        }
+
+        if (cardTracking && ((root.matches && root.matches(selector)) || (root.querySelector && root.querySelector(selector)))) currentStatsNonce();
+    }
+
+    prewarmTargets(document);
+
+    let watchCards = null;
+    if (cardTracking || (actionsEnabled && !statsNonce)) {
+        // AJAX can add action links even when both card collectors are disabled.
+        const mutationObserver = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                mutation.addedNodes.forEach(function (root) {
+                    prewarmTargets(root);
+                    if (watchCards) watchCards(root);
+                });
+            });
+            if (!cardTracking && statsNonce) mutationObserver.disconnect();
+        });
+        mutationObserver.observe(document.body, { childList: true, subtree: true });
+    }
+    if (!cardTracking) return;
+
+    // Card Impressions
+    const observed = new WeakSet();
+    const impressed = new WeakSet();
+    const carouselImpressions = new WeakMap();
+    const clicked = new WeakSet();
+    const impressionQueue = [];
+    let impressionTimer = null;
+
+    function send(event, ids) {
+        if (event === "listing_card_impression" && lsd.stats.impressions === 0) return;
+        if (event === "listing_card_click" && lsd.stats.clicks === 0) return;
+
+        const data = new FormData();
+        data.append("action", "lsd_stats_card_event");
+        data.append("event", event);
+        if (event === "listing_card_impression") ids.forEach(function (id) {
+            data.append("listing_ids[]", id);
+        });
+        else data.append("listing_id", ids[0]);
+
+        submitStats(data);
+    }
+
+    function flushImpressions() {
+        if (impressionTimer !== null) clearTimeout(impressionTimer);
+        impressionTimer = null;
+
+        while (impressionQueue.length) send("listing_card_impression", impressionQueue.splice(0, 50));
+    }
+
+    function queueImpression(card) {
+        if (impressed.has(card)) return;
+
+        // Owl duplicates cards for looping; count each listing once in its carousel.
+        const stage = card.closest(".owl-stage");
+        if (stage) {
+            let ids = carouselImpressions.get(stage);
+            if (!ids) {
+                ids = new Set();
+                carouselImpressions.set(stage, ids);
+            }
+            if (ids.has(card.dataset.lsdStatsListing)) return;
+            ids.add(card.dataset.lsdStatsListing);
+        }
+
+        impressed.add(card);
+        impressionQueue.push(card.dataset.lsdStatsListing);
+        if (impressionTimer === null) impressionTimer = setTimeout(flushImpressions, 100);
+    }
+
+    const observer = window.IntersectionObserver ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (!entry.isIntersecting || entry.intersectionRatio < 0.5) return;
+
+            observer.unobserve(entry.target);
+            queueImpression(entry.target);
+        });
+    }, { threshold: 0.5 }) : null;
+
+    function watch(root) {
+        if (root.matches && root.matches(selector) && !observed.has(root)) {
+            observed.add(root);
+            observer.observe(root);
+        }
+
+        if (!root.querySelectorAll) return;
+        const cards = root.querySelectorAll(selector);
+        cards.forEach(function (card) {
+            if (observed.has(card)) return;
+            observed.add(card);
+            observer.observe(card);
+        });
+    }
+
+    if (observer) {
+        watchCards = watch;
+        watch(document);
+    }
+    window.addEventListener("pagehide", flushImpressions);
+
+    // Listing Card Clicks
+    document.addEventListener("click", function (event) {
+        const link = event.target.closest ? event.target.closest("a[href]") : null;
+        // Side cards open their detail panel from the container, including non-link content.
+        if (!link && (!event.isTrusted || event.target.closest("a, button, input, select, textarea, [role='button']"))) return;
+        const card = link ? link.closest(selector) : event.target.closest(".lsd-side-view-wrapper .lsd-listing[data-lsd-stats-listing][data-lsd-stats-url]");
+        if (!card || clicked.has(card)) return;
+        if (link) {
+            if (link.hasAttribute("data-listdom-lightbox") || link.hasAttribute("data-listdom-panel") || link.hasAttribute("data-listdom-map")) return;
+
+            const target = new URL(link.href, window.location.href);
+            const listing = new URL(card.dataset.lsdStatsUrl, window.location.href);
+            if (target.origin !== listing.origin || target.pathname !== listing.pathname || target.search !== listing.search) return;
+        }
+
+        clicked.add(card);
+        if (observer) observer.unobserve(card);
+        queueImpression(card);
+        flushImpressions();
+        send("listing_card_click", [card.dataset.lsdStatsListing]);
+    });
+});

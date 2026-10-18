@@ -12,7 +12,7 @@ $fields = $display['fields'];
 $ids = $this->listings;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
-    <tr class="lsd-listing" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
+    <tr class="lsd-listing" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
         <?php foreach ($display['columns_union'] as $key => $column): ?>
             <?php
             $key_class = sanitize_html_class($key);

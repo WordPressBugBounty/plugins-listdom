@@ -9,7 +9,7 @@ $index = 0;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); $index++; ?>
     <div>
-        <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
+        <div class="lsd-listing<?php if (!$this->display_image) echo ' lsd-listing-no-image'; ?>" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
 
             <div class="<?php echo $index % 2 === 0 ? 'lsd-left-side-mobile' : '';  ?> lsd-mosaic-left-side<?php echo (($index - 3) % 4 === 0) || (($index - 4) % 4 === 0) ? ' lsd-left-side-even-rows' : '' ?>">
                 <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">

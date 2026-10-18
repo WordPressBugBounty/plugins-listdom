@@ -53,12 +53,11 @@ class LSD_Checklist_Provider_Submission extends LSD_Checklist_Provider_Base
 
     protected function dashboard_page(?LSD_Checklist_Check_Interface $check = null): array
     {
-        $page_id = (int) LSD_Options::post_id('submission_page');
-        $ready = $this->helper->published_post_has_shortcodes($page_id, ['listdom-dashboard']);
+        $ready = $this->helper->dashboard_status()['ready'];
 
         return [
             'status' => $ready ? LSD_Checklist_Result::STATUS_COMPLETE : LSD_Checklist_Result::STATUS_OPTIONAL,
-            'message' => $ready ? esc_html__('Dashboard page is assigned, published, and contains the dashboard shortcode.', 'listdom') : esc_html__('Assign a published page containing the Listdom dashboard shortcode.', 'listdom'),
+            'message' => $ready ? esc_html__('Dashboard page is assigned, published, and contains the dashboard.', 'listdom') : esc_html__('Assign a published page containing the Listdom dashboard.', 'listdom'),
         ];
     }
 

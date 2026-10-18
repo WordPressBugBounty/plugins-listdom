@@ -28,9 +28,9 @@ $website = $this->listing->get_meta('lsd_website');
 		<?php if (trim($phone) || trim($website)): ?>
 			<div class="lsd-listing-phone-website">
 				<?php if ($phone): ?>
-					<a href="tel:<?php echo esc_attr($phone); ?>"><?php echo esc_html($phone); ?></a>
+                    <a href="tel:<?php echo esc_attr($phone); ?>" data-lsd-stats-action="phone_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>"><?php echo esc_html($phone); ?></a>
 				<?php elseif ($website): ?>
-					<a href="<?php echo esc_attr($website); ?>" target="_blank"><?php echo esc_html(LSD_Base::remove_protocols($website)); ?></a>
+                    <a href="<?php echo esc_url($website); ?>" target="_blank" rel="noopener" data-lsd-stats-action="website_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>"><?php echo esc_html(LSD_Base::remove_protocols($website)); ?></a>
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>

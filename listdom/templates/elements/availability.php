@@ -23,7 +23,7 @@ $today = $availability[$day] ?? [];
 $isoffday = isset($today['off']) && $today['off'];
 
 // Not Valid for One Day
-if ($this->oneday && !$isoffday && !trim($today['hours'])) return '';
+if ($this->oneday && !$isoffday && !trim($today['hours'] ?? '')) return '';
 ?>
 <?php 
 	/** One Day **/ if ($this->oneday):

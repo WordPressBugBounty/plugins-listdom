@@ -53,6 +53,8 @@ class LSD_Personalize_Forms extends LSD_Personalize
         $hover = $config['inputs']['hover'] ?? [];
 
         $CSS = str_replace("((search_form_bg_color))", sanitize_text_field($form['form_bg_color'] ?: 'inherit'), $CSS);
+        $padding = array_merge(['top' => 2, 'right' => 2, 'bottom' => 2, 'left' => 2], $form['field_padding'] ?? []);
+        $CSS = str_replace('((search_form_field_padding))', self::paddings($padding), $CSS);
         $CSS = str_replace("((search_form_input_icons_color))", sanitize_text_field($icon['icon_color'] ?: 'inherit'), $CSS);
 
         // Normal state (non-hover settings)

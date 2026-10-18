@@ -30,7 +30,7 @@ class LSD_Socials extends LSD_Base
      * @param array|null $options
      * @return bool|object
      */
-    public function get(string $network, array $options = null)
+    public function get(string $network, ?array $options = null)
     {
         $class = 'LSD_Socials_' . ucfirst($network);
 
@@ -129,7 +129,7 @@ class LSD_Socials extends LSD_Base
      * @param WP_Post|stdClass $listing
      * @param LSD_Shortcodes_Dashboard|null $dashboard
      */
-    public function listing_form($listing, LSD_Shortcodes_Dashboard $dashboard = null)
+    public function listing_form($listing, ?LSD_Shortcodes_Dashboard $dashboard = null)
     {
         if (!LSD_Components::socials()) return;
 
@@ -204,7 +204,7 @@ class LSD_Socials extends LSD_Base
             if (trim($link) === '') continue;
 
             if ($method === 'profile') $socials .= '<li>' . $obj->owner($link) . '</li>';
-            else $socials .= '<li>' . $obj->listing($link) . '</li>';
+            else $socials .= '<li data-lsd-stats-action="social_click" data-lsd-stats-listing="' . esc_attr($id) . '" data-lsd-stats-network="' . esc_attr($obj->key()) . '">' . $obj->listing($link) . '</li>';
         }
 
         return $socials;

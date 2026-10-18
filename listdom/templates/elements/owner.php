@@ -6,6 +6,7 @@ defined('ABSPATH') || die();
 /** @var int $post_id */
 
 $owner_id = get_post_field('post_author', $post_id);
+$form_id = wp_unique_id('lsd_owner_contact_form_' . $post_id . '_');
 $display_avatar = !isset($this->args['display_avatar']) || $this->args['display_avatar'];
 $display_name = !isset($this->args['display_name']) || $this->args['display_name'];
 $display_job_title = !isset($this->args['display_job_title']) || $this->args['display_job_title'];
@@ -40,7 +41,7 @@ $owner_privacy_field = '';
 if ($display_form && $pc_enabled)
 {
     $owner_privacy_field = LSD_Privacy::consent_field([
-        'id' => 'lsd_owner_privacy_consent_' . absint($post_id),
+        'id' => $form_id . '_consent',
         'wrapper_class' => 'lsd-owner-privacy-consent-field',
         'context' => 'contact',
         'label' => $pc_label,
@@ -100,28 +101,28 @@ if ($display_form && $pc_enabled)
 				<?php if ($display_tel && isset($user['lsd_phone'][0]) && trim($user['lsd_phone'][0])): ?>
 				<div class="lsd-owner-phone" title="<?php esc_attr_e('Phone', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
 					<i class="lsd-fe-icon fas fa-phone-alt"></i>
-					<a href="tel:<?php echo esc_html($user['lsd_phone'][0]); ?>"><?php echo esc_html($user['lsd_phone'][0]); ?></a>
+                    <a class="lsd-owner-phone-link" data-lsd-stats-action="phone_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>" data-lsd-stats-source="author" href="tel:<?php echo esc_attr($user['lsd_phone'][0]); ?>"><?php echo esc_html($user['lsd_phone'][0]); ?></a>
 				</div>
 				<?php endif; ?>
 
                 <?php if ($display_email): ?>
 				<div class="lsd-owner-email" title="<?php esc_attr_e('Email', 'listdom'); ?>" <?php echo lsd_schema()->email(); ?>>
 					<i class="lsd-fe-icon fa fa-envelope"></i>
-					<a href="mailto:<?php echo esc_html(get_the_author_meta('email', $owner_id)); ?>"><?php echo esc_html(get_the_author_meta('email', $owner_id)); ?></a>
+                    <a class="lsd-owner-email-link" data-lsd-stats-action="email_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>" data-lsd-stats-source="author" href="mailto:<?php echo esc_attr(get_the_author_meta('email', $owner_id)); ?>"><?php echo esc_html(get_the_author_meta('email', $owner_id)); ?></a>
 				</div>
                 <?php endif; ?>
 
 				<?php if ($display_mobile && isset($user['lsd_mobile'][0]) && trim($user['lsd_mobile'][0])): ?>
 				<div class="lsd-owner-mobile" title="<?php esc_attr_e('Mobile', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
 					<i class="lsd-fe-icon fa fa-mobile"></i>
-					<a href="tel:<?php echo esc_html($user['lsd_mobile'][0]); ?>"><?php echo esc_html($user['lsd_mobile'][0]); ?></a>
+                    <a class="lsd-owner-mobile-link" data-lsd-stats-action="phone_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>" data-lsd-stats-source="author" href="tel:<?php echo esc_attr($user['lsd_mobile'][0]); ?>"><?php echo esc_html($user['lsd_mobile'][0]); ?></a>
 				</div>
 				<?php endif; ?>
 
                 <?php if ($display_website && isset($user['lsd_website'][0]) && trim($user['lsd_website'][0])): ?>
                 <div class="lsd-owner-website" title="<?php esc_attr_e('Website', 'listdom'); ?>">
                     <i class="lsd-fe-icon fas fa-link"></i>
-                    <a href="<?php echo esc_url($user['lsd_website'][0]); ?>" target="_blank"><?php echo esc_html(LSD_Base::remove_protocols($user['lsd_website'][0])); ?></a>
+                    <a class="lsd-owner-website-link" data-lsd-stats-action="website_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>" data-lsd-stats-source="author" href="<?php echo esc_url($user['lsd_website'][0]); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html(LSD_Base::remove_protocols($user['lsd_website'][0])); ?></a>
                 </div>
                 <?php endif; ?>
 
@@ -136,8 +137,13 @@ if ($display_form && $pc_enabled)
 	</div>
 </div>
 <?php if ($display_form): ?>
+<?php if (($this->args['form_layout'] ?? '') === 'dropdown'): ?>
+<details class="lsd-form-dropdown">
+    <summary class="lsd-general-button"><?php echo esc_html($this->args['form_label'] ?? __('Contact owner', 'listdom')); ?></summary>
+    <div class="lsd-form-panel">
+<?php endif; ?>
 <div class="lsd-owner-contact-form-wrapper">
-	<form class="lsd-owner-contact-form" id="lsd_owner_contact_form_<?php echo esc_attr($post_id); ?>" data-id="<?php echo esc_attr($post_id); ?>">
+    <form class="lsd-owner-contact-form" id="<?php echo esc_attr($form_id); ?>" data-id="<?php echo esc_attr($post_id); ?>">
 
 		<div class="lsd-owner-contact-form-name-email-phone-wrapper">
 			<?php if ($field_name): ?>
@@ -222,7 +228,11 @@ if ($display_form && $pc_enabled)
 		</div>
 	</form>
 
-    <div class="lsd-owner-contact-form-alert"></div>
+    <div class="lsd-owner-contact-form-alert" role="status" aria-live="polite"></div>
 </div>
+<?php if (($this->args['form_layout'] ?? '') === 'dropdown'): ?>
+    </div>
+</details>
+<?php endif; ?>
 <?php endif; ?>
 <?php endif;

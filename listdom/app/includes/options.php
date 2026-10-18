@@ -10,10 +10,7 @@ class LSD_Options extends LSD_Base
         $blog_id = self::get_blog_id();
         if (isset(self::$settings_cache[$blog_id]) && is_array(self::$settings_cache[$blog_id])) return self::$settings_cache[$blog_id];
 
-        self::$settings_cache[$blog_id] = self::parse_args(
-            get_option('lsd_settings', []),
-            self::defaults()
-        );
+        self::$settings_cache[$blog_id] = self::effective_settings((array) get_option('lsd_settings', []));
 
         return self::$settings_cache[$blog_id];
     }
@@ -21,6 +18,67 @@ class LSD_Options extends LSD_Base
     private static function get_blog_id(): int
     {
         return function_exists('get_current_blog_id') ? get_current_blog_id() : 1;
+    }
+
+    public static function clear_settings_cache(): void
+    {
+        unset(self::$settings_cache[self::get_blog_id()]);
+    }
+
+    public static function effective_settings(array $stored): array
+    {
+        return self::parse_args($stored, self::defaults());
+    }
+
+    /** Uncached snapshot for an approved settings patch, never for serialization. */
+    public static function settings_snapshot(): array
+    {
+        global $wpdb;
+        $serialized = $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", 'lsd_settings'));
+        $stored = $serialized === null ? [] : maybe_unserialize($serialized);
+        return ['serialized' => $serialized, 'stored' => is_array($stored) ? $stored : [], 'blogId' => self::get_blog_id()];
+    }
+
+    /**
+     * Compare-and-set prevents a stale settings snapshot from overwriting another
+     * administrator's save. Preserve WordPress option filters, hooks and caches.
+     */
+    public static function compare_settings(array $snapshot, array $settings)
+    {
+        global $wpdb;
+        if ($snapshot['blogId'] !== self::get_blog_id()) return new WP_Error('listdom_site_changed', __('The site changed. Prepare the operation again.', 'listdom'));
+        $old = $snapshot['stored'];
+        $value = sanitize_option('lsd_settings', $settings);
+        $value = apply_filters('pre_update_option_lsd_settings', $value, $old, 'lsd_settings');
+        $value = apply_filters('pre_update_option', $value, 'lsd_settings', $old);
+        if (!is_array($value)) return new WP_Error('listdom_settings_invalid', __('The settings save was rejected.', 'listdom'));
+        if ($snapshot['serialized'] === null)
+        {
+            if (!add_option('lsd_settings', $value, '', true)) return new WP_Error('listdom_settings_conflict', __('Settings changed. Prepare a fresh preview.', 'listdom'));
+        }
+        else
+        {
+            $serialized = maybe_serialize($value);
+            if ($serialized === $snapshot['serialized']) return true;
+            do_action('update_option', 'lsd_settings', $old, $value);
+            // BINARY avoids database-collation comparisons treating different
+            // serialized values as equal (including case and trailing spaces).
+            $saved = $wpdb->query($wpdb->prepare(
+                "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND BINARY option_value = BINARY %s",
+                $serialized,
+                'lsd_settings',
+                $snapshot['serialized']
+            ));
+            if ($saved !== 1) return new WP_Error('listdom_settings_conflict', __('Settings changed or could not be saved. Prepare a fresh preview.', 'listdom'));
+            wp_cache_delete('alloptions', 'options');
+            wp_cache_delete('notoptions', 'options');
+            wp_cache_delete('lsd_settings', 'options');
+            self::clear_settings_cache();
+            do_action('update_option_lsd_settings', $old, $value, 'lsd_settings');
+            do_action('updated_option', 'lsd_settings', $old, $value);
+        }
+        self::clear_settings_cache();
+        return true;
     }
 
     /**

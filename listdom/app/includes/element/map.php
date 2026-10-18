@@ -24,7 +24,7 @@ class LSD_Element_Map extends LSD_Element
         $HTML = lsd_map([$post_id], [
             'provider' => $args['provider'] ?? LSD_Map_Provider::def(),
             'clustering' => false,
-            'id' => $post_id,
+            'id' => $args['id'] ?? $post_id,
             'canvas_class' => 'lsd-map-canvas',
             'mapstyle' => $args['style'] ?? null,
             'map_height' => $args['map_height'] ?? null,

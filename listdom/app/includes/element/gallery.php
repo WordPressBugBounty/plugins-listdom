@@ -23,7 +23,13 @@ class LSD_Element_Gallery extends LSD_Element
         // Template
         $tpl = 'elements/gallery/lightbox.php';
         if (isset($params['style']) && $params['style'] === 'slider') $tpl = 'elements/gallery/slider.php';
-        if (isset($params['style']) && $params['style'] === 'linear') $tpl = 'elements/gallery/linear.php';
+        if (isset($params['style']) && $params['style'] === 'linear')
+        {
+            $tpl = 'elements/gallery/linear.php';
+
+            // Editor previews render in separate requests, so a request-local counter can repeat.
+            $params['modal_id'] = 'lsd-gallery-modal-' . wp_generate_uuid4();
+        }
 
         // Generate output
         ob_start();

@@ -1,34 +1,53 @@
-(function(wp, $)
+(function(wp, settings)
 {
-    // Block Editor
-    if(lsd && wp && wp.blocks && wp.blockEditor && wp.element)
-    {
-        lsd.shortcodes.forEach(function(e, i)
-        {
-            var shortcode = '[listdom id="'+e.id+'"]';
+    if (!settings || !wp || !wp.blocks || !wp.element) return;
 
-            wp.blocks.registerBlockType('listdom/shortcodes-'+i,
-            {
-                apiVersion: 3,
-                title: e.title.toLowerCase().replace("/(^([a-zA-Z\p{M}]))|([ -][a-zA-Z\p{M}])/g", function(s)
-                {
-                    return s.toUpperCase().replace(/-/g,' ');
-                }),
-                icon: 'editor-code',
-                category: 'lsd.be.category',
-                edit: function()
-                {
-                    return wp.element.createElement(
-                        'div',
-                        wp.blockEditor.useBlockProps(),
-                        shortcode
-                    );
-                },
-                save: function()
-                {
-                    return shortcode;
-                }
-            });
+    var editor = wp.blockEditor || wp.editor;
+    if (!editor) return;
+
+    // Native blocks are defined once in PHP and passed to the editor here.
+    settings.blocks.forEach(function(block)
+    {
+        var fallback = function()
+        {
+            var label = block.editor.message || block.description || block.title;
+            var props = editor.useBlockProps ? editor.useBlockProps() : {};
+
+            return wp.element.createElement('div', props, label);
+        };
+        var edit = wp.hooks ? wp.hooks.applyFilters('lsd.blockEditor.edit', fallback, block) : fallback;
+
+        wp.blocks.registerBlockType(block.name, {
+            apiVersion: block.apiVersion,
+            title: block.title,
+            description: block.description,
+            icon: block.icon,
+            category: block.category,
+            attributes: block.attributes,
+            supports: block.supports,
+            edit: edit,
+            save: function() { return null; }
         });
-    }
-}(window.wp, jQuery));
+    });
+
+    // Register only names found in the edited document; their numbers are not layout IDs.
+    settings.legacyBlocks.forEach(function(name)
+    {
+        wp.blocks.registerBlockType(name, {
+            apiVersion: 3,
+            title: settings.legacyTitle,
+            icon: 'editor-code',
+            category: 'listdom',
+            supports: { inserter: false },
+            attributes: { shortcode: { type: 'string', source: 'raw' } },
+            edit: function(props)
+            {
+                return wp.element.createElement('div', editor.useBlockProps ? editor.useBlockProps() : {}, props.attributes.shortcode);
+            },
+            save: function(props)
+            {
+                return props.attributes.shortcode;
+            }
+        });
+    });
+}(window.wp, window.lsdBlockEditor));

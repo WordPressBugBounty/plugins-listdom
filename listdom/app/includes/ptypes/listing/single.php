@@ -12,6 +12,12 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
     public $style;
     protected $filtered_content;
     protected ?bool $suppress_legacy_schema = null;
+    protected $block_endpoint = '';
+    protected $endpoint_rendered = false;
+    protected $endpoint_has_main = false;
+    private static $access_messages = [];
+    private static $access_rendered = [];
+    private static $visited = [];
 
     public function __construct()
     {
@@ -33,6 +39,8 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         remove_filter('the_content', [$this, 'filter_content']);
         remove_filter('lsd_ptype_listing_supports', [$this, 'add_comments_support']);
         remove_filter('template_include', [$this, 'template']);
+        remove_filter('pre_render_block', [$this, 'endpoint_block']);
+        remove_filter('render_block_data', [$this, 'endpoint_main']);
     }
 
     /**
@@ -213,7 +221,96 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
             }
         }
 
+        // Block templates can omit Post Content, where listing endpoints normally render.
+        if (is_singular($this->PT) && basename($template) === 'template-canvas.php')
+        {
+            $this->block_endpoint = LSD_Endpoints::is();
+            if ($this->block_endpoint && $this->block_endpoint !== 'raw')
+            {
+                global $_wp_current_template_content;
+
+                $blocks = parse_blocks((string) $_wp_current_template_content);
+                $this->endpoint_has_main = $this->has_endpoint_main($blocks);
+                if (!$this->endpoint_has_main && !$this->has_endpoint_post_content($blocks))
+                {
+                    $main = parse_blocks('<!-- wp:group {"tagName":"main"} --><main class="wp-block-group"></main><!-- /wp:group -->')[0];
+                    $position = count($blocks);
+                    foreach ($blocks as $index => $block)
+                    {
+                        if (($block['blockName'] ?? '') === 'core/template-part' && ($block['attrs']['slug'] ?? '') === 'footer')
+                        {
+                            $position = $index;
+                            break;
+                        }
+                    }
+
+                    array_splice($blocks, $position, 0, [$main]);
+                    $_wp_current_template_content = serialize_blocks($blocks);
+                    $this->endpoint_has_main = true;
+                }
+
+                add_filter('render_block_data', [$this, 'endpoint_main']);
+                add_filter('pre_render_block', [$this, 'endpoint_block'], 10, 2);
+            }
+        }
+
         return $template;
+    }
+
+    public function endpoint_block($pre_render, $block)
+    {
+        if ($pre_render !== null || get_the_ID() !== get_queried_object_id()) return $pre_render;
+
+        $name = $block['blockName'] ?? '';
+        $is_listing_block = preg_match('~^listdom(?:-[a-z0-9-]+)?/listing-[a-z0-9-]+$~', $name) || $name === 'listdom/layout' || preg_match('~^listdom/shortcodes-[0-9]+$~', $name);
+        if ($is_listing_block) return '';
+        if ($name !== 'core/post-content') return $pre_render;
+        if ($this->endpoint_has_main) return '';
+
+        if ($this->endpoint_rendered) return '';
+        $this->endpoint_rendered = true;
+
+        return LSD_Endpoints::output($this->block_endpoint);
+    }
+
+    public function endpoint_main($block)
+    {
+        if (
+            $this->endpoint_rendered
+            || get_the_ID() !== get_queried_object_id()
+            || ($block['blockName'] ?? '') !== 'core/group'
+            || ($block['attrs']['tagName'] ?? '') !== 'main'
+        ) return $block;
+
+        $html = $block['innerHTML'] ?? '';
+        if (!preg_match('~^(\s*<main\b[^>]*>).*?(</main>\s*)$~is', $html, $matches)) return $block;
+
+        $this->endpoint_rendered = true;
+        $block['innerBlocks'] = [];
+        $block['innerHTML'] = $matches[1] . LSD_Endpoints::output($this->block_endpoint) . $matches[2];
+        $block['innerContent'] = [$block['innerHTML']];
+
+        return $block;
+    }
+
+    protected function has_endpoint_main(array $blocks): bool
+    {
+        $seen = [];
+        return LSD_Integrations_Blockeditor_Content::blocks_match($blocks, function ($block): bool
+        {
+            return ($block['blockName'] ?? '') === 'core/group'
+                && ($block['attrs']['tagName'] ?? '') === 'main'
+                && preg_match('~^\s*<main\b[^>]*>.*</main>\s*$~is', $block['innerHTML'] ?? '');
+        }, $seen);
+    }
+
+    protected function has_endpoint_post_content(array $blocks): bool
+    {
+        $seen = [];
+        return LSD_Integrations_Blockeditor_Content::blocks_match($blocks, function ($block): bool
+        {
+            return ($block['blockName'] ?? '') === 'core/post-content';
+        }, $seen);
     }
 
     public function filter_content($content)
@@ -223,6 +320,9 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
 
         global $post;
         if ($post->post_type !== $this->PT) return $content;
+
+        // The Listing Content block applies normal description filters without rendering the listing again.
+        if (class_exists('LSD_Integrations_Blockeditor_Elements') && LSD_Integrations_Blockeditor_Elements::rendering_description()) return $content;
 
         // Is it an endpoint?
         if ($ep = LSD_Endpoints::is()) return LSD_Endpoints::output($ep);
@@ -240,6 +340,58 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         return $output;
     }
 
+    public static function editor_preview(LSD_Entity_Listing $listing): bool
+    {
+        if (!current_user_can('edit_post', $listing->id())) return false;
+
+        if (defined('REST_REQUEST') && REST_REQUEST && !empty($_REQUEST['lsd_editor_preview'])) return true;
+        if (is_preview()) return true;
+
+        return class_exists('LSD_PTypes_Template') && (bool) LSD_PTypes_Template::get_active_preview_request();
+    }
+
+    /** Return null when allowed, or the access message once per listing request. */
+    public static function access_output(LSD_Entity_Listing $listing, bool $render = true): ?string
+    {
+        if (self::editor_preview($listing)) return null;
+
+        $id = $listing->id();
+        if (!array_key_exists($id, self::$access_messages))
+        {
+            // Access callbacks only authorize the listing; layout replacement has its own hook.
+            self::$access_messages[$id] = post_password_required($listing->post)
+                ? get_the_password_form($listing->post)
+                : (string) apply_filters('lsd_listing_access_message', '', $listing);
+        }
+
+        $message = self::$access_messages[$id];
+        if ($message === '') return null;
+        if (!$render || isset(self::$access_rendered[$id])) return '';
+
+        self::$access_rendered[$id] = true;
+        return $message;
+    }
+
+    /** Called only after access is granted, by both native blocks and the traditional layout. */
+    public static function visit(LSD_Entity_Listing $listing): void
+    {
+        if (
+            is_admin()
+            || (defined('REST_REQUEST') && REST_REQUEST)
+            || is_preview()
+            || self::editor_preview($listing)
+            || !is_singular(LSD_Base::PTYPE_LISTING)
+            || (int) get_queried_object_id() !== $listing->id()
+            || $listing->post->post_status !== 'publish'
+            || LSD_Endpoints::is()
+            || isset(self::$visited[$listing->id()])
+        ) return;
+
+        self::$visited[$listing->id()] = true;
+        $listing->update_visits();
+        do_action('lsd_listing_visited', $listing->post, 'page');
+    }
+
     public function get($content, ?string $style = null)
     {
         global $post;
@@ -247,14 +399,13 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Bootstrap the Parameters
         $this->bootstrap($post, $content);
 
-        // Filtered Content
+        $access = self::access_output($this->entity);
+        if ($access !== null) return $access;
+
+        self::visit($this->entity);
+
+        // Layout integrations can replace the traditional renderer after access is granted.
         if ($filtered = apply_filters('lsd_listing_before_single_content', false, $this)) return $filtered;
-
-        // Update Listing Visits
-        $this->entity->update_visits();
-
-        // Trigger Action
-        do_action('lsd_listing_visited', $post);
 
         // Force Style
         if ($style)

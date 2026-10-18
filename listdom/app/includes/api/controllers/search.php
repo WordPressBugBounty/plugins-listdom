@@ -57,6 +57,10 @@ class LSD_API_Controllers_Search extends LSD_API_Controller
         // Skin Object
         $skin = new LSD_Skins_List();
 
+        // Preserve submitted filters before search add-ons rewrite request parameters.
+        $track_search = absint($request->get_param('page')) <= 1;
+        $tracking_filters = $track_search ? (isset($vars['sf']) && is_array($vars['sf']) ? $vars['sf'] : $skin->get_sf()) : [];
+
         // Start the skin
         $skin->start([]);
         $skin->after_start();
@@ -69,6 +73,8 @@ class LSD_API_Controllers_Search extends LSD_API_Controller
 
         // Fetch the listings
         $skin->fetch();
+
+        if ($track_search) do_action('lsd_search_executed', (int) $skin->found_listings, 'rest', $tracking_filters);
 
         // Response
         return $this->response([

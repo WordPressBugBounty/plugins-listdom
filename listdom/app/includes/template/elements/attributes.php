@@ -256,7 +256,7 @@ class LSD_Template_Elements_Attributes extends LSD_Template
             $att = new LSD_Entity_Attribute($term->term_id);
 
             $raw_value = $listing_attributes[$term->slug] ?? '';
-            $value = $att->render($raw_value);
+            $value = $att->render($raw_value, ['listing_id' => $listing_id]);
 
             $has_value = trim((string) $value) !== '';
             if ($att->type === 'url') $has_value = trim((string) $raw_value) !== '';
@@ -315,7 +315,10 @@ class LSD_Template_Elements_Attributes extends LSD_Template
 
             $value_output = $has_value_output ? '<span class="lsdtb-attr-value">' . LSD_Kses::element($display_value) . '</span>' : '';
 
-            $output .= '<div class="lsdtb-attr lsdtb-attr-' . sanitize_html_class($att->type) . '" ' . LSD_Entity_Attribute::schema($term->term_id) . '>
+            // URL fields can also link through the icon or field name.
+            $tracking = $att->type === 'url' ? ' data-lsd-stats-action="website_click" data-lsd-stats-listing="' . esc_attr($listing_id) . '"' : '';
+
+            $output .= '<div class="lsdtb-attr lsdtb-attr-' . sanitize_html_class($att->type) . '"' . $tracking . ' ' . LSD_Entity_Attribute::schema($term->term_id) . '>
                 <span class="lsdtb-attr-key">' . $icon . $name . '</span>
                 ' . $value_output . '
             </div>';

@@ -46,7 +46,7 @@ $ids = $this->listings;
             <div class="lsd-circle"></div>
         <?php endif; ?>
         <div class="<?php echo esc_attr(implode(' ', array_map('sanitize_html_class', $timeline_classes))); ?>">
-            <div class="lsd-listing" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
+            <div class="lsd-listing" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
                 <?php echo (new LSD_Builders())->listing($listing)->build($this->style); ?>
             </div>
         </div>

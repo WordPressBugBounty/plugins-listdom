@@ -18,7 +18,7 @@ jQuery(document).ready(function()
     {
         id: "'.$this->id.'",
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
-        atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
+        atts: "'.http_build_query(['atts'=>$this->get_atts()], '', '&').'",
         load_more: "'.($this->pagination === 'loadmore' ? '1' : '0').'",
         infinite_scroll: "'.($this->pagination === 'scroll' ? '1' : '0').'",
         single_listing_style: "'.$this->single_listing_style.'",

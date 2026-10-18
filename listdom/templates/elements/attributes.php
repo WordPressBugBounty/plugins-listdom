@@ -69,7 +69,7 @@ $render_attribute_items = static function (LSD_Entity_Attribute $att, $raw_value
     $value_tag = $att->is_rich_editor() ? 'div' : 'span';
     $value = in_array($att->type, ['checkbox', 'dropdown'], true)
         ? $render_attribute_items($att, $post_attributes[$key], 'lsd-attr-value-item')
-        : LSD_Kses::element($att->render($post_attributes[$key]));
+        : LSD_Kses::element($att->render($post_attributes[$key], ['listing_id' => $post_id]));
     if (trim($value) === '') continue;
     ?>
     <?php if ($pending_separator): ?>

@@ -13,6 +13,11 @@ class LSD_Entity_Attribute extends LSD_Base
 
     public function render($data, $args = [])
     {
+        // Mark listing contact links when the renderer knows their listing.
+        $action = ['email' => 'email_click', 'tel' => 'phone_click', 'url' => 'website_click'][$this->type] ?? '';
+        $tracking = $action !== '' && !empty($args['listing_id'])
+            ? ' data-lsd-stats-action="' . esc_attr($action) . '" data-lsd-stats-listing="' . esc_attr($args['listing_id']) . '"' : '';
+
         switch ($this->type)
         {
             case 'number':
@@ -24,21 +29,21 @@ class LSD_Entity_Attribute extends LSD_Base
                 $label = get_term_meta($this->term_id, 'lsd_link_label', true);
                 $text = trim($label) === '' ? $data : $label;
 
-                return '<a href="mailto:' . esc_attr($data) . '">' . esc_html($text) . '</a>';
+                return '<a href="mailto:' . esc_attr($data) . '"' . $tracking . '>' . esc_html($text) . '</a>';
 
             case 'tel':
 
                 $label = get_term_meta($this->term_id, 'lsd_link_label', true);
                 $text = trim($label) === '' ? $data : $label;
 
-                return '<a href="tel:' . esc_attr($data) . '">' . esc_html($text) . '</a>';
+                return '<a href="tel:' . esc_attr($data) . '"' . $tracking . '>' . esc_html($text) . '</a>';
 
             case 'url':
 
                 $label = get_term_meta($this->term_id, 'lsd_link_label', true);
                 $text = trim($label) === '' ? $data : $label;
 
-                return '<a href="' . esc_attr($data) . '">' . esc_html($text) . '</a>';
+                return '<a href="' . esc_attr($data) . '"' . $tracking . '>' . esc_html($text) . '</a>';
 
             case 'image':
 

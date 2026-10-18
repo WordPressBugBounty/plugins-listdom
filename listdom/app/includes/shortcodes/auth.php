@@ -77,7 +77,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
 
         $layout = isset($atts['layout']) ? strtolower(sanitize_text_field($atts['layout'])) : 'inline';
-        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role, 'login');
+        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role, 'login', $redirect, $explicit_redirect);
 
         // Get Redirect from Request
         if (isset($_REQUEST['redirect_to']) && trim($_REQUEST['redirect_to']))
@@ -122,7 +122,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
 
         $layout = isset($atts['layout']) ? strtolower(sanitize_text_field($atts['layout'])) : 'inline';
-        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role, 'register');
+        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role, 'register', $redirect, $explicit_redirect);
 
         // User is Already Logged-in
         if (is_user_logged_in()) return $this->user_profile();
@@ -175,7 +175,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
         $role = isset($atts['role']) ? sanitize_text_field($atts['role']) : '';
         if (!in_array($role, LSD_Roles::supported(true), true)) $role = '';
 
-        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role);
+        if ($layout === 'dropdown') return $this->render_auth_dropdown($atts, $role, 'auth', $redirect, $explicit_redirect);
 
         // User is Already Logged-in
         if (is_user_logged_in()) return $this->user_profile();
@@ -185,12 +185,14 @@ class LSD_Shortcodes_Auth extends LSD_Base
         return ob_get_clean();
     }
 
-    private function render_auth_dropdown($atts = [], string $role = '', string $form_type = 'auth'): string
+    private function render_auth_dropdown($atts = [], string $role = '', string $form_type = 'auth', string $redirect = '', bool $explicit_redirect = false): string
     {
         $defaults = [
             'label' => esc_html__('Sign in', 'listdom'),
             'layout' => 'dropdown',
             'role' => '',
+            'redirect' => '',
+            'explicit_redirect' => '',
             'align' => 'right',
             'hover' => '',
             'role_tabs' => '',
@@ -209,7 +211,8 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
         $role_tabs_enabled = in_array(strtolower((string) $atts['role_tabs']), ['1', 'true', 'yes', 'on'], true);
         $role_tab_labels = $this->parse_pipe_list($atts['role_tabs_labels'] ?? '');
-        $role_tab_roles = $this->parse_pipe_list($atts['tabs_roles'] ?? '');
+        $role_tab_roles = explode('|', (string) ($atts['tabs_roles'] ?? ''));
+        $role_tab_roles = array_map('trim', $role_tab_roles);
         $role_tabs = $this->auth_dropdown_role_tabs($atts['role'] ?: $role, $role_tab_labels, $role_tab_roles, $role_tabs_enabled);
 
         $id = 'lsd-auth-dropdown-' . uniqid();
@@ -267,7 +270,7 @@ class LSD_Shortcodes_Auth extends LSD_Base
 
                 $tabs[] = [
                     'label' => $label,
-                    'role' => $role ?: ($tab_count === 1 ? $fallback_role : ''),
+                    'role' => $role ?: $fallback_role,
                 ];
             }
 

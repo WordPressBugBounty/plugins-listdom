@@ -158,6 +158,14 @@ class LSD_Menus_Addons extends LSD_Menus
 
         if (!LSD_Webilia_Connect::isAllowed($basename, 'use'))
         {
+            if (LSD_Webilia_Connect::error() !== '')
+            {
+                $this->response(['success' => 0, 'message' => esc_html__('Webilia could not verify access to this product. Please try again later.', 'listdom')]);
+            }
+            if ($basename === 'listdom-stats/listdom-stats.php')
+            {
+                $this->response(['success' => 0, 'message' => esc_html__('Webilia has not granted free Stats access to this account. Nothing was installed.', 'listdom')]);
+            }
             $this->response([
                 'success' => 0,
                 'message' => esc_html__('Your connected Webilia account is not entitled to this product.', 'listdom'),
@@ -166,7 +174,7 @@ class LSD_Menus_Addons extends LSD_Menus
             ]);
         }
 
-        if ($state === 'active')
+        if ($state === 'active' && is_plugin_active($basename))
         {
             $this->response(['success' => 1, 'reload' => true, 'message' => sprintf(esc_html__('%s is already installed and active.', 'listdom'), $this->addonName($addon))]);
         }
@@ -205,6 +213,7 @@ class LSD_Menus_Addons extends LSD_Menus
         require_once ABSPATH . 'wp-admin/includes/plugin.php';
         $activation = activate_plugin($basename);
         if (is_wp_error($activation)) $this->response(['success' => 0, 'message' => wp_kses_post($activation->get_error_message())]);
+        if (!is_plugin_active($basename)) $this->response(['success' => 0, 'message' => esc_html__('WordPress did not confirm activation of this product. Please check the Plugins page.', 'listdom')]);
 
         $message = $state === 'missing'
             ? sprintf(esc_html__('%s was installed and activated with Webilia Connect.', 'listdom'), $this->addonName($addon))

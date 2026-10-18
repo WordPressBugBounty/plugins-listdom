@@ -14,7 +14,10 @@ jQuery(document).on('submit', '.lsd-addons-form', function(e)
     const loading = new ListdomButtonLoader($button);
     loading.start("<?php echo esc_js(__('Saving', 'listdom')); ?>");
 
-    const addons = $form.serialize();
+    const $statsPanel = $form.find('#lsd_panel_addons_stats.lsd-tab-content-active');
+    const addons = $statsPanel.length
+        ? $statsPanel.find(':input').add($form.find('input[name="_wpnonce"]')).serialize()
+        : $form.serialize();
     jQuery.ajax(
     {
         type: "POST",

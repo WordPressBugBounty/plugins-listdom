@@ -3,6 +3,17 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v6.3.0 <span>October 17th, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added native WordPress blocks for directory layouts, search, the frontend dashboard, authentication, checkout, and listing content, with editor previews.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added an Analytics dashboard for listing activity, search performance, popular categories and locations, and conversion reports with the Stats addon.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added Business Data enrichment and refresh tools with business matches and field-by-field review before applying changes.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added native WordPress abilities for inspecting and updating supported settings and checking directory setup and dashboard readiness.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved Business Data history, selections across pages, progress and completion messages, searches up to 50 km, and fractional credit balance display.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved frontend form spacing, keyboard accessibility, mobile profile layouts, Timeline colors, and map cluster contrast.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved PHP 8.4 compatibility.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed repeated searches to preserve saved filters and archive scope and show accurate empty result totals.', 'listdom'); ?></li>
+    </ul>
     <h2>v6.2.0 <span>October 3rd, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Added Webilia Business Data to discover businesses worldwide and import selected results as Listdom draft listings, with taxonomy assignment, duplicate protection, and optional enrichment of missing business details.', 'listdom'); ?></li>

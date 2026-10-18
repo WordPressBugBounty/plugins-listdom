@@ -759,11 +759,17 @@ class LSD_Form extends LSD_Base
 
         $stars = ((isset($args['stars']) and is_numeric($args['stars'])) ? $args['stars'] : 5);
         $value = ((isset($args['value']) and is_numeric($args['value'])) ? $args['value'] : 1);
+        $focus = max(1, min((int) $stars, (int) floor((float) $value)));
 
         $output = '<div class="lsd-rate">';
 
-        $output .= '<div class="lsd-rate-stars">';
-        for ($i = 1; $i <= $stars; $i++) $output .= '<a href="#" data-rating-value="' . esc_attr($i) . '" data-rating-text="' . esc_attr($i) . '" class="' . ($value >= $i ? 'lsd-rate-selected' : '') . '"><i class="lsd-fe-icon ' . ($value >= $i ? 'fas fa-star' : 'far fa-star') . '"></i></a>';
+        $output .= '<div class="lsd-rate-stars" role="radiogroup" aria-label="' . esc_attr__('Rating', 'listdom') . '">';
+        for ($i = 1; $i <= $stars; $i++)
+        {
+            $selected = $value == $i;
+            $label = sprintf(esc_html__('%1$d out of %2$d stars', 'listdom'), $i, $stars);
+            $output .= '<a href="#" role="radio" aria-label="' . esc_attr($label) . '" aria-checked="' . ($selected ? 'true' : 'false') . '" tabindex="' . ($i === $focus ? '0' : '-1') . '" data-rating-value="' . esc_attr($i) . '" data-rating-text="' . esc_attr($i) . '" class="' . ($value >= $i ? 'lsd-rate-selected' : '') . '"><i aria-hidden="true" class="lsd-fe-icon ' . ($value >= $i ? 'fas fa-star' : 'far fa-star') . '"></i></a>';
+        }
         $output .= '</div>';
 
         $output .= '<input type="hidden" name="' . esc_attr($args['name']) . '" value="' . esc_attr($value) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="lsd-rate-input ' . (isset($args['class']) ? esc_attr($args['class']) : '') . '">';

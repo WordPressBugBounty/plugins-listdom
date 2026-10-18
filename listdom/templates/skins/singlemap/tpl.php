@@ -14,7 +14,7 @@ jQuery(document).ready(function()
         id: "'.$this->id.'",
         sidebar: "'.($this->sidebar ? '1' : '0').'",
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
-        atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
+        atts: "'.http_build_query(['atts'=>$this->get_atts()], '', '&').'",
     });
 });
 </script>');
@@ -50,6 +50,7 @@ jQuery(document).ready(function()
                     'clustering' => $this->skin_options['clustering'] ?? true,
                     'clustering_images' => $this->skin_options['clustering_images'] ?? '',
                     'clustering_color' => $this->skin_options['clustering_color'] ?? '#3f51b5',
+                    'clustering_text_color' => sanitize_hex_color($this->skin_options['clustering_text_color'] ?? '') ?: '',
                     'mapstyle' => $this->skin_options['mapstyle'] ?? '',
                     'id' => $this->id,
                     'sidebar' => $this->sidebar,
@@ -58,7 +59,7 @@ jQuery(document).ready(function()
                     'mapcontrols' => $this->mapcontrols,
                     'map_height' => $this->map_height,
                     'mousewheel_zoom' => $this->mousewheel_zoom,
-                    'atts' => $this->atts,
+                    'atts' => $this->get_atts(),
                     'mapsearch' => $this->mapsearch,
                     'autoGPS' => $this->autoGPS,
                     'max_bounds' => $this->maxBounds,

@@ -2,7 +2,7 @@
 
 class LSD_Endpoints_Raw extends LSD_Base
 {
-    public function output(string $classes = '', string $style = null)
+    public function output(string $classes = '', ?string $style = null)
     {
         global $post;
         $content = do_shortcode(wpautop($post->post_content));

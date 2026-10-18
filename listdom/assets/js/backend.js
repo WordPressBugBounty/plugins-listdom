@@ -4675,7 +4675,8 @@ jQuery(function ($)
         savingPreferences: false,
         preferencesErrorShown: false,
         activityToast: null,
-        creditsBalance: null
+        creditsBalance: null,
+        creditsBalanceText: null
     };
     const $message = $root.find('[data-business-data-message]');
     const $categories = $root.find('[data-business-data-categories]');
@@ -4694,7 +4695,7 @@ jQuery(function ($)
         return $('<div>').text(value || '').html();
     };
 
-    const countLabel = function (count, type)
+    const countLabel = function (count, type, displayCount)
     {
         const canTranslate = typeof wp !== 'undefined' && wp.i18n && typeof wp.i18n._n === 'function' && typeof wp.i18n.sprintf === 'function';
         let singular = '';
@@ -4716,7 +4717,13 @@ jQuery(function ($)
         {
             singular = '%d credit remaining';
             plural = '%d credits remaining';
-            if (canTranslate) return wp.i18n.sprintf(wp.i18n._n('%d credit remaining', '%d credits remaining', count, 'listdom'), count);
+            if (canTranslate)
+            {
+                const translation = wp.i18n._n('%d credit remaining', '%d credits remaining', count, 'listdom');
+                if (displayCount !== undefined) return wp.i18n.sprintf(translation.replace(/%(\d+\$)?d/g, '%$1s'), displayCount);
+
+                return wp.i18n.sprintf(translation, count);
+            }
         }
         else if (type === 'credits')
         {
@@ -4725,7 +4732,7 @@ jQuery(function ($)
             if (canTranslate) return wp.i18n.sprintf(wp.i18n._n('%d credit', '%d credits', count, 'listdom'), count);
         }
 
-        return (count === 1 ? singular : plural).replace('%d', count);
+        return (count === 1 ? singular : plural).replace('%d', displayCount === undefined ? count : displayCount);
     };
 
     const categoryLabel = function (code)
@@ -4796,7 +4803,7 @@ jQuery(function ($)
 
     const maxAffordableResults = function ()
     {
-        return state.creditsBalance === null ? 100 : Math.min(100, Math.max(0, state.creditsBalance * resultsPerCredit));
+        return state.creditsBalance === null ? 100 : Math.min(100, Math.max(0, Math.floor(state.creditsBalance) * resultsPerCredit));
     };
 
     const updateResultLimit = function ()
@@ -4806,21 +4813,24 @@ jQuery(function ($)
         if (maximum > 0 && Number($limit.val()) > maximum) $limit.val(maximum);
 
         const $help = $root.find('[data-business-data-limit-help]');
+        const balanceText = state.creditsBalanceText === null ? state.creditsBalance : state.creditsBalanceText;
         $help.prop('hidden', maximum === 0 || maximum >= 100).text(maximum > 0 && maximum < 100
-            ? config.strings.limitForCredits.replace('%1$d', state.creditsBalance).replace('%2$d', maximum) : '');
+            ? config.strings.limitForCredits.replace('%1$d', balanceText).replace('%2$d', maximum) : '');
     };
 
-    const setBalanceState = function (balance)
+    const setBalanceState = function (balance, balanceText)
     {
         const $workspace = $root.find('[data-business-data-search-workspace]');
-        const showWorkspace = config.connected && config.mapEnabled && (balance === null || balance > 0 || !!state.entry);
+        const showWorkspace = config.connected && config.mapEnabled && (balance === null || balance >= 1 || !!state.entry);
         $root.find('[data-business-data-checking]').prop('hidden', true);
-        $root.find('[data-business-data-no-credits]').prop('hidden', balance !== 0);
+        $root.find('[data-business-data-no-credits]').prop('hidden', balance === null || balance >= 1);
         $root.find('[data-business-data-balance-error]').prop('hidden', balance !== null);
-        $root.find('[data-business-data-map-disabled]').prop('hidden', balance === null || balance === 0 || config.mapEnabled);
+        $root.find('[data-business-data-map-disabled]').prop('hidden', balance === null || balance < 1 || config.mapEnabled);
         $workspace.prop('hidden', !showWorkspace);
-        $root.find('[data-business-data-search]').prop('disabled', !config.connected || balance === 0);
+        $root.find('[data-business-data-search]').prop('disabled', !config.connected || (balance !== null && balance < 1));
         state.creditsBalance = balance;
+        if (balanceText !== undefined) state.creditsBalanceText = String(balanceText);
+        else if (balance === null) state.creditsBalanceText = null;
 
         if (showWorkspace)
         {
@@ -4850,9 +4860,9 @@ jQuery(function ($)
         {
             if (response.success)
             {
-                const balance = Math.max(0, parseInt(response.credits_balance, 10) || 0);
-                showBalance(balance);
-                setBalanceState(balance);
+                const balance = Math.max(0, Number(response.credits_balance) || 0);
+                showBalance(response.credits_balance);
+                setBalanceState(balance, response.credits_balance);
                 return;
             }
 
@@ -4921,7 +4931,7 @@ jQuery(function ($)
     {
         if (!state.marker) return;
 
-        const radius = Math.max(.1, Math.min(25, parseFloat($root.find('#lsd-business-data-radius').val()) || 25));
+        const radius = Math.max(.1, Math.min(50, parseFloat($root.find('#lsd-business-data-radius').val()) || 25));
         state.circle.setLatLng(state.marker.getLatLng()).setRadius(radius * 1000);
     };
 
@@ -4933,7 +4943,7 @@ jQuery(function ($)
         const limitValue = $limit.val();
         const parsedRadius = Number(radiusValue);
         const parsedLimit = Number(limitValue);
-        const radius = radiusValue !== '' && Number.isFinite(parsedRadius) ? Math.min(25, Math.max(.1, Math.round(parsedRadius * 10) / 10)) : 25;
+        const radius = radiusValue !== '' && Number.isFinite(parsedRadius) ? Math.min(50, Math.max(.1, Math.round(parsedRadius * 10) / 10)) : 25;
         const limit = Math.min(Math.max(1, maxAffordableResults()), limitValue !== '' && Number.isFinite(parsedLimit) ? Math.max(1, Math.round(parsedLimit)) : 20);
 
         $radius.val(radius);
@@ -4989,7 +4999,7 @@ jQuery(function ($)
         const limit = parseInt(preferences.limit, 10);
         // Older map/radius saves also stored the former default limit of 100.
         const legacyDefaultLimit = limit === 100 && !preferences.limit_default_version;
-        $root.find('#lsd-business-data-radius').val(Number.isFinite(radius) && radius > 0 && radius <= 25 ? radius : 25);
+        $root.find('#lsd-business-data-radius').val(Number.isFinite(radius) && radius > 0 && radius <= 50 ? radius : 25);
         $root.find('#lsd-business-data-limit').val(legacyDefaultLimit ? 20 : (Number.isInteger(limit) && limit >= 1 && limit <= 100 ? limit : 20));
         state.map = L.map('lsd-business-data-map', {minZoom: 1, maxZoom: 18}).setView(center, Number.isInteger(zoom) && zoom >= 1 && zoom <= 18 ? zoom : config.center.zoom || 12);
 
@@ -5113,7 +5123,7 @@ jQuery(function ($)
             state.marker.setLatLng([latitude, longitude]);
             state.map.setView([latitude, longitude], state.map.getZoom());
         }
-        if (Number.isFinite(radius) && radius > 0 && radius <= 25)
+        if (Number.isFinite(radius) && radius > 0 && radius <= 50)
         {
             $root.find('#lsd-business-data-radius').val(radius);
         }
@@ -5127,11 +5137,12 @@ jQuery(function ($)
         const $resultsWrap = $root.find('.lsd-business-data-results-wrap').prop('hidden', false);
         const resultCount = Number(meta.result_count ?? places.length);
         const creditsCharged = Number(meta.credits_charged || 0);
-        const creditsRemaining = Number(meta.credits_balance || 0);
+        const creditsRemainingText = String(meta.credits_balance ?? 0);
+        const creditsRemaining = Number(creditsRemainingText || 0);
         $root.find('[data-business-data-meta]').text([
             countLabel(resultCount, 'results'),
             countLabel(creditsCharged, 'charged'),
-            countLabel(creditsRemaining, 'remaining')
+            countLabel(creditsRemaining, 'remaining', creditsRemainingText)
         ].join(' · '));
         $root.find('[data-business-data-results]').html(places.map(function (place)
         {
@@ -5329,7 +5340,7 @@ jQuery(function ($)
 
     $root.on('click', '[data-business-data-search]', function ()
     {
-        if (state.creditsBalance === 0 || !state.marker) return;
+        if ((state.creditsBalance !== null && state.creditsBalance < 1) || !state.marker) return;
         if (!state.selectedCategories.length) return showMessage(config.strings.selectCategory);
 
         const settings = normalizeSearchInputs();
@@ -5354,7 +5365,7 @@ jQuery(function ($)
                 if (remaining !== undefined)
                 {
                     showBalance(remaining);
-                    setBalanceState(Math.max(0, parseInt(remaining, 10) || 0));
+                    setBalanceState(Math.max(0, Number(remaining) || 0), remaining);
                 }
                 loadHistory();
                 finishActivity(config.strings.searchComplete, 'lsd-success');
@@ -5363,16 +5374,16 @@ jQuery(function ($)
         }).fail(function (xhr)
         {
             const error = xhr.responseJSON || {};
-            if (xhr.status === 402 && Number.isInteger(Number(error.credits_balance)))
+            if (xhr.status === 402 && Number.isFinite(Number(error.credits_balance)))
             {
                 const balance = Math.max(0, Number(error.credits_balance));
-                showBalance(balance);
-                setBalanceState(balance);
+                showBalance(error.credits_balance);
+                setBalanceState(balance, error.credits_balance);
             }
             finishActivity(error.message || config.strings.searchFailed, 'lsd-error');
         }).always(function ()
         {
-            $button.prop('disabled', state.creditsBalance === 0);
+            $button.prop('disabled', state.creditsBalance !== null && state.creditsBalance < 1);
         });
     });
 
@@ -5555,6 +5566,25 @@ jQuery(function ($)
     };
 
     if (window.lsdBusinessDataConfig) window.LSD_Business_Data.init(window.lsdBusinessDataConfig);
+})(jQuery);
+
+// Show Stats choices only while Analytics is enabled.
+(function ($)
+{
+    $(function ()
+    {
+        const $enabled = $('#lsd_stats_analytics_enabled');
+        if (!$enabled.length) return;
+
+        const $options = $('#lsd_panel_addons_stats [data-lsd-stats-option]');
+        function syncStatsOptions()
+        {
+            $options.prop('hidden', !$enabled.prop('checked'));
+        }
+
+        $enabled.on('change', syncStatsOptions);
+        syncStatsOptions();
+    });
 })(jQuery);
 
 // Claim Payment Settings

@@ -1203,6 +1203,22 @@ class LSD_Base
         else return gmdate($format, $time);
     }
 
+    /**
+     * Return the site timezone on WordPress 5.0 and newer.
+     */
+    public static function timezone(): DateTimeZone
+    {
+        if (function_exists('wp_timezone')) return wp_timezone();
+
+        $name = get_option('timezone_string');
+        if ($name) return new DateTimeZone($name);
+
+        $offset = (float) get_option('gmt_offset', 0);
+        $hours = (int) floor(abs($offset));
+        $minutes = (int) round((abs($offset) - $hours) * 60);
+        return new DateTimeZone(sprintf('%s%02d:%02d', $offset < 0 ? '-' : '+', $hours, $minutes));
+    }
+
     public static function time($time, $format = null)
     {
         if (!is_numeric($time)) $time = LSD_Base::strtotime($time);
@@ -1225,7 +1241,7 @@ class LSD_Base
     {
         try
         {
-            $date = new DateTime($time, wp_timezone());
+            $date = new DateTime($time, self::timezone());
             return $date->format('U');
         }
         catch (Exception $ex)

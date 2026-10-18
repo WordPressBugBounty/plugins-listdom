@@ -19,7 +19,7 @@ if ($has_listings)
         {
             id: "'.$this->id.'",
             ajax_url: "'.admin_url('admin-ajax.php', null).'",
-            atts: "'.http_build_query(['atts'=>$this->atts], '', '&').'",
+            atts: "'.http_build_query(['atts'=>$this->get_atts()], '', '&').'",
             items: "'.$this->columns.'",
             loop: "'.(count($this->listings) > $this->columns ? '1' : '0').'",
             autoplay: '.($this->autoplay ? 'true' : 'false').',

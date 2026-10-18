@@ -6,16 +6,17 @@ defined('ABSPATH') || die();
 
 $networks = LSD_Options::socials();
 $SN = new LSD_Socials();
+$modal_id = $this->args['modal_id'] ?? $post_id;
 ?>
 <?php if ($this->layout == 'archive'): ?>
     <div class="lsd-share lsd-share-archive">
         <div class="lsd-share-icon">
-            <span class="lsd-main-icon lsd-color-m-txt lsd-share-modal-button" data-id="<?php echo esc_attr($post_id); ?>">
+            <span class="lsd-main-icon lsd-color-m-txt lsd-share-modal-button" data-id="<?php echo esc_attr($modal_id); ?>">
                 <i class="lsd-fe-icon fa fa-share-alt fa-lg"></i>
             </span>
         </div>
 
-        <div id="lsd-share-modal-<?php echo esc_attr($post_id); ?>" class="lsd-modal">
+        <div id="lsd-share-modal-<?php echo esc_attr($modal_id); ?>" class="lsd-modal">
             <div class="lsd-modal-content lsd-share-modal">
                 <h3 class="lsd-modal-title lsd-m-0 lsd-fe-title">
                     <?php echo esc_html__('Share', 'listdom') . ' ' . esc_html(get_the_title($post_id)); ?>
@@ -32,7 +33,7 @@ $SN = new LSD_Socials();
                         $share = $obj->share($post_id);
                         if (!trim($share)) continue;
 
-                        echo '<li class="lsd-share-list-item">'.$share.'</li>';
+                        echo '<li class="lsd-share-list-item" data-lsd-stats-action="share_click" data-lsd-stats-listing="' . esc_attr($post_id) . '">'.$share.'</li>';
                     }
                     ?>
                 </ul>
@@ -54,7 +55,7 @@ $SN = new LSD_Socials();
                     $share = $obj->share($post_id);
                     if (!trim($share)) continue;
 
-                    echo '<li class="lsd-share-list-item">'.$share.'</li>';
+                    echo '<li class="lsd-share-list-item" data-lsd-stats-action="share_click" data-lsd-stats-listing="' . esc_attr($post_id) . '">'.$share.'</li>';
                 }
                 ?>
             </ul>

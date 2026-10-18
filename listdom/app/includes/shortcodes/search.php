@@ -1511,6 +1511,8 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         <div class="lsd-search-devices-<?php echo esc_attr($device); ?>">
             <form action="<?php echo esc_url($action); ?>"
                   class="lsd-search-form <?php echo !$inherit ? 'lsd-search-not-inherit' : ''; ?>">
+                <?php if (!$this->ajax): ?><input type="hidden" name="lsd_search_submit" value="1"><?php endif; ?>
+                <input type="hidden" name="lsd_search_target" value="<?php echo esc_attr($this->form['shortcode'] ?? 0); ?>">
                 <?php
                 $HTML = '';
                 foreach ($filters as $row) $HTML .= $this->row($row);

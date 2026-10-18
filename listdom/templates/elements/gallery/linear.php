@@ -51,7 +51,7 @@ if (!count($gallery)) return '';
         }
     ?>
 
-    <button class="lsd-all-photos-button">
+    <button class="lsd-all-photos-button" type="button" data-modal-id="<?php echo esc_attr($params['modal_id']); ?>">
         <?php printf(
             /* translators: %d: Total number of gallery photos. */
             esc_html__('See all %d photos', 'listdom'),
@@ -59,7 +59,7 @@ if (!count($gallery)) return '';
         ); ?>
     </button>
 
-    <div id="lsd-gallery-modal" class="lsd-gallery-modal">
+    <div id="<?php echo esc_attr($params['modal_id']); ?>" class="lsd-gallery-modal">
         <div class="lsd-gallery-modal-wrapper">
             <div class="lsd-gallery-modal-top-bar">
                 <h3><?php echo sprintf(

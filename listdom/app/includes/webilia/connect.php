@@ -416,6 +416,28 @@ class LSD_Webilia_Connect
         }
     }
 
+    public static function businessDataMaintenance(string $operation, array $request): array
+    {
+        if (!self::enabled() || !self::isConnected()) throw new RuntimeException('Webilia Connect is unavailable.');
+        $client = self::client();
+        if (!method_exists($client, 'overtureMaintenanceQuote')) throw new RuntimeException('Update Webilia Connect before using Business Data maintenance.', 503);
+
+        try
+        {
+            if ($operation === 'quote') return $client->overtureMaintenanceQuote((string) $request['operation'], (int) $request['count']);
+            if ($operation === 'match') return $client->overturePlacesMatch((string) $request['idempotency_key'], (array) $request['listings']);
+            if ($operation === 'lookup') return $client->overturePlacesLookup((string) $request['idempotency_key'], (array) $request['place_ids']);
+            throw new RuntimeException('Unknown Business Data operation.', 422);
+        }
+        catch (Throwable $e)
+        {
+            self::$error = $e->getMessage();
+            if ($e instanceof RequestException) throw new RuntimeException($e->getMessage(), (int) $e->getCode(), $e);
+            if ($e instanceof TransientException && $e->getCode()) throw new RuntimeException($e->getMessage(), (int) $e->getCode(), $e);
+            throw $e;
+        }
+    }
+
     private static function client(): Client
     {
         if (self::$client instanceof Client) return self::$client;

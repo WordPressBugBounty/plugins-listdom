@@ -211,6 +211,13 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Redirect Guest Users
         add_action('wp', [$this, 'redirect']);
 
+        // Block templates are resolved after wp; check again before any template output.
+        add_filter('template_include', function ($template)
+        {
+            $this->redirect();
+            return $template;
+        }, 99);
+
         // Save Listing
         add_action('wp_ajax_lsd_dashboard_listing_save', [$this, 'save']);
         add_action('wp_ajax_nopriv_lsd_dashboard_listing_save', [$this, 'save']);

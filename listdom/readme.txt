@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 5.0
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 6.2.0
+Stable tag: 6.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -446,6 +446,16 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 6.3.0 =
+* Added native WordPress blocks for directory layouts, search, the frontend dashboard, authentication, checkout, and listing content, with editor previews.
+* Added an Analytics dashboard for listing activity, search performance, popular categories and locations, and conversion reports with the Stats addon.
+* Added Business Data enrichment and refresh tools with business matches and field-by-field review before applying changes.
+* Added native WordPress abilities for inspecting and updating supported settings and checking directory setup and dashboard readiness.
+* Improved Business Data history, selections across pages, progress and completion messages, searches up to 50 km, and fractional credit balance display.
+* Improved frontend form spacing, keyboard accessibility, mobile profile layouts, Timeline colors, and map cluster contrast.
+* Improved PHP 8.4 compatibility.
+* Fixed repeated searches to preserve saved filters and archive scope and show accurate empty result totals.
 
 = 6.2.0 =
 * Added Webilia Business Data to discover businesses worldwide and import selected results as Listdom draft listings, with taxonomy assignment, duplicate protection, and optional enrichment of missing business details.

@@ -8,7 +8,7 @@ $ids = $this->listings;
 if (!$this->display_slider_arrows) LSD_Assets::footer('<style>.owl-nav{display:none !important;}</style>');
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
-<div class="lsd-listing" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
+<div class="lsd-listing" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
     <div class="lsd-listing-image">
         <?php echo LSD_Kses::element($listing->get_cover_image([1100, 550], $this->get_listing_link_method())); ?>
 

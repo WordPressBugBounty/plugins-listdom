@@ -14,15 +14,17 @@ if(!count($embeds)) return '';
     <ul>
         <?php foreach($embeds as $embed): if(!isset($embed['code']) || !trim($embed['code'])) continue; ?>
             <?php if(!isset($embed['featured']) || $embed['featured'] == 0): ?>
+                <?php
+                    $code = filter_var($embed['code'], FILTER_VALIDATE_URL) ? wp_oembed_get($embed['code']) : $embed['code'];
+                    $html = LSD_Kses::embed($code);
+                    $ratio = LSD_Kses::embed_ratio($html);
+                ?>
                 <li <?php echo lsd_schema()->subjectOf(); ?> <?php echo lsd_schema()->scope()->type('https://schema.org/VideoObject'); ?>>
                     <?php if(isset($embed['name']) && trim($embed['name'])): ?>
                     <h2 class="lsd-single-page-section-title lsd-fe-title" <?php echo lsd_schema()->name(); ?> ><?php echo esc_html($embed['name']); ?></h2>
                     <?php endif; ?>
-                    <div class="lsd-embed-code-wrapper">
-                        <?php
-                            if (filter_var($embed['code'], FILTER_VALIDATE_URL)) echo LSD_Kses::embed(wp_oembed_get($embed['code']));
-                            else echo LSD_Kses::embed($embed['code']);
-                        ?>
+                    <div class="lsd-embed-code-wrapper"<?php echo $ratio ? ' style="--lsd-embed-aspect-ratio: ' . esc_attr($ratio) . '"' : ''; ?>>
+                        <?php echo $html; ?>
                     </div>
                 </li>
             <?php endif; ?>

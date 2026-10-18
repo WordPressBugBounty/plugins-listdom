@@ -479,7 +479,7 @@ class LSD_Template_Elements_Contact extends LSD_Template
             $html .= '<span class="lsd-contact-name">' . esc_html($name) . ': </span>';
         }
 
-        $html .= '<span class="lsd-contact-value">' . $this->format_contact_value($field_id, $value) . '</span>';
+        $html .= '<span class="lsd-contact-value">' . $this->format_contact_value($field_id, $value, $listing_id) . '</span>';
         $html .= '</li>';
 
         return $html;
@@ -509,30 +509,33 @@ class LSD_Template_Elements_Contact extends LSD_Template
         return ucfirst(str_replace('_', ' ', $field_id));
     }
 
-    private function format_contact_value(string $field_id, $value): string
+    private function format_contact_value(string $field_id, $value, int $listing_id): string
     {
         $value = trim((string) $value);
+        $listing = esc_attr($listing_id);
 
         if (LSD_Base::is_url($value))
         {
-            return '<a href="' . esc_url($value) . '" target="_blank" rel="noopener noreferrer">' . esc_html(LSD_Base::remove_protocols($value)) . '</a>';
+            $action = $field_id === 'website' ? 'website_click' : ($field_id === 'whatsapp' ? 'whatsapp_click' : '');
+            $tracking = $action !== '' ? ' data-lsd-stats-action="' . $action . '" data-lsd-stats-listing="' . $listing . '"' : '';
+            return '<a class="lsd-contact-value-link"' . $tracking . ' href="' . esc_url($value) . '" target="_blank" rel="noopener noreferrer">' . esc_html(LSD_Base::remove_protocols($value)) . '</a>';
         }
 
         if (is_email($value))
         {
-            return '<a href="mailto:' . esc_attr($value) . '">' . esc_html($value) . '</a>';
+            return '<a class="lsd-contact-value-link" data-lsd-stats-action="email_click" data-lsd-stats-listing="' . $listing . '" href="mailto:' . esc_attr($value) . '">' . esc_html($value) . '</a>';
         }
 
         if ($field_id === 'phone')
         {
-            return '<a href="tel:' . esc_attr($this->normalize_phone($value)) . '">' . esc_html($value) . '</a>';
+            return '<a class="lsd-contact-value-link" data-lsd-stats-action="phone_click" data-lsd-stats-listing="' . $listing . '" href="tel:' . esc_attr($this->normalize_phone($value)) . '">' . esc_html($value) . '</a>';
         }
 
         if ($field_id === 'whatsapp')
         {
             $tel = $this->normalize_phone($value);
 
-            return '<a href="https://wa.me/' . esc_attr($tel) . '" target="_blank" rel="noopener noreferrer">' . esc_html($value) . '</a>';
+            return '<a class="lsd-contact-value-link" data-lsd-stats-action="whatsapp_click" data-lsd-stats-listing="' . $listing . '" href="https://wa.me/' . esc_attr($tel) . '" target="_blank" rel="noopener noreferrer">' . esc_html($value) . '</a>';
         }
 
         return esc_html($value);

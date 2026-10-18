@@ -139,6 +139,7 @@
   --listdom-form-input-line-height: ((general_form_input_line_height)); /* General Form Typography */
 
   --listdom-search-form-bg-color: ((search_form_bg_color)); /* Input Background Color */
+  --listdom-search-form-field-padding: ((search_form_field_padding));
   --listdom-search-form-input-bg-color: ((search_form_input_bg_color)); /* Input Background Color */
   --listdom-search-form-input-text-color: ((search_form_input_text_color)); /* Input Text Color */
   --listdom-search-form-input-border-width: ((search_form_input_border_width)); /* Input Border Width */
@@ -276,6 +277,7 @@
   --listdom-auth-form-tabs-active-font-size: ((auth_forms_tabs_active_font_size));
   --listdom-auth-form-tabs-active-line-height: ((auth_forms_tabs_active_line_height));
 
+  --listdom-timeline-color: ((timeline_color));
   --listdom-masonry-tabs-bg: ((masonry_tabs_bg_color)); /* Masonry Tabs Background Color */
   --listdom-masonry-tabs-text: ((masonry_tabs_text_color)); /* Masonry Tabs Text Color */
   --listdom-masonry-tabs-hover-bg: ((masonry_tabs_hover_bg_color)); /* Masonry Tabs Hover Background Color */
@@ -292,6 +294,10 @@
   --listdom-slider-arrows-icon-color: ((slider_arrows_icon_color)); /* Slider Icons Color */
 
   --listdom-reviews-tabs-bg: ((reviews_tabs_bg_color)); /* Reviews Tabs Background Color */
+  --listdom-reviews-score-color: ((reviews_score_color));
+  --listdom-reviews-stars-color: ((reviews_stars_color));
+  --listdom-reviews-empty-stars-color: ((reviews_empty_stars_color));
+  --listdom-reviews-count-color: ((reviews_count_color));
   --listdom-reviews-tabs-text: ((reviews_tabs_text_color)); /* Reviews Tabs Text Color */
   --listdom-reviews-tabs-hover-bg: ((reviews_tabs_hover_bg_color)); /* Reviews Tabs Hover Background Color */
   --listdom-reviews-tabs-hover-text: ((reviews_tabs_hover_text_color)); /* Reviews Tabs Hover Text Color */

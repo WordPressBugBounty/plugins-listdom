@@ -167,12 +167,18 @@ class LSD_Dashboard extends LSD_Base
         if (!($post instanceof WP_Post)) return false;
 
         $content = $post->post_content ?? '';
-        if (!is_string($content) || trim($content) === '') return false;
+        if (is_string($content) && preg_match('/\[(' . preg_quote($shortcode, '/') . ')(\s|]|\/)/i', $content)) return true;
 
-        return (bool) preg_match('/\[(' . preg_quote($shortcode, '/') . ')(\s|]|\/)/i', $content);
+        $block = $shortcode === 'listdom-dashboard' ? 'listdom/dashboard' : 'listdom/add-listing';
+        if (!function_exists('has_block') || !shortcode_exists($shortcode)) return false;
+        if (LSD_Integrations_Blockeditor_Content::has_block($content, $block)) return true;
+
+        global $_wp_current_template_content;
+        return is_string($_wp_current_template_content)
+            && LSD_Integrations_Blockeditor_Content::has_block($_wp_current_template_content, $block);
     }
 
-    private static function post_has_elementor_dashboard(int $post_id): bool
+    public static function post_has_elementor_dashboard(int $post_id): bool
     {
         $elements = get_post_meta($post_id, '_elementor_data', true);
         if (is_string($elements)) $elements = json_decode($elements, true);

@@ -44,7 +44,7 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
                     <span class="lsd-contact-info-label"><?php esc_html_e('Phone', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
                 <?php endif; ?>
                 <span>
-                    <a <?php echo lsd_schema()->telephone(); ?> href="tel:<?php echo esc_attr($phone); ?>"><?php echo esc_html($phone); ?></a>
+                    <a class="lsd-stats-action-link" data-lsd-stats-action="phone_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>" <?php echo lsd_schema()->telephone(); ?> href="tel:<?php echo esc_attr($phone); ?>"><?php echo esc_html($phone); ?></a>
                 </span>
             </li>
         <?php endif; ?>
@@ -58,7 +58,7 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
                     <span class="lsd-contact-info-label"><?php esc_html_e('Email', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
                 <?php endif; ?>
                 <span <?php echo lsd_schema()->email(); ?>>
-                    <a href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a>
+                    <a class="lsd-stats-action-link" data-lsd-stats-action="email_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>" href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a>
                 </span>
             </li>
         <?php endif; ?>
@@ -72,7 +72,7 @@ if (!$email && !$phone && !$website && !$contact_address && !$socials) return ''
                     <span class="lsd-contact-info-label"><?php esc_html_e('Website', 'listdom'); ?><span class="lsd-colon-mark">: </span></span>
                 <?php endif; ?>
                 <span <?php echo lsd_schema()->url(); ?>>
-                    <a href="<?php echo esc_url($website); ?>"
+                    <a class="lsd-stats-action-link" data-lsd-stats-action="website_click" data-lsd-stats-listing="<?php echo esc_attr($post_id); ?>" href="<?php echo esc_url($website); ?>"
                        target="_blank"><?php echo esc_html(LSD_Base::remove_protocols($website)); ?></a>
                 </span>
             </li>

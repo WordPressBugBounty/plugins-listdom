@@ -898,7 +898,7 @@ class LSD_PTypes_Template extends LSD_PTypes
         return $cache[$element_type];
     }
 
-    protected function sanitize_element_settings($settings, string $element_type = '', array $html_fields = null): array
+    protected function sanitize_element_settings($settings, string $element_type = '', ?array $html_fields = null): array
     {
         if (!is_array($settings)) return [];
 

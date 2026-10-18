@@ -141,6 +141,16 @@ class LSD_Kses extends LSD_Base
         return wp_kses($html, self::$allowed_html_embed);
     }
 
+    public static function embed_ratio(string $html): string
+    {
+        if (!preg_match('~<(?:iframe|embed|object)\b[^>]*>~i', $html, $media)) return '';
+        if (!preg_match('~\swidth\s*=\s*(["\']?)([0-9]+(?:\.[0-9]+)?)\1(?=\s|/?>)~i', $media[0], $width)) return '';
+        if (!preg_match('~\sheight\s*=\s*(["\']?)([0-9]+(?:\.[0-9]+)?)\1(?=\s|/?>)~i', $media[0], $height)) return '';
+        if ((float) $width[2] <= 0 || (float) $height[2] <= 0) return '';
+
+        return $width[2] . ' / ' . $height[2];
+    }
+
     /**
      * Full Page
      *

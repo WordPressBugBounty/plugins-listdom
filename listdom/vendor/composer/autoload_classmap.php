@@ -945,6 +945,7 @@ return array(
     'Webilia\\Connect\\Contracts\\GetHttpClient' => $vendorDir . '/webilia/connect/src/Contracts/GetHttpClient.php',
     'Webilia\\Connect\\Contracts\\HttpClient' => $vendorDir . '/webilia/connect/src/Contracts/HttpClient.php',
     'Webilia\\Connect\\Contracts\\Storage' => $vendorDir . '/webilia/connect/src/Contracts/Storage.php',
+    'Webilia\\Connect\\Contracts\\TimeoutHttpClient' => $vendorDir . '/webilia/connect/src/Contracts/TimeoutHttpClient.php',
     'Webilia\\Connect\\Contracts\\UpdateClient' => $vendorDir . '/webilia/connect/src/Contracts/UpdateClient.php',
     'Webilia\\Connect\\Exception\\RequestException' => $vendorDir . '/webilia/connect/src/Exception/RequestException.php',
     'Webilia\\Connect\\Exception\\TransientException' => $vendorDir . '/webilia/connect/src/Exception/TransientException.php',

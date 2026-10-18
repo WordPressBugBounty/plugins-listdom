@@ -8,6 +8,7 @@ class LSD_Skins extends LSD_Base
     public $skin_options = [];
     public $filter_options = [];
     public $exclude_options = [];
+    protected $filters = [];
 
     public $search_options = [];
     public $sm_shortcode;
@@ -124,6 +125,9 @@ class LSD_Skins extends LSD_Base
 
     public function start($atts)
     {
+        // Preserve shortcode filters before request search filters are applied.
+        $this->filters = isset($atts['lsd_filter']) && is_array($atts['lsd_filter']) ? $atts['lsd_filter'] : [];
+
         $this->atts = apply_filters('lsd_skins_atts', $atts);
         $instance_id = isset($this->atts['lsd_instance_id'])
             ? (int) $this->atts['lsd_instance_id']
@@ -839,6 +843,9 @@ class LSD_Skins extends LSD_Base
             $this->sort_distance_reference = null;
         }
 
+        // Empty searches must report zero rather than a previous query's count.
+        $this->found_listings = (int) $query->found_posts;
+
         $ids = [];
         if ($query->have_posts())
         {
@@ -848,9 +855,6 @@ class LSD_Skins extends LSD_Base
                 $query->the_post();
                 $ids[] = get_the_ID();
             }
-
-            // Total Count of Results
-            $this->found_listings = $query->found_posts;
 
             // Next Page
             $this->next_page = isset($args['paged']) ? $args['paged'] + 1 : 1;
@@ -1295,6 +1299,11 @@ class LSD_Skins extends LSD_Base
         // It's not a Listdom taxonomy
         if (!in_array($q->taxonomy, $this->taxonomies())) return $filter_options;
 
+        $this->filters[$q->taxonomy] = array_merge(
+            isset($this->filters[$q->taxonomy]) && is_array($this->filters[$q->taxonomy]) ? $this->filters[$q->taxonomy] : [],
+            [$q->term_id]
+        );
+
         if (isset($filter_options[$q->taxonomy]) && is_array($filter_options[$q->taxonomy]))
         {
             $filter_options[$q->taxonomy][] = $q->term_id;
@@ -1309,6 +1318,15 @@ class LSD_Skins extends LSD_Base
         return $filter_options;
     }
 
+    public function get_atts(): array
+    {
+        $atts = $this->atts;
+        // Request filters must be recalculated for each AJAX search.
+        $atts['lsd_filter'] = $this->filters;
+
+        return $atts;
+    }
+
     public function fetch()
     {
         // Get Listings
@@ -1319,6 +1337,11 @@ class LSD_Skins extends LSD_Base
     {
         // Get attributes
         $atts = isset($_POST['atts']) && is_array($_POST['atts']) ? wp_unslash($_POST['atts']) : [];
+
+        $track_search = isset($_POST['lsd_search_submit']) && (string) $_POST['lsd_search_submit'] === '1' && absint($_POST['page'] ?? 1) <= 1;
+
+        // Preserve submitted filters before search add-ons rewrite request parameters.
+        $tracking_filters = $track_search ? (isset($_POST['sf']) && is_array($_POST['sf']) ? wp_unslash($_POST['sf']) : $this->get_sf()) : [];
 
         // Sanitization
         $atts = LSD_Sanitize::deep($atts);
@@ -1335,6 +1358,8 @@ class LSD_Skins extends LSD_Base
 
         // Fetch the listings
         $this->fetch();
+
+        if ($track_search) do_action('lsd_search_executed', (int) $this->found_listings, 'ajax', $tracking_filters);
 
         // Generate the output
         $output = $this->listings_html();
@@ -1877,6 +1902,7 @@ class LSD_Skins extends LSD_Base
             'clustering' => $this->skin_options['clustering'] ?? true,
             'clustering_images' => $this->skin_options['clustering_images'] ?? '',
             'clustering_color' => $this->skin_options['clustering_color'] ?? '#3f51b5',
+            'clustering_text_color' => sanitize_hex_color($this->skin_options['clustering_text_color'] ?? '') ?: '',
             'mapstyle' => $this->skin_options['mapstyle'] ?? '',
             'id' => $this->id,
             'onclick' => $this->skin_options['mapobject_onclick'] ?? 'infowindow',
@@ -1885,7 +1911,7 @@ class LSD_Skins extends LSD_Base
             'mapcontrols' => $this->mapcontrols,
             'map_height' => $this->map_height,
             'mousewheel_zoom' => $this->mousewheel_zoom,
-            'atts' => $this->atts,
+            'atts' => $this->get_atts(),
             'mapsearch' => $this->mapsearch,
             'autoGPS' => $this->autoGPS,
             'max_bounds' => $this->maxBounds,
