@@ -1182,6 +1182,25 @@ jQuery(function($)
             const hideClass = $modal.data('lsdModalHideClass');
             if (hideClass) $modal.removeClass(hideClass);
 
+            // The top layer escapes ancestor stacking and clipping without moving form fields.
+            const modal = $modal.get(0);
+            if (typeof modal.showPopover === 'function')
+            {
+                modal.setAttribute('popover', 'manual');
+                if (!modal.matches(':popover-open')) modal.showPopover();
+            }
+
+            // Select2 dropdowns must render inside the dialog's layer rather than on body.
+            $modal.find('select').each(function ()
+            {
+                const $select = $(this);
+                const select2 = $select.data('select2');
+                if (!select2 || $(select2.options.get('dropdownParent')).is($modal)) return;
+
+                const options = $.extend({}, select2.options.options, {dropdownParent: $modal});
+                $select.select2('destroy').select2(options);
+            });
+
             if (!$modal.data('lsdModalActive'))
             {
                 $modal.data('lsdModalActive', true);
@@ -1221,6 +1240,12 @@ jQuery(function($)
             $modal.fadeOut(100, function ()
             {
                 const $element = $(this);
+                const modal = this;
+
+                if (typeof modal.hidePopover === 'function' && modal.matches(':popover-open'))
+                {
+                    modal.hidePopover();
+                }
 
                 if ($element.data('lsdModalActive'))
                 {
@@ -2860,28 +2885,34 @@ jQuery(function($)
         $('.lsd-h-scroll-shadow-wrapper').each(function()
         {
             const $wrapper = $(this);
-            const $content = $wrapper.find($('.lsd-h-scroll-shadow-content'));
-            const $shadow_left = $wrapper.find($('.lsd-h-scroll-shadow-left'));
-            const $shadow_right = $wrapper.find($('.lsd-h-scroll-shadow-right'));
-            const scrollable = $content[0].scrollWidth - $wrapper[0].offsetWidth;
+            const $content = $wrapper.find('.lsd-h-scroll-shadow-content');
+            const $shadow_left = $wrapper.find('.lsd-h-scroll-shadow-left');
+            const $shadow_right = $wrapper.find('.lsd-h-scroll-shadow-right');
 
-            if (scrollable === 0)
+            const updateShadows = function()
             {
-                $shadow_left.css('opacity', 0);
-                $shadow_right.css('opacity', 0);
-            }
-            else
-            {
-                $shadow_right.css('opacity', 1);
+                const content = $content[0];
+                const scrollable = content.scrollWidth - content.clientWidth;
 
-                $content.on('scroll', function()
+                if (scrollable <= 0)
                 {
-                    let current = this.scrollLeft / scrollable;
+                    $shadow_left.css('opacity', 0);
+                    $shadow_right.css('opacity', 0);
+                    return;
+                }
 
-                    $shadow_left.css('opacity', current);
-                    $shadow_right.css('opacity', 1 - current);
-                });
-            }
+                const current = content.scrollLeft / scrollable;
+                $shadow_left.css('opacity', current);
+                $shadow_right.css('opacity', 1 - current);
+            };
+
+            $content.on('scroll.lsdScrollShadow lsd:update-scroll-shadow', updateShadows);
+            updateShadows();
+        });
+
+        $(window).on('resize.lsdScrollShadow', function()
+        {
+            $('.lsd-h-scroll-shadow-content').trigger('lsd:update-scroll-shadow');
         });
 
         // Collapsible
@@ -3784,7 +3815,7 @@ function ListdomButtonLoader($button) {
     this.$button = $button;
     this.originalHtml = $button.html();
 
-    this.iconSelector = 'i, .lsd-icon, .lsd-fe-icon, .lsdi, .wbli, svg';
+    this.iconSelector = 'i, .lsd-icon, .lsd-fe-icon, .lsdi, .wui-icon, svg';
 
     this.iconPosition = (() => {
         const $temp = jQuery('<div>').html(this.originalHtml);
@@ -4007,23 +4038,53 @@ const ListdomPageScroll = {
 
 window.ListdomPageScroll = ListdomPageScroll;
 
-function listdom_toastify(alert, type, options = {})
+function listdom_toast_root()
 {
-    if (options.update instanceof WebiliaToast)
+    let root = document.querySelector('[data-listdom-toast-root]');
+    if (!root)
     {
-        options.update.update(alert, type);
+        root = document.createElement('div');
+        root.className = 'wui lsd-ui';
+        root.dataset.listdomToastRoot = '';
+        document.body.append(root);
+    }
+
+    return root;
+}
+
+function listdom_notify(message, type, options = {})
+{
+    // Legacy endpoints may return escaped markup; Webilia UI toasts display text.
+    const template = document.createElement('template');
+    template.innerHTML = String(message || '');
+    template.content.querySelectorAll('script, style').forEach((element) => element.remove());
+    message = template.content.textContent;
+
+    const tones = {
+        'lsd-natural': 'neutral',
+        'lsd-info': 'info',
+        'lsd-success': 'success',
+        'lsd-warning': 'warning',
+        'lsd-error': 'danger',
+        'lsd-in-progress': 'loading'
+    };
+    const tone = tones[type] || 'info';
+    const config = {
+        tone: tone,
+        position: options.position ? options.position.replace(/^lsd-/, '') : (document.documentElement.dir === 'rtl' ? 'bottom-left' : 'bottom-right'),
+        durationMs: typeof options.hideTime === 'number' ? options.hideTime : (tone === 'loading' ? 0 : 8000),
+        progress: options.progress !== false,
+        root: listdom_toast_root(),
+        closeLabel: window.lsd && window.lsd.i18n_toast_close ? window.lsd.i18n_toast_close : 'Dismiss notification'
+    };
+
+    if (options.update && typeof options.update.update === 'function')
+    {
+        options.update.update(message, config);
         return options.update;
     }
 
-    return new WebiliaToast(alert, {
-        type: type,
-        position: options.position,
-        icon: options.icon,
-        hideTime: options.hideTime,
-        progress: options.progress,
-        showClose: options.showClose,
-        confirm: options.confirm
-    });
+    return window.WebiliaUI.toast.show(message, config);
 }
 
 /**
@@ -4041,15 +4102,9 @@ function listdom_toastify(alert, type, options = {})
     {
         if (!message) return;
 
-        if (typeof window.listdom_toastify === 'function')
+        if (window.WebiliaUI && window.WebiliaUI.toast)
         {
-            window.listdom_toastify(message, 'lsd-error');
-            return;
-        }
-
-        if (typeof window.WebiliaToast === 'function')
-        {
-            new window.WebiliaToast(message, {type: 'lsd-error'});
+            listdom_notify(message, 'lsd-error');
             return;
         }
 
@@ -4312,7 +4367,7 @@ function listdom_toastify(alert, type, options = {})
         e.preventDefault();
 
         const tab = $(this);
-        const dropdown = tab.closest(".lsd-auth-dropdown");
+        const dropdown = tab.closest(".lsd-auth-dropdown, .lsd-auth-inline");
         const target = tab.data("target");
         if (!target) return;
 

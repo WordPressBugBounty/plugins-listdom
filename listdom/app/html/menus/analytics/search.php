@@ -69,7 +69,7 @@ $search_available = in_array('full', $search_coverage, true) || in_array('partia
     <?php else: ?>
         <div class="lsd-analytics-report-empty lsd-analytics-search-empty" role="status">
             <span class="lsd-analytics-report-empty-icon" aria-hidden="true">
-                <i class="lsd-analytics-report-empty-image webilia-icon wbli-search-magnifier"></i>
+                <i class="lsd-analytics-report-empty-image wui-icon wui-icon--search-magnifier"></i>
             </span>
             <h3 class="lsd-admin-title-small lsd-analytics-report-empty-title"><?php echo !empty($events_series['search_filtered_out']) ? esc_html__('Search data unavailable for listing filters', 'listdom') : (!$search_available && is_array($events_series) && $events_series['started'] !== '' ? esc_html__('Search tracking unavailable', 'listdom') : (is_array($events_series) ? esc_html__('Search analytics will appear soon', 'listdom') : esc_html__('Search report unavailable', 'listdom'))); ?></h3>
             <p class="lsd-admin-description-tiny lsd-analytics-report-empty-copy"><?php echo !empty($events_series['search_filtered_out']) ? esc_html__('Searches are not tied to a listing. Clear the location, category, and title filters to see search activity.', 'listdom') : (!$search_available && is_array($events_series) && $events_series['started'] !== '' ? esc_html__('Search collection was unavailable in this period.', 'listdom') : (is_array($events_series) ? esc_html__('This chart will show search activity after visitors start searching your directory.', 'listdom') : esc_html__('Stored search events could not be read.', 'listdom'))); ?></p>
@@ -89,7 +89,7 @@ $search_available = in_array('full', $search_coverage, true) || in_array('partia
             <summary class="lsd-analytics-search-filters-toggle">
                 <?php esc_html_e('Filters Used', 'listdom'); ?> (<?php echo esc_html(number_format_i18n($chart_search_summary['filter_use'])); ?>)
                 <span class="lsd-analytics-search-filters-help lsd-tooltip" tabindex="0" aria-label="<?php echo esc_attr($filter_help); ?>" data-lsd-tooltip="<?php echo esc_attr($filter_help); ?>">
-                    <i class="webilia-icon wbli-question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
+                    <i class="wui-icon wui-icon--question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
                 </span>
             </summary>
             <dl class="lsd-analytics-search-filters-list">

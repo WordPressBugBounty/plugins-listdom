@@ -45,39 +45,86 @@ class LSD_Options extends LSD_Base
      */
     public static function compare_settings(array $snapshot, array $settings)
     {
+        return self::compare_option('lsd_settings', $snapshot, $settings);
+    }
+
+    /** Fixed first-party storage only; the public ability cannot select options. */
+    public static function option_snapshot(string $option): array
+    {
+        self::settings_option($option);
+        global $wpdb;
+        $serialized = $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $option));
+        $stored = $serialized === null ? [] : maybe_unserialize($serialized);
+        return ['serialized' => $serialized, 'stored' => $stored, 'blogId' => self::get_blog_id()];
+    }
+
+    private static function settings_option(string $option): void
+    {
+        if (!in_array($option, ['lsd_settings', 'lsd_addons', 'lsd_customizer', 'lsd_details_page', 'lsd_auth', 'lsd_payments', 'lsd_socials', 'lsd_ai', 'lsdaddwl_settings'], true))
+            throw new InvalidArgumentException('Unsupported settings option.');
+    }
+
+    /** Share the legacy CAS, WordPress hooks and cache handling with domain saves. */
+    public static function compare_option(string $option, array $snapshot, array $settings, ?callable $guard = null)
+    {
+        self::settings_option($option);
         global $wpdb;
         if ($snapshot['blogId'] !== self::get_blog_id()) return new WP_Error('listdom_site_changed', __('The site changed. Prepare the operation again.', 'listdom'));
         $old = $snapshot['stored'];
-        $value = sanitize_option('lsd_settings', $settings);
-        $value = apply_filters('pre_update_option_lsd_settings', $value, $old, 'lsd_settings');
-        $value = apply_filters('pre_update_option', $value, 'lsd_settings', $old);
+        $value = sanitize_option($option, $settings);
+        $value = apply_filters('pre_update_option_' . $option, $value, $old, $option);
+        $value = apply_filters('pre_update_option', $value, $option, $old);
         if (!is_array($value)) return new WP_Error('listdom_settings_invalid', __('The settings save was rejected.', 'listdom'));
+        if ($guard)
+        {
+            $allowed = $guard($value);
+            if (is_wp_error($allowed)) return $allowed;
+        }
         if ($snapshot['serialized'] === null)
         {
-            if (!add_option('lsd_settings', $value, '', true)) return new WP_Error('listdom_settings_conflict', __('Settings changed. Prepare a fresh preview.', 'listdom'));
+            // add_option sanitizes again. Check that actual value before its insert,
+            // preserving its native hooks without admitting unapproved changes.
+            $rejected = null;
+            $check = static function ($name, $actual) use ($option, $guard, &$rejected): void
+            {
+                if ($name !== $option || !$guard) return;
+                $rejected = $guard($actual);
+                if (is_wp_error($rejected)) throw new RuntimeException('settings_add_rejected');
+            };
+            if ($guard) add_action('add_option', $check, PHP_INT_MAX, 2);
+            try { $added = add_option($option, $value, '', true); }
+            catch (Throwable $error)
+            {
+                if (is_wp_error($rejected)) return $rejected;
+                throw $error;
+            }
+            finally { if ($guard) remove_action('add_option', $check, PHP_INT_MAX); }
+            if (!$added) return new WP_Error('listdom_settings_conflict', __('Settings changed. Prepare a fresh preview.', 'listdom'));
         }
         else
         {
             $serialized = maybe_serialize($value);
             if ($serialized === $snapshot['serialized']) return true;
-            do_action('update_option', 'lsd_settings', $old, $value);
+            do_action('update_option', $option, $old, $value);
+            if ($snapshot['blogId'] !== self::get_blog_id()) return new WP_Error('listdom_site_changed', __('The site changed before saving. Prepare the operation again.', 'listdom'));
             // BINARY avoids database-collation comparisons treating different
             // serialized values as equal (including case and trailing spaces).
             $saved = $wpdb->query($wpdb->prepare(
                 "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND BINARY option_value = BINARY %s",
                 $serialized,
-                'lsd_settings',
+                $option,
                 $snapshot['serialized']
             ));
             if ($saved !== 1) return new WP_Error('listdom_settings_conflict', __('Settings changed or could not be saved. Prepare a fresh preview.', 'listdom'));
             wp_cache_delete('alloptions', 'options');
             wp_cache_delete('notoptions', 'options');
-            wp_cache_delete('lsd_settings', 'options');
+            wp_cache_delete($option, 'options');
             self::clear_settings_cache();
-            do_action('update_option_lsd_settings', $old, $value, 'lsd_settings');
-            do_action('updated_option', 'lsd_settings', $old, $value);
+            do_action('update_option_' . $option, $old, $value, $option);
+            do_action('updated_option', $option, $old, $value);
         }
         self::clear_settings_cache();
+        if ($option === 'lsd_payments') LSD_Payments_Engine::clear_cache();
         return true;
     }
 
@@ -688,6 +735,7 @@ class LSD_Options extends LSD_Base
                     'currency_thousand_separator' => ',',
                     'currency_decimal_separator' => '.',
                     'advanced_datetimepicker' => 0,
+                    'compact_menu' => 0,
                     'timepicker_format' => 24,
                     'listing_link_status' => 1,
                     'rss_status' => 1,

@@ -27,7 +27,7 @@ $grouped_elements = LSD_Template::grouped_elements($current_type);
                        data-lsd-element-type="<?php echo esc_attr($item['key']); ?>"
                        data-lsd-element-label="<?php echo esc_attr($item['label']); ?>"
                        data-lsd-element-icon="<?php echo esc_attr($item['icon']); ?>">
-                        <i class="<?php echo esc_attr($item['icon']); ?>"></i>
+                        <i class="wui-icon <?php echo esc_attr($item['icon']); ?>" aria-hidden="true"></i>
                         <span class="lsd-template-editor-element-list__label"><?php echo esc_html($item['label']); ?></span>
                     </a>
                 </li>

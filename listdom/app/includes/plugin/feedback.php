@@ -10,37 +10,37 @@ class LSD_Plugin_Feedback extends Feedback
             'missing-a-feature' => [
                 'title' => esc_html__('Missing a feature', 'listdom'),
                 'placeholder' => esc_attr__('Anything that can help', 'listdom'),
-                'icon' => 'wbli-puzzle',
+                'icon' => 'wui-icon--puzzle',
             ],
             'had-conflicts' => [
                 'title' => esc_html__("Didn't work / Had conflicts", 'listdom'),
                 'placeholder' => esc_attr__('Anything that can help', 'listdom'),
-                'icon' => 'wbli-alert',
+                'icon' => 'wui-icon--alert',
             ],
             'hard-to-use' => [
                 'title' => esc_html__('Hard to use', 'listdom'),
                 'placeholder' => esc_attr__('Anything that can help', 'listdom'),
-                'icon' => 'wbli-sad-dizzy',
+                'icon' => 'wui-icon--sad-dizzy',
             ],
             'found-a-better-plugin' => [
                 'title' => esc_html__('Found a better plugin', 'listdom'),
                 'placeholder' => esc_attr__('Please share which plugin', 'listdom'),
-                'icon' => 'wbli-search-magnifier',
+                'icon' => 'wui-icon--search-magnifier',
             ],
             'no-longer-needed' => [
                 'title' => esc_html__("Don't need it anymore", 'listdom'),
                 'placeholder' => esc_attr__('Anything that can help', 'listdom'),
-                'icon' => 'wbli-waving-hand',
+                'icon' => 'wui-icon--waving-hand',
             ],
             'temporary-deactivation' => [
                 'title' => esc_html__("Temporary deactivation", 'listdom'),
                 'placeholder' => esc_attr__('Anything that can help', 'listdom'),
-                'icon' => 'wbli-time-half-pass',
+                'icon' => 'wui-icon--time-half-pass',
             ],
             'other' => [
                 'title' => esc_html__('Other', 'listdom'),
                 'placeholder' => esc_attr__('Please share the reason', 'listdom'),
-                'icon' => 'wbli-three-dots',
+                'icon' => 'wui-icon--three-dots',
             ],
         ];
     }

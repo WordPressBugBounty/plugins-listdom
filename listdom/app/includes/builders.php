@@ -100,13 +100,28 @@ class LSD_Builders extends LSD_Base
         {
             $preview_request = $this->get_template_preview_request($template_id);
             if (!empty($preview_request['template_type'])) return sanitize_key((string) $preview_request['template_type']);
+        }
 
-            $template_type = sanitize_key((string) get_post_meta($template_id, '_lsd_template_type', true));
+        return self::stored_template_type($template_id, $template);
+    }
 
+    /** Saved frontend type resolution, independent of editor preview overrides. */
+    public static function stored_template_type(int $template_id, WP_Post $template): string
+    {
+        $key = $template->post_type === LSD_Base::PTYPE_TEMPLATE ? '_lsd_template_type' : 'lsd_type';
+        return self::template_type_from_value($template, get_post_meta($template_id, $key, true));
+    }
+
+    /** Decode the owning builder's saved type without retrieving other metadata. */
+    public static function template_type_from_value(WP_Post $template, $value): string
+    {
+        if ($template->post_type === LSD_Base::PTYPE_TEMPLATE)
+        {
+            $template_type = sanitize_key((string) $value);
             return $template_type !== '' ? $template_type : 'single_listing';
         }
 
-        $template_type = sanitize_key((string) get_post_meta($template_id, 'lsd_type', true));
+        $template_type = sanitize_key((string) $value);
         if ($template_type === 'details') return 'single_listing';
         if ($template_type === 'card') return 'listing_card';
         if ($template_type === 'infowindow') return 'info_window';

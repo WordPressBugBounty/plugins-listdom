@@ -14,7 +14,7 @@
  * @var bool $can_create_templates
  */
 ?>
-<div class="lsd-template-container">
+<div class="lsd-template-container wui">
     <div class="lsd-template-wrap">
         <div class="lsd-template-screen">
             <?php if ($show_blank_screen): ?>
@@ -31,23 +31,23 @@
                     <?php if ($can_create_templates): ?>
                         <a href="#" class="lsd-primary-button lsd-open-template-modal" data-modal-target="<?php echo esc_attr($modal_id); ?>">
                             <?php esc_html_e('Create Your First Template', 'listdom'); ?>
-                            <i class="listdom-icon wbli-right-arrow"></i>
+                            <i class="wui-icon listdom-icon wui-icon--right-arrow"></i>
                         </a>
                     <?php endif; ?>
 
                     <div class="lsd-template-icon-box">
                         <div class="lsd-admin-icon-box">
-                            <i class="listdom-icon wbli-cursor-pointer"></i>
+                            <i class="wui-icon listdom-icon wui-icon--cursor-pointer"></i>
                             <h3 class="lsd-admin-subtitle"><?php esc_html_e('Drag & Drop', 'listdom'); ?></h3>
                             <p class="lsd-admin-description"><?php esc_html_e('Intuitive builder', 'listdom'); ?></p>
                         </div>
                         <div class="lsd-admin-icon-box">
-                            <i class="listdom-icon wbli-database"></i>
+                            <i class="wui-icon listdom-icon wui-icon--database"></i>
                             <h3 class="lsd-admin-subtitle"><?php esc_html_e('Dynamic Data', 'listdom'); ?></h3>
                             <p class="lsd-admin-description"><?php esc_html_e('Live field binding', 'listdom'); ?></p>
                         </div>
                         <div class="lsd-admin-icon-box">
-                            <i class="listdom-icon wbli-responsive"></i>
+                            <i class="wui-icon listdom-icon wui-icon--responsive"></i>
                             <h3 class="lsd-admin-subtitle"><?php esc_html_e('Responsive', 'listdom'); ?></h3>
                             <p class="lsd-admin-description"><?php esc_html_e('Mobile-ready', 'listdom'); ?></p>
                         </div>
@@ -127,7 +127,7 @@
                                             }
                                             ?>
                                             <a href="<?php echo esc_url($action['url']); ?>" class="lsd-template-card-action lsd-template-card-action-<?php echo esc_attr($action['name']); ?>" title="<?php echo esc_attr($action['label']); ?>"<?php echo $data_attributes; ?>>
-                                                <i class="<?php echo esc_attr($action['icon']); ?>" aria-hidden="true"></i>
+                                                <i class="wui-icon <?php echo esc_attr($action['icon']); ?>" aria-hidden="true"></i>
                                                 <span class="screen-reader-text"><?php echo esc_html($action['label']); ?></span>
                                             </a>
                                         <?php endforeach; ?>
@@ -162,7 +162,7 @@
                             <a href="#" class="lsd-template-card-create-link lsd-open-template-modal" data-modal-target="<?php echo esc_attr($modal_id); ?>">
                                 <div class="lsd-template-card-thumb">
                                 <span class="lsd-template-card-create-icon">
-                                    <i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i>
+                                    <i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i>
                                 </span>
                                 </div>
                                 <div class="lsd-template-card-body">
@@ -218,12 +218,12 @@
                     <div class="lsd-template-empty__actions">
                         <a href="<?php echo esc_url($reset_url); ?>" class="lsd-primary-button">
                             <?php esc_html_e('Reset Filters', 'listdom'); ?>
-                            <i class="listdom-icon wbli-reset"></i>
+                            <i class="wui-icon listdom-icon wui-icon--reset"></i>
                         </a>
                         <?php if ($can_create_templates): ?>
                             <a href="#" class="lsd-primary-button lsd-open-template-modal" data-modal-target="<?php echo esc_attr($modal_id); ?>">
                                 <?php esc_html_e('Create Template', 'listdom'); ?>
-                                <i class="listdom-icon wbli-add-plus-circle"></i>
+                                <i class="wui-icon listdom-icon wui-icon--add-plus-circle"></i>
                             </a>
                         <?php endif; ?>
                     </div>

@@ -16,7 +16,7 @@ foreach($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
 >
     <?php if ($this->display_image): ?>
     <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
-        <?php echo LSD_Kses::element($listing->get_cover_image([100, 100], $this->get_listing_link_method())); ?>
+        <?php echo LSD_Kses::element($listing->get_cover_image($this->presentation_image_size(), $this->get_listing_link_method())); ?>
     </div>
     <?php endif; ?>
 

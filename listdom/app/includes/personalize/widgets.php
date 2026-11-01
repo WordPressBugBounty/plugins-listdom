@@ -90,7 +90,9 @@ class LSD_Personalize_Widgets extends LSD_Personalize
             $CSS = str_replace("(({$widget_type}_widget_hover_border_radius))", $settings['hover_border_radius'], $CSS);
 
             // Typography
-            $CSS = str_replace("(({$widget_type}_widget_font_family))", self::font_family($settings['family'] ?? ''), $CSS);
+            $font_family = self::font_family($settings['family'] ?? '');
+            if ($font_family !== 'inherit') $font_family .= ', serif';
+            $CSS = str_replace("(({$widget_type}_widget_font_family))", $font_family, $CSS);
             $CSS = str_replace("(({$widget_type}_widget_font_weight))", $settings['weight'], $CSS);
             $CSS = str_replace("(({$widget_type}_widget_text_align))", $settings['align'], $CSS);
             $CSS = str_replace("(({$widget_type}_widget_font_size))", $settings['size'], $CSS);

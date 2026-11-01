@@ -181,12 +181,25 @@ class LSD_Search_Helper extends LSD_Base
         {
             if (!class_exists(\LSDPACBOK\Index::class) || !is_callable([\LSDPACBOK\Index::class, 'install']) || !is_callable([\LSDPACBOK\Index::class, 'table_name'])) return [];
             \LSDPACBOK\Index::install();
+            if ($key === 'booking_available_slots' && is_callable([\LSDPACBOK\Index::class, 'refresh_stale_slots'])) \LSDPACBOK\Index::refresh_stale_slots();
 
             global $wpdb;
 
             $table = \LSDPACBOK\Index::table_name();
             $column = $key === 'booking_guests' ? 'guests' : ($key === 'booking_available_slots' ? 'available_slots' : 'capacity');
-            $results = $wpdb->get_col("SELECT DISTINCT `$column` FROM `$table` WHERE `$column` IS NOT NULL ORDER BY `$column` ASC");
+            $setup_filter = $key === 'booking_guests' ? " AND `booking_setup`='date_range' AND `capacity_model`='per_bookable'" : '';
+            $value = "`$column`";
+            if ($key === 'booking_available_slots')
+            {
+                // Undated quantity listings use their capacity for remaining-slot searches.
+                $value = "CASE WHEN `booking_setup`='quantity' AND `available_slots` IS NULL THEN `capacity` ELSE `available_slots` END";
+            }
+            else if ($key === 'booking_guests')
+            {
+                // A partially unbounded guest limit has no finite dropdown value.
+                $value = 'CASE WHEN `adults` IS NOT NULL AND `children` IS NOT NULL THEN `adults` + `children` END';
+            }
+            $results = $wpdb->get_col("SELECT DISTINCT $value FROM `$table` WHERE $value IS NOT NULL$setup_filter ORDER BY $value ASC");
 
             $terms = [];
             if (is_array($results))

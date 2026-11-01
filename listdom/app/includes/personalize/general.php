@@ -18,7 +18,7 @@ class LSD_Personalize_General extends LSD_Personalize
         $CSS = str_replace('((gap_large))', $large.'px', $CSS);
         $CSS = str_replace('((gap_huge))', $huge.'px', $CSS);
 
-        $CSS = str_replace('((dply_main_color))', $settings['colors']['_']['primary_color'] ?? 'inherit', $CSS);
+        $CSS = str_replace('((dply_main_color))', $settings['colors']['_']['primary_color'] ?? '#33c6ff', $CSS);
 
         return str_replace('((dply_main_font))', self::font_family($settings['fonts']['_']['primary_font']['family'] ?? 'Poppins'), $CSS);
     }

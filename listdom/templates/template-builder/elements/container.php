@@ -13,7 +13,7 @@ defined('ABSPATH') || die();
         <div class="lsd-template-editor-canvas__container-inner lsd-flex">
             <?php if (is_admin() && (!isset($context) || $context !== 'frontend')): ?>
                 <div class="lsd-template-editor-canvas__container-placeholder">
-                  <span><i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i></span>
+                  <span><i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i></span>
                 </div>
             <?php endif; ?>
             <?php if(isset($content)): ?>

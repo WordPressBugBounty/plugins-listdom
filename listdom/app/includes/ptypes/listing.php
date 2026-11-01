@@ -83,7 +83,8 @@ class LSD_PTypes_Listing extends LSD_PTypes
     public function register_post_type()
     {
         $supports = apply_filters('lsd_ptype_listing_supports', ['title', 'editor', 'thumbnail', 'author', 'excerpt']);
-        $icon = $this->lsd_asset_url('img/listings-icon.svg');
+        // Let WordPress apply the admin menu color scheme to the SVG.
+        $icon = 'data:image/svg+xml;base64,' . base64_encode(file_get_contents($this->lsd_asset_path('img/listings-icon.svg')));
 
         $args = [
             'labels' => [
@@ -103,7 +104,7 @@ class LSD_PTypes_Listing extends LSD_PTypes
             ],
             'public' => true,
             'show_ui' => true,
-            'show_in_menu' => true,
+            'show_in_menu' => !LSD_Menus::compact_menu(),
             'show_in_rest' => false,
             'supports' => $supports,
             'rewrite' => [

@@ -169,10 +169,11 @@ class LSD_Taxonomies_Feature extends LSD_Taxonomies
 
         $icon = sanitize_text_field(wp_unslash($_POST['lsd_icon']));
 
-        update_term_meta($term_id, 'lsd_icon', $icon);
+        LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['icon' => $icon]);
         $this->save_archive_shortcode($term_id);
-        if (isset($_POST['lsd_schema'])) update_term_meta($term_id, 'lsd_schema', $this->posted_scalar('lsd_schema'));
-        if (isset($_POST['lsd_itemprop'])) update_term_meta($term_id, 'lsd_itemprop', $this->posted_scalar('lsd_itemprop'));
+
+        if (isset($_POST['lsd_schema'])) LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['schema' => $this->posted_scalar('lsd_schema')]);
+        if (isset($_POST['lsd_itemprop'])) LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['itemprop' => $this->posted_scalar('lsd_itemprop')]);
     }
 
     public function filter_columns($columns)

@@ -61,7 +61,7 @@ function lsdUpdateLoadingPositions() {
         const loadingTop = Math.min(Math.max(viewportCenterTop, 0), maximumTop);
 
         if (rectangle.height > 0) {
-            element.style.setProperty('--lsd-loading-top', loadingTop + 'px');
+            element.style.setProperty('--lsd-fe-loading-top', loadingTop + 'px');
         }
     });
 }
@@ -1463,6 +1463,13 @@ function ListdomDetails(id, link, settings) {
             $bodyRows.each(function () {
                 updateVisibility($(this), 'td');
             });
+
+            let tableWidth = 0;
+            $headRow.find('th:not(.lsd-table-column-hidden)').each(function () {
+                tableWidth += parseInt(this.style.width, 10) || 150;
+            });
+            $table.css({ width: '100%', minWidth: tableWidth + 'px' });
+            $table.closest('.lsd-h-scroll-shadow-content').trigger('lsd:update-scroll-shadow');
         }
 
         function loadMore(append = true, page = null, submitted = false) {
@@ -1727,26 +1734,42 @@ function ListdomDetails(id, link, settings) {
                 loadMore(false, null, lsdSearchSubmitted(request));
             });
 
-            $("#lsd_skin" + settings.id + " .lsd-accordion-body").hide();
+            $wrapper.find('.lsd-accordion-body').hide();
+            $wrapper.find('.lsd-accordion-header').attr('aria-expanded', 'false').find('.accordion-arrow').removeClass('rotated');
+
+            const accordionEvents = 'click.listdomAccordion' + settings.id + ' keydown.listdomAccordion' + settings.id;
+            const accordionHeader = "#lsd_skin" + settings.id + ' .lsd-accordion-header';
 
             $(document)
-            .off('click.listdomAccordion' + settings.id, "#lsd_skin" + settings.id + ' .lsd-accordion-header')
-            .on('click.listdomAccordion' + settings.id, "#lsd_skin" + settings.id + ' .lsd-accordion-header', function() {
-                const $header = $(this);
-                const $body = $header.next('.lsd-accordion-body');
+                .off(accordionEvents, accordionHeader)
+                .on(accordionEvents, accordionHeader, function (e) {
+                    if ($(e.target).closest('a, button, input, select, textarea').length) return;
+                    if (e.type === 'keydown' && (e.target !== this || e.repeat || (e.key !== 'Enter' && e.key !== ' '))) return;
 
-                $('.lsd-accordion-body').not($body).slideUp();
-                $('.lsd-accordion-header').not($header).find('.accordion-arrow').removeClass('rotated');
+                    e.preventDefault();
 
-                // Toggle current body and initialize slider when shown
-                $body.stop(true, true).slideToggle(400, function() {
-                    if ($body.is(':visible') && typeof listdom_image_slider === 'function') {
-                        listdom_image_slider();
+                    const $header = $(this);
+                    const $body = $header.next('.lsd-accordion-body');
+                    const expanded = $header.attr('aria-expanded') !== 'true';
+                    const $siblings = $wrapper.find('.lsd-accordion-header').not($header);
+
+                    $siblings.attr('aria-expanded', 'false').find('.accordion-arrow').removeClass('rotated');
+                    $siblings.next('.lsd-accordion-body').stop(true, true).slideUp();
+
+                    $body.stop(true, true);
+                    $header.attr('aria-expanded', expanded ? 'true' : 'false');
+                    $header.find('.accordion-arrow').toggleClass('rotated', expanded);
+
+                    if (expanded) {
+                        $body.slideDown(400, function () {
+                            if ($body.is(':visible') && typeof listdom_image_slider === 'function') {
+                                listdom_image_slider();
+                            }
+                        });
+                    } else {
+                        $body.slideUp(400);
                     }
                 });
-
-                $header.find('.accordion-arrow').toggleClass('rotated');
-            });
         }
 
         function loadMore(append = true, page = null, submitted = false) {
@@ -2131,6 +2154,7 @@ function ListdomDetails(id, link, settings) {
                 next_page: 2,
                 atts: "",
                 limit: 300,
+                pagination: "loadmore",
                 horizontal: 0,
                 autoplay: 0,
                 columns: 1,
@@ -2174,6 +2198,17 @@ function ListdomDetails(id, link, settings) {
             const detail = event.originalEvent ? event.originalEvent.detail : event.detail;
             if (!detail || parseInt(detail.shortcode) !== parseInt(settings.id)) return;
 
+            const $currentWrapper = setItemsWrapper();
+            if (!$currentWrapper.find('.lsd-timeline-item').length) {
+                if ($currentWrapper.children().length || $currentWrapper.text().trim()) {
+                    $wrapper.find('.lsd-timeline-empty').empty().append($currentWrapper.contents());
+                }
+                $currentWrapper.addClass('lsd-util-hide');
+                return;
+            }
+
+            $wrapper.find('.lsd-timeline-empty').empty();
+            $currentWrapper.removeClass('lsd-util-hide');
             rebuildHorizontalCarousel(true);
         });
 
@@ -2296,7 +2331,7 @@ function ListdomDetails(id, link, settings) {
 
         function rebuildHorizontalCarousel(forceSync = false) {
             const $currentWrapper = setItemsWrapper();
-            if (!isHorizontal || !$items_wrapper.length) return;
+            if (!isHorizontal || !$items_wrapper.length || !$items_wrapper.find('.lsd-timeline-item').length) return;
 
             const needsInit = !$items_wrapper.hasClass('owl-loaded');
             if (needsInit) initCarousel();
@@ -2382,8 +2417,16 @@ function ListdomDetails(id, link, settings) {
             window.requestAnimationFrame(syncHorizontalTimeline);
         }
 
+        function updatePagination(html) {
+            if (settings.pagination !== 'numeric') return;
+
+            const $pagination = $wrapper.find('.lsd-numeric-pagination-wrapper');
+            if ($pagination.length) $pagination.replaceWith(html);
+            else if (html) $wrapper.find('.lsd-timeline-view-listings-wrapper').after(html);
+        }
+
         function renderListings(html, append = true) {
-            const $content = $(html);
+            const $content = $($.parseHTML(html, document, true) || []);
             listdom_mount_fragment_assets($content);
             const $items = $content
             .filter('.lsd-timeline-item')
@@ -2394,6 +2437,16 @@ function ListdomDetails(id, link, settings) {
 
             // Replace mode
             if (!append) {
+                if (!$items.length) {
+                    lsdResetTimelineCarousel($wrapper);
+                    $items_wrapper.empty().addClass('lsd-util-hide');
+                    $wrapper.find('.lsd-timeline-empty').html(html);
+                    listdom_onload();
+                    return;
+                }
+
+                $wrapper.find('.lsd-timeline-empty').empty();
+                $items_wrapper.removeClass('lsd-util-hide');
                 if (hasOwl) {
                     $items_wrapper
                     .trigger('replace.owl.carousel', [$items])
@@ -2466,14 +2519,14 @@ function ListdomDetails(id, link, settings) {
                         renderListings(response.html, append);
 
                         // Update Pagination
-                        $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper").replaceWith(response.pagination);
+                        updatePagination(response.pagination);
 
                         if (response.total <= next_page * settings.limit) {
                             // Adjust Loading Classes
                             $list_wrapper.removeClass('lsd-loading');
                             $button.removeClass("lsd-load-more-loading");
                             $loadMoreWrapper.addClass("lsd-util-hide");
-                        }
+                        } else $loadMoreWrapper.removeClass("lsd-util-hide");
 
                         // Update the Next Page
                         $("#lsd_skin" + settings.id).data("next-page", response.next_page);
@@ -2514,20 +2567,14 @@ function ListdomDetails(id, link, settings) {
                         renderListings(response.html, false);
 
                         // Update Pagination
-                        $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper").replaceWith(response.pagination);
+                        updatePagination(response.pagination);
 
-                        if (parseInt(settings.load_more) && response.total > response.count) {
-                            // Show Load More
-                            $(
-                                "#lsd_skin" + settings.id + " .lsd-load-more-wrapper"
-                            ).removeClass("lsd-util-hide");
-                            $("#lsd_skin" + settings.id + " .lsd-load-more").removeClass(
-                                "lsd-util-hide"
-                            );
+                        const $loadMoreWrapper = $wrapper.find('.lsd-load-more-wrapper');
+                        $loadMoreWrapper.toggleClass('lsd-util-hide', response.total <= response.count);
+                        if (response.total > response.count) $loadMoreWrapper.find('.lsd-load-more').removeClass('lsd-util-hide');
 
-                            // Update the Next Page
-                            $("#lsd_skin" + settings.id).data("next-page", 2);
-                        }
+                        // Update the Next Page
+                        $wrapper.data('next-page', response.next_page);
 
                         // Update Seed
                         if (typeof response.seed != "undefined" && response.seed)
@@ -4385,7 +4432,7 @@ function ListdomDetails(id, link, settings) {
                     const textColor = clusterTextColor || lsdGetClusterTextColor(clusterColor);
 
                     return new L.DivIcon({
-                        html: '<div class="lsd-cluster-color-ring" style="--lsd-cluster-size:' + clusterSize + 'px;--lsd-cluster-inner-size:' + clusterInnerSize + 'px;border-color:' + clusterColor + ';background-color:' + clusterColor + '38;"><div style="background-color:' + clusterColor + ';color:' + textColor + ';">' + count + '</div></div>',
+                        html: '<div class="lsd-cluster-color-ring" style="--lsd-fe-cluster-size:' + clusterSize + 'px;--lsd-fe-cluster-inner-size:' + clusterInnerSize + 'px;border-color:' + clusterColor + ';background-color:' + clusterColor + '38;"><div style="background-color:' + clusterColor + ';color:' + textColor + ';">' + count + '</div></div>',
                         className: "marker-cluster lsd-marker-cluster-color",
                         iconSize: new L.Point(clusterSize, clusterSize),
                     });
@@ -4408,12 +4455,14 @@ function ListdomDetails(id, link, settings) {
         // Mapbox Tile Server
         else if (settings.access_token) {
             L.tileLayer(
-                "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
+                "https://api.mapbox.com/styles/v1/{id}/tiles/512/{z}/{x}/{y}?access_token={accessToken}",
                 {
                     attribution:
                         'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
                     maxZoom: 18,
-                    id: "streets-v9",
+                    id: "mapbox/streets-v12",
+                    tileSize: 512,
+                    zoomOffset: -1,
                     accessToken: settings.access_token,
                 }
             ).addTo(map);
@@ -6302,7 +6351,7 @@ function ListdomDetails(id, link, settings) {
                         // No result or error
                         if (status !== google.maps.DirectionsStatus.OK || !response.routes || !response.routes.length)
                         {
-                            listdom_toastify($message, 'lsd-warning');
+                            listdom_notify($message, 'lsd-warning');
 
                             // Fade Google Maps Canvas back
                             $(canvas).fadeTo(300, 1);
@@ -7391,9 +7440,7 @@ function ListdomDetails(id, link, settings) {
                 $select.toggleClass('lsd-native-select-empty', isEmpty);
             };
 
-            $container
-            .find('select[data-enhanced=1]')
-            .each(function () {
+            const initEnhancedSearchSelect = function () {
                 const $select = $(this);
 
                 $select.off('.lsdNativeSelectFallback');
@@ -7411,7 +7458,10 @@ function ListdomDetails(id, link, settings) {
 
                 $select.removeClass('lsd-native-select-fallback lsd-native-select-empty');
 
+                if ($select.data('select2')) $select.select2('destroy');
+
                 $select.select2({
+                    dropdownParent: $select.closest('.lsd-modal, .lsd-search'),
                     allowClear: true,
                     placeholder: $select.attr('placeholder'),
                     minimumResultsForSearch: 0,
@@ -7420,7 +7470,9 @@ function ListdomDetails(id, link, settings) {
                         "noResults": () => settings.select2.noResults
                     },
                 });
-            });
+            };
+
+            $container.find('select[data-enhanced=1]').each(initEnhancedSearchSelect);
 
             initRadiusFields();
             bindSearchInputClearButtons();
@@ -7523,36 +7575,16 @@ function ListdomDetails(id, link, settings) {
                             $wrapper = $("#" + uniqueId);
                             $toggle.attr("data-popup-id", uniqueId);
 
-                            const $stackTargets = $wrapper
-                                .parents(".lsd-search-bar-sticky, .lsd-search-bar-wrapper")
-                                .add($wrapper.closest(".lsd-search"));
-
-                            $wrapper.data("lsdSearchPopupStackTargets", $stackTargets);
-                            $wrapper
-                                .off("listdom:modal:opened.lsdSearchPopup listdom:modal:closed.lsdSearchPopup")
-                                .on("listdom:modal:opened.lsdSearchPopup", function ()
-                                {
-                                    const $targets = $(this).data("lsdSearchPopupStackTargets");
-                                    if ($targets && $targets.length) $targets.addClass("lsd-search-popup-active");
-                                })
-                                .on("listdom:modal:closed.lsdSearchPopup", function ()
-                                {
-                                    const $targets = $(this).data("lsdSearchPopupStackTargets");
-                                    if ($targets && $targets.length) $targets.removeClass("lsd-search-popup-active");
-                                });
-
                             $wrapper.find(".lsd-modal-content")
                                 .css("width", width + "vw")
                                 .prepend('<a href="#" class="lsd-modal-close">&times;</a>');
 
+                            $wrapper.find('select[data-enhanced=1]').each(initEnhancedSearchSelect);
                             if (typeof window.lsdInitFlatpickr === 'function') window.lsdInitFlatpickr($wrapper);
 
                             $more.fadeIn();
                         }
                     }
-
-                    const $stackTargets = $wrapper.data("lsdSearchPopupStackTargets");
-                    if ($stackTargets && $stackTargets.length) $stackTargets.addClass("lsd-search-popup-active");
 
                     if (typeof ListdomModal !== 'undefined') ListdomModal.open($wrapper);
                     else $wrapper.fadeIn();
@@ -7791,7 +7823,7 @@ function ListdomDetails(id, link, settings) {
                             $dropdown.next('.select2-container').show();
                             $dropdown.trigger('change.select2');
                         } else if ($dropdown.hasClass("use-select2")) {
-                            $dropdown.select2();
+                            $dropdown.select2({dropdownParent: $dropdown.closest('.lsd-modal, .lsd-search')});
                         }
                     } else {
                         $dropdown.hide();
@@ -8423,7 +8455,7 @@ function ListdomDetails(id, link, settings) {
         function showRadiusError(message, preferNative) {
             if (!message) return;
 
-            new WebiliaToast(message, {type: 'lsd-error'});
+            listdom_notify(message, 'lsd-error');
         }
 
         function prepareDistanceSearchFields($activeForm = $form) {
@@ -8544,12 +8576,7 @@ function ListdomDetails(id, link, settings) {
             {
                 $('.lsd-popup-wrapper').each(function ()
                 {
-                    const $popup = $(this);
-                    const $stackTargets = $popup.data("lsdSearchPopupStackTargets");
-
-                    if ($stackTargets && $stackTargets.length) $stackTargets.removeClass("lsd-search-popup-active");
-
-                    $popup.fadeOut();
+                    ListdomModal.close($(this));
                 });
             };
 
@@ -8879,7 +8906,7 @@ function ListdomDetails(id, link, settings) {
                     const computed = window.getComputedStyle(this);
                     if (computed)
                     {
-                        const parsed = parseFloat(computed.getPropertyValue('--listdom-gap'));
+                        const parsed = parseFloat(computed.getPropertyValue('--lsd-fe-gap'));
                         if (!isNaN(parsed)) gap = parsed;
                     }
                 }
@@ -9400,7 +9427,7 @@ window.lsdDashboardInitPaymentActions = function (context)
     $context
     .find('.lsd-dashboard-payments-disable-autorenew')
     .off('click.lsdDisableAutoRenew')
-    .on('click.lsdDisableAutoRenew', function (event)
+    .on('click.lsdDisableAutoRenew', async function (event)
     {
         event.preventDefault();
 
@@ -9410,34 +9437,15 @@ window.lsdDashboardInitPaymentActions = function (context)
         const confirmApproveLabel = ($button.data('confirmApproveLabel') || 'Yes').toString();
         const confirmCancelLabel = ($button.data('confirmCancelLabel') || 'No').toString();
 
-        if (typeof WebiliaToast === 'function')
-        {
-            new WebiliaToast(
-                '<div class="lsd-dashboard-payments-disable-autorenew-toast">' +
-                    '<h4 class="lsd-fe-title">' + escapeHtml(confirmTitle) + '</h4>' +
-                    '<p class="lsd-fe-description">' + escapeHtml(confirmDescription) + '</p>' +
-                '</div>',
-                {
-                    type: 'lsd-confirm',
-                    icon: '<i class="lsd-fe-icon fa-solid fa-info-circle"></i>',
-                    position: 'lsd-center-center',
-                    confirm: {
-                        confirmText: confirmApproveLabel,
-                        cancelText: confirmCancelLabel,
-                        confirmClass: 'lsd-light-button',
-                        cancelClass: 'lsd-general-button',
-                        confirmFirst: false,
-                        onConfirm: function () {
-                            handleAutoRenewAction($button, 'lsd_dashboard_payments_disable_autorenew', true);
-                        }
-                    }
-                }
-            );
-
-            return;
-        }
-
-        handleAutoRenewAction($button, 'lsd_dashboard_payments_disable_autorenew', true);
+        const accepted = await window.WebiliaUI.modal.confirm({
+            title: confirmTitle,
+            message: confirmDescription,
+            confirmLabel: confirmApproveLabel,
+            cancelLabel: confirmCancelLabel,
+            closeLabel: window.lsd.i18n_dialog_close,
+            danger: true
+        });
+        if (accepted) handleAutoRenewAction($button, 'lsd_dashboard_payments_disable_autorenew', true);
     });
 
     $context
@@ -9474,9 +9482,9 @@ window.lsdDashboardInitPromotions = function (context)
     {
         if (!message) return;
 
-        if (typeof listdom_toastify === 'function')
+        if (typeof listdom_notify === 'function')
         {
-            listdom_toastify(message, type || 'lsd-info');
+            listdom_notify(message, type || 'lsd-info');
             return;
         }
 
@@ -10158,7 +10166,7 @@ window.lsdDashboardInitPromotions = function (context)
             submitTopupCheckout([listingId], $button);
         })
         .off('click.lsdPromotionRemove', '.lsd-promotion-remove-label')
-        .on('click.lsdPromotionRemove', '.lsd-promotion-remove-label', function (event)
+        .on('click.lsdPromotionRemove', '.lsd-promotion-remove-label', async function (event)
         {
             event.preventDefault();
 
@@ -10168,7 +10176,15 @@ window.lsdDashboardInitPromotions = function (context)
             const recurringId = parseInt($button.data('recurringId'), 10) || 0;
 
             if (!labelId || !listingId || recurringId > 0) return;
-            if (messageRemoveConfirm && !window.confirm(messageRemoveConfirm)) return;
+            const accepted = await window.WebiliaUI.modal.confirm({
+                title: window.lsd.i18n_confirm_title,
+                message: messageRemoveConfirm,
+                confirmLabel: window.lsd.i18n_confirm,
+                cancelLabel: window.lsd.i18n_cancel,
+                closeLabel: window.lsd.i18n_dialog_close,
+                danger: true
+            });
+            if (!accepted) return;
 
             const loading = typeof ListdomButtonLoader === 'function' ? new ListdomButtonLoader($button) : null;
             if (loading) loading.start('');
@@ -10205,7 +10221,7 @@ window.lsdDashboardInitPromotions = function (context)
             });
         })
         .off('click.lsdPromotionRemoveTopup', '.lsd-promotion-remove-topup')
-        .on('click.lsdPromotionRemoveTopup', '.lsd-promotion-remove-topup', function (event)
+        .on('click.lsdPromotionRemoveTopup', '.lsd-promotion-remove-topup', async function (event)
         {
             event.preventDefault();
 
@@ -10214,35 +10230,15 @@ window.lsdDashboardInitPromotions = function (context)
 
             if (!listingId) return;
 
-            if (typeof WebiliaToast === 'function' && messageRemoveTopupConfirm)
-            {
-                new WebiliaToast(
-                    '<div class="lsd-dashboard-promotions-remove-topup-toast">' +
-                        '<h4 class="lsd-fe-title">' + escapeHtml(messageRemoveTopupTitle) + '</h4>' +
-                        '<p class="lsd-fe-description">' + escapeHtml(messageRemoveTopupConfirm) + '</p>' +
-                    '</div>',
-                    {
-                        type: 'lsd-confirm',
-                        icon: '<i class="lsd-fe-icon fa-solid fa-info-circle"></i>',
-                        position: 'lsd-center-center',
-                        confirm: {
-                            confirmText: messageRemoveTopupApprove,
-                            cancelText: messageRemoveTopupCancel,
-                            confirmClass: 'lsd-light-button',
-                            cancelClass: 'lsd-general-button',
-                            confirmFirst: false,
-                            onConfirm: function () {
-                                removeTopup($button);
-                            }
-                        }
-                    }
-                );
-
-                return;
-            }
-
-            if (messageRemoveTopupConfirm && !window.confirm(messageRemoveTopupConfirm)) return;
-            removeTopup($button);
+            const accepted = await window.WebiliaUI.modal.confirm({
+                title: messageRemoveTopupTitle,
+                message: messageRemoveTopupConfirm,
+                confirmLabel: messageRemoveTopupApprove,
+                cancelLabel: messageRemoveTopupCancel,
+                closeLabel: window.lsd.i18n_dialog_close,
+                danger: true
+            });
+            if (accepted) removeTopup($button);
         });
 
         $modal.find('.lsd-promotion-modal-results')
@@ -10536,13 +10532,8 @@ window.lsdResetRecaptcha = function (form)
         function showStatusError(message) {
             message = message || messages.status;
 
-            if (typeof window.listdom_toastify === "function") {
-                window.listdom_toastify(message, "lsd-error");
-                return;
-            }
-
-            if (typeof window.WebiliaToast === "function") {
-                new window.WebiliaToast(message, {type: "lsd-error"});
+            if (typeof window.listdom_notify === "function") {
+                window.listdom_notify(message, "lsd-error");
                 return;
             }
 
@@ -13234,8 +13225,8 @@ function listdom_compare_add_listings() {
     if (!getBtn().length || !$modal.length) return;
 
     const handleAjaxError = (xhr, textStatus, error) => {
-        if (typeof listdom_toastify === 'function') {
-            listdom_toastify('AJAX request failed: ' + error, 'lsd-error');
+        if (typeof listdom_notify === 'function') {
+            listdom_notify('AJAX request failed: ' + error, 'lsd-error');
         }
     };
 
@@ -13254,8 +13245,8 @@ function listdom_compare_add_listings() {
             $btn.data('max-items-message') ||
             $btn.data('message');
 
-        if (message && typeof listdom_toastify === 'function') {
-            listdom_toastify(message, 'lsd-warning');
+        if (message && typeof listdom_notify === 'function') {
+            listdom_notify(message, 'lsd-warning');
         }
     };
 
@@ -13325,8 +13316,8 @@ function listdom_compare_add_listings() {
                     }
 
                     bindModalCompareToggles();
-                } else if (response && response.message && typeof listdom_toastify === 'function') {
-                    listdom_toastify(response.message, 'lsd-error');
+                } else if (response && response.message && typeof listdom_notify === 'function') {
+                    listdom_notify(response.message, 'lsd-error');
                 }
             },
             error: handleAjaxError,
@@ -13337,27 +13328,13 @@ function listdom_compare_add_listings() {
     };
 
     const openModal = () => {
-        $modal.css('display', 'flex').hide().fadeIn(100);
-
-        if (
-            typeof ListdomPageScroll !== 'undefined' &&
-            typeof ListdomPageScroll.stop === 'function'
-        ) {
-            ListdomPageScroll.stop();
-        }
+        ListdomModal.open($modal);
 
         loadModalShortcode();
     };
 
     const closeModal = () => {
-        $modal.fadeOut(100);
-
-        if (
-            typeof ListdomPageScroll !== 'undefined' &&
-            typeof ListdomPageScroll.start === 'function'
-        ) {
-            ListdomPageScroll.start();
-        }
+        ListdomModal.close($modal);
     };
 
     const toggleCompare = (id) => {
@@ -13374,8 +13351,8 @@ function listdom_compare_add_listings() {
             },
             success: (nonceRes) => {
                 if (!nonceRes || !nonceRes.success || !nonceRes.nonce) {
-                    if (nonceRes?.message && typeof listdom_toastify === 'function') {
-                        listdom_toastify(nonceRes.message, 'lsd-error');
+                    if (nonceRes?.message && typeof listdom_notify === 'function') {
+                        listdom_notify(nonceRes.message, 'lsd-error');
                     }
                     return;
                 }
@@ -13412,8 +13389,8 @@ function listdom_compare_add_listings() {
                             }
                         }
 
-                        if (res?.message && typeof listdom_toastify === 'function') {
-                            listdom_toastify(
+                        if (res?.message && typeof listdom_notify === 'function') {
+                            listdom_notify(
                                 res.message,
                                 res.success ? 'lsd-success' : 'lsd-error'
                             );
@@ -13802,8 +13779,8 @@ function lsdaddbok_run_booking_manage_action($button, extraData) {
             return;
         }
 
-        if (typeof listdom_toastify === "function") {
-            listdom_toastify(message, "lsd-error");
+        if (typeof listdom_notify === "function") {
+            listdom_notify(message, "lsd-error");
         }
     };
 
@@ -15694,9 +15671,9 @@ function lsdCheckoutComplete(orderKey)
             {
                 if (!message) return;
 
-                if (typeof listdom_toastify === 'function')
+                if (typeof listdom_notify === 'function')
                 {
-                    listdom_toastify(message, type || 'lsd-info');
+                    listdom_notify(message, type || 'lsd-info');
                     return;
                 }
 

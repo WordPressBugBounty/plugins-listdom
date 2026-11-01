@@ -72,52 +72,45 @@ foreach ($jobs as $job)
     </div>
 
     <script>
-        jQuery('.lsd-csv-job-remove').on('click', function()
+        jQuery('.lsd-csv-job-remove').on('click', async function()
         {
             const $button = jQuery(this);
             const $row = $button.closest('tr');
             const key = $button.data('key');
             const name = $button.data('name');
 
-            // Loading Wrapper
+            const accepted = await window.WebiliaUI.modal.confirm({
+                title: window.lsd.i18n_confirm_title,
+                message: "<?php echo esc_js(esc_html__("Are you sure you want to delete this?", 'listdom')); ?>",
+                confirmLabel: "<?php echo esc_js(esc_html__('Confirm', 'listdom')); ?>",
+                cancelLabel: "<?php echo esc_js(esc_html__('Cancel', 'listdom')); ?>",
+                closeLabel: window.lsd.i18n_dialog_close,
+                danger: true
+            });
+            if (!accepted) return;
+
             const loading = new ListdomButtonLoader($button);
             loading.start("");
 
-            listdom_toastify("<?php echo esc_js(esc_html__("Are you sure you want to delete this?", 'listdom')); ?>", "lsd-confirm", {
-                position: "lsd-center-center",
-                confirm: {
-                    confirmText: "<?php echo esc_js(esc_html__('Confirm', 'listdom')); ?>",
-                    cancelText:  "<?php echo esc_js(esc_html__('Cancel', 'listdom')); ?>",
-                    onConfirm: function(toast) {
-                        jQuery.ajax({
-                            type: "POST",
-                            url: ajaxurl,
-                            data: "action=lsdaddcsv_remove_job&_wpnonce=<?php echo wp_create_nonce('lsdaddcsv_remove_job'); ?>&key=" + key,
-                            dataType: 'json',
-                            success: function(response) {
+            jQuery.ajax({
+                type: "POST",
+                url: ajaxurl,
+                data: "action=lsdaddcsv_remove_job&_wpnonce=<?php echo wp_create_nonce('lsdaddcsv_remove_job'); ?>&key=" + key,
+                dataType: 'json',
+                success: function(response) {
+                    loading.stop();
 
-                                loading.stop();
+                    if (response.success === 1) {
+                        $row.remove();
 
-                                if (response.success === 1) {
-                                    $row.remove();
-
-                                    if (!jQuery('.lsd-ix-auto-import-jobs tbody tr').length) {
-                                        jQuery('.lsd-ix-auto-import-existing-jobs').addClass('lsd-util-hide');
-                                    }
-                                    listdom_toastify(name + ' ' + "<?php echo esc_js(esc_html__('Removed', 'listdom')); ?>", 'lsd-success');
-                                }
-                            },
-                            error: function() {
-                                loading.stop();
-                            }
-                        });
-                    },
-                    onCancel: function(toast) {
-                        loading.stop();
-                    },
-                    onCloseOverlay: function(toast) {
-                        loading.stop();
+                        if (!jQuery('.lsd-ix-auto-import-jobs tbody tr').length) {
+                            jQuery('.lsd-ix-auto-import-existing-jobs').addClass('lsd-util-hide');
+                        }
+                        listdom_notify(name + ' ' + "<?php echo esc_js(esc_html__('Removed', 'listdom')); ?>", 'lsd-success');
                     }
+                },
+                error: function() {
+                    loading.stop();
                 }
             });
         });

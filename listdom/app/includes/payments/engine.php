@@ -17,6 +17,11 @@ class LSD_Payments_Engine extends LSD_Base
         return self::$instance;
     }
 
+    public static function clear_cache(): void
+    {
+        self::$instance = null;
+    }
+
     protected function __construct()
     {
         // Payment Options

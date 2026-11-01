@@ -48,8 +48,8 @@ class LSD_Element_Breadcrumb extends LSD_Element
                     'listdom-category' => esc_html__('Category', 'listdom'),
                     'listdom-location' => esc_html__('Location', 'listdom'),
                     'listdom-label' => esc_html__('Label', 'listdom'),
-                    'listdom-tags' => esc_html__('Tag', 'listdom'),
-                    'listdom-features' => esc_html__('Feature', 'listdom'),
+                    LSD_Base::TAX_TAG => esc_html__('Tag', 'listdom'),
+                    LSD_Base::TAX_FEATURE => esc_html__('Feature', 'listdom'),
                 ],
             ]) . '
         </div>';

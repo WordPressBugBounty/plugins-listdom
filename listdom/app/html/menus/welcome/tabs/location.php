@@ -14,7 +14,7 @@ LSD_Assets::map();
     <div class="lsd-welcome-content-header">
         <div class="lsd-admin-section-heading">
             <div class="lsd-admin-title-icon">
-                <i class="webilia-icon wbli-map-pinpoint"></i>
+                <i class="wui-icon wui-icon--map-pinpoint"></i>
                 <h2 class="lsd-admin-title lsd-m-0"><?php echo esc_html__('Location Setting', 'listdom'); ?></h2>
             </div>
             <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Set the default address of your directory. Type the address or use the GPS button to set your current location.' , 'listdom'); ?></p>
@@ -91,7 +91,7 @@ LSD_Assets::map();
         <button class="lsd-skip-step lsd-text-button"><?php echo esc_html__('Skip', 'listdom'); ?></button>
         <button class="lsd-step-link lsd-primary-button" id="lsd_settings_location_save_button">
             <?php echo esc_html__('Next', 'listdom'); ?>
-            <i class="webilia-icon wbli-right-arrow"></i>
+            <i class="wui-icon wui-icon--right-arrow"></i>
         </button>
     </div>
 </div>
@@ -220,7 +220,7 @@ jQuery(function($)
     {
         if (!message) return;
 
-        if (typeof listdom_toastify === 'function') listdom_toastify(message, 'lsd-error');
+        if (typeof listdom_notify === 'function') listdom_notify(message, 'lsd-error');
         else window.alert(message);
     };
 
@@ -637,11 +637,13 @@ jQuery(function($)
 
         if (accessToken)
         {
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}',
+            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/512/{z}/{x}/{y}?access_token={accessToken}',
                 {
                     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
                     maxZoom: 18,
-                    id: 'mapbox.streets',
+                    id: 'mapbox/streets-v12',
+                    tileSize: 512,
+                    zoomOffset: -1,
                     accessToken: accessToken
                 }).addTo(map);
         }
@@ -844,7 +846,7 @@ jQuery(function($)
             error: function ()
             {
                 loading.stop();
-                listdom_toastify("<?php echo esc_js(esc_html__('There was an issue', 'listdom')); ?>", 'lsd-error');
+                listdom_notify("<?php echo esc_js(esc_html__('There was an issue', 'listdom')); ?>", 'lsd-error');
             }
         });
     });

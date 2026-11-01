@@ -9,7 +9,7 @@ defined('ABSPATH') || die();
  * @var array $answers
  */
 ?>
-<main class="lsd-admin-wizard" data-dashboard-url="<?php echo esc_url(admin_url('admin.php?page=listdom')); ?>">
+<main class="lsd-admin-wizard wui" data-dashboard-url="<?php echo esc_url(admin_url('admin.php?page=listdom')); ?>">
     <div class="lsd-admin-wizard__ambient lsd-admin-wizard__ambient--one"></div>
     <div class="lsd-admin-wizard__ambient lsd-admin-wizard__ambient--two"></div>
     <div class="lsd-admin-wizard__ambient lsd-admin-wizard__ambient--three"></div>
@@ -20,7 +20,7 @@ defined('ABSPATH') || die();
             <span><?php esc_html_e('Setup Wizard', 'listdom'); ?></span>
         </a>
         <button class="lsd-admin-wizard__close" id="lsd-admin-wizard-close" type="button" aria-label="<?php esc_attr_e('Close setup wizard', 'listdom'); ?>">
-            <i class="webilia-icon wbli-cross"></i>
+            <i class="wui-icon wui-icon--cross"></i>
         </button>
     </header>
 
@@ -41,7 +41,7 @@ defined('ABSPATH') || die();
                         <?php foreach ($directory_types as $type): ?>
                             <button class="lsd-admin-wizard__choice<?php echo $type['id'] === 'business_directory' ? ' is-selected' : ''; ?>" type="button" data-blueprint="<?php echo esc_attr($type['id']); ?>">
                                 <span class="lsd-admin-wizard__choice-mark">
-                                    <i class="webilia-icon <?php echo esc_attr($type['icon']); ?>"></i>
+                                    <i class="wui-icon <?php echo esc_attr($type['icon']); ?>"></i>
                                 </span>
                                 <div class="lsd-admin-section-heading">
                                     <h4 class="lsd-admin-title"><?php echo esc_html($type['label']); ?></h4>
@@ -113,10 +113,10 @@ defined('ABSPATH') || die();
     <div class="lsd-admin-wizard__modal" id="lsd-admin-wizard-modal" hidden>
         <div class="lsd-admin-wizard__modal-dialog" role="dialog" aria-modal="true" aria-labelledby="lsd-admin-wizard-modal-title">
             <button class="lsd-admin-wizard__modal-close" id="lsd-admin-wizard-cancel" type="button" aria-label="<?php esc_attr_e('Close confirmation', 'listdom'); ?>">
-                <i class="webilia-icon wbli-cross"></i>
+                <i class="wui-icon wui-icon--cross"></i>
             </button>
             <div class="lsd-admin-wizard__modal-icon">
-                <i class="webilia-icon wbli-question"></i>
+                <i class="wui-icon wui-icon--question"></i>
             </div>
             <div class="lsd-admin-section-heading">
                 <h2 id="lsd-admin-wizard-modal-title" class="lsd-admin-title"><?php esc_html_e('Leave the setup wizard?', 'listdom'); ?></h2>

@@ -11,6 +11,11 @@ class LSD_Skins_Cover extends LSD_Skins
 
     public function query()
     {
+        $this->prepare_query();
+    }
+
+    public function prepare_query(): void
+    {
         $this->args['post_type'] = LSD_Base::PTYPE_LISTING;
 
         // Post ID

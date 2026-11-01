@@ -84,7 +84,9 @@ class LSD_Personalize_Buttons extends LSD_Personalize
             $CSS = str_replace("(({$button_type}_button_padding))", self::paddings($settings['padding']), $CSS);
 
             // Typography
-            $CSS = str_replace("(({$button_type}_button_font_family))", self::font_family($settings['family'] ?? ''), $CSS);
+            $font_family = self::font_family($settings['family'] ?? '');
+            if ($font_family !== 'inherit') $font_family .= ', serif';
+            $CSS = str_replace("(({$button_type}_button_font_family))", $font_family, $CSS);
             $CSS = str_replace("(({$button_type}_button_font_weight))", $settings['weight'], $CSS);
             $CSS = str_replace("(({$button_type}_button_text_align))", $settings['align'], $CSS);
             $CSS = str_replace("(({$button_type}_button_font_size))", $settings['size'], $CSS);

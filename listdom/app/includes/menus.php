@@ -33,6 +33,8 @@ class LSD_Menus extends LSD_Base
         add_action('admin_menu', [$this, 'update_main_menu_badge'], 100);
         add_action('parent_file', [$this, 'mainmenu_selection']);
         add_action('submenu_file', [$this, 'submenu_selection']);
+        add_filter('lsd_post_type_header_menus', [$this, 'listing_header_menus'], 10, 2);
+        add_filter('lsd_taxonomy_header_menus', [$this, 'listing_header_menus'], 10, 2);
 
         // Add Separators
         add_action('admin_init', [$this, 'add_separators']);
@@ -40,7 +42,12 @@ class LSD_Menus extends LSD_Base
 
     public function register_menus()
     {
-        $icon = $this->lsd_asset_url('img/listdom-icon.svg');
+        $compact = self::compact_menu();
+        $listing_capability = get_post_type_object(LSD_Base::PTYPE_LISTING)->cap->edit_posts;
+        $menu_capability = $compact && !current_user_can('manage_options') ? $listing_capability : 'manage_options';
+
+        // Let WordPress apply the admin menu color scheme to the SVG.
+        $icon = 'data:image/svg+xml;base64,' . base64_encode(file_get_contents($this->lsd_asset_path('img/listdom-icon.svg')));
 
         $listdom_name = LSD_Branding::name();
         $listdom = esc_html($listdom_name);
@@ -60,30 +67,90 @@ class LSD_Menus extends LSD_Base
             $webilia .= ' <span class="update-plugins count-' . esc_attr($backend_badge) . '"><span class="update-count">' . esc_html($backend_badge) . '</span></span>';
         }
 
-        add_menu_page(esc_html($listdom_name), $listdom, 'manage_options', 'listdom', null, $icon, 26);
+        add_menu_page(esc_html($listdom_name), $listdom, $menu_capability, 'listdom', null, $icon, 26);
         add_submenu_page('listdom', esc_html__('Home', 'listdom'), esc_html__('Home', 'listdom'), 'manage_options', 'listdom', [$this->dashboard, 'output'], 1);
         add_submenu_page('listdom', esc_html__('Shortcodes', 'listdom'), esc_html__('Shortcodes', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SHORTCODE, null, 2);
-        add_submenu_page('listdom', esc_html__('Template Builder', 'listdom'), esc_html__('Template Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_TEMPLATE, null, 2.5);
-        add_submenu_page('listdom', esc_html__('Search Builder', 'listdom'), esc_html__('Search and Filter Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SEARCH, null, 3);
+        add_submenu_page('listdom', esc_html__('Template Builder', 'listdom'), esc_html__('Template Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_TEMPLATE, null, 3);
+        add_submenu_page('listdom', esc_html__('Search Builder', 'listdom'), esc_html__('Search and Filter Builder', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_SEARCH, null, 4);
+        add_submenu_page('listdom', esc_html__('Notifications', 'listdom'), esc_html__('Notifications', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_NOTIFICATION, null, 5);
 
         if (LSD_Payments_Engine::instance()->listdom())
         {
             $payments = esc_html__('Payments', 'listdom');
             if ($pending) $payments .= ' <span class="update-plugins count-' . esc_attr($pending) . '"><span class="update-count">' . esc_html($pending) . '</span></span>';
 
-            add_submenu_page('listdom', esc_html__('Payments', 'listdom'), $payments, 'manage_options', $this->payments_submenu_url(), null, 4.1);
+            add_submenu_page('listdom', esc_html__('Payments', 'listdom'), $payments, 'manage_options', $this->payments_submenu_url(), null, 6);
         }
 
-        add_submenu_page('listdom', esc_html__('Settings', 'listdom'), esc_html__('Settings', 'listdom'), 'manage_options', 'listdom-settings', [$this->settings, 'output'], 5);
+        add_submenu_page('listdom', esc_html__('Settings', 'listdom'), esc_html__('Settings', 'listdom'), 'manage_options', 'listdom-settings', [$this->settings, 'output'], 7);
         $import_export = '<span class="lsd-admin-menu-new">' . esc_html__('Import / Export', 'listdom') . ' <span class="lsd-admin-menu-new-badge">' . esc_html__('New', 'listdom') . '</span></span>';
-        add_submenu_page('listdom', esc_html__('Import / Export', 'listdom'), $import_export, 'manage_options', 'listdom-ix', [$this->ix, 'output'], 6);
-        add_submenu_page('listdom', esc_html__('Notifications', 'listdom'), esc_html__('Notifications', 'listdom'), 'manage_options', 'edit.php?post_type=' . LSD_Base::PTYPE_NOTIFICATION, null, 7);
+        add_submenu_page('listdom', esc_html__('Import / Export', 'listdom'), $import_export, 'manage_options', 'listdom-ix', [$this->ix, 'output'], 8);
         $analytics = '<span class="lsd-admin-menu-new">' . esc_html__('Analytics', 'listdom') . ' <span class="lsd-admin-menu-new-badge">' . esc_html__('New', 'listdom') . '</span></span>';
-        add_submenu_page('listdom', esc_html__('Analytics', 'listdom'), $analytics, 'manage_options', 'listdom-analytics', [$this->analytics, 'output'], 8);
-        add_submenu_page('listdom', esc_html__('Webilia Connect', 'listdom'), $webilia, 'manage_options', 'listdom-connect', [$this, 'connect'], 31);
-        add_submenu_page('listdom', esc_html__('Help', 'listdom'), $help, 'manage_options', LSD_Checklist::MENU_SLUG, [$this->launch_checklist, 'output'], 33);
+        add_submenu_page('listdom', esc_html__('Analytics', 'listdom'), $analytics, 'manage_options', 'listdom-analytics', [$this->analytics, 'output'], 9);
+        add_submenu_page('listdom', esc_html__('Webilia Connect', 'listdom'), $webilia, 'manage_options', 'listdom-connect', [$this, 'connect'], 10);
+        add_submenu_page('listdom', esc_html__('Help', 'listdom'), $help, 'manage_options', LSD_Checklist::MENU_SLUG, [$this->launch_checklist, 'output'], 11);
         add_submenu_page(LSD_Checklist::MENU_SLUG, esc_html__('Welcome to Listdom Setup Wizard', 'listdom'), esc_html__('Wizard', 'listdom'), 'manage_options', LSD_Base::WELCOME_SLUG, [$this->welcome, 'output'], 1);
 
+        if ($compact)
+        {
+            add_submenu_page('listdom', esc_html__('Listings', 'listdom'), esc_html__('Listings', 'listdom'), $listing_capability, 'edit.php?post_type=' . LSD_Base::PTYPE_LISTING, null, 1);
+
+            // WordPress inserts a parent link when Listings is the user's first submenu.
+            if (!current_user_can('manage_options')) remove_submenu_page('listdom', 'listdom');
+        }
+    }
+
+    public static function compact_menu(): bool
+    {
+        $settings = LSD_Options::settings();
+        return !empty($settings['compact_menu']);
+    }
+
+    private static function is_listing_screen($screen): bool
+    {
+        $taxonomy = $screen->taxonomy ?? '';
+        if ($taxonomy !== '') return in_array($taxonomy, LSD_Base::taxonomies(true), true);
+
+        return ($screen->post_type ?? '') === LSD_Base::PTYPE_LISTING;
+    }
+
+    public function listing_header_menus(array $menus, $screen): array
+    {
+        if (!self::compact_menu() || !self::is_listing_screen($screen)) return $menus;
+
+        $taxonomy = $screen->taxonomy ?? '';
+        $listing = get_post_type_object(LSD_Base::PTYPE_LISTING);
+        $tabs = [];
+
+        if (current_user_can($listing->cap->edit_posts))
+        {
+            $tabs[] = [
+                'title' => esc_html__('All Listings', 'listdom'),
+                'url' => admin_url('edit.php?post_type=' . LSD_Base::PTYPE_LISTING),
+                'selected' => $taxonomy === '',
+            ];
+        }
+
+        foreach ([
+            LSD_Base::TAX_ATTRIBUTE,
+            LSD_Base::TAX_CATEGORY,
+            LSD_Base::TAX_LOCATION,
+            LSD_Base::TAX_TAG,
+            LSD_Base::TAX_FEATURE,
+            LSD_Base::TAX_LABEL,
+        ] as $name)
+        {
+            $object = get_taxonomy($name);
+            if (!$object || !$object->show_ui || !current_user_can($object->cap->manage_terms)) continue;
+
+            $tabs[] = [
+                'title' => $object->labels->name,
+                'url' => admin_url('edit-tags.php?taxonomy=' . $name . '&post_type=' . LSD_Base::PTYPE_LISTING),
+                'selected' => $taxonomy === $name,
+            ];
+        }
+
+        return array_merge($tabs, $menus);
     }
 
     public function connect(): void
@@ -189,6 +256,8 @@ class LSD_Menus extends LSD_Base
     {
         global $current_screen;
 
+        if (self::compact_menu() && self::is_listing_screen($current_screen)) return 'listdom';
+
         // Don't do anything if the post type is not Listdom Post Type
         $post_types = [
             LSD_Base::PTYPE_SHORTCODE,
@@ -213,6 +282,9 @@ class LSD_Menus extends LSD_Base
     public function submenu_selection($submenu_file)
     {
         global $current_screen;
+
+        if (self::compact_menu() && self::is_listing_screen($current_screen))
+            return 'edit.php?post_type=' . LSD_Base::PTYPE_LISTING;
 
         $post_type = $current_screen->post_type ?? '';
         $taxonomy = $current_screen->taxonomy ?? '';
@@ -297,6 +369,7 @@ class LSD_Menus extends LSD_Base
         if (is_null($start)) return false;
 
         $end_menu = !is_null($plan) ? $plan : $listing;
+        if (self::compact_menu() && is_null($end_menu)) $end_menu = $start;
         if (is_null($end_menu)) return false;
 
         if (!$sep) return false;

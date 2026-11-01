@@ -259,14 +259,14 @@ class LSD_Checklist extends LSD_Base
     public static function get_section_icon(string $section): string
     {
         $icons = [
-            esc_html__('Core Directory Setup', 'listdom') => 'wbli-settings',
-            esc_html__('Submission & User Flow', 'listdom') => 'wbli-account',
-            esc_html__('Search & Discovery', 'listdom') => 'wbli-search',
-            esc_html__('Monetization', 'listdom') => 'wbli-hot-price',
-            esc_html__('Trust & Engagement', 'listdom') => 'wbli-eye',
-            esc_html__('SEO & AI Visibility', 'listdom') => 'wbli-chart-increase',
-            esc_html__('Priority Fixes', 'listdom') => 'wbli-left-to-right-list-star',
-            esc_html__('Health Check Summary', 'listdom') => 'wbli-curvy-right-direction',
+            esc_html__('Core Directory Setup', 'listdom') => 'wui-icon--settings',
+            esc_html__('Submission & User Flow', 'listdom') => 'wui-icon--account',
+            esc_html__('Search & Discovery', 'listdom') => 'wui-icon--search',
+            esc_html__('Monetization', 'listdom') => 'wui-icon--hot-price',
+            esc_html__('Trust & Engagement', 'listdom') => 'wui-icon--eye',
+            esc_html__('SEO & AI Visibility', 'listdom') => 'wui-icon--chart-increase',
+            esc_html__('Priority Fixes', 'listdom') => 'wui-icon--left-to-right-list-star',
+            esc_html__('Health Check Summary', 'listdom') => 'wui-icon--curvy-right-direction',
         ];
 
         return $icons[$section] ?? 'fa-circle-o';
@@ -275,10 +275,10 @@ class LSD_Checklist extends LSD_Base
     public static function get_status_icon(string $status): string
     {
         $icons = [
-            LSD_Checklist_Result::STATUS_COMPLETE => 'wbli-checkmark-circle',
-            LSD_Checklist_Result::STATUS_WARNING => 'wbli-alert',
-            LSD_Checklist_Result::STATUS_INCOMPLETE => 'wbli-cross',
-            LSD_Checklist_Result::STATUS_OPTIONAL => 'wbli-first-aid-kit',
+            LSD_Checklist_Result::STATUS_COMPLETE => 'wui-icon--checkmark-circle',
+            LSD_Checklist_Result::STATUS_WARNING => 'wui-icon--alert',
+            LSD_Checklist_Result::STATUS_INCOMPLETE => 'wui-icon--cross',
+            LSD_Checklist_Result::STATUS_OPTIONAL => 'wui-icon--first-aid-kit',
             LSD_Checklist_Result::STATUS_IGNORED => 'fas fa-ban',
         ];
 

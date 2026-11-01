@@ -408,7 +408,7 @@ class LSD_Integrations_Blockeditor_Elements
         if (trim($html) === '') return '';
 
         $class = 'wp-block-listdom-listing-' . $kind;
-        $class .= ' lsd-listing-block ' . str_replace('listdom/', 'lsd-', $name);
+        $class .= ' lsd-listing-block wui ' . str_replace('listdom/', 'lsd-', $name);
 
         $typography = $attributes['style']['typography'] ?? [];
         $colors = $attributes['style']['color'] ?? [];
@@ -422,7 +422,7 @@ class LSD_Integrations_Blockeditor_Elements
         if (defined('REST_REQUEST') && REST_REQUEST && !empty($_REQUEST['lsd_editor_preview']))
         {
             // useBlockProps applies block supports and theme block styles to the outer editor wrapper.
-            $wrapper = 'class="' . esc_attr('lsd-listing-block ' . str_replace('listdom/', 'lsd-', $name) . $support_class) . '"';
+            $wrapper = 'class="' . esc_attr('lsd-listing-block wui ' . str_replace('listdom/', 'lsd-', $name) . $support_class) . '"';
         }
         elseif (function_exists('get_block_wrapper_attributes'))
         {

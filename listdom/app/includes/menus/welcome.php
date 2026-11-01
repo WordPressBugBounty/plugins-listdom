@@ -62,19 +62,19 @@ class LSD_Menus_Welcome extends LSD_Menus
         return [
             [
                 'id' => 'business_directory',
-                'icon' => 'wbli-list-view',
+                'icon' => 'wui-icon--list-view',
                 'label' => esc_html__('Business Directory', 'listdom'),
                 'description' => esc_html__('A local directory for businesses, shops, and venues.', 'listdom'),
             ],
             [
                 'id' => 'city_portal',
-                'icon' => 'wbli-location',
+                'icon' => 'wui-icon--location',
                 'label' => esc_html__('City Portal', 'listdom'),
                 'description' => esc_html__('A city-scale portal for places and public services.', 'listdom'),
             ],
             [
                 'id' => 'service_marketplace',
-                'icon' => 'wbli-group-items',
+                'icon' => 'wui-icon--group-items',
                 'label' => esc_html__('Service Marketplace', 'listdom'),
                 'description' => esc_html__('A marketplace for providers, services, and leads.', 'listdom'),
             ],

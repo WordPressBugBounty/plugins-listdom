@@ -17,19 +17,21 @@ $logout_redirect = $logout_link ?: home_url();
 $account_link = isset($auth['account']['redirect']) ? get_permalink($auth['account']['redirect']) : false;
 $account_redirect = $account_link ?: ($dashboard_page ? get_page_link($dashboard_page) : home_url());
 ?>
-<div class="lsd-logged-in-wrapper">
-    <div class="lsd-user-avatar">
-        <?php echo LSD_User::get_user_avatar('', 70); ?>
-        <span class="lsd-user-display-name">
-            <?php echo sprintf(
-                /* translators: %s: Current user display name. */
-                esc_html__('Hi %s 👋', 'listdom'),
-                $user['display_name'] ?? ''
-            ); ?>
-        </span>
-    </div>
-    <div class="lsd-logged-in-actions">
-        <a href="<?php echo esc_url($account_redirect); ?>"><?php esc_html_e('My Account', 'listdom'); ?></a>
-        <a href="<?php echo wp_logout_url($logout_redirect); ?>"><?php esc_html_e('Logout', 'listdom'); ?></a>
+<div class="lsd-logged-in-container">
+    <div class="lsd-logged-in-wrapper">
+        <div class="lsd-user-avatar">
+            <?php echo LSD_User::get_user_avatar('', 70); ?>
+            <span class="lsd-user-display-name">
+                <?php echo sprintf(
+                    /* translators: %s: Current user display name. */
+                    esc_html__('Hi %s 👋', 'listdom'),
+                    $user['display_name'] ?? ''
+                ); ?>
+            </span>
+        </div>
+        <div class="lsd-logged-in-actions">
+            <a href="<?php echo esc_url($account_redirect); ?>"><?php esc_html_e('My Account', 'listdom'); ?></a>
+            <a href="<?php echo wp_logout_url($logout_redirect); ?>"><?php esc_html_e('Logout', 'listdom'); ?></a>
+        </div>
     </div>
 </div>

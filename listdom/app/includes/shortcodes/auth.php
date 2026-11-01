@@ -180,6 +180,22 @@ class LSD_Shortcodes_Auth extends LSD_Base
         // User is Already Logged-in
         if (is_user_logged_in()) return $this->user_profile();
 
+        if ($this->is_truthy($atts['role_tabs'] ?? false))
+        {
+            $role_tabs = $this->auth_dropdown_role_tabs(
+                $role,
+                $this->parse_pipe_list($atts['role_tabs_labels'] ?? ''),
+                array_map('trim', explode('|', (string) ($atts['tabs_roles'] ?? ''))),
+                true
+            );
+            $id = uniqid('lsd-auth-inline-');
+            $form_type = 'auth';
+
+            ob_start();
+            include lsd_template('auth/auth-inline.php');
+            return ob_get_clean();
+        }
+
         ob_start();
         include lsd_template('auth/auth.php');
         return ob_get_clean();

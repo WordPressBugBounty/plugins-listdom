@@ -86,7 +86,9 @@ class LSD_Personalize_Single_Price extends LSD_Personalize_Single
             $CSS = str_replace("(({$price_type}_hover_border_radius))", $settings['hover_border_radius'], $CSS);
 
             // Typography
-            $CSS = str_replace("(({$price_type}_font_family))", self::font_family($settings['family'] ?? ''), $CSS);
+            $font_family = self::font_family($settings['family'] ?? '');
+            if ($font_family !== 'inherit') $font_family .= ', sans-serif';
+            $CSS = str_replace("(({$price_type}_font_family))", $font_family, $CSS);
             $CSS = str_replace("(({$price_type}_font_weight))", $settings['weight'], $CSS);
             $CSS = str_replace("(({$price_type}_text_align))", $settings['align'], $CSS);
             $CSS = str_replace("(({$price_type}_font_size))", $settings['size'], $CSS);

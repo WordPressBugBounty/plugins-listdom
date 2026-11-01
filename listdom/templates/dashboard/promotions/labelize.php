@@ -79,7 +79,7 @@ $expired_records = $this->get_expired_label_records($user_id, $dashboard);
                             <div
                                 class="lsd-dashboard-promotions-card lsd-promotion-active-card"
                                 data-search="<?php echo esc_attr($label_group['search']); ?>"
-                                <?php if ($label_group['label_color'] !== ''): ?>style="--lsd-dashboard-promotions-label-color: <?php echo esc_attr($label_group['label_color']); ?>;"<?php endif; ?>
+                                <?php if ($label_group['label_color'] !== ''): ?>style="--lsd-fe-dashboard-promotions-label-color: <?php echo esc_attr($label_group['label_color']); ?>;"<?php endif; ?>
                             >
                                 <div class="lsd-dashboard-promotions-card-chip-row">
                                     <?php echo LSD_Kses::element($this->label_chip($label_group['label_name'], (int) $label_group['label_id'], [

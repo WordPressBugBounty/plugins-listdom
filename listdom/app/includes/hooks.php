@@ -125,6 +125,8 @@ class LSD_Hooks extends LSD_Base
         if (isset($sf['booking']) && is_array($sf['booking']) && count($sf['booking']))
         {
             $existing_booking_filters = isset($atts['lsd_filter']['booking']) && is_array($atts['lsd_filter']['booking']) ? $atts['lsd_filter']['booking'] : [];
+            // Keep the shortcode restriction intact for Booking's separate matching pass.
+            $atts['lsd_booking_shortcode_filters'] = $existing_booking_filters;
             $atts['lsd_filter']['booking'] = array_replace_recursive($existing_booking_filters, $sf['booking']);
         }
 

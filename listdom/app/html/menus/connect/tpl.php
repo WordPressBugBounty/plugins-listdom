@@ -7,7 +7,7 @@ $connect_notice_type = in_array($connect_notice['type'] ?? '', ['error', 'info',
 $connect_return_url = LSD_Webilia_Connect::returnUrl(isset($_GET['return_to']) ? esc_url_raw(wp_unslash($_GET['return_to'])) : admin_url('admin.php?page=listdom-connect&tab=connect'));
 $active_tab = $active_tab ?? 'connect';
 ?>
-<div class="wrap lsd-wrap lsd-connect-page">
+<div class="wrap lsd-wrap wui lsd-connect-page">
     <?php LSD_Menus::header(esc_html__('Connect', 'listdom'), null, LSD_Menus::webiliaTabs($active_tab)); ?>
 
     <div class="lsd-admin-main-wrapper">

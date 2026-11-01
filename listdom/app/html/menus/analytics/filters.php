@@ -32,7 +32,7 @@ defined('ABSPATH') || die();
 
         <label class="screen-reader-text lsd-analytics-activity-label" for="lsd-analytics-activity-location"><?php esc_html_e('Tracked listing report location', 'listdom'); ?></label>
         <span class="lsd-analytics-activity-control">
-            <i class="lsd-analytics-activity-icon webilia-icon wbli-map-marker" aria-hidden="true"></i>
+            <i class="lsd-analytics-activity-icon wui-icon wui-icon--map-marker" aria-hidden="true"></i>
             <select class="lsd-admin-input lsd-analytics-activity-select" id="lsd-analytics-activity-location" name="analytics_location">
                 <option value="0"><?php esc_html_e('All Locations', 'listdom'); ?></option>
                 <?php foreach ($activity_terms['location'] as $term): ?>
@@ -54,7 +54,7 @@ defined('ABSPATH') || die();
 
         <label class="screen-reader-text lsd-analytics-activity-label" for="lsd-analytics-activity-search"><?php esc_html_e('Search tracked listings by title', 'listdom'); ?></label>
         <span class="lsd-analytics-activity-control lsd-analytics-activity-search-control">
-            <i class="lsd-analytics-activity-icon webilia-icon wbli-search-magnifier" aria-hidden="true"></i>
+            <i class="lsd-analytics-activity-icon wui-icon wui-icon--search-magnifier" aria-hidden="true"></i>
             <input class="lsd-admin-input lsd-analytics-activity-search" id="lsd-analytics-activity-search" type="search" name="analytics_search" value="<?php echo esc_attr($activity_filters['search']); ?>" placeholder="<?php esc_attr_e('Search listings...', 'listdom'); ?>">
             <button class="lsd-analytics-activity-search-submit" type="submit"><?php esc_html_e('Go', 'listdom'); ?></button>
         </span>
@@ -65,7 +65,7 @@ defined('ABSPATH') || die();
             <a class="lsd-secondary-button lsd-analytics-activity-settings" href="<?php echo esc_url($status['url']); ?>"><?php esc_html_e('Manage Stats settings', 'listdom'); ?></a>
         <?php endif; ?>
         <button class="lsd-secondary-button lsd-analytics-activity-export" type="submit" form="lsd-analytics-activity-filters" formaction="<?php echo esc_url(admin_url('admin-post.php')); ?>" name="action" value="lsd_analytics_export" aria-label="<?php esc_attr_e('Export Report', 'listdom'); ?>" title="<?php esc_attr_e('Export Report', 'listdom'); ?>"<?php if (!$activity_export_available): ?> disabled<?php endif; ?>>
-            <i class="lsd-analytics-activity-export-icon webilia-icon wbli-file-download" aria-hidden="true"></i>
+            <i class="lsd-analytics-activity-export-icon wui-icon wui-icon--file-download" aria-hidden="true"></i>
         </button>
     </div>
 </div>

@@ -466,7 +466,7 @@ jQuery(document).ready(function()
         {
             if (!message) return;
 
-            if (typeof window.listdom_toastify === 'function') window.listdom_toastify(message, 'lsd-error');
+            if (typeof window.listdom_notify === 'function') window.listdom_notify(message, 'lsd-error');
             else window.alert(message);
         };
 

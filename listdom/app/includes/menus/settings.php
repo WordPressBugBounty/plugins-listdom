@@ -173,18 +173,7 @@ class LSD_Menus_Settings extends LSD_Menus
         $lsd_raw = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
         $lsd_raw = is_array($lsd_raw) ? $lsd_raw : [];
 
-        $lsd = LSD_Sanitize::deep($lsd_raw);
-        if (isset($lsd_raw['advanced_slug'])) $lsd['advanced_slug'] = LSD_Sanitize::advanced_slug($lsd_raw['advanced_slug']);
-        if (isset($lsd_raw['rss_slug']))
-        {
-            $lsd['rss_slug'] = LSD_Sanitize::slug($lsd_raw['rss_slug']);
-
-            if ($lsd['rss_slug'] === '')
-            {
-                $defaults = LSD_Options::defaults();
-                $lsd['rss_slug'] = $defaults['rss_slug'] ?? 'listdom-listings';
-            }
-        }
+        $lsd = self::sanitize_general($lsd_raw);
 
         // Separate social settings
         $social_setting_keys = [
@@ -218,6 +207,25 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Print the response
         $this->response(['success' => 1]);
+    }
+
+    /** Shared general-form sanitizer, independent of HTTP input. */
+    public static function sanitize_general(array $raw): array
+    {
+        $lsd = LSD_Sanitize::deep($raw);
+        if (isset($raw['advanced_slug'])) $lsd['advanced_slug'] = LSD_Sanitize::advanced_slug($raw['advanced_slug']);
+        if (isset($raw['rss_slug']))
+        {
+            $lsd['rss_slug'] = LSD_Sanitize::slug($raw['rss_slug']);
+
+            if ($lsd['rss_slug'] === '')
+            {
+                $defaults = LSD_Options::defaults();
+                $lsd['rss_slug'] = $defaults['rss_slug'] ?? 'listdom-listings';
+            }
+        }
+
+        return $lsd;
     }
 
     public function save_advanced()
@@ -493,6 +501,22 @@ class LSD_Menus_Settings extends LSD_Menus
             }
         }
 
+        self::save_details_pattern($lsd);
+
+        // Save Settings
+        LSD_Options::merge('lsd_details_page', $lsd);
+
+        // Print the response
+        $this->response(['success' => 1]);
+    }
+
+    /** Maintain the canonical pattern without rendering any shortcode. */
+    public static function save_details_pattern(array $lsd, array $cleared_elements = []): bool
+    {
+        $disabled_elements = [];
+        if (!LSD_Components::remark()) $disabled_elements[] = 'remark';
+        if (!LSD_Components::embed()) $disabled_elements = array_merge($disabled_elements, ['embed', 'video']);
+        if (!LSD_Components::faq()) $disabled_elements[] = 'faq';
         $pattern = '';
         if (isset($lsd['elements']) && is_array($lsd['elements']))
         {
@@ -506,16 +530,15 @@ class LSD_Menus_Settings extends LSD_Menus
             }
         }
 
-        $pattern = self::preserve_disabled_pattern_positions($pattern, LSD_Options::details_page_pattern(), $disabled_elements);
+        $stored_pattern = LSD_Options::details_page_pattern();
+        // Explicit ability clears must not be restored as hidden layout tokens.
+        foreach ($cleared_elements as $element) $stored_pattern = str_replace('{' . $element . '}', '', $stored_pattern);
+        $pattern = self::preserve_disabled_pattern_positions($pattern, $stored_pattern, $disabled_elements);
 
         // Save single listing pattern
         update_option('lsd_details_page_pattern', trim($pattern));
 
-        // Save Settings
-        LSD_Options::merge('lsd_details_page', $lsd);
-
-        // Print the response
-        $this->response(['success' => 1]);
+        return get_option('lsd_details_page_pattern', '') === trim($pattern);
     }
 
     private static function preserve_disabled_pattern_positions(string $pattern, string $stored_pattern, array $disabled_elements): string
@@ -574,16 +597,7 @@ class LSD_Menus_Settings extends LSD_Menus
         // Get Listdom options
         $lsd = isset($_POST['addons']) ? wp_unslash($_POST['addons']) : [];
         $lsd_raw = is_array($lsd) ? $lsd : [];
-        $lsd = LSD_Sanitize::deep($lsd_raw);
-
-        /**
-         * Allows trusted addons to preserve specific option values that require custom sanitization.
-         *
-         * @param array $lsd Sanitized addon options.
-         * @param array $lsd_raw Original unslashed addon options.
-         */
-        $lsd = apply_filters('lsd_addons_sanitized_options', $lsd, $lsd_raw);
-        if (!is_array($lsd)) $lsd = [];
+        $lsd = self::sanitize_addons($lsd_raw);
 
         // Get current Addons options
         $current = get_option('lsd_addons', []);
@@ -600,6 +614,13 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Print the response
         $this->response(['success' => 1]);
+    }
+
+    /** Complete owning sections let form filters preserve omitted switches. */
+    public static function sanitize_addons(array $raw): array
+    {
+        $sanitized = apply_filters('lsd_addons_sanitized_options', LSD_Sanitize::deep($raw), $raw);
+        return is_array($sanitized) ? $sanitized : [];
     }
 
     public function token_add()
@@ -755,6 +776,18 @@ class LSD_Menus_Settings extends LSD_Menus
         $lsd = $_POST['lsd']['payments'] ?? [];
         $lsd = is_array($lsd) ? wp_unslash($lsd) : [];
 
+        $lsd = self::sanitize_payments($lsd);
+
+        // Save Payments
+        LSD_Options::merge('lsd_payments', $lsd);
+
+        // Print the response
+        $this->response(['success' => 1]);
+    }
+
+    /** Shared complete-section payment sanitizer; callers preserve unapproved leaves. */
+    public static function sanitize_payments(array $lsd): array
+    {
         // Keep HTML fields
         $appreciation_message = wp_kses_post($lsd['appreciation_message'] ?? '');
         $agreement = wp_kses_post($lsd['agreement'] ?? '');
@@ -812,10 +845,6 @@ class LSD_Menus_Settings extends LSD_Menus
             'locations' => $tax_locations,
         ];
 
-        // Save Payments
-        LSD_Options::merge('lsd_payments', $lsd);
-
-        // Print the response
-        $this->response(['success' => 1]);
+        return $lsd;
     }
 }

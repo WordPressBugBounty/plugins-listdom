@@ -6,6 +6,7 @@ defined('ABSPATH') || die();
 
 // Get HTML of Listings
 $listings_html = $this->listings_html();
+$has_listings = count($this->listings) > 0;
 
 $orientation_class = $this->horizontal ? 'lsd-timeline-horizontal' : 'lsd-timeline-vertical';
 $items_wrapper_classes = [
@@ -32,6 +33,7 @@ jQuery(document).ready(function()
         id: "'.$this->id.'",
         load_more: "'.($this->pagination === 'loadmore' ? '1' : '0').'",
         infinite_scroll: "'.($this->pagination === 'scroll' ? '1' : '0').'",
+        pagination: "'.esc_js($this->pagination).'",
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         atts: "'.http_build_query(['atts'=>$this->get_atts()], '', '&').'",
         next_page: "'.$this->next_page.'",
@@ -71,8 +73,11 @@ jQuery(document).ready(function()
             <?php echo LSD_Kses::form($this->get_sortbar()); ?>
 
             <div class="lsd-timeline-view-listings-wrapper lsd-viewstyle-timeline">
-                <div class="<?php echo esc_attr(implode(' ', array_map('sanitize_html_class', $items_wrapper_classes))); ?> lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?>">
-                    <?php echo LSD_Kses::full($listings_html); ?>
+                <div class="<?php echo esc_attr(implode(' ', array_map('sanitize_html_class', $items_wrapper_classes))); ?> lsd-listing-wrapper <?php echo $this->image_fit === 'contain' ? 'lsd-image-object-contain' : ''; ?><?php echo !$has_listings ? ' lsd-util-hide' : ''; ?>">
+                    <?php if ($has_listings) echo LSD_Kses::full($listings_html); ?>
+                </div>
+                <div class="lsd-timeline-empty" role="status" aria-live="polite">
+                    <?php if (!$has_listings) echo LSD_Kses::full($listings_html); ?>
                 </div>
             </div>
 

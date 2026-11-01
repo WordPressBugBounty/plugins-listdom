@@ -606,7 +606,11 @@ class LSD_Base
                     {
                         if (!isset($sf['booking']['price_mode']) || !$sf['booking']['price_mode']) $sf['booking']['price_mode'] = 'min';
 
-                        if ($operator === 'grq' || $operator === 'eq') $sf['booking']['price_min'] = sanitize_text_field($value);
+                        if ($operator === 'grq' || $operator === 'eq')
+                        {
+                            $sf['booking']['price_min'] = sanitize_text_field($value);
+                            if ($operator === 'eq') $sf['booking']['price_max'] = sanitize_text_field($value);
+                        }
                         else if (in_array($operator, ['bt', 'grb'], true))
                         {
                             if ($suffix === 'min') $sf['booking']['price_min'] = sanitize_text_field($value);
@@ -615,20 +619,28 @@ class LSD_Base
                     }
                     else
                     {
+                        $mode = str_replace('booking_', '', $field);
                         if (!isset($sf['booking']['capacity_mode']) || !$sf['booking']['capacity_mode'])
                         {
-                            $sf['booking']['capacity_mode'] = str_replace('booking_', '', $field);
+                            $sf['booking']['capacity_mode'] = $mode;
                         }
 
+                        $bounds = [];
                         if ($operator === 'grq' || $operator === 'eq')
                         {
-                            $sf['booking']['capacity_min'] = sanitize_text_field($value);
-                            if ($operator === 'eq') $sf['booking']['capacity_max'] = sanitize_text_field($value);
+                            $bounds['min'] = sanitize_text_field($value);
+                            if ($operator === 'eq') $bounds['max'] = sanitize_text_field($value);
                         }
                         else if (in_array($operator, ['bt', 'grb'], true))
                         {
-                            if ($suffix === 'min') $sf['booking']['capacity_min'] = sanitize_text_field($value);
-                            else if ($suffix === 'max') $sf['booking']['capacity_max'] = sanitize_text_field($value);
+                            if ($suffix === 'min') $bounds['min'] = sanitize_text_field($value);
+                            else if ($suffix === 'max') $bounds['max'] = sanitize_text_field($value);
+                        }
+
+                        foreach ($bounds as $bound => $number)
+                        {
+                            $sf['booking']['capacity_' . $mode . '_' . $bound] = $number;
+                            if ($sf['booking']['capacity_mode'] === $mode) $sf['booking']['capacity_' . $bound] = $number;
                         }
                     }
                 }

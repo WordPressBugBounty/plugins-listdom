@@ -18,7 +18,22 @@ class LSD_Abilities_Settings
 
     private static function scalar(): array
     {
-        return ['type' => ['string', 'integer', 'boolean', 'null'], 'maxLength' => 150];
+        return ['type' => ['string', 'integer', 'number', 'boolean', 'null'], 'maxLength' => 150];
+    }
+
+    /** Bounded JSON values for explicitly scoped, structured configuration. */
+    private static function setting_value(int $depth = 2): array
+    {
+        $types = ['string', 'integer', 'number', 'boolean', 'null'];
+        $schema = ['type' => $types, 'maxLength' => 512];
+        if ($depth > 0)
+        {
+            $schema['type'][] = 'array';
+            $schema['type'][] = 'object';
+            $schema += ['items' => self::setting_value($depth - 1), 'maxItems' => 50,
+                'additionalProperties' => self::setting_value($depth - 1), 'maxProperties' => 50];
+        }
+        return $schema;
     }
 
     private static function field_schema(): array
@@ -26,15 +41,25 @@ class LSD_Abilities_Settings
         $string = ['type' => 'string'];
         $properties = [
             'key' => $string, 'label' => $string, 'description' => $string, 'group' => $string,
-            'allowedValues' => self::array_of(self::scalar()), 'type' => ['type' => 'string', 'enum' => ['integer', 'string', 'limit']],
-            'minimum' => ['type' => ['integer', 'null']], 'maximum' => ['type' => ['integer', 'null']], 'defaultValue' => self::scalar(), 'effectiveValue' => self::scalar(),
+            // Choice metadata (for example currencies) is independent of the 20-field page limit.
+            'allowedValues' => self::array_of(self::scalar(), 512), 'type' => ['type' => 'string', 'enum' => ['integer', 'string', 'limit', 'number', 'boolean', 'array', 'object', 'union']],
+            'minimum' => ['type' => ['number', 'null']], 'maximum' => ['type' => ['number', 'null']], 'defaultValue' => self::setting_value(), 'effectiveValue' => self::setting_value(),
             'available' => ['type' => 'boolean'], 'readable' => ['type' => 'boolean'], 'writable' => ['type' => 'boolean'],
             'risk' => ['type' => 'string', 'enum' => ['configuration']], 'dependencies' => self::array_of($string),
             'tab' => $string, 'subtab' => $string, 'adminUrl' => $string,
         ];
         $required = array_keys($properties);
         $properties['storedPresent'] = ['type' => 'boolean'];
-        $properties['storedValue'] = self::scalar();
+        $properties['storedValue'] = self::setting_value();
+        $properties += [
+            'domain' => ['type' => 'string', 'maxLength' => 80], 'owner' => ['type' => 'string', 'maxLength' => 100],
+            'addon' => ['type' => 'string', 'maxLength' => 80], 'path' => self::array_of(['type' => 'string', 'maxLength' => 191], 12),
+            'schema' => ['type' => 'object', 'maxProperties' => 20],
+            'valueStatus' => ['type' => 'string', 'enum' => ['valid', 'invalid', 'unavailable']],
+            'writeReason' => ['type' => 'string', 'enum' => ['', 'domain_writer_not_available', 'read_only', 'status_only', 'permission', 'dependency']],
+            'permissions' => self::array_of(['type' => 'string', 'maxLength' => 100]),
+            'sensitivity' => ['type' => 'string', 'enum' => ['configuration', 'status_only']],
+        ];
         return self::object($properties, $required);
     }
 
@@ -44,26 +69,53 @@ class LSD_Abilities_Settings
         $empty = self::object([]) + ['default' => (object) []];
         $revision = ['type' => 'string', 'pattern' => '^[a-f0-9]{64}$'];
         $fields = self::array_of(self::field_schema());
+        $domain = ['type' => 'string', 'maxLength' => 80, 'pattern' => '^(\\*|(core|addons)\\.[a-z0-9_-]+)$',
+            'description' => 'Omit for the legacy settings view. Use core.settings, core.customizer, core.details_page, core.auth, core.payments, core.socials, core.styles, core.ai or core.api; * lists all registered domains. Exact domain revisions authorize only that domain’s approved writes.'];
         $list_input = self::object([
-            'group' => ['type' => 'string', 'enum' => ['', 'dashboard', 'submission', 'gallery', 'map']],
+            'group' => ['type' => 'string', 'maxLength' => 80],
+            'domain' => $domain, 'addon' => ['type' => 'string', 'maxLength' => 80, 'description' => 'Registered add-on slug; requires an explicit domain or *.'],
             'page' => ['type' => 'integer', 'minimum' => 1, 'maximum' => 1000],
             'perPage' => ['type' => 'integer', 'minimum' => 1, 'maximum' => 20],
         ], []) + ['default' => (object) []];
         $get_input = self::object([
-            'keys' => ['type' => 'array', 'minItems' => 1, 'maxItems' => 20, 'uniqueItems' => true, 'items' => ['type' => 'string', 'enum' => array_keys($catalog->definitions())]],
+            'keys' => ['type' => 'array', 'minItems' => 1, 'maxItems' => 20, 'uniqueItems' => true, 'items' => ['type' => 'string', 'minLength' => 1, 'maxLength' => 191]],
             'includeStored' => ['type' => 'boolean'],
+            'domain' => $domain,
         ], ['keys']);
-        $change = self::object(['key' => ['type' => 'string'], 'before' => self::scalar(), 'requested' => self::scalar(), 'current' => self::scalar(),
+        $list_properties = ['settings' => $fields, 'revision' => $revision, 'page' => ['type' => 'integer'], 'perPage' => ['type' => 'integer'], 'total' => ['type' => 'integer'], 'hasMore' => ['type' => 'boolean']];
+        $get_properties = ['settings' => $fields, 'revision' => $revision];
+        $scoped = ['domain' => ['type' => 'string'], 'readOnly' => ['type' => 'boolean']];
+        $change = self::object(['key' => ['type' => 'string'], 'before' => self::setting_value(), 'requested' => self::setting_value(), 'current' => self::setting_value(),
             'verified' => ['type' => 'boolean'], 'errors' => self::array_of(['type' => 'string'])]);
         $schemas = [
-            'listdom/list-settings' => [__('List Listdom settings', 'listdom'), __('Discover approved Listdom settings, live effective values, constraints, dependencies and admin locations. Filter by group and page.', 'listdom'), $list_input,
-                self::object(['settings' => $fields, 'revision' => $revision, 'page' => ['type' => 'integer'], 'perPage' => ['type' => 'integer'], 'total' => ['type' => 'integer'], 'hasMore' => ['type' => 'boolean']])],
-            'listdom/get-settings' => [__('Read Listdom settings', 'listdom'), __('Read requested approved Listdom settings by exact key, with optional stored/default distinctions and an opaque revision for conditional updates. No arbitrary options or credentials.', 'listdom'), $get_input, self::object(['settings' => $fields, 'revision' => $revision])],
-            'listdom/update-settings' => [__('Update Listdom settings', 'listdom'), __('Apply a patch of supported settings with expectedRevision from listdom/get-settings or listdom/list-settings. Changed settings or modules reject the update. Zero or empty limits mean no Listdom restriction.', 'listdom'),
-                self::object(['patch' => $catalog->patch_schema(), 'expectedRevision' => $revision]), self::object(['outcome' => ['type' => 'string', 'enum' => ['applied', 'noop']], 'verified' => ['type' => 'boolean', 'enum' => [true]], 'fields' => self::array_of($change)])],
+            'listdom/list-settings' => [__('List Listdom settings', 'listdom'), __('Discover settings, values and constraints. Omit domain for the legacy view; domain=* discovers all registered core/add-on domains. Filter by domain, addon, group and page. Exact domain revisions authorize only that domain’s approved writes.', 'listdom'), $list_input,
+                self::object($list_properties + $scoped, array_keys($list_properties))],
+            'listdom/get-settings' => [__('Read Listdom settings', 'listdom'), __('Read up to 20 registered keys. Omit domain for legacy settings/revisions; supply one exact domain for expanded configuration and its scoped revision. Discover keys with list-settings. No raw options or credentials.', 'listdom'), $get_input, self::object($get_properties + $scoped, array_keys($get_properties))],
+            'listdom/update-settings' => [__('Update Listdom settings', 'listdom'), __('Apply up to 20 approved changes with expectedRevision. Omit domain for the original settings contract; supply one concrete domain and its fresh read revision for expanded writes. Discovery revisions cannot authorize writes. Dependencies are evaluated against the complete proposed configuration. Confirm exact inputs before execution.', 'listdom'),
+                ['type' => 'object', 'required' => ['patch', 'expectedRevision'], 'oneOf' => [
+                    self::object(['patch' => $catalog->patch_schema(), 'expectedRevision' => $revision]),
+                    self::object(['domain' => ['type' => 'string', 'maxLength' => 80, 'pattern' => '^(core|addons)\\.[a-z0-9_-]+$'],
+                        'patch' => ['type' => 'object', 'minProperties' => 1, 'maxProperties' => 20, 'additionalProperties' => self::setting_value()],
+                        'expectedRevision' => $revision]),
+                ]],
+                self::object(['outcome' => ['type' => 'string', 'enum' => ['applied', 'noop', 'unchanged']], 'verified' => ['type' => 'boolean', 'enum' => [true]],
+                    'fields' => self::array_of($change), 'domain' => ['type' => 'string'], 'revision' => $revision], ['outcome', 'verified', 'fields'])],
             'listdom/audit-directory-setup' => [__('Audit Listdom directory setup', 'listdom'), __('Run the existing Listdom directory setup audit and return bounded summary counts and actionable findings.', 'listdom'), $empty, $this->audit_schema()],
             'listdom/get-dashboard-status' => [__('Inspect Listdom dashboard', 'listdom'), __('Inspect the assigned frontend dashboard page, published/shortcode readiness, form modules and restrictions. Does not create or assign pages.', 'listdom'), $empty, $this->dashboard_schema()],
         ];
+        $update_input = $schemas['listdom/update-settings'][2];
+        LSD_Abilities_Schema::register('listdom/preview-settings-update', __('Preview Listdom settings changes', 'listdom'), __('Validate exact settings inputs without saving.', 'listdom'), $update_input, ['type' => 'object'], [LSD_Settings_Service::class, 'permitted'], static function ($input) { return (new LSD_Settings_Service())->update(LSD_Abilities_Schema::input($input), true); }, true);
+        LSD_Abilities_Schema::register('listdom/verify-settings-update', __('Verify Listdom settings changes', 'listdom'), __('Independently compare requested values with current effective settings.', 'listdom'), $update_input, ['type' => 'object'], [LSD_Settings_Service::class, 'permitted'], static function ($raw)
+        {
+            $input = LSD_Abilities_Schema::input($raw);
+            $read = ['keys' => array_keys($input['patch'])];
+            if (isset($input['domain'])) $read['domain'] = $input['domain'];
+            $result = (new LSD_Settings_Service())->get_settings($read);
+            if (is_wp_error($result)) return $result;
+            $matched = 0;
+            foreach ($result['settings'] as $field) if (LSD_Settings_Writer::equal($field['effectiveValue'], $input['patch'][$field['key']])) $matched++;
+            return ['verification' => ['outcome' => $matched === count($input['patch']) ? 'fixed' : ($matched ? 'partially_fixed' : 'not_fixed'), 'scope' => 'effective_configuration'], 'settings' => $result['settings']];
+        }, true);
         foreach ($schemas as $id => $definition)
         {
             $read = $id !== 'listdom/update-settings';
@@ -91,7 +143,7 @@ class LSD_Abilities_Settings
                     $json = wp_json_encode($result);
                     return false === $json || strlen($json) > 32768 ? new WP_Error('listdom_result_limit', __('The result is too large. Request fewer settings.', 'listdom')) : $result;
                 },
-                'meta' => ['provider' => 'Listdom', 'public' => true, 'show_in_rest' => $read, 'annotations' => ['readonly' => $read, 'destructive' => false, 'idempotent' => $read]],
+                'meta' => ['workflow' => $id === 'listdom/update-settings' ? ['version' => 1, 'preview' => LSD_Abilities_Repairs::whole_input('preview-settings-update'), 'verify' => LSD_Abilities_Repairs::whole_input('verify-settings-update')] : [], 'provider' => 'Listdom', 'public' => true, 'show_in_rest' => $read, 'annotations' => ['readonly' => $read, 'destructive' => false, 'idempotent' => $read]],
             ]);
         }
     }

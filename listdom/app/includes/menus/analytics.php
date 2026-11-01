@@ -778,31 +778,31 @@ class LSD_Menus_Analytics extends LSD_Menus
     {
         $icons = [
             'listings' => 'far fa-building',
-            'published' => 'webilia-icon wbli-checkmark-circle-fill',
+            'published' => 'wui-icon wui-icon--checkmark-circle-fill',
             'categories' => 'far fa-folder',
-            'views' => 'webilia-icon wbli-eye',
+            'views' => 'wui-icon wui-icon--eye',
             'contact' => 'far fa-envelope',
-            'search' => 'webilia-icon wbli-search-magnifier',
+            'search' => 'wui-icon wui-icon--search-magnifier',
             'favorite' => 'far fa-heart',
-            'trend' => 'webilia-icon wbli-chart-increase',
-            'phone' => 'webilia-icon wbli-calling',
-            'link' => 'webilia-icon wbli-link-square',
-            'directions' => 'webilia-icon wbli-curvy-right-direction',
+            'trend' => 'wui-icon wui-icon--chart-increase',
+            'phone' => 'wui-icon wui-icon--calling',
+            'link' => 'wui-icon wui-icon--link-square',
+            'directions' => 'wui-icon wui-icon--curvy-right-direction',
             'preview-contact' => 'far fa-envelope',
-            'preview-search' => 'webilia-icon wbli-search-magnifier',
+            'preview-search' => 'wui-icon wui-icon--search-magnifier',
             'preview-favorite' => 'far fa-heart',
-            'preview-phone' => 'webilia-icon wbli-calling',
-            'preview-link' => 'webilia-icon wbli-link-square',
-            'preview-directions' => 'webilia-icon wbli-curvy-right-direction',
-            'preview-share' => 'webilia-icon wbli-share',
-            'preview-trend' => 'webilia-icon wbli-chart-increase',
+            'preview-phone' => 'wui-icon wui-icon--calling',
+            'preview-link' => 'wui-icon wui-icon--link-square',
+            'preview-directions' => 'wui-icon wui-icon--curvy-right-direction',
+            'preview-share' => 'wui-icon wui-icon--share',
+            'preview-trend' => 'wui-icon wui-icon--chart-increase',
             'action-contact' => 'far fa-envelope',
             'action-email' => 'far fa-envelope',
             'action-whatsapp' => 'fab fa-whatsapp',
-            'action-map-marker' => 'webilia-icon wbli-map-marker',
+            'action-map-marker' => 'wui-icon wui-icon--map-marker',
         ];
 
-        return $icons[$icon] ?? 'webilia-icon wbli-question';
+        return $icons[$icon] ?? 'wui-icon wui-icon--question';
     }
 
     protected function cards(array $summary, array $status, ?array $report, ?array $search_summary, ?array $series, bool $rich_data, array $changes = [], bool $filtered = false, int $days = 30): array

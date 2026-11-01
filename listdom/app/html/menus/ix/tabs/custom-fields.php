@@ -182,14 +182,14 @@ $custom_fields_mapping = isset($custom_fields_config['mapping']) ? sanitize_key(
                 if (response.success === 1)
                 {
                     replaceMapping(response.output);
-                    listdom_toastify([response.message].concat(warnings).filter(Boolean).join(' '), warnings.length ? 'lsd-warning' : 'lsd-success');
+                    listdom_notify([response.message].concat(warnings).filter(Boolean).join(' '), warnings.length ? 'lsd-warning' : 'lsd-success');
                     return;
                 }
 
                 if (response.output)
                 {
                     replaceMapping(response.output);
-                    listdom_toastify([response.message].concat(notices).filter(Boolean).join(' '), 'lsd-warning');
+                    listdom_notify([response.message].concat(notices).filter(Boolean).join(' '), 'lsd-warning');
                     return;
                 }
 

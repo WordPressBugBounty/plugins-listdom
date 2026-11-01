@@ -833,7 +833,7 @@
 .lsd-listing-googlemap .lsd-infowindow-wrapper .lsd-infowindow-container .lsd-listing-address i {
   text-align: right;
 }
-.lsd-listing-googlemap .lsd-infowindow-wrapper .lsd-infowindow-container .lsd-external-geo-link i {
+.lsd-listing-googlemap .lsd-infowindow-wrapper .lsd-infowindow-container > .lsd-infowindow-body > .lsd-external-geo-link i {
   text-align: right;
 }
 

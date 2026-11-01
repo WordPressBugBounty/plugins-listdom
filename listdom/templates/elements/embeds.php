@@ -23,7 +23,7 @@ if(!count($embeds)) return '';
                     <?php if(isset($embed['name']) && trim($embed['name'])): ?>
                     <h2 class="lsd-single-page-section-title lsd-fe-title" <?php echo lsd_schema()->name(); ?> ><?php echo esc_html($embed['name']); ?></h2>
                     <?php endif; ?>
-                    <div class="lsd-embed-code-wrapper"<?php echo $ratio ? ' style="--lsd-embed-aspect-ratio: ' . esc_attr($ratio) . '"' : ''; ?>>
+                    <div class="lsd-embed-code-wrapper"<?php echo $ratio ? ' style="--lsd-fe-embed-aspect-ratio: ' . esc_attr($ratio) . '"' : ''; ?>>
                         <?php echo $html; ?>
                     </div>
                 </li>

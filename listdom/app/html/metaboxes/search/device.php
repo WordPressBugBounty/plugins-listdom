@@ -84,6 +84,7 @@ $fields = $builder->getAvailableFields($device_fields);
                 <h3><?php esc_html_e('Available Fields', 'listdom'); ?></h3>
                 <div class="lsd-search-available-fields-container">
                     <?php foreach ($fields as $field): ?>
+                        <?php if (!empty($field['legacy'])) continue; ?>
                         <div class="lsd-search-field" id="lsd_search_available_<?php echo esc_html($device_key); ?>_<?php echo esc_attr($field['key']); ?>" data-key="<?php echo esc_attr($field['key']); ?>">
                             <strong><?php echo esc_html($field['title']); ?></strong>
                             <?php if (isset($field['description'])): ?>

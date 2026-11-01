@@ -9,7 +9,7 @@ defined('ABSPATH') || die();
 /** @var array $menus */
 ?>
 <style>.wrap > h1.wp-heading-inline, .wrap > h1 {display: none;} .wrap > span.subtitle {padding-left: 0}</style>
-<div id="lsd-tax-header" class="wrap about-wrap lsd-wrap">
+<div id="lsd-tax-header" class="wrap about-wrap lsd-wrap wui">
     <?php LSD_Menus::header($title, $url, $menus ?? []); ?>
 </div>
 <?php if ($show_links): ?>

@@ -105,7 +105,7 @@ $export_url = add_query_arg('lsd-type', 'listings', $export_base);
                         ]); ?>
                         <button type="submit" id="lsd_ix_csv_import_submit" class="lsd-primary-button">
                             <?php esc_html_e('Import', 'listdom'); ?>
-                            <i class="webilia-icon wbli-checkmark-circle"></i>
+                            <i class="wui-icon wui-icon--checkmark-circle"></i>
                         </button>
                     </div>
                 </div>
@@ -184,7 +184,7 @@ $export_url = add_query_arg('lsd-type', 'listings', $export_base);
                                 <?php LSD_Form::nonce('lsdaddcsv_auto_add'); ?>
                                 <button class="lsd-primary-button" type="submit">
                                     <?php esc_html_e('Add Import Job', 'listdom'); ?>
-                                    <i class="webilia-icon wbli-checkmark-circle"></i>
+                                    <i class="wui-icon wui-icon--checkmark-circle"></i>
                                 </button>
                             </div>
                         </div>
@@ -275,7 +275,7 @@ $importTypeSelect.on('change', function()
         $importHiddenFile.val('');
         jQuery('.lsd-settings-submit-wrapper').addClass('lsd-util-hide');
 
-        listdom_toastify("<?php echo esc_js(esc_html__('Import type changed. Please upload the CSV again to load the correct mapping form.', 'listdom')); ?>", 'lsd-warning');
+        listdom_notify("<?php echo esc_js(esc_html__('Import type changed. Please upload the CSV again to load the correct mapping form.', 'listdom')); ?>", 'lsd-warning');
     }
 });
 
@@ -328,17 +328,17 @@ jQuery('#lsd_ix_csv_import_form').on('click', '#lsd_ix_csv_load_template_map', f
     {
         if (response.success !== 1)
         {
-            listdom_toastify(response.message || "<?php echo esc_js(esc_html__('The template could not be applied. Please try again.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify(response.message || "<?php echo esc_js(esc_html__('The template could not be applied. Please try again.', 'listdom')); ?>", 'lsd-error');
             return;
         }
 
         lsdCsvApplyTemplate(response.template || {});
-        listdom_toastify("<?php echo esc_js(esc_html__('Template mapping was successful', 'listdom')); ?>", 'lsd-success');
+        listdom_notify("<?php echo esc_js(esc_html__('Template mapping was successful', 'listdom')); ?>", 'lsd-success');
         jQuery('#lsd_csv_template_name_toggle').trigger('change');
     })
     .fail(function()
     {
-        listdom_toastify("<?php echo esc_js(esc_html__('The template could not be applied. Please try again.', 'listdom')); ?>", 'lsd-error');
+        listdom_notify("<?php echo esc_js(esc_html__('The template could not be applied. Please try again.', 'listdom')); ?>", 'lsd-error');
     })
     .always(function()
     {
@@ -375,7 +375,7 @@ const lsdCsvExportStep = function(state)
         {
             lsdCsvExportReset();
             lsdCsvExportSetMessage("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
-            listdom_toastify("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
             return;
         }
 
@@ -401,7 +401,7 @@ const lsdCsvExportStep = function(state)
     {
         lsdCsvExportReset();
         lsdCsvExportSetMessage("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
-        listdom_toastify("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
+        listdom_notify("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
     });
 };
 
@@ -432,7 +432,7 @@ const lsdCsvExportStart = function(event)
         {
             lsdCsvExportReset();
             lsdCsvExportSetMessage("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
-            listdom_toastify("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
             return;
         }
 
@@ -442,7 +442,7 @@ const lsdCsvExportStart = function(event)
     {
         lsdCsvExportReset();
         lsdCsvExportSetMessage("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
-        listdom_toastify("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
+        listdom_notify("<?php echo esc_js(esc_html__('Export failed. Please try again.', 'listdom')); ?>", 'lsd-error');
     });
 };
 
@@ -526,7 +526,7 @@ jQuery('#lsd_ix_csv_import_file_input').on('change', function()
             lsdTemplateName();
 
             // Show Alert
-            listdom_toastify(response.message, 'lsd-success');
+            listdom_notify(response.message, 'lsd-success');
         }
         else
         {
@@ -541,7 +541,7 @@ jQuery('#lsd_ix_csv_import_file_input').on('change', function()
             }
             else
             {
-                listdom_toastify(response.message, 'lsd-error');
+                listdom_notify(response.message, 'lsd-error');
             }
         }
     });
@@ -571,7 +571,7 @@ jQuery('#lsd_ix_csv_auto_import_form').on('submit', function(e)
             loading.stop();
 
             // Show Alert
-            listdom_toastify(response.message, response.success === 1 ? 'lsd-success' : 'lsd-error');
+            listdom_notify(response.message, response.success === 1 ? 'lsd-success' : 'lsd-error');
 
             // Update Jobs Section
             if (response.success === 1 && response.content)
@@ -594,7 +594,7 @@ jQuery('#lsd_ix_csv_auto_import_form').on('submit', function(e)
             loading.stop();
 
             // Show Alert
-            listdom_toastify("<?php echo esc_js(esc_html__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
         }
     });
 });
@@ -669,7 +669,7 @@ const lsdCsvImportShowRecovery = function(message, session)
         message,
         'lsd-warning',
         '<div class="lsd-mt-2 lsd-flex lsd-gap-2">'
-        + '<button type="button" id="lsd_ix_csv_import_resume" class="lsd-secondary-button"><?php echo esc_js(esc_html__('Resume Import', 'listdom')); ?><i class="webilia-icon wbli-right-arrow"></i></button>'
+        + '<button type="button" id="lsd_ix_csv_import_resume" class="lsd-secondary-button"><?php echo esc_js(esc_html__('Resume Import', 'listdom')); ?><i class="wui-icon wui-icon--right-arrow"></i></button>'
         + '<button type="button" id="lsd_ix_csv_import_discard" class="lsd-text-button"><?php echo esc_js(esc_html__('Discard', 'listdom')); ?></button>'
         + '</div>'
     );

@@ -21,6 +21,8 @@ class LSD_Personalize_Forms extends LSD_Personalize
         $CSS = str_replace("((general_form_input_bg_color))", sanitize_text_field($normal['input_bg_color'] ?: 'inherit'), $CSS);
 
         $CSS = str_replace("((general_form_input_text_color))", sanitize_text_field($normal['text'] ?: 'inherit'), $CSS);
+        $arrow_color = sanitize_hex_color($normal['text'] ?? '') ?: '#000000';
+        $CSS = str_replace('((general_form_input_select_arrow_color))', rawurlencode($arrow_color), $CSS);
         $CSS = str_replace("((general_form_input_placeholder_text_color))", sanitize_text_field($normal['placeholder'] ?: 'inherit'), $CSS);
         $CSS = str_replace("((general_form_input_border_width))", self::borders($normal['border'] ?? []), $CSS);
         $CSS = str_replace("((general_form_input_border_style))", sanitize_text_field($normal['border']['style']), $CSS);
@@ -55,12 +57,17 @@ class LSD_Personalize_Forms extends LSD_Personalize
         $CSS = str_replace("((search_form_bg_color))", sanitize_text_field($form['form_bg_color'] ?: 'inherit'), $CSS);
         $padding = array_merge(['top' => 2, 'right' => 2, 'bottom' => 2, 'left' => 2], $form['field_padding'] ?? []);
         $CSS = str_replace('((search_form_field_padding))', self::paddings($padding), $CSS);
+        $choice_range_padding = array_merge(['top' => 2, 'right' => 10, 'bottom' => 2, 'left' => 10], $form['choice_range_padding'] ?? []);
+        $CSS = str_replace('((search_form_choice_range_padding))', self::paddings($choice_range_padding), $CSS);
         $CSS = str_replace("((search_form_input_icons_color))", sanitize_text_field($icon['icon_color'] ?: 'inherit'), $CSS);
 
         // Normal state (non-hover settings)
         $CSS = str_replace("((search_form_input_bg_color))", sanitize_text_field($normal['input_bg_color'] ?: 'inherit'), $CSS);
 
         $CSS = str_replace("((search_form_input_text_color))", sanitize_text_field($normal['text'] ?: 'inherit'), $CSS);
+        // Background SVGs cannot inherit the select's CSS color.
+        $arrow_color = sanitize_hex_color($normal['text'] ?? '') ?: '#000000';
+        $CSS = str_replace('((search_form_input_select_arrow_color))', rawurlencode($arrow_color), $CSS);
         $CSS = str_replace("((search_form_input_placeholder_text_color))", sanitize_text_field($normal['placeholder'] ?: 'inherit'), $CSS);
         $CSS = str_replace("((search_form_input_border_width))", self::borders($normal['border'] ?? []), $CSS);
         $CSS = str_replace("((search_form_input_border_style))", sanitize_text_field($normal['border']['style']), $CSS);
@@ -75,7 +82,9 @@ class LSD_Personalize_Forms extends LSD_Personalize
         $CSS = str_replace("((search_form_input_hover_border_radius))", sanitize_text_field($hover['border']['radius']) . 'px', $CSS);
 
         // Typography
-        $CSS = str_replace("((search_form_input_font_family))", self::font_family($normal['typography']['family'] ?? ''), $CSS);
+        $font_family = self::font_family($normal['typography']['family'] ?? '');
+        if ($font_family !== 'inherit') $font_family .= ', serif';
+        $CSS = str_replace("((search_form_input_font_family))", $font_family, $CSS);
         $CSS = str_replace("((search_form_input_font_weight))", sanitize_text_field($normal['typography']['weight']), $CSS);
         $CSS = str_replace("((search_form_input_text_align))", sanitize_text_field($normal['typography']['align']), $CSS);
         $CSS = str_replace("((search_form_input_font_size))", self::unit_number($normal['typography']['size']), $CSS);
@@ -111,7 +120,9 @@ class LSD_Personalize_Forms extends LSD_Personalize
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_border_color))', sanitize_text_field($tab['border']['color'] ?: 'inherit'), $CSS);
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_border_radius))', sanitize_text_field($tab['border']['radius'] ?: 0) . 'px', $CSS);
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_padding))', self::paddings($tab['padding'] ?? []), $CSS);
-            $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_family))', self::font_family($tab['typography']['family'] ?? ''), $CSS);
+            $font_family = self::font_family($tab['typography']['family'] ?? '');
+            if ($font_family !== 'inherit') $font_family .= ', serif';
+            $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_family))', $font_family, $CSS);
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_weight))', sanitize_text_field($tab['typography']['weight'] ?: 'inherit'), $CSS);
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_text_align))', sanitize_text_field($tab['typography']['align'] ?: 'inherit'), $CSS);
             $CSS = str_replace('((auth_forms_tabs_' . $state . '_font_size))', self::unit_number($tab['typography']['size'] ?? '', 'px', 'inherit'), $CSS);
@@ -120,7 +131,9 @@ class LSD_Personalize_Forms extends LSD_Personalize
 
         // Labels
         $CSS = str_replace('((auth_forms_labels_color))', sanitize_text_field($labels['text'] ?: 'inherit'), $CSS);
-        $CSS = str_replace('((auth_forms_labels_font_family))', self::font_family($labels['typography']['family'] ?? ''), $CSS);
+        $font_family = self::font_family($labels['typography']['family'] ?? '');
+        if ($font_family !== 'inherit') $font_family .= ', serif';
+        $CSS = str_replace('((auth_forms_labels_font_family))', $font_family, $CSS);
         $CSS = str_replace('((auth_forms_labels_font_weight))', sanitize_text_field($labels['typography']['weight'] ?: 'inherit'), $CSS);
         $CSS = str_replace('((auth_forms_labels_text_align))', sanitize_text_field($labels['typography']['align'] ?: 'inherit'), $CSS);
         $CSS = str_replace('((auth_forms_labels_font_size))', self::unit_number($labels['typography']['size'] ?? '', 'px', 'inherit'), $CSS);

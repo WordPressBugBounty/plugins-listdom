@@ -12,17 +12,48 @@ class LSD_Entity_Listing extends LSD_Entity
         $this->post = get_post($post);
     }
 
-    public function save(array $data = [], $trigger_actions = true)
+    /** Enable readback only for the explicitly managed write path. */
+    private $verify_write = false;
+    private $defer_saved = false;
+
+    public function save_managed(array $data, bool $creating = false)
+    {
+        $this->verify_write = true;
+        $this->defer_saved = true;
+        if (!$creating && $this->post->post_status === 'draft') $data['_lsd_managed_draft'] = true;
+        try { return $this->save($data, !$creating, !$creating); }
+        finally { $this->verify_write = false; $this->defer_saved = false; }
+    }
+
+    private function save_meta(int $id, string $key, $value)
+    {
+        // Managed input is decoded, unlike already-slashed ordinary form data.
+        $result = update_post_meta($id, $key, $this->verify_write ? wp_slash($value) : $value);
+        if ($this->verify_write && get_post_meta($id, $key, true) != $value) throw new RuntimeException('Listing metadata readback failed.');
+        return $result;
+    }
+
+    public function save(array $data = [], $trigger_actions = true, bool $partial = false)
     {
         // Edit Locked?
         if (get_post_meta($this->post->ID, 'lsd_lock_edit', true)) return;
+
+        if ($partial && !array_intersect(['address', 'latitude', 'longitude'], array_keys($data))) $validation = true;
+        elseif ($partial)
+        {
+            // Validate the complete coordinate pair while writing only supplied fields.
+            $location = $data + ['latitude' => get_post_meta($this->post->ID, 'lsd_latitude', true), 'longitude' => get_post_meta($this->post->ID, 'lsd_longitude', true)];
+            $validation = $this->validate_location($location);
+        }
+        else $validation = $this->validate_location($data);
+        if (is_wp_error($validation)) return $validation;
 
         $submission = !empty($data['_lsd_submission']);
         if (isset($data['_lsd_submission'])) unset($data['_lsd_submission']);
 
         $skip_location = !empty($data['_lsd_skip_location']);
         if (isset($data['_lsd_skip_location'])) unset($data['_lsd_skip_location']);
-        $data_id = false;
+        $data_id = $partial;
 
         $category = isset($data['listing_category']) ? sanitize_text_field($data['listing_category']) : '';
         $term = $category ? get_term_by('term_id', $category, LSD_Base::TAX_CATEGORY) : null;
@@ -36,50 +67,60 @@ class LSD_Entity_Listing extends LSD_Entity
             $categories = array_unique(array_merge([$term->term_id], $additional_categories));
 
             // Category Term
-            wp_set_object_terms($this->post->ID, $categories, LSD_Base::TAX_CATEGORY);
+            $assigned = wp_set_object_terms($this->post->ID, $categories, LSD_Base::TAX_CATEGORY);
+            if ($this->verify_write)
+            {
+                $actual = wp_get_object_terms($this->post->ID, LSD_Base::TAX_CATEGORY, ['fields' => 'ids']);
+                if (is_wp_error($assigned) || is_wp_error($actual) || array_diff($categories, $actual) || array_diff($actual, $categories)) throw new RuntimeException('Listing categories readback failed.');
+            }
 
             // Primary Category Meta
-            update_post_meta($this->post->ID, 'lsd_primary_category', $term->slug);
+            $this->save_meta($this->post->ID, 'lsd_primary_category', $term->slug);
         }
         // A valid category is required!
-        else if ($trigger_actions)
+        else if ($trigger_actions && !$partial)
         {
             LSD_Flash::add(esc_html__("A valid Listing Category is required.", 'listdom'), 'error');
         }
 
-        update_post_meta($this->post->ID, 'lsd_object_type', isset($data['object_type']) ? sanitize_text_field($data['object_type']) : 'marker');
-        update_post_meta($this->post->ID, 'lsd_zoomlevel', isset($data['zoomlevel']) ? sanitize_text_field($data['zoomlevel']) : $this->settings['map_backend_zl']);
+        if (!$partial || array_key_exists('object_type', $data)) $this->save_meta($this->post->ID, 'lsd_object_type', isset($data['object_type']) ? sanitize_text_field($data['object_type']) : 'marker');
+        if (!$partial || array_key_exists('zoomlevel', $data)) $this->save_meta($this->post->ID, 'lsd_zoomlevel', isset($data['zoomlevel']) ? sanitize_text_field($data['zoomlevel']) : $this->settings['map_backend_zl']);
 
-        if (!$skip_location)
+        if (!$skip_location && (!$partial || array_intersect(['address', 'latitude', 'longitude'], array_keys($data))))
         {
             // Lat / Long
-            $lat = isset($data['latitude']) ? sanitize_text_field($data['latitude']) : $this->settings['map_backend_lt'];
-            $lng = isset($data['longitude']) ? sanitize_text_field($data['longitude']) : $this->settings['map_backend_ln'];
+            $lat = isset($data['latitude']) ? sanitize_text_field($data['latitude']) : ($partial ? get_post_meta($this->post->ID, 'lsd_latitude', true) : $this->settings['map_backend_lt']);
+            $lng = isset($data['longitude']) ? sanitize_text_field($data['longitude']) : ($partial ? get_post_meta($this->post->ID, 'lsd_longitude', true) : $this->settings['map_backend_ln']);
 
             // Geo Point on WP Meta Table
-            update_post_meta($this->post->ID, 'lsd_address', isset($data['address']) ? sanitize_text_field($data['address']) : '');
-            update_post_meta($this->post->ID, 'lsd_latitude', $lat);
-            update_post_meta($this->post->ID, 'lsd_longitude', $lng);
+            if (!$partial || array_key_exists('address', $data)) $this->save_meta($this->post->ID, 'lsd_address', isset($data['address']) ? sanitize_text_field($data['address']) : '');
+            $this->save_meta($this->post->ID, 'lsd_latitude', $lat);
+            $this->save_meta($this->post->ID, 'lsd_longitude', $lng);
 
             // Geo-point
             $data_id = $this->update_geopoint($this->post->ID, $lat, $lng);
         }
 
         // Shape
-        update_post_meta($this->post->ID, 'lsd_shape_type', isset($data['shape_type']) ? sanitize_text_field($data['shape_type']) : '');
-        update_post_meta($this->post->ID, 'lsd_shape_paths', isset($data['shape_paths']) ? sanitize_text_field($data['shape_paths']) : '');
-        update_post_meta($this->post->ID, 'lsd_shape_radius', isset($data['shape_radius']) ? sanitize_text_field($data['shape_radius']) : '');
+        if (!$partial || array_key_exists('shape_type', $data)) $this->save_meta($this->post->ID, 'lsd_shape_type', isset($data['shape_type']) ? sanitize_text_field($data['shape_type']) : '');
+        if (!$partial || array_key_exists('shape_paths', $data)) $this->save_meta($this->post->ID, 'lsd_shape_paths', isset($data['shape_paths']) ? sanitize_text_field($data['shape_paths']) : '');
+        if (!$partial || array_key_exists('shape_radius', $data)) $this->save_meta($this->post->ID, 'lsd_shape_radius', isset($data['shape_radius']) ? sanitize_text_field($data['shape_radius']) : '');
 
         // Save attributes one by one
         $attributes_input = isset($data['attributes']) && is_array($data['attributes']) ? $data['attributes'] : [];
         $existing_attributes = get_post_meta($this->post->ID, 'lsd_attributes', true);
         if (!is_array($existing_attributes)) $existing_attributes = [];
+        if ($partial && !array_key_exists('attributes', $data)) $attributes_input = $existing_attributes;
+        elseif ($partial && $attributes_input) $attributes_input += $existing_attributes;
+        if ($partial && array_key_exists('attributes', $data))
+            foreach (array_diff_key($existing_attributes, $attributes_input) as $key => $value) delete_post_meta($this->post->ID, 'lsd_attribute_' . $key);
 
         $attribute_context = LSD_Taxonomies_Attribute::context([
             'post_id' => $this->post->ID,
             'category_id' => ($term && !is_wp_error($term) && isset($term->term_id)) ? $term->term_id : 0,
             'category_slug' => ($term && !is_wp_error($term) && isset($term->slug)) ? sanitize_title($term->slug) : '',
             'submission' => $submission,
+            'listing_fields' => $this->verify_write ? $data : null,
         ]);
 
         $attribute_types = [];
@@ -97,7 +138,7 @@ class LSD_Entity_Listing extends LSD_Entity
             $attribute_labels[$slug] = $attribute_detail['name'] ?? $slug;
 
             if (
-                !array_key_exists($slug, $attributes_input)
+                !$partial && !array_key_exists($slug, $attributes_input)
                 && array_key_exists($slug, $existing_attributes)
                 && !LSD_Taxonomies_Attribute::applies($attribute_term_ids[$slug], $attribute_context)
             )
@@ -109,6 +150,11 @@ class LSD_Entity_Listing extends LSD_Entity
         $normalized_attributes = [];
         foreach ($attributes_input as $key => $attribute_value)
         {
+            if ($partial && !array_key_exists($key, $data['attributes'] ?? []))
+            {
+                $normalized_attributes[$key] = $attribute_value;
+                continue;
+            }
             if (is_array($attribute_value))
             {
                 $normalized_array = array_map('sanitize_text_field', $attribute_value);
@@ -129,33 +175,50 @@ class LSD_Entity_Listing extends LSD_Entity
                 $stored_value = $normalized_value;
             }
 
-            update_post_meta($this->post->ID, 'lsd_attribute_' . $key, $stored_value);
+            $this->save_meta($this->post->ID, 'lsd_attribute_' . $key, $stored_value);
         }
 
-        update_post_meta($this->post->ID, 'lsd_attributes', $normalized_attributes);
+        $this->save_meta($this->post->ID, 'lsd_attributes', $normalized_attributes);
 
         // Related Listings
-        update_post_meta($this->post->ID, 'lsd_related_listings', isset($data['related_listings']) && is_array($data['related_listings']) ? $data['related_listings'] : []);
+        if (!$partial || array_key_exists('related_listings', $data)) $this->save_meta($this->post->ID, 'lsd_related_listings', isset($data['related_listings']) && is_array($data['related_listings']) ? $data['related_listings'] : []);
 
         // Listing Link
-        update_post_meta($this->post->ID, 'lsd_link', isset($data['link']) && filter_var($data['link'], FILTER_VALIDATE_URL) ? esc_url_raw($data['link']) : '');
+        if (!$partial || array_key_exists('link', $data)) $this->save_meta($this->post->ID, 'lsd_link', isset($data['link']) && filter_var($data['link'], FILTER_VALIDATE_URL) ? esc_url_raw($data['link']) : '');
 
         // Price Options
-        update_post_meta($this->post->ID, 'lsd_price', isset($data['price']) ? sanitize_text_field($data['price']) : 0);
-        update_post_meta($this->post->ID, 'lsd_price_max', isset($data['price_max']) ? sanitize_text_field($data['price_max']) : 0);
-        update_post_meta($this->post->ID, 'lsd_price_after', isset($data['price_after']) ? sanitize_text_field($data['price_after']) : '');
-        update_post_meta($this->post->ID, 'lsd_price_class', isset($data['price_class']) ? sanitize_text_field($data['price_class']) : 2);
-        update_post_meta($this->post->ID, 'lsd_currency', isset($data['currency']) ? sanitize_text_field($data['currency']) : LSD_Options::currency());
+        if (!$partial || array_key_exists('price', $data)) $this->save_meta($this->post->ID, 'lsd_price', isset($data['price']) ? sanitize_text_field($data['price']) : 0);
+        if (!$partial || array_key_exists('price_max', $data)) $this->save_meta($this->post->ID, 'lsd_price_max', isset($data['price_max']) ? sanitize_text_field($data['price_max']) : 0);
+        if (!$partial || array_key_exists('price_after', $data)) $this->save_meta($this->post->ID, 'lsd_price_after', isset($data['price_after']) ? sanitize_text_field($data['price_after']) : '');
+        if (!$partial || array_key_exists('price_class', $data)) $this->save_meta($this->post->ID, 'lsd_price_class', isset($data['price_class']) ? sanitize_text_field($data['price_class']) : 2);
+        if (!$partial || array_key_exists('currency', $data)) $this->save_meta($this->post->ID, 'lsd_currency', isset($data['currency']) ? sanitize_text_field($data['currency']) : LSD_Options::currency());
 
         // Availability
-        update_post_meta($this->post->ID, 'lsd_ava', $data['ava'] ?? []);
+        if (!$partial || array_key_exists('ava', $data))
+        {
+            $hours = $data['ava'] ?? [];
+            $existing_hours = get_post_meta($this->post->ID, 'lsd_ava', true);
+            if ($partial && $hours && is_array($existing_hours))
+            {
+                foreach ($hours as $day => $values) $hours[$day] = $values + ($existing_hours[$day] ?? []);
+                $hours += $existing_hours;
+            }
+            $this->save_meta($this->post->ID, 'lsd_ava', $hours);
+        }
 
         // Contact Details
-        update_post_meta($this->post->ID, 'lsd_email', isset($data['email']) ? sanitize_email($data['email']) : '');
-        update_post_meta($this->post->ID, 'lsd_phone', isset($data['phone']) ? sanitize_text_field($data['phone']) : '');
-        update_post_meta($this->post->ID, 'lsd_website', isset($data['website']) ? esc_url($data['website']) : '');
-        update_post_meta($this->post->ID, 'lsd_contact_address', isset($data['contact_address']) ? sanitize_text_field($data['contact_address']) : '');
+        if (!$partial || array_key_exists('email', $data)) $this->save_meta($this->post->ID, 'lsd_email', isset($data['email']) ? sanitize_email($data['email']) : '');
+        if (!$partial || array_key_exists('phone', $data)) $this->save_meta($this->post->ID, 'lsd_phone', isset($data['phone']) ? sanitize_text_field($data['phone']) : '');
+        if (!$partial || array_key_exists('website', $data)) $this->save_meta($this->post->ID, 'lsd_website', isset($data['website']) ? esc_url($data['website']) : '');
+        if (!$partial || array_key_exists('contact_address', $data)) $this->save_meta($this->post->ID, 'lsd_contact_address', isset($data['contact_address']) ? sanitize_text_field($data['contact_address']) : '');
 
+        $cta_fields = ['cta_mode' => 'mode', 'cta_text' => 'text', 'cta_target' => 'target', 'cta_url' => 'url', 'cta_popup' => 'content'];
+        $save_cta = !$partial || array_intersect(array_keys($cta_fields), array_keys($data));
+        if ($partial && $save_cta)
+        {
+            $existing_cta = get_post_meta($this->post->ID, 'lsd_call_to_action', true);
+            foreach ($cta_fields as $field => $part) if (!array_key_exists($field, $data) && isset($existing_cta[$part])) $data[$field] = $existing_cta[$part];
+        }
         $cta_text = isset($data['cta_text']) ? sanitize_text_field($data['cta_text']) : '';
         $cta_options = ['details', 'lightbox', 'custom', 'popup'];
 
@@ -169,7 +232,7 @@ class LSD_Entity_Listing extends LSD_Entity
         $cta_url = isset($data['cta_url']) ? esc_url_raw($data['cta_url']) : '';
         $cta_popup = isset($data['cta_popup']) ? wp_kses_post($data['cta_popup']) : '';
 
-        update_post_meta($this->post->ID, 'lsd_call_to_action', [
+        if ($save_cta) $this->save_meta($this->post->ID, 'lsd_call_to_action', [
             'mode' => $cta_mode,
             'text' => $cta_text,
             'target' => $cta_target,
@@ -190,7 +253,7 @@ class LSD_Entity_Listing extends LSD_Entity
             $current_user = get_current_user_id();
             if ($current_user) $log_extra['user_id'] = $current_user;
 
-            update_post_meta($this->post->ID, 'lsd_privacy_consent', LSD_Privacy::create_log($log_extra));
+            $this->save_meta($this->post->ID, 'lsd_privacy_consent', LSD_Privacy::create_log($log_extra));
         }
 
         // add zero Visits
@@ -198,45 +261,46 @@ class LSD_Entity_Listing extends LSD_Entity
 
         // Keep hidden data on ordinary saves, but accept values explicitly supplied by an importer.
         if (LSD_Components::remark() || array_key_exists('remark', $data))
-            update_post_meta($this->post->ID, 'lsd_remark', isset($data['remark']) && is_scalar($data['remark']) ? wp_kses_post((string) $data['remark']) : '');
+            if (!$partial || array_key_exists('remark', $data)) $this->save_meta($this->post->ID, 'lsd_remark', isset($data['remark']) && is_scalar($data['remark']) ? wp_kses_post((string) $data['remark']) : '');
 
         // Display Options
         $display_options = isset($data['displ']) && is_array($data['displ']) ? $data['displ'] : [];
         if (isset($display_options['style'])) $display_options['style'] = self::sanitize_display_style($display_options['style']);
 
-        update_post_meta($this->post->ID, 'lsd_displ', $display_options);
+        if (!$partial || array_key_exists('displ', $data)) $this->save_meta($this->post->ID, 'lsd_displ', $display_options);
 
         // Featured Image Alt Text
         if (array_key_exists('featured_image_alt', $data))
         {
-            update_post_meta($this->post->ID, 'lsd_featured_image_alt', sanitize_text_field($data['featured_image_alt']));
+            $this->save_meta($this->post->ID, 'lsd_featured_image_alt', sanitize_text_field($data['featured_image_alt']));
         }
 
         // Gallery
-        $gallery = isset($data['gallery']) && is_array($data['gallery']) ? array_map('absint', $data['gallery']) : [];
-        update_post_meta($this->post->ID, 'lsd_gallery', $gallery);
+        $gallery = isset($data['gallery']) && is_array($data['gallery']) ? array_map('absint', $data['gallery']) : ($partial ? (array) get_post_meta($this->post->ID, 'lsd_gallery', true) : []);
+        if (!$partial || array_key_exists('gallery', $data)) $this->save_meta($this->post->ID, 'lsd_gallery', $gallery);
 
         // Gallery Image Alt Text
-        if (array_key_exists('gallery_alt', $data))
+        if (array_key_exists('gallery_alt', $data) || array_key_exists('gallery', $data))
         {
             $gallery_alt = [];
-            $gallery_alt_data = is_array($data['gallery_alt']) ? $data['gallery_alt'] : [];
+            $gallery_alt_data = array_key_exists('gallery_alt', $data) ? (is_array($data['gallery_alt']) ? $data['gallery_alt'] : []) : (array) get_post_meta($this->post->ID, 'lsd_gallery_alt', true);
+            if ($partial && $gallery_alt_data) $gallery_alt_data += (array) get_post_meta($this->post->ID, 'lsd_gallery_alt', true);
             foreach ($gallery as $image_id)
             {
                 $alt = isset($gallery_alt_data[$image_id]) ? sanitize_text_field($gallery_alt_data[$image_id]) : '';
                 if ($alt !== '') $gallery_alt[(string) $image_id] = $alt;
             }
-            update_post_meta($this->post->ID, 'lsd_gallery_alt', $gallery_alt);
+            $this->save_meta($this->post->ID, 'lsd_gallery_alt', $gallery_alt);
         }
 
         // Embeds
         if (array_key_exists('embeds', $data))
         {
-            update_post_meta($this->post->ID, 'lsd_embeds', is_array($data['embeds']) ? $this->indexify($data['embeds']) : []);
+            $this->save_meta($this->post->ID, 'lsd_embeds', is_array($data['embeds']) ? $this->indexify($data['embeds']) : []);
         }
 
         if (LSD_Components::faq() || array_key_exists('faqs', $data))
-            update_post_meta($this->post->ID, 'lsd_faqs', isset($data['faqs']) && is_array($data['faqs']) ? $this->indexify($data['faqs']) : []);
+            if (!$partial || array_key_exists('faqs', $data)) $this->save_meta($this->post->ID, 'lsd_faqs', isset($data['faqs']) && is_array($data['faqs']) ? $this->indexify($data['faqs']) : []);
 
         // Guest Data
         if (isset($data['guest_email']))
@@ -244,9 +308,9 @@ class LSD_Entity_Listing extends LSD_Entity
             // Guest Email
             $guest_email = sanitize_email($data['guest_email']);
 
-            update_post_meta($this->post->ID, 'lsd_guest_email', $guest_email);
-            update_post_meta($this->post->ID, 'lsd_guest_message', isset($data['guest_message']) ? sanitize_text_field($data['guest_message']) : '');
-            update_post_meta($this->post->ID, 'lsd_guest_fullname', isset($data['guest_fullname']) ? sanitize_text_field($data['guest_fullname']) : '');
+            $this->save_meta($this->post->ID, 'lsd_guest_email', $guest_email);
+            $this->save_meta($this->post->ID, 'lsd_guest_message', isset($data['guest_message']) ? sanitize_text_field($data['guest_message']) : '');
+            $this->save_meta($this->post->ID, 'lsd_guest_fullname', isset($data['guest_fullname']) ? sanitize_text_field($data['guest_fullname']) : '');
         }
 
         // Registration Method
@@ -265,10 +329,10 @@ class LSD_Entity_Listing extends LSD_Entity
         }
 
         // Save Third Party Data
-        do_action('lsd_listing_saved', $this->post, $data, !$data_id);
+        if (!$this->defer_saved) do_action('lsd_listing_saved', $this->post, $data, !$partial && !$data_id);
 
         // New Listing Action
-        if ($trigger_actions && !$data_id) do_action('lsd_new_listing', $this->post->ID);
+        if ($trigger_actions && !$partial && !$data_id) do_action('lsd_new_listing', $this->post->ID);
     }
 
     /**
@@ -288,20 +352,46 @@ class LSD_Entity_Listing extends LSD_Entity
         return isset($styles[$style]) ? $style : '';
     }
 
+    /** Validate the effective coordinates, preserving omitted fields and location-free saves. */
+    public function validate_location(array $data)
+    {
+        if (!empty($data['_lsd_skip_location'])) return true;
+
+        return self::validate_coordinates(
+            $data['latitude'] ?? $this->settings['map_backend_lt'],
+            $data['longitude'] ?? $this->settings['map_backend_ln']
+        );
+    }
+
+    /** Accept only finite geographic numbers, including numeric form/import strings. */
+    private static function validate_coordinates($lat, $lng)
+    {
+        foreach ([[$lat, 90], [$lng, 180]] as [$value, $maximum])
+        {
+            if (!is_numeric($value) || !is_finite((float) $value) || abs((float) $value) > $maximum)
+                return new WP_Error('listdom_invalid_coordinates', esc_html__('Latitude must be a finite number between -90 and 90, and longitude between -180 and 180.', 'listdom'));
+        }
+
+        return true;
+    }
+
     public function update_geopoint($listing_id, $lat, $lng)
     {
+        $validation = self::validate_coordinates($lat, $lng);
+        if (is_wp_error($validation)) return $validation;
+
         // Listdom DB
         $db = new LSD_db();
 
         // Listdom Data ID
-        $data_id = $db->select("SELECT `id` FROM `#__lsd_data` WHERE `id`='" . esc_sql($listing_id) . "'");
+        $data_id = $db->select($db->prepare('SELECT `id` FROM `#__lsd_data` WHERE `id` = %d', $listing_id));
 
         // Insert Geo Point on Listdom Table
-        if (!$data_id) $db->q("INSERT INTO `#__lsd_data` (`id`, `latitude`, `longitude`) VALUES ('" . esc_sql($listing_id) . "', '" . $lat . "', '" . $lng . "')");
-        else $db->q("UPDATE `#__lsd_data` SET `latitude`='" . $lat . "', `longitude`='" . $lng . "' WHERE `id`='" . esc_sql($listing_id) . "'");
+        if (!$data_id) $db->q($db->prepare('INSERT INTO `#__lsd_data` (`id`, `latitude`, `longitude`) VALUES (%d, %.8f, %.8f)', $listing_id, $lat, $lng));
+        else $db->q($db->prepare('UPDATE `#__lsd_data` SET `latitude` = %.8f, `longitude` = %.8f WHERE `id` = %d', $lat, $lng, $listing_id));
 
         // Update Point Field
-        $db->q("UPDATE `#__lsd_data` SET `point`=Point(`latitude`, `longitude`) WHERE `id`='" . esc_sql($listing_id) . "'");
+        $db->q($db->prepare('UPDATE `#__lsd_data` SET `point` = Point(`latitude`, `longitude`) WHERE `id` = %d', $listing_id));
 
         return $data_id;
     }
@@ -434,8 +524,9 @@ class LSD_Entity_Listing extends LSD_Entity
         return $element->slider($size, $this->post->ID, $link_method, $style);
     }
 
-    public function get_image_module($shortcode, $size = [390, 260])
+    public function get_image_module($shortcode, $size = null)
     {
+        if ($size === null) $size = $shortcode->presentation_image_size();
         if ($shortcode->image_method === 'slider') return $this->get_image_slider(
             $size,
             $shortcode->get_listing_link_method(),

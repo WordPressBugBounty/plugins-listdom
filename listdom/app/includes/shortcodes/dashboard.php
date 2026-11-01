@@ -68,6 +68,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             : 'default';
 
         $classes = is_array($options['classes']) ? array_values(array_filter(array_map('trim', $options['classes']))) : [];
+        $classes[] = 'wui';
         if (!in_array('lsd-dashboard', $classes, true)) array_unshift($classes, 'lsd-dashboard');
 
         if ($sidebar_status === 'horizontal')
@@ -673,8 +674,20 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $item .= '<a href="' . esc_url($url) . '" target="' . esc_attr($target) . '"' . $rel_attribute . $aria_label . '>';
             if ($show_icons)
             {
-                if (!empty($menu['icon_html'])) $item .= LSD_Kses::full($menu['icon_html']);
-                else $item .= '<i class="lsd-fe-icon ' . esc_attr($icon) . '" aria-hidden="true"></i>';
+                if (!empty($menu['icon_html']))
+                {
+                    $icon_html = str_replace(['webilia-icon', 'wbli-'], ['wui-icon', 'wui-icon--'], $menu['icon_html']);
+                    $icon_html = preg_replace('/(?<![\w-])wbli(?![\w-])/', 'wui-icon', $icon_html);
+                    $item .= LSD_Kses::full($icon_html);
+                }
+                else
+                {
+                    $icon = str_replace(['webilia-icon', 'wbli-'], ['wui-icon', 'wui-icon--'], $icon);
+                    $icon = preg_replace('/(?<![\w-])wbli(?![\w-])/', 'wui-icon', $icon);
+                    if (strpos($icon, 'wui-icon--') !== false
+                        && !preg_match('/(?:^|\s)wui-icon(?:\s|$)/', $icon)) $icon = 'wui-icon ' . $icon;
+                    $item .= '<i class="lsd-fe-icon ' . esc_attr($icon) . '" aria-hidden="true"></i>';
+                }
             }
             if ($show_labels) $item .= '<span class="lsd-dashboard-menu-label">' . esc_html($label) . '</span>';
             $item .= '</a>';
@@ -1579,12 +1592,18 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
     public function get_restriction_rules(): array
     {
-        return apply_filters('lsd_dashboard_restriction_rules', [
-            'max_gallery_images' => $this->settings['submission_max_gallery_images'] ?? '',
-            'max_upload_size' => $this->settings['submission_max_image_upload_size'] ?? '',
-            'description_length' => $this->settings['submission_max_description_length'] ?? '',
-            'max_tags' => $this->settings['submission_max_tags_count'] ?? '',
-        ]);
+        return apply_filters('lsd_dashboard_restriction_rules', self::restriction_rules($this->settings));
+    }
+
+    /** First-party effective limits without request-specific subscription overrides. */
+    public static function restriction_rules(array $settings): array
+    {
+        return [
+            'max_gallery_images' => $settings['submission_max_gallery_images'] ?? '',
+            'max_upload_size' => $settings['submission_max_image_upload_size'] ?? '',
+            'description_length' => $settings['submission_max_description_length'] ?? '',
+            'max_tags' => $settings['submission_max_tags_count'] ?? '',
+        ];
     }
 
     public function upload()

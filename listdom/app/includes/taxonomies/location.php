@@ -148,8 +148,9 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
         if (!current_user_can('edit_term', $term_id)) return false;
 
         $image = sanitize_text_field(wp_unslash($_POST['lsd_image']));
-        update_term_meta($term_id, 'lsd_image', $image);
-        if (isset($_POST['lsd_schema'])) update_term_meta($term_id, 'lsd_schema', $this->posted_scalar('lsd_schema'));
+        LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['image' => $image]);
+
+        if (isset($_POST['lsd_schema'])) LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['schema' => $this->posted_scalar('lsd_schema')]);
         $this->save_archive_shortcode($term_id);
 
         return true;
@@ -234,18 +235,18 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
                 const taxonomy = "' . esc_js($taxonomy) . '";
                 const locationNonce = "' . esc_js(wp_create_nonce('lsd_get_location_terms')) . '";
                 const $add_button = $("#" + taxonomy + "-add-submit");
-            
+
                 $add_button.on("click", function ()
                 {
                     setTimeout(function ()
                     {
                         const $new_term_input = $("#new" + taxonomy);
                         const new_term_name = $new_term_input.val().trim();
-            
+
                         const checked_terms = $("#listdom-locationchecklist input[type=\'checkbox\']:checked").map(function () {
                             return $(this).val();
                         }).get();
-            
+
                         $.post(ajaxurl, {
                             action: "lsd_get_location_terms",
                             post_id: $("#post_ID").val(),
@@ -255,12 +256,12 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
                         {
                             if (typeof response === "string") response = JSON.parse(response);
                             if (!response || !response.success || !response.content) return;
-            
+
                             $("#listdom-locationchecklist").html(response.content);
                             checked_terms.forEach(function (termId) {
                                 $("#listdom-locationchecklist input[type=\'checkbox\'][value=\'" + termId + "\']").prop("checked", true);
                             });
-            
+
                             let $new_checkbox = null;
                             if (response.new_term_id) $new_checkbox = $("#listdom-locationchecklist input[type=\'checkbox\'][value=\'" + response.new_term_id + "\']");
                             else
@@ -269,8 +270,8 @@ class LSD_Taxonomies_Location extends LSD_Taxonomies
                                     if ($(this).text().trim() === new_term_name) $new_checkbox = $(this).find("input[type=\'checkbox\']");
                                 });
                             }
-            
-                            if ($new_checkbox && $new_checkbox.length) 
+
+                            if ($new_checkbox && $new_checkbox.length)
                             {
                                 $new_checkbox.prop("checked", true);
                                 $new_checkbox.parents("ul.children").each(function () {

@@ -203,7 +203,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
 
         echo '<li class="lsd-has-children lsd-business-data-nav' . ($active ? ' lsd-nav-expanded' : '') . '">';
         echo '<a class="lsd-nav-tab ' . ($active ? 'lsd-nav-tab-active' : '') . '" href="' . esc_url(admin_url('admin.php?page=listdom-ix&tab=' . self::TAB . '&mode=find')) . '">';
-        echo '<i class="webilia-icon wbli-database lsd-m-0"></i>' . esc_html__('Business Data', 'listdom') . '</a>';
+        echo '<i class="wui-icon wui-icon--database lsd-m-0"></i>' . esc_html__('Business Data', 'listdom') . '</a>';
         echo '<ul class="lsd-nav-sub-tabs" data-parent="business-data"' . ($active ? '' : ' hidden') . '>';
         foreach (['find' => __('Find Businesses', 'listdom'), 'enrich' => __('Enrich Listings', 'listdom'), 'refresh' => __('Refresh Listings', 'listdom'), 'history' => __('History', 'listdom')] as $key => $label)
         {
@@ -564,7 +564,7 @@ class LSD_Menus_IX_Business_Data extends LSD_Base
     {
         if (!current_user_can('manage_options') || !LSD_Webilia_Connect::enabled()) return;
 
-        add_meta_box('lsd_metabox_business_data', esc_html__('Webilia Business Data', 'listdom'), [$this, 'metabox'], LSD_Base::PTYPE_LISTING, 'side', 'default');
+        add_meta_box('lsd_metabox_business_data', esc_html__('Business Data', 'listdom'), [$this, 'metabox'], LSD_Base::PTYPE_LISTING, 'side', 'default');
     }
 
     public function metabox($post): void

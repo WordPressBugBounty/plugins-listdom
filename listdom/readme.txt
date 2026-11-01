@@ -5,7 +5,7 @@ Tags: business directory, listings, classifieds, local business directory, direc
 Requires at least: 5.0
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 6.3.0
+Stable tag: 6.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,7 +22,7 @@ Here are the key features of Listdom and how to use them with your WordPress dir
 
 [youtube https://www.youtube.com/watch?v=du_96cv6BAw]
 
-Listdom has more than 80 different skins and views that are responsive and mobile-friendly, giving your WordPress directory plugin a polished front end. It keeps a store locator layout simple to present alongside your business listings needs. This listing plugin adapts to classifieds ads sites, so they keep listings organized without extra steps.
+Listdom includes 80+ responsive skins and views for business directories, store locators, and classifieds.
 
 ✅ [Demo](https://demo.webilia.com/listdom/)
 ✅ [Documentation](https://api.webilia.com/go/listdom-docs/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository)
@@ -36,7 +36,7 @@ Listdom has a dedicated theme called Listdomer that helps you to import full web
 
 == Listdom; The WordPress Directory Plugin by Webilia ==
 
-Listdom is an AI-powered WordPress directory plugin developed by Webilia. This [WordPress classified plugin](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+classified+plugin) helps you create directory, classified, business directory, listing, or store locator websites. Built for users with different levels of coding experience, Listdom makes it easy to publish listings, manage classifieds, and customize your WordPress directory based on your needs.
+Listdom is Webilia's AI-powered [WordPress classified plugin](https://listdom.net/?utm_source=listdom+on+wordpress&utm_medium=text&utm_campaign=Wordpress+repository&utm_term=Wordpress+classified+plugin) for publishing listings, managing classifieds, and customizing directories or store locators.
 
 
 == Free WordPress Listing Plugin Features ==
@@ -45,6 +45,7 @@ Listdom Free includes the core features needed to launch a searchable directory,
 
 **👉 Display and Layout Tools**
 
+*   Native WordPress blocks for saved directory layouts, search, dashboard, authentication, checkout, and listing content, with editor previews
 *   Wonderful 80 different skins for listing cards and archives
 *   Display listings in List + Grid view (Contains a switch button)
 *   Display listings in List view
@@ -123,6 +124,7 @@ Listdom Free includes the core features needed to launch a searchable directory,
 *   Structured and semantic AI search for natural-language listing discovery
 *   Optional AI Visibility feed and discovery hints for public, machine-readable directory content
 *   CSV import auto mapping, with support for compatible import add-ons
+*   Native WordPress abilities on WordPress 6.9+ for authorized listing operations, supported settings, read-only diagnostics, and explicitly approved bounded repairs; active add-on and permission requirements still apply
 *   Text generation
 *   Work hours generation
 
@@ -181,6 +183,8 @@ Listdom Free includes the core features needed to launch a searchable directory,
 *   Separate login forms for different user roles
 *   Block access of different user roles to WordPress dashboard
 *   CSV importer and exporter
+*   Webilia Business Data to discover businesses, import drafts, and review enrichment or refresh changes field by field using [Webilia Credits](https://listdom.net/products/credits/)
+*   Directory-wide Analytics with the Stats add-on for listing activity, submitted searches, categories, locations, and conversions
 *   Import and export listings, working hours, custom fields, and listing taxonomies (categories, locations, tags, features, and labels) with CSV files
 *   Hierarchical category and location import support for larger directories
 *   Create missing custom fields during CSV listing import mapping
@@ -313,7 +317,7 @@ While Listdom and Listdomer offer free versions, their Pro versions and Listdom 
 👉 Official X Account: [Follow on X](https://twitter.com/Webilia_Inc)
 👉 Official LinkedIn: [Follow on LinkedIn](https://www.linkedin.com/company/webilia)
 
-Listdom as a classified listing plugin has been developed according to the latest best practices, design patterns, trending design methods, and technologies. It offers advanced features useful for WordPress directory plugins or store locators.
+Listdom combines structured listing data with configurable directory and store-locator workflows.
 
 == Bring Ideas in Action with Listdom WordPress Listing Plugin ==
 
@@ -446,6 +450,16 @@ You can translate Listdom using translation plugins like Loco Translate or by cr
 14. Powerful Search Bars
 
 == Changelog ==
+
+= 6.4.0 =
+* Added native WordPress abilities for listing search, contact, taxonomy management, and complete draft-to-publish listing workflows.
+* Added administrator abilities to inspect and update supported settings, diagnose directory issues, adjust saved display settings, and generate selected missing thumbnails.
+* Added an optional compact admin menu and separate padding controls for checkbox, radio, and range search fields.
+* Improved admin icons, notifications, dashboard spacing, and frontend form styling.
+* Fixed Mapbox tiles, listing editor map resizing, and map infowindow styling and dimensions.
+* Fixed map, search dropdown, and dialog stacking, rating star order, and authentication notice spacing.
+* Fixed Table skin spacing and rounded corners, Timeline empty results, and Accordion listing buttons.
+* Fixed primary category synchronization when listing categories are changed through the REST API.
 
 = 6.3.0 =
 * Added native WordPress blocks for directory layouts, search, the frontend dashboard, authentication, checkout, and listing content, with editor previews.

@@ -9,7 +9,7 @@ $settings = LSD_Options::settings();
     <div class="lsd-welcome-content-header">
         <div class="lsd-admin-section-heading">
             <div class="lsd-admin-title-icon">
-                <i class="webilia-icon wbli-frontend-dashboard"></i>
+                <i class="wui-icon wui-icon--frontend-dashboard"></i>
                 <h2 class="lsd-admin-title lsd-m-0"><?php echo esc_html__('Match Listdom To Your Needs', 'listdom'); ?></h2>
             </div>
             <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Disable the features you don\'t need to simplify your website. You will always be able to change them in Listdom → Settings → Advanced.' , 'listdom'); ?></p>
@@ -118,7 +118,7 @@ $settings = LSD_Options::settings();
         <a class="lsd-text-button" href="<?php echo admin_url('/admin.php?page=listdom'); ?>"><?php echo esc_html__('Not Now, Exit to Dashboard', 'listdom'); ?></a>
         <button class="lsd-step-link lsd-primary-button" id="lsd_settings_features_save_button">
             <?php echo esc_html__('Next', 'listdom'); ?>
-            <i class="webilia-icon wbli-right-arrow"></i>
+            <i class="wui-icon wui-icon--right-arrow"></i>
         </button>
     </div>
 </div>
@@ -179,7 +179,7 @@ jQuery('#lsd_settings_features_save_button').on('click', function (event)
         error: function ()
         {
             loading.stop();
-            listdom_toastify("<?php echo esc_js(esc_html__('There was an issue', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('There was an issue', 'listdom')); ?>", 'lsd-error');
         }
     });
 });

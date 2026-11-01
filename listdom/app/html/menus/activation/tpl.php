@@ -8,7 +8,7 @@ defined('ABSPATH') || die();
 $connect_url = admin_url('admin.php?page=listdom-connect&return_to=' . rawurlencode(admin_url('admin.php?page=listdom-connect&tab=licenses')));
 $connect_notice_type = in_array($connect_notice['type'] ?? '', ['error', 'info', 'success', 'warning'], true) ? $connect_notice['type'] : 'info';
 ?>
-<div class="wrap lsd-wrap lsd-licenses-wrap">
+<div class="wrap lsd-wrap wui lsd-licenses-wrap">
     <?php LSD_Menus::header(esc_html__('Licenses', 'listdom'), null, LSD_Menus::webiliaTabs('licenses')); ?>
 
     <div class="lsd-admin-main-wrapper">
@@ -26,7 +26,7 @@ $connect_notice_type = in_array($connect_notice['type'] ?? '', ['error', 'info',
                 <div class="lsd-accordion-section">
                     <p class="lsd-admin-description"><?php esc_html_e('Prefer individual license keys?', 'listdom'); ?></p>
                     <button type="button" class="lsd-accordion-title lsd-secondary-button lsd-license-section-toggle" aria-expanded="false" aria-controls="lsd-all-licenses-content" aria-label="<?php esc_attr_e('Open license key details', 'listdom'); ?>">
-                        <span class="lsd-accordion-icons" aria-hidden="true"><i class="webilia-icon wbli-add-plus lsd-license-toggle-closed"></i><i class="webilia-icon wbli-up-arrow-s lsd-license-toggle-open"></i></span>
+                        <span class="lsd-accordion-icons" aria-hidden="true"><i class="wui-icon wui-icon--add-plus lsd-license-toggle-closed"></i><i class="wui-icon wui-icon--up-arrow-s lsd-license-toggle-open"></i></span>
                         <span class="screen-reader-text"><?php esc_html_e('Open or close all license details', 'listdom'); ?></span>
                     </button>
                 </div>

@@ -11,7 +11,7 @@ defined('ABSPATH') || die();
 $notice = $notice ?? '';
 ?>
 <style>.wrap > h1.wp-heading-inline, .wrap > .page-title-action {display: none;} .wrap > span.subtitle {padding-left: 0}</style>
-<div id="lsd-ptype-header" class="wrap about-wrap lsd-wrap">
+<div id="lsd-ptype-header" class="wrap about-wrap lsd-wrap wui">
     <?php LSD_Menus::header($title, $url, $menus ?? []); ?>
 </div>
 <?php if ($notice !== ''): ?>

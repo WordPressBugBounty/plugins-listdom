@@ -293,7 +293,7 @@ $semantic_attributes = $semantic->attribute_options();
                 <?php LSD_Form::nonce('lsd_ai_form'); ?>
                 <button type="submit" id="lsd_ai_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='wbli wbli-checkmark-circle'></i>
+                    <i class='wui-icon wui-icon--checkmark-circle'></i>
                 </button>
             </div>
         </div>
@@ -391,13 +391,13 @@ jQuery('#lsd_ai_semantic_search_reindex').on('click', function (event)
         },
         success: function (response)
         {
-            if (response && Number(response.success) === 1) listdom_toastify(response.message, 'lsd-success');
-            else if (response && response.message) listdom_toastify(response.message, 'lsd-error');
+            if (response && Number(response.success) === 1) listdom_notify(response.message, 'lsd-success');
+            else if (response && response.message) listdom_notify(response.message, 'lsd-error');
             loading.stop();
         },
         error: function ()
         {
-            listdom_toastify("<?php echo esc_js(esc_html__('Unable to queue semantic reindexing right now.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('Unable to queue semantic reindexing right now.', 'listdom')); ?>", 'lsd-error');
             loading.stop();
         }
     });
@@ -423,14 +423,14 @@ jQuery('#lsd_ai_form').on('submit', function (event)
         {
             $tab.attr('data-saved', 'true');
 
-            listdom_toastify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
+            listdom_notify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
             loading.stop();
         },
         error: function ()
         {
             $tab.attr('data-saved', 'false');
 
-            listdom_toastify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
             loading.stop();
         }
     });

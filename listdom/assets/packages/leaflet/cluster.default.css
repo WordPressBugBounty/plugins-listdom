@@ -65,8 +65,8 @@
 }
 
 .lsd-marker-cluster-color .lsd-cluster-color-ring {
-    width: calc(var(--lsd-cluster-size, 40px) - 2px);
-    height: calc(var(--lsd-cluster-size, 40px) - 2px);
+    width: calc(var(--lsd-fe-cluster-size, 40px) - 2px);
+    height: calc(var(--lsd-fe-cluster-size, 40px) - 2px);
     margin: 0;
     border: 1px solid;
     border-radius: 50%;
@@ -77,12 +77,12 @@
 }
 
 .lsd-marker-cluster-color .lsd-cluster-color-ring > div {
-    width: var(--lsd-cluster-inner-size, 26px);
-    height: var(--lsd-cluster-inner-size, 26px);
+    width: var(--lsd-fe-cluster-inner-size, 26px);
+    height: var(--lsd-fe-cluster-inner-size, 26px);
     margin: 0;
     border-radius: 50%;
     font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
-    line-height: var(--lsd-cluster-inner-size, 26px);
+    line-height: var(--lsd-fe-cluster-inner-size, 26px);
 }
 .marker-cluster span {
     line-height: 30px;

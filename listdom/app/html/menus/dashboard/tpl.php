@@ -6,7 +6,7 @@ defined('ABSPATH') || die();
 $connect_notice = LSD_Webilia_Connect::notice();
 $connect_notice_type = in_array($connect_notice['type'] ?? '', ['error', 'info', 'success', 'warning'], true) ? $connect_notice['type'] : 'info';
 ?>
-<div class="wrap about-wrap lsd-wrap">
+<div class="wrap about-wrap lsd-wrap wui">
     <?php LSD_Menus::header(); ?>
 
     <div class="lsd-admin-main-wrapper">

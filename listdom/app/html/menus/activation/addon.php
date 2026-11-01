@@ -30,7 +30,7 @@ $has_stored_legacy_license = trim($licensing->getLicenseKey()) !== '';
         </div>
         <h3 class="lsd-my-0 lsd-admin-title"><?php echo esc_html($product['name']); ?></h3>
         <div class="lsd-badge <?php echo esc_attr($status['badge']['class']); ?>">
-            <i class="listdom-icon <?php echo esc_attr($status['badge']['icon']); ?>"></i>
+            <i class="listdom-icon wui-icon <?php echo esc_attr($status['badge']['icon']); ?>"></i>
             <?php echo esc_html($status['badge']['text']); ?>
         </div>
     </div>
@@ -80,7 +80,7 @@ $has_stored_legacy_license = trim($licensing->getLicenseKey()) !== '';
                     <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>"
                        target="_blank">
                         <?php esc_html_e('Renew License', 'listdom'); ?>
-                        <i class="webilia-icon wbli-key"></i>
+                        <i class="wui-icon wui-icon--key"></i>
                     </a>
                 </div>
             <?php elseif ($status['action'] === 'get_license'): ?>
@@ -88,7 +88,7 @@ $has_stored_legacy_license = trim($licensing->getLicenseKey()) !== '';
                     <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>"
                        target="_blank">
                         <?php esc_html_e('Get License', 'listdom'); ?>
-                        <i class="webilia-icon wbli-key"></i>
+                        <i class="wui-icon wui-icon--key"></i>
                     </a>
                 </div>
             <?php endif; ?>
@@ -114,13 +114,13 @@ $has_stored_legacy_license = trim($licensing->getLicenseKey()) !== '';
                             <a data-copied="<?php echo esc_html__('Copied!', 'listdom'); ?>"
                                class="lsd-copy lsd-w-auto"
                                data-target="lsd-license-code-<?php echo esc_attr($key); ?>">
-                                <i class="webilia-icon wbli-copy"></i>
+                                <i class="wui-icon wui-icon--copy"></i>
                             </a>
                         </div>
                     </div>
                     <a class="lsd-neutral-button lsd-w-auto" href="<?php echo esc_url($this->getManageLicensesURL()); ?>" target="_blank">
                         <?php esc_html_e('Manage Licenses', 'listdom'); ?>
-                        <i class="webilia-icon wbli-link-square"></i>
+                        <i class="wui-icon wui-icon--link-square"></i>
                     </a>
                 </div>
                 <div class="lsd-w-full lsd-deactivation">
@@ -206,7 +206,7 @@ $has_stored_legacy_license = trim($licensing->getLicenseKey()) !== '';
                 </div>
                 <a class="lsd-primary-button" href="<?php echo esc_url($shop_url); ?>" target="_blank">
                     <?php esc_html_e('Get License', 'listdom'); ?>
-                    <i class="webilia-icon wbli-key"></i>
+                    <i class="wui-icon wui-icon--key"></i>
                 </a>
             </div>
         <?php endif; ?>
@@ -277,14 +277,14 @@ $has_stored_legacy_license = trim($licensing->getLicenseKey()) !== '';
                     <a data-copied="<?php echo esc_html__('Copied!', 'listdom'); ?>"
                        class="lsd-copy lsd-w-auto"
                        data-target="lsd-license-code-<?php echo esc_attr($key); ?>">
-                        <i class="webilia-icon wbli-copy"></i>
+                        <i class="wui-icon wui-icon--copy"></i>
                     </a>
                 </div>
             </div>
             <a class="lsd-neutral-button lsd-w-auto" href="<?php echo esc_url($this->getManageLicensesURL()); ?>"
                target="_blank">
                 <?php esc_html_e('Manage Licenses', 'listdom'); ?>
-                <i class="webilia-icon wbli-link-square"></i>
+                <i class="wui-icon wui-icon--link-square"></i>
             </a>
         </div>
     <div class="lsd-w-full lsd-deactivation">

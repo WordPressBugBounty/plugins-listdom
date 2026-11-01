@@ -2,6 +2,9 @@
 
 class LSD_Taxonomies_Category extends LSD_Taxonomies
 {
+    private $rest_primary_categories;
+    private $deleted_primary_categories = [];
+
     public function init()
     {
         add_action('init', [$this, 'register']);
@@ -11,6 +14,13 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         add_action(LSD_Base::TAX_CATEGORY . '_edit_form_fields', [$this, 'edit_form']);
         add_action('created_' . LSD_Base::TAX_CATEGORY, [$this, 'save_metadata']);
         add_action('edited_' . LSD_Base::TAX_CATEGORY, [$this, 'save_metadata']);
+
+        add_filter('rest_prepare_taxonomy', [$this, 'rest_visibility'], 10, 3);
+        add_filter('rest_pre_insert_' . LSD_Base::PTYPE_LISTING, [$this, 'validate_rest_categories'], 10, 2);
+        add_action('rest_after_insert_' . LSD_Base::PTYPE_LISTING, [$this, 'save_rest_primary_category'], 10, 2);
+        add_action('lsd_' . LSD_Base::TAX_CATEGORY . '_term_slug_updated', [$this, 'primary_slug_updated'], 10, 3);
+        add_action('pre_delete_term', [$this, 'capture_deleted_primary_categories'], 10, 2);
+        add_action('delete_' . LSD_Base::TAX_CATEGORY, [$this, 'replace_deleted_primary_categories']);
 
         add_filter('manage_edit-' . LSD_Base::TAX_CATEGORY . '_columns', [$this, 'filter_columns']);
         add_filter('manage_' . LSD_Base::TAX_CATEGORY . '_custom_column', [$this, 'filter_columns_content'], 10, 3);
@@ -62,6 +72,135 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         );
 
         register_taxonomy_for_object_type(LSD_Base::TAX_CATEGORY, LSD_Base::PTYPE_LISTING);
+    }
+
+    public function rest_visibility($response, $taxonomy, $request)
+    {
+        if ($taxonomy->name !== LSD_Base::TAX_CATEGORY || $request['context'] !== 'edit') return $response;
+
+        // Gutenberg ignores meta_box_cb; keep Listdom's required primary selector as the only category UI.
+        $data = $response->get_data();
+        if (isset($data['visibility']['show_ui']))
+        {
+            $data['visibility']['show_ui'] = false;
+            $response->set_data($data);
+        }
+
+        return $response;
+    }
+
+    private function rest_category_field(): string
+    {
+        $taxonomy = get_taxonomy(LSD_Base::TAX_CATEGORY);
+        if (!$taxonomy || !$taxonomy->show_in_rest) return '';
+
+        return $taxonomy->rest_base ?: $taxonomy->name;
+    }
+
+    public function validate_rest_categories($prepared_post, $request)
+    {
+        if (is_wp_error($prepared_post)) return $prepared_post;
+
+        $field = $this->rest_category_field();
+        if (!$field || !array_key_exists($field, $request->get_params())) return $prepared_post;
+
+        $categories = $request->get_param($field);
+        if (!is_array($categories) || !$categories)
+            return new WP_Error('listdom_invalid_categories', esc_html__('Select at least one existing listing category.', 'listdom'), ['status' => 400]);
+
+        $taxonomy = get_taxonomy(LSD_Base::TAX_CATEGORY);
+        if (!current_user_can($taxonomy->cap->assign_terms))
+            return new WP_Error('rest_cannot_assign_term', esc_html__('You are not allowed to assign listing categories.', 'listdom'), ['status' => rest_authorization_required_code()]);
+
+        $id = (int) $request->get_param('id');
+        if ($id && get_post_meta($id, 'lsd_lock_edit', true))
+            return new WP_Error('listdom_listing_locked', esc_html__('This listing is locked for editing.', 'listdom'), ['status' => 403]);
+
+        foreach ($categories as $category)
+        {
+            if (!(get_term((int) $category, LSD_Base::TAX_CATEGORY) instanceof WP_Term))
+                return new WP_Error('listdom_invalid_categories', esc_html__('Every listing category must exist.', 'listdom'), ['status' => 400]);
+
+            if (!current_user_can('assign_term', (int) $category))
+                return new WP_Error('rest_cannot_assign_term', esc_html__('You are not allowed to assign listing categories.', 'listdom'), ['status' => rest_authorization_required_code()]);
+        }
+
+        $primary = $id ? LSD_Entity_Listing::get_primary_category($id) : null;
+        if (!$this->rest_primary_categories) $this->rest_primary_categories = new SplObjectStorage();
+        $this->rest_primary_categories[$request] = $primary instanceof WP_Term ? (int) $primary->term_id : 0;
+
+        return $prepared_post;
+    }
+
+    public function save_rest_primary_category($post, $request): void
+    {
+        if (!$this->rest_primary_categories || !$this->rest_primary_categories->contains($request)) return;
+
+        $primary_id = $this->rest_primary_categories[$request];
+        $this->rest_primary_categories->detach($request);
+        $field = $this->rest_category_field();
+        if (!$field || !array_key_exists($field, $request->get_params())) return;
+
+        $categories = array_values(array_map('intval', $request->get_param($field)));
+        $assigned = wp_get_post_terms($post->ID, LSD_Base::TAX_CATEGORY, ['fields' => 'ids']);
+        if (is_wp_error($assigned)) return;
+
+        // Use actual assignments, while retaining request order when a replacement primary is needed.
+        $categories = array_values(array_intersect($categories, $assigned));
+        if (!$categories) return;
+        if (!in_array($primary_id, $categories, true)) $primary_id = $categories[0];
+
+        $primary = get_term($primary_id, LSD_Base::TAX_CATEGORY);
+        if ($primary instanceof WP_Term) update_post_meta($post->ID, 'lsd_primary_category', $primary->slug);
+    }
+
+    public function primary_slug_updated($old_slug, $new_slug, $term): void
+    {
+        $listings = get_posts([
+            'post_type' => LSD_Base::PTYPE_LISTING,
+            'post_status' => array_values(get_post_stati()),
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'meta_key' => 'lsd_primary_category',
+            'meta_value' => $old_slug,
+        ]);
+
+        foreach ($listings as $id) update_post_meta($id, 'lsd_primary_category', $new_slug);
+    }
+
+    public function capture_deleted_primary_categories($term_id, $taxonomy): void
+    {
+        if ($taxonomy !== LSD_Base::TAX_CATEGORY) return;
+
+        $objects = get_objects_in_term($term_id, $taxonomy);
+        if (is_wp_error($objects)) return;
+
+        $this->deleted_primary_categories[$term_id] = [];
+        foreach ($objects as $id)
+        {
+            if (get_post_type($id) !== LSD_Base::PTYPE_LISTING) continue;
+
+            // Resolve before deletion so legacy numeric primary values keep their existing meaning.
+            $primary = LSD_Entity_Listing::get_primary_category($id);
+            if ($primary instanceof WP_Term && (int) $primary->term_id === (int) $term_id)
+                $this->deleted_primary_categories[$term_id][] = (int) $id;
+        }
+    }
+
+    public function replace_deleted_primary_categories($term_id): void
+    {
+        $listings = $this->deleted_primary_categories[$term_id] ?? [];
+        unset($this->deleted_primary_categories[$term_id]);
+
+        foreach ($listings as $id)
+        {
+            // Match the existing first-category read fallback without changing term relationships.
+            $terms = wp_get_post_terms($id, LSD_Base::TAX_CATEGORY);
+            if (is_wp_error($terms)) continue;
+
+            if ($terms) update_post_meta($id, 'lsd_primary_category', $terms[0]->slug);
+            else delete_post_meta($id, 'lsd_primary_category');
+        }
     }
 
     public function register_metaboxes()
@@ -277,12 +416,13 @@ class LSD_Taxonomies_Category extends LSD_Taxonomies
         $image = isset($_POST['lsd_image']) ? sanitize_text_field(wp_unslash($_POST['lsd_image'])) : '';
         $disable = isset($_POST['lsd_disabled_icon']) ? (int) sanitize_text_field(wp_unslash($_POST['lsd_disabled_icon'])) : 0;
 
-        update_term_meta($term_id, 'lsd_icon', $icon);
-        update_term_meta($term_id, 'lsd_color', $color);
-        update_term_meta($term_id, 'lsd_image', $image);
-        update_term_meta($term_id, 'lsd_disabled_icon', $disable);
+        LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['icon' => $icon]);
+        LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['color' => $color]);
+        LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['image' => $image]);
+        LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['disabled_icon' => $disable]);
+
         $this->save_archive_shortcode($term_id);
-        if (isset($_POST['lsd_schema'])) update_term_meta($term_id, 'lsd_schema', $this->posted_scalar('lsd_schema'));
+        if (isset($_POST['lsd_schema'])) LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['schema' => $this->posted_scalar('lsd_schema')]);
 
         return true;
     }

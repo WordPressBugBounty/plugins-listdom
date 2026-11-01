@@ -24,18 +24,18 @@
                 const result = response && response.data ? response.data : response;
                 if (response && response.success && result.reload)
                 {
-                    window.listdom_toastify(result.message, 'lsd-success');
+                    window.listdom_notify(result.message, 'lsd-success');
                     window.setTimeout(function () { window.location.reload(); }, 2500);
                     return;
                 }
 
-                window.listdom_toastify(result && result.message ? result.message : $button.data('failed'), 'lsd-error');
+                window.listdom_notify(result && result.message ? result.message : $button.data('failed'), 'lsd-error');
                 loading.stop();
                 $button.prop('disabled', false);
             }, 'json').fail(function (xhr)
             {
                 const result = xhr.responseJSON && (xhr.responseJSON.data || xhr.responseJSON);
-                window.listdom_toastify(result && result.message ? result.message : $button.data('failed'), 'lsd-error');
+                window.listdom_notify(result && result.message ? result.message : $button.data('failed'), 'lsd-error');
                 loading.stop();
                 $button.prop('disabled', false);
             });

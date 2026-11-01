@@ -816,10 +816,11 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
         $offset = isset($args['offset']) ? max(0, absint($args['offset'])) : 0;
         $search = isset($args['search']) ? sanitize_text_field((string) $args['search']) : '';
         $hide_empty = !array_key_exists('hide_empty', $args) || (bool) $args['hide_empty'];
+        $parent = isset($args['parent']) ? absint($args['parent']) : null;
 
         if ($hide_empty && $this->taxonomy_uses_descendant_term_counts($taxonomy))
         {
-            $term_ids = $this->matching_public_term_ids($taxonomy, $search, $number, $offset);
+            $term_ids = $this->matching_public_term_ids($taxonomy, $search, $number, $offset, $parent);
             if (!count($term_ids)) return [];
 
             $terms = get_terms([
@@ -832,7 +833,7 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
             return is_wp_error($terms) || !is_array($terms) ? [] : $terms;
         }
 
-        [$joins, $where, $parameters] = $this->public_terms_where($taxonomy, $search, $hide_empty);
+        [$joins, $where, $parameters] = $this->public_terms_where($taxonomy, $search, $hide_empty, $parent);
 
         $limit = '';
         if ($number > 0)
@@ -887,10 +888,11 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
         // Query Args
         $search = isset($args['search']) ? sanitize_text_field((string) $args['search']) : '';
         $hide_empty = !array_key_exists('hide_empty', $args) || (bool) $args['hide_empty'];
+        $parent = isset($args['parent']) ? absint($args['parent']) : null;
 
-        if ($hide_empty && $this->taxonomy_uses_descendant_term_counts($taxonomy)) return $this->matching_public_term_count($taxonomy, $search);
+        if ($hide_empty && $this->taxonomy_uses_descendant_term_counts($taxonomy)) return $this->matching_public_term_count($taxonomy, $search, $parent);
 
-        [$joins, $where, $parameters] = $this->public_terms_where($taxonomy, $search, $hide_empty);
+        [$joins, $where, $parameters] = $this->public_terms_where($taxonomy, $search, $hide_empty, $parent);
 
         $db = new LSD_db();
         $query = $db->prepare("
@@ -909,14 +911,20 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
      * @param string $taxonomy
      * @param string $search
      * @param bool $hide_empty
+     * @param int|null $parent
      * @return array
      */
-    protected function public_terms_where(string $taxonomy, string $search = '', bool $hide_empty = true): array
+    protected function public_terms_where(string $taxonomy, string $search = '', bool $hide_empty = true, ?int $parent = null): array
     {
         // SQL Parts
         $joins = '';
         $conditions = ['tt.taxonomy = %s'];
         $parameters = [$taxonomy];
+        if ($parent !== null)
+        {
+            $conditions[] = 'tt.parent = %d';
+            $parameters[] = $parent;
+        }
         $listing_constraints = $this->public_listing_sql_constraints('p');
         $needs_listing_join = $hide_empty;
 
@@ -993,7 +1001,7 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
      * @param array $terms
      * @return array
      */
-    protected function public_term_counts(string $taxonomy, array $terms): array
+    public function public_term_counts(string $taxonomy, array $terms): array
     {
         // Term IDs
         $term_ids = [];
@@ -1084,9 +1092,10 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
      * @param string $search
      * @param int $number
      * @param int $offset
+     * @param int|null $parent
      * @return array
      */
-    protected function matching_public_term_ids(string $taxonomy, string $search = '', int $number = 0, int $offset = 0): array
+    protected function matching_public_term_ids(string $taxonomy, string $search = '', int $number = 0, int $offset = 0, ?int $parent = null): array
     {
         // Count Map
         $counts = $this->hierarchical_public_term_count_map($taxonomy);
@@ -1095,7 +1104,7 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
         $ids = [];
         $matched = 0;
 
-        foreach ($this->matching_public_term_id_rows($taxonomy, $search) as $term_id)
+        foreach ($this->matching_public_term_id_rows($taxonomy, $search, $parent) as $term_id)
         {
             if (($counts[$term_id] ?? 0) <= 0) continue;
 
@@ -1112,9 +1121,10 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
      * Count matching public terms.
      * @param string $taxonomy
      * @param string $search
+     * @param int|null $parent
      * @return int
      */
-    protected function matching_public_term_count(string $taxonomy, string $search = ''): int
+    protected function matching_public_term_count(string $taxonomy, string $search = '', ?int $parent = null): int
     {
         // Count Map
         $counts = $this->hierarchical_public_term_count_map($taxonomy);
@@ -1122,7 +1132,7 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
 
         $total = 0;
 
-        foreach ($this->matching_public_term_id_rows($taxonomy, $search) as $term_id)
+        foreach ($this->matching_public_term_id_rows($taxonomy, $search, $parent) as $term_id)
         {
             if (($counts[$term_id] ?? 0) > 0) $total++;
         }
@@ -1134,13 +1144,19 @@ class LSD_AI_Visibility_Public_API extends LSD_Base
      * Query matching public term ID rows.
      * @param string $taxonomy
      * @param string $search
+     * @param int|null $parent
      * @return array
      */
-    protected function matching_public_term_id_rows(string $taxonomy, string $search = ''): array
+    protected function matching_public_term_id_rows(string $taxonomy, string $search = '', ?int $parent = null): array
     {
         // SQL Parts
         $conditions = ['tt.taxonomy = %s'];
         $parameters = [$taxonomy];
+        if ($parent !== null)
+        {
+            $conditions[] = 'tt.parent = %d';
+            $parameters[] = $parent;
+        }
 
         if ($search !== '')
         {

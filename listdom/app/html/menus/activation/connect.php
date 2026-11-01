@@ -17,10 +17,10 @@ $notice_type = in_array($connect_notice['type'] ?? '', ['success', 'info', 'warn
             <div class="lsd-flex lsd-flex-align-items-center lsd-flex-content-between lsd-flex-wrap lsd-gap-3 lsd-w-full">
                 <div class="lsd-flex lsd-flex-align-items-center lsd-gap-3">
                     <h3 id="lsd-connect-title" class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Connect Your Site', 'listdom'); ?></h3>
-                    <div class="lsd-badge <?php echo $connect_connected ? 'lsd-success' : ''; ?>"><i class="webilia-icon <?php echo $connect_connected ? 'wbli-checkmark-circle' : 'wbli-alert'; ?>"></i><?php echo $connect_connected ? esc_html__('Connected', 'listdom') : esc_html__('Not connected', 'listdom'); ?></div>
+                    <div class="lsd-badge <?php echo $connect_connected ? 'lsd-success' : ''; ?>"><i class="wui-icon <?php echo $connect_connected ? 'wui-icon--checkmark-circle' : 'wui-icon--alert'; ?>"></i><?php echo $connect_connected ? esc_html__('Connected', 'listdom') : esc_html__('Not connected', 'listdom'); ?></div>
                 </div>
                 <?php if ($connect_connected): ?>
-                    <a class="lsd-primary-button" href="<?php echo esc_url(LSD_Branding::accountUrl()); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('My Webilia Account', 'listdom'); ?><i class="webilia-icon wbli-link-square" aria-hidden="true"></i></a>
+                    <a class="lsd-primary-button" href="<?php echo esc_url(LSD_Branding::accountUrl()); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('My Webilia Account', 'listdom'); ?><i class="wui-icon wui-icon--link-square" aria-hidden="true"></i></a>
                 <?php endif; ?>
             </div>
             <?php if (!empty($connect_notice['message']) && !($connect_connected && $notice_type === 'success')): ?><div class="lsd-alert lsd-<?php echo esc_attr($notice_type); ?> lsd-w-full"><?php echo esc_html($connect_notice['message']); ?></div><?php endif; ?>
@@ -29,7 +29,7 @@ $notice_type = in_array($connect_notice['type'] ?? '', ['success', 'info', 'warn
                 <div class="lsd-alert lsd-success lsd-w-full"><?php esc_html_e('This website is connected to your Webilia account. Installed Listdom products are checked automatically, so eligible products can work and receive updates without entering a license key for each add-on.', 'listdom'); ?></div>
                 <details class="lsd-connect-disclosure">
                     <summary class="lsd-connect-disclosure-summary">
-                        <span class="lsd-connect-disclosure-icon" aria-hidden="true"><i class="webilia-icon wbli-down-arrow-s lsd-connect-disclosure-closed"></i><i class="webilia-icon wbli-up-arrow-s lsd-connect-disclosure-open"></i></span>
+                        <span class="lsd-connect-disclosure-icon" aria-hidden="true"><i class="wui-icon wui-icon--down-arrow-s lsd-connect-disclosure-closed"></i><i class="wui-icon wui-icon--up-arrow-s lsd-connect-disclosure-open"></i></span>
                         <span><?php esc_html_e('Disconnect this website', 'listdom'); ?></span>
                     </summary>
                     <div class="lsd-connect-disclosure-content">
@@ -44,7 +44,7 @@ $notice_type = in_array($connect_notice['type'] ?? '', ['success', 'info', 'warn
                 </details>
             <?php else: ?>
                 <p class="lsd-admin-description"><?php esc_html_e('Connect this website once to let Listdom automatically use the eligible products in your Webilia account. Your existing license keys remain available as a fallback.', 'listdom'); ?></p>
-                <a class="lsd-primary-button" href="<?php echo esc_url(LSD_Webilia_Connect::connectUrl($connect_return_url ?? '')); ?>"><?php esc_html_e('Connect to Webilia', 'listdom'); ?><i class="webilia-icon wbli-link-square"></i></a>
+                <a class="lsd-primary-button" href="<?php echo esc_url(LSD_Webilia_Connect::connectUrl($connect_return_url ?? '')); ?>"><?php esc_html_e('Connect to Webilia', 'listdom'); ?><i class="wui-icon wui-icon--link-square"></i></a>
             <?php endif; ?>
         </div>
         <div class="lsd-wbl-connection-art" aria-hidden="true">

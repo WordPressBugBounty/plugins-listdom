@@ -633,7 +633,7 @@
 
                 if (message && !options.initial)
                 {
-                    if (typeof window.listdom_toastify === 'function') window.listdom_toastify(message, 'lsd-warning');
+                    if (typeof window.listdom_notify === 'function') window.listdom_notify(message, 'lsd-warning');
                     else window.alert(message);
                 }
 
@@ -3057,9 +3057,9 @@ jQuery(function ($)
 
     const notify = function (message, type, options)
     {
-        if (typeof window.listdom_toastify === 'function')
+        if (typeof window.listdom_notify === 'function')
         {
-            window.listdom_toastify(message, type || 'lsd-info', options || {});
+            window.listdom_notify(message, type || 'lsd-info', options || {});
         }
     };
 
@@ -4473,9 +4473,9 @@ jQuery(function ($)
     {
         if (!message) return;
 
-        if (typeof window.listdom_toastify === 'function')
+        if (typeof window.listdom_notify === 'function')
         {
-            window.listdom_toastify(message, type || 'lsd-error');
+            window.listdom_notify(message, type || 'lsd-error');
         }
     }
 
@@ -4760,7 +4760,7 @@ jQuery(function ($)
 
     const notify = function (text, type, options)
     {
-        if (text && typeof window.listdom_toastify === 'function') return window.listdom_toastify(escapeHtml(text), type || 'lsd-info', options || {});
+        if (text && typeof window.listdom_notify === 'function') return window.listdom_notify(text, type || 'lsd-info', options || {});
         return null;
     };
 
@@ -4773,19 +4773,19 @@ jQuery(function ($)
     const startActivity = function (text)
     {
         $message.text(text);
-        state.activityToast = notify(text, 'lsd-in-progress', {hideTime: 0, showClose: false, progress: false});
+        state.activityToast = notify(text, 'lsd-in-progress', {hideTime: 0, progress: false});
     };
 
     const finishActivity = function (text, type)
     {
-        if (state.activityToast) state.activityToast.remove();
+        if (state.activityToast) state.activityToast.dismiss();
         state.activityToast = null;
         showMessage(text, type);
     };
 
     const stopActivity = function ()
     {
-        if (state.activityToast) state.activityToast.remove();
+        if (state.activityToast) state.activityToast.dismiss();
         state.activityToast = null;
         $message.text('');
     };
@@ -5530,32 +5530,32 @@ jQuery(function ($)
         }
     });
 
-    $root.on('click', '[data-clear-history], [data-business-data-clear-history]', function ()
+    $root.on('click', '[data-clear-history], [data-business-data-clear-history]', async function ()
     {
         const id = $(this).data('clear-history') || '';
-        notify(id ? config.strings.removeConfirm : config.strings.clearConfirm, 'lsd-confirm', {
-            position: 'lsd-center-center',
-            confirm: {
-                confirmText: config.strings.confirm,
-                cancelText: config.strings.cancel,
-                onConfirm: function ()
-                {
-                    request('lsd_business_data_clear_history', {id: id}).done(function (response)
-                    {
-                        if (!response.success) return showMessage(response.message || config.strings.historyFailed);
-                        if (state.entry && (!id || state.entry.id === id))
-                        {
-                            state.entry = null;
-                            $root.find('.lsd-business-data-results-wrap').prop('hidden', true);
-                            renderMapResults(false);
-                            setBalanceState(state.creditsBalance);
-                        }
-                        loadHistory();
-                        notify(config.strings.historyRemoved, 'lsd-success');
-                    }).fail(function (xhr) { showMessage((xhr.responseJSON || {}).message || config.strings.historyFailed); });
-                }
-            }
+        const accepted = await window.WebiliaUI.modal.confirm({
+            title: window.lsd.i18n_confirm_title,
+            message: id ? config.strings.removeConfirm : config.strings.clearConfirm,
+            confirmLabel: config.strings.confirm,
+            cancelLabel: config.strings.cancel,
+            closeLabel: window.lsd.i18n_dialog_close,
+            danger: true
         });
+        if (!accepted) return;
+
+        request('lsd_business_data_clear_history', {id: id}).done(function (response)
+        {
+            if (!response.success) return showMessage(response.message || config.strings.historyFailed);
+            if (state.entry && (!id || state.entry.id === id))
+            {
+                state.entry = null;
+                $root.find('.lsd-business-data-results-wrap').prop('hidden', true);
+                renderMapResults(false);
+                setBalanceState(state.creditsBalance);
+            }
+            loadHistory();
+            notify(config.strings.historyRemoved, 'lsd-success');
+        }).fail(function (xhr) { showMessage((xhr.responseJSON || {}).message || config.strings.historyFailed); });
     });
 
             $root.on('click', '[data-business-data-retry-balance]', refreshBalance);
@@ -5566,6 +5566,15 @@ jQuery(function ($)
     };
 
     if (window.lsdBusinessDataConfig) window.LSD_Business_Data.init(window.lsdBusinessDataConfig);
+})(jQuery);
+
+// Scope deactivation feedback icons to Webilia UI.
+(function ($)
+{
+    $(function ()
+    {
+        $('#web-dfd-wrapper-listdom, #web-dfd-wrapper-listdom-pro').addClass('wui');
+    });
 })(jQuery);
 
 // Show Stats choices only while Analytics is enabled.

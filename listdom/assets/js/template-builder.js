@@ -16,6 +16,16 @@
         return (string || '').toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     };
 
+    const normalizeIconClass = (iconClass) => {
+        const normalized = (iconClass || '').toString().trim()
+            .replace(/\bwbli-/g, 'wui-icon--')
+            .replace(/\bwebilia-icon\b/g, 'wui-icon')
+            .replace(/(^|\s)wbli(?=\s|$)/g, '$1wui-icon');
+
+        return /(?:^|\s)wui-icon--/.test(normalized) && !/(?:^|\s)wui-icon(?:\s|$)/.test(normalized)
+            ? 'wui-icon ' + normalized : normalized;
+    };
+
     const shouldDebugTemplateBuilder = () => !!(window.lsd && window.lsd.debug);
     const templateBuilderDebugCounters = {};
     const debugTemplateBuilder = (key, reason = '', details) => {
@@ -1368,7 +1378,7 @@
             if (!this.$selectionWrapper || !this.$selectionWrapper.length) return;
 
             const nextTitle = (title || '').toString().trim();
-            const nextIcon = (iconClass || '').toString().trim();
+            const nextIcon = normalizeIconClass(iconClass);
 
             if (!nextTitle) {
                 this.$selectionWrapper.addClass('lsd-util-hide');
@@ -2336,13 +2346,7 @@
                 progress: true
             };
 
-            if (typeof window.listdom_toastify === 'function')
-            {
-                window.listdom_toastify(message, 'lsd-warning', options);
-                return;
-            }
-
-            if (typeof window.ListdomToast === 'function') new window.ListdomToast(message, { type: 'lsd-warning' });
+            window.listdom_notify(message, 'lsd-warning', options);
         }
     }
 
@@ -2413,7 +2417,7 @@
                 const elementState = this.state ? (this.state.getElement(node.id) || {}) : {};
                 const type = node.type || elementState.type || '';
                 const label = elementState.label || node.label || type || '';
-                const iconClass = (elementState.icon || node.icon || '').toString().trim();
+                const iconClass = normalizeIconClass(elementState.icon || node.icon || '');
 
                 const hasChildren = Array.isArray(node.children) && node.children.length > 0;
                 const isContainer = type === 'container';
@@ -3760,11 +3764,10 @@
         }
 
         showHistoryToast(message) {
-            if (typeof window.listdom_toastify !== 'function') return;
-            listdom_toastify(message, 'lsd-success', {
+            if (typeof window.listdom_notify !== 'function') return;
+            listdom_notify(message, 'lsd-success', {
                 position: 'lsd-bottom-right',
                 hideTime: 2000,
-                showClose: false,
                 progress: true
             });
         }
@@ -4683,7 +4686,7 @@
                 : 'lsd-template-editor-canvas__sort-helper lsd-template-editor-canvas__sort-helper--element lsd-template-editor-element-list__drag-helper';
             const iconHtml = elementIcon
                 ? '<i class="' + elementIcon.replace(/"/g, '&quot;') + '" aria-hidden="true"></i>'
-                : '<i class="wbli-square" aria-hidden="true"></i>';
+                : '<i class="wui-icon wui-icon--layout" aria-hidden="true"></i>';
 
             return $(
                 '<div class="' + helperClass + '">' +
@@ -4890,7 +4893,7 @@
             const elementIcon = ($button.find('i').attr('class') || this.getIconForType(elementType) || '').toString();
             const iconHtml = elementIcon
                 ? '<i class="' + elementIcon.replace(/"/g, '&quot;') + '" aria-hidden="true"></i>'
-                : '<i class="wbli-square" aria-hidden="true"></i>';
+                : '<i class="wui-icon wui-icon--layout" aria-hidden="true"></i>';
 
             return $(
                 '<div class="lsd-template-editor-element-list__drag-helper">' +
@@ -6546,9 +6549,9 @@
         }
 
         iconClassForMode(mode) {
-            if (mode === 'tablet') return 'listdom-icon wbli-tablet';
-            if (mode === 'mobile') return 'listdom-icon wbli-mobile';
-            return 'listdom-icon wbli-screen';
+            if (mode === 'tablet') return 'listdom-icon wui-icon wui-icon--tablet';
+            if (mode === 'mobile') return 'listdom-icon wui-icon wui-icon--mobile';
+            return 'listdom-icon wui-icon wui-icon--screen';
         }
 
         apply(mode) {
@@ -6871,8 +6874,8 @@
 
             // Basic guard: if anything critical is missing, show error and bail
             if (!ajaxUrl || !nonce || !postId) {
-                if (typeof window.listdom_toastify === 'function') {
-                    listdom_toastify(defaultErrorMessage, 'lsd-error', {
+                if (typeof window.listdom_notify === 'function') {
+                    listdom_notify(defaultErrorMessage, 'lsd-error', {
                         position: 'lsd-bottom-right',
                         hideTime: 4000,
                         showClose: true,
@@ -6927,8 +6930,8 @@
                 if (!response || !response.success) {
                     const finalErrorMsg = response && response.message ? response.message : defaultErrorMessage;
 
-                    if (typeof window.listdom_toastify === 'function') {
-                        listdom_toastify(finalErrorMsg, 'lsd-error', {
+                    if (typeof window.listdom_notify === 'function') {
+                        listdom_notify(finalErrorMsg, 'lsd-error', {
                             position: 'lsd-bottom-right',
                             hideTime: 4000,
                             showClose: true,
@@ -6938,8 +6941,8 @@
                     return;
                 }
 
-                if (typeof window.listdom_toastify === 'function' && successMessage) {
-                    listdom_toastify(successMessage, 'lsd-success', {
+                if (typeof window.listdom_notify === 'function' && successMessage) {
+                    listdom_notify(successMessage, 'lsd-success', {
                         position: 'lsd-bottom-right',
                         hideTime: 4000,
                         showClose: true,
@@ -6979,8 +6982,8 @@
             })
 
             .fail(() => {
-                if (typeof window.listdom_toastify === 'function') {
-                    listdom_toastify(defaultErrorMessage, 'lsd-error', {
+                if (typeof window.listdom_notify === 'function') {
+                    listdom_notify(defaultErrorMessage, 'lsd-error', {
                         position: 'lsd-bottom-right',
                         hideTime: 4000,
                         showClose: true,
@@ -7166,8 +7169,8 @@
             const redirectUrl = this.popPendingRedirect();
 
             if (mode) {
-                if (message && typeof window.listdom_toastify === 'function') {
-                    listdom_toastify(message, 'lsd-success', {
+                if (message && typeof window.listdom_notify === 'function') {
+                    listdom_notify(message, 'lsd-success', {
                         position: 'lsd-bottom-right',
                         hideTime: 4000,
                         showClose: true,
@@ -7333,47 +7336,19 @@
             return false;
         }
 
-        confirmNavigate(onConfirm, onCancel) {
-            const hasToastify = typeof window.listdom_toastify === 'function';
-            const hasToast = typeof window.ListdomToast === 'function';
-
-            if (hasToastify || hasToast) {
-                if (this.confirmToast) return;
-
-                const config = {
-                    confirm: {
-                        confirmText: this.confirmText,
-                        cancelText: this.cancelText,
-                        onConfirm: () => {
-                            this.confirmToast = null;
-                            if (typeof onConfirm === 'function') onConfirm();
-                        },
-                        onCancel: () => {
-                            this.confirmToast = null;
-                            if (typeof onCancel === 'function') onCancel();
-                        },
-                        onCloseOverlay: () => {
-                            this.confirmToast = null;
-                            if (typeof onCancel === 'function') onCancel();
-                        }
-                    },
-                    position: 'lsd-center-center'
-                };
-
-                this.confirmToast = hasToastify
-                    ? listdom_toastify(this.message, 'lsd-confirm', config)
-                    : new window.ListdomToast(this.message, {
-                        type: 'lsd-confirm',
-                        confirm: config.confirm
-                    });
-                return;
-            }
-
-            if (window.confirm(this.message)) {
-                if (typeof onConfirm === 'function') onConfirm();
-            } else if (typeof onCancel === 'function') {
-                onCancel();
-            }
+        async confirmNavigate(onConfirm, onCancel) {
+            if (this.confirmToast) return;
+            this.confirmToast = true;
+            const accepted = await window.WebiliaUI.modal.confirm({
+                title: window.lsd.i18n_confirm_title,
+                message: this.message,
+                confirmLabel: this.confirmText,
+                cancelLabel: this.cancelText,
+                closeLabel: window.lsd.i18n_dialog_close
+            });
+            this.confirmToast = null;
+            if (accepted && typeof onConfirm === 'function') onConfirm();
+            else if (!accepted && typeof onCancel === 'function') onCancel();
         }
 
         init() {
@@ -8213,8 +8188,8 @@
                 });
             });
 
-            // Delete / trash confirm (unchanged)
-            $(document).on('click', '[data-lsd-template-delete]', function (event) {
+            // Delete / trash confirmation
+            $(document).on('click', '[data-lsd-template-delete]', async function (event) {
                 const $link = $(this);
                 const href = $link.attr('href') || '';
                 if (!href) return;
@@ -8224,41 +8199,18 @@
                     confirmText: $link.data('lsd-template-confirm-text'),
                     cancelText: $link.data('lsd-template-cancel-text'),
                 };
-                const hasToast =
-                    (typeof window.listdom_toastify === 'function') ||
-                    (typeof window.ListdomToast === 'function');
-
-                if (!cfg || !hasToast) return;
-
                 event.preventDefault();
                 event.stopPropagation();
 
-                const message = cfg.message || '';
-                const confirmText = cfg.confirmText || 'OK';
-                const cancelText = cfg.cancelText || 'Cancel';
-
-                const handleCancel = () => {};
-
-                const confirmOptions = {
-                    confirm: {
-                        confirmText,
-                        cancelText,
-                        onConfirm: () => { window.location.href = href; },
-                        onCancel: handleCancel,
-                        onCloseOverlay: handleCancel
-                    },
-                    position: 'lsd-center-center'
-                };
-
-                if (typeof window.listdom_toastify === 'function') {
-                    listdom_toastify(message, 'lsd-confirm', confirmOptions);
-                    return;
-                }
-
-                new window.ListdomToast(message, {
-                    type: 'lsd-confirm',
-                    confirm: confirmOptions.confirm
+                const accepted = await window.WebiliaUI.modal.confirm({
+                    title: window.lsd.i18n_confirm_title,
+                    message: cfg.message || '',
+                    confirmLabel: cfg.confirmText || window.lsd.i18n_confirm,
+                    cancelLabel: cfg.cancelText || window.lsd.i18n_cancel,
+                    closeLabel: window.lsd.i18n_dialog_close,
+                    danger: true
                 });
+                if (accepted) window.location.href = href;
             });
         }
     }
@@ -8317,8 +8269,8 @@
                 if (revealTimer) window.clearTimeout(revealTimer);
 
                 const thumbStyles = window.getComputedStyle(thumbEl);
-                const previewWidth = parseFloat(thumbStyles.getPropertyValue('--lsd-template-preview-width')) || 1200;
-                const previewHeight = parseFloat(thumbStyles.getPropertyValue('--lsd-template-preview-height')) || 210;
+                const previewWidth = parseFloat(thumbStyles.getPropertyValue('--lsd-admin-template-preview-width')) || 1000;
+                const previewHeight = parseFloat(thumbStyles.getPropertyValue('--lsd-admin-template-preview-height')) || 210;
                 const thumbWidth = $thumb.innerWidth();
                 const naturalHeight = $inner.get(0).offsetHeight || 0;
 
@@ -8328,9 +8280,9 @@
                 const renderedHeight = naturalHeight * scale;
                 const maxTranslate = Math.min(0, previewHeight - renderedHeight);
 
-                thumbEl.style.setProperty('--lsd-template-preview-scale', scale.toFixed(4));
-                thumbEl.style.setProperty('--lsd-template-preview-translate', '0px');
-                thumbEl.style.setProperty('--lsd-template-preview-translate-max', `${maxTranslate.toFixed(2)}px`);
+                thumbEl.style.setProperty('--lsd-admin-template-preview-scale', scale.toFixed(4));
+                thumbEl.style.setProperty('--lsd-admin-template-preview-translate', '0px');
+                thumbEl.style.setProperty('--lsd-admin-template-preview-translate-max', `${maxTranslate.toFixed(2)}px`);
                 const timerId = window.setTimeout(() => {
                     $thumb.addClass('is-ready');
                     $thumb.removeData('lsdPreviewRevealTimer');

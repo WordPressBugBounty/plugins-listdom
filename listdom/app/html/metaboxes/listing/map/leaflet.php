@@ -146,10 +146,12 @@ jQuery(document).ready(function()
     if(mapbox_token)
     {
         // Mapbox Tile Server
-        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/512/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             maxZoom: 18,
-            id: 'mapbox.streets',
+            id: 'mapbox/streets-v12',
+            tileSize: 512,
+            zoomOffset: -1,
             accessToken: mapbox_token
         }).addTo(map);
     }
@@ -301,7 +303,6 @@ jQuery(document).ready(function()
     <?php endif; ?>
 
     overlaysArray.push(overlay);
-    map.fitBounds(overlay.getBounds());
     drawnItems.addLayer(overlay);
 
     <?php endif; ?>
@@ -416,7 +417,7 @@ jQuery(document).ready(function()
     {
         if (!message) return;
 
-        if (typeof window.listdom_toastify === 'function') window.listdom_toastify(message, 'lsd-error');
+        if (typeof window.listdom_notify === 'function') window.listdom_notify(message, 'lsd-error');
         else window.alert(message);
     };
 
@@ -509,12 +510,33 @@ jQuery(document).ready(function()
         if(overlay) overlay.addTo(map);
     });
 
-    // Load Tiles on Block Editor
-    setTimeout(function()
+    // The Block Editor can keep the map hidden until its Meta Boxes panel opens.
+    const mapContainer = map.getContainer();
+    let fitInitialShape = !!overlay;
+    const resizeMap = function()
     {
-        map.invalidateSize();
-        if(overlay) map.fitBounds(overlay.getBounds());
-    }, 1000);
+        if (!mapContainer.clientWidth || !mapContainer.clientHeight) return;
+
+        map.invalidateSize({animate: false});
+
+        if (fitInitialShape)
+        {
+            map.fitBounds(overlay.getBounds(), {animate: false});
+            fitInitialShape = false;
+        }
+    };
+
+    if (typeof ResizeObserver !== 'undefined')
+    {
+        const resizeObserver = new ResizeObserver(resizeMap);
+        resizeObserver.observe(mapContainer);
+        map.on('unload', function()
+        {
+            resizeObserver.disconnect();
+        });
+    }
+
+    resizeMap();
 });
 
 function lsd_set_boundaries(overlay, type)

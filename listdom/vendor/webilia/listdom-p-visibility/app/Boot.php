@@ -18,6 +18,9 @@ class Boot extends Base
         if (self::$ran) return;
         self::$ran = true;
 
+        // Register Filters
+        $this->filters();
+
         // Register Actions
         $this->actions();
 
@@ -29,6 +32,12 @@ class Boot extends Base
 
         // Init API
         (new API())->init();
+    }
+
+    public function filters()
+    {
+        // Register Settings Abilities
+        add_filter('lsd_settings_domains', [SettingsAbilities::class, 'register']);
     }
 
     public function actions()

@@ -109,7 +109,7 @@ class LSD_Taxonomies_Label extends LSD_Taxonomies
         if (!$taxonomy || !current_user_can($taxonomy->cap->edit_terms)) return;
 
         $color = sanitize_text_field(wp_unslash($_POST['lsd_color']));
-        update_term_meta($term_id, 'lsd_color', $color);
+        LSD_Listings_Taxonomies::save_metadata((int) $term_id, ['color' => $color]);
         $this->save_archive_shortcode($term_id);
     }
 

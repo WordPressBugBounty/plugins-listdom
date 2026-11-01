@@ -49,6 +49,12 @@ class LSD_Shortcodes extends LSD_Base
         $post_atts = [];
         if ($post_id) $post_atts = $this->get_post_meta($post_id);
 
+        return $this->parse_saved($post_atts, $atts);
+    }
+
+    /** Apply shortcode overrides to an already loaded saved configuration. */
+    public function parse_saved(array $post_atts, array $atts = []): array
+    {
         // Overwrite values passed directly from shortcode
         $skin = $post_atts['lsd_display']['skin'] ?? $this->get_default_skin();
         foreach ($atts as $key => $value)

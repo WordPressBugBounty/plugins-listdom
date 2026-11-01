@@ -32,7 +32,7 @@ if (is_array($conversion))
             <?php esc_html_e('Conversion Insights', 'listdom'); ?>
             <?php if (is_array($conversion)): ?>
                 <button class="lsd-analytics-report-help lsd-tooltip" type="button" aria-label="<?php echo esc_attr($chart_note); ?>" data-lsd-tooltip="<?php echo esc_attr($chart_note); ?>">
-                    <i class="webilia-icon wbli-question" aria-hidden="true"></i>
+                    <i class="wui-icon wui-icon--question" aria-hidden="true"></i>
                 </button>
             <?php endif; ?>
         </h2>

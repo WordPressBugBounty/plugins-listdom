@@ -20,7 +20,17 @@ class LSD_Skins_Timeline extends LSD_Skins
     public function start($atts)
     {
         parent::start($atts);
+        $this->configure_timeline();
+    }
 
+    public function prepare_inspection(array $atts): void
+    {
+        parent::prepare_inspection($atts);
+        $this->configure_timeline();
+    }
+
+    private function configure_timeline(): void
+    {
         $horizontal_enabled = isset($this->skin_options['horizontal']) && (int) $this->skin_options['horizontal'];
         $this->horizontal = (bool) $horizontal_enabled;
 

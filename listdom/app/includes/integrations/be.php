@@ -39,7 +39,7 @@ class LSD_Integrations_BE extends LSD_Integrations
         }
 
         // Block Editor Status for Taxonomies
-        foreach (['location', 'tag', 'feature', 'label'] as $taxonomy)
+        foreach (['category', 'location', 'tag', 'feature', 'label'] as $taxonomy)
         {
             add_filter('lsd_taxonomy_' . $taxonomy . '_args', [$this, 'enable_be'], 9999);
         }
@@ -595,7 +595,7 @@ class LSD_Integrations_BE extends LSD_Integrations
                 {
                     $seen[$id] = true;
                     $pattern = get_post((int) $attrs['ref']);
-                    if ($pattern instanceof WP_Post && $pattern->post_type === 'wp_block' && $pattern->post_status === 'publish' && empty($pattern->post_password) && $this->content_has_registered_block($pattern->post_content, $names, $seen)) return true;
+                    if ($pattern instanceof WP_Post && $pattern->post_type === 'wp_block' && LSD_Integrations_Blockeditor_Layout::reusable_eligible($pattern) && $this->content_has_registered_block($pattern->post_content, $names, $seen)) return true;
                 }
             }
             elseif ($type === 'core/pattern' && !empty($attrs['slug']) && class_exists('WP_Block_Patterns_Registry'))
@@ -624,12 +624,11 @@ class LSD_Integrations_BE extends LSD_Integrations
         $saved = $block['innerHTML'] ?? '';
         if (!is_string($saved)) return $content;
 
-        $saved = html_entity_decode($saved, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        if (!preg_match('~^\s*\[listdom id="([1-9][0-9]*)"\]\s*$~', $saved, $matches)) return $content;
+        $id = LSD_Integrations_Blockeditor_Layout::legacy_id($saved);
+        if (!$id) return $content;
 
-        $id = (int) $matches[1];
         $layout = get_post($id);
-        if (!$layout || $layout->post_type !== LSD_Base::PTYPE_SHORTCODE || $layout->post_status !== 'publish') return '';
+        if (!LSD_Integrations_Blockeditor_Layout::eligible($layout)) return '';
 
         $styles_before = wp_styles()->queue;
         $html = do_shortcode('[listdom id="' . $id . '"]');
@@ -656,7 +655,7 @@ class LSD_Integrations_BE extends LSD_Integrations
             {
                 $seen[$id] = true;
                 $pattern = get_post($id);
-                if ($pattern instanceof WP_Post && $pattern->post_type === 'wp_block' && $pattern->post_status === 'publish' && empty($pattern->post_password))
+                if ($pattern instanceof WP_Post && $pattern->post_type === 'wp_block' && LSD_Integrations_Blockeditor_Layout::reusable_eligible($pattern))
                 {
                     foreach (parse_blocks($pattern->post_content) as $inner) $this->collect_legacy_blocks($inner, $names, $seen);
                 }

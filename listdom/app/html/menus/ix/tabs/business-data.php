@@ -32,7 +32,7 @@ $business_data_titles = [
                 <div class="lsd-wbl-connection-content">
                     <h4><?php esc_html_e('Connect your website to get started', 'listdom'); ?></h4>
                     <p class="lsd-admin-description"><?php esc_html_e('Open Webilia Connect, choose Connect to Webilia, and finish linking your account. Then return here to see your balance and search businesses. You’ll receive 20 free Webilia Credits when you connect your first website to Webilia.', 'listdom'); ?></p>
-                    <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('admin.php?page=listdom-connect&tab=connect')); ?>"><?php esc_html_e('Go to Webilia Connect', 'listdom'); ?><i class="webilia-icon wbli-right-arrow" aria-hidden="true"></i></a>
+                    <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('admin.php?page=listdom-connect&tab=connect')); ?>"><?php esc_html_e('Go to Webilia Connect', 'listdom'); ?><i class="wui-icon wui-icon--right-arrow" aria-hidden="true"></i></a>
                 </div>
                 <div class="lsd-wbl-connection-art" aria-hidden="true"><img src="<?php echo esc_url($this->lsd_asset_url('img/webilia-connect-illustration.png')); ?>" alt=""></div>
             </div>
@@ -42,7 +42,7 @@ $business_data_titles = [
         <div class="lsd-business-data-guide" data-business-data-no-credits hidden>
             <h4><?php esc_html_e('Get more Webilia Credits to search', 'listdom'); ?></h4>
             <p><?php esc_html_e('Your Webilia account has no credits available for a new Business Data search. Buy a credit package to continue. You can still reopen recent searches and import their saved results below without another charge.', 'listdom'); ?></p>
-            <a class="lsd-primary-button" href="https://api.webilia.com/go/listdom-credits" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Buy Webilia Credits', 'listdom'); ?><i class="webilia-icon wbli-link-square" aria-hidden="true"></i></a>
+            <a class="lsd-primary-button" href="https://api.webilia.com/go/listdom-credits" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Buy Webilia Credits', 'listdom'); ?><i class="wui-icon wui-icon--link-square" aria-hidden="true"></i></a>
             <button type="button" class="lsd-secondary-button" data-business-data-retry-balance><?php esc_html_e('Check balance again', 'listdom'); ?></button>
         </div>
         <div class="lsd-business-data-guide" data-business-data-balance-error hidden>
@@ -111,7 +111,7 @@ $business_data_titles = [
                 <div><strong data-business-data-skipped-count>0</strong><span><?php esc_html_e('Skipped', 'listdom'); ?></span></div>
             </div>
             <div class="lsd-business-data-import-result-actions">
-                <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('edit.php?post_type=' . LSD_Base::PTYPE_LISTING)); ?>"><?php esc_html_e('Manage listings', 'listdom'); ?><i class="webilia-icon wbli-right-arrow" aria-hidden="true"></i></a>
+                <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('edit.php?post_type=' . LSD_Base::PTYPE_LISTING)); ?>"><?php esc_html_e('Manage listings', 'listdom'); ?><i class="wui-icon wui-icon--right-arrow" aria-hidden="true"></i></a>
             </div>
             <div class="lsd-business-data-import-result-details" data-business-data-import-result-details></div>
         </div>
@@ -162,7 +162,7 @@ $business_data_titles = [
                 <div class="lsd-wbl-connection-content">
                     <h4><?php esc_html_e('Connect your website to get started', 'listdom'); ?></h4>
                     <p class="lsd-admin-description"><?php esc_html_e('Open Webilia Connect and finish linking your account. Then return here to match or refresh your listings with Business Data.', 'listdom'); ?></p>
-                    <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('admin.php?page=listdom-connect&tab=connect')); ?>"><?php esc_html_e('Go to Webilia Connect', 'listdom'); ?><i class="webilia-icon wbli-right-arrow" aria-hidden="true"></i></a>
+                    <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('admin.php?page=listdom-connect&tab=connect')); ?>"><?php esc_html_e('Go to Webilia Connect', 'listdom'); ?><i class="wui-icon wui-icon--right-arrow" aria-hidden="true"></i></a>
                 </div>
                 <div class="lsd-wbl-connection-art" aria-hidden="true"><img src="<?php echo esc_url($this->lsd_asset_url('img/webilia-connect-illustration.png')); ?>" alt=""></div>
             </div>

@@ -536,25 +536,19 @@ class LSD_Checklist_Helper
 
     public function content_has_unescaped_shortcode(string $content, string $shortcode): bool
     {
-        if (trim($content) === '' || $shortcode === '') return false;
+        return count(self::saved_shortcode_matches($content, $shortcode)) > 0;
+    }
 
-        $content = $this->strip_html_comments($content);
-        if (trim($content) === '') return false;
-
-        $pattern = get_shortcode_regex([$shortcode]);
-        $matches = [];
-
-        if (!preg_match_all('/' . $pattern . '/s', $content, $matches, PREG_SET_ORDER)) return false;
-
-        foreach ($matches as $match)
+    /** Saved shortcode eligibility shared by checklist discovery and administrator inspection. */
+    public static function saved_shortcode_matches(string $content, string $shortcode): array
+    {
+        if (trim($content) === '' || $shortcode === '') return [];
+        $content = (string) preg_replace('/<!--.*?-->/s', '', $content);
+        if (!preg_match_all('/' . get_shortcode_regex([$shortcode]) . '/s', $content, $matches, PREG_SET_ORDER)) return [];
+        return array_values(array_filter($matches, static function ($match) use ($shortcode)
         {
-            // Ignore escaped forms such as [[listdom-dashboard]].
-            if (($match[1] ?? '') === '[' && ($match[6] ?? '') === ']') continue;
-
-            if (($match[2] ?? '') === $shortcode) return true;
-        }
-
-        return false;
+            return !(($match[1] ?? '') === '[' && ($match[6] ?? '') === ']') && ($match[2] ?? '') === $shortcode;
+        }));
     }
 
     private function content_has_shortcode_or_block(string $content, string $shortcode): bool
@@ -602,7 +596,7 @@ class LSD_Checklist_Helper
                 {
                     $seen[$id] = true;
                     $pattern = get_post($id);
-                    if ($pattern instanceof WP_Post && $pattern->post_type === 'wp_block' && $pattern->post_status === 'publish' && empty($pattern->post_password))
+                    if ($pattern instanceof WP_Post && $pattern->post_type === 'wp_block' && LSD_Integrations_Blockeditor_Layout::reusable_eligible($pattern))
                     {
                         if (has_block($name, $pattern->post_content))
                         {
@@ -696,16 +690,25 @@ class LSD_Checklist_Helper
         return apply_filters('lsd_checklist_post_content_sources', array_values($sources), $post_id);
     }
 
+    /** Shared page state; shortcode readiness is resolved separately by each reader. */
+    public function page_state(int $page_id): array
+    {
+        $post = $page_id > 0 ? get_post($page_id) : null;
+        $exists = $post instanceof WP_Post && $post->post_type === 'page';
+        return ['exists' => $exists, 'published' => $exists && $post->post_status === 'publish',
+            'pageStatus' => $exists ? $post->post_status : 'missing'];
+    }
+
     public function dashboard_status(): array
     {
         $page_id = (int) LSD_Options::post_id('submission_page');
-        $post = $page_id > 0 ? get_post($page_id) : null;
-        $exists = $post instanceof WP_Post && $post->post_type === 'page';
-        $published = $exists && $post->post_status === 'publish';
+        $state = $this->page_state($page_id);
+        $exists = $state['exists'];
+        $published = $state['published'];
         $shortcode = $published && $this->is_published_post($page_id) && ($this->published_post_has_shortcodes($page_id, ['listdom-dashboard'])
             || LSD_Dashboard::post_has_elementor_dashboard($page_id));
         return ['submissionPage' => $page_id, 'exists' => $exists, 'published' => $published,
-            'shortcodeReady' => (bool) $shortcode, 'ready' => $published && $shortcode, 'pageStatus' => $exists ? $post->post_status : 'missing'];
+            'shortcodeReady' => (bool) $shortcode, 'ready' => $published && $shortcode, 'pageStatus' => $state['pageStatus']];
     }
 
     public function published_post_has_shortcodes(int $post_id, array $shortcodes): bool

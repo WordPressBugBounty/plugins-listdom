@@ -1211,7 +1211,7 @@ class LSD_Dashboard_Promotions extends LSD_Base
 
     protected function get_topup_progress(string $start_time, string $expiry_time, string $status): array
     {
-        return $this->get_progress_data($start_time, $expiry_time, $status, self::TOPUP_ACCENT);
+        return $this->get_progress_data($start_time, $expiry_time, $status, 'color-mix(in srgb, var(--lsd-fe-main-gbg1, #33c6ff) 92%, #260bff)');
     }
 
     protected function get_progress_data(string $start_time, string $expiry_time, string $status, string $accent = ''): array

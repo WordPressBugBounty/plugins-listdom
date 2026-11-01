@@ -185,7 +185,7 @@ class LSD_Admin extends LSD_Base
         ], admin_url('admin.php'));
 
         ?>
-        <div class="lsd-ask-review-wrapper notice notice-info is-dismissible lsd-flex lsd-flex-row lsd-flex-content-start lsd-flex-items-start">
+        <div class="lsd-ask-review-wrapper notice notice-info is-dismissible wui lsd-flex lsd-flex-row lsd-flex-content-start lsd-flex-items-start">
             <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-flex-items-start">
                 <h3 class="lsd-m-0 lsd-admin-title">
                     <?php esc_html_e('Listdom translation reminder', 'listdom'); ?>
@@ -202,7 +202,7 @@ class LSD_Admin extends LSD_Base
                 <div class="lsd-ask-review-buttons lsd-flex lsd-flex-row lsd-gap-3 lsd-mt-3 lsd-flex-items-center">
                     <a class="lsd-primary-button" href="<?php echo esc_url($listdom_url); ?>">
                         <span><?php esc_html_e('Translate Listdom core', 'listdom'); ?></span>
-                        <i class="webilia-icon wbli-right-arrow"></i>
+                        <i class="dashicons dashicons-arrow-right-alt"></i>
                     </a>
                 </div>
             </div>

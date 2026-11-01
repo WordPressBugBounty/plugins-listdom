@@ -46,8 +46,6 @@ if ($show_reset)
 }
 else
 {
-    if ($reset_error) echo '<div class="lsd-alert lsd-error">' . esc_html($reset_error) . '</div>';
-
     $assets->footer('<script>
     jQuery(document).ready(function()
     {
@@ -120,6 +118,9 @@ else
     </div>
 <?php else: ?>
     <div class="lsd-forgot-password-wrapper">
+        <?php if ($reset_error): ?>
+            <div class="lsd-alert lsd-error"><?php echo esc_html($reset_error); ?></div>
+        <?php endif; ?>
         <div id="<?php echo esc_attr('lsd_forgot_password_form_message_' . $instance_id); ?>" class="lsd-forgot-password-form-message"></div>
         <form name="lsd-forgot-password" id="<?php echo esc_attr('lsd-forgot-password-' . $instance_id); ?>" class="lsd-forgot-password-form" method="post">
             <?php LSD_Form::nonce('lsd_forgot_password_nonce', 'lsd_forgot_password_nonce'); ?>

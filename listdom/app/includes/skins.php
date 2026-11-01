@@ -125,17 +125,32 @@ class LSD_Skins extends LSD_Base
 
     public function start($atts)
     {
+        $this->configure($atts);
+    }
+
+    /** Resolve saved configuration without rendering, assets or request filters. */
+    public function prepare_inspection(array $atts): void
+    {
+        $this->configure($atts, true);
+    }
+
+    /** Shared effective defaults; inspection deliberately skips extension callbacks. */
+    protected function configure(array $atts, bool $inspection = false): void
+    {
         // Preserve shortcode filters before request search filters are applied.
         $this->filters = isset($atts['lsd_filter']) && is_array($atts['lsd_filter']) ? $atts['lsd_filter'] : [];
 
-        $this->atts = apply_filters('lsd_skins_atts', $atts);
+        $this->atts = $inspection ? $atts : apply_filters('lsd_skins_atts', $atts);
         $instance_id = isset($this->atts['lsd_instance_id'])
             ? (int) $this->atts['lsd_instance_id']
             : (isset($this->atts['id']) ? (int) $this->atts['id'] : wp_rand(100, 999));
-        $this->id = LSD_id::get($instance_id);
+        $this->id = $inspection ? $instance_id : LSD_id::get($instance_id);
 
-        $update_address_bar = apply_filters('lsd_update_page_address', true, $this);
-        LSD_Assets::update_address_bar($update_address_bar, $this->id);
+        if (!$inspection)
+        {
+            $update_address_bar = apply_filters('lsd_update_page_address', true, $this);
+            LSD_Assets::update_address_bar($update_address_bar, $this->id);
+        }
 
         // Skin Options
         $this->skin_options = $this->atts['lsd_display'][$this->skin] ?? [];
@@ -153,14 +168,13 @@ class LSD_Skins extends LSD_Base
         $this->sm_ajax = isset($this->search_options['ajax']) && trim($this->search_options['ajax']) !== '' ? (int) $this->search_options['ajax'] : 0;
 
         // Requested Page
-        $this->page = max(1, get_query_var('paged', isset($_REQUEST['page']) && is_numeric($_REQUEST['page']) ? $_REQUEST['page'] : 1));
+        $this->page = $inspection ? 1 : max(1, get_query_var('paged', isset($_REQUEST['page']) && is_numeric($_REQUEST['page']) ? $_REQUEST['page'] : 1));
 
         // Filter Options
-        $this->filter_options = $this->apply_current_query(
-            isset($this->atts['lsd_filter']) && is_array($this->atts['lsd_filter'])
-                ? $this->atts['lsd_filter']
-                : []
-        );
+        $this->filter_options = isset($this->atts['lsd_filter']) && is_array($this->atts['lsd_filter'])
+            ? $this->atts['lsd_filter']
+            : [];
+        if (!$inspection && empty($this->atts['lsd_ignore_current_query'])) $this->filter_options = $this->apply_current_query($this->filter_options);
 
         if (isset($this->filter_options['circle']) && is_array($this->filter_options['circle']))
         {
@@ -299,7 +313,8 @@ class LSD_Skins extends LSD_Base
         // Map Search Options
         $this->mapsearch = isset($this->skin_options['mapsearch']) && $this->skin_options['mapsearch'];
         $this->autoGPS = isset($this->skin_options['auto_gps']) && $this->skin_options['auto_gps'];
-        $this->maxBounds = apply_filters('lsd_map_max_bounds', isset($this->skin_options['max_bounds']) && is_array($this->skin_options['max_bounds']) ? $this->skin_options['max_bounds'] : []);
+        $bounds = isset($this->skin_options['max_bounds']) && is_array($this->skin_options['max_bounds']) ? $this->skin_options['max_bounds'] : [];
+        $this->maxBounds = $inspection ? $bounds : apply_filters('lsd_map_max_bounds', $bounds);
         $this->ignore_map_exclusion = isset($this->skin_options['show_excluded_listings']) && $this->skin_options['show_excluded_listings'];
 
         // Map height
@@ -309,6 +324,7 @@ class LSD_Skins extends LSD_Base
 
         // HTML Class
         $this->html_class = isset($this->atts['html_class']) && trim($this->atts['html_class']) ? sanitize_text_field($this->atts['html_class']) : '';
+        $this->html_class = trim($this->html_class . ' wui');
 
         // Is it Widget?
         $this->widget = isset($this->atts['widget']) && $this->atts['widget'];
@@ -332,7 +348,21 @@ class LSD_Skins extends LSD_Base
         }
 
         // Set to Payload Options
-        LSD_Payload::set('shortcode', $this);
+        if (!$inspection) LSD_Payload::set('shortcode', $this);
+    }
+
+    /** The image size requested by first-party listing card templates. */
+    public function presentation_image_size(): array
+    {
+        if (($this->skin === 'grid' && in_array($this->style, ['style1', 'style4'], true))
+            || ($this->skin === 'list' && $this->style === 'style4'))
+        {
+            $sizes = [2 => [560, 430], 3 => [325, 250], 4 => [280, 215]];
+            return $sizes[(int) $this->columns] ?? [390, 260];
+        }
+        if ($this->skin === 'slider' || ($this->skin === 'cover' && $this->style === 'style4')) return [1100, 550];
+        if ($this->skin === 'side') return [100, 100];
+        return [390, 260];
     }
 
     public function is_cta_enabled(): bool
@@ -380,6 +410,17 @@ class LSD_Skins extends LSD_Base
 
     public function query()
     {
+        $this->prepare_query();
+
+        // Radius
+        $this->query_radius();
+
+        $this->prepare_query_pagination();
+    }
+
+    /** Shared deterministic constraints, without geocoding or sorting. */
+    public function prepare_query(): void
+    {
         // Post Type
         $this->args['post_type'] = LSD_Base::PTYPE_LISTING;
         $this->args['ignore_sticky_posts'] = true;
@@ -401,10 +442,10 @@ class LSD_Skins extends LSD_Base
 
         // Include / Exclude
         $this->query_ixclude();
+    }
 
-        // Radius
-        $this->query_radius();
-
+    private function prepare_query_pagination(): void
+    {
         // Pagination Options
         $this->limit = isset($this->skin_options['limit']) && trim($this->skin_options['limit'])
             ? sanitize_text_field($this->skin_options['limit'])
@@ -562,6 +603,12 @@ class LSD_Skins extends LSD_Base
         }
     }
 
+    /** Explicit latitude/longitude may lie on the equator or prime meridian. */
+    public static function has_coordinates($point): bool
+    {
+        return is_array($point) && isset($point[0], $point[1]) && is_numeric($point[0]) && is_numeric($point[1]);
+    }
+
     public function query_radius()
     {
         // Include
@@ -571,7 +618,7 @@ class LSD_Skins extends LSD_Base
             if(is_array($this->filter_options['circle']['center'])) $geopoint = $this->filter_options['circle']['center'];
             else $geopoint = $main->geopoint($this->filter_options['circle']['center']);
 
-            if (isset($geopoint[0]) && $geopoint[0] && isset($geopoint[1]) && $geopoint[1])
+            if (self::has_coordinates($geopoint))
             {
                 $this->args['lsd-circle'] = [
                     'center' => [$geopoint[0], $geopoint[1]],
@@ -1674,9 +1721,9 @@ class LSD_Skins extends LSD_Base
      * @param LSD_Entity_Listing $listing
      * @return string
      */
-    public function get_title_tag(LSD_Entity_Listing $listing): string
+    public function get_title_tag(LSD_Entity_Listing $listing, ?string $method = null): string
     {
-        $method = $this->get_listing_link_method();
+        $method = $method ?? $this->get_listing_link_method();
         $style = $this->get_single_listing_style();
 
         $title = $listing->get_title_tag($method, $style);
@@ -1976,7 +2023,7 @@ class LSD_Skins extends LSD_Base
     {
         if (!$this->sm_sticky || $this->sm_sticky_offset === null) return '';
 
-        return ' style="--lsd-search-sticky-top:' . esc_attr($this->sm_sticky_offset) . 'px;"';
+        return ' style="--lsd-fe-search-sticky-top:' . esc_attr($this->sm_sticky_offset) . 'px;"';
     }
 
     public function get_bar_class(bool $map = true, bool $search = true): string

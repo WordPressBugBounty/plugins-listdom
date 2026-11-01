@@ -19,7 +19,7 @@ $dashboard_wrapper = $this->get_dashboard_wrapper([
 <div class="<?php echo esc_attr($dashboard_wrapper['class']); ?>"<?php echo $dashboard_wrapper['attributes']; ?>>
 
     <?php if (!$restricted_state): ?>
-        <p class="lsd-alert lsd-info lsd-mb-2"><?php esc_html_e("Please login to continue.", 'listdom'); ?></p>
+        <p class="lsd-alert lsd-info"><?php esc_html_e("Please login to continue.", 'listdom'); ?></p>
         <?php echo do_shortcode('[listdom-auth redirect="' . $main->current_url() . '"]'); ?>
     <?php else: ?>
         <div class="lsd-dashboard-restricted-state">

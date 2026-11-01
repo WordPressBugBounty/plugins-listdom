@@ -17,7 +17,7 @@ $ai_profile_id = $form_id('lsd_ava_ai_profile');
 $ai_text_id = $form_id('lsd_ava_ai_text');
 $ai_generate_id = $form_id('lsd_ava_ai_generate');
 ?>
-<div class="lsd-listing-module-availability <?php echo LSD_Base::get_lsd_class('box-white'); ?>">
+<div class="lsd-listing-module-availability wui <?php echo LSD_Base::get_lsd_class('box-white'); ?>">
     <div class="lsd-fe-section-heading">
         <div class="lsd-listing-availability-heading">
             <h3 class="<?php echo LSD_Base::get_lsd_class('title'); ?>"><?php esc_html_e('Work Hours', 'listdom'); ?><?php $dashboard && $dashboard->required_html('ava'); ?></h3>
@@ -34,7 +34,7 @@ $ai_generate_id = $form_id('lsd_ava_ai_generate');
                                 <textarea class="lsd-d-block lsd-admin-input" title="" id="<?php echo esc_attr($ai_text_id); ?>" rows="5" maxlength="200" placeholder="<?php esc_attr_e('e.g. Mon-Fri 9 AM - 5 PM, Sat off', 'listdom'); ?>"></textarea>
                             </div>
                             <div>
-                                <button type="button" class="<?php echo is_admin() ? 'lsd-primary-button': 'lsd-general-button'; ?>" id="<?php echo esc_attr($ai_generate_id); ?>"><i class="webilia-icon wbli-stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?></button>
+                                <button type="button" class="<?php echo is_admin() ? 'lsd-primary-button': 'lsd-general-button'; ?>" id="<?php echo esc_attr($ai_generate_id); ?>"><i class="wui-icon wui-icon--stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?></button>
                             </div>
                         </div>
                     </div>

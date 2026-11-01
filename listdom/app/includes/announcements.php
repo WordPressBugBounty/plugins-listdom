@@ -298,7 +298,8 @@ class LSD_Announcements extends LSD_Base
 
         foreach (['category', 'priority', 'start_at', 'end_at'] as $meta_key)
         {
-            if (array_key_exists($meta_key, $announcement) && !array_key_exists($meta_key, $meta))
+            // Treat null optional metadata as absent before calling the array-only sanitizer.
+            if (isset($announcement[$meta_key]) && !array_key_exists($meta_key, $meta))
             {
                 $meta[$meta_key] = is_scalar($announcement[$meta_key]) ? sanitize_text_field((string) $announcement[$meta_key]) : LSD_Sanitize::deep($announcement[$meta_key]);
             }

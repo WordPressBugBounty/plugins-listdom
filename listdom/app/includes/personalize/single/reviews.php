@@ -12,7 +12,7 @@ class LSD_Personalize_Single_Reviews extends LSD_Personalize_Single
 
         foreach ($reviews_types as $type) $reviews_settings[$type] = self::reviews($type);
         $summary = LSD_Options::customizer('single.reviews.summary._');
-        foreach (['score_color' => '#855e00', 'stars_color' => '#855e00', 'empty_stars_color' => '#767676', 'count_color' => '#595959'] as $key => $default)
+        foreach (['score_color' => '#ffda72', 'stars_color' => '#ffda72', 'empty_stars_color' => '#767676', 'count_color' => '#595959'] as $key => $default)
         {
             $color = sanitize_hex_color($summary[$key] ?? '') ?: $default;
             $CSS = str_replace("((reviews_{$key}))", $color, $CSS);

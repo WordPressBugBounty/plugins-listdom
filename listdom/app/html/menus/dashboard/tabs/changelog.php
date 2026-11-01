@@ -3,6 +3,17 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v6.4.0 <span>November 1st, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added native WordPress abilities for listing search, contact, taxonomy management, and complete draft-to-publish listing workflows.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added administrator abilities to inspect and update supported settings, diagnose directory issues, adjust saved display settings, and generate selected missing thumbnails.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added an optional compact admin menu and separate padding controls for checkbox, radio, and range search fields.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved admin icons, notifications, dashboard spacing, and frontend form styling.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed Mapbox tiles, listing editor map resizing, and map infowindow styling and dimensions.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed map, search dropdown, and dialog stacking, rating star order, and authentication notice spacing.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed Table skin spacing and rounded corners, Timeline empty results, and Accordion listing buttons.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed primary category synchronization when listing categories are changed through the REST API.', 'listdom'); ?></li>
+    </ul>
     <h2>v6.3.0 <span>October 17th, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Added native WordPress blocks for directory layouts, search, the frontend dashboard, authentication, checkout, and listing content, with editor previews.', 'listdom'); ?></li>

@@ -9,26 +9,11 @@ defined('ABSPATH') || die();
 /** @var array $size */
 /** @var LSD_Element_Image $this */
 
-// Get Listing Gallery
-$gallery = get_post_meta($post_id, 'lsd_gallery', true);
-if (!is_array($gallery)) $gallery = [];
-
-// Include Featured Image
-$include_featured_image = isset($this->settings['gallery_featured_image']) && trim($this->settings['gallery_featured_image'])
-    ? $this->settings['gallery_featured_image']
-    : 'always';
-$featured_image_id = get_post_thumbnail_id($post_id);
-$featured_image_added = false;
-
-// Add Featured Image to Gallery
-if (($include_featured_image === 'always' || ($include_featured_image === 'fallback' && !count($gallery))) && $featured_image_id)
-{
-    array_unshift($gallery, $featured_image_id);
-    $featured_image_added = true;
-}
-
-// Unique Gallery
-$gallery = array_unique($gallery);
+// Resolve the same sources used by native media diagnostics.
+$sources = LSD_Media_Sources::gallery((int) $post_id, $this->settings);
+$gallery = $sources['ids'];
+$featured_image_id = $sources['featured_id'];
+$featured_image_added = $sources['featured_added'];
 $image_attributes = LSD_Schema::suppressing_markup() ? [] : ['itemprop' => 'image'];
 ?>
 <div class="lsd-image-slider-wrapper <?php echo (count($gallery) ? 'lsd-has-image' : ''); ?>">

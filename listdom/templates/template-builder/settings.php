@@ -51,7 +51,7 @@ $visible_index = 0;
 
                         <?php if ($section_is_responsive) : ?>
                             <span class="lsd-template-editor-settings-panel__responsive lsd-ml-2" data-lsd-responsive-icon>
-                                <i class="listdom-icon wbli-screen" aria-hidden="true"></i>
+                                <i class="wui-icon listdom-icon wui-icon--screen" aria-hidden="true"></i>
                             </span>
                         <?php endif; ?>
                     </h4>

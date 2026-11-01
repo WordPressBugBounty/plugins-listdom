@@ -64,32 +64,8 @@ class Addon extends Base
         $this->migrate_legacy_dates($listing->ID);
         if ($can_publish === null) $can_publish = (bool) get_post_meta($listing->ID, self::PUBLISH_APPROVED_META, true);
 
-        // Current Time
-        $now = current_time('timestamp', true);
-
-        $visible_from = (int) get_post_meta($listing->ID, 'lsd_visible_from', true);
-        $visible_until = (int) get_post_meta($listing->ID, 'lsd_visible_until', true);
-
-        // A dashboard Put Online action explicitly overrides visibility rules.
-        $visible = (bool) get_post_meta($listing->ID, self::OVERRIDE_META, true);
-        if (!$visible)
-        {
-            $visible = true;
-
-            // Max Visits
-            $max_visits = $this->get_max_visits();
-            $max_visits = apply_filters('lsd_visibility_max_visits', $max_visits, $listing);
-
-            // Listing Visits
-            if (is_numeric($max_visits) && $max_visits)
-            {
-                $visits = (new \LSD_Entity_Listing($listing))->get_visits();
-                if ($visits >= (int) $max_visits) $visible = false;
-            }
-
-            if ($visible && $visible_from && $visible_from > $now) $visible = false;
-            if ($visible && $visible_until && $visible_until <= $now) $visible = false;
-        }
+        $evidence = $this->inspection($listing);
+        $visible = $evidence['visible'];
 
         // Listing Status
         $status = $visible ? ($can_publish ? \LSD_Base::STATUS_PUBLISHED : \LSD_Base::STATUS_PENDING) : \LSD_Base::STATUS_OFFLINE;
@@ -107,6 +83,38 @@ class Addon extends Base
                 do_action('lsd_listing_offlined', $listing->ID);
             }
         }
+    }
+
+    /** Pure rule evaluation shared by lifecycle saves and read-only diagnostics. */
+    public static function evaluate(int $now, int $from, int $until, bool $override, int $visits, $maximum): bool
+    {
+        if ($override) return true;
+        if (is_numeric($maximum) && $maximum && $visits >= (int) $maximum) return false;
+        if ($from && $from > $now) return false;
+        if ($until && $until <= $now) return false;
+        return true;
+    }
+
+    /** Interpret legacy date-only values without persisting a migration. */
+    public static function date_value(int $timestamp, bool $local): int
+    {
+        return !$local && $timestamp && $timestamp % DAY_IN_SECONDS === 0
+            ? (int) \LSD_Base::strtotime(gmdate('Y-m-d', $timestamp)) : $timestamp;
+    }
+
+    /** Read evidence; diagnostic callers supply a reviewed maximum rather than running filters. */
+    public function inspection(\WP_Post $listing, bool $diagnostic = false, $maximum = null): array
+    {
+        $local = get_post_meta($listing->ID, self::CLOCK_META, true) === self::CLOCK_VERSION;
+        $from = self::date_value((int) get_post_meta($listing->ID, 'lsd_visible_from', true), $local);
+        $until = self::date_value((int) get_post_meta($listing->ID, 'lsd_visible_until', true), $local);
+        $override = (bool) get_post_meta($listing->ID, self::OVERRIDE_META, true);
+        $now = (int) current_time('timestamp', true);
+        if (!$diagnostic && !$override) $maximum = apply_filters('lsd_visibility_max_visits', $this->get_max_visits(), $listing);
+        $visits = $diagnostic ? (int) get_post_meta($listing->ID, 'lsd_visits', true) : ($override || !is_numeric($maximum) || !$maximum ? 0 : (int) (new \LSD_Entity_Listing($listing))->get_visits());
+        return ['from' => $from, 'until' => $until, 'override' => $override, 'visits' => $visits,
+            'maximum' => is_numeric($maximum) ? (int) $maximum : null, 'evaluated_at' => $now,
+            'visible' => self::evaluate($now, $from, $until, $override, $visits, $maximum)];
     }
 
     public function put_online(\WP_Post $listing, $action)
@@ -161,8 +169,7 @@ class Addon extends Base
             $timestamp = (int) get_post_meta($listing_id, $meta_key, true);
             if (!$timestamp || $timestamp % DAY_IN_SECONDS !== 0) continue;
 
-            $date = gmdate('Y-m-d', $timestamp);
-            update_post_meta($listing_id, $meta_key, \LSD_Base::strtotime($date));
+            update_post_meta($listing_id, $meta_key, self::date_value($timestamp, false));
         }
 
         if (!metadata_exists('post', $listing_id, self::PUBLISH_APPROVED_META))

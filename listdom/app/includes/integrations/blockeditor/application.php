@@ -258,7 +258,7 @@ class LSD_Integrations_Blockeditor_Application
         if (trim($html) === '') return '';
         if ($preview) return $html;
 
-        $class = 'wp-block-listdom-' . $kind;
+        $class = 'wp-block-listdom-' . $kind . ' wui';
         if (function_exists('get_block_wrapper_attributes')) $wrapper = get_block_wrapper_attributes(['class' => $class]);
         else
         {

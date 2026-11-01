@@ -117,7 +117,7 @@ $missFeatureMessages = [];
     <div class="lsd-form-row lsd-settings-submit-wrapper">
         <div class="lsd-col-12 lsd-flex lsd-gap-3 lsd-flex-content-end lsd-flex-align-center">
             <button type="button" class="lsd-secondary-button" id="lsd_blueprint_preview_button"><?php esc_html_e('Preview Data Collection', 'listdom'); ?> <i class="fa fa-eye"></i></button>
-            <button type="button" class="lsd-primary-button" id="lsd_blueprint_apply_button" disabled="disabled"><?php esc_html_e('Apply Data Collection', 'listdom'); ?> <i class="wbli wbli-checkmark-circle"></i></button>
+            <button type="button" class="lsd-primary-button" id="lsd_blueprint_apply_button" disabled="disabled"><?php esc_html_e('Apply Data Collection', 'listdom'); ?> <i class="wui-icon wui-icon--checkmark-circle"></i></button>
         </div>
     </div>
 </form>
@@ -181,7 +181,7 @@ jQuery(function($) {
 
         if (!blueprint) {
             const message = '<?php echo esc_js(__('Select a data collection first.', 'listdom')); ?>';
-            listdom_toastify(message, 'lsd-warning');
+            listdom_notify(message, 'lsd-warning');
             return;
         }
 
@@ -204,7 +204,7 @@ jQuery(function($) {
             if (!response || !response.success) {
                 const message = response && response.message ? response.message : '<?php echo esc_js(__('The request failed.', 'listdom')); ?>';
                 loading.stop();
-                listdom_toastify(message, 'lsd-error');
+                listdom_notify(message, 'lsd-error');
                 return;
             }
 
@@ -215,7 +215,7 @@ jQuery(function($) {
         }).fail(function(xhr) {
             const message = xhr && xhr.responseText ? xhr.responseText : '<?php echo esc_js(__('The request failed.', 'listdom')); ?>';
             loading.stop();
-            listdom_toastify(message, 'lsd-error');
+            listdom_notify(message, 'lsd-error');
         });
     }
 
@@ -224,14 +224,14 @@ jQuery(function($) {
             renderPreview(response);
             $('#lsd_blueprint_apply_button').prop('disabled', false);
             const message = response.message || '<?php echo esc_js(__('Preview is ready. Review it before applying the data collection.', 'listdom')); ?>';
-            listdom_toastify(message, 'lsd-success');
+            listdom_notify(message, 'lsd-success');
         });
     });
 
     $('#lsd_blueprint_apply_button').on('click', function() {
         if (!lastBlueprint || lastBlueprint !== $('#lsd_blueprint_select').val() || lastIncludeDemo !== $('#lsd_blueprint_include_demo').is(':checked')) {
             const message = '<?php echo esc_js(__('Preview the current data collection before applying it.', 'listdom')); ?>';
-            listdom_toastify(message, 'lsd-warning');
+            listdom_notify(message, 'lsd-warning');
             return;
         }
 
@@ -244,7 +244,7 @@ jQuery(function($) {
             $('#lsd_blueprint_preview_content').html(html);
             $('#lsd_blueprint_preview_panel').removeClass('lsd-util-hide');
             const message = response.message || '<?php echo esc_js(__('Operation is successfull. All Required item created or updated.', 'listdom')); ?>';
-            listdom_toastify(message, 'lsd-success');
+            listdom_notify(message, 'lsd-success');
         });
     });
 });

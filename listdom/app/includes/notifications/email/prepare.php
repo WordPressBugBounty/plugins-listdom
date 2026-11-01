@@ -25,7 +25,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
     {
         return $this->form($args, 'lsd_contact_owner');
     }
-  
+
     public function profile($args): array
     {
         return $this->form($args, 'lsd_profile_contact');
@@ -33,6 +33,8 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
 
     public function new_listing($listing_id): array
     {
+        if (LSD_Listings_Lifecycle::unannounced((int) $listing_id)) return [];
+
         $owner_id = get_post_field('post_author', $listing_id);
         $owner_name = get_the_author_meta('display_name', $owner_id);
         $owner_email = get_the_author_meta('user_email', $owner_id);
@@ -87,7 +89,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
     public function listing_status_changed($listing_id, $previous)
     {
         // Do not send anything for new listings
-        if ($previous === 'new') return false;
+        if ($previous === 'new' || LSD_Listings_Lifecycle::unannounced((int) $listing_id)) return false;
 
         $owner_id = get_post_field('post_author', $listing_id);
         $owner_name = get_the_author_meta('display_name', $owner_id);

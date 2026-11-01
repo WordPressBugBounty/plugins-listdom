@@ -28,7 +28,7 @@ defined('ABSPATH') || die();
                                 <?php if ($step['url'] !== ''): ?>
                                     <a class="lsd-analytics-onboarding-step-link lsd-admin-title-small" href="<?php echo esc_url($step['url']); ?>">
                                         <?php echo esc_html($step['title']); ?>
-                                        <i class="lsd-analytics-onboarding-step-link-icon webilia-icon wbli-link-square" aria-hidden="true"></i>
+                                        <i class="lsd-analytics-onboarding-step-link-icon wui-icon wui-icon--link-square" aria-hidden="true"></i>
                                     </a>
                                 <?php else: ?>
                                     <span class="lsd-analytics-onboarding-step-title lsd-admin-title-small"><?php echo esc_html($step['title']); ?></span>

@@ -9,13 +9,13 @@
 $has_checked_type = false;
 $visible_types = is_array($types) ? $types : [];
 ?>
-<div id="<?php echo esc_attr($modal_id); ?>" class="lsd-template-modal" aria-hidden="true">
+<div id="<?php echo esc_attr($modal_id); ?>" class="lsd-template-modal wui" aria-hidden="true">
     <div class="lsd-template-modal-backdrop" role="presentation">
         <div class="lsd-template-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="<?php echo esc_attr($modal_id); ?>-title">
             <div class="lsd-template-modal-header">
                 <div class="lsd-admin-section-heading">
                     <div class="lsd-admin-title-icon">
-                        <i class="listdom-icon wbli-frontend-dashboard"></i>
+                        <i class="wui-icon listdom-icon wui-icon--frontend-dashboard"></i>
                         <h2 id="<?php echo esc_attr($modal_id); ?>-title" class="lsd-admin-title lsd-m-0">
                             <?php echo esc_html__('Create New Template', 'listdom'); ?>
                         </h2>
@@ -60,7 +60,7 @@ $visible_types = is_array($types) ? $types : [];
                             <span class="lsd-template-type-option-box">
                                 <?php if ( isset( $type['icon'] ) ) : ?>
                                     <span class="lsd-template-type-icon">
-                                        <i class="<?php echo esc_attr( 'listdom-icon ' . trim( $type['icon'] ) ); ?>" aria-hidden="true"></i>
+                                        <i class="<?php echo esc_attr( 'wui-icon listdom-icon ' . trim( $type['icon'] ) ); ?>" aria-hidden="true"></i>
                                     </span>
                                 <?php endif; ?>
                                 <h3 class="lsd-admin-subtitle">
@@ -88,7 +88,7 @@ $visible_types = is_array($types) ? $types : [];
                         </button>
                         <button type="submit" class="lsd-primary-button" data-lsd-loading-text="<?php echo esc_attr__( 'Creating Template', 'listdom' ); ?>">
                             <?php esc_html_e( 'Create Template', 'listdom' ); ?>
-                            <i class="listdom-icon wbli-right-arrow"></i>
+                            <i class="wui-icon listdom-icon wui-icon--right-arrow"></i>
                         </button>
                     </div>
                 </div>

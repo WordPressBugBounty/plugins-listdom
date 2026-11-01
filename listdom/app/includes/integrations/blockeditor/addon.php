@@ -38,11 +38,11 @@ class LSD_Integrations_Blockeditor_Addon
         $html = (string) call_user_func($callback);
         if (trim($html) === '') return $editor ? self::placeholder($message) : '';
 
-        $class = 'wp-block-' . str_replace('/', '-', $name) . ' lsd-addon-block';
+        $class = 'wp-block-' . str_replace('/', '-', $name) . ' lsd-addon-block wui';
         if ($editor)
         {
             // The selectable editor wrapper already carries block-support styles.
-            $wrapper = 'class="lsd-addon-block"';
+            $wrapper = 'class="lsd-addon-block wui"';
         }
         elseif (function_exists('get_block_wrapper_attributes')) $wrapper = get_block_wrapper_attributes(['class' => $class]);
         else

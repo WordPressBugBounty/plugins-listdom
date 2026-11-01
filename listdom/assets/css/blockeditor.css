@@ -1,3 +1,7 @@
+.edit-post-meta-boxes-area #lsd_metabox_category > .inside {
+  padding: 0 16px 16px;
+}
+
 [data-type^="listdom/shortcodes-"] {
   box-sizing: border-box;
   padding: 16px;

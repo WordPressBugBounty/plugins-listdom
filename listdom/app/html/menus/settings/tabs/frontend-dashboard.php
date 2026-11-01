@@ -994,7 +994,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                 <?php LSD_Form::nonce('lsd_settings_form'); ?>
                 <button type="submit" id="lsd_settings_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='wbli wbli-checkmark-circle'></i>
+                    <i class='wui-icon wui-icon--checkmark-circle'></i>
                 </button>
             </div>
         </div>
@@ -1065,7 +1065,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                 {
                     $tab.attr('data-saved', 'true');
 
-                    listdom_toastify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
+                    listdom_notify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
 
                     // Unloading
                     loading.stop();
@@ -1074,7 +1074,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                 {
                     $tab.attr('data-saved', 'false');
 
-                    listdom_toastify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
+                    listdom_notify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
 
                     // Unloading
                     loading.stop();

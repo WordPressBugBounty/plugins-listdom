@@ -95,7 +95,7 @@ $autorenew_groups = $this->get_overview_autorenew_groups($recurrings, $dashboard
                     <?php foreach ($quick_actions as $action): ?>
                         <a class="lsd-light-button" href="<?php echo esc_url($action['url']); ?>">
                             <?php echo esc_html($action['label']); ?>
-                            <i class="lsd-fe-icon wbli-right-arrow"></i>
+                            <i class="wui-icon lsd-fe-icon wui-icon--right-arrow"></i>
                         </a>
                     <?php endforeach; ?>
                 </div>

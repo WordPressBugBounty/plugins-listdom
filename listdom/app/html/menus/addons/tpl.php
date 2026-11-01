@@ -15,7 +15,7 @@ $connect_connected = $connect_enabled && LSD_Webilia_Connect::isConnected();
 $install_nonce = wp_create_nonce('lsd_install_addon_via_connect');
 $connect_url = admin_url('admin.php?page=listdom-connect&return_to=' . rawurlencode(admin_url('admin.php?page=listdom-connect&tab=addons')));
 ?>
-<div class="wrap lsd-wrap lsd-addons-wrap">
+<div class="wrap lsd-wrap wui lsd-addons-wrap">
     <?php LSD_Menus::header(esc_html__('Addons, Toolkits, & Apps', 'listdom'), null, LSD_Menus::webiliaTabs('addons')); ?>
 
     <div class="lsd-admin-main-wrapper">
@@ -65,7 +65,7 @@ $connect_url = admin_url('admin.php?page=listdom-connect&return_to=' . rawurlenc
                                             </h3>
                                         </a>
                                         <span class="lsd-badge <?php echo esc_attr($badge['class']); ?>">
-                                            <i class="listdom-icon <?php echo esc_attr($badge['icon']); ?>"></i>
+                                            <i class="listdom-icon wui-icon <?php echo esc_attr($badge['icon']); ?>"></i>
                                             <?php echo esc_html($badge['text']); ?>
                                         </span>
                                     </div>
@@ -80,7 +80,7 @@ $connect_url = admin_url('admin.php?page=listdom-connect&return_to=' . rawurlenc
                                             <?php if ($connect_enabled && $installable): ?>
                                                 <button type="button" class="lsd-primary-button lsd-connect-addon-install" data-basename="<?php echo esc_attr($addon->basename); ?>" data-nonce="<?php echo esc_attr($install_nonce); ?>" data-connected="<?php echo $connect_connected ? '1' : '0'; ?>" data-connect-url="<?php echo esc_url($connect_url); ?>">
                                                     <?php esc_html_e('Auto Install', 'listdom'); ?>
-                                                    <i class="webilia-icon wbli-link-square" aria-hidden="true"></i>
+                                                    <i class="wui-icon wui-icon--link-square" aria-hidden="true"></i>
                                                 </button>
                                                 <a class="lsd-secondary-button" href="<?php echo esc_url($addon->url); ?>" target="_blank">
                                                     <?php echo esc_html($type_labels[$type] ?? esc_html__('Get This Addon', 'listdom')); ?>
@@ -158,7 +158,7 @@ function lsdBindConnectAddonInstallButtons()
                         target: '_blank',
                         rel: 'noopener noreferrer',
                         text: ' ' + (ctaLabel || '<?php echo esc_js(__('View plans and upgrade', 'listdom')); ?>')
-                    }).append(jQuery('<i>', {class: 'webilia-icon wbli-right-arrow', 'aria-hidden': 'true'})).appendTo($alert);
+                    }).append(jQuery('<i>', {class: 'wui-icon wui-icon--right-arrow', 'aria-hidden': 'true'})).appendTo($alert);
                 }
             };
 

@@ -8,11 +8,11 @@ $ids = $this->listings;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
     <div class="lsd-accordion-item" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
-        <div class="lsd-accordion-header" role="button" tabindex="0">
+        <div class="lsd-accordion-header" role="button" tabindex="0" aria-expanded="false">
             <div class="lsd-listing-title-section">
                 <?php if ($this->display_title): ?>
                     <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
-                        <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
+                        <?php echo LSD_Kses::element($this->get_title_tag($listing, 'disabled')); ?>
                     </h3>
                 <?php endif; ?>
                 <?php if ($this->display_labels): ?>
@@ -106,6 +106,13 @@ $ids = $this->listings;
                                         </div>
                                     <?php endif; ?>
                                 </div>
+                            </div>
+
+                            <div class="lsd-listing-link-button lsd-mt-3">
+                                <a href="<?php echo esc_url(get_the_permalink($id)); ?>"
+                                   class="lsd-general-button" <?php echo lsd_schema()->url(); ?>>
+                                    <?php esc_html_e('Read More', 'listdom'); ?>
+                                </a>
                             </div>
 
                             <?php if ($this->display_cta): ?>

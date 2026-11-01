@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 /** @var string $uid */
 ?>
-<div class="lsd-inline-popup-wrapper lsd-no-button-styles lsd-editor-ai-button" data-editor-id="<?php echo esc_attr($uid); ?>">
+<div class="lsd-inline-popup-wrapper lsd-no-button-styles lsd-editor-ai-button wui" data-editor-id="<?php echo esc_attr($uid); ?>">
     <button type="button" class="button lsd-inline-popup-trigger lsd-text-button" data-focus="#lsd_ai_content_text_<?php echo esc_attr($uid); ?>" data-for="#lsd-editor-ai-popup-<?php echo esc_attr($uid); ?>" id="lsd_ai_content_open_<?php echo esc_attr($uid); ?>">
         <i class="listdom-icon fa-solid fa-magic-wand-sparkles"></i>
     </button>
@@ -18,7 +18,7 @@ defined('ABSPATH') || die();
             </div>
             <div>
                 <button type="button" class="<?php echo is_admin() ? 'lsd-primary-button': 'lsd-general-button'; ?> lsd_ai_content_generate" data-editor-id="<?php echo esc_attr($uid); ?>">
-                    <i class="webilia-icon wbli-stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?>
+                    <i class="wui-icon wui-icon--stars lsd-mr-3"></i><?php esc_html_e('Generate', 'listdom'); ?>
                 </button>
             </div>
         </div>

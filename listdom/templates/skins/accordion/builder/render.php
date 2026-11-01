@@ -8,11 +8,11 @@ $ids = $this->listings;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
 <div class="lsd-accordion-item" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>">
-    <div class="lsd-accordion-header" role="button" tabindex="0">
+    <div class="lsd-accordion-header" role="button" tabindex="0" aria-expanded="false">
         <div class="lsd-listing-title-section">
             <?php if ($this->display_title): ?>
                 <h3 class="lsd-listing-title" <?php echo lsd_schema()->name(); ?>>
-                    <?php echo LSD_Kses::element($this->get_title_tag($listing)); ?>
+                    <?php echo LSD_Kses::element($this->get_title_tag($listing, 'disabled')); ?>
                 </h3>
             <?php endif; ?>
             <?php if ($this->display_labels): ?>

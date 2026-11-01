@@ -859,8 +859,9 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
                 if (!$all_terms && count($predefined_terms) && !isset($predefined_terms[$term_key])) continue;
 
                 $term_value = is_string($term_key) && $term_key !== '' ? $term_key : $term;
-                $output .= '<label class="lsd-search-checkbox-label"><input type="radio" name="' . esc_attr($name) . '" value="' . esc_attr($term_value) . '" ' . ($term_value == $current ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
+                $output .= '<label class="lsd-search-radio-label"><input type="radio" name="' . esc_attr($name) . '" value="' . esc_attr($term_value) . '" ' . ($term_value == $current ? 'checked="checked"' : '') . '>' . esc_html($term) . '</label>';
             }
+            if (trim($output)) $output = '<div class="lsd-search-radio-list">' . $output . '</div>';
         }
         else if ($method === 'buttons')
         {
@@ -1405,6 +1406,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             {
                 $output .= '<label class="lsd-search-radio-label"><input type="radio" class="' . esc_attr($key) . '" name="' . esc_attr($name) . '" value="' . esc_attr($key) . '" ' . ($current == $key ? 'checked="checked"' : '') . '>' . esc_html($l) . '</label>';
             }
+            if (trim($output)) $output = '<div class="lsd-search-radio-list">' . $output . '</div>';
         }
 
         return trim($output) ? $label['label'] . $output : '';
@@ -1450,6 +1452,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
 
         $output .= '<div class="lsd-search-range">';
         $output .= $this->label($filter, $id, $title)['label'];
+        $output .= '<div class="lsd-search-range-inner">';
         $output .= $this->helper->range($filter, [
             'id' => $id,
             'min_name' => $min_name,
@@ -1464,7 +1467,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
             'prepend' => $prepend,
         ]);
 
-        $output .= '</div>';
+        $output .= '</div></div>';
         return $output;
     }
 
@@ -1510,7 +1513,7 @@ class LSD_Shortcodes_Search extends LSD_Shortcodes
         ?>
         <div class="lsd-search-devices-<?php echo esc_attr($device); ?>">
             <form action="<?php echo esc_url($action); ?>"
-                  class="lsd-search-form <?php echo !$inherit ? 'lsd-search-not-inherit' : ''; ?>">
+                  class="lsd-search-form wui <?php echo !$inherit ? 'lsd-search-not-inherit' : ''; ?>">
                 <?php if (!$this->ajax): ?><input type="hidden" name="lsd_search_submit" value="1"><?php endif; ?>
                 <input type="hidden" name="lsd_search_target" value="<?php echo esc_attr($this->form['shortcode'] ?? 0); ?>">
                 <?php

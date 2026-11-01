@@ -51,7 +51,7 @@ $preview_actions = [
                         <div class="lsd-analytics-preview-listing">
                             <span class="lsd-analytics-preview-listing-image lsd-analytics-preview-listing-image-<?php echo esc_attr($row); ?>"></span>
                             <span class="lsd-analytics-preview-listing-text"></span>
-                            <i class="lsd-analytics-preview-listing-eye webilia-icon wbli-eye"></i>
+                            <i class="lsd-analytics-preview-listing-eye wui-icon wui-icon--eye"></i>
                             <span class="lsd-analytics-preview-listing-count"></span>
                         </div>
                     <?php endfor; ?>
@@ -132,13 +132,13 @@ $preview_actions = [
                         data-loading="<?php echo $activate ? esc_attr__('Activating', 'listdom') : esc_attr__('Installing', 'listdom'); ?>"
                         data-failed="<?php echo $activate ? esc_attr__('Stats Addon could not be activated. Please try again.', 'listdom') : esc_attr__('Stats Addon could not be installed or activated. Please try again.', 'listdom'); ?>">
                         <span class="lsd-analytics-preview-action-label"><?php echo esc_html($preview['action']); ?></span>
-                        <i class="lsd-analytics-preview-action-arrow webilia-icon wbli-right-arrow" aria-hidden="true"></i>
+                        <i class="lsd-analytics-preview-action-arrow wui-icon wui-icon--right-arrow" aria-hidden="true"></i>
                     </button>
                 <?php else: ?>
                     <a class="lsd-primary-button lsd-analytics-preview-primary" href="<?php echo esc_url($preview['url']); ?>">
-                        <i class="webilia-icon wbli-link-square lsd-analytics-preview-action-icon" aria-hidden="true"></i>
+                        <i class="wui-icon wui-icon--link-square lsd-analytics-preview-action-icon" aria-hidden="true"></i>
                         <span class="lsd-analytics-preview-action-label"><?php echo esc_html($preview['action']); ?></span>
-                        <i class="lsd-analytics-preview-action-arrow webilia-icon wbli-right-arrow" aria-hidden="true"></i>
+                        <i class="lsd-analytics-preview-action-arrow wui-icon wui-icon--right-arrow" aria-hidden="true"></i>
                     </a>
                 <?php endif; ?>
                 <a class="lsd-secondary-button lsd-analytics-preview-secondary" href="<?php echo esc_url($preview['learn_url']); ?>"><?php esc_html_e('Learn More', 'listdom'); ?></a>
@@ -156,7 +156,7 @@ $preview_actions = [
         </div>
         <a class="lsd-analytics-preview-note-link" href="<?php echo esc_url($preview['learn_url']); ?>">
             <span class="lsd-analytics-preview-note-link-label"><?php esc_html_e('Learn More', 'listdom'); ?></span>
-            <i class="lsd-analytics-preview-note-arrow webilia-icon wbli-right-arrow" aria-hidden="true"></i>
+            <i class="lsd-analytics-preview-note-arrow wui-icon wui-icon--right-arrow" aria-hidden="true"></i>
         </a>
     </div>
 </section>

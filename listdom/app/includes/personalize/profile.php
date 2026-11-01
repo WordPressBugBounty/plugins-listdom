@@ -63,7 +63,9 @@ class LSD_Personalize_Profile extends LSD_Personalize
         $typography = $data['typography'] ?? [];
 
         $CSS = str_replace("(($prefix" . "_text_color))", sanitize_text_field($data['text_color'] ?? ''), $CSS);
-        $CSS = str_replace("(($prefix" . "_font_family))", self::font_family($typography['family'] ?? ''), $CSS);
+        $font_family = self::font_family($typography['family'] ?? '');
+        if ($font_family !== 'inherit') $font_family .= ', sans-serif';
+        $CSS = str_replace("(($prefix" . "_font_family))", $font_family, $CSS);
         $CSS = str_replace("(($prefix" . "_font_weight))", sanitize_text_field($typography['weight'] ?? ''), $CSS);
         $CSS = str_replace("(($prefix" . "_text_align))", sanitize_text_field($typography['align'] ?? ''), $CSS);
         $CSS = str_replace("(($prefix" . "_font_size))", isset($typography['size']) ? self::unit_number($typography['size']) : '', $CSS);

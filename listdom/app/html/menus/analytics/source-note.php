@@ -17,6 +17,6 @@ defined('ABSPATH') || die();
     </div>
     <a class="lsd-analytics-source-note-link lsd-text-button" href="https://api.webilia.com/go/stats-menu-cta">
         <?php esc_html_e('Learn More', 'listdom'); ?>
-        <i class="lsd-analytics-report-view-all-arrow webilia-icon wbli-right-arrow" aria-hidden="true"></i>
+        <i class="lsd-analytics-report-view-all-arrow wui-icon wui-icon--right-arrow" aria-hidden="true"></i>
     </a>
 </div>

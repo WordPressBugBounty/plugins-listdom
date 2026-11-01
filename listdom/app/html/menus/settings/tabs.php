@@ -18,7 +18,7 @@ $ai_module_panels = $this->get_ai_module_panels();
     <ul class="lsd-nav-tab-wrapper">
         <li class="lsd-has-children lsd-general-nav <?php echo $this->tab === 'general' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'general' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=general')); ?>">
-                <i class="webilia-icon wbli-menu-square lsd-m-0"></i>
+                <i class="wui-icon wui-icon--menu-square lsd-m-0"></i>
                 <?php esc_html_e('General', 'listdom'); ?>
             </a>
             <ul class="lsd-nav-sub-tabs" data-parent="general" hidden>
@@ -38,7 +38,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-seo-nav <?php echo $this->tab === 'seo' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'seo' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=seo')); ?>">
-                <i class="webilia-icon wbli-chart-increase lsd-m-0"></i>
+                <i class="wui-icon wui-icon--chart-increase lsd-m-0"></i>
                 <?php esc_html_e('SEO & GEO', 'listdom'); ?>
             </a>
             <ul data-parent="seo" class="lsd-nav-sub-tabs lsd-tabs">
@@ -49,7 +49,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-customizer-nav <?php echo $this->tab === 'customizer' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'customizer' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=customizer')); ?>">
-                <i class="webilia-icon wbli-customizer lsd-m-0"></i>
+                <i class="wui-icon wui-icon--customizer lsd-m-0"></i>
                 <?php esc_html_e('Customizer', 'listdom'); ?>
             </a>
             <ul data-parent="customizer" class="lsd-nav-sub-tabs lsd-tabs">
@@ -65,7 +65,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-frontend-dashboard-nav <?php echo $this->tab === 'frontend-dashboard' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'frontend-dashboard' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=frontend-dashboard')); ?>">
-                <i class="webilia-icon wbli-frontend-dashboard lsd-m-0"></i>
+                <i class="wui-icon wui-icon--frontend-dashboard lsd-m-0"></i>
                 <?php esc_html_e('Frontend Dashboard', 'listdom'); ?>
             </a>
             <ul data-parent="frontend-dashboard" class="lsd-nav-sub-tabs lsd-tabs">
@@ -82,7 +82,7 @@ $ai_module_panels = $this->get_ai_module_panels();
 
         <li class="lsd-has-children lsd-users-nav <?php echo $this->tab === 'auth' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'auth' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>">
-                <i class="webilia-icon wbli-user-circle lsd-m-0"></i>
+                <i class="wui-icon wui-icon--user-circle lsd-m-0"></i>
                 <?php esc_html_e('Users', 'listdom'); ?>
             </a>
             <ul data-parent="auth" class="lsd-nav-sub-tabs lsd-tabs">
@@ -97,7 +97,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-single-listing-nav <?php echo $this->tab === 'single-listing' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'single-listing' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=single-listing')); ?>">
-                <i class="webilia-icon wbli-list-view lsd-m-0"></i>
+                <i class="wui-icon wui-icon--list-view lsd-m-0"></i>
                 <?php esc_html_e('Single Listing', 'listdom'); ?>
             </a>
             <ul data-parent="single-listing" class="lsd-nav-sub-tabs lsd-tabs">
@@ -107,20 +107,21 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-advanced-nav <?php echo $this->tab === 'advanced' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'advanced' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=advanced')); ?>">
-                <i class="webilia-icon wbli-advanced lsd-m-0"></i>
+                <i class="wui-icon wui-icon--advanced lsd-m-0"></i>
                 <?php esc_html_e('Advanced', 'listdom'); ?>
             </a>
             <ul data-parent="advanced" class="lsd-nav-sub-tabs lsd-tabs">
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && ($this->subtab === 'assets-loading' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="assets-loading"><?php esc_html_e('Assets Loading', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'custom-styles' ? 'lsd-nav-tab-active' : ''; ?>" data-key="custom-styles"><?php esc_html_e('Custom Styles', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'components' ? 'lsd-nav-tab-active' : ''; ?>" data-key="components"><?php esc_html_e('Components', 'listdom'); ?></li>
+                <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'admin-menu' ? 'lsd-nav-tab-active' : ''; ?>" data-key="admin-menu"><?php esc_html_e('Admin Menu', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'translations' ? 'lsd-nav-tab-active' : ''; ?>" data-key="translations"><?php esc_html_e('Translations', 'listdom'); ?></li>
                 <li class="lsd-nav-tab <?php echo $this->tab === 'advanced' && $this->subtab === 'import-export' ? 'lsd-nav-tab-active' : ''; ?>" data-key="import-export"><?php esc_html_e('Import / Export', 'listdom'); ?></li>
             </ul>
         </li>
         <li class="lsd-has-children lsd-payments-nav <?php echo $this->tab === 'payments' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'payments' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=payments')); ?>">
-                <i class="webilia-icon wbli-payment lsd-m-0"></i>
+                <i class="wui-icon wui-icon--payment lsd-m-0"></i>
                 <?php esc_html_e('Payments', 'listdom'); ?>
             </a>
             <ul
@@ -140,7 +141,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-has-children lsd-ai-nav <?php echo $this->tab === 'ai' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'ai' ? 'lsd-nav-tab-active' : ''; ?>"  href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=ai')); ?>">
-                <i class="webilia-icon wbli-stars lsd-m-0"></i>
+                <i class="wui-icon wui-icon--stars lsd-m-0"></i>
                 <?php esc_html_e('AI', 'listdom'); ?>
             </a>
             <ul data-parent="ai" class="lsd-nav-sub-tabs lsd-tabs">
@@ -153,7 +154,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         </li>
         <li class="lsd-api-nav">
             <a class="lsd-nav-tab <?php echo $this->tab === 'api' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=api')); ?>">
-                <i class="webilia-icon wbli-api lsd-m-0"></i>
+                <i class="wui-icon wui-icon--api lsd-m-0"></i>
                 <?php esc_html_e('API', 'listdom'); ?>
             </a>
         </li>
@@ -167,7 +168,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         <?php if ($addon): ?>
         <li class="lsd-has-children lsd-addons-nav <?php echo $this->tab === 'addons' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'addons' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=addons')); ?>">
-                <i class="webilia-icon wbli-add-plus-circle lsd-m-0"></i>
+                <i class="wui-icon wui-icon--add-plus-circle lsd-m-0"></i>
                 <?php esc_html_e('Addons', 'listdom'); ?>
             </a>
 
@@ -180,7 +181,7 @@ $ai_module_panels = $this->get_ai_module_panels();
         <?php if ($toolkits): ?>
         <li class="lsd-has-children lsd-addons-nav <?php echo $this->tab === 'toolkits' ? ' lsd-nav-expanded' : ''; ?>">
             <a class="lsd-nav-tab <?php echo $this->tab === 'toolkits' ? 'lsd-nav-tab-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=toolkits')); ?>">
-                <i class="webilia-icon wbli-group-items lsd-m-0"></i>
+                <i class="wui-icon wui-icon--group-items lsd-m-0"></i>
                 <?php esc_html_e('Toolkits', 'listdom'); ?>
             </a>
 
@@ -215,7 +216,7 @@ jQuery(document).ready(function ($)
     const hasUnsavedChanges = () => currentTab.attr('data-saved') === 'false';
 
     // Function to handle tab click events
-    const handleTabClick = function (e)
+    const handleTabClick = async function (e)
     {
         const newTab = $(this);
 
@@ -223,22 +224,26 @@ jQuery(document).ready(function ($)
         {
             e.preventDefault();
 
-            listdom_toastify("<?php echo esc_js(__("You have unsaved changes. Do you want to leave without saving? ", 'listdom')); ?>", "lsd-confirm", {
-                position: "lsd-center-center",
-                confirm: {
-                    confirmText: "<?php echo esc_js(__('Save & Leave', 'listdom')); ?>",
-                    cancelText:  "<?php echo esc_js(__('Leave Now', 'listdom')); ?>",
-                    onConfirm: function()
-                    {
-                        handleFormSubmission(newTab)
-                    },
-                    onCancel: function()
-                    {
-                        updateTab(newTab);
-                        window.location.href = newTab.attr('href');
-                    }
-                }
+            let leaveNow = false;
+            const detectLeaveClick = event => {
+                if (event.target.closest('[data-wui-confirm-cancel]')) leaveNow = true;
+            };
+            document.addEventListener('click', detectLeaveClick, true);
+            const save = await window.WebiliaUI.modal.confirm({
+                title: window.lsd.i18n_confirm_title,
+                message: <?php echo wp_json_encode(__('You have unsaved changes. Do you want to leave without saving? ', 'listdom'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+                confirmLabel: <?php echo wp_json_encode(__('Save & Leave', 'listdom'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+                cancelLabel: <?php echo wp_json_encode(__('Leave Now', 'listdom'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+                closeLabel: window.lsd.i18n_dialog_close
             });
+            document.removeEventListener('click', detectLeaveClick, true);
+
+            if (save) handleFormSubmission(newTab);
+            else if (leaveNow)
+            {
+                updateTab(newTab);
+                window.location.href = newTab.attr('href');
+            }
         }
         else updateTab(newTab);
     };

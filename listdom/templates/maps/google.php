@@ -118,7 +118,7 @@ jQuery(document).ready(function()
 });
 </script>');
 ?>
-<div class="lsd-listing-googlemap">
+<div class="lsd-listing-googlemap wui">
     <div id="lsd_map<?php echo esc_attr($id); ?>" class="<?php echo isset($args['canvas_class']) ? sanitize_html_class($args['canvas_class']) : 'lsd-map-canvas'; ?>" <?php if ($map_height) echo 'style="height: '.esc_attr($map_height).';"'; ?>></div>
 
     <?php if($direction): ?>
@@ -127,7 +127,7 @@ jQuery(document).ready(function()
 			<div class="lsd-row">
 				<div class="lsd-col-9 lsd-direction-address-wrapper">
 					<input class="lsd-direction-address" type="text" placeholder="<?php esc_attr_e('Address from ...', 'listdom') ?>" title="<?php esc_attr_e('Address from ...', 'listdom') ?>" id="lsd_direction_address<?php echo esc_attr($id); ?>" required>
-					<span class="lsd-direction-reset lsd-util-hide" id="lsd_direction_reset<?php echo esc_attr($id); ?>"><i class="lsd-fe-icon wbli-cross"></i></span>
+					<span class="lsd-direction-reset lsd-util-hide" id="lsd_direction_reset<?php echo esc_attr($id); ?>"><i class="wui-icon lsd-fe-icon wui-icon--cross"></i></span>
 					<div class="lsd-direction-position-wrapper">
 						<input type="hidden" id="lsd_direction_latitude<?php echo esc_attr($id); ?>">
 						<input type="hidden" id="lsd_direction_longitude<?php echo esc_attr($id); ?>">

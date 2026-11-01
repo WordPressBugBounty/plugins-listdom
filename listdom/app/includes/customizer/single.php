@@ -43,12 +43,12 @@ class LSD_Customizer_Single extends LSD_Customizer
                                             'score_color' => [
                                                 'type' => 'color',
                                                 'title' => esc_html__('Score Color', 'listdom'),
-                                                'default' => '#855e00',
+                                                'default' => '#ffda72',
                                             ],
                                             'stars_color' => [
                                                 'type' => 'color',
                                                 'title' => esc_html__('Stars Color', 'listdom'),
-                                                'default' => '#855e00',
+                                                'default' => '#ffda72',
                                             ],
                                             'empty_stars_color' => [
                                                 'type' => 'color',

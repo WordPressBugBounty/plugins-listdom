@@ -6,7 +6,7 @@ defined('ABSPATH') || die();
 /** @var array $items */
 /** @var string|null $error */
 ?>
-<div class="lsd-dashboard-widget lsd-wrap">
+<div class="lsd-dashboard-widget lsd-wrap wui">
     <?php echo lsd_ads('dashboard-widget'); ?>
 
     <h3 class="lsd-heading"><?php esc_html_e('News & Updates', 'listdom'); ?></h3>

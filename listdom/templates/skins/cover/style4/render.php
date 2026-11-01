@@ -9,7 +9,7 @@ $ids = $this->listings;
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
 <div class="lsd-listing" data-lsd-stats-listing="<?php echo esc_attr($id); ?>" data-lsd-stats-url="<?php echo esc_url(get_permalink($id)); ?>" <?php echo lsd_schema()->scope()->type(null, $listing->get_data_category()); ?>>
     <div class="lsd-listing-image">
-        <?php echo LSD_Kses::element($listing->get_cover_image([1100, 550], $this->get_listing_link_method())); ?>
+        <?php echo LSD_Kses::element($listing->get_cover_image($this->presentation_image_size(), $this->get_listing_link_method())); ?>
 
         <div class="lsd-listing-detail">
             <div class="lsd-listing-detail-top">

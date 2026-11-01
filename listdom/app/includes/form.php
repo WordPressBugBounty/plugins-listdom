@@ -1132,7 +1132,7 @@ class LSD_Form extends LSD_Base
 
             $is_active = $value !== '' && $value === (string) $option_value;
             $buttons  .= sprintf(
-                '<button type="button" class="lsd-iconset-btn lsd-tooltip lsd-tooltip-top%s" data-value="%s" aria-pressed="%s" aria-label="%s" data-lsd-tooltip="%s"><i class="webilia-icon %s"></i></button>',
+                '<button type="button" class="lsd-iconset-btn lsd-tooltip lsd-tooltip-top%s" data-value="%s" aria-pressed="%s" aria-label="%s" data-lsd-tooltip="%s"><i class="wui-icon %s"></i></button>',
                 $is_active ? ' is-active' : '',
                 esc_attr($option_value),
                 $is_active ? 'true' : 'false',
@@ -1179,10 +1179,10 @@ class LSD_Form extends LSD_Base
         $args['wrapper'] = ($args['wrapper'] ?? '') . ' lsd-iconset--direction';
 
         $options = [
-            'row' => ['icon' => 'wbli-right-arrow', 'label' => __('Row', 'listdom'),],
-            'row-reverse' => ['icon' => 'wbli-move-left', 'label' => __('Row Reverse', 'listdom'),],
-            'column' => ['icon' => 'wbli-move-down', 'label' => __('Column', 'listdom'),],
-            'column-reverse' => ['icon' => 'wbli-move-up', 'label' => __('Column Reverse', 'listdom'),],
+            'row' => ['icon' => 'wui-icon--right-arrow', 'label' => __('Row', 'listdom'),],
+            'row-reverse' => ['icon' => 'wui-icon--move-left', 'label' => __('Row Reverse', 'listdom'),],
+            'column' => ['icon' => 'wui-icon--move-down', 'label' => __('Column', 'listdom'),],
+            'column-reverse' => ['icon' => 'wui-icon--move-up', 'label' => __('Column Reverse', 'listdom'),],
         ];
 
         return self::iconset($args, $options);
@@ -1199,12 +1199,12 @@ class LSD_Form extends LSD_Base
         $args['wrapper'] = ($args['wrapper'] ?? '') . ' lsd-iconset--justify';
 
         $options = [
-            'flex-start' => ['icon' => 'wbli-justify-flex-start', 'label' => __('Start', 'listdom'),],
-            'center' => ['icon' => 'wbli-justify-center', 'label' => __('Center', 'listdom'),],
-            'flex-end' => ['icon' => 'wbli-justify-flex-end', 'label' => __('End', 'listdom'),],
-            'space-between' => ['icon' => 'wbli-justify-space-between', 'label' => __('Space Between', 'listdom'),],
-            'space-around' => ['icon' => 'wbli-justify-space-around', 'label' => __('Space Around', 'listdom'),],
-            'space-evenly' => ['icon' => 'wbli-justify-space-evenly', 'label' => __('Space Evenly', 'listdom'),],
+            'flex-start' => ['icon' => 'wui-icon--justify-flex-start', 'label' => __('Start', 'listdom'),],
+            'center' => ['icon' => 'wui-icon--justify-center', 'label' => __('Center', 'listdom'),],
+            'flex-end' => ['icon' => 'wui-icon--justify-flex-end', 'label' => __('End', 'listdom'),],
+            'space-between' => ['icon' => 'wui-icon--justify-space-between', 'label' => __('Space Between', 'listdom'),],
+            'space-around' => ['icon' => 'wui-icon--justify-space-around', 'label' => __('Space Around', 'listdom'),],
+            'space-evenly' => ['icon' => 'wui-icon--justify-space-evenly', 'label' => __('Space Evenly', 'listdom'),],
         ];
 
         return self::iconset($args, $options);
@@ -1221,10 +1221,10 @@ class LSD_Form extends LSD_Base
         $args['wrapper'] = ($args['wrapper'] ?? '') . ' lsd-iconset--align';
 
         $options = [
-            'stretch' => ['icon' => 'wbli-align-stretch', 'label' => __('Stretch', 'listdom'),],
-            'flex-start' => ['icon' => 'wbli-align-flex-start', 'label' => __('Start', 'listdom'),],
-            'center' => ['icon' => 'wbli-align-center', 'label' => __('Center', 'listdom'),],
-            'flex-end' => ['icon' => 'wbli-align-flex-end', 'label' => __('End', 'listdom'),],
+            'stretch' => ['icon' => 'wui-icon--align-stretch', 'label' => __('Stretch', 'listdom'),],
+            'flex-start' => ['icon' => 'wui-icon--align-flex-start', 'label' => __('Start', 'listdom'),],
+            'center' => ['icon' => 'wui-icon--align-center', 'label' => __('Center', 'listdom'),],
+            'flex-end' => ['icon' => 'wui-icon--align-flex-end', 'label' => __('End', 'listdom'),],
         ];
 
         return self::iconset($args, $options);
@@ -1241,9 +1241,9 @@ class LSD_Form extends LSD_Base
         $args['wrapper'] = ($args['wrapper'] ?? '') . ' lsd-iconset--wrap';
 
         $options = [
-            'nowrap' => ['icon' => 'wbli-nowrap', 'label' => __('No Wrap', 'listdom'),],
-            'wrap' => ['icon' => 'wbli-wrap', 'label' => __('Wrap', 'listdom'),],
-            'wrap-reverse' => ['icon' => 'wbli-wrap-reverse', 'label' => __('Wrap Reverse', 'listdom'),],
+            'nowrap' => ['icon' => 'wui-icon--nowrap', 'label' => __('No Wrap', 'listdom'),],
+            'wrap' => ['icon' => 'wui-icon--wrap', 'label' => __('Wrap', 'listdom'),],
+            'wrap-reverse' => ['icon' => 'wui-icon--wrap-reverse', 'label' => __('Wrap Reverse', 'listdom'),],
         ];
 
         return self::iconset($args, $options);

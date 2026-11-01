@@ -27,14 +27,14 @@ jQuery(document).on('submit', '.lsd-addons-form', function(e)
         {
             $tab.attr('data-saved', 'true');
 
-            listdom_toastify("<?php echo esc_js(__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
+            listdom_notify("<?php echo esc_js(__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
             loading.stop();
         },
         error: function()
         {
             $tab.attr('data-saved', 'false');
 
-            listdom_toastify("<?php echo esc_js(__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
             loading.stop();
         }
     });

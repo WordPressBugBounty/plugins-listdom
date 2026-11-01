@@ -840,7 +840,7 @@ class LSD_PTypes_Template extends LSD_PTypes
         if (trim(wp_strip_all_tags($content)) !== '') return false;
 
         return !preg_match('/<(img|svg|iframe|video|audio|canvas|input|textarea|select|button)\b/i', $content)
-            && !preg_match('/<i\b[^>]*class\s*=\s*(["\'])[^"\']*(icon|wbli-)[^"\']*\1/i', $content)
+            && !preg_match('/<i\b[^>]*class\s*=\s*(["\'])[^"\']*icon[^"\']*\1/i', $content)
             && !preg_match('/<div\b[^>]*class\s*=\s*(["\'])[^"\']*lsd-template-editor-canvas__container[^"\']*\1/i', $content);
     }
 
@@ -1165,7 +1165,7 @@ class LSD_PTypes_Template extends LSD_PTypes
                 'name' => 'restore',
                 'label' => esc_html__('Restore', 'listdom'),
                 'url' => $restore_url,
-                'icon' => 'wbli-reset',
+                'icon' => 'wui-icon--reset',
             ];
         }
 
@@ -1175,7 +1175,7 @@ class LSD_PTypes_Template extends LSD_PTypes
                 'name' => 'delete',
                 'label' => $is_trashed ? esc_html__('Delete Permanently', 'listdom') : esc_html__('Move to Trash', 'listdom'),
                 'url' => $del_url,
-                'icon' => 'wbli-cross',
+                'icon' => 'wui-icon--cross',
                 'data' => [
                     'lsd-template-delete' => 'true',
                     'lsd-template-delete-type' => $is_trashed ? 'delete' : 'trash',
@@ -1192,11 +1192,11 @@ class LSD_PTypes_Template extends LSD_PTypes
 
         if ($edit_url = get_edit_post_link($post->ID))
         {
-            $actions[] = ['name' => 'edit', 'label' => __('Edit Template', 'listdom'), 'url' => $edit_url, 'icon' => 'wbli-file-edit-pencil'];
+            $actions[] = ['name' => 'edit', 'label' => __('Edit Template', 'listdom'), 'url' => $edit_url, 'icon' => 'wui-icon--file-edit-pencil'];
         }
         if ($dup_url = $this->get_duplicate_link($post->ID))
         {
-            $actions[] = ['name' => 'duplicate', 'label' => __('Duplicate', 'listdom'), 'url' => $dup_url, 'icon' => 'wbli-copy'];
+            $actions[] = ['name' => 'duplicate', 'label' => __('Duplicate', 'listdom'), 'url' => $dup_url, 'icon' => 'wui-icon--copy'];
         }
 
         return [
@@ -1426,9 +1426,9 @@ class LSD_PTypes_Template extends LSD_PTypes
     protected function template_types(): array
     {
         return [
-            'single_listing' => ['label' => __('Single Listing', 'listdom'), 'icon' => 'wbli-file', 'description' => __('Full page layout for individual listings', 'listdom')],
-            'listing_card' => ['label' => __('Listing Card', 'listdom'), 'icon' => 'wbli-card', 'description' => __('Card layout for listing grids and archives', 'listdom')],
-            'info_window' => ['label' => __('Info Window', 'listdom'), 'icon' => 'wbli-location', 'description' => __('Compact layout for map info windows', 'listdom')],
+            'single_listing' => ['label' => __('Single Listing', 'listdom'), 'icon' => 'wui-icon--file', 'description' => __('Full page layout for individual listings', 'listdom')],
+            'listing_card' => ['label' => __('Listing Card', 'listdom'), 'icon' => 'wui-icon--card', 'description' => __('Card layout for listing grids and archives', 'listdom')],
+            'info_window' => ['label' => __('Info Window', 'listdom'), 'icon' => 'wui-icon--location', 'description' => __('Compact layout for map info windows', 'listdom')],
         ];
     }
 

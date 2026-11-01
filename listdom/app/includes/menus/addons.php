@@ -92,10 +92,10 @@ class LSD_Menus_Addons extends LSD_Menus
 
     public function get_badge(string $status): array
     {
-        if ($status === 'active') return ['class' => 'lsd-success', 'icon' => 'wbli-checkmark-circle', 'text' => esc_html__('Installed', 'listdom')];
-        if ($status === 'inactive') return ['class' => 'lsd-warning', 'icon' => 'wbli-alert', 'text' => esc_html__('Inactive', 'listdom')];
+        if ($status === 'active') return ['class' => 'lsd-success', 'icon' => 'wui-icon--checkmark-circle', 'text' => esc_html__('Installed', 'listdom')];
+        if ($status === 'inactive') return ['class' => 'lsd-warning', 'icon' => 'wui-icon--alert', 'text' => esc_html__('Inactive', 'listdom')];
 
-        return ['class' => '', 'icon' => 'wbli-alert', 'text' => esc_html__('Not Installed', 'listdom')];
+        return ['class' => '', 'icon' => 'wui-icon--alert', 'text' => esc_html__('Not Installed', 'listdom')];
     }
 
     public function get_grouped_addons(): array

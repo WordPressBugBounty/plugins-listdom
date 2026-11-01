@@ -233,7 +233,7 @@
 
     function notify(response)
     {
-        if (response && response.message && window.listdom_toastify) window.listdom_toastify(response.message, 'lsd-error');
+        if (response && response.message && window.listdom_notify) window.listdom_notify(response.message, 'lsd-error');
     }
 
     function nextQuestion()

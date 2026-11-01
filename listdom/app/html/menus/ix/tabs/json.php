@@ -53,7 +53,7 @@ $export_url = wp_nonce_url(
                     <?php LSD_Form::nonce('lsd_ix_listdom_import'); ?>
                     <button type="submit" id="lsd_ix_listdom_import_submit" class="lsd-primary-button lsd-util-hide">
                         <?php esc_html_e('Import', 'listdom'); ?>
-                        <i class="webilia-icon wbli-checkmark-circle"></i>
+                        <i class="wui-icon wui-icon--checkmark-circle"></i>
                     </button>
 
                 </div>
@@ -134,7 +134,7 @@ jQuery('#lsd_ix_listdom_import_file_input').on('change', function()
             $submit.addClass('lsd-util-hide');
 
             // Show Alert
-            listdom_toastify(response.message, 'lsd-error');
+            listdom_notify(response.message, 'lsd-error');
         }
     });
 });
@@ -152,7 +152,7 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
     const loading = new ListdomButtonLoader($button);
     loading.start("<?php echo esc_js(esc_html__('Importing', 'listdom')); ?>");
 
-    listdom_toastify("<?php echo esc_js(esc_html__('Please wait ...', 'listdom')); ?>", 'lsd-in-progress');
+    const importToast = listdom_notify("<?php echo esc_js(esc_html__('Please wait ...', 'listdom')); ?>", 'lsd-in-progress');
     jQuery("#lsd_ix_listdom_import_message").addClass('lsd-util-hide');
 
     const data = jQuery(this).serialize();
@@ -167,8 +167,7 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
             loading.stop();
             $button.addClass('lsd-util-hide');
 
-            jQuery('.lsd-in-progress').remove();
-            window.currentToast = null;
+            importToast.dismiss();
 
             // Reset File
             jQuery('#lsd_ix_listdom_import_file_input').val('');
@@ -176,18 +175,19 @@ jQuery('#lsd_ix_listdom_import_form').on('submit', function(e)
 
             if(response.success === 1)
             {
-                listdom_toastify(response.message, 'lsd-success');
+                listdom_notify(response.message, 'lsd-success');
             }
             else
             {
-                typeof response.message !== 'undefined' && listdom_toastify(response.message, 'lsd-error');
+                typeof response.message !== 'undefined' && listdom_notify(response.message, 'lsd-error');
             }
         },
         error: function()
         {
             loading.stop();
             $button.addClass('lsd-util-hide');
-            listdom_toastify("<?php echo esc_js(esc_html__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
+            importToast.dismiss();
+            listdom_notify("<?php echo esc_js(esc_html__('An error occurred! Most probably maximum execution time reached so try increasing the maximum execution time of your server.', 'listdom')); ?>", 'lsd-error');
         }
     });
 });

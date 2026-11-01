@@ -14,7 +14,7 @@ $checked_at = (int) ($report['checked_at'] ?? current_time('timestamp'));
 
 $score = LSD_Checklist::get_score($health_score);
 ?>
-<div class="lsd-wrap">
+<div class="lsd-wrap wui">
     <?php LSD_Menus::header(__('Help', 'listdom')); ?>
 
     <div class="lsd-admin-main-wrapper">
@@ -41,7 +41,7 @@ $score = LSD_Checklist::get_score($health_score);
                     <div class="lsd-launch-checklist-hero__meta">
                         <span><?php echo esc_html(sprintf(__('Last checked: %s', 'listdom'), LSD_Base::date($checked_at))); ?></span>
                         <a href="<?php echo esc_url(admin_url('admin.php?page=' . LSD_Checklist::MENU_SLUG . '&refresh=' . time())); ?>" class="lsd-text-button">
-                            <i class="webilia-icon wbli-reset"></i>
+                            <i class="wui-icon wui-icon--reset"></i>
                             <span><?php esc_html_e('Refresh health check', 'listdom'); ?></span>
                         </a>
                     </div>
@@ -49,7 +49,7 @@ $score = LSD_Checklist::get_score($health_score);
 
                 <div class="lsd-launch-checklist-summary">
                     <div class="lsd-launch-checklist-score-card">
-                        <div class="lsd-launch-checklist-gauge <?php echo esc_attr($score['class']); ?>" style="<?php echo esc_attr('--score:' . $health_score . ';'); ?>">
+                        <div class="lsd-launch-checklist-gauge <?php echo esc_attr($score['class']); ?>" style="<?php echo esc_attr('--lsd-admin-checklist-score:' . $health_score . ';'); ?>">
                             <div class="lsd-launch-checklist-gauge__inner">
                                 <strong><?php echo esc_html($health_score); ?>%</strong>
                                 <span><?php echo esc_html($score['label']); ?></span>
@@ -63,7 +63,7 @@ $score = LSD_Checklist::get_score($health_score);
                             <div class="lsd-launch-checklist-stats">
                                 <div class="lsd-launch-checklist-stat lsd-admin-box-white">
                                     <span class="lsd-launch-checklist-stat__icon is-complete">
-                                        <i class="webilia-icon wbli-checkmark-circle"></i>
+                                        <i class="wui-icon wui-icon--checkmark-circle"></i>
                                     </span>
                                     <div class="lsd-admin-subsections">
                                         <strong class="lsd-admin-title"><?php echo esc_html((int) ($counts['complete'] ?? 0)); ?></strong>
@@ -72,7 +72,7 @@ $score = LSD_Checklist::get_score($health_score);
                                 </div>
                                 <div class="lsd-launch-checklist-stat lsd-admin-box-white">
                                     <span class="lsd-launch-checklist-stat__icon is-warning">
-                                        <i class="webilia-icon wbli-alert"></i>
+                                        <i class="wui-icon wui-icon--alert"></i>
                                     </span>
                                     <div class="lsd-admin-subsections">
                                         <strong class="lsd-admin-title"><?php echo esc_html((int) ($counts['warning'] ?? 0)); ?></strong>
@@ -81,7 +81,7 @@ $score = LSD_Checklist::get_score($health_score);
                                 </div>
                                 <div class="lsd-launch-checklist-stat lsd-admin-box-white">
                                     <span class="lsd-launch-checklist-stat__icon is-incomplete">
-                                        <i class="webilia-icon wbli-cross"></i>
+                                        <i class="wui-icon wui-icon--cross"></i>
                                     </span>
                                     <div class="lsd-admin-subsections">
                                         <strong class="lsd-admin-title"><?php echo esc_html((int) ($counts['incomplete'] ?? 0)); ?></strong>
@@ -90,7 +90,7 @@ $score = LSD_Checklist::get_score($health_score);
                                 </div>
                                 <div class="lsd-launch-checklist-stat lsd-admin-box-white">
                                     <span class="lsd-launch-checklist-stat__icon is-optional">
-                                        <i class="webilia-icon wbli-first-aid-kit"></i>
+                                        <i class="wui-icon wui-icon--first-aid-kit"></i>
                                     </span>
                                     <div class="lsd-admin-subsections">
                                         <strong class="lsd-admin-title"><?php echo esc_html((int) ($counts['optional'] ?? 0)); ?></strong>
@@ -99,7 +99,7 @@ $score = LSD_Checklist::get_score($health_score);
                                 </div>
                                 <div class="lsd-launch-checklist-stat lsd-admin-box-white">
                                     <span class="lsd-launch-checklist-stat__icon is-skipped">
-                                        <i class="webilia-icon fas fa-ban"></i>
+                                        <i class="wui-icon fas fa-ban"></i>
                                     </span>
                                     <div class="lsd-admin-subsections">
                                         <strong class="lsd-admin-title"><?php echo esc_html((int) ($counts['skipped'] ?? 0)); ?></strong>
@@ -111,12 +111,12 @@ $score = LSD_Checklist::get_score($health_score);
                             <div class="lsd-launch-checklist-actions">
                                 <?php if ($has_priority): ?>
                                     <a href="#lsd-launch-priority-fixes" class="lsd-primary-button lsd-launch-checklist-scroll-link">
-                                        <i class="webilia-icon wbli-settings"></i>
+                                        <i class="wui-icon wui-icon--settings"></i>
                                         <span><?php esc_html_e('Fix Priority Items', 'listdom'); ?></span>
                                     </a>
                                 <?php endif; ?>
                                 <a href="<?php echo esc_url(LSD_Base::getListdomWelcomeWizardUrl()); ?>" class="lsd-secondary-button">
-                                    <i class="webilia-icon wbli-wizard"></i>
+                                    <i class="wui-icon wui-icon--wizard"></i>
                                     <span><?php esc_html_e('Open Setup Wizard', 'listdom'); ?></span>
                                 </a>
                             </div>
@@ -137,7 +137,7 @@ $score = LSD_Checklist::get_score($health_score);
                         <div class="lsd-launch-checklist-section__header">
                             <h2 class="lsd-admin-title">
                                 <span class="lsd-launch-checklist-section__header-icon">
-                                    <i class="webilia-icon <?php echo esc_attr(LSD_Checklist::get_section_icon($section_title)); ?>"></i>
+                                    <i class="wui-icon <?php echo esc_attr(LSD_Checklist::get_section_icon($section_title)); ?>"></i>
                                 </span>
                                 <span><?php echo esc_html($section_index . '. ' . $section_title); ?></span>
                             </h2>
@@ -151,8 +151,8 @@ $score = LSD_Checklist::get_score($health_score);
                                     <div class="lsd-launch-checklist-item__row">
                                         <div class="lsd-launch-checklist-item__indicator lsd-fe-icon-button lsd-tooltip" data-lsd-tooltip="<?php echo esc_attr($item['description']); ?>">
                                             <span class="lsd-launch-checklist-item__status-icon status-<?php echo esc_attr($item['status']); ?>" tabindex="0" role="button" aria-label="<?php echo esc_attr($item['description']); ?>">
-                                                <i class="webilia-icon <?php echo esc_attr(LSD_Checklist::get_status_icon($item['status'])); ?> lsd-launch-checklist-item__primary-icon"></i>
-                                                <i class="webilia-icon wbli-question lsd-launch-checklist-item__question-icon" aria-hidden="true"></i>
+                                                <i class="wui-icon <?php echo esc_attr(LSD_Checklist::get_status_icon($item['status'])); ?> lsd-launch-checklist-item__primary-icon"></i>
+                                                <i class="wui-icon wui-icon--question lsd-launch-checklist-item__question-icon" aria-hidden="true"></i>
                                             </span>
                                         </div>
 
@@ -190,7 +190,7 @@ $score = LSD_Checklist::get_score($health_score);
                             <div class="lsd-launch-checklist-section__more">
                                 <button type="button" class="lsd-text-button lsd-launch-checklist-more-button" data-show-more="<?php echo esc_attr($visible_count); ?>">
                                     <span data-less-label="<?php esc_attr_e('Show less', 'listdom'); ?>"><?php echo esc_html(sprintf(__('View %d more items', 'listdom'), count($items) - $visible_count)); ?></span>
-                                    <i class="webilia-icon wbli-right-arrow"></i>
+                                    <i class="wui-icon wui-icon--right-arrow"></i>
                                 </button>
                             </div>
                         <?php endif; ?>
@@ -200,7 +200,7 @@ $score = LSD_Checklist::get_score($health_score);
                 <section class="lsd-launch-checklist-section lsd-launch-checklist-section--priority" id="lsd-launch-priority-fixes">
                     <div class="lsd-launch-checklist-section__header">
                          <span class="lsd-launch-checklist-section__header-icon">
-                                <i class="webilia-icon <?php echo esc_attr(LSD_Checklist::get_section_icon(esc_html__('Priority Fixes', 'listdom'))); ?>"></i>
+                                <i class="wui-icon <?php echo esc_attr(LSD_Checklist::get_section_icon(esc_html__('Priority Fixes', 'listdom'))); ?>"></i>
                             </span>
                         <div class="lsd-admin-section-heading">
                             <h2 class="lsd-admin-title"><?php esc_html_e('Priority Fixes', 'listdom'); ?></h2>
@@ -214,8 +214,8 @@ $score = LSD_Checklist::get_score($health_score);
                                     <div class="lsd-launch-checklist-item__row">
                                         <div class="lsd-launch-checklist-item__indicator lsd-fe-icon-button lsd-tooltip" data-lsd-tooltip="<?php echo esc_attr($item['description']); ?>">
                                             <span class="lsd-launch-checklist-item__status-icon status-<?php echo esc_attr($item['status']); ?>" tabindex="0" role="button" aria-label="<?php echo esc_attr($item['description']); ?>">
-                                                <i class="webilia-icon <?php echo esc_attr(LSD_Checklist::get_status_icon($item['status'])); ?> lsd-launch-checklist-item__primary-icon"></i>
-                                                <i class="webilia-icon wbli-question lsd-launch-checklist-item__question-icon" aria-hidden="true"></i>
+                                                <i class="wui-icon <?php echo esc_attr(LSD_Checklist::get_status_icon($item['status'])); ?> lsd-launch-checklist-item__primary-icon"></i>
+                                                <i class="wui-icon wui-icon--question lsd-launch-checklist-item__question-icon" aria-hidden="true"></i>
                                             </span>
                                         </div>
                                         <div class="lsd-launch-checklist-item__content">
@@ -243,7 +243,7 @@ $score = LSD_Checklist::get_score($health_score);
                             <div class="lsd-launch-checklist-section__more">
                                 <a href="#lsd-launch-checklist-grid" class="lsd-text-button lsd-launch-checklist-scroll-link">
                                     <span><?php esc_html_e('View all incomplete items', 'listdom'); ?></span>
-                                    <i class="webilia-icon wbli-right-arrow"></i>
+                                    <i class="wui-icon wui-icon--right-arrow"></i>
                                 </a>
                             </div>
                         <?php else: ?>
@@ -258,7 +258,7 @@ $score = LSD_Checklist::get_score($health_score);
                     <div class="lsd-launch-checklist-section__header">
                         <h2 class="lsd-admin-title">
                             <span class="lsd-launch-checklist-section__header-icon">
-                                <i class="webilia-icon <?php echo esc_attr(LSD_Checklist::get_section_icon(esc_html__('Health Check Summary', 'listdom'))); ?>"></i>
+                                <i class="wui-icon <?php echo esc_attr(LSD_Checklist::get_section_icon(esc_html__('Health Check Summary', 'listdom'))); ?>"></i>
                             </span>
                             <span><?php esc_html_e('Health Check Summary', 'listdom'); ?></span>
                         </h2>

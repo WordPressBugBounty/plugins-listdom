@@ -528,7 +528,7 @@ $required_billing_fields = $payments['required_billing_fields'] ?? [];
 				<?php LSD_Form::nonce('lsd_payments_form'); ?>
                 <button type="submit" id="lsd_payments_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='wbli wbli-checkmark-circle'></i>
+                    <i class='wui-icon wui-icon--checkmark-circle'></i>
                 </button>
 			</div>
         </div>
@@ -563,7 +563,7 @@ jQuery('#lsd_payments_form').on('submit', function (event)
         {
             $tab.attr('data-saved', 'true');
 
-            listdom_toastify("<?php echo esc_js(__('Options saved successfully.', 'listdom')); ?>", 'lsd-success', {
+            listdom_notify("<?php echo esc_js(__('Options saved successfully.', 'listdom')); ?>", 'lsd-success', {
                 hideTime: engine_changed ? 1000 : 8000
             });
 
@@ -580,7 +580,7 @@ jQuery('#lsd_payments_form').on('submit', function (event)
         {
             $tab.attr('data-saved', 'false');
 
-            listdom_toastify("<?php echo esc_js(__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
 
             // Unloading
             loading.stop();

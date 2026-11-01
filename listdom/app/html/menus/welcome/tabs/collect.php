@@ -9,7 +9,7 @@ $settings = LSD_Options::settings();
     <div class="lsd-welcome-content-header">
         <div class="lsd-admin-section-heading">
             <div class="lsd-admin-title-icon">
-                <i class="webilia-icon wbli-add-plus"></i>
+                <i class="wui-icon wui-icon--add-plus"></i>
                 <h2 class="lsd-admin-title lsd-m-0"><?php echo esc_html__('Stay Updated & Improve Listdom', 'listdom'); ?></h2>
             </div>
             <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Add your email for updates and optionally share usage data to help us improve.' , 'listdom'); ?></p>
@@ -29,7 +29,7 @@ $settings = LSD_Options::settings();
                         ]); ?>
                     </div>
                     <div class="lsd-col-3">
-                        <button id="lsd_submit_newsletter" type="button" class="lsd-secondary-button"><?php esc_html_e('Submit', 'listdom'); ?><i class="webilia-icon wbli-right-arrow"></i></button>
+                        <button id="lsd_submit_newsletter" type="button" class="lsd-secondary-button"><?php esc_html_e('Submit', 'listdom'); ?><i class="wui-icon wui-icon--right-arrow"></i></button>
                     </div>
                 </div>
 
@@ -73,7 +73,7 @@ $settings = LSD_Options::settings();
         <button class="lsd-skip-step lsd-text-button"><?php echo esc_html__('Skip', 'listdom'); ?></button>
         <button type="submit" class="lsd-step-link lsd-primary-button" id="lsd_settings_collect_data_button">
             <?php echo esc_html__('Continue', 'listdom'); ?>
-            <i class="webilia-icon wbli-right-arrow"></i>
+            <i class="wui-icon wui-icon--right-arrow"></i>
         </button>
     </div>
 </div>
@@ -118,7 +118,7 @@ jQuery('#lsd_submit_newsletter').on('click', function (event)
 
     if (!email)
     {
-        listdom_toastify("<?php echo esc_js(esc_html__('Please enter a valid email address.', 'listdom')); ?>", 'lsd-error');
+        listdom_notify("<?php echo esc_js(esc_html__('Please enter a valid email address.', 'listdom')); ?>", 'lsd-error');
         return;
     }
 
@@ -142,17 +142,17 @@ jQuery('#lsd_submit_newsletter').on('click', function (event)
             if(response.success)
             {
                 if (response.success) jQuery('#lsd_subscription_email').val('');
-                listdom_toastify(response.message, 'lsd-success');
+                listdom_notify(response.message, 'lsd-success');
             }
             else
             {
-                listdom_toastify(response.message, 'lsd-error');
+                listdom_notify(response.message, 'lsd-error');
             }
         },
         error: function ()
         {
             loading.stop();
-            listdom_toastify("<?php echo esc_js(esc_html__('There was an issue with the subscription, try again later.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('There was an issue with the subscription, try again later.', 'listdom')); ?>", 'lsd-error');
         }
     });
 });

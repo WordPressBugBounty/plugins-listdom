@@ -69,8 +69,14 @@ class LSD_Assets extends LSD_Base
             $frontend_dependencies[] = 'lsd-flatpickr';
         }
 
-        // Listdom Toast
+        // Notifications are used throughout the frontend bundle.
         $this->toast();
+        $frontend_dependencies[] = 'webilia-ui-v1-toast';
+        if (LSD_Dashboard::is_dashboard())
+        {
+            $this->modal();
+            $frontend_dependencies[] = 'webilia-ui-v1-modal';
+        }
 
         $has_elementor_dashboard = LSD_Dashboard::has_elementor_dashboard();
         if (LSD_Main::is_grecaptcha_enabled($this->settings)) $this->grecaptcha(true);
@@ -115,8 +121,6 @@ class LSD_Assets extends LSD_Base
         // Include no-ui-slider
         $this->nouislider();
 
-        // Webilia Icons
-        $this->icons();
     }
 
     /**
@@ -130,6 +134,9 @@ class LSD_Assets extends LSD_Base
     {
         $frontend_dependencies = ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-slider', 'jquery-ui-autocomplete'];
 
+        $this->toast();
+        $frontend_dependencies[] = 'webilia-ui-v1-toast';
+
         if ($this->advanced_datetimepicker_enabled())
         {
             $this->flatpickr();
@@ -141,6 +148,9 @@ class LSD_Assets extends LSD_Base
         wp_enqueue_style('lsd-frontend', $this->lsd_asset_url('css/frontend.min.css'), [], $this->version());
 
         if (is_rtl()) wp_enqueue_style('lsd-frontend-rtl', $this->lsd_asset_url('css/frontend-rtl.min.css'), ['lsd-frontend'], $this->version());
+
+        $personalize = new LSD_Personalize();
+        $personalize->assets();
     }
 
     public function admin()
@@ -150,7 +160,7 @@ class LSD_Assets extends LSD_Base
         $include_backend = $this->should_include('backend');
 
         // Listdom block previews may use the shared icon font.
-        if ($block_editor || $include_backend) $this->icons();
+        if ($block_editor && !$include_backend) $this->icons();
 
         // Native Listdom blocks provide their own editor assets on unrelated post types.
         if ($block_editor && !$include_backend) return;
@@ -158,13 +168,17 @@ class LSD_Assets extends LSD_Base
         // Include Listdom backend CSS file for WordPress
         wp_enqueue_style('lsd-wp-backend', $this->lsd_asset_url('css/wp-backend.min.css'), [], $this->version());
 
-        // Listdom Toast
-        $this->toast();
-
         // Check to see if we should include the assets or not
         if (!$include_backend) return;
 
+        $this->toast();
         $backend_dependencies = ['jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-autocomplete'];
+        $backend_dependencies[] = 'webilia-ui-v1-toast';
+        if ($this->is_template_builder_screen($screen) || strpos($screen->base, 'listdom-settings') !== false || strpos($screen->base, 'listdom-ix') !== false)
+        {
+            $this->modal();
+            $backend_dependencies[] = 'webilia-ui-v1-modal';
+        }
 
         if ($this->advanced_datetimepicker_enabled())
         {
@@ -209,6 +223,11 @@ class LSD_Assets extends LSD_Base
             'i18n_description_icon' => esc_html__('Select the icon.', 'listdom'),
             'i18n_description_content' => esc_html__('Type dashboard content, You can also use shortcodes.', 'listdom'),
             'icon_options' => $icon_options,
+            'i18n_toast_close' => __('Dismiss notification', 'listdom'),
+            'i18n_dialog_close' => __('Close dialog', 'listdom'),
+            'i18n_confirm_title' => __('Confirm action', 'listdom'),
+            'i18n_confirm' => __('Confirm', 'listdom'),
+            'i18n_cancel' => __('Cancel', 'listdom'),
         ]);
 
         // WP Editor
@@ -222,9 +241,6 @@ class LSD_Assets extends LSD_Base
 
         // Include Listdom font-awesome assets
         $this->fontawesome();
-
-        // Include Webilia icon assets used throughout the backend.
-        $this->icons();
 
         // Include Color Picker
         $this->colorpicker();
@@ -412,14 +428,17 @@ class LSD_Assets extends LSD_Base
 
     public function icons()
     {
-        (new \Webilia\Icons\Boot(plugins_url('vendor/webilia/icons', LSD_ABSPATH . '/listdom.php')))
-            ->enqueue('webilia-icons', [], LSD_Assets::version());
+        \Webilia\UI\WordPress\Assets::enqueue(['icons'], plugins_url('vendor/webilia/ui', LSD_ABSPATH . '/listdom.php'));
     }
 
     public function toast(): void
     {
-        (new \Webilia\Toast\Boot(plugins_url('vendor/webilia/toast', LSD_ABSPATH . '/listdom.php')))
-            ->enqueue('webilia-toast', ['jquery'], LSD_Assets::version());
+        \Webilia\UI\WordPress\Assets::enqueue(['toast'], plugins_url('vendor/webilia/ui', LSD_ABSPATH . '/listdom.php'));
+    }
+
+    public function modal(): void
+    {
+        \Webilia\UI\WordPress\Assets::enqueue(['modal'], plugins_url('vendor/webilia/ui', LSD_ABSPATH . '/listdom.php'));
     }
 
     public static function api()
@@ -458,8 +477,9 @@ class LSD_Assets extends LSD_Base
             $frontend_dependencies[] = 'lsd-flatpickr';
         }
 
-        // Listdom Toast
+        // Builder preview uses frontend notifications.
         $this->toast();
+        $frontend_dependencies[] = 'webilia-ui-v1-toast';
 
         // Frontend Assets
         wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), $frontend_dependencies, $this->version(), true);
@@ -469,8 +489,10 @@ class LSD_Assets extends LSD_Base
 
         if (is_rtl()) wp_enqueue_style('lsd-frontend-rtl', $this->lsd_asset_url('css/frontend-rtl.min.css'), ['lsd-frontend'], $this->version());
 
+        $personalize = new LSD_Personalize();
+        $personalize->assets();
+
         $this->fontawesome();
-        $this->icons();
 
         $this->isotope();
         $this->googlemaps();
@@ -491,6 +513,11 @@ class LSD_Assets extends LSD_Base
             'i18n_message_send_failed' => esc_html__('Unable to send your message. Please try again.', 'listdom'),
             'i18n_review_submit_failed' => esc_html__('Unable to submit your review. Please try again.', 'listdom'),
             'i18n_checkout_failed' => esc_html__('Unable to complete checkout. Please try again.', 'listdom'),
+            'i18n_toast_close' => __('Dismiss notification', 'listdom'),
+            'i18n_dialog_close' => __('Close dialog', 'listdom'),
+            'i18n_confirm_title' => __('Confirm action', 'listdom'),
+            'i18n_confirm' => __('Confirm', 'listdom'),
+            'i18n_cancel' => __('Cancel', 'listdom'),
         ]));
     }
 

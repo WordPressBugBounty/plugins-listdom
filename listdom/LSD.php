@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 final class Listdom
 {
-    public string $version = '6.3.0';
+    public string $version = '6.4.0';
     protected static ?Listdom $instance = null;
 
     /**
@@ -210,6 +210,9 @@ final class Listdom
         // Internal Actions
         LSD_Actions::instance()->init();
 
+        // Listings Lifecycle
+        LSD_Listings_Lifecycle::init();
+
         // Native abilities are optional on older supported WordPress versions.
         (new LSD_Abilities())->init();
 
@@ -236,6 +239,7 @@ final class Listdom
         new LSD_Plugin_Feedback([
             'plugin' => 'listdom',
             'basename' => LSD_BASENAME,
+            'icon_class' => 'listdom-icon wui-icon',
         ]);
 
         // Settings Import / Export

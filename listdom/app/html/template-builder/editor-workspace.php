@@ -46,7 +46,7 @@ if (!$preview_listing_id) $preview_listing_id = $this->get_preview_listing_id($p
 $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_listing_id);
 ?>
 
-<div class="lsd-template-editor-workspace" data-lsd-template-id="<?php echo esc_attr($post->ID); ?>"
+<div class="lsd-template-editor-workspace wui" data-lsd-template-id="<?php echo esc_attr($post->ID); ?>"
      data-lsd-can-publish="<?php echo esc_attr($can_publish_templates ? '1' : '0'); ?>"
      data-lsd-template-type-mismatch="<?php echo esc_attr__('The ({element}) isn\'t supported in ({template_type}) template type.', 'listdom'); ?>"
      data-lsd-unsaved-message="<?php echo esc_attr__('You have unsaved changes. Do you want to leave without saving? ', 'listdom'); ?>"
@@ -73,13 +73,13 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
             </div>
             <div class="lsd-template-editor-topbar__actions">
                 <button type="button" class="lsd-text-button lsd-template-editor-add-toggle" data-lsd-template-action="add" aria-pressed="false">
-                    <i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i>
+                    <i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i>
                 </button>
                 <button type="button" class="lsd-text-button lsd-template-editor-structure-toggle" data-lsd-template-action="structure" aria-pressed="false">
-                    <i class="listdom-icon wbli-structure-check" aria-hidden="true"></i>
+                    <i class="wui-icon listdom-icon wui-icon--structure-check" aria-hidden="true"></i>
                 </button>
                 <button type="button" class="lsd-text-button lsd-template-editor-settings-toggle" data-lsd-template-action="settings" aria-pressed="false">
-                    <i class="listdom-icon wbli-settings" aria-hidden="true"></i>
+                    <i class="wui-icon listdom-icon wui-icon--settings" aria-hidden="true"></i>
                 </button>
                 <?php if ($show_save_draft_action): ?>
                     <button type="button" class="lsd-secondary-button" data-lsd-template-action="save"
@@ -89,7 +89,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                             data-lsd-toast-draft="<?php echo esc_attr__('Template saved as Draft successfully.', 'listdom'); ?>"
                             data-lsd-toast-pending="<?php echo esc_attr__('Template updated successfully.', 'listdom'); ?>"
                             data-lsd-toast-update="<?php echo esc_attr__('Template updated successfully.', 'listdom'); ?>">
-                        <i class="listdom-icon wbli-floppy-disk" aria-hidden="true"></i>
+                        <i class="wui-icon listdom-icon wui-icon--floppy-disk" aria-hidden="true"></i>
                         <span data-lsd-button-label><?php echo esc_html($save_button_label); ?></span>
                     </button>
                 <?php endif; ?>
@@ -100,7 +100,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                             data-lsd-label-update="<?php echo esc_attr__('Update', 'listdom'); ?>"
                             data-lsd-toast="<?php echo esc_attr__('Template published successfully.', 'listdom'); ?>"
                             data-lsd-toast-update="<?php echo esc_attr__('Template updated successfully.', 'listdom'); ?>">
-                        <i class="listdom-icon wbli-transition-top" aria-hidden="true"></i>
+                        <i class="wui-icon listdom-icon wui-icon--transition-top" aria-hidden="true"></i>
                         <span data-lsd-button-label><?php echo esc_html($publish_button_label); ?></span>
                     </button>
                 <?php endif; ?>
@@ -116,7 +116,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
             <nav class="lsd-template-editor-menu lsd-template-editor-menu--left" aria-label="<?php esc_attr_e('Template elements', 'listdom'); ?>" data-lsd-template-editor-menu="left-default">
                 <div class="lsd-template-editor-selection lsd-util-hide" data-lsd-template-selection>
                     <span class="lsd-template-editor-selection__icon" aria-hidden="true">
-                        <i class="listdom-icon wbli-add-plus-circle"></i>
+                        <i class="wui-icon listdom-icon wui-icon--add-plus-circle"></i>
                     </span>
                     <span class="lsd-template-editor-selection__label" data-lsd-template-selection-label></span>
                 </div>
@@ -124,14 +124,14 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                     <?php foreach ($sidebars['elements'] as $index => $item): ?>
                         <li data-tab="<?php echo esc_attr($index); ?>" class="<?php echo $index === 'elements' ? 'lsd-sub-tabs-active' : ''; ?>">
                             <a href="#" role="tab">
-                                <i class="listdom-icon wbli-add-plus-circle lsd-template-editor-tab__icon" aria-hidden="true"></i>
+                                <i class="wui-icon listdom-icon wui-icon--add-plus-circle lsd-template-editor-tab__icon" aria-hidden="true"></i>
                                 <span class="lsd-template-editor-tab__label"><?php echo esc_html($item); ?></span>
                             </a>
                         </li>
                     <?php endforeach; ?>
                     <li data-tab="general" class="lsd-util-hide">
                         <a href="#" role="tab" tabindex="-1">
-                            <i class="listdom-icon wbli-structure-check lsd-template-editor-tab__icon" aria-hidden="true"></i>
+                            <i class="wui-icon listdom-icon wui-icon--structure-check lsd-template-editor-tab__icon" aria-hidden="true"></i>
                             <span class="lsd-template-editor-tab__label"><?php esc_html_e('General', 'listdom'); ?></span>
                         </a>
                     </li>
@@ -147,17 +147,17 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                 <ul class="lsd-template-editor-workspace__responsive_controls lsd-tab-switcher lsd-level-5-menu lsd-sub-tabs" data-lsd-template-responsive>
                     <li data-lsd-responsive="desktop" class="lsd-sub-tabs-active lsd-tooltip lsd-tooltip-bottom" data-lsd-tooltip="<?php echo esc_attr__('Desktop', 'listdom'); ?>">
                         <a href="#" aria-label="<?php echo esc_attr__('Desktop', 'listdom'); ?>" title="<?php echo esc_attr__('Desktop', 'listdom'); ?>">
-                            <i class="listdom-icon wbli-screen"></i>
+                            <i class="wui-icon listdom-icon wui-icon--screen"></i>
                         </a>
                     </li>
                     <li data-lsd-responsive="tablet" class="lsd-tooltip lsd-tooltip-bottom" data-lsd-tooltip="<?php echo esc_attr__('Tablet', 'listdom'); ?>">
                         <a href="#" aria-label="<?php echo esc_attr__('Tablet', 'listdom'); ?>" title="<?php echo esc_attr__('Tablet', 'listdom'); ?>">
-                            <i class="listdom-icon wbli-tablet"></i>
+                            <i class="wui-icon listdom-icon wui-icon--tablet"></i>
                         </a>
                     </li>
                     <li data-lsd-responsive="mobile" class="lsd-tooltip lsd-tooltip-bottom" data-lsd-tooltip="<?php echo esc_attr__('Mobile', 'listdom'); ?>">
                         <a href="#" aria-label="<?php echo esc_attr__('Mobile', 'listdom'); ?>" title="<?php echo esc_attr__('Mobile', 'listdom'); ?>">
-                            <i class="listdom-icon wbli-mobile"></i>
+                            <i class="wui-icon listdom-icon wui-icon--mobile"></i>
                         </a>
                     </li>
                 </ul>
@@ -268,11 +268,11 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                             <button type="button" class="lsd-primary-button lsd-template-editor-settings__save" data-lsd-template-action="settings-save"
                                     data-lsd-settings-toast="<?php esc_html_e('Settings saved successfully.', 'listdom'); ?>"
                                     data-lsd-settings-error-toast="<?php esc_html_e('Unable to save settings.', 'listdom'); ?>">
-                                <i class="listdom-icon wbli-floppy-disk" aria-hidden="true"></i>
+                                <i class="wui-icon listdom-icon wui-icon--floppy-disk" aria-hidden="true"></i>
                                 <?php esc_html_e('Save & Apply', 'listdom'); ?>
                             </button>
                             <button type="button" class="lsd-text-button lsd-template-editor-settings__back" data-lsd-template-action="settings-back">
-                                <i class="listdom-icon wbli-move-left" aria-hidden="true"></i>
+                                <i class="wui-icon listdom-icon wui-icon--move-left" aria-hidden="true"></i>
                                 <?php esc_html_e('Back', 'listdom'); ?>
                             </button>
                         </div>
@@ -302,11 +302,11 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                             <button type="button" class="lsd-primary-button lsd-template-editor-settings__save" data-lsd-template-action="settings-save"
                                     data-lsd-settings-toast="<?php esc_html_e('Settings saved successfully.', 'listdom'); ?>"
                                     data-lsd-settings-error-toast="<?php esc_html_e('Unable to save settings.', 'listdom'); ?>">
-                                <i class="listdom-icon wbli-floppy-disk" aria-hidden="true"></i>
+                                <i class="wui-icon listdom-icon wui-icon--floppy-disk" aria-hidden="true"></i>
                                 <?php esc_html_e('Save & Apply', 'listdom'); ?>
                             </button>
                             <button type="button" class="lsd-text-button lsd-template-editor-settings__back" data-lsd-template-action="settings-back">
-                                <i class="listdom-icon wbli-move-left" aria-hidden="true"></i>
+                                <i class="wui-icon listdom-icon wui-icon--move-left" aria-hidden="true"></i>
                                 <?php esc_html_e('Back', 'listdom'); ?>
                             </button>
                         </div>
@@ -315,7 +315,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                 <div class="lsd-tab-switcher-content lsd-template-editor-sidebar-panel" id="lsd-tab-switcher-content-content" data-lsd-settings-scope="content">
                     <div class="lsd-template-editor-settings-panel lsd-template-editor-settings-panel--empty">
                         <div class="lsd-template-editor-sidebar__placeholder" data-empty-text="<?php echo esc_attr__('This element has no settings.', 'listdom'); ?>">
-                            <span><i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i></span>
+                            <span><i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i></span>
                             <p class="lsd-admin-description"><?php esc_html_e('Select an element to edit its properties', 'listdom'); ?></p>
                         </div>
                     </div>
@@ -323,7 +323,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                 <div class="lsd-tab-switcher-content lsd-template-editor-sidebar-panel" id="lsd-tab-switcher-style-content" data-lsd-settings-scope="style">
                     <div class="lsd-template-editor-settings-panel lsd-template-editor-settings-panel--empty">
                         <div class="lsd-template-editor-sidebar__placeholder" data-empty-text="<?php echo esc_attr__('This element has no settings.', 'listdom'); ?>">
-                            <span><i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i></span>
+                            <span><i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i></span>
                             <p class="lsd-admin-description"><?php esc_html_e('Select an element to edit its properties', 'listdom'); ?></p>
                         </div>
                     </div>
@@ -331,7 +331,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                 <div class="lsd-tab-switcher-content lsd-template-editor-sidebar-panel" id="lsd-tab-switcher-advanced-content" data-lsd-settings-scope="advanced">
                     <div class="lsd-template-editor-settings-panel lsd-template-editor-settings-panel--empty">
                         <div class="lsd-template-editor-sidebar__placeholder" data-empty-text="<?php echo esc_attr__('This element has no settings.', 'listdom'); ?>">
-                            <span><i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i></span>
+                            <span><i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i></span>
                             <p class="lsd-admin-description"><?php esc_html_e('Select an element to edit its properties', 'listdom'); ?></p>
                         </div>
                     </div>
@@ -353,7 +353,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                         <div class="lsd-template-editor-structure" data-lsd-template-editor-structure>
                             <div class="lsd-template-editor-structure__tree" data-lsd-structure-tree></div>
                             <div class="lsd-template-editor-sidebar__placeholder" data-lsd-structure-placeholder>
-                                <span><i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i></span>
+                                <span><i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i></span>
                                 <p class="lsd-admin-description"><?php esc_html_e('Add containers and elements to see the structure here.', 'listdom'); ?></p>
                             </div>
                         </div>
@@ -382,7 +382,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                 </div>
                 <div class="lsd-template-editor-canvas__templates lsd-util-hide" aria-hidden="true" data-lsd-canvas-template-source>
                     <div class="lsd-template-editor-canvas__placeholder" data-lsd-canvas-template="placeholder">
-                        <span><i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i></span>
+                        <span><i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i></span>
                         <p class="lsd-admin-description"><?php esc_html_e('Drag Elements here', 'listdom'); ?></p>
                     </div>
                     <div data-lsd-canvas-template="controls">
@@ -394,7 +394,7 @@ $preview_iframe_url = $this->get_preview_iframe_url((int) $post->ID, $preview_li
                             <div class="lsd-template-editor-canvas__container">
                                 <div class="lsd-template-editor-canvas__container-inner">
                                     <div class="lsd-template-editor-canvas__container-placeholder">
-                                        <span><i class="listdom-icon wbli-add-plus-circle" aria-hidden="true"></i></span>
+                                        <span><i class="wui-icon listdom-icon wui-icon--add-plus-circle" aria-hidden="true"></i></span>
                                     </div>
                                 </div>
                             </div>

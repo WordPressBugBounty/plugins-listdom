@@ -43,7 +43,7 @@ $expanded = isset($_GET['analytics_actions_expanded']) && $_GET['analytics_actio
             <?php if ($has_more_actions): ?>
                 <button class="lsd-analytics-report-view-all lsd-text-button lsd-analytics-action-clicks-toggle" type="button" aria-controls="lsd-analytics-action-clicks-more" aria-expanded="<?php echo $expanded ? 'true' : 'false'; ?>" data-show-label="<?php echo esc_attr__('View All', 'listdom'); ?>" data-hide-label="<?php echo esc_attr__('View Less', 'listdom'); ?>">
                     <span class="lsd-analytics-action-clicks-toggle-label"><?php echo $expanded ? esc_html__('View Less', 'listdom') : esc_html__('View All', 'listdom'); ?></span>
-                    <i class="lsd-analytics-report-view-all-arrow webilia-icon wbli-right-arrow" aria-hidden="true"></i>
+                    <i class="lsd-analytics-report-view-all-arrow wui-icon wui-icon--right-arrow" aria-hidden="true"></i>
                 </button>
             <?php endif; ?>
         </div>
@@ -78,7 +78,7 @@ $expanded = isset($_GET['analytics_actions_expanded']) && $_GET['analytics_actio
                             <span class="lsd-admin-title-small lsd-analytics-action-clicks-value"><?php echo $action['value'] === null ? esc_html__('Unavailable', 'listdom') : esc_html(number_format_i18n($action['value'])); ?></span>
                             <span class="lsd-admin-description-tiny lsd-analytics-action-clicks-share lsd-tooltip" tabindex="0" data-lsd-tooltip="<?php echo esc_attr($share === null ? __('This action is unavailable in the shown range', 'listdom') : ($group['comparable'] ? __('Share of available actions in this group', 'listdom') : __('Share of available actions in this group. Tracking was partial or differed between actions, so this share may be inaccurate.', 'listdom'))); ?>">
                                 <?php echo $share === null ? '—' : esc_html(number_format_i18n($share) . '%'); ?>
-                                <i class="webilia-icon wbli-question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
+                                <i class="wui-icon wui-icon--question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
                             </span>
                         </div>
                     <?php endforeach; ?>

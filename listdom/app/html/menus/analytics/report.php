@@ -46,7 +46,7 @@ $all_url = add_query_arg('analytics_view', 'all', $report_url) . '#lsd-analytics
                 <?php echo $all_listings ? ($tracked_report ? esc_html__('All Tracked Listings', 'listdom') : esc_html__('All Published Listings', 'listdom')) : esc_html__('Top Performing Listings', 'listdom'); ?>
                 <?php if ($tracked_report && !empty($listing_report['partial'])): ?>
                     <button class="lsd-analytics-report-partial lsd-tooltip" type="button" aria-label="<?php esc_attr_e('Tracking was active for only part of the selected range. Listing totals may be incomplete.', 'listdom'); ?>" data-lsd-tooltip="<?php esc_attr_e('Tracking was active for only part of the selected range. Listing totals may be incomplete.', 'listdom'); ?>">
-                        <i class="webilia-icon wbli-question" aria-hidden="true"></i>
+                        <i class="wui-icon wui-icon--question" aria-hidden="true"></i>
                     </button>
                 <?php endif; ?>
             </h2>
@@ -54,7 +54,7 @@ $all_url = add_query_arg('analytics_view', 'all', $report_url) . '#lsd-analytics
         <?php if ($all_listings || $has_more_listings || ($tracked_report && $listings)): ?>
             <a class="lsd-analytics-report-view-all lsd-text-button<?php echo $all_listings ? '' : ' lsd-analytics-expand-toggle'; ?>" href="<?php echo esc_url($all_listings ? $report_url . '#lsd-analytics-report-title' : $all_url); ?>"<?php if (!$all_listings): ?> data-lsd-expand="listings" data-lsd-nonce="<?php echo esc_attr(wp_create_nonce('lsd_analytics_listings')); ?>" data-lsd-tracked="<?php echo $tracked_report ? '1' : '0'; ?>" data-lsd-total="<?php echo esc_attr($listing_report['total']); ?>" data-lsd-load-error="<?php echo esc_attr__('Could not load more listings. Try again.', 'listdom'); ?>" aria-controls="lsd-analytics-listings-expanded" aria-expanded="false" data-hide-label="<?php echo esc_attr__('View Less', 'listdom'); ?>"<?php endif; ?>>
                 <?php echo $all_listings ? esc_html__('Overview', 'listdom') : esc_html__('View All', 'listdom'); ?>
-                <i class="lsd-analytics-report-view-all-arrow webilia-icon wbli-right-arrow" aria-hidden="true"></i>
+                <i class="lsd-analytics-report-view-all-arrow wui-icon wui-icon--right-arrow" aria-hidden="true"></i>
             </a>
         <?php endif; ?>
     </div>
@@ -62,7 +62,7 @@ $all_url = add_query_arg('analytics_view', 'all', $report_url) . '#lsd-analytics
     <?php if (!is_array($listings)): ?>
         <div class="lsd-analytics-report-empty lsd-analytics-report-unavailable" role="status">
             <span class="lsd-analytics-report-empty-icon" aria-hidden="true">
-                <i class="lsd-analytics-report-empty-image webilia-icon wbli-list-view"></i>
+                <i class="lsd-analytics-report-empty-image wui-icon wui-icon--list-view"></i>
             </span>
             <h3 class="lsd-admin-title-small lsd-analytics-report-empty-title"><?php esc_html_e('Listing report unavailable', 'listdom'); ?></h3>
             <p class="lsd-admin-description-tiny lsd-analytics-report-empty-copy"><?php esc_html_e('This Stats version cannot provide the lifetime listing report, or the stored counters could not be read.', 'listdom'); ?></p>
@@ -70,7 +70,7 @@ $all_url = add_query_arg('analytics_view', 'all', $report_url) . '#lsd-analytics
     <?php elseif (!$listings): ?>
         <div class="lsd-analytics-report-empty" role="status">
             <span class="lsd-analytics-report-empty-icon" aria-hidden="true">
-                <i class="lsd-analytics-report-empty-image webilia-icon wbli-list-view"></i>
+                <i class="lsd-analytics-report-empty-image wui-icon wui-icon--list-view"></i>
             </span>
             <h3 class="lsd-admin-title-small lsd-analytics-report-empty-title"><?php echo $tracked_report ? esc_html__('No tracked listings in this selection', 'listdom') : esc_html__('No data available yet', 'listdom'); ?></h3>
             <p class="lsd-admin-description-tiny lsd-analytics-report-empty-copy"><?php echo $tracked_report ? esc_html__('Try a wider date range or clear the listing filters.', 'listdom') : esc_html__('Your top performing listings will appear here after visitors start interacting with your content.', 'listdom'); ?></p>
@@ -90,12 +90,12 @@ $all_url = add_query_arg('analytics_view', 'all', $report_url) . '#lsd-analytics
                         <th class="lsd-analytics-report-cell lsd-analytics-report-listing" scope="col"><?php esc_html_e('Listing', 'listdom'); ?></th>
                         <th class="lsd-analytics-report-cell lsd-analytics-report-number lsd-tooltip lsd-tooltip-bottom" scope="col" tabindex="0" data-lsd-tooltip="<?php echo esc_attr($tracked_report ? __('Tracked views in the selected range', 'listdom') : __('Stored lifetime views', 'listdom')); ?>">
                             <?php esc_html_e('Views', 'listdom'); ?>
-                            <i class="webilia-icon wbli-question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
+                            <i class="wui-icon wui-icon--question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
                         </th>
                         <?php if ($unique_views_available): ?>
                             <th class="lsd-analytics-report-cell lsd-analytics-report-number lsd-tooltip lsd-tooltip-bottom" scope="col" tabindex="0" data-lsd-detail-column<?php if ($detail_cells_hidden): ?> hidden<?php endif; ?> data-lsd-tooltip="<?php esc_attr_e('One view per browser, listing, and UTC day in the selected range', 'listdom'); ?>">
                                 <?php esc_html_e('Daily Unique Views', 'listdom'); ?>
-                                <i class="webilia-icon wbli-question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
+                                <i class="wui-icon wui-icon--question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
                             </th>
                         <?php endif; ?>
                         <?php if ($tracked_report): ?>
@@ -103,12 +103,12 @@ $all_url = add_query_arg('analytics_view', 'all', $report_url) . '#lsd-analytics
                             <th class="lsd-analytics-report-cell lsd-analytics-report-number" scope="col" data-lsd-detail-column<?php if ($detail_cells_hidden): ?> hidden<?php endif; ?>><?php esc_html_e('Card Clicks', 'listdom'); ?></th>
                             <th class="lsd-analytics-report-cell lsd-analytics-report-number lsd-tooltip lsd-tooltip-bottom" scope="col" tabindex="0" data-lsd-detail-column<?php if ($detail_cells_hidden): ?> hidden<?php endif; ?> data-lsd-tooltip="<?php echo esc_attr(!empty($listing_report['card_ctr_partial']) ? __('Card clicks divided by card impressions in the selected range. Tracking for clicks or impressions was incomplete, so this rate may be inaccurate.', 'listdom') : __('Card clicks divided by card impressions in the selected range', 'listdom')); ?>">
                                 <?php esc_html_e('Card CTR', 'listdom'); ?>
-                                <i class="webilia-icon wbli-question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
+                                <i class="wui-icon wui-icon--question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
                             </th>
                         <?php endif; ?>
                         <th class="lsd-analytics-report-cell lsd-analytics-report-number lsd-tooltip lsd-tooltip-bottom" scope="col" tabindex="0" data-lsd-tooltip="<?php echo esc_attr($tracked_report ? __('Tracked contacts in the selected range', 'listdom') : __('Stored lifetime contact submissions', 'listdom')); ?>">
                             <?php esc_html_e('Contacts', 'listdom'); ?>
-                            <i class="webilia-icon wbli-question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
+                            <i class="wui-icon wui-icon--question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
                         </th>
                         <th class="lsd-analytics-report-cell lsd-analytics-report-number" scope="col"><?php esc_html_e('Phone', 'listdom'); ?></th>
                         <th class="lsd-analytics-report-cell lsd-analytics-report-number" scope="col"><?php esc_html_e('Website', 'listdom'); ?></th>

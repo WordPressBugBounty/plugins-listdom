@@ -149,7 +149,7 @@ $missFeatureMessages = [];
             <?php LSD_Form::nonce('lsd_dummy_data_form'); ?>
             <button type="submit" id="lsd_dummy_data_save_button" class="lsd-primary-button">
                 <?php esc_html_e('Import Dummy Data', 'listdom'); ?>
-                <i class="wbli wbli-checkmark-circle"></i>
+                <i class="wui-icon wui-icon--checkmark-circle"></i>
             </button>
         </div>
     </div>
@@ -171,7 +171,7 @@ jQuery('#lsd_dummy_data_form').on('submit', function(event)
         data: "action=lsd_dummy&" + dummy,
         success: function()
         {
-            listdom_toastify("<?php echo esc_js(esc_html__("Dummy Data imported completely.", 'listdom')); ?>", 'lsd-success');
+            listdom_notify("<?php echo esc_js(esc_html__("Dummy Data imported completely.", 'listdom')); ?>", 'lsd-success');
             loading.stop();
         },
         error: function()

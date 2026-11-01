@@ -1,0 +1,37 @@
+.wui .wui-header { background: var(--wui-color-surface); border-block-end: 1px solid var(--wui-color-border); }
+.wui .wui-header__top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--wui-space-3); padding: var(--wui-space-3) var(--wui-space-5); }
+.wui .wui-header__brand { display: inline-flex; align-items: center; gap: var(--wui-space-2); min-inline-size: 0; color: var(--wui-color-text); text-decoration: none; }
+.wui .wui-header__brand:focus-visible { outline: 2px solid var(--wui-color-focus); outline-offset: 2px; }
+.wui .wui-header__brand img { inline-size: 32px; block-size: 32px; object-fit: contain; }
+.wui .wui-header__title { overflow: hidden; font-size: 20px; font-weight: var(--wui-font-weight-semibold); text-overflow: ellipsis; white-space: nowrap; }
+.wui .wui-header__actions { display: flex; flex-wrap: wrap; gap: var(--wui-space-2); }
+.wui .wui-header__version { color: var(--wui-color-muted); font-size: var(--wui-font-size-sm); }
+.wui .wui-header__page { display: flex; align-items: center; flex-wrap: wrap; gap: var(--wui-space-3); padding: var(--wui-space-3) var(--wui-space-5); }
+.wui .wui-header__page-title { margin: 0; font-size: var(--wui-font-size-lg); color: var(--wui-color-text); }
+.wui .wui-header__nav { display: flex; flex-wrap: wrap; gap: var(--wui-space-1); padding-inline: var(--wui-space-5); border-block-start: 1px solid var(--wui-color-border); }
+.wui .wui-header__nav-link { display: inline-flex; align-items: center; min-block-size: 44px; padding-inline: var(--wui-space-3); border-block-end: 2px solid transparent; color: var(--wui-color-text); font-size: var(--wui-font-size-md); text-decoration: none; }
+.wui .wui-header__nav-link:hover,
+.wui .wui-header__nav-link.is-active { color: var(--wui-color-primary); border-block-end-color: var(--wui-color-primary); text-decoration: none; }
+.wui .wui-header__nav-link:focus-visible { outline: 2px solid var(--wui-color-focus); outline-offset: -2px; }
+
+// WordPress reserves an inline gutter for page content. The early admin header
+// sits directly in #wpcontent, so let it meet the admin menu edge.
+.wui.wui-admin-header { margin-inline-start: -20px; inline-size: calc(100% + 20px); }
+
+@media (max-width: 782px) {
+  .wui .wui-header__top { padding-inline: var(--wui-space-4); }
+  .wui .wui-header__nav { padding-inline: var(--wui-space-4); }
+  .wui.wui-admin-header { margin-inline-start: -10px; inline-size: calc(100% + 10px); }
+  // Core moves #wpbody when the responsive admin menu opens. This header is
+  // its preceding sibling, so move it by the same distance.
+  .wui.wui-admin-header:where(#wpwrap.wp-responsive-open *) { position: relative; inset-inline-start: 16em; }
+}
+
+@media (max-width: 600px) {
+  // Core puts the mobile toolbar offset on #wpbody, after this header.
+  .wui.wui-admin-header { padding-block-start: 46px; }
+  .wui.wui-admin-header ~ #wpbody { padding-block-start: 0; }
+}
+
+.wui .wui-header__icon-action { position: relative; flex-shrink: 0; }
+.wui .wui-header__icon-action .wui-badge { position: absolute; inset-block-start: -8px; inset-inline-end: -8px; min-inline-size: 18px; padding: 2px 5px; background: var(--wui-color-primary); color: var(--wui-color-on-primary); }

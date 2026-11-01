@@ -40,7 +40,7 @@ defined('ABSPATH') || die();
 /** @var string $events_period */
 /** @var bool $all_listings */
 ?>
-<div class="wrap lsd-wrap lsd-analytics-page<?php echo $low_data ? ' lsd-analytics-page-low-data' : ''; ?><?php echo $rich_data ? ' lsd-analytics-page-rich' : ''; ?>">
+<div class="wrap lsd-wrap wui lsd-analytics-page<?php echo $low_data ? ' lsd-analytics-page-low-data' : ''; ?><?php echo $rich_data ? ' lsd-analytics-page-rich' : ''; ?>">
     <?php LSD_Menus::header(esc_html__('Analytics', 'listdom')); ?>
 
     <div class="lsd-admin-main-wrapper">
@@ -51,7 +51,7 @@ defined('ABSPATH') || die();
         <?php if ($status['code'] !== 'disconnected'): ?>
             <section class="lsd-admin-wrapper lsd-analytics-status lsd-analytics-status-<?php echo esc_attr($status['tone']); ?><?php echo $rich_data ? ' lsd-analytics-status-rich' : ''; ?>" aria-labelledby="lsd-analytics-status-title">
                 <span class="lsd-analytics-status-icon" aria-hidden="true">
-                    <i class="lsd-analytics-status-icon-image webilia-icon <?php echo $status['tone'] === 'success' ? 'wbli-checkmark-circle-fill' : 'wbli-alert'; ?>"></i>
+                    <i class="lsd-analytics-status-icon-image wui-icon <?php echo $status['tone'] === 'success' ? 'wui-icon--checkmark-circle-fill' : 'wui-icon--alert'; ?>"></i>
                 </span>
                 <div class="lsd-analytics-status-copy lsd-admin-subsections">
                     <h2 class="lsd-admin-title lsd-analytics-status-title" id="lsd-analytics-status-title"><?php echo esc_html($status['title']); ?></h2>
@@ -64,13 +64,13 @@ defined('ABSPATH') || die();
                 </div>
                 <?php if ($rich_data && !empty($status['connected']) && $status['tone'] === 'success'): ?>
                     <button class="lsd-analytics-status-dismiss" type="button" aria-label="<?php esc_attr_e('Dismiss analytics status', 'listdom'); ?>">
-                        <i class="webilia-icon wbli-cross" aria-hidden="true"></i>
+                        <i class="wui-icon wui-icon--cross" aria-hidden="true"></i>
                     </button>
                 <?php endif; ?>
                 <?php if ($status['tone'] === 'success' && !$rich_data): ?>
                     <span class="lsd-analytics-status-art" aria-hidden="true">
                         <img class="lsd-analytics-status-art-chart" src="<?php echo esc_url($this->lsd_asset_url('img/analytics/summary-illustration.svg')); ?>" alt="">
-                        <i class="lsd-analytics-status-art-check webilia-icon wbli-checkmark-circle-fill"></i>
+                        <i class="lsd-analytics-status-art-check wui-icon wui-icon--checkmark-circle-fill"></i>
                     </span>
                 <?php endif; ?>
             </section>
@@ -121,7 +121,7 @@ defined('ABSPATH') || die();
                         </span>
                         <div class="lsd-analytics-card-stat<?php echo $change ? ' lsd-analytics-card-stat-' . esc_attr($change['direction']) : ''; ?>">
                             <?php if ($change && $change['direction'] !== 'flat'): ?>
-                                <i class="webilia-icon wbli-right-arrow lsd-analytics-card-stat-indicator" aria-hidden="true"></i>
+                                <i class="wui-icon wui-icon--right-arrow lsd-analytics-card-stat-indicator" aria-hidden="true"></i>
                             <?php endif; ?>
                             <span class="lsd-analytics-card-stat-label"><?php echo $change ? esc_html($change['value']) : '&mdash;'; ?></span>
                             <?php if ($change): ?>
@@ -130,7 +130,7 @@ defined('ABSPATH') || die();
                                 </span>
                             <?php endif; ?>
                             <button class="lsd-tooltip" type="button" aria-label="<?php echo esc_attr(implode(' ', $tooltip_parts)); ?>" data-lsd-tooltip="<?php echo esc_attr($tooltip); ?>">
-                                <i class="webilia-icon wbli-question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
+                                <i class="wui-icon wui-icon--question lsd-analytics-tooltip-icon" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>

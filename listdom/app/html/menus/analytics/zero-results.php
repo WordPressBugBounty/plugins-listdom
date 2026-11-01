@@ -25,7 +25,7 @@ $overview_url = remove_query_arg(['analytics_zero_terms', 'analytics_zero_terms_
                 <?php esc_html_e('Zero-result Searches', 'listdom'); ?>
                 <?php if ($term_coverage === 'partial' || $term_coverage === 'unavailable'): ?>
                     <button class="lsd-analytics-report-partial lsd-tooltip" type="button" aria-label="<?php echo $coverage_note; ?>" data-lsd-tooltip="<?php echo $coverage_note; ?>">
-                        <i class="webilia-icon wbli-question" aria-hidden="true"></i>
+                        <i class="wui-icon wui-icon--question" aria-hidden="true"></i>
                     </button>
                 <?php endif; ?>
             </h2>
@@ -33,7 +33,7 @@ $overview_url = remove_query_arg(['analytics_zero_terms', 'analytics_zero_terms_
         <?php if (!$listing_filter_active && ($all_zero_terms || $has_more_zero_terms)): ?>
             <a class="lsd-analytics-report-view-all lsd-text-button<?php echo $all_zero_terms ? '' : ' lsd-analytics-expand-toggle'; ?>" href="<?php echo esc_url($all_zero_terms ? $overview_url : $view_url); ?>"<?php if (!$all_zero_terms): ?> data-lsd-expand="zero" aria-controls="lsd-analytics-zero-expanded" aria-expanded="false" data-hide-label="<?php echo esc_attr__('View Less', 'listdom'); ?>" data-lsd-load-error="<?php echo esc_attr__('Could not load more rows. Open the next page.', 'listdom'); ?>" data-lsd-nonce="<?php echo esc_attr(wp_create_nonce('lsd_analytics_terms')); ?>" data-lsd-from="<?php echo esc_attr($zero_terms_report['from'] ?? ''); ?>" data-lsd-total="<?php echo esc_attr($zero_terms_report['total']); ?>"<?php endif; ?>>
                 <?php echo $all_zero_terms ? esc_html__('Overview', 'listdom') : esc_html__('View All', 'listdom'); ?>
-                <i class="lsd-analytics-report-view-all-arrow webilia-icon wbli-right-arrow" aria-hidden="true"></i>
+                <i class="lsd-analytics-report-view-all-arrow wui-icon wui-icon--right-arrow" aria-hidden="true"></i>
             </a>
         <?php endif; ?>
     </div>
@@ -73,7 +73,7 @@ $overview_url = remove_query_arg(['analytics_zero_terms', 'analytics_zero_terms_
     <?php else: ?>
         <div class="lsd-analytics-report-empty lsd-analytics-zero-results-empty" role="status">
             <span class="lsd-analytics-report-empty-icon" aria-hidden="true">
-                <i class="lsd-analytics-report-empty-image webilia-icon wbli-search-magnifier"></i>
+                <i class="lsd-analytics-report-empty-image wui-icon wui-icon--search-magnifier"></i>
             </span>
             <h3 class="lsd-admin-title-small lsd-analytics-report-empty-title"><?php echo $listing_filter_active ? esc_html__('Zero-result searches unavailable for listing filters', 'listdom') : esc_html__('Zero-result searches unavailable', 'listdom'); ?></h3>
             <p class="lsd-admin-description-tiny lsd-analytics-report-empty-copy"><?php echo $listing_filter_active ? esc_html__('Clear the location, category, and title filters to see zero-result searches.', 'listdom') : esc_html__('Zero-result searches have not been collected in this chart range.', 'listdom'); ?></p>

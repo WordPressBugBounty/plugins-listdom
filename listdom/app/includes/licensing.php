@@ -394,7 +394,7 @@ class LSD_Licensing extends LSD_Base
             'valid' => self::STATUS_VALID, 'validation_status' => $validation_status, 'installed_date' => '', 'expired' => false,
             'expiring' => false, 'progress' => 100, 'days_remaining' => 0, 'valid_license' => true,
             'has_license_key' => trim((string) get_option($prefix . '_purchase_code', '')) !== '', 'state' => 'active',
-            'badge' => ['class' => 'lsd-success', 'icon' => 'wbli-checkmark-circle', 'text' => esc_html__('Active', 'listdom')],
+            'badge' => ['class' => 'lsd-success', 'icon' => 'wui-icon--checkmark-circle', 'text' => esc_html__('Active', 'listdom')],
             'progress_class' => 'lsd-success', 'card_class' => 'lsd-activation-valid', 'action' => '', 'show_status' => false,
             'show_valid_from' => false, 'status_text' => '', 'expiry_mode' => 'none', 'connect_authorized' => true, 'source' => 'webilia_connect',
         ];
@@ -473,7 +473,7 @@ class LSD_Licensing extends LSD_Base
                         'cta' => [
                             'label' => esc_html__('Renew License', 'listdom'),
                             'url' => $shop_url,
-                            'icon' => 'wbli-key',
+                            'icon' => 'wui-icon--key',
                         ],
                     ];
                 }
@@ -491,7 +491,7 @@ class LSD_Licensing extends LSD_Base
                         'cta' => [
                             'label' => esc_html__('Get License', 'listdom'),
                             'url' => $shop_url,
-                            'icon' => 'wbli-key',
+                            'icon' => 'wui-icon--key',
                         ],
                     ];
                 }
@@ -509,7 +509,7 @@ class LSD_Licensing extends LSD_Base
                         'cta' => [
                             'label' => esc_html__('Renew License', 'listdom'),
                             'url' => $shop_url,
-                            'icon' => 'wbli-key',
+                            'icon' => 'wui-icon--key',
                         ],
                     ];
                 }
@@ -529,7 +529,7 @@ class LSD_Licensing extends LSD_Base
                     'cta' => [
                         'label' => esc_html__('Get License', 'listdom'),
                         'url' => $shop_url,
-                        'icon' => 'wbli-key',
+                        'icon' => 'wui-icon--key',
                     ],
                 ];
             case 'trial_inline':
@@ -550,7 +550,7 @@ class LSD_Licensing extends LSD_Base
                     'cta' => [
                         'label' => esc_html__('Renew License', 'listdom'),
                         'url' => $shop_url,
-                        'icon' => 'wbli-key',
+                        'icon' => 'wui-icon--key',
                     ],
                 ];
             default:
@@ -583,37 +583,37 @@ class LSD_Licensing extends LSD_Base
     {
         $map = [
             'inactive' => [
-                'badge' => ['class' => '', 'icon' => 'wbli-key', 'text' => esc_html__('Inactive', 'listdom')],
+                'badge' => ['class' => '', 'icon' => 'wui-icon--key', 'text' => esc_html__('Inactive', 'listdom')],
                 'progress_class' => 'lsd-error',
                 'card_class' => '',
                 'action' => 'get_license',
             ],
             'trial' => [
-                'badge' => ['class' => '', 'icon' => 'wbli-key', 'text' => esc_html__('Inactive', 'listdom')],
+                'badge' => ['class' => '', 'icon' => 'wui-icon--key', 'text' => esc_html__('Inactive', 'listdom')],
                 'progress_class' => 'lsd-warning',
                 'card_class' => '',
                 'action' => 'get_license',
             ],
             'grace' => [
-                'badge' => ['class' => 'lsd-grace', 'icon' => 'wbli-time-half-pass', 'text' => esc_html__('Grace', 'listdom')],
+                'badge' => ['class' => 'lsd-grace', 'icon' => 'wui-icon--time-half-pass', 'text' => esc_html__('Grace', 'listdom')],
                 'progress_class' => 'lsd-warning',
                 'card_class' => 'lsd-activation-grace',
                 'action' => 'renew',
             ],
             'active' => [
-                'badge' => ['class' => 'lsd-success', 'icon' => 'wbli-checkmark-circle', 'text' => esc_html__('Active', 'listdom')],
+                'badge' => ['class' => 'lsd-success', 'icon' => 'wui-icon--checkmark-circle', 'text' => esc_html__('Active', 'listdom')],
                 'progress_class' => 'lsd-success',
                 'card_class' => 'lsd-activation-valid',
                 'action' => '',
             ],
             'expiring' => [
-                'badge' => ['class' => 'lsd-warning', 'icon' => 'wbli-alert', 'text' => esc_html__('Expiring', 'listdom')],
+                'badge' => ['class' => 'lsd-warning', 'icon' => 'wui-icon--alert', 'text' => esc_html__('Expiring', 'listdom')],
                 'progress_class' => 'lsd-warning',
                 'card_class' => 'lsd-activation-expiring',
                 'action' => 'renew',
             ],
             'expired' => [
-                'badge' => ['class' => 'lsd-error', 'icon' => 'wbli-alert', 'text' => esc_html__('Expired', 'listdom')],
+                'badge' => ['class' => 'lsd-error', 'icon' => 'wui-icon--alert', 'text' => esc_html__('Expired', 'listdom')],
                 'progress_class' => 'lsd-error',
                 'card_class' => 'lsd-activation-expired',
                 'action' => 'renew',

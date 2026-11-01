@@ -4,13 +4,6 @@ defined('ABSPATH') || die();
 
 /** @var LSD_Skins_Grid $this */
 
-// Featured Image Sizes
-$sizes = [
-    2 => [560, 430],
-    3 => [325, 250],
-    4 => [280, 215],
-];
-
 $ids = $this->listings;
 ?>
 <?php foreach ($ids as $id): $listing = new LSD_Entity_Listing($id); ?>
@@ -20,7 +13,7 @@ $ids = $this->listings;
         <div class="lsd-listing-image <?php echo esc_attr($listing->image_class_wrapper()); ?>">
             <?php if ($this->display_image): ?>
             <div class="lsd-image">
-                <?php echo LSD_Kses::element($listing->get_image_module($this, $sizes[$this->columns])); ?>
+                <?php echo LSD_Kses::element($listing->get_image_module($this, $this->presentation_image_size())); ?>
             </div>
             <?php endif; ?>
 

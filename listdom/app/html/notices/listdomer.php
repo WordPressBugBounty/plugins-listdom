@@ -7,7 +7,7 @@ defined('ABSPATH') || die();
 /** @var string $notice */
 ?>
 <?php if (!LSD_Base::is_current_theme('listdomer') && !LSD_Base::is_theme_installed('listdomer') && $this->can_display_notice($notice)): ?>
-    <div class="lsd-ask-review-wrapper <?php echo $home ? 'lsd-my-0' : 'notice notice-info'; ?> lsd-flex lsd-flex-row lsd-gap-5 lsd-flex-content-start lsd-flex-items-start">
+    <div class="lsd-ask-review-wrapper wui <?php echo $home ? 'lsd-my-0' : 'notice notice-info'; ?> lsd-flex lsd-flex-row lsd-gap-5 lsd-flex-content-start lsd-flex-items-start">
         <img src="<?php echo esc_url($this->lsd_asset_url('img/listdomer.svg')); ?>" alt="">
         <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-flex-items-start">
             <h3 class="lsd-m-0 lsd-admin-title"><?php echo esc_html__('Enjoy the Listdom more with Listdomer theme', 'listdom'); ?></h3>
@@ -15,7 +15,7 @@ defined('ABSPATH') || die();
             <div class="lsd-ask-review-buttons lsd-flex lsd-flex-row lsd-gap-3 lsd-mt-3 lsd-flex-items-center">
                 <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('update.php?action=install-theme&theme=listdomer&_wpnonce='.wp_create_nonce('install-theme_listdomer'))); ?>" target="_blank">
                     <span><?php echo esc_html__('YES, Install Listdomer Theme', 'listdom'); ?></span>
-                    <i class="webilia-icon wbli-right-arrow"></i>
+                    <i class="wui-icon wui-icon--right-arrow"></i>
                 </a>
                 <a class="lsd-text-button" href="<?php echo esc_url(add_query_arg('lsd-listdomer', 'later')); ?>"><?php echo esc_html__('Maybe, Later', 'listdom'); ?></a>
                 <a class="lsd-text-button" href="<?php echo esc_url(add_query_arg('lsd-listdomer', 'done')); ?>"><?php echo esc_html__('No, Thanks', 'listdom'); ?></a>

@@ -91,7 +91,7 @@ $render_announcement = function (array $announcement, string $tab) use ($announc
         <?php endif; ?>
 
         <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-connect&tab=addons')); ?>" class="lsd-text-button lsd-header-addons-button">
-            <i class="webilia-icon wbli-add-plus-circle"></i>
+            <i class="wui-icon wui-icon--add-plus-circle"></i>
             <span><?php echo esc_html__('Addons', 'listdom'); ?></span>
         </a>
 
@@ -102,7 +102,7 @@ $render_announcement = function (array $announcement, string $tab) use ($announc
                 $connect_url = $connect_connected ? $connect_return_url : LSD_Webilia_Connect::connectUrl($connect_return_url);
             ?>
             <a href="<?php echo esc_url($connect_url); ?>" class="lsd-primary-button lsd-header-connect-button<?php echo $connect_connected ? ' lsd-header-connect-button-connected' : ''; ?>">
-                <i class="webilia-icon <?php echo $connect_connected ? 'wbli-checkmark-circle' : 'wbli-link-square'; ?>" aria-hidden="true"></i>
+                <i class="wui-icon <?php echo $connect_connected ? 'wui-icon--checkmark-circle' : 'wui-icon--link-square'; ?>" aria-hidden="true"></i>
                 <span><?php echo $connect_connected ? esc_html__('Connected to Webilia', 'listdom') : esc_html__('Connect Now', 'listdom'); ?></span>
             </a>
         <?php endif; ?>
@@ -153,7 +153,7 @@ $render_announcement = function (array $announcement, string $tab) use ($announc
       <?php foreach ($menus as $menu): if (!isset($menu['title']) || !isset($menu['url'])) continue; ?>
       <?php $badge = isset($menu['badge']) ? (int) $menu['badge'] : 0; ?>
       <a href="<?php echo esc_url($menu['url']); ?>" class="lsd-submenu-item<?php echo isset($menu['selected']) && $menu['selected'] ? ' selected' : ''; ?>">
-          <?php if (!empty($menu['icon'])): ?><i class="webilia-icon <?php echo esc_attr($menu['icon']); ?>" aria-hidden="true"></i><?php endif; ?>
+          <?php if (!empty($menu['icon'])): ?><i class="wui-icon <?php echo esc_attr($menu['icon']); ?>" aria-hidden="true"></i><?php endif; ?>
           <?php echo esc_html($menu['title']); ?>
           <?php if ($badge > 0): ?><span class="update-plugins count-<?php echo esc_attr($badge); ?>"><span class="update-count"><?php echo esc_html($badge); ?></span></span><?php endif; ?>
       </a>

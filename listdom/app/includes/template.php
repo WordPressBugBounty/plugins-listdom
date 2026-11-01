@@ -751,67 +751,67 @@ abstract class LSD_Template extends LSD_Base
     {
         $icons = [
             // Structure
-            'container'       => 'wbli-inbox',
-            'spacer'          => 'wbli-subtitle',
-            'heading'         => 'wbli-text-square',
-            'breadcrumb'      => 'wbli-curvy-right-direction',
-            'backbutton'      => 'wbli-arrow-turn-backward',
+            'container'       => 'wui-icon--inbox',
+            'spacer'          => 'wui-icon--subtitle',
+            'heading'         => 'wui-icon--text-square',
+            'breadcrumb'      => 'wui-icon--curvy-right-direction',
+            'backbutton'      => 'wui-icon--arrow-turn-backward',
 
             // Main content
-            'title'           => 'wbli-text-square',
-            'excerpt'         => 'wbli-text-select',
-            'content'         => 'wbli-subtitle',
-            'remark'          => 'wbli-quotes',
+            'title'           => 'wui-icon--text-square',
+            'excerpt'         => 'wui-icon--text-select',
+            'content'         => 'wui-icon--subtitle',
+            'remark'          => 'wui-icon--quotes',
 
             // Taxonomies
-            'categories'      => 'wbli-dashboard-square-add',
-            'locations'       => 'wbli-map-pinpoint',
-            'features'        => 'wbli-left-to-right-list-star',
-            'tags'            => 'wbli-hashtag',
-            'labels'          => 'wbli-label-important',
+            'categories'      => 'wui-icon--dashboard-square-add',
+            'locations'       => 'wui-icon--map-pinpoint',
+            'features'        => 'wui-icon--left-to-right-list-star',
+            'tags'            => 'wui-icon--hashtag',
+            'labels'          => 'wui-icon--label-important',
 
             // Media
-            'image'           => 'wbli-card',
-            'video'           => 'wbli-computer-video',
-            'gallery'         => 'wbli-image-composition-oval',
-            'embed'           => 'wbli-second-bracket-square',
+            'image'           => 'wui-icon--card',
+            'video'           => 'wui-icon--computer-video',
+            'gallery'         => 'wui-icon--image-composition-oval',
+            'embed'           => 'wui-icon--second-bracket-square',
 
             // Commerce
-            'price'           => 'wbli-hot-price',
-            'ads'             => 'wbli-file-audio',
-            'auction'         => 'wbli-auction',
-            'booking'         => 'wbli-ticket',
-            'franchise'       => 'wbli-git-fork',
-            'application'     => 'wbli-job-link',
-            'cta'             => 'wbli-cursor-pointer',
+            'price'           => 'wui-icon--hot-price',
+            'ads'             => 'wui-icon--file-audio',
+            'auction'         => 'wui-icon--auction',
+            'booking'         => 'wui-icon--ticket',
+            'franchise'       => 'wui-icon--git-fork',
+            'application'     => 'wui-icon--job-link',
+            'cta'             => 'wui-icon--cursor-pointer',
 
             // Contact and owner
-            'contact'         => 'wbli-calling',
-            'owner'           => 'wbli-identity-card',
-            'team'            => 'wbli-add-team',
-            'abuse'           => 'wbli-flag',
+            'contact'         => 'wui-icon--calling',
+            'owner'           => 'wui-icon--identity-card',
+            'team'            => 'wui-icon--add-team',
+            'abuse'           => 'wui-icon--flag',
 
             // Location
-            'address'         => 'wbli-map-pin',
-            'map'             => 'wbli-maps-location',
-            'google_places'   => 'wbli-google-places',
+            'address'         => 'wui-icon--map-pin',
+            'map'             => 'wui-icon--maps-location',
+            'google_places'   => 'wui-icon--google-places',
 
             // Listing data
-            'availability'    => 'wbli-clipboard-clock',
-            'attributes'      => 'wbli-custom-field',
-            'faq'             => 'wbli-bubble-chat-question',
-            'acf'             => 'wbli-acf',
+            'availability'    => 'wui-icon--clipboard-clock',
+            'attributes'      => 'wui-icon--custom-field',
+            'faq'             => 'wui-icon--bubble-chat-question',
+            'acf'             => 'wui-icon--acf',
 
             // Engagement
-            'share'           => 'wbli-share',
-            'compare'         => 'wbli-chart-relationship',
-            'favorite'        => 'wbli-stars',
-            'stats'           => 'wbli-chart-increase',
-            'related'         => 'wbli-chart-relationship',
-            'discussion'      => 'wbli-comment',
+            'share'           => 'wui-icon--share',
+            'compare'         => 'wui-icon--chart-relationship',
+            'favorite'        => 'wui-icon--stars',
+            'stats'           => 'wui-icon--chart-increase',
+            'related'         => 'wui-icon--chart-relationship',
+            'discussion'      => 'wui-icon--comment',
         ];
 
-        return $icons[$key] ?? 'wbli-listdom-logo';
+        return $icons[$key] ?? 'wui-icon--listdom-logo';
 
     }
 
@@ -1068,7 +1068,7 @@ abstract class LSD_Template extends LSD_Base
 
         foreach ($layout_tree as $row)
         {
-            $html .= self::node($row, $elements_map, $render_args);
+            $html .= self::node($row, $elements_map, array_merge($render_args, ['wui_scope' => true]));
         }
 
         return $html;
@@ -1100,7 +1100,7 @@ abstract class LSD_Template extends LSD_Base
             return '';
         }
 
-        $children_html = self::children($node['children'] ?? null, $elements_map, $render_args);
+        $children_html = self::children($node['children'] ?? null, $elements_map, array_merge($render_args, ['wui_scope' => false]));
 
         $args = array_merge($render_args, [
             'settings' => $settings,
@@ -1110,7 +1110,7 @@ abstract class LSD_Template extends LSD_Base
         $content = $element->render($args);
         if (trim((string) $content) === '') return '';
 
-        return self::wrap_element($element_id, $content);
+        return self::wrap_element($element_id, $content, !empty($render_args['wui_scope']));
     }
 
     private static function children($children, array $elements_map, array $render_args): string
@@ -1133,13 +1133,13 @@ abstract class LSD_Template extends LSD_Base
         return $template_type === '' || empty($supported_types) || in_array($template_type, $supported_types, true);
     }
 
-    private static function wrap_element(string $element_id, string $content): string
+    private static function wrap_element(string $element_id, string $content, bool $wui_scope = false): string
     {
         $wrapper_class = class_exists('LSD_Template_Generator_CSS')
             ? LSD_Template_Generator_CSS::wrapper_class($element_id)
             : 'lsd-template-builder-element-' . sanitize_html_class($element_id);
 
-        return '<div class="' . esc_attr($wrapper_class) . '" data-lsd-element-id="' . esc_attr($element_id) . '">' . $content . '</div>';
+        return '<div class="' . esc_attr($wrapper_class . ($wui_scope ? ' wui' : '')) . '" data-lsd-element-id="' . esc_attr($element_id) . '">' . $content . '</div>';
     }
 
     /* -------------------------------------------------------------------------

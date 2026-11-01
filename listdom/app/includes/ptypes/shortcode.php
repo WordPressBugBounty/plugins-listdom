@@ -148,6 +148,20 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
         include $this->include_html_file('metaboxes/shortcode/display-options.php', ['return_path' => true]);
     }
 
+    /** Shared display normalization for admin saves and scoped native updates. */
+    public static function normalize_display(array $display): array
+    {
+        return LSD_Skins_Table::normalize_display_options($display);
+    }
+
+    /** Canonical display persistence; native callers supply the captured state. */
+    public static function persist_display(int $post_id, array $display, ?array $expected = null)
+    {
+        $display = self::normalize_display($display);
+        return $expected === null ? update_post_meta($post_id, 'lsd_display', $display)
+            : update_post_meta($post_id, 'lsd_display', $display, $expected);
+    }
+
     public function save($post_id, $post)
     {
         // It's not a shortcode
@@ -170,8 +184,7 @@ class LSD_PTypes_Shortcode extends LSD_PTypes
 
         // Display Options
         $display = $lsd['display'] ?? [];
-        if (is_array($display)) $display = LSD_Skins_Table::normalize_display_options($display);
-        update_post_meta($post_id, 'lsd_display', $display);
+        if (is_array($display)) self::persist_display($post_id, $display);
 
         // Search Options
         $search = $lsd['search'] ?? [];

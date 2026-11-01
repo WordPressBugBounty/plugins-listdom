@@ -261,6 +261,35 @@ $did_taxonomies = [];
             </div>
         </div>
 
+        <div id="lsd_panel_advanced_admin-menu" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'admin-menu' ? ' lsd-tab-content-active' : ''; ?>">
+            <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Admin Menu', 'listdom'); ?></h3>
+            <div class="lsd-settings-group-wrapper">
+                <div class="lsd-settings-fields-wrapper">
+                    <div class="lsd-form-row">
+                        <div class="lsd-col-3">
+                            <?php echo LSD_Form::label([
+                                'class' => 'lsd-fields-label',
+                                'title' => esc_html__('Compact Menu', 'listdom'),
+                                'for' => 'lsd_compact_menu',
+                            ]); ?>
+                        </div>
+                        <div class="lsd-col-5">
+                            <?php echo LSD_Form::switcher([
+                                'id' => 'lsd_compact_menu',
+                                'name' => 'lsd[compact_menu]',
+                                'value' => $settings['compact_menu'] ?? 0,
+                                'toggle' => '#lsd_compact_menu_enabled_notice',
+                                'toggle2' => '#lsd_compact_menu_disabled_notice',
+                            ]); ?>
+                            <p class="lsd-admin-description-tiny lsd-mt-2 lsd-mb-0"><?php esc_html_e('Save Changes to apply this setting. The page will reload automatically.', 'listdom'); ?></p>
+                        </div>
+                    </div>
+                    <div id="lsd_compact_menu_disabled_notice" class="lsd-alert lsd-info lsd-my-0<?php echo !empty($settings['compact_menu']) ? ' lsd-util-hide' : ''; ?>"><strong><?php esc_html_e('Disabled:', 'listdom'); ?></strong> <?php esc_html_e('Find All Listings, Custom Fields, Categories, Locations, Tags, Features, and Labels under the standalone Listings menu.', 'listdom'); ?></div>
+                    <div id="lsd_compact_menu_enabled_notice" class="lsd-alert lsd-info lsd-my-0<?php echo empty($settings['compact_menu']) ? ' lsd-util-hide' : ''; ?>"><strong><?php esc_html_e('Enabled:', 'listdom'); ?></strong> <?php esc_html_e('Go to Listdom → Listings. Use the tabs in the Listdom header to manage listings, custom fields, and taxonomies.', 'listdom'); ?></div>
+                </div>
+            </div>
+        </div>
+
         <div id="lsd_panel_advanced_translations" class="lsd-settings-form-group lsd-tab-content<?php echo $this->subtab === 'translations' ? ' lsd-tab-content-active' : ''; ?>">
             <h3 class="lsd-admin-title lsd-mt-0"><?php esc_html_e('Translations', 'listdom'); ?></h3>
             <div class="lsd-settings-group-wrapper">
@@ -433,7 +462,7 @@ $did_taxonomies = [];
                 <?php LSD_Form::nonce('lsd_settings_form'); ?>
                 <button type="submit" id="lsd_settings_save_button" class="lsd-primary-button">
                     <?php esc_html_e('Save The Changes', 'listdom'); ?>
-                    <i class='wbli wbli-checkmark-circle'></i>
+                    <i class='wui-icon wui-icon--checkmark-circle'></i>
                 </button>
             </div>
         </div>
@@ -499,26 +528,47 @@ jQuery('#lsd_settings_form').on('submit', function (e)
     const loading = new ListdomButtonLoader($button);
     loading.start("<?php echo esc_js( esc_html__('Saving', 'listdom') ); ?>");
 
+    const compact_menu_changed = (jQuery('#lsd_compact_menu').is(':checked') ? 1 : 0) !== <?php echo (int) !empty($settings['compact_menu']); ?>;
+
     const settings = jQuery(this).serialize();
     jQuery.ajax(
     {
         type: "POST",
         url: ajaxurl,
         data: "action=lsd_save_advanced&" + settings,
-        success: function ()
+        dataType: 'json',
+        success: function (response)
         {
+            if (!response || response.success !== 1)
+            {
+                $tab.attr('data-saved', 'false');
+                listdom_notify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
+                loading.stop();
+                return;
+            }
+
             $tab.attr('data-saved', 'true');
 
-            listdom_toastify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success');
+            listdom_notify("<?php echo esc_js(esc_html__('Options saved successfully.', 'listdom')); ?>", 'lsd-success', {
+                hideTime: compact_menu_changed ? 1000 : 8000
+            });
 
             // Unloading
             loading.stop();
+
+            if (compact_menu_changed)
+            {
+                setTimeout(() =>
+                {
+                    window.location.reload();
+                }, 1000);
+            }
         },
         error: function ()
         {
             $tab.attr('data-saved', 'false');
 
-            listdom_toastify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('Error: Unable to save options.', 'listdom')); ?>", 'lsd-error');
 
             // Unloading
             loading.stop();
@@ -589,7 +639,7 @@ jQuery('#lsd_import_settings_form').on('submit', function (e)
         contentType: false,
         success: function () {
 
-            listdom_toastify("<?php echo esc_js(esc_html__('Options imported successfully.', 'listdom')); ?>", 'lsd-success');
+            listdom_notify("<?php echo esc_js(esc_html__('Options imported successfully.', 'listdom')); ?>", 'lsd-success');
 
             // Unloading
             loading.stop();
@@ -600,7 +650,7 @@ jQuery('#lsd_import_settings_form').on('submit', function (e)
         },
         error: function () {
 
-            listdom_toastify("<?php echo esc_js(esc_html__('Error: Unable to import options.', 'listdom')); ?>", 'lsd-error');
+            listdom_notify("<?php echo esc_js(esc_html__('Error: Unable to import options.', 'listdom')); ?>", 'lsd-error');
 
             // Unloading
             loading.stop();

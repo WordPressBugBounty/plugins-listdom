@@ -59,6 +59,11 @@ class LSD_Customizer_Forms extends LSD_Customizer
                                 'title' => esc_html__('Field Padding', 'listdom'),
                                 'default' => ['top' => 2, 'right' => 2, 'bottom' => 2, 'left' => 2],
                             ],
+                            'choice_range_padding' => [
+                                'type' => 'padding',
+                                'title' => esc_html__('Checkbox, Radio & Range Padding', 'listdom'),
+                                'default' => ['top' => 2, 'right' => 10, 'bottom' => 2, 'left' => 10],
+                            ],
                         ]),
                     ],
                 ]

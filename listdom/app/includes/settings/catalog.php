@@ -138,4 +138,175 @@ class LSD_Settings_Catalog
         }
         return $result;
     }
+
+    /** The existing 26-field definitions() remain the legacy compatibility view. */
+    public function domains(): array
+    {
+        $domains = LSD_Settings_Core::domains($this);
+        /**
+         * Trusted Listdom modules register named domains, not arbitrary UI fields.
+         * Each domain declares owner/addon/available, a read callback returning
+         * stored/effective/defaults, and explicit bounded field definitions.
+         * Writers are fixed package-owned adapters with explicit field policies.
+         */
+        $domains = apply_filters('lsd_settings_domains', $domains);
+        if (!is_array($domains)) return [];
+        foreach ($domains as $id => &$domain)
+        {
+            if (!is_string($id) || !preg_match('/^(core|addons)\.[a-z0-9_-]+$/D', $id)
+                || !is_array($domain) || !is_callable($domain['read'] ?? null) || !is_array($domain['fields'] ?? null))
+            {
+                unset($domains[$id]);
+                continue;
+            }
+            foreach ($domain['fields'] as $key => &$field)
+            {
+                if (!is_string($key) || strlen($key) > 191 || !is_array($field)
+                    || !is_array($field['path'] ?? null) || !$field['path'] || !is_array($field['schema'] ?? null))
+                {
+                    unset($domain['fields'][$key]);
+                    continue;
+                }
+                $field += ['key' => $key, 'label' => $key, 'description' => '', 'group' => '', 'tab' => 'addons', 'subtab' => '',
+                    'available' => true, 'dependencies' => [], 'sensitivity' => 'configuration', 'default' => null, 'capability' => 'manage_options'];
+                $field['domain'] = $id;
+                $field['owner'] = mb_substr(sanitize_text_field($domain['owner'] ?? 'Listdom'), 0, 100);
+                $field['addon'] = sanitize_key($domain['addon'] ?? '');
+                $field['readable'] = current_user_can($field['capability']);
+                $field['available'] = $field['readable'] && !empty($field['available']) && !empty($domain['available']);
+                $field['write'] = $field['write'] ?? 'read_only';
+                $writer = $domain['writer'] ?? null;
+                $field['writeReason'] = $field['sensitivity'] === 'status_only' ? 'status_only'
+                    : (!$field['readable'] ? 'permission'
+                    : ($field['write'] !== 'leaf' ? 'read_only'
+                    : (!$writer instanceof LSD_Settings_Writer ? 'domain_writer_not_available'
+                    : (empty($domain['available']) ? 'dependency' : (!$field['available'] || empty($field['writeAvailable'] ?? true) ? 'dependency' : '')))));
+                $field['writable'] = $field['writeReason'] === '';
+            }
+            unset($field);
+            ksort($domain['fields']);
+        }
+        unset($domain);
+        ksort($domains);
+        return $domains;
+    }
+
+    /** Read only a declared path; never serialize an option tree. */
+    public function at($values, array $path, &$present = null)
+    {
+        $present = true;
+        foreach ($path as $part)
+        {
+            if (!is_array($values) || !array_key_exists($part, $values))
+            {
+                $present = false;
+                return null;
+            }
+            $values = $values[$part];
+        }
+        return $values;
+    }
+
+    public function scoped_value(array $field, $value)
+    {
+        if (($field['projection'] ?? '') === 'configured') return !empty($value);
+        if (($field['projection'] ?? '') === 'first_reference' && is_array($value)) $value = $value[0] ?? 0;
+        if (($field['projection'] ?? '') === 'integer_keys')
+        {
+            // Some checkbox maps persist IDs as keys rather than array values.
+            // Invalid/non-ID keys are withheld, never silently dropped or leaked.
+            if (!is_array($value)) return null;
+            $ids = [];
+            foreach (array_keys($value) as $key)
+            {
+                if (!preg_match('/^[0-9]{1,10}$/D', (string) $key)) return null;
+                $ids[] = (int) $key;
+            }
+            $value = $ids;
+        }
+        $value = $this->scoped_representation($field['schema'], $value);
+        if (is_wp_error(rest_validate_value_from_schema($value, $field['schema'], 'setting'))) return null;
+        return $value;
+    }
+
+    /** Normalize only schema-declared representations, including saved arrays. */
+    private function scoped_representation(array $schema, $value)
+    {
+        foreach ($schema['anyOf'] ?? [] as $choice)
+        {
+            $candidate = $this->scoped_representation($choice, $value);
+            if (!is_wp_error(rest_validate_value_from_schema($candidate, $choice, 'setting'))) return $candidate;
+        }
+        $type = $schema['type'] ?? '';
+        // WordPress validates integer-like form strings without coercing them.
+        if (($type === 'integer' || (isset($schema['enum'][0]) && is_int($schema['enum'][0])))
+            && is_string($value) && preg_match('/^-?[0-9]{1,10}$/D', $value)) $value = (int) $value;
+        elseif ($type === 'number' && is_string($value) && is_numeric($value) && strlen($value) <= 32) $value = (float) $value;
+        if ($type === 'array' && is_array($value) && isset($schema['items']))
+            foreach ($value as &$item) $item = $this->scoped_representation($schema['items'], $item);
+        unset($item);
+        if ($type === 'object' && (is_array($value) || is_object($value)))
+        {
+            $value = (array) $value;
+            foreach ($schema['properties'] ?? [] as $key => $property)
+                if (array_key_exists($key, $value)) $value[$key] = $this->scoped_representation($property, $value[$key]);
+            $value = (object) $value;
+        }
+        return $value;
+    }
+
+    public function scoped_describe(array $field, array $snapshot, bool $include_stored): array
+    {
+        $stored = $this->at($snapshot['stored'], $field['path'], $present);
+        $default = $this->at($snapshot['defaults'], $field['path'], $has_default);
+        if (!$has_default) $default = $field['default'];
+        $effective = $this->at($snapshot['effective'], $field['path'], $has_effective);
+        if (!$has_effective) $effective = $default;
+        if (isset($field['customizer']))
+        {
+            $section_path = $field['customizer'];
+            $seen = [];
+            do
+            {
+                $section_key = implode('.', $section_path);
+                if (isset($seen[$section_key])) { $effective = null; break; }
+                $seen[$section_key] = true;
+                $section = $this->at($snapshot['effective'], $section_path);
+                if (!is_array($section)) break;
+                if (empty($section['inherit']) || empty($section['inherit_from']) || !is_string($section['inherit_from']))
+                {
+                    $resolved = $this->at($section, array_slice($field['path'], 2), $has_resolved);
+                    if ($has_resolved) $effective = $resolved;
+                    break;
+                }
+                $section_path = explode('.', $section['inherit_from']);
+            }
+            while (true);
+        }
+        $value = !empty($snapshot['invalidFields'][$field['key']]) ? null : $this->scoped_value($field, $effective);
+        $status = !$field['available'] ? 'unavailable' : ($value === null ? 'invalid' : 'valid');
+        $result = [
+            'key' => $field['key'], 'domain' => $field['domain'], 'owner' => $field['owner'], 'addon' => $field['addon'],
+            'path' => $field['path'], 'label' => mb_substr(sanitize_text_field($field['label']), 0, 120),
+            'description' => mb_substr(sanitize_text_field($field['description']), 0, 300), 'group' => $field['group'],
+            'allowedValues' => $field['schema']['enum'] ?? [],
+            'type' => isset($field['schema']['anyOf']) ? 'limit' : (is_string($field['schema']['type'] ?? null) ? $field['schema']['type'] : 'union'),
+            'minimum' => $field['schema']['minimum'] ?? ($field['schema']['anyOf'][0]['minimum'] ?? null),
+            'maximum' => $field['schema']['maximum'] ?? ($field['schema']['anyOf'][0]['maximum'] ?? null),
+            'schema' => (object) $field['schema'], 'defaultValue' => $this->scoped_value($field, $default),
+            'effectiveValue' => $field['available'] ? $value : null, 'valueStatus' => $status,
+            'available' => $field['available'], 'readable' => $field['readable'], 'writable' => $field['writable'],
+            'permissions' => [$field['capability']],
+            'writeReason' => $field['writeReason'], 'sensitivity' => $field['sensitivity'],
+            'risk' => 'configuration', 'dependencies' => $field['dependencies'], 'tab' => $field['tab'], 'subtab' => $field['subtab'],
+            'adminUrl' => (new LSD_Checklist_Helper())->settings_action_url($field['tab'], $field['subtab']),
+        ];
+        if ($include_stored)
+        {
+            $result['storedPresent'] = $field['readable'] && $present;
+            $result['storedValue'] = $field['readable'] && $present ? $this->scoped_value($field, $stored) : null;
+        }
+        return $result;
+    }
+
 }
