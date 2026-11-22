@@ -30,7 +30,7 @@ class LSD_Base
     const STATUS_PENDING = 'pending';
     const STATUS_PUBLISHED = 'publish';
     const EP_LISTING = 701;
-    const DB_VERSION = 3;
+    const DB_VERSION = 4;
     const REQ_HTML = '<span class="lsd-required">*</span>';
     const WELCOME_SLUG = 'listdom-welcome';
 

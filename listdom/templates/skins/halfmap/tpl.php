@@ -19,8 +19,8 @@ jQuery(document).ready(function()
         infinite_scroll: "'.($this->pagination === 'scroll' ? '1' : '0').'",
         ajax_url: "'.admin_url('admin-ajax.php', null).'",
         atts: "'.http_build_query(['atts'=>$this->get_atts()], '', '&').'",
-        next_page: "'.$this->next_page.'",
-        limit: "'.$this->limit.'",
+        next_page: ' . (int) $this->next_page . ',
+        limit: ' . (int) $this->limit . ',
         view: "'.$this->default_view.'",
         columns: "'.$this->columns.'"
     });

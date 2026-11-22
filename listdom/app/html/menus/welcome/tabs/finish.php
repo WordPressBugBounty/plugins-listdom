@@ -15,10 +15,10 @@ defined('ABSPATH') || die();
     </div>
     <div class="lsd-welcome-content-wrapper">
         <div class="lsd-finish-settings">
-            <p class="lsd-my-0 lsd-admin-description"><?php echo esc_html__('Watch this short video to have a better start with Listdom.', 'listdom'); ?></p>
-            <div class="lsd-wizard-video" data-video-id="du_96cv6BAw">
-                <button type="button" class="lsd-wizard-video-cover" aria-label="<?php echo esc_attr__('Play the Listdom introduction video', 'listdom'); ?>">
-                    <img src="https://i.ytimg.com/vi/du_96cv6BAw/maxresdefault.jpg" alt="<?php echo esc_attr__('Listdom introduction video', 'listdom'); ?>" loading="eager" fetchpriority="high">
+            <p class="lsd-my-0 lsd-admin-description"><?php echo esc_html__('Watch Mark J Draper set up a directory, edit it with Claude and Easy MCP, and import business listings as drafts.', 'listdom'); ?></p>
+            <div class="lsd-wizard-video" data-video-id="_Jch4Zpa9_M">
+                <button type="button" class="lsd-wizard-video-cover" aria-label="<?php echo esc_attr__('Play Mark J Draper\'s Listdom walkthrough', 'listdom'); ?>">
+                    <img src="https://i.ytimg.com/vi/_Jch4Zpa9_M/maxresdefault.jpg" alt="<?php echo esc_attr__('Mark J Draper\'s Listdom walkthrough', 'listdom'); ?>" loading="eager" fetchpriority="high">
                     <span class="lsd-wizard-video-play" aria-hidden="true"><i class="fas fa-play"></i></span>
                 </button>
             </div>
@@ -46,7 +46,7 @@ jQuery(function ($)
             width: 640,
             height: 360,
             src: 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0&vq=hd1080',
-            title: '<?php echo esc_js(__('YouTube video player', 'listdom')); ?>',
+            title: '<?php echo esc_js(__('Mark J Draper demonstrates Listdom, Claude and Business Data', 'listdom')); ?>',
             frameborder: 0,
             allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
             referrerpolicy: 'strict-origin-when-cross-origin',

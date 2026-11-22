@@ -22,11 +22,11 @@
                     <img width="77" height="77" src="<?php echo esc_url($this->lsd_asset_url('img/listdom-logo.svg')); ?>" alt="<?php esc_attr_e('Logo', 'listdom'); ?>">
                     <h3 class="lsd-blank-section-title">
                         <?php printf(__('Welcome to %s', 'listdom'),
-                            '<span class="lsd-highlighted-title">Listdom Template Builder</span>'); ?>
+                            '<span class="lsd-highlighted-title">Listdom Templates</span>'); ?>
                     </h3>
                     <div>
-                        <p class="lsd-admin-description"><?php esc_html_e('The official visual template builder for Listdom directory system.', 'listdom'); ?></p>
-                        <p class="lsd-admin-description"><?php esc_html_e('Create stunning, professional templates with drag-and-drop simplicity.', 'listdom'); ?></p>
+                        <p class="lsd-admin-description"><?php esc_html_e('Create reusable listing layouts with Listdom or the WordPress Block Editor.', 'listdom'); ?></p>
+                        <p class="lsd-admin-description"><?php esc_html_e('Use templates for single listings, listing cards, and map info windows.', 'listdom'); ?></p>
                     </div>
                     <?php if ($can_create_templates): ?>
                         <a href="#" class="lsd-primary-button lsd-open-template-modal" data-modal-target="<?php echo esc_attr($modal_id); ?>">
@@ -133,25 +133,29 @@
                                         <?php endforeach; ?>
                                     </div>
                                 <?php endif; ?>
-                                <span class="lsd-template-post-status">
+                                <div class="lsd-template-card-badges">
+                                    <span class="lsd-template-card-builder">
+                                        <span class="dashicons <?php echo esc_attr($template['builder_icon']); ?>" aria-hidden="true"></span>
+                                        <?php echo esc_html($template['builder']); ?>
+                                    </span>
                                     <span class="lsd-template-status lsd-template-status-<?php echo esc_attr($template['status']); ?>">
                                         <?php echo esc_html($template['status_label']); ?>
                                     </span>
-                                </span>
+                                </div>
                             </div>
                             <div class="lsd-template-card-body">
                                 <div class="lsd-template-title-section">
                                     <h3 class="lsd-admin-subtitle"><?php echo esc_html($template['title']); ?></h3>
                                 </div>
                                 <div class="lsd-template-card-metas">
-                                <span class="lsd-template-card-meta">
-                                    <span class="lsd-template-card-type">
-                                        <?php echo esc_html($template['type']); ?>
-                                    </span>
-                                </span>
                                     <span class="lsd-template-card-meta">
-                                    <?php echo esc_html($template['created']); ?>
-                                </span>
+                                        <span class="lsd-template-card-type">
+                                            <?php echo esc_html($template['type']); ?>
+                                        </span>
+                                    </span>
+                                    <span class="lsd-template-card-meta">
+                                        <?php echo esc_html($template['created']); ?>
+                                    </span>
                                 </div>
                             </div>
                         </div>

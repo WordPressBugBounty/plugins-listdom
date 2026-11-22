@@ -24,6 +24,11 @@ $filtered_menus = array_filter($menus, function ($menu) use ($custom_menus)
     return !isset($custom_menus[$menu_id]);
 });
 
+$render_custom_menu = static function (array $menu, string $slug, bool $new = false): void
+{
+    include __DIR__ . '/dashboard-menu-custom.php';
+};
+
 $privacy = LSD_Options::privacy();
 $add_listing_subtabs = ['general', 'guest-submission', 'fields', 'restrictions'];
 $add_listing_active = $this->subtab === 'add-listing' || !$this->subtab || in_array($this->subtab, $add_listing_subtabs, true);
@@ -103,7 +108,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                                         $builtin_icon = $settings['dashboard_menu_builtin'][$key]['icon'] ?? '';
                                         $menu_label = $builtin_label !== '' ? $builtin_label : $menu['label'];
                                         $menu_icon = $builtin_icon !== '' ? $builtin_icon : $icon;
-                                        $enabled = !isset($builtin_menu_statuses[$key]) || (int) $builtin_menu_statuses[$key] === 1;
+                                        $enabled = (int) ($builtin_menu_statuses[$key] ?? ($key === 'account-overview' ? 0 : 1)) === 1;
                                         $enabled_value = $enabled ? 1 : 0;
                                         $toggle_icon = $enabled ? 'fa-check-circle' : 'fa-minus-circle';
                                         $disabled_class = $enabled ? '' : ' lsd-dashboard-menu-item-disabled';
@@ -135,27 +140,47 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                                                 </span>
                                             </p>
                                             <div class="lsd-dashboard-menu-content lsd-util-hide">
-                                                <div class="lsd-field-group">
-                                                    <label class="lsd-fields-label-tiny"
-                                                           for="lsd_builtin_menu_<?php echo esc_attr($key); ?>_label">
-                                                        <?php esc_html_e('Label', 'listdom'); ?>
-                                                    </label>
-                                                    <input
-                                                        id="lsd_builtin_menu_<?php echo esc_attr($key); ?>_label"
-                                                        type="text"
-                                                        class="lsd-admin-input"
-                                                        name="lsd[dashboard_menu_builtin][<?php echo esc_attr($key); ?>][label]"
-                                                        placeholder="<?php esc_attr_e('Enter the menu name', 'listdom'); ?>"
-                                                        value="<?php echo esc_attr($menu_label); ?>"
-                                                    >
+                                                <div class="lsd-dashboard-menu-section">
+                                                    <div class="lsd-field-group">
+                                                        <label class="lsd-fields-label-tiny"
+                                                               for="lsd_builtin_menu_<?php echo esc_attr($key); ?>_label">
+                                                            <?php esc_html_e('Label', 'listdom'); ?>
+                                                        </label>
+                                                        <input
+                                                            id="lsd_builtin_menu_<?php echo esc_attr($key); ?>_label"
+                                                            type="text"
+                                                            class="lsd-admin-input"
+                                                            name="lsd[dashboard_menu_builtin][<?php echo esc_attr($key); ?>][label]"
+                                                            placeholder="<?php esc_attr_e('Enter the menu name', 'listdom'); ?>"
+                                                            value="<?php echo esc_attr($menu_label); ?>"
+                                                        >
+                                                    </div>
+                                                    <div class="lsd-field-group">
+                                                        <label class="lsd-fields-label-tiny"
+                                                               for="lsd_builtin_menu_<?php echo esc_attr($key); ?>_icon">
+                                                            <?php esc_html_e('Icon', 'listdom'); ?>
+                                                        </label>
+                                                        <?php echo LSD_Kses::form($icon_picker); ?>
+                                                    </div>
                                                 </div>
-                                                <div class="lsd-field-group">
-                                                    <label class="lsd-fields-label-tiny"
-                                                           for="lsd_builtin_menu_<?php echo esc_attr($key); ?>_icon">
-                                                        <?php esc_html_e('Icon', 'listdom'); ?>
-                                                    </label>
-                                                    <?php echo LSD_Kses::form($icon_picker); ?>
-                                                </div>
+                                                <?php if ($key === 'profile'): ?>
+                                                    <div class="lsd-dashboard-menu-section">
+                                                        <h4 class="lsd-dashboard-menu-section-title"><?php esc_html_e('Account Security', 'listdom'); ?></h4>
+                                                        <div class="lsd-field-group">
+                                                            <?php echo LSD_Form::label([
+                                                                'for' => 'lsd_builtin_menu_profile_show_security',
+                                                                'title' => __('Show Account Security', 'listdom'),
+                                                                'class' => 'lsd-fields-label-tiny',
+                                                            ]); ?>
+                                                            <?php echo LSD_Form::switcher([
+                                                                'id' => 'lsd_builtin_menu_profile_show_security',
+                                                                'name' => 'lsd[dashboard_menu_builtin][profile][show_security]',
+                                                                'value' => $settings['dashboard_menu_builtin']['profile']['show_security'] ?? 1,
+                                                            ]); ?>
+                                                            <p class="lsd-admin-description-tiny"><?php esc_html_e('Display Account Security below the profile form. Disable this when you offer the account security shortcode on a dedicated page or dashboard tab.', 'listdom'); ?></p>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                             <input type="hidden" name="lsd[dashboard_menus][]"
                                                    value="<?php echo esc_attr($id); ?>">
@@ -167,146 +192,15 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                                         continue;
                                     }
 
-                                    $label = $menu['label'] ?? '';
-                                    $slug = $menu['slug'] ?? $item['key'];
-                                    $icon = $menu['icon'] ?? 'fas fa-tachometer-alt';
-                                    $enabled = !isset($menu['enabled']) || (int) $menu['enabled'] === 1;
-                                    $enabled_value = $enabled ? 1 : 0;
-                                    $toggle_icon = $enabled ? 'fa-check-circle' : 'fa-minus-circle';
-                                    $disabled_class = $enabled ? '' : ' lsd-dashboard-menu-item-disabled';
-                                    ?>
-                                    <li class="lsd-dashboard-menu-item lsd-custom-menu-list<?php echo esc_attr($disabled_class); ?>">
-                                        <p class="lsd-flex lsd-flex-content-between">
-                                            <span>
-                                                <i class="lsd-icon lsd-custom-menu-icon <?php echo esc_attr($icon); ?>"></i>
-                                                <span class="lsd-custom-menu-label"><?php echo esc_html($label); ?></span>
-                                            </span>
-                                            <span class="lsd-menu-actions">
-                                                <i class="fas fa-trash"></i>
-                                                <button type="button" class="lsd-dashboard-menu-toggle"
-                                                        aria-pressed="<?php echo $enabled ? 'true' : 'false'; ?>"><i
-                                                        class="fas <?php echo esc_attr($toggle_icon); ?>"></i></button>
-                                                <i class="fas fa-chevron-down lsd-dashboard-menu-chevron"></i>
-                                            </span>
-                                        </p>
-                                        <div class="lsd-custom-menu-content lsd-dashboard-menu-content lsd-util-hide">
-                                            <?php $base_id = 'lsd_menu_' . esc_attr($slug); ?>
-                                            <div class="lsd-field-group">
-                                                <input
-                                                    type="hidden"
-                                                    class="lsd-dashboard-menu-status"
-                                                    name="lsd[dashboard_menu_custom][<?php echo esc_attr($slug); ?>][enabled]"
-                                                    value="<?php echo esc_attr($enabled_value); ?>"
-                                                    data-field="enabled"
-                                                >
-                                                <label class="lsd-fields-label-tiny"
-                                                       for="<?php echo $base_id; ?>_label">
-                                                    <?php esc_html_e('Label', 'listdom'); ?>
-                                                </label>
-                                                <input
-                                                    id="<?php echo $base_id; ?>_label"
-                                                    type="text"
-                                                    class="lsd-admin-input"
-                                                    name="lsd[dashboard_menu_custom][<?php echo esc_attr($slug); ?>][label]"
-                                                    placeholder="<?php esc_attr_e('Enter the menu name', 'listdom') ?>"
-                                                    required="required"
-                                                    value="<?php echo esc_attr($label); ?>"
-                                                    data-field="label"
-                                                />
-                                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2">
-                                                    <?php esc_html_e('This is the label for your menu item.', 'listdom'); ?>
-                                                </p>
-                                            </div>
-
-                                            <div class="lsd-field-group">
-                                                <label class="lsd-fields-label-tiny" for="<?php echo $base_id; ?>_slug">
-                                                    <?php esc_html_e('Slug', 'listdom'); ?>
-                                                </label>
-                                                <input
-                                                    id="<?php echo $base_id; ?>_slug"
-                                                    type="text"
-                                                    class="lsd-admin-input"
-                                                    name="lsd[dashboard_menu_custom][<?php echo esc_attr($slug); ?>][slug]"
-                                                    placeholder="<?php esc_attr_e('Enter the menu slug', 'listdom') ?>"
-                                                    required="required"
-                                                    value="<?php echo esc_attr($slug); ?>"
-                                                    data-field="slug"
-                                                />
-                                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2">
-                                                    <?php esc_html_e('Provide a unique slug for this menu.', 'listdom'); ?>
-                                                </p>
-                                            </div>
-
-                                            <div class="lsd-field-group">
-                                                <label class="lsd-fields-label-tiny" for="<?php echo $base_id; ?>_icon">
-                                                    <?php esc_html_e('Icon', 'listdom'); ?>
-                                                </label>
-                                                <?php echo LSD_Form::iconpicker([
-                                                    'name' => 'lsd[dashboard_menu_custom][' . esc_attr($slug) . '][icon]',
-                                                    'id' => $base_id . '_icon',
-                                                    'value' => $icon,
-                                                    'data-field' => 'icon',
-                                                ]); ?>
-                                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2">
-                                                    <?php esc_html_e('Select an icon.', 'listdom'); ?>
-                                                </p>
-                                            </div>
-
-                                            <div class="lsd-field-group">
-                                                <label class="lsd-fields-label-tiny"
-                                                       for="<?php echo $base_id; ?>_login_status">
-                                                    <?php esc_html_e('Login Status', 'listdom'); ?>
-                                                </label>
-                                                <?php echo LSD_Form::select([
-                                                    'id' => $base_id . '_login_status',
-                                                    'name' => 'lsd[dashboard_menu_custom][' . esc_attr($slug) . '][login_status]',
-                                                    'data-field' => 'login_status',
-                                                    'options' => [
-                                                        'required' => esc_html__('Required (only logged-in users)', 'listdom'),
-                                                        'optional' => esc_html__('Optional (visible to all users)', 'listdom'),
-                                                    ],
-                                                    'value' => $menu['login_status'] ?? 'required',
-                                                    'class' => 'lsd-admin-input',
-                                                ]); ?>
-                                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2">
-                                                    <?php esc_html_e('Choose whether this custom menu requires the user to be logged in.', 'listdom'); ?>
-                                                </p>
-                                            </div>
-
-                                            <!-- Content -->
-                                            <div class="lsd-field-group">
-                                                <label class="lsd-fields-label-tiny"
-                                                       for="<?php echo $base_id; ?>_content">
-                                                    <?php esc_html_e('Content', 'listdom'); ?>
-                                                </label>
-                                                <?php echo LSD_Form::editor([
-                                                    'id' => $base_id . '_content',
-                                                    'name' => 'lsd[dashboard_menu_custom][' . esc_attr($slug) . '][content]',
-                                                    'value' => $menu['content'] ?? '',
-                                                    'data-field' => 'content',
-                                                ]); ?>
-                                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2">
-                                                    <?php esc_html_e('Type dashboard content. You can also use shortcodes.', 'listdom'); ?>
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <input type="hidden" name="lsd[dashboard_menus][]" class="custom-menu-slug"
-                                               value="<?php echo esc_attr($slug); ?>">
-                                    </li>
-                                    <?php
+                                    $render_custom_menu($menu, $menu['slug'] ?? $item['key']);
                                 }
                                 ?>
                             </ul>
                             <button type="button" class="lsd-custom-menu-btn lsd-secondary-button"><?php esc_html_e('Add Custom Menu', 'listdom'); ?></button>
+                            <template id="lsd-dashboard-menu-custom-template">
+                                <?php $render_custom_menu([], '__lsd_menu_id__', true); ?>
+                            </template>
                             <p class="lsd-admin-description lsd-mb-0 lsd-mt-2"><?php esc_html_e("Drag and drop the menus to change the order of dashboard menus.", 'listdom'); ?></p>
-                            <?php echo LSD_Form::iconpicker([
-                                'name' => '',
-                                'id' => 'lsd_icon',
-                                'value' => 'fas fa-tachometer-alt',
-                                'data-field' => 'icon',
-                                'class' => 'lsd-util-hide',
-                            ]); ?>
                         </div>
                     </div>
                 </div>
@@ -337,27 +231,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
                 <div class="lsd-settings-group-wrapper">
                     <div class="lsd-settings-fields-wrapper">
                         <h3 class="lsd-admin-title lsd-m-0"><?php esc_html_e('Pages', 'listdom'); ?></h3>
-                        <div class="lsd-form-row">
-                            <div class="lsd-col-3"><?php echo LSD_Form::label([
-                                    'class' => 'lsd-fields-label',
-                                    'title' => esc_html__('Dashboard Page', 'listdom'),
-                                    'for' => 'lsd_settings_submission_page',
-                                ]); ?></div>
-                            <div class="lsd-col-5">
-                                <?php echo LSD_Form::pages([
-                                    'class' => 'lsd-admin-input',
-                                    'id' => 'lsd_settings_submission_page',
-                                    'value' => $settings['submission_page'] ?? null,
-                                    'name' => 'lsd[submission_page]',
-                                    'show_empty' => true,
-                                ]); ?>
-                                <p class="lsd-admin-description-tiny lsd-mb-0 lsd-mt-2"><?php echo sprintf(
-                                    /* translators: %s: Frontend dashboard shortcode. */
-                                        esc_html__("Put %s shortcode into the page.", 'listdom'),
-                                        '<code>[listdom-dashboard]</code>'
-                                    ); ?></p>
-                            </div>
-                        </div>
+                        <p class="lsd-admin-description lsd-m-0"><a href="<?php echo esc_url(LSD_Portal::admin_url('account-setup', 'pages')); ?>"><?php esc_html_e('Manage the Dashboard Page under Users → Account Setup → Pages', 'listdom'); ?></a></p>
                         <div class="lsd-form-row">
                             <div class="lsd-col-3"><?php echo LSD_Form::label([
                                     'class' => 'lsd-fields-label',
@@ -1039,13 +913,7 @@ $add_listing_subtab = in_array($this->subtab, $add_listing_subtabs, true) ? $thi
             return false;
         }
 
-        jQuery('.lsd-custom-menu-content textarea').each(function ()
-        {
-            const uniqueId = jQuery(this).attr('id');
-            const content = tinymce.editors[uniqueId].getContent();
-
-            jQuery(this).val(content);
-        });
+        jQuery(this).trigger('lsd:save-dashboard-editors');
 
         // Elements
         const $button = jQuery("#lsd_settings_save_button");

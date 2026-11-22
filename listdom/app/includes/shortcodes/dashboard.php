@@ -176,7 +176,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         if (isset($this->atts['content_loading']) && in_array($this->atts['content_loading'], ['reload', 'ajax'], true))
             $this->widget_options['content_loading'] = $this->atts['content_loading'];
 
-        if (($this->widget_options['content_loading'] ?? '') === 'ajax')
+        if (($this->widget_options['content_loading'] ?? '') === 'ajax' && !LSD_Portal::hide_listings())
         {
             if (function_exists('wp_enqueue_editor')) wp_enqueue_editor();
             LSD_Assets::map(true);
@@ -283,6 +283,9 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             : $this->get_default_mode($menus);
         $this->mode = $requested_mode !== 'logout' && isset($menus[$requested_mode]) ? $requested_mode : $fallback_mode;
 
+        // Explain a denied Add Listing request before unavailable modes fall back to the dashboard.
+        if ($requested_mode === 'form' && !isset($menus['form']) && get_current_user_id() && !$this->guest_status && !LSD_Capability::can('edit_listings', 'edit_posts')) return $this->form();
+
         // Widget custom menu content takes precedence over built-in mode names.
         $custom_menu = $this->get_widget_custom_menu($this->mode);
 
@@ -309,11 +312,12 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         // Dashboard
         if ($custom_menu !== null)
         {
-            if (($custom_menu['login_status'] ?? 'required') === 'required' && !is_user_logged_in()) return $this->auth();
+            if (!LSD_Dashboard_Access::allows($custom_menu)) return $this->alert(esc_html__('This section is unavailable.', 'listdom'), 'info');
 
             return $this->custom_menu_output($custom_menu);
         }
 
+        if ($this->mode === 'account-overview') return $this->overview();
         if ($this->mode === 'manage') return $this->manage();
         // Form
         else if ($this->mode === 'form') return $this->form();
@@ -329,6 +333,15 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
             return $output;
         }
+    }
+
+    private function overview(): string
+    {
+        if (!is_user_logged_in()) return $this->auth();
+
+        ob_start();
+        include lsd_template('dashboard/account-overview.php');
+        return ob_get_clean();
     }
 
     private function get_widget_custom_menu(string $mode): ?array
@@ -359,7 +372,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     private function custom_menu_output(array $menu): string
     {
         $dashboard_wrapper = $this->get_dashboard_wrapper();
-        $content = do_shortcode((string) ($menu['content'] ?? ''));
+        $content = LSD_Dashboard_Access::locked($menu) ?? do_shortcode((string) ($menu['content'] ?? ''));
 
         return '<div class="' . esc_attr($dashboard_wrapper['class']) . '" id="' . esc_attr($this->form_id('lsd_dashboard')) . '"' . $dashboard_wrapper['attributes'] . '>'
             . '<div class="lsd-row lsd-dashboard-wrapper">'
@@ -453,15 +466,15 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     {
         if (!get_current_user_id() && !$this->guest_status) return $this->auth();
 
+        if (!LSD_Capability::can('edit_listings', 'edit_posts') && !$this->guest_status)
+        {
+            return $this->alert(esc_html__("Unfortunately you don't have permission to create or edit listings. Please contact the site administrator to request access.", 'listdom'), 'error');
+        }
+
         $menu_ids = $this->menu_ids();
         if (!isset($menu_ids[$this->mode]))
         {
             return apply_filters('lsd_dashboard_modes', $this->alert(esc_html__('Not found!', 'listdom'), 'warning'), $this);
-        }
-
-        if (!LSD_Capability::can('edit_listings', 'edit_posts') && !$this->guest_status)
-        {
-            return $this->alert(esc_html__("Unfortunately you don't have permission to create or edit listings.", 'listdom'), 'error');
         }
 
         $id = isset($_GET['id']) ? (int) sanitize_text_field($_GET['id']) : 0;
@@ -548,7 +561,8 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             isset($this->settings['submission_guest_redirect']) &&
             $this->settings['submission_guest_redirect'] &&
             is_page() &&
-            LSD_Dashboard::is_dashboard()
+            LSD_Dashboard::is_dashboard() &&
+            !(LSD_Portal::is_account_page() && LSD_Portal::url('login') !== '')
         )
         {
             $url = wp_login_url();
@@ -794,6 +808,18 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             ];
         }
 
+        // Account Overview Menu
+        if ($include_disabled || (int) ($statuses['account-overview'] ?? 0) === 1)
+        {
+            $menus['account-overview'] = [
+                'label' => esc_html__('Account Overview', 'listdom'),
+                'default_label' => esc_html__('Account Overview', 'listdom'),
+                'id' => 'lsd_dashboard_menus_account_overview',
+                'url' => $this->add_qs_var('mode', 'account-overview', $this->url),
+                'icon' => 'fas fa-user-circle',
+            ];
+        }
+
         // Logout Menu
         if (get_current_user_id() && ($include_disabled || !isset($statuses['logout']) || (int) $statuses['logout'] === 1))
         {
@@ -803,7 +829,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 'label' => $logout_label !== '' ? $logout_label : esc_html__('Logout', 'listdom'),
                 'default_label' => esc_html__('Logout', 'listdom'),
                 'id' => 'lsd_dashboard_menus_logout',
-                'url' => wp_logout_url(),
+                'url' => wp_logout_url(LSD_Portal::is_account_page() ? LSD_Portal::url('login') : ''),
                 'icon' => $logout_icon !== '' ? $logout_icon : 'fas fa-sign-out-alt',
             ];
         }
@@ -821,7 +847,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $key = sanitize_key($custom_menu['slug'] ?? '');
             if ($key === '') $key = 'custom-' . (int) $index;
             if ((int) ($custom_menu['enabled'] ?? 1) !== 1) continue;
-            if (($custom_menu['login_status'] ?? 'required') === 'required' && !is_user_logged_in()) continue;
+            if (!LSD_Dashboard_Access::allows($custom_menu)) continue;
             if (isset($custom_menus[$key])) continue;
             if (isset($menus[$key]))
             {
@@ -903,7 +929,6 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
     public function get_default_mode(?array $menus = null): string
     {
         if ($menus === null) $menus = $this->menu_ids();
-
         foreach ($menus as $key => $menu)
         {
             if ($key === 'logout') continue;
@@ -1033,7 +1058,11 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         // Password Validation
         $guest_password = $lsd['guest_password'] ?? '';
-        if (!get_current_user_id() && $guest_registration === 'submission' && strlen($guest_password) < 8) $this->response(['success' => 0, 'message' => esc_html__('Please insert your password! It should be at-least 8 characters.', 'listdom')]);
+        if (!get_current_user_id() && $guest_registration === 'submission')
+        {
+            $valid = LSD_Security::password($guest_password);
+            if (is_wp_error($valid)) $this->response(['success' => 0, 'message' => $valid->get_error_message()]);
+        }
 
         // Gallery
         if (isset($lsd['_gallery']) && is_array($lsd['_gallery'])) $lsd['gallery'] = $lsd['_gallery'];
@@ -1472,7 +1501,7 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
                 if (!$owner_id)
                 {
                     $fullname = (string) get_post_meta($id, 'lsd_guest_fullname', true);
-                    LSD_User::listing($id, $guest_email, '', $fullname);
+                    LSD_User::listing($id, $guest_email, '', $fullname, 'approval');
                 }
             }
         }
@@ -1504,26 +1533,55 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
 
         if (!current_user_can('edit_user', $user_id)) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to update this profile.', 'listdom')]);
 
-        $lsd = $_POST['lsd'] ?? [];
-
-        // Sanitization
-        array_walk_recursive($lsd, 'sanitize_text_field');
+        $lsd = isset($_POST['lsd']) && is_array($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
 
         $profile_fields = LSD_User::profile_edit_fields();
         $current_user = get_userdata($user_id);
         if (!($current_user instanceof WP_User)) $this->response(['success' => 0, 'message' => esc_html__('User not found!', 'listdom')]);
 
-        // Save the Data
-        $user_data = [
-            'ID' => $user_id,
-            'first_name' => $lsd['first_name'] ?? '',
-            'last_name' => $lsd['last_name'] ?? '',
-            'description' => !empty($profile_fields['bio']) ? ($lsd['bio'] ?? '') : $current_user->description,
-            'user_email' => !empty($profile_fields['email']) ? ($lsd['email'] ?? '') : $current_user->user_email,
-        ];
+        if (array_key_exists('Tiktok', $lsd) && !array_key_exists('tiktok', $lsd)) $lsd['tiktok'] = $lsd['Tiktok'];
+        $allowed = LSD_Portal_Fieldlayout::check_profile_write($lsd, $profile_fields);
+        if (is_wp_error($allowed)) $this->response(['success' => 0, 'message' => $allowed->get_error_message()]);
+
+        $custom_fields = LSD_Portal_Fields::validate(wp_unslash($_POST['lsd_user_fields'] ?? []), $current_user->roles, 'edit');
+        if (is_wp_error($custom_fields)) $this->response(['success' => 0, 'message' => $custom_fields->get_error_message()]);
+
+        $password = isset($lsd['password']) && is_string($lsd['password']) ? $lsd['password'] : '';
+        $confirmation = isset($lsd['confirm_password']) && is_string($lsd['confirm_password']) ? $lsd['confirm_password'] : '';
+        $email = !empty($profile_fields['email']) && isset($lsd['email']) && is_string($lsd['email']) ? sanitize_email($lsd['email']) : $current_user->user_email;
+        $email_changed = strcasecmp($email, $current_user->user_email) !== 0;
+        if ($email_changed && ($password !== '' || $confirmation !== '')) $this->response(['success' => 0, 'message' => __('Please change your email address and password separately using Account Security.', 'listdom')]);
+        if ($password !== '' || $confirmation !== '')
+        {
+            $valid = LSD_Security::password($password, $confirmation);
+            if (is_wp_error($valid)) $this->response(['success' => 0, 'message' => $valid->get_error_message()]);
+        }
+        if ($email_changed)
+        {
+            $valid = LSD_Security_Account::validate_email($user_id, $email);
+            if (is_wp_error($valid)) $this->response(['success' => 0, 'message' => $valid->get_error_message()]);
+        }
+        if ($email_changed || $password !== '')
+        {
+            $valid = LSD_Security::reauthenticate($user_id, isset($lsd['current_password']) && is_string($lsd['current_password']) ? $lsd['current_password'] : '', isset($lsd['code']) && is_string($lsd['code']) ? $lsd['code'] : '');
+            if (is_wp_error($valid)) $this->response(['success' => 0, 'message' => $valid->get_error_message()]);
+        }
+        if (LSD_Privacy::is_consent_enabled('profile') && ($lsd['privacy_consent'] ?? ($_POST['lsd_privacy_consent'] ?? '')) !== '1') $this->response(['success' => 0, 'message' => LSD_Privacy::consent_required_text()]);
+        if ($email_changed)
+        {
+            $requested = LSD_Security_Account::request_email($user_id, $email);
+            if (is_wp_error($requested)) $this->response(['success' => 0, 'message' => $requested->get_error_message()]);
+        }
+        $user_data = ['ID' => $user_id];
+        foreach (['first_name' => 'first_name', 'last_name' => 'last_name', 'bio' => 'description'] as $key => $property)
+        {
+            if (empty($profile_fields[$key]) || !isset($lsd[$key]) || !is_string($lsd[$key])) continue;
+            $user_data[$property] = wp_slash($key === 'bio' ? sanitize_textarea_field($lsd[$key]) : sanitize_text_field($lsd[$key]));
+        }
 
         // Update core user fields
-        wp_update_user($user_data);
+        $updated = wp_update_user($user_data);
+        if (is_wp_error($updated)) $this->response(['success' => 0, 'message' => $updated->get_error_message()]);
 
         $meta_keys = [];
 
@@ -1544,50 +1602,31 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
             $network = sanitize_key($network);
             if ($network === '') continue;
 
-            $field_name = $network;
-            if ($network === 'tiktok' && !isset($lsd[$field_name]) && isset($lsd['Tiktok'])) $field_name = 'Tiktok';
-
-            $meta_keys['lsd_' . $network] = $field_name;
+            $meta_keys['lsd_' . $network] = $network;
         }
+
+        LSD_Portal_Fields::persist($user_id, $custom_fields);
 
         // Update user meta
         foreach ($meta_keys as $meta_key => $field_name)
         {
-            if (isset($lsd[$field_name]))
+            if (isset($lsd[$field_name]) && is_string($lsd[$field_name]))
             {
-                update_user_meta($user_id, $meta_key, $lsd[$field_name]);
+                update_user_meta($user_id, $meta_key, wp_slash(sanitize_text_field($lsd[$field_name])));
             }
         }
 
-        // Password Validation and Update
-        if (!empty($lsd['password']) && !empty($lsd['confirm_password']))
+        if ($password !== '')
         {
-            if (strlen($lsd['password']) < 6)
-            {
-                $this->response(['success' => 0, 'message' => esc_html__('Password must be at least 6 characters long!', 'listdom')]);
-            }
-
-            if ($lsd['password'] !== $lsd['confirm_password'])
-            {
-                $this->response(['success' => 0, 'message' => esc_html__('Passwords do not match!', 'listdom')]);
-            }
-
-            // Update Password
-            wp_set_password($lsd['password'], $user_id);
-
-            // Success Message
-            echo wp_json_encode(['success' => 1, 'message' => esc_html__('Password updated successfully! Please log in again.', 'listdom')], JSON_NUMERIC_CHECK);
-
-            // Force the user to re-login
-            wp_destroy_current_session();
+            wp_set_password($password, $user_id);
+            LSD_Security::revoke_credentials($user_id);
             wp_clear_auth_cookie();
             wp_set_current_user(0);
-
-            exit;
+            $this->response(['success' => 1, 'message' => __('Password updated successfully. Please sign in again.', 'listdom')]);
         }
 
         // Success response
-        $this->response(['success' => 1, 'message' => esc_html__('The Profile has been updated.', 'listdom')]);
+        $this->response(['success' => 1, 'message' => $email_changed ? __('Profile saved. Check your new email address to confirm the email change.', 'listdom') : __('The Profile has been updated.', 'listdom')]);
     }
 
     public function get_restriction_rules(): array
@@ -1977,10 +2016,20 @@ class LSD_Shortcodes_Dashboard extends LSD_Shortcodes
         $this->response(['success' => $success, 'message' => $message, 'data' => $data]);
     }
 
-    public function auth(): string
+    public function auth_redirect(): string
     {
         $current_url = (new LSD_Main())->current_url();
-        $redirect = !empty($this->widget_options['redirect_after_login']) ? wp_validate_redirect($this->widget_options['redirect_after_login'], $current_url) : $current_url;
+        return !empty($this->widget_options['redirect_after_login']) ? wp_validate_redirect($this->widget_options['redirect_after_login'], $current_url) : $current_url;
+    }
+
+    public function auth(): string
+    {
+        if (LSD_Auth::requested()) return LSD_Auth::frontend();
+        if (LSD_Portal::is_account_page() && LSD_Portal::url('login') !== '')
+        {
+            return '<p><a class="lsd-auth-button" href="' . esc_url(add_query_arg('redirect_to', $this->auth_redirect(), LSD_Portal::url('login'))) . '">' . esc_html__('Sign In', 'listdom') . '</a></p>';
+        }
+        $redirect = $this->auth_redirect();
         $signin_url = !empty($this->widget_options['signin_button_url']) ? $this->widget_options['signin_button_url'] : wp_login_url($redirect);
         $register_url = !empty($this->widget_options['register_link_url'])
             ? $this->widget_options['register_link_url']

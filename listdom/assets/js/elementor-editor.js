@@ -1,6 +1,26 @@
 (function ($) {
     // Elementor's init Hook
     $(window).on('elementor:init', function () {
+        elementor.addControlView('lsd_role_checkboxes', elementor.modules.controls.BaseData.extend({
+            events: function () {
+                return {'change [data-lsd-role]': 'onRolesChange'};
+            },
+
+            applySavedValue: function () {
+                const roles = this.getControlValue() || [];
+                this.$('[data-lsd-role]').each(function () {
+                    this.checked = roles.includes(this.value);
+                });
+            },
+
+            onRolesChange: function () {
+                const roles = this.$('[data-lsd-role]:checked').map(function () {
+                    return this.value;
+                }).get();
+                this.setValue(roles);
+            }
+        }));
+
         function dashboardMenuSlug(value) {
             return (value || '')
                 .toString()

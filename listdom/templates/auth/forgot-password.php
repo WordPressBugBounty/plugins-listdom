@@ -60,6 +60,7 @@ else
 ?>
 <?php if ($show_reset): ?>
     <div class="lsd-reset-password-wrapper">
+        <p class="lsd-password-policy"><?php echo esc_html(LSD_Security::password_description()); ?></p>
         <div id="<?php echo esc_attr('lsd_reset_password_form_message_' . $instance_id); ?>" class="lsd-reset-password-form-message"></div>
         <form id="<?php echo esc_attr('lsd-reset-password-' . $instance_id); ?>" class="lsd-reset-password-form" method="post">
             <?php LSD_Form::nonce('lsd_reset_password_nonce', 'lsd_reset_password_nonce'); ?>
@@ -124,6 +125,7 @@ else
         <div id="<?php echo esc_attr('lsd_forgot_password_form_message_' . $instance_id); ?>" class="lsd-forgot-password-form-message"></div>
         <form name="lsd-forgot-password" id="<?php echo esc_attr('lsd-forgot-password-' . $instance_id); ?>" class="lsd-forgot-password-form" method="post">
             <?php LSD_Form::nonce('lsd_forgot_password_nonce', 'lsd_forgot_password_nonce'); ?>
+            <?php if (LSD_Portal::is_page('forgot')) wp_nonce_field('lsd_portal_recovery', 'lsd_portal_recovery', false); ?>
             <div class="form-group">
                 <?php
                 echo LSD_Form::label([

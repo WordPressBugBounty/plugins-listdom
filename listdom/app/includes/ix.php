@@ -746,7 +746,7 @@ class LSD_IX extends LSD_Base
         // Insert User
         if (isset($listing['post_author']) && is_email($listing['post_author']))
         {
-            $post['post_author'] = LSD_User::create($listing['post_author']);
+            $post['post_author'] = LSD_User::create($listing['post_author'], 'import');
         }
 
         // Add-ons and Third Party Applications

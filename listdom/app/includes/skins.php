@@ -611,21 +611,28 @@ class LSD_Skins extends LSD_Base
 
     public function query_radius()
     {
-        // Include
-        if (isset($this->filter_options['circle']['center']) && isset($this->filter_options['circle']['radius']) && is_array($this->filter_options['circle']) && count($this->filter_options['circle']))
-        {
-            $main = new LSD_Main();
-            if(is_array($this->filter_options['circle']['center'])) $geopoint = $this->filter_options['circle']['center'];
-            else $geopoint = $main->geopoint($this->filter_options['circle']['center']);
+        $circle = $this->filter_options['circle'] ?? [];
+        if (!isset($circle['center'], $circle['radius'])) return;
 
-            if (self::has_coordinates($geopoint))
-            {
-                $this->args['lsd-circle'] = [
-                    'center' => [$geopoint[0], $geopoint[1]],
-                    'radius' => (int) $this->filter_options['circle']['radius'],
-                ];
-            }
+        $center = $circle['center'];
+        if (is_array($center)) $geopoint = $center;
+        else
+        {
+            $address = trim($center);
+            if ($address === '') return;
+
+            $geopoint = (new LSD_Main())->geopoint($address);
+
+            // geopoint() uses [0, 0] for a failed lookup; explicit coordinates may be zero.
+            if ($geopoint === [0, 0]) return;
         }
+
+        if (!self::has_coordinates($geopoint)) return;
+
+        $this->args['lsd-circle'] = [
+            'center' => [$geopoint[0], $geopoint[1]],
+            'radius' => (int) $circle['radius'],
+        ];
     }
 
     public function sort()
@@ -1281,13 +1288,20 @@ class LSD_Skins extends LSD_Base
         $args = $this->query_sort($args, $this->orderby, $this->order);
 
         // Limit
-        $limit = (isset($search['limit']) && trim($search['limit']) ? $search['limit'] : ($limitType == 'map' && isset($this->skin_options['maplimit']) ? sanitize_text_field($this->skin_options['maplimit']) : (isset($this->skin_options['limit']) ? sanitize_text_field($this->skin_options['limit']) : 12)));
+        $limit = (int) ($limitType === 'map' ? ($this->skin_options['maplimit'] ?? $this->skin_options['limit'] ?? 12) : ($this->skin_options['limit'] ?? 12));
+        // Preserve the configured unlimited option, but bound public request overrides.
+        if ($limit !== -1) $limit = max(1, $limit);
+        if (isset($search['limit']) && is_scalar($search['limit']) && trim((string) $search['limit']) !== '')
+        {
+            $limit = min(1000, max(1, absint($search['limit'])));
+        }
 
         $args['posts_per_page'] = $limit;
         $this->limit = $limit;
 
         // Page
-        $args['paged'] = isset($search['page']) ? sanitize_text_field($search['page']) : (get_query_var('paged') ?: 1);
+        $page = $search['page'] ?? (get_query_var('paged') ?: 1);
+        $args['paged'] = is_scalar($page) ? max(1, absint($page)) : 1;
 
         // Search Parameters
         $sf = isset($search['sf']) && is_array($search['sf']) ? LSD_Sanitize::search($search['sf']) : [];
@@ -1488,7 +1502,14 @@ class LSD_Skins extends LSD_Base
      */
     protected function normalize_style($style)
     {
-        if (is_string($style) && preg_match('/^tb_(\d+)$/', $style, $matches)) return (int) $matches[1];
+        if (is_string($style) && preg_match('/^tb_(\d+)$/', $style, $matches))
+        {
+            $template_id = (int) $matches[1];
+            $template = get_post($template_id);
+            if (!$template instanceof WP_Post || $template->post_type !== LSD_Base::PTYPE_TEMPLATE || $template->post_status !== 'publish') return 'style1';
+            if ((get_post_meta($template_id, '_lsd_template_type', true) ?: 'single_listing') !== 'listing_card') return 'style1';
+            return $template_id;
+        }
 
         return $style;
     }
@@ -1838,7 +1859,16 @@ class LSD_Skins extends LSD_Base
 
         if ($template->post_type === LSD_Base::PTYPE_TEMPLATE)
         {
-            $sources[] = get_post_meta($template_id, '_lsd_template_layout', true);
+            if (LSD_PTypes_Template::is_gutenberg_template($template_id))
+            {
+                $seen = [];
+                return LSD_Integrations_Blockeditor_Content::blocks_match(parse_blocks($template->post_content), function ($block): bool
+                {
+                    return in_array($block['blockName'] ?? '', ['listdom/listing-title', 'listdom/listing-gallery'], true)
+                        && ($block['attrs']['linkMethod'] ?? '') === 'map';
+                }, $seen);
+            }
+            else $sources[] = get_post_meta($template_id, '_lsd_template_layout', true);
         }
         else
         {
@@ -1864,7 +1894,7 @@ class LSD_Skins extends LSD_Base
 
             foreach ($source as $key => $value)
             {
-                if ($key === 'link_method' && (string) $value === 'map') return true;
+                if ($key === 'link_method' && $value === 'map') return true;
                 if (self::contains_map_link($value)) return true;
             }
 
@@ -1873,7 +1903,8 @@ class LSD_Skins extends LSD_Base
 
         if (!is_string($source) || trim($source) === '') return false;
 
-        $unserialized = maybe_unserialize($source);
+        // Legacy builder data may be serialized, but must never instantiate PHP objects.
+        $unserialized = is_serialized($source) ? @unserialize(trim($source), ['allowed_classes' => false]) : $source;
         if ($unserialized !== $source && self::contains_map_link($unserialized)) return true;
 
         $decoded = json_decode($source, true);
@@ -1899,13 +1930,13 @@ class LSD_Skins extends LSD_Base
 
     private static function gallery_contains_map_link(array $element): bool
     {
-        $style = (string) self::element_setting($element, 'style', 'list');
+        $style = self::element_setting($element, 'style', 'list');
         if ($style !== 'slider') return false;
 
         $lightbox = self::element_setting($element, 'lightbox', 1);
         if (self::setting_is_enabled($lightbox)) return false;
 
-        return (string) self::element_setting($element, 'link_method', 'normal') === 'map';
+        return self::element_setting($element, 'link_method', 'normal') === 'map';
     }
 
     private static function element_setting(array $element, string $setting_key, $default = null)

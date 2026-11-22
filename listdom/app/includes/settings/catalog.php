@@ -122,7 +122,7 @@ class LSD_Settings_Catalog
             'defaultValue' => $this->normalize($field, $field['default']), 'effectiveValue' => $this->value($effective, $field),
             'available' => $field['available'], 'readable' => true, 'writable' => $field['available'], 'risk' => 'configuration',
             'dependencies' => $field['dependencies'], 'tab' => $field['tab'], 'subtab' => $field['subtab'],
-            'adminUrl' => (new LSD_Checklist_Helper())->settings_action_url($field['tab'], $field['subtab']),
+            'adminUrl' => (new LSD_Checklist_Helper())->settings_action_url($field['tab'], $field['subtab'], $field['section'] ?? ''),
         ];
         if ($include_stored)
         {
@@ -299,7 +299,7 @@ class LSD_Settings_Catalog
             'permissions' => [$field['capability']],
             'writeReason' => $field['writeReason'], 'sensitivity' => $field['sensitivity'],
             'risk' => 'configuration', 'dependencies' => $field['dependencies'], 'tab' => $field['tab'], 'subtab' => $field['subtab'],
-            'adminUrl' => (new LSD_Checklist_Helper())->settings_action_url($field['tab'], $field['subtab']),
+            'adminUrl' => (new LSD_Checklist_Helper())->settings_action_url($field['tab'], $field['subtab'], $field['section'] ?? ''),
         ];
         if ($include_stored)
         {

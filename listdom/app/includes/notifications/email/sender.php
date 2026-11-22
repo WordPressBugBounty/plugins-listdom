@@ -170,6 +170,6 @@ class LSD_Notifications_Email_Sender extends LSD_Notifications
     private function toArray($string)
     {
         if (is_array($string)) return $string;
-        else return explode(',', trim($string, ', '));
+        else return explode(',', trim((string) $string, ', '));
     }
 }

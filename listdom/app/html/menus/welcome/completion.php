@@ -11,11 +11,12 @@ $directory_url = $this->directory_url($application);
     <div class="lsd-admin-wizard__completion-layout">
         <div class="lsd-admin-wizard__completion-video">
             <div class="lsd-admin-wizard__video-frame">
-                <img src="https://i.ytimg.com/vi/du_96cv6BAw/maxresdefault.jpg" alt="<?php esc_attr_e('Listdom introduction video', 'listdom'); ?>">
-                <a class="lsd-admin-wizard__video-play" href="https://www.youtube.com/watch?v=du_96cv6BAw" target="_blank" rel="noopener noreferrer" aria-label="<?php esc_attr_e('Play the Listdom introduction video', 'listdom'); ?>">
+                <img src="https://i.ytimg.com/vi/_Jch4Zpa9_M/maxresdefault.jpg" alt="<?php esc_attr_e('Mark J Draper\'s Listdom walkthrough', 'listdom'); ?>">
+                <a class="lsd-admin-wizard__video-play" href="https://www.youtube.com/watch?v=_Jch4Zpa9_M" target="_blank" rel="noopener noreferrer" aria-label="<?php esc_attr_e('Play Mark J Draper\'s Listdom walkthrough', 'listdom'); ?>">
                     <i class="wui-icon wui-icon--computer-video"></i>
                 </a>
             </div>
+            <p class="lsd-admin-description"><?php esc_html_e('Listdom walkthrough by Mark J Draper.', 'listdom'); ?></p>
         </div>
 
         <div class="lsd-admin-wizard__completion-actions">

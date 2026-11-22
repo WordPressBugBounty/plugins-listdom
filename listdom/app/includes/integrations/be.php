@@ -49,7 +49,7 @@ class LSD_Integrations_BE extends LSD_Integrations
     {
         $existing = array_column($categories, 'slug');
         $groups = [
-            ['slug' => 'listdom-single-listing', 'title' => esc_html__('Single Listing', 'listdom'), 'icon' => 'list-view'],
+            ['slug' => 'listdom-single-listing', 'title' => esc_html__('Listing Elements', 'listdom'), 'icon' => 'list-view'],
             ['slug' => 'listdom', 'title' => esc_html__('Listdom', 'listdom'), 'icon' => 'list-view'],
         ];
 

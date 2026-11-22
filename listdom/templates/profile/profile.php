@@ -13,8 +13,6 @@ if (!isset($user['ID']) || !$user['ID'])
     return;
 }
 
-$socials = (new LSD_Socials())->list($user['ID']);
-
 $auth = LSD_Options::auth();
 $shortcode = isset($auth['profile']['shortcode']) && $auth['profile']['shortcode'] ? $auth['profile']['shortcode'] : '';
 
@@ -44,12 +42,14 @@ $profile_privacy_field = LSD_Privacy::consent_field([
 ?>
 <div class="lsd-profile-wrapper lsd-mb-4">
     <div class="lsd-hero-image">
-        <img class="lsd-hero" src="<?php
-            $hero_image_url = LSD_User::get_user_image_url((int) $user['ID'], 'lsd_hero_image');
-            echo $hero_image_url
-                ? esc_url($hero_image_url)
-                : esc_url($this->lsd_asset_url('img/no-image.jpg'));
-        ?>" alt="<?php echo esc_attr__('Hero Image', 'listdom'); ?>">
+        <?php if (LSD_Portal_Fieldlayout::is_public('hero_image')): ?>
+            <img class="lsd-hero" src="<?php
+                $hero_image_url = LSD_User::get_user_image_url((int) $user['ID'], 'lsd_hero_image');
+                echo $hero_image_url
+                    ? esc_url($hero_image_url)
+                    : esc_url($this->lsd_asset_url('img/no-image.jpg'));
+            ?>" alt="<?php echo esc_attr__('Hero Image', 'listdom'); ?>">
+        <?php endif; ?>
         <div class="lsd-profile-avatar">
             <?php echo $this->user_profile($user); ?>
         </div>
@@ -59,8 +59,10 @@ $profile_privacy_field = LSD_Privacy::consent_field([
         <div class="lsd-profile-box lsd-profile-name-section lsd-flex lsd-flex-align-items-center lsd-flex-row lsd-flex-wrap lsd-gap-4">
             <div class="lsd-flex lsd-gap-5 lsd-flex-align-items-center lsd-name-section">
                 <div class="lsd-flex lsd-flex-col lsd-gap-3 lsd-flex-items-start">
-                    <h2 class="lsd-profile-name"><?php echo !empty($user['first_name']) || !empty($user['last_name']) ? $user['first_name'] .' '. $user['last_name'] : esc_html($user['display_name'] ?? ''); ?></h2>
-                    <p class="lsd-job-title"><?php echo esc_html($user['job_title'] ?? ''); ?></p>
+                    <h2 class="lsd-profile-name"><?php echo !empty($user['first_name']) || !empty($user['last_name']) ? esc_html(trim($user['first_name'] . ' ' . $user['last_name'])) : esc_html($user['display_name'] ?? ''); ?></h2>
+                    <?php if (LSD_Portal_Fieldlayout::is_public('job_title')): ?>
+                        <p class="lsd-job-title"><?php echo esc_html($user['job_title'] ?? ''); ?></p>
+                    <?php endif; ?>
                 </div>
                 <div class="lsd-flex lsd-gap-2 lsd-author-listing-count">
                     <i class="lsd-fe-icon fa fa-clone"></i>
@@ -173,56 +175,15 @@ $profile_privacy_field = LSD_Privacy::consent_field([
             </div>
         </div>
 
-        <div class="lsd-grid lsd-g-6-columns">
-            <div class="lsd-profile-box lsd-col-span-2 lsd-flex lsd-flex-col lsd-flex-align-items-start lsd-gap-4">
-                <h3 class="lsd-profile-title"><?php esc_html_e('Contact Info', 'listdom'); ?></h3>
-                <div class="lsd-profile-information">
-                    <?php if (!empty($user['mobile'])): ?>
-                        <div class="lsd-profile-mobile" title="<?php esc_attr_e('Mobile', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
-                            <i class="lsd-fe-icon fa fa-mobile"></i>
-                            <a href="tel:<?php echo esc_html($user['mobile']); ?>"><?php echo esc_html($user['mobile']); ?></a>
-                        </div>
-                    <?php endif; ?>
-                    <?php if (!empty($user['phone'])): ?>
-                        <div class="lsd-profile-phone" title="<?php esc_attr_e('Phone', 'listdom'); ?>" <?php echo lsd_schema()->telephone(); ?>>
-                            <i class="lsd-fe-icon fas fa-phone-alt"></i>
-                            <a href="tel:<?php echo esc_html($user['phone']); ?>"><?php echo esc_html($user['phone']); ?></a>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($user['email'])): ?>
-                        <div class="lsd-profile-email" title="<?php esc_attr_e('Email', 'listdom'); ?>" <?php echo lsd_schema()->email(); ?>>
-                            <i class="lsd-fe-icon fa fa-envelope"></i>
-                            <a href="mailto:<?php echo esc_html($user['email']); ?>"><?php echo esc_html($user['email']); ?></a>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($user['website'])): ?>
-                        <div class="lsd-profile-website" title="<?php esc_attr_e('Website', 'listdom'); ?>">
-                            <i class="lsd-fe-icon fas fa-link"></i>
-                            <a href="<?php echo esc_html($user['website']); ?>"><?php echo esc_html($user['website']); ?></a>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($user['fax'])): ?>
-                        <div class="lsd-profile-fax" title="<?php esc_attr_e('Fax', 'listdom'); ?>" <?php echo lsd_schema()->faxNumber(); ?>>
-                            <i class="lsd-fe-icon fa fa-fax"></i>
-                            <span><?php echo esc_html($user['fax']); ?></span>
-                        </div>
-                    <?php endif; ?>
-                </div>
-
-                <div class="lsd-profile-socials">
-                    <ul class="lsd-flex lsd-flex-align-items-center lsd-gap-2 lsd-flex-wrap">
-                        <?php echo LSD_Kses::element($socials); ?>
-                    </ul>
-                </div>
-            </div>
-            <div class="lsd-profile-box lsd-col-span-4">
-                <h3 class="lsd-profile-title"><?php esc_html_e('About', 'listdom'); ?></h3>
-                <p class="lsd-profile-bio"><?php echo esc_html($user['bio'] ?? esc_html__('No bio available', 'listdom')); ?></p>
-            </div>
-        </div>
+        <?php
+        $profile_body = LSD_Portal_Fieldlayout::view('public', [], (int) $user['ID']);
+        if ($profile_body)
+        {
+            echo '<div class="lsd-profile-box lsd-profile-information">';
+            include lsd_template('profile/field-body.php');
+            echo '</div>';
+        }
+        ?>
         <?php if (array_intersect($allowed_roles, $user_roles)) : ?>
             <div class="lsd-profile-box" id="author_listings">
                 <h3 class="lsd-profile-title"><?php esc_html_e('Author Listing', 'listdom'); ?></h3>

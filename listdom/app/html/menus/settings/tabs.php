@@ -86,13 +86,9 @@ $ai_module_panels = $this->get_ai_module_panels();
                 <?php esc_html_e('Users', 'listdom'); ?>
             </a>
             <ul data-parent="auth" class="lsd-nav-sub-tabs lsd-tabs">
-                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && ($this->subtab === 'authentication' || !$this->subtab) ? 'lsd-nav-tab-active' : ''; ?>" data-key="authentication"><?php esc_html_e('Authentication', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'login' ? 'lsd-nav-tab-active' : ''; ?>" data-key="login"><?php esc_html_e('Login', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'register' ? 'lsd-nav-tab-active' : ''; ?>" data-key="register"><?php esc_html_e('Register', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'forgot-password' ? 'lsd-nav-tab-active' : ''; ?>" data-key="forgot-password"><?php esc_html_e('Forgot Password', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && ($this->subtab === 'profile-user-directory' || $this->subtab === 'public-profile' || $this->subtab === 'edit-profile' || $this->subtab === 'user-directory') ? 'lsd-nav-tab-active' : ''; ?>" data-key="profile-user-directory"><?php esc_html_e('Profile & User Directory', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'logged-in-users' ? 'lsd-nav-tab-active' : ''; ?>" data-key="logged-in-users"><?php esc_html_e('Logged In Users', 'listdom'); ?></li>
-                <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === 'block-admin-access' ? 'lsd-nav-tab-active' : ''; ?>" data-key="block-admin-access"><?php esc_html_e('Block Admin Access', 'listdom'); ?></li>
+                <?php foreach (LSD_Portal::admin_tabs() as $key => $user_tab): ?>
+                    <li class="lsd-nav-tab <?php echo $this->tab === 'auth' && $this->subtab === $key ? 'lsd-nav-tab-active' : ''; ?>" data-key="<?php echo esc_attr($key); ?>"><?php echo esc_html($user_tab['label']); ?></li>
+                <?php endforeach; ?>
             </ul>
         </li>
         <li class="lsd-has-children lsd-single-listing-nav <?php echo $this->tab === 'single-listing' ? ' lsd-nav-expanded' : ''; ?>">

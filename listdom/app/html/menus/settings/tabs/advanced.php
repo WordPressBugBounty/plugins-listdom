@@ -477,7 +477,7 @@ $did_taxonomies = [];
                         <div class="lsd-box-white">
                            <div class="lsd-admin-section-heading">
                                <h4 class="lsd-admin-title"><?php esc_html_e('Import', 'listdom'); ?></h4>
-                               <p class="lsd-admin-description lsd-m-0"><?php esc_html_e("Simply restore a backup using the exported JSON file.", 'listdom'); ?></p>
+                               <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Restore settings from a Listdom JSON backup.', 'listdom'); ?></p>
                            </div>
                             <form class="lsd-settings-fields-sub-wrapper" id="lsd_import_settings_form" enctype="multipart/form-data" method="post">
                                 <div class="lsd-admin-input-file">
@@ -490,7 +490,7 @@ $did_taxonomies = [];
                                     <label for="lsd_settings_file" class="lsd-neutral-button lsd-csv-import-choose-file lsd-w-max"><?php echo esc_html__('Choose File', 'listdom'); ?></label>
                                     <p class="lsd-text-red lsd-admin-description-tiny lsd-m-0"><?php echo sprintf(
                                         /* translators: %s: Highlighted caution label. */
-                                        esc_html__('%s: This will overwrite all existing configurations.', 'listdom'),
+                                        esc_html__('%s: Imported settings can overwrite existing settings.', 'listdom'),
                                         '<strong class="lsd-text-uppercase">'.esc_html__('Caution', 'listdom').'</strong>'
                                     ); ?></p>
                                 </div>
@@ -504,7 +504,7 @@ $did_taxonomies = [];
                         <div class="lsd-box-white">
                             <div class="lsd-admin-section-heading">
                                 <h4 class="lsd-my-0 lsd-admin-title"><?php esc_html_e('Export', 'listdom'); ?></h4>
-                                <p class="lsd-admin-description lsd-m-0"><?php esc_html_e("You can export all Listdom settings in JSON format to create a backup or import them to another website.", 'listdom'); ?></p>
+                                <p class="lsd-admin-description lsd-m-0"><?php esc_html_e('Download a JSON backup of your Listdom settings. API keys, tokens, and other credentials are excluded.', 'listdom'); ?></p>
                             </div>
                             <a class="lsd-secondary-button" href="<?php echo esc_url(LSD_IX_Settings::get_export_url()); ?>"><?php esc_html_e('Export', 'listdom'); ?></a>
                         </div>
@@ -637,14 +637,21 @@ jQuery('#lsd_import_settings_form').on('submit', function (e)
         dataType: 'json',
         processData: false,
         contentType: false,
-        success: function () {
+        success: function (response)
+        {
+            loading.stop();
+
+            if (!response || response.success !== 1)
+            {
+                const message = response && response.message ? response.message : "<?php echo esc_js(esc_html__('Error: Unable to import options.', 'listdom')); ?>";
+                listdom_notify(message, 'lsd-error');
+                return;
+            }
 
             listdom_notify("<?php echo esc_js(esc_html__('Options imported successfully.', 'listdom')); ?>", 'lsd-success');
 
-            // Unloading
-            loading.stop();
-
-            setTimeout(function () {
+            setTimeout(function ()
+            {
                 window.location.reload();
             }, 2000);
         },

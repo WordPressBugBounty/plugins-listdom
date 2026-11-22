@@ -103,10 +103,13 @@ class LSD_Privacy extends LSD_Base
 
         $max_pages = max(1, $query->max_num_pages);
 
+        $retained = $user instanceof WP_User || !empty($query->posts);
+        $messages = $retained ? [__('Account identity, listing ownership and content, and any payments, subscriptions, or legally retained records require administrator review and are not automatically deleted by this eraser.', 'listdom')] : [];
+        $messages = apply_filters('lsd_security_erasure_retention_messages', $messages, $email_address, $page);
         return [
             'items_removed' => $items_removed,
-            'items_retained' => false,
-            'messages' => [],
+            'items_retained' => $retained || !empty($messages),
+            'messages' => $messages,
             'done' => $page >= $max_pages,
         ];
     }
@@ -252,6 +255,15 @@ class LSD_Privacy extends LSD_Base
             'lsd_telegram' => esc_html__('Telegram', 'listdom'),
             'lsd_privacy_consent' => esc_html__('Privacy Consent', 'listdom'),
         ];
+
+        $prefix = LSD_Portal_Fields::prefix();
+        $fields = LSD_Portal_Fields::stored();
+        foreach (array_keys(get_user_meta($user->ID)) as $key)
+        {
+            if (strpos($key, $prefix) !== 0) continue;
+            $id = substr($key, strlen($prefix));
+            $meta_map[$key] = $fields[$id]['label'] ?? $id;
+        }
 
         $data = [];
 
@@ -421,6 +433,11 @@ class LSD_Privacy extends LSD_Base
         ];
 
         $removed = false;
+        $prefix = LSD_Portal_Fields::prefix();
+        foreach (array_keys(get_user_meta($user->ID)) as $key)
+        {
+            if (strpos($key, $prefix) === 0 && delete_user_meta($user->ID, $key)) $removed = true;
+        }
 
         foreach ($keys as $key)
         {

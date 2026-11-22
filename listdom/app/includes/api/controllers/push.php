@@ -60,7 +60,7 @@ class LSD_API_Controllers_Push extends LSD_API_Controller
         // Create User
         if (isset($vars['user']) && is_email($vars['user']))
         {
-            $post['post_author'] = LSD_User::create($vars['user']);
+            $post['post_author'] = LSD_Security::api_push(static function () use ($vars) { return LSD_User::create($vars['user'], 'api_push'); });
         }
 
         if ($post_id)

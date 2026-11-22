@@ -7,20 +7,19 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
         $password = $request->get_param('password');
         $password_confirmation = $request->get_param('password_confirmation');
 
-        // Password is Too Short
-        if (strlen($password) < 6) return $this->response([
-            'data' => new WP_Error('400', esc_html__("Password is too short! It should be at least 6 characters.", 'listdom')),
-            'status' => 400,
-        ]);
-
-        // Password does not Match
-        if ($password !== $password_confirmation) return $this->response([
-            'data' => new WP_Error('400', esc_html__("Password does not match its confirmation.", 'listdom')),
-            'status' => 400,
-        ]);
+        $valid = LSD_Security::password(is_string($password) ? $password : '', is_string($password_confirmation) ? $password_confirmation : '');
+        if (is_wp_error($valid)) return $this->security_error($valid);
+        // Sensitive changes require the same fresh second factor as the frontend.
+        $current = $request->get_param('current_password');
+        if (!is_string($current) || $current === '') return $this->security_error(new WP_Error('lsd_current_password_required', __('Enter your current password to change it.', 'listdom'), ['status' => 400]));
+        $code = $request->get_param('code');
+        $auth = LSD_Security::reauthenticate(get_current_user_id(), is_string($current) ? $current : '', is_string($code) ? $code : '');
+        if (is_wp_error($auth)) return $this->security_error($auth);
 
         // Update Password
         wp_set_password($password, get_current_user_id());
+
+        LSD_Security::revoke_credentials(get_current_user_id());
 
         // Trigger Action
         do_action('lsd_api_user_password_changed', get_current_user_id(), $request);
@@ -37,91 +36,8 @@ class LSD_API_Controllers_Password extends LSD_API_Controller
     public function forgot(WP_REST_Request $request): WP_REST_Response
     {
         $username = $request->get_param('username');
-        $response = $this->send($username);
-
-        // Invalid Username
-        if (is_wp_error($response)) return $this->response([
-            'data' => new WP_Error('400', $response->get_error_message()),
-            'status' => 400,
-        ]);
-
-        // Response
-        return $this->response([
-            'data' => [
-                'success' => (int) $response,
-            ],
-            'status' => 200,
-        ]);
-    }
-
-    private function send($username)
-    {
-        $user = null;
-        $errors = new WP_Error();
-
-        if (empty($username) || !is_string($username))
-        {
-            $errors->add('empty_username', esc_html__('Enter a username or email address.', 'listdom'));
-        }
-        else if (strpos($username, '@'))
-        {
-            $user = get_user_by('email', sanitize_email(trim(wp_unslash($username))));
-            if (empty($user)) $errors->add('invalid_email', esc_html__('There is no account with that username or email address.', 'listdom'));
-        }
-        else
-        {
-            $user = get_user_by('login', trim($username));
-        }
-
-        if ($errors->has_errors()) return $errors;
-
-        if (!$user)
-        {
-            $errors->add('invalid-combo', esc_html__('There is no account with that username or email address.', 'listdom'));
-            return $errors;
-        }
-
-        $user_login = $user->user_login;
-        $user_email = $user->user_email;
-
-        $key = get_password_reset_key($user);
-        if (is_wp_error($key)) return $key;
-
-        if (is_multisite()) $site_name = get_network()->site_name;
-        else $site_name = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
-
-        $reset_link = LSD_User::password_reset_url($user_login, $key);
-
-        $message = esc_html__('Someone has requested a password reset for the following account:', 'listdom') . "\r\n\r\n";
-        $message .= sprintf(
-            /* translators: %s: Site name. */
-            esc_html__('Site Name: %s', 'listdom'),
-            $site_name
-        ) . "\r\n\r\n";
-        $message .= sprintf(
-            /* translators: %s: Username requesting a password reset. */
-            esc_html__('Username: %s', 'listdom'),
-            $user_login
-        ) . "\r\n\r\n";
-        $message .= esc_html__('If this was a mistake, just ignore this email and nothing will happen.', 'listdom') . "\r\n\r\n";
-        $message .= esc_html__('To reset your password, visit the following address:', 'listdom') . "\r\n\r\n";
-        $message .= '<' . $reset_link . ">\r\n";
-
-        $title = sprintf(
-            /* translators: %s: Site name. */
-            esc_html__('[%s] Password Reset', 'listdom'),
-            $site_name
-        );
-        $title = apply_filters('retrieve_password_title', $title, $user_login, $user);
-
-        $default_message = $message;
-        $message = apply_filters('retrieve_password_message', $message, $key, $user_login, $user);
-
-        // Match WordPress behavior: a falsey filtered message suppresses the email.
-        if (!$message) return true;
-
-        $html_message = LSD_User::password_reset_email_html($message, $default_message, $reset_link);
-
-        return wp_mail($user_email, wp_specialchars_decode($title), $html_message, ['Content-Type: text/html; charset=UTF-8']);
+        $result = LSD_Security::recover_password(is_string($username) ? $username : '');
+        if (is_wp_error($result)) return $this->security_error($result);
+        return $this->response(['data' => ['success' => 1, 'message' => LSD_Security::recovery_message()], 'status' => 200]);
     }
 }

@@ -382,6 +382,7 @@ class LSD_Dashboard_Payments extends LSD_Base
     public function get_membership_capacity(array $memberships): array
     {
         $active_memberships = $this->get_active_subscriptions($memberships);
+        if ($active_memberships) $active_memberships = \LSDPACSUB\Subscriptions::for_listings($active_memberships);
         if (!count($active_memberships))
         {
             return [

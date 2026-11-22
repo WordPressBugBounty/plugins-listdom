@@ -83,6 +83,7 @@ class LSD_Settings_Core
             $always = in_array($key, ['title', 'guest_email', 'guest_password', 'listing_category'], true);
             $add('core.settings', 'submission_fields.' . $key . '.required', $switch, 'submission', 'frontend-dashboard', $always ? 1 : 0);
         }
+        $add('core.settings', 'dashboard_menu_builtin.profile.show_security', $switch, 'dashboard', 'frontend-dashboard', 1);
         $add('core.settings', 'dashboard_menus', ['type' => 'array', 'maxItems' => 50, 'items' => ['type' => 'string', 'maxLength' => 80, 'pattern' => '^[a-zA-Z0-9_-]+$']], 'dashboard', 'frontend-dashboard', []);
         $add('core.settings', 'assets.load', $switch, 'assets', 'advanced', 1);
         $add('core.settings', 'privacy_consent.enabled', $switch, 'privacy', 'general', 1);
@@ -120,6 +121,39 @@ class LSD_Settings_Core
             foreach ($keys as $key) $add('core.auth', $section . '.' . $key, $page, $section, 'auth', $auth[$section][$key] ?? '');
         $add('core.auth', 'auth.switch_style', $enum(['both', 'tabs', 'links']), 'auth', 'auth', $auth['auth']['switch_style']);
         $add('core.auth', 'register.password_length', ['type' => 'integer', 'minimum' => 8, 'maximum' => 24], 'register', 'auth', $auth['register']['password_length']);
+        $safe_roles = array_values(array_filter(array_keys(wp_roles()->roles), [LSD_Security::class, 'safe_role']));
+        $role_schema = ['type' => 'string', 'enum' => $safe_roles];
+        $add('core.auth', 'register.policy', $enum(['wordpress', 'enabled', 'disabled']), 'security', 'auth', 'wordpress');
+        $add('core.auth', 'register.public_roles', ['type' => 'array', 'maxItems' => 50, 'items' => $role_schema], 'security', 'auth', ['subscriber']);
+        $add('core.auth', 'register.default_role', ['type' => 'string', 'enum' => array_merge([''], $safe_roles)], 'security', 'auth', 'subscriber');
+        $add('core.auth', 'security.page', $page, 'security', 'auth', '');
+        $add('core.auth', 'security.rate_enabled', $switch, 'security', 'auth', 1);
+        foreach (['login_pair_limit' => 10, 'login_ip_limit' => 60, 'register_limit' => 5, 'mail_ip_limit' => 5, 'mail_identifier_limit' => 3, 'resend_cooldown' => 60] as $key => $default)
+            $add('core.auth', 'security.' . $key, ['type' => 'integer', 'minimum' => 1, 'maximum' => 3600], 'security', 'auth', $default);
+        $section_defaults = LSD_Security_Sections::defaults();
+        $add('core.auth', 'security.section_order', ['type' => 'array', 'minItems' => count($section_defaults), 'maxItems' => count($section_defaults), 'uniqueItems' => true, 'items' => ['type' => 'string', 'enum' => array_keys($section_defaults)]], 'security', 'auth', array_keys($section_defaults));
+        foreach (LSD_Auth_Providers::all() as $provider => $definition)
+        {
+            $add('core.auth', 'social_login.' . $provider . '.enabled', $switch, 'social-login', 'auth', 0);
+            $add('core.auth', 'social_login.' . $provider . '.client_id', $text, 'social-login', 'auth', '');
+            self::status($domains['core.auth']['fields'], 'core.auth.social_login.' . $provider . '.credentials_configured', ['native_credentials', $provider], 'social-login', 'auth');
+        }
+        foreach (['team_id', 'key_id'] as $key) $add('core.auth', 'social_login.apple.' . $key, $text, 'social-login', 'auth', '');
+        $add('core.auth', 'social_login.microsoft.tenant', $text, 'social-login', 'auth', 'common');
+        foreach (['show_text', 'show_logo', 'branded'] as $key) $add('core.auth', 'social_login_buttons.' . $key, $switch, 'social-login', 'auth', 1);
+        foreach (['magic', 'passkeys'] as $method) $add('core.auth', 'passwordless.' . $method, $switch, 'passwordless', 'auth', 0);
+        foreach ($section_defaults as $id => $section)
+        {
+            $prefix = 'security.sections.' . $id . '.';
+            $add('core.auth', $prefix . 'enabled', $id === 'password' ? ['type' => 'integer', 'enum' => [1]] : $switch, 'security', 'auth', $section['enabled']);
+            $add('core.auth', $prefix . 'heading', $text, 'security', 'auth', $section['heading']);
+            $add('core.auth', $prefix . 'description', ['type' => 'string', 'maxLength' => 20000], 'security', 'auth', $section['description']);
+        }
+        $add('core.auth', 'security.sections.totp.roles', ['type' => 'array', 'maxItems' => 50, 'items' => ['type' => 'string', 'enum' => array_keys(wp_roles()->roles)]], 'security', 'auth', $section_defaults['totp']['roles']);
+        foreach (['challenge_limit', 'ip_limit'] as $key)
+            $add('core.auth', 'security.sections.totp.' . $key, ['type' => 'integer', 'minimum' => 1, 'maximum' => $key === 'challenge_limit' ? 5 : 3600], 'security', 'auth', $section_defaults['totp'][$key]);
+        foreach (['export', 'erasure'] as $key)
+            $add('core.auth', 'security.sections.privacy.' . $key, $switch, 'security', 'auth', $section_defaults['privacy'][$key]);
         // "list" is the built-in legacy default; saved views are numeric IDs.
         $add('core.auth', 'profile.shortcode', ['type' => ['integer', 'string'], 'anyOf' => [$integer, ['type' => 'string', 'enum' => ['', 'list']]]], 'profile', 'auth', $auth['profile']['shortcode']);
         foreach (['login', 'register'] as $section)
@@ -244,6 +278,7 @@ class LSD_Settings_Core
             {
                 if ($name === 'settings') return LSD_Menus_Settings::sanitize_general($candidate);
                 if ($name === 'payments') return LSD_Menus_Settings::sanitize_payments($candidate);
+                if ($name === 'auth') return LSD_Security::sanitize_settings($candidate, get_option('lsd_auth', []));
                 return LSD_Sanitize::deep($candidate);
             },
             'context' => static function (): array
@@ -267,6 +302,11 @@ class LSD_Settings_Core
 
     private static function validate(string $name, array $candidate, array $keys, array $domain)
     {
+        if ($name === 'auth')
+        {
+            $valid = LSD_Security::validate_settings($candidate);
+            if (is_wp_error($valid)) return $valid;
+        }
         $components = ['address' => 'map', 'price' => 'pricing', 'availability' => 'work_hours', 'video' => 'embed', 'share' => 'socials'];
         foreach ($keys as $key)
         {
@@ -318,7 +358,7 @@ class LSD_Settings_Core
                 {
                     $roles = (new LSD_Settings_Catalog())->at($candidate, $domain['fields'][$key]['path']);
                     if (array_diff($roles, array_keys(wp_roles()->roles)))
-                        return LSD_Settings_Writer::error('listdom_invalid_value', __('Select existing WordPress roles for AI module access.', 'listdom'));
+                        return LSD_Settings_Writer::error('listdom_invalid_value', __('Select existing user roles for AI module access.', 'listdom'));
                 }
             $semantic_changed = false;
             foreach ($keys as $key)
@@ -342,11 +382,54 @@ class LSD_Settings_Core
 
     private static function field(string $key, array $path, array $schema, string $group, string $tab, $default): array
     {
+        $subtab = '';
+        $section = '';
+        if ($tab === 'auth') [$subtab, $section] = self::auth_admin_route($path);
+        if ($key === 'core.settings.submission_page')
+        {
+            $tab = 'auth';
+            [$subtab, $section] = ['account-setup', 'pages'];
+        }
+        if (strpos($key, 'core.settings.block_admin_') === 0)
+        {
+            $tab = 'auth';
+            [$subtab, $section] = ['security', 'admin-access'];
+        }
+
         return ['key' => $key, 'path' => $path, 'label' => ucwords(str_replace(['_', '.'], ' ', implode('.', $path))),
             'description' => __('Reviewed Listdom configuration; write policies and dependencies are checked before saving.', 'listdom'),
             'write' => 'leaf',
-            'group' => $group, 'tab' => $tab, 'subtab' => '', 'schema' => $schema, 'default' => $default,
+            'group' => $group, 'tab' => $tab, 'subtab' => $subtab, 'section' => $section, 'schema' => $schema, 'default' => $default,
             'available' => true, 'dependencies' => [], 'sensitivity' => 'configuration'];
+    }
+
+    private static function auth_admin_route(array $path): array
+    {
+        $area = $path[0] ?? '';
+        $key = $path[1] ?? '';
+        if ($area === 'auth')
+        {
+            if (in_array($key, ['login_page', 'register_page', 'forgot_password_page', 'login_form', 'register_form', 'forgot_password_form'], true)) return ['account-setup', 'pages'];
+            return ['login-registration', 'full-auth'];
+        }
+        if (in_array($area, ['account', 'logout'], true)) return ['account-setup', 'navigation'];
+        if ($area === 'profile')
+        {
+            if ($key === 'page') return ['account-setup', 'pages'];
+            return ['profiles-directory', $key === 'fields' ? 'fields' : 'profiles'];
+        }
+        if ($area === 'register')
+        {
+            if (in_array($key, ['strong_password', 'password_length', 'contain_uppercase', 'contain_lowercase', 'contain_numbers', 'contain_specials'], true)) return ['security', 'password-policy'];
+            return ['login-registration', 'registration'];
+        }
+        if ($area === 'security')
+        {
+            if ($key === 'page') return ['account-setup', 'pages'];
+            return ['security', in_array($key, ['sections', 'section_order'], true) ? 'account-sections' : 'abuse-protection'];
+        }
+        $sections = ['login' => 'login', 'forgot_password' => 'password-recovery', 'social_login' => 'social-login', 'social_login_buttons' => 'social-login', 'native_credentials' => 'social-login', 'passwordless' => 'passwordless'];
+        return isset($sections[$area]) ? ['login-registration', $sections[$area]] : ['account-setup', 'pages'];
     }
 
     private static function status(array &$fields, string $key, array $path, string $group, string $tab): void
@@ -387,6 +470,12 @@ class LSD_Settings_Core
         else $effective = LSD_Base::parse_args((array) get_option($option, []), $defaults);
         if ($name === 'auth')
         {
+            $effective['security'] = LSD_Security::normalize_security((array) ($effective['security'] ?? []));
+            foreach (LSD_Auth_Providers::all() as $provider => $definition)
+            {
+                $effective['native_credentials'][$provider] = LSD_Auth_Providers::secret($provider) !== '';
+                $stored['native_credentials'][$provider] = $effective['native_credentials'][$provider];
+            }
             // Match role_based_redirect(): an unset role destination uses the
             // current general destination, while stored presence stays separate.
             foreach (['login', 'register'] as $section)

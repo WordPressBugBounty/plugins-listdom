@@ -484,7 +484,8 @@ class LSD_PTypes_Listing extends LSD_PTypes
                 $listing_id,
                 $guest_email,
                 '',
-                $fullname
+                $fullname,
+                'approval'
             );
         }
 

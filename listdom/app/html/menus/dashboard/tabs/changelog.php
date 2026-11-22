@@ -3,6 +3,20 @@
 defined('ABSPATH') || die();
 ?>
 <div class="lsd-changelog-wrap">
+    <h2>v6.5.0 <span>November 21st, 2026</span></h2>
+    <ul class="lsd-changelog">
+        <li><?php esc_html_e('Added configurable account security with authenticator-based two-factor authentication, recovery codes, session management, email changes, and privacy requests.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added native Google, Yahoo, Apple, and Microsoft sign-in and registration.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added optional email sign-in links and passkeys for Listdom Pro.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added account page setup, an Account Overview dashboard, and a reversible Account Portal preset.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added shared registration and profile field layouts, profile privacy and directory role controls, and custom user fields for Listdom Pro.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added role and membership access controls for custom Listdom Pro dashboard tabs and protected portal content.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Added WordPress Block Editor templates for single listings, listing cards, and map info windows, with sample listing previews.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved settings backups to include AI profiles, user field layouts, and supported addon settings while protecting credentials.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Improved authentication layouts, social sign-in button styling, settings navigation, confirmation dialogs, and getting-started guidance.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed password-reset links, empty-result pagination, listing submission permission notices, and Template Builder icons.', 'listdom'); ?></li>
+        <li><?php esc_html_e('Fixed access checks for user email suggestions and protected listing, checklist, and legacy template output against unsafe content.', 'listdom'); ?></li>
+    </ul>
     <h2>v6.4.0 <span>November 1st, 2026</span></h2>
     <ul class="lsd-changelog">
         <li><?php esc_html_e('Added native WordPress abilities for listing search, contact, taxonomy management, and complete draft-to-publish listing workflows.', 'listdom'); ?></li>

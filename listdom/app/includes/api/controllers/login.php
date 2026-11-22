@@ -4,92 +4,66 @@ class LSD_API_Controllers_Login extends LSD_API_Controller
 {
     public function perform(WP_REST_Request $request): WP_REST_Response
     {
-        $vars = $request->get_params();
+        $user = LSD_Security_API::authenticate($request, $this->credential($request, 'username'), $this->credential($request, 'password'));
+        if (is_wp_error($user)) return $this->result($user);
+        return $this->result(LSD_Security_API::complete($user, $request));
+    }
 
-        $username = isset($vars['username']) ? base64_decode($vars['username']) : null;
-        $password = isset($vars['password']) ? base64_decode($vars['password']) : null;
+    public function challenge(WP_REST_Request $request): WP_REST_Response
+    {
+        return $this->result(LSD_Security_API::finish($request));
+    }
 
-        // Login
-        $response = wp_signon([
-            'user_login' => $username,
-            'user_password' => $password,
-            'remember' => false,
-        ], is_ssl());
+    public function enroll(WP_REST_Request $request): WP_REST_Response
+    {
+        return $this->result(LSD_Security_API::enroll($request));
+    }
 
-        // Invalid Credentials
-        if (is_wp_error($response)) return $this->response([
-            'data' => new WP_Error('400', $response->get_error_message()),
-            'status' => 400,
-        ]);
+    public function confirm_enrollment(WP_REST_Request $request): WP_REST_Response
+    {
+        return $this->result(LSD_Security_API::finish($request, true));
+    }
 
-        // Trigger Action
-        do_action('lsd_api_user_loggedin', $response->ID, $request);
-
-        // Response
-        return $this->response([
-            'data' => [
-                'success' => 1,
-                'id' => $response->ID,
-                'token' => $this->getUserToken($response->ID),
-            ],
-            'status' => 200,
-        ]);
+    private function result($result): WP_REST_Response
+    {
+        nocache_headers();
+        if (LSD_Security_API::pending($result)) return $this->authentication_response($result->get_error_data(), 202);
+        if (is_wp_error($result)) return $this->security_error($result);
+        return $this->authentication_response($result);
     }
 
     public function key(WP_REST_Request $request): WP_REST_Response
     {
-        // Response
-        return $this->response([
-            'data' => [
-                'success' => 1,
-                'key' => $this->getLoginKey(get_current_user_id()),
-            ],
-            'status' => 200,
-        ]);
+        nocache_headers();
+        $key = LSD_Security_API::handoff(get_current_user_id(), $request);
+        if (is_wp_error($key)) return $this->security_error($key);
+        return $this->authentication_response(['success' => 1, 'key' => $key]);
     }
 
     public function redirect(WP_REST_Request $request)
     {
-        // Login Key
+        nocache_headers();
+        header('Cache-Control: no-store');
+        header('Referrer-Policy: no-referrer');
         $key = $request->get_param('key');
-
-        // Search Users
-        $users = get_users([
-            'meta_key' => 'lsd_login',
-            'meta_value' => $key,
-            'number' => 1,
-            'count_total' => false,
-        ]);
-
-        // User
-        $user = reset($users);
-
-        // Not Found!
-        if (!$user || !$user->ID) return $this->response([
-            'data' => new WP_Error('404', esc_html__('User not found!', 'listdom')),
-            'status' => 404,
-        ]);
-
-        if (
-            LSD_User::requires_email_verification()
-            && !LSD_User::is_email_verified($user->ID)
-        ) {
-            return $this->response([
-                'data' => new WP_Error('403', LSD_User::verification_required_message()),
-                'status' => 403,
-            ]);
+        $data = LSD_Security_API::consume_handoff(is_string($key) ? $key : '');
+        if (is_wp_error($data)) return $this->security_error($data);
+        $user = get_userdata($data['user']);
+        $requested = $request->get_param('redirect_url');
+        $redirect = wp_validate_redirect(is_string($requested) ? wp_sanitize_redirect(urldecode($requested)) : '', home_url('/'));
+        if (LSD_Security_API::protected_account($user->ID) && !LSD_Security_API::recent($data))
+        {
+            $challenge = LSD_Security_Challenge::issue_browser($user, $redirect, false, $data);
+            if ($challenge->get_error_code() !== 'lsd_totp_required') return $this->security_error($challenge);
+            wp_safe_redirect(LSD_Security_Challenge::url($challenge));
+            exit;
         }
-
-        // Login
+        // A newly protected or revoked account must not inherit a previously minted key.
+        if ((!empty($data['legacy']) && LSD_Security_API::protected_account($user->ID)) || (empty($data['legacy']) && !LSD_Security_API::valid_handoff_source($data))) return $this->security_error(new WP_Error('lsd_handoff_invalid', __('Please sign in again.', 'listdom'), ['status' => 403]));
         wp_set_current_user($user->ID, $user->user_login);
-        wp_set_auth_cookie($user->ID);
+        wp_set_auth_cookie($user->ID, false, is_ssl());
         do_action('wp_login', $user->user_login, $user);
-
-        // Redirection URL
-        $redirect_url = urldecode($request->get_param('redirect_url'));
-        if (!trim($redirect_url)) $redirect_url = get_home_url();
-
-        wp_safe_redirect($redirect_url);
+        wp_safe_redirect($redirect);
         exit;
     }
 }

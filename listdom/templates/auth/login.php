@@ -40,6 +40,10 @@ if (isset($_GET['lsd-verified']))
 }
 
 $form_id = 'lsd-login-' . $instance_id;
+$forgot_target = sanitize_html_class($atts['forgot_target'] ?? '');
+$standalone = empty($atts['auth_switcher']);
+$forgot_url = $standalone && LSD_Portal::is_page('login') && !LSD_Portal::is_page('forgot') ? LSD_Portal::url('forgot') : '';
+$register_url = $standalone && LSD_Portal::is_page('login') && !LSD_Portal::is_page('register') && LSD_Security::registration_allowed() ? LSD_Portal::url('register', $explicit_redirect ? $redirect : '') : '';
 
 $assets = new LSD_Assets();
 $assets->footer('<script>
@@ -64,7 +68,7 @@ jQuery(document).ready(function()
         </div>
     <?php endif; ?>
 
-    <div id="<?php echo esc_attr('lsd_login_form_message_' . $instance_id); ?>" class="lsd-login-form-message"></div>
+    <div id="<?php echo esc_attr('lsd_login_form_message_' . $instance_id); ?>" class="lsd-login-form-message" role="status"></div>
 
     <?php if (LSD_User::requires_email_verification()): ?>
         <div class="lsd-login-resend-wrapper lsd-util-hide">
@@ -121,4 +125,15 @@ jQuery(document).ready(function()
             ?>
         </div>
     </form>
+    <?php if ($forgot_target !== ''): ?>
+        <button type="button" class="lsd-login-recovery lsd-auth-switch-button lsd-text-button" data-target="#<?php echo esc_attr($forgot_target); ?>"><?php echo esc_html($auth['auth']['forgot_password_link_label']); ?></button>
+    <?php elseif ($forgot_url !== ''): ?>
+        <a class="lsd-login-recovery lsd-text-button" href="<?php echo esc_url($forgot_url); ?>"><?php esc_html_e('Forgot your password?', 'listdom'); ?></a>
+    <?php endif; ?>
+    <?php echo LSD_Auth::methods('login', $role, $redirect, $explicit_redirect); ?>
+    <?php if ($register_url !== ''): ?>
+        <div class="lsd-auth-switcher-links">
+            <a href="<?php echo esc_url($register_url); ?>"><?php esc_html_e('Create an account', 'listdom'); ?></a>
+        </div>
+    <?php endif; ?>
 </div>

@@ -43,11 +43,21 @@ class LSD_Builders extends LSD_Base
 
         if (!$this->is_template_type_compatible($template_id, $template)) return '';
 
+        if (LSD_PTypes_Template::is_gutenberg_template($template_id) && $template->post_status !== 'publish')
+        {
+            $preview = $this->get_template_preview_request($template_id);
+            if (!$preview || !current_user_can('edit_post', $template_id)) return '';
+        }
+
         // Listdom Bar
         if (is_numeric($template_id)) (LSD_Bar::instance())->add($template_id);
 
         // Template Builder
-        if ($template->post_type === LSD_Base::PTYPE_TEMPLATE) return $this->template_builder($template_id);
+        if ($template->post_type === LSD_Base::PTYPE_TEMPLATE)
+        {
+            if (LSD_PTypes_Template::is_gutenberg_template($template_id)) return $this->gutenberg($template);
+            return $this->template_builder($template_id);
+        }
 
         // Elementor
         if (
@@ -155,6 +165,24 @@ class LSD_Builders extends LSD_Base
         if ($this->listing) LSD_LifeCycle::reset();
 
         return $output;
+    }
+
+    public function gutenberg(WP_Post $template): string
+    {
+        if (!$this->listing || !function_exists('do_blocks')) return '';
+
+        LSD_LifeCycle::post($this->listing->id());
+        try
+        {
+            return LSD_Integrations_Blockeditor_Listing::with_listing($this->listing, function () use ($template): string
+            {
+                return do_shortcode(do_blocks($template->post_content));
+            });
+        }
+        finally
+        {
+            LSD_LifeCycle::reset();
+        }
     }
 
     private function get_template_preview_request(int $template_id): array

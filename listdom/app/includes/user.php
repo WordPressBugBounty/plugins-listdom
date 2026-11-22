@@ -47,9 +47,8 @@ class LSD_User extends LSD_Base
     {
         if (!$user_id) return '';
 
-        $token = wp_generate_password(32, false);
-
-        update_user_meta($user_id, self::META_VERIFICATION_TOKEN, $token);
+        $token = bin2hex(random_bytes(32));
+        update_user_meta($user_id, self::META_VERIFICATION_TOKEN, ['hash' => hash('sha256', $token), 'expires' => time() + DAY_IN_SECONDS]);
         update_user_meta($user_id, self::META_VERIFICATION_STATUS, 'pending');
         update_user_meta($user_id, 'lsd_email_verification_requested', current_time('mysql'));
 
@@ -66,27 +65,28 @@ class LSD_User extends LSD_Base
         return apply_filters('lsd_email_verification_url', $url, $user_id, $token);
     }
 
-    public static function maybe_send_verification_email(int $user_id)
+    public static function maybe_send_verification_email(int $user_id, bool $resend = false)
     {
         if (!$user_id || !self::requires_email_verification()) return;
 
         $status = get_user_meta($user_id, self::META_VERIFICATION_STATUS, true);
         if ($status === 'verified') return;
 
-        $token = get_user_meta($user_id, self::META_VERIFICATION_TOKEN, true);
+        $saved = get_user_meta($user_id, self::META_VERIFICATION_TOKEN, true);
+        $active = is_array($saved)
+            ? !empty($saved['hash']) && ($saved['expires'] ?? 0) > time()
+            : is_string($saved) && $saved !== '' && (int) get_option('lsd_security_upgraded_at', time()) + DAY_IN_SECONDS > time();
+        // Duplicate registration hooks must not invalidate an already mailed link.
+        if ($active && !$resend) return;
 
-        // When a pending token already exists, reuse it to avoid invalidating
-        // previously issued verification links (for example, when multiple
-        // registration hooks trigger this method).
-        if ($status !== 'pending' || !$token)
-        {
-            $token = self::request_email_verification($user_id);
-            if (!$token) return;
-        }
-
+        $token = self::request_email_verification($user_id);
+        if (!$token) return;
+        $record = get_user_meta($user_id, self::META_VERIFICATION_TOKEN, true);
         $url = self::verification_url($user_id, $token);
-
-        do_action('lsd_user_email_verification', $user_id, $token, $url);
+        $delivery = (object) ['sent' => null];
+        do_action('lsd_user_email_verification', $user_id, $token, $url, $delivery);
+        // Known failures can retry; legacy replacement senders may not report delivery.
+        if ($delivery->sent === false) delete_user_meta($user_id, self::META_VERIFICATION_TOKEN, $record);
     }
 
     public static function verify_email(int $user_id, string $token): bool
@@ -97,15 +97,18 @@ class LSD_User extends LSD_Base
         if (!$token) return false;
 
         $saved_token = get_user_meta($user_id, self::META_VERIFICATION_TOKEN, true);
-        if (!$saved_token) return false;
+        if (is_string($saved_token) && $saved_token !== '')
+        {
+            // Legacy links remain usable for one day after the security upgrade.
+            $upgraded = (int) get_option('lsd_security_upgraded_at', time());
+            $converted = ['hash' => hash('sha256', $saved_token), 'expires' => $upgraded + DAY_IN_SECONDS];
+            update_user_meta($user_id, self::META_VERIFICATION_TOKEN, $converted, $saved_token);
+            $saved_token = get_user_meta($user_id, self::META_VERIFICATION_TOKEN, true);
+        }
+        if (!is_array($saved_token) || ($saved_token['expires'] ?? 0) <= time()) return false;
+        if (!hash_equals($saved_token['hash'], hash('sha256', $token))) return false;
+        if (!delete_user_meta($user_id, self::META_VERIFICATION_TOKEN, $saved_token)) return false;
 
-        $is_valid = function_exists('hash_equals')
-            ? hash_equals($saved_token, $token)
-            : $saved_token === $token;
-
-        if (!$is_valid) return false;
-
-        delete_user_meta($user_id, self::META_VERIFICATION_TOKEN);
         update_user_meta($user_id, self::META_VERIFICATION_STATUS, 'verified');
         update_user_meta($user_id, 'lsd_email_verification_time', current_time('mysql'));
 
@@ -114,7 +117,20 @@ class LSD_User extends LSD_Base
         return true;
     }
 
-    public static function create(string $email)
+    public static function migrate_verification_tokens(): void
+    {
+        global $wpdb;
+        $rows = $wpdb->get_results($wpdb->prepare("SELECT umeta_id, user_id, meta_value FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value <> '' AND meta_value NOT LIKE %s LIMIT 100", self::META_VERIFICATION_TOKEN, 'a:%'));
+        $expires = (int) get_option('lsd_security_upgraded_at', time()) + DAY_IN_SECONDS;
+        foreach ($rows as $row)
+        {
+            $record = ['hash' => hash('sha256', $row->meta_value), 'expires' => $expires];
+            update_user_meta((int) $row->user_id, self::META_VERIFICATION_TOKEN, $record, $row->meta_value);
+        }
+        if (count($rows) === 100 && !wp_next_scheduled('lsd_security_verification_migration')) wp_schedule_single_event(time() + 60, 'lsd_security_verification_migration');
+    }
+
+    public static function create(string $email, string $context = 'public')
     {
         $email = sanitize_email($email);
 
@@ -122,17 +138,23 @@ class LSD_User extends LSD_Base
         if ($exists) return $exists;
         else
         {
-            $results = register_new_user($email, $email);
+            $results = self::register($email, $email, null, $context);
             if (!is_wp_error($results)) return $results;
         }
 
         return 0;
     }
 
-    public static function register($user_login, $user_email, $password = null)
+    public static function register($user_login, $user_email, $password = null, string $context = 'public')
     {
         // Password
-        if (!$password) $password = wp_generate_password();
+        if (!$password) $password = LSD_Security::generated_password();
+        $allowed = LSD_Security::registration_check($context, $user_login, $user_email);
+        if (is_wp_error($allowed)) return $allowed;
+        $valid = LSD_Security::password($password);
+        if (is_wp_error($valid)) return $valid;
+        $role = LSD_Security::registration_role('', $context);
+        if (is_wp_error($role)) return $role;
 
         // Errors
         $errors = new WP_Error();
@@ -205,7 +227,7 @@ class LSD_User extends LSD_Base
         // Return Errors
         if ($errors->has_errors()) return $errors;
 
-        $user_id = wp_create_user($sanitized_user_login, $password, $user_email);
+        $user_id = LSD_Security::insert_user(['user_login' => $sanitized_user_login, 'user_pass' => $password, 'user_email' => $user_email, 'role' => $role]);
         if (!$user_id || is_wp_error($user_id))
         {
             $errors->add('registerfail', sprintf(
@@ -235,6 +257,7 @@ class LSD_User extends LSD_Base
 
     public static function login($user_id)
     {
+        if (!LSD_User::is_email_verified((int) $user_id) || LSD_Security_Totp::enabled((int) $user_id) || LSD_Security_Totp::enrollment_required((int) $user_id)) return false;
         wp_clear_auth_cookie();
         wp_set_current_user($user_id);
         wp_set_auth_cookie($user_id);
@@ -247,7 +270,7 @@ class LSD_User extends LSD_Base
      * @param string $fullname
      * @return int|mixed|WP_Error|null
      */
-    public static function listing(int $listing_id, string $email, string $password = '', string $fullname = '')
+    public static function listing(int $listing_id, string $email, string $password = '', string $fullname = '', string $context = 'guest_submission')
     {
         if (!is_email($email)) return null;
 
@@ -257,8 +280,8 @@ class LSD_User extends LSD_Base
         if ($exists) $user_id = $exists;
         else
         {
-            $password = trim($password) ? sanitize_text_field($password) : wp_generate_password();
-            $registered = LSD_User::register($email, $email, $password);
+            $password = $password !== '' ? $password : LSD_Security::generated_password();
+            $registered = LSD_User::register($email, $email, $password, $context);
 
             if (!is_wp_error($registered))
             {
@@ -279,7 +302,7 @@ class LSD_User extends LSD_Base
         }
 
         // Assign Listing to new Owner
-        LSD_Main::assign($listing_id, $user_id);
+        if ($user_id) LSD_Main::assign($listing_id, $user_id);
 
         // User ID
         return $user_id;
@@ -427,7 +450,7 @@ class LSD_User extends LSD_Base
         return $networks;
     }
 
-    public static function profile_edit_fields(): array
+    public static function profile_edit_fields(bool $use_layout = true): array
     {
         $auth = LSD_Options::auth();
         $fields = isset($auth['profile']['fields']) && is_array($auth['profile']['fields']) ? $auth['profile']['fields'] : [];
@@ -451,6 +474,20 @@ class LSD_User extends LSD_Base
 
         $fields['social'] = $social;
         unset($fields['socials']);
+
+        if ($use_layout)
+        {
+            foreach (LSD_Portal_Fieldlayout::core() as $key => $field)
+            {
+                if ($key === 'email')
+                {
+                    // The profile editor displays the email. Account Security owns changes.
+                    $fields[$key] = (int) ($field['enabled'] && $field['display']);
+                }
+                else if ($field['social']) $fields['social'][$key] = (int) ($field['enabled'] && $field['edit']);
+                else $fields[$key] = (int) ($field['enabled'] && $field['edit']);
+            }
+        }
 
         return $fields;
     }
@@ -486,13 +523,17 @@ class LSD_User extends LSD_Base
         return false;
     }
 
-    public static function send_forgot_password_email(WP_User $user): bool
+    public static function send_forgot_password_email(WP_User $user, string $recovery_page = ''): bool
     {
         // Generate password reset key and link
         $reset_key = get_password_reset_key($user);
         if (is_wp_error($reset_key)) return false;
 
-        $reset_link = self::password_reset_url($user->user_login, $reset_key);
+        $reset_link = $recovery_page === '' ? self::password_reset_url($user->user_login, $reset_key) : add_query_arg([
+            'action' => 'rp',
+            'key' => $reset_key,
+            'login' => rawurlencode($user->user_login),
+        ], $recovery_page);
 
         if (is_multisite()) $site_name = get_network()->site_name;
         else $site_name = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
@@ -577,7 +618,7 @@ class LSD_User extends LSD_Base
 
         if (!is_string($without_plaintext_tokens)) $without_plaintext_tokens = $message;
 
-        return $without_plaintext_tokens !== wp_strip_all_tags($without_plaintext_tokens);
+        return trim($without_plaintext_tokens) !== wp_strip_all_tags($without_plaintext_tokens);
     }
 
     public static function password_reset_url(string $user_login, string $reset_key): string
@@ -601,7 +642,7 @@ class LSD_User extends LSD_Base
                         'tab' => 'lostpassword',
                         'action' => 'rp',
                         'key' => $reset_key,
-                        'login' => $user_login,
+                        'login' => rawurlencode($user_login),
                     ], $url);
                 }
             }
@@ -614,7 +655,8 @@ class LSD_User extends LSD_Base
     {
         $auth = LSD_Options::auth();
 
-        $profile_page_id = isset($auth['profile']['page']) && $auth['profile']['page'] ? $auth['profile']['page'] : 0;
+        if (!LSD_Portal::public_profiles() && $id !== get_current_user_id()) return '';
+        $profile_page_id = (int) ($auth['profile']['page'] ?? 0);
         $profile_page = $profile_page_id ? get_post($profile_page_id) : null;
 
         // Listdom Profile Page

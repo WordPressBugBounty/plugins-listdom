@@ -4,6 +4,20 @@
 class LSD_Integrations_Blockeditor_Listing
 {
     private static $content_stack = [];
+    private static $listing_stack = [];
+
+    public static function with_listing(LSD_Entity_Listing $listing, callable $callback): string
+    {
+        self::$listing_stack[] = $listing;
+        try
+        {
+            return (string) $callback();
+        }
+        finally
+        {
+            array_pop(self::$listing_stack);
+        }
+    }
 
     public static function begin_content($content)
     {
@@ -20,6 +34,9 @@ class LSD_Integrations_Blockeditor_Listing
 
     public static function in_own_content(LSD_Entity_Listing $listing): bool
     {
+        // A template can render while the outer listing's the_content filter is still active.
+        if (self::$listing_stack) return false;
+
         if ((int) end(self::$content_stack) === $listing->id()) return true;
 
         return defined('REST_REQUEST') && REST_REQUEST
@@ -29,6 +46,22 @@ class LSD_Integrations_Blockeditor_Listing
 
     public static function get(): ?LSD_Entity_Listing
     {
+        $current = end(self::$listing_stack);
+        if (self::valid($current)) return $current;
+
+        // Block previews may name a template and its selected listing explicitly.
+        if (defined('REST_REQUEST') && REST_REQUEST && !empty($_REQUEST['lsd_editor_preview']))
+        {
+            $template_id = isset($_REQUEST['lsd_template_id']) ? absint(wp_unslash($_REQUEST['lsd_template_id'])) : 0;
+            if ($template_id)
+            {
+                if (!LSD_PTypes_Template::is_gutenberg_template($template_id) || !current_user_can('edit_post', $template_id)) return null;
+                $listing_id = isset($_REQUEST['lsd_preview_listing']) ? absint(wp_unslash($_REQUEST['lsd_preview_listing'])) : 0;
+                $preview_post = $listing_id ? get_post($listing_id) : null;
+                return self::can_preview($preview_post) ? new LSD_Entity_Listing($preview_post) : null;
+            }
+        }
+
         // A valid template preview nonce grants access to the template, not to every draft listing.
         $preview = class_exists('LSD_PTypes_Template') && method_exists('LSD_PTypes_Template', 'get_active_preview_request')
             ? LSD_PTypes_Template::get_active_preview_request()

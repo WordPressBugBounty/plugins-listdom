@@ -54,7 +54,9 @@ class LSD_Shortcodes_Listdom extends LSD_Shortcodes
         $SKO->query();
 
         // Apply Search
-        $SKO->apply_search($_GET);
+        $SKO->apply_search(
+            LSD_Sanitize::deep(wp_unslash($_GET))
+        );
 
         // Fetch the listings
         $SKO->fetch();

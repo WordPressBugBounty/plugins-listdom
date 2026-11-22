@@ -30,7 +30,7 @@ class LSD_Shortcodes_Profile extends LSD_Base
     public function profile($atts = [])
     {
         // Listdom Pre Shortcode
-        $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-profile');
+        $pre = !LSD_Portal::public_profiles() ? '' : apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-profile');
         if (trim($pre)) return $pre;
 
         // Get username from URL
@@ -50,6 +50,18 @@ class LSD_Shortcodes_Profile extends LSD_Base
 
         // Slugify email or username
         $username = $this->slugify_username($username);
+        if (!LSD_Portal::public_profiles())
+        {
+            $user = LSD_User::get_user_info(get_query_var('user') ?: get_current_user_id());
+            if (!$user || (int) $user['ID'] !== get_current_user_id())
+            {
+                return $this->alert(esc_html__('Profile unavailable.', 'listdom'), 'info');
+            }
+            $public_user = array_intersect_key($user, array_flip(['ID', 'display_name', 'bio', 'job_title']));
+            ob_start();
+            include lsd_template('profile/portal.php');
+            return ob_get_clean();
+        }
 
         ob_start();
         include lsd_template('profile/profile.php');
@@ -70,6 +82,8 @@ class LSD_Shortcodes_Profile extends LSD_Base
 
     public function users($atts = [])
     {
+        if (!LSD_Portal::public_profiles()) return '';
+
         // Listdom Pre Shortcode
         $pre = apply_filters('lsd_pre_shortcode', '', $atts, 'listdom-users');
         if (trim($pre)) return $pre;
@@ -87,6 +101,8 @@ class LSD_Shortcodes_Profile extends LSD_Base
 
     public function user_profile($user, $size = 264)
     {
+        if (!LSD_Portal_Fieldlayout::is_public('profile_image')) return '';
+
         $user_id = isset($user['ID']) ? (int) $user['ID'] : 0;
         $profile_image_url = $user_id ? LSD_User::get_user_image_url($user_id, 'lsd_profile_image') : '';
 
@@ -95,6 +111,6 @@ class LSD_Shortcodes_Profile extends LSD_Base
             return '<img src="' . esc_url($profile_image_url) . '" class="avatar avatar-'.esc_attr($size).' photo" height="'.esc_attr($size).'" width="'.esc_attr($size).'" alt="'.esc_attr__('Profile Image', 'listdom').'">';
         }
 
-        return LSD_User::get_user_avatar($user['email'] ?? '', $size);
+        return LSD_User::get_user_avatar(LSD_Portal_Fieldlayout::is_public('email') ? ($user['email'] ?? '') : '', $size);
     }
 }

@@ -737,7 +737,11 @@ class LSD_Form extends LSD_Base
             $options .= '<option value="" ' . ((isset($args['value']) && esc_attr($args['value']) == '') ? 'selected="selected"' : '') . '>' . ((isset($args['empty_label']) && trim($args['empty_label'])) ? $args['empty_label'] : '-----') . '</option>';
         }
 
-        foreach ($packages as $package) $options .= '<option value="' . esc_attr($package->ID) . '" ' . ((isset($args['value']) && $args['value'] == $package->ID) ? 'selected="selected"' : '') . '>' . esc_html($package->post_title) . '</option>';
+        foreach ($packages as $package)
+        {
+            if (!empty($args['listings_only']) && (new \LSDPACSUB\Package($package))->portal_only()) continue;
+            $options .= '<option value="' . esc_attr($package->ID) . '" ' . ((isset($args['value']) && $args['value'] == $package->ID) ? 'selected="selected"' : '') . '>' . esc_html($package->post_title) . '</option>';
+        }
 
         return '<select name="' . esc_attr($args['name']) . '" id="' . (isset($args['id']) ? esc_attr($args['id']) : '') . '" class="' . (isset($args['class']) ? esc_attr($args['class']) : 'lsd-package') . '">
             ' . $options . '                       

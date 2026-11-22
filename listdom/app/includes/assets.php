@@ -34,6 +34,7 @@ class LSD_Assets extends LSD_Base
         add_action('elementor/editor/after_enqueue_scripts', function ()
         {
             wp_enqueue_script('lsd-elementor-editor', $this->lsd_asset_url('js/elementor-editor.min.js'), ['jquery'], LSD_Assets::version());
+            wp_enqueue_style('lsd-elementor-editor', $this->lsd_asset_url('css/elementor-editor.min.css'), [], LSD_Assets::version());
         });
 
         // Elementor
@@ -83,6 +84,8 @@ class LSD_Assets extends LSD_Base
         if ($has_elementor_dashboard) $this->iconpicker();
 
         // Include Listdom frontend script file
+        LSD_Countdown::enqueue();
+        $frontend_dependencies[] = 'lsd-countdown';
         wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), $frontend_dependencies, $this->version(), true);
 
         // Localize Vars
@@ -102,6 +105,13 @@ class LSD_Assets extends LSD_Base
 
         // Include Listdom font-awesome assets
         $this->fontawesome();
+
+        $page = get_queried_object();
+        $portal_key = LSD_Portal::current_page_key();
+        $shortcode = LSD_Portal::definitions()[$portal_key][1] ?? '';
+        $account_only = $shortcode !== '' && $page instanceof WP_Post && trim($page->post_content) === '[' . $shortcode . ']';
+        if ($account_only && in_array($portal_key, ['login', 'register', 'forgot'], true)
+            && apply_filters('lsd_portal_light_auth_assets', true, $portal_key)) return;
 
         // Include OWL
         $this->owl(['lsd-frontend']);
@@ -143,6 +153,8 @@ class LSD_Assets extends LSD_Base
             $frontend_dependencies[] = 'lsd-flatpickr';
         }
 
+        LSD_Countdown::enqueue();
+        $frontend_dependencies[] = 'lsd-countdown';
         wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), $frontend_dependencies, $this->version(), true);
         $this->localize();
         wp_enqueue_style('lsd-frontend', $this->lsd_asset_url('css/frontend.min.css'), [], $this->version());
@@ -215,6 +227,8 @@ class LSD_Assets extends LSD_Base
             'i18n_field_delete' => esc_html__('Click twice to delete', 'listdom'),
             'i18n_announcements_dismiss_failed' => esc_html__('Announcement could not be dismissed.', 'listdom'),
             'i18n_field_label' => esc_html__('Label', 'listdom'),
+            'i18n_menu_access' => esc_html__('Access', 'listdom'),
+            'i18n_menu_content' => esc_html__('Content', 'listdom'),
             'i18n_placeholder_label' => esc_html__('Enter the menu name', 'listdom'),
             'i18n_placeholder_slug' => esc_html__('Enter the menu Slug', 'listdom'),
             'i18n_placeholder_icon' => esc_html__('Enter the icon class', 'listdom'),
@@ -275,7 +289,12 @@ class LSD_Assets extends LSD_Base
     protected function is_template_builder_screen($screen = null): bool
     {
         if (!$screen && function_exists('get_current_screen')) $screen = get_current_screen();
-        return ($screen && $screen->post_type === LSD_Base::PTYPE_TEMPLATE && in_array($screen->base, ['post', 'edit'], true));
+        if (!$screen || $screen->post_type !== LSD_Base::PTYPE_TEMPLATE) return false;
+        if ($screen->base === 'edit') return true;
+        if ($screen->base !== 'post') return false;
+
+        $template_id = isset($_GET['post']) ? absint(wp_unslash($_GET['post'])) : 0;
+        return !$template_id || !LSD_PTypes_Template::is_gutenberg_template($template_id);
     }
 
     protected function template_builder()
@@ -482,6 +501,8 @@ class LSD_Assets extends LSD_Base
         $frontend_dependencies[] = 'webilia-ui-v1-toast';
 
         // Frontend Assets
+        LSD_Countdown::enqueue();
+        $frontend_dependencies[] = 'lsd-countdown';
         wp_enqueue_script('lsd-frontend', $this->lsd_asset_url('js/frontend.min.js'), $frontend_dependencies, $this->version(), true);
         $this->localize();
 
@@ -729,9 +750,13 @@ class LSD_Assets extends LSD_Base
         if ($client === 'frontend')
         {
             if (apply_filters('lsd_force_include_frontend_assets', false, $client)) return true;
+            if (LSD_Portal::current_page_key() !== '') return true;
 
             // If global settings is on return true
             if (!isset($this->settings['assets']['load']) || $this->settings['assets']['load']) return true;
+
+            $security_page = get_queried_object();
+            if ($security_page instanceof WP_Post && has_shortcode($security_page->post_content, 'listdom-account-security')) return true;
 
             // If it's a listdom page return true
             if (LSD_Base::is_listdom_page()) return true;
@@ -776,11 +801,13 @@ class LSD_Assets extends LSD_Base
             // Current Screen
             $screen = get_current_screen();
 
-            if (isset($_GET['lsd_checklist_focus']) && sanitize_text_field(wp_unslash($_GET['lsd_checklist_focus'])) === '1') return true;
-
             $base = $screen->base;
             $post_type = $screen->post_type;
             $taxonomy = $screen->taxonomy;
+
+            // The site tagline checklist item targets WordPress General Settings.
+            if ($base === 'options-general' && current_user_can('manage_options')
+                && isset($_GET['lsd_checklist_focus']) && $_GET['lsd_checklist_focus'] === '1') return true;
 
             // It's one of Listdom taxonomy pages
             if (trim($taxonomy) && in_array($taxonomy, $this->taxonomies())) return true;

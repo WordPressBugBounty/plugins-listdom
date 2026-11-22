@@ -131,7 +131,7 @@ jQuery(document).ready(function()
                                     <?php if($this->guest_registration === 'submission'): ?>
                                     <div class="lsd-dashboard-guest-password">
                                         <label for="<?php echo esc_attr($this->form_id('lsd_guest_password')); ?>"><?php echo esc_html__('Password', 'listdom').' '.LSD_Base::REQ_HTML; ?></label>
-                                        <input type="password" id="<?php echo esc_attr($this->form_id('lsd_guest_password')); ?>" name="lsd[guest_password]" required value="<?php echo esc_attr(get_post_meta($this->post->ID, 'lsd_guest_password', true)); ?>" placeholder="<?php esc_attr_e('Should be at-least 8 characters', 'listdom'); ?>">
+                                        <input type="password" id="<?php echo esc_attr($this->form_id('lsd_guest_password')); ?>" name="lsd[guest_password]" required value="" autocomplete="new-password" placeholder="<?php echo esc_attr(LSD_Security::password_description()); ?>">
                                     </div>
                                     <?php endif; ?>
                                 <?php endif; ?>

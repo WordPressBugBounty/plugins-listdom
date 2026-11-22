@@ -4,7 +4,7 @@ defined('ABSPATH') || die();
 
 final class Listdom
 {
-    public string $version = '6.4.0';
+    public string $version = '6.5.0';
     protected static ?Listdom $instance = null;
 
     /**
@@ -97,6 +97,11 @@ final class Listdom
 
         // Repair Listdom roles when a site lost them after activation.
         LSD_Roles::ensure();
+
+        // Shared Free account-security services.
+        (new LSD_Security())->init();
+        (new LSD_Auth())->init();
+        (new LSD_Notifications_Auth())->init();
 
         // Life Cycle
         $life_cycle = new LSD_LifeCycle();
@@ -202,6 +207,14 @@ final class Listdom
         // Dashboard
         $dashboard = new LSD_Dashboard();
         $dashboard->init();
+        add_action('admin_post_lsd_account_portal', [LSD_Portal::class, 'save']);
+        add_action('template_redirect', static function ()
+        {
+            if (LSD_Portal::current_page_key() !== '' || ((LSD_Base::isPro() || class_exists(\LSDPACELM\Base::class)) && LSD_Dashboard::is_dashboard()))
+            {
+                LSD_Portal::private_response();
+            }
+        });
 
         // Launch Checklist
         $checklist = LSD_Checklist::instance();

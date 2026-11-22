@@ -10,17 +10,24 @@ $limit = isset($atts['limit']) ? (int) $atts['limit'] : 12;
 $columns = isset($atts['columns']) ? (int) $atts['columns'] : 4;
 
 // Fetch users
-$users = get_users([
-    'number'    => $limit,
-    'orderby'   => 'registered',
-    'order'     => 'DESC',
-    'role__in'  => ['listdom_author', 'listdom_publisher', 'administrator'],
-]);
+$roles = LSD_Portal::directory_roles();
+$query = ['number' => $limit, 'orderby' => 'registered', 'order' => 'DESC', 'role__in' => $roles];
+$users = $roles ? get_users($query) : [];
+$public_fields = array_filter(LSD_Portal_Fieldlayout::core(), static function (array $field): bool
+{
+    return $field['enabled'] && $field['public'];
+});
 ?>
 <div class="lsd-users-wrapper lsd-users-style-<?php echo esc_attr($style); ?> <?php echo $style === 'grid' ? 'lsd-grid lsd-g-' . esc_attr($columns) . '-columns' : ''; ?>">
     <?php if (count($users)): ?>
         <?php foreach ($users as $user): ?>
-            <?php $info = LSD_User::get_user_info($user->user_login); ?>
+            <?php
+            $info = LSD_User::get_user_info($user->user_login);
+            foreach (['email', 'phone', 'website'] as $key)
+            {
+                if (!isset($public_fields[$key])) unset($info[$key]);
+            }
+            ?>
             <div class="lsd-user-card">
                 <div class="lsd-user-avatar">
                     <a href="<?php echo esc_url(LSD_User::profile_link($user->ID)); ?>">
@@ -31,9 +38,11 @@ $users = get_users([
                     <a href="<?php echo esc_url(LSD_User::profile_link($user->ID)); ?>">
                         <h3 class="lsd-user-name"><?php echo esc_html($user->display_name); ?></h3>
                     </a>
-                    <p class="lsd-user-job-title"><?php echo esc_html($info['job_title']); ?></p>
+                    <?php if (isset($public_fields['job_title'])): ?>
+                        <p class="lsd-user-job-title"><?php echo esc_html($info['job_title']); ?></p>
+                    <?php endif; ?>
 
-                    <?php if($style === 'list') : ?>
+                    <?php if ($style === 'list' && isset($public_fields['bio'])) : ?>
                         <div class="lsd-user-bio"><?php echo esc_html($info['bio']); ?></div>
                     <?php endif; ?>
                 </div>

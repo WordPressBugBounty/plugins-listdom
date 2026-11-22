@@ -24,8 +24,8 @@ jQuery(document).ready(function()
         atts: "' . http_build_query(['atts' => $this->get_atts()], '', '&') . '",
         rtl: ' . (is_rtl() ? 'true' : 'false') . ',
         duration: ' . ((int) $this->duration) . ',
-        next_page: ' . $this->next_page . ',
-        limit: ' . $this->limit . ',
+        next_page: ' . (int) $this->next_page . ',
+        limit: ' . (int) $this->limit . ',
     });
 });
 </script>');

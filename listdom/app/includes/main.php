@@ -17,6 +17,8 @@ class LSD_Main extends LSD_Base
 
         return version_compare($installed_db_ver, LSD_Base::DB_VERSION, '<')
             || !$db->exists('lsd_data')
+            || !$db->exists('lsd_identities')
+            || !$db->exists('lsd_passkeys')
             || !$db->exists('lsd_jobs')
             || !$db->exists('lsd_ai_embeddings');
     }

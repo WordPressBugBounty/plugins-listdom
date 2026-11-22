@@ -16,6 +16,9 @@ class LSD_Notifications extends LSD_Base
         $prepare = new LSD_Notifications_Email_Prepare();
         $prepare->init();
 
+        // Account Security Notifications
+        (new LSD_Notifications_Security())->init();
+
         // Payments Notifications
         $payments = new LSD_Payments_Notifications();
         $payments->init();

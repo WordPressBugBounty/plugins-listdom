@@ -129,6 +129,8 @@ class LSD_Ajax extends LSD_Base
 
         if ($source === 'users')
         {
+            if (!current_user_can('list_users')) $this->response(['success' => 0, 'message' => esc_html__('You are not allowed to list users.', 'listdom')]);
+
             $users = get_users([
                 'search' => '*' . $term . '*',
                 'search_columns' => ['user_email', 'display_name'],

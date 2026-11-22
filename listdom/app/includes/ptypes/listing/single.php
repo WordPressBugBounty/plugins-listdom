@@ -97,7 +97,22 @@ class LSD_PTypes_Listing_Single extends LSD_PTypes_Listing
         // Get Listing Style by Category and Others
         $listing_style = (string) apply_filters('lsd_listing_details_style', $listing_style, $listing_id);
 
-        return $listing_style ?: $general_style;
+        $style = $listing_style ?: $general_style;
+        if (!self::is_published_single_template_style($style)) $style = $general_style;
+        if (!self::is_published_single_template_style($style)) $style = 'style1';
+
+        return $style;
+    }
+
+    private static function is_published_single_template_style($style): bool
+    {
+        if (!is_string($style) || !preg_match('/^tb_(\d+)$/', $style, $matches)) return true;
+
+        $template = get_post((int) $matches[1]);
+        return $template instanceof WP_Post
+            && $template->post_type === LSD_Base::PTYPE_TEMPLATE
+            && $template->post_status === 'publish'
+            && (get_post_meta($template->ID, '_lsd_template_type', true) ?: 'single_listing') === 'single_listing';
     }
 
     public static function get_listing_elements(int $listing_id): array

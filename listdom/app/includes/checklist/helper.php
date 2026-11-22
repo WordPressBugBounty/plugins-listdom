@@ -53,8 +53,10 @@ class LSD_Checklist_Helper
         return add_query_arg($action_query_args, $action_url);
     }
 
-    public function settings_action_url(string $tab, string $subtab = ''): string
+    public function settings_action_url(string $tab, string $subtab = '', string $section = ''): string
     {
+        if ($tab === 'auth') return LSD_Portal::admin_url($subtab, $section);
+
         $args = [
             'page' => 'listdom-settings',
             'tab' => $tab,

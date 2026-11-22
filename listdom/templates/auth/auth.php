@@ -13,6 +13,10 @@ $instance_id = uniqid('lsd-auth-');
 
 // Auth Settings
 $auth = LSD_Options::auth();
+if (!LSD_Security::registration_allowed()) $auth['auth']['hide_register_form'] = 1;
+$forgot_target = !$auth['auth']['hide_forgot_password_form'] && in_array($auth['auth']['switch_style'], ['links', 'both'], true)
+    ? 'lsd-forgot-password-form-' . $instance_id
+    : '';
 ?>
 <div class="lsd-auth-wrapper">
     <?php if (in_array($auth['auth']['switch_style'], ['tabs', 'both'])): ?>
@@ -23,7 +27,7 @@ $auth = LSD_Options::auth();
             <?php if (!$auth['auth']['hide_register_form']): ?>
                 <button class="lsd-auth-switch-button" data-target="#<?php echo esc_attr('lsd-register-form-' . $instance_id); ?>"><?php echo esc_html($auth['auth']['register_tab_label']); ?></button>
             <?php endif;?>
-            <?php if (!$auth['auth']['hide_forgot_password_form']): ?>
+            <?php if (!$auth['auth']['hide_forgot_password_form'] && (!$forgot_target || $auth['auth']['hide_login_form'])): ?>
                 <button class="lsd-auth-switch-button" data-target="#<?php echo esc_attr('lsd-forgot-password-form-' . $instance_id); ?>"><?php echo esc_html($auth['auth']['forgot_password_tab_label']); ?></button>
             <?php endif;?>
         </div>
@@ -36,15 +40,12 @@ $auth = LSD_Options::auth();
                     'role' => $role,
                     'redirect' => $redirect,
                     'explicit_redirect' => $explicit_redirect,
+                    'forgot_target' => $forgot_target,
+                    'auth_switcher' => true,
                 ]); ?>
-                <?php if (in_array($auth['auth']['switch_style'], ['links', 'both'])): ?>
+                <?php if (in_array($auth['auth']['switch_style'], ['links', 'both']) && !$auth['auth']['hide_register_form']): ?>
                     <div class="lsd-auth-switcher-links">
-                        <?php if (!$auth['auth']['hide_register_form']) : ?>
-                            <span class="lsd-auth-switch-button" data-target="#<?php echo esc_attr('lsd-register-form-' . $instance_id); ?>"><?php echo esc_html($auth['auth']['register_link_label']); ?></span>
-                        <?php endif; ?>
-                        <?php if (!$auth['auth']['hide_forgot_password_form']) : ?>
-                            <span class="lsd-auth-switch-button" data-target="#<?php echo esc_attr('lsd-forgot-password-form-' . $instance_id); ?>"><?php echo esc_html($auth['auth']['forgot_password_link_label']); ?></span>
-                        <?php endif; ?>
+                        <button type="button" class="lsd-auth-switch-button lsd-text-button" data-target="#<?php echo esc_attr('lsd-register-form-' . $instance_id); ?>"><?php echo esc_html($auth['auth']['register_link_label']); ?></button>
                     </div>
                 <?php endif;?>
             </div>
@@ -57,7 +58,7 @@ $auth = LSD_Options::auth();
                     'redirect' => $redirect,
                     'explicit_redirect' => $explicit_redirect,
                 ]); ?>
-                <?php if (in_array($auth['auth']['switch_style'], ['links', 'both'])): ?>
+                <?php if (in_array($auth['auth']['switch_style'], ['links', 'both']) && !$auth['auth']['hide_login_form']): ?>
                     <div class="lsd-auth-switcher-links">
                         <?php if (!$auth['auth']['hide_login_form']) : ?>
                             <span class="lsd-auth-switch-button" data-target="#<?php echo esc_attr('lsd-login-form-' . $instance_id); ?>"><?php echo esc_html($auth['auth']['login_link_label']); ?></span>
@@ -71,7 +72,7 @@ $auth = LSD_Options::auth();
         <?php if (!$auth['auth']['hide_forgot_password_form']) : ?>
             <div id="<?php echo esc_attr('lsd-forgot-password-form-' . $instance_id); ?>" class="lsd-auth-form-content">
                 <?php echo do_shortcode('[listdom-forgot-password]'); ?>
-                <?php if (in_array($auth['auth']['switch_style'], ['links', 'both'])): ?>
+                <?php if (in_array($auth['auth']['switch_style'], ['links', 'both']) && (!$auth['auth']['hide_register_form'] || !$auth['auth']['hide_login_form'])): ?>
                     <div class="lsd-auth-switcher-links">
                         <?php if (!$auth['auth']['hide_register_form']) : ?>
                             <span class="lsd-auth-switch-button" data-target="#<?php echo esc_attr('lsd-register-form-' . $instance_id); ?>"><?php echo esc_html($auth['auth']['register_link_label']); ?></span>

@@ -18,6 +18,15 @@
             var settings = block.editor;
             var attributes = props.attributes;
             var wrapper = editor.useBlockProps ? editor.useBlockProps() : {};
+            var context = wp.data.useSelect(function(select)
+            {
+                var store = select('core/editor');
+                return {
+                    postId: store && store.getCurrentPostId ? store.getCurrentPostId() : 0,
+                    postType: store && store.getCurrentPostType ? store.getCurrentPostType() : '',
+                    meta: store && store.getEditedPostAttribute ? store.getEditedPostAttribute('meta') : {}
+                };
+            }, []);
 
             if (settings.kind === 'title')
             {
@@ -186,10 +195,13 @@
             }
             else
             {
-                var store = wp.data && wp.data.select('core/editor');
-                var postId = store && store.getCurrentPostId ? store.getCurrentPostId() : 0;
                 var args = { lsd_editor_preview: 1 };
-                if (/^[1-9]\d*$/.test(String(postId))) args.post_id = parseInt(postId, 10);
+                if (/^[1-9]\d*$/.test(String(context.postId))) args.post_id = parseInt(context.postId, 10);
+                if (context.postType === 'listdom-template' && window.lsdTemplateGutenberg)
+                {
+                    args.lsd_template_id = context.postId;
+                    args.lsd_preview_listing = parseInt((context.meta || {}).lsd_gutenberg_preview_listing, 10) || 0;
+                }
 
                 preview = createElement(ServerSideRender, {
                     block: block.name,

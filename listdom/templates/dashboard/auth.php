@@ -20,7 +20,7 @@ $dashboard_wrapper = $this->get_dashboard_wrapper([
 
     <?php if (!$restricted_state): ?>
         <p class="lsd-alert lsd-info"><?php esc_html_e("Please login to continue.", 'listdom'); ?></p>
-        <?php echo do_shortcode('[listdom-auth redirect="' . $main->current_url() . '"]'); ?>
+        <?php echo (new LSD_Shortcodes_Auth())->auth(['redirect' => $main->current_url()]); ?>
     <?php else: ?>
         <div class="lsd-dashboard-restricted-state">
             <div class="lsd-row lsd-dashboard-wrapper">

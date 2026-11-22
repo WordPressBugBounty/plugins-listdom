@@ -26,7 +26,10 @@ class LSD_Integrations_Blockeditor_Application
             'auth' => [
                 'title' => esc_html__('Listdom Authentication', 'listdom'),
                 'icon' => 'admin-users',
-                'attributes' => ['authLayout' => ['type' => 'string', 'default' => 'inline']],
+                'attributes' => [
+                    'authLayout' => ['type' => 'string', 'default' => 'inline'],
+                    'showSecurityLink' => ['type' => 'boolean', 'default' => false],
+                ],
                 'message' => esc_html__('The login and registration forms appear on the published page.', 'listdom'),
                 'controls' => [[
                     'key' => 'authLayout',
@@ -36,6 +39,10 @@ class LSD_Integrations_Blockeditor_Application
                         ['label' => esc_html__('Inline', 'listdom'), 'value' => 'inline'],
                         ['label' => esc_html__('Dropdown', 'listdom'), 'value' => 'dropdown'],
                     ],
+                ], [
+                    'key' => 'showSecurityLink',
+                    'label' => esc_html__('Show Account Security Link', 'listdom'),
+                    'type' => 'toggle',
                 ]],
             ],
             'profile' => [
@@ -242,7 +249,7 @@ class LSD_Integrations_Blockeditor_Application
                 'search' => '[listdom-search id="' . $id . '"]',
                 'add-listing' => '[listdom-add-listing]',
                 'dashboard' => '[listdom-dashboard]',
-                'auth' => '[listdom-auth layout="' . (($attributes['authLayout'] ?? 'inline') === 'dropdown' ? 'dropdown' : 'inline') . '"]',
+                'auth' => '[listdom-auth layout="' . (($attributes['authLayout'] ?? 'inline') === 'dropdown' ? 'dropdown' : 'inline') . '" show_security_link="' . (!empty($attributes['showSecurityLink']) ? '1' : '0') . '"]',
                 'profile' => '[listdom-profile]',
                 'checkout' => '[listdom-checkout]',
                 'order-summary' => '[listdom-order-summary invoice="' . (!isset($attributes['showInvoice']) || $attributes['showInvoice'] ? '1' : '0') . '"]',

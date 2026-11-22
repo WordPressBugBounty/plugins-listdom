@@ -50,7 +50,21 @@ class LSD_Menus_Settings extends LSD_Menus
         $tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : '';
         $subtab = isset($_GET['subtab']) ? sanitize_text_field(wp_unslash($_GET['subtab'])) : '';
 
-        if ($page !== 'listdom-settings' || $tab !== 'general' || $subtab !== 'slugs') return;
+        if ($page !== 'listdom-settings') return;
+
+        if ($tab === 'auth')
+        {
+            $section = isset($_GET['section']) ? sanitize_key(wp_unslash($_GET['section'])) : '';
+            [$destination, $destination_section] = LSD_Portal::admin_route($subtab, $section);
+            if ($subtab === $destination && ($section === '' || $section === $destination_section)) return;
+
+            $args = wp_unslash($_GET);
+            unset($args['page'], $args['tab'], $args['subtab'], $args['section']);
+            wp_safe_redirect(add_query_arg($args, LSD_Portal::admin_url($destination, $destination_section)));
+            exit;
+        }
+
+        if ($tab !== 'general' || $subtab !== 'slugs') return;
 
         wp_safe_redirect(admin_url('admin.php?page=listdom-settings&tab=seo&subtab=slugs'));
         exit;
@@ -59,7 +73,7 @@ class LSD_Menus_Settings extends LSD_Menus
     public function get_default_subtab(): string
     {
         if ($this->tab === 'frontend-dashboard') return 'general';
-        if ($this->tab === 'auth') return 'authentication';
+        if ($this->tab === 'auth') return 'account-setup';
         if ($this->tab === 'advanced') return 'assets-loading';
         if ($this->tab === 'single-listing') return 'style-elements';
         if ($this->tab === 'payments') return 'engine';
@@ -213,6 +227,8 @@ class LSD_Menus_Settings extends LSD_Menus
     public static function sanitize_general(array $raw): array
     {
         $lsd = LSD_Sanitize::deep($raw);
+        if (isset($raw['dashboard_menu_builtin']['profile']['show_security']))
+            $lsd['dashboard_menu_builtin']['profile']['show_security'] = (int) !empty($raw['dashboard_menu_builtin']['profile']['show_security']);
         if (isset($raw['advanced_slug'])) $lsd['advanced_slug'] = LSD_Sanitize::advanced_slug($raw['advanced_slug']);
         if (isset($raw['rss_slug']))
         {
@@ -322,7 +338,7 @@ class LSD_Menus_Settings extends LSD_Menus
                     'content' => $content,
                     'login_status' => $login_status,
                     'enabled' => $enabled,
-                ];
+                ] + LSD_Dashboard_Access::rules($menu);
             }
 
             $lsd['dashboard_menu_custom'] = $custom_menus;
@@ -342,12 +358,13 @@ class LSD_Menus_Settings extends LSD_Menus
                 $label = isset($menu['label']) ? sanitize_text_field($menu['label']) : '';
                 $icon = isset($menu['icon']) ? sanitize_text_field($menu['icon']) : '';
 
-                if ($label === '' && $icon === '') continue;
+                if ($label === '' && $icon === '' && $key !== 'profile') continue;
 
                 $builtin_menus[$key] = [
                     'label' => $label,
                     'icon' => $icon,
                 ];
+                if ($key === 'profile') $builtin_menus[$key]['show_security'] = (int) !empty($menu['show_security'] ?? 1);
             }
 
             $lsd['dashboard_menu_builtin'] = $builtin_menus;
@@ -751,20 +768,54 @@ class LSD_Menus_Settings extends LSD_Menus
 
         // Get Auth
         $lsd = isset($_POST['lsd']) ? wp_unslash($_POST['lsd']) : [];
+        $raw_sections = is_array($lsd) ? ($lsd['security']['sections'] ?? []) : [];
         $lsd = is_array($lsd) ? LSD_Sanitize::deep($lsd) : [];
+        foreach (LSD_Security_Sections::definitions() as $id => $definition)
+        {
+            if (isset($raw_sections[$id]['description']) && is_string($raw_sections[$id]['description']))
+                $lsd['security']['sections'][$id]['description'] = wp_kses($raw_sections[$id]['description'], LSD_Security_Sections::allowed_html());
+        }
+
+        $valid = LSD_Security::validate_settings($lsd);
+        if (is_wp_error($valid)) $this->response(['success' => 0, 'message' => $valid->get_error_message()]);
+
+        $layout = null;
+        if (isset($_POST['lsd_user_field_layout']) && is_string($_POST['lsd_user_field_layout']) && $_POST['lsd_user_field_layout'] !== '')
+        {
+            $input = json_decode(wp_unslash($_POST['lsd_user_field_layout']), true);
+            if (!is_array($input) || !is_array($input['rows'] ?? null) || !is_array($input['removed'] ?? null))
+                $this->response(['success' => 0, 'message' => __('Unable to read the user fields.', 'listdom')]);
+
+            $layout = LSD_Portal_Fieldlayout::prepare($input);
+            if (is_wp_error($layout)) $this->response(['success' => 0, 'message' => $layout->get_error_message()]);
+        }
+
+        // Older sites still use these defaults until their field list is saved.
+        $previous = get_option('lsd_auth', []);
+        if (isset($previous['profile']['fields'])) $lsd['profile']['fields'] = $previous['profile']['fields'];
+
+        $secrets = LSD_Auth_Settings::prepare_secrets(isset($_POST['lsd_native_secrets']) && is_array($_POST['lsd_native_secrets']) ? wp_unslash($_POST['lsd_native_secrets']) : []);
+        if (is_wp_error($secrets)) $this->response(['success' => 0, 'message' => $secrets->get_error_message()]);
+        update_option('lsd_auth_secrets', $secrets, false);
 
         // Save Auth
+        $previous_profile_page = (int) (LSD_Options::auth()['profile']['page'] ?? 0);
         update_option('lsd_auth', $lsd);
+        if ($previous_profile_page !== (int) ($lsd['profile']['page'] ?? 0)) delete_option('rewrite_rules');
 
         // Get Settings
         $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : [];
         $settings = is_array($settings) ? LSD_Sanitize::deep($settings) : [];
 
         // Save Settings
-        LSD_Options::merge('lsd_settings', $settings);
+        LSD_Settings_Service::save_admin($settings, false);
+
+        if ($layout !== null) LSD_Portal_Fieldlayout::save($layout);
 
         // Print the response
-        $this->response(['success' => 1]);
+        $credentials = [];
+        foreach (LSD_Auth_Providers::all() as $provider => $definition) $credentials[$provider] = LSD_Auth_Providers::secret($provider) !== '';
+        $this->response(['success' => 1, 'native_credentials' => $credentials, 'fields_saved' => $layout !== null]);
     }
 
     public function save_payments()

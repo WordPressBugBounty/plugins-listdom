@@ -48,6 +48,28 @@ function lsdGetClusterSvgUrl(color, size) {
     return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
 }
 
+function lsdUpdateNumericPagination($skin, pagination) {
+    const $current = $skin.find('.lsd-numeric-pagination-wrapper');
+    const $next = jQuery(pagination).filter('.lsd-numeric-pagination-wrapper');
+    if (!$next.length) {
+        $current.remove();
+        return;
+    }
+
+    if ($current.length) {
+        $current.replaceWith($next);
+        return;
+    }
+
+    const $listings = $skin.find('.lsd-listing-wrapper').first().parent();
+    if ($listings.is('.lsd-viewstyle-grid, .lsd-viewstyle-list')) $listings.after($next);
+    else {
+        const $listWrapper = $skin.find('.lsd-list-wrapper');
+        if ($listWrapper.length) $listWrapper.append($next);
+        else $listings.after($next);
+    }
+}
+
 let lsdLoadingPositionFrame = null;
 
 function lsdUpdateLoadingPositions() {
@@ -811,6 +833,7 @@ function ListdomDetails(id, link, settings) {
                         $button
                             .removeClass("lsd-util-hide")
                             .removeClass("lsd-load-more-loading");
+                        if (parseInt(settings.load_more)) $wrapper.removeClass("lsd-util-hide");
                         $list_wrapper.removeClass('lsd-loading');
 
                         // Append Items
@@ -818,7 +841,7 @@ function ListdomDetails(id, link, settings) {
                         else $("#lsd_skin" + settings.id + " .lsd-listing-wrapper").append(response.html);
 
                         // Update Pagination
-                        $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper").replaceWith(response.pagination);
+                        lsdUpdateNumericPagination($("#lsd_skin" + settings.id), response.pagination);
 
                         if (response.total <= next_page * settings.limit) {
                             // Adjust Loading Classes
@@ -865,7 +888,7 @@ function ListdomDetails(id, link, settings) {
                         );
 
                         // Update Pagination
-                        $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper").replaceWith(response.pagination);
+                        lsdUpdateNumericPagination($("#lsd_skin" + settings.id), response.pagination);
 
                         if (parseInt(settings.load_more) && response.total > response.count) {
                             // Show Load More
@@ -1075,6 +1098,7 @@ function ListdomDetails(id, link, settings) {
                         $button
                             .removeClass("lsd-util-hide")
                             .removeClass("lsd-load-more-loading");
+                        if (parseInt(settings.load_more)) $wrapper.removeClass("lsd-util-hide");
 
                         $list_wrapper.removeClass('lsd-loading');
 
@@ -1083,7 +1107,7 @@ function ListdomDetails(id, link, settings) {
                         else $("#lsd_skin" + settings.id + " .lsd-listing-wrapper").append(response.html);
 
                         // Update Pagination
-                        $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper").replaceWith(response.pagination);
+                        lsdUpdateNumericPagination($("#lsd_skin" + settings.id), response.pagination);
 
                         if (response.total <= next_page * settings.limit) {
                             // Adjust Loading Classes
@@ -1130,7 +1154,7 @@ function ListdomDetails(id, link, settings) {
                         );
 
                         // Update Pagination
-                        $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper").replaceWith(response.pagination);
+                        lsdUpdateNumericPagination($("#lsd_skin" + settings.id), response.pagination);
 
                         if (parseInt(settings.load_more) && response.total > response.count) {
                             // Show Load More
@@ -5212,9 +5236,6 @@ function ListdomDetails(id, link, settings) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
 
-            // Pagination Wrapper
-            const $pagination = $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper");
-
             $.ajax({
                 url: settings.ajax_url,
                 data: "action=lsd_ajax_search&" + req.get(request, settings.args, clearKeys),
@@ -5238,8 +5259,7 @@ function ListdomDetails(id, link, settings) {
                     $skin.find('.lsd-listing-wrapper').html(response.listings);
 
                     // Update Pagination
-                    if($pagination.length) $pagination.replaceWith(response.pagination);
-                    else $("#lsd_skin" + settings.id + " .lsd-list-wrapper").append(response.pagination);
+                    lsdUpdateNumericPagination($skin, response.pagination);
 
                     // Hide or Show Load More
                     if (response.count === 0 || response.total <= response.count)
@@ -7122,9 +7142,6 @@ function ListdomDetails(id, link, settings) {
             // Loading Style
             $wrapper.fadeTo(200, 0.7);
 
-            // Pagination Wrapper
-            const $pagination = $("#lsd_skin" + settings.id + " .lsd-numeric-pagination-wrapper");
-
             $.ajax({
                 url: settings.ajax_url,
                 data: "action=lsd_ajax_search&" + req.get(request, settings.args, clearKeys),
@@ -7148,8 +7165,7 @@ function ListdomDetails(id, link, settings) {
                     $skin.find('.lsd-listing-wrapper').html(response.listings);
 
                     // Update Pagination
-                    if($pagination.length) $pagination.replaceWith(response.pagination);
-                    else $("#lsd_skin" + settings.id + " .lsd-list-wrapper").append(response.pagination);
+                    lsdUpdateNumericPagination($skin, response.pagination);
 
                     // Hide or Show Load More
                     if (response.count === 0 || response.total <= response.count)
@@ -8610,8 +8626,6 @@ function ListdomDetails(id, link, settings) {
                 let $skin = $("#lsd_skin" + settings.shortcode);
                 let $wrapper = $("#lsd_skin" + settings.shortcode + " .lsd-listing-wrapper");
                 let $loadMoreWrapper = $("#lsd_skin" + settings.shortcode + " .lsd-load-more-wrapper");
-                const $pagination = $skin.find($(".lsd-numeric-pagination-wrapper"));
-
                 // Add loading Class
                 $wrapper.addClass("lsd-loading");
 
@@ -8666,8 +8680,7 @@ function ListdomDetails(id, link, settings) {
                             }
 
                             // Update Pagination
-                            if ($pagination.length) $pagination.replaceWith(response.pagination);
-                            else $skin.find($('.lsd-list-wrapper')).append(response.pagination);
+                            lsdUpdateNumericPagination($skin, response.pagination);
 
                             // Hide Load More
                             if (response.count === 0 || response.total <= response.count)
@@ -11460,7 +11473,7 @@ window.lsdResetRecaptcha = function (form)
 (function ($) {
     $.fn.AdditionalCategories = function(options)
     {
-        const defaults = {post_id: '', children_only: '0', id_suffix: '', ajax_url: '', nonce: ''};
+        const defaults = {post_id: '', children_only: '0', maximum: '', id_suffix: '', ajax_url: '', nonce: ''};
 
         return this.each(function()
         {
@@ -11469,6 +11482,7 @@ window.lsdResetRecaptcha = function (form)
 
             const settings = $.extend({}, defaults, options || {});
             const childrenOnly = settings.children_only === '1';
+            const maximum = settings.maximum === '' ? null : parseInt(settings.maximum, 10);
             const ajaxUrl = settings.ajax_url || '';
             const nonce = settings.nonce || '';
             const postId = parseInt(settings.post_id, 10) || 0;
@@ -11478,6 +11492,8 @@ window.lsdResetRecaptcha = function (form)
             const $form = $wrapper.closest('form');
             const $target = $wrapper.find('.lsd-additional-categories');
             const requiresPrimary = $wrapper.data('requires-primary') || '';
+            const maximumMessage = $wrapper.data('maximum-message') || '';
+            const $error = $wrapper.find('.lsd-alert.lsd-error');
 
             let request = null;
             let refreshTimer = null;
@@ -11547,6 +11563,33 @@ window.lsdResetRecaptcha = function (form)
                 return selected;
             };
 
+            const selectedCount = function(selected)
+            {
+                return [...new Set(selected.filter(function(id) { return id !== currentPrimaryId(); }))].length;
+            };
+
+            let previous = collectSelected();
+            if (maximum !== null && !isNaN(maximum))
+            {
+                $target.on('change' + namespace, 'select.lsd-fd-taxonomies-dropdown, input[type="checkbox"]', function()
+                {
+                    const selected = collectSelected();
+                    if (selectedCount(selected) > maximum && selectedCount(selected) >= selectedCount(previous))
+                    {
+                        $target.find('select.lsd-fd-taxonomies-dropdown').val(previous.map(String)).trigger('change.select2');
+                        $target.find('input[type="checkbox"]').each(function()
+                        {
+                            $(this).prop('checked', previous.includes(parseInt($(this).val(), 10)));
+                        });
+                        $error.text(maximumMessage).removeClass('lsd-util-hide');
+                        return;
+                    }
+
+                    previous = selected;
+                    $error.addClass('lsd-util-hide').empty();
+                });
+            }
+
             const showPrimaryMessage = function()
             {
                 if (requiresPrimary)
@@ -11603,6 +11646,8 @@ window.lsdResetRecaptcha = function (form)
 
                         $target.html(html);
                         initSelect2($target.find('.lsd-select-multiple'));
+                        previous = collectSelected();
+                        $error.addClass('lsd-util-hide').empty();
                     },
                     complete: function()
                     {
@@ -11664,6 +11709,7 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
         $wrapper.AdditionalCategories({
             post_id: ($wrapper.data('postId') || '').toString(),
             children_only: ($wrapper.data('childrenOnly') || '0').toString(),
+            maximum: $wrapper.attr('data-maximum') || '',
             id_suffix: ($wrapper.data('idSuffix') || '').toString(),
             ajax_url: ($wrapper.data('ajaxUrl') || '').toString(),
             nonce: ($wrapper.data('nonce') || '').toString()
@@ -11967,18 +12013,6 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
             const password = $form.find('input[name="lsd[password]"]').val();
             const confirmPassword = $form.find('input[name="lsd[confirm_password]"]').val();
 
-            if (password && password.length < 6) {
-                $pass_message.html(listdom_alertify("Password must be at least 6 characters long!", "lsd-error"));
-                $form.removeClass("lsd-loading");
-                return;
-            }
-
-            if (password && password !== confirmPassword) {
-                $pass_message.html(listdom_alertify("Passwords do not match!", "lsd-error"));
-                $form.removeClass("lsd-loading");
-                return;
-            }
-
             // Abort previous request
             if (ajax) ajax.abort();
 
@@ -11992,34 +12026,7 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
                     // Remove the Loading Class from the Form
                     $form.removeClass("lsd-loading");
 
-                    if (response.success === 1) {
-                        clearFieldMessages();
-
-                        // Show the message
-                        $message.html(listdom_alertify(response.message, "lsd-success"));
-
-                        // Set the event id
-                        $dashboard.find('[id^="lsd_dashboard_id"]').val(response.data.id);
-
-                        // Labelize Addon
-                        const $labelize = $dashboard.find('.lsd-labelize-button');
-                        if ($labelize.length) {
-                            // Set Listing ID
-                            $labelize.data("id", response.data.id);
-
-                            // Hide Message
-                            $dashboard.find(".lsd-labelize-metabox .lsd-labelize-message").addClass(
-                                "lsd-util-hide"
-                            );
-
-                            // Show Button
-                            $labelize.removeClass("lsd-util-hide");
-                        }
-                    } else {
-                        // Show the message
-                        $message.html(listdom_alertify(response.message, "lsd-error"));
-                        applyFieldMessages(response.data || {});
-                    }
+                    $message.html(listdom_alertify(response.message, response.success === 1 ? "lsd-success" : "lsd-error"));
                 },
                 error: function () {
                     // Remove the Loading Class from the Form
@@ -12180,6 +12187,8 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
 
             if (settings.password_placeholder && $userPassword.length) $userPassword.attr("placeholder", settings.password_placeholder);
 
+            $wrapper.children(".lsd-login-recovery").insertAfter($userPassword.siblings("label"));
+
             setListeners();
             handleResendVisibility(false);
 
@@ -12223,7 +12232,7 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
                 // Abort previous request
                 if (ajax) ajax.abort();
 
-                const data = $form.serialize() + '&action=lsd_login&lsd_login=' + settings.nonce;
+                const data = $form.serialize() + '&action=lsd_login&lsd_login=' + settings.nonce + '&lsd_recovery_dropdown=' + ($form.closest('.lsd-auth-dropdown').length ? '1' : '0');
 
                 ajax = $.ajax({
                     type: "POST",
@@ -12233,8 +12242,24 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
                     success: function (response) {
                         $form.removeClass("lsd-loading");
 
+                        if (response.challenge_html) {
+                            ajax = false;
+                            handleResendVisibility(false);
+                            $userPassword.val("");
+                            $login.data('auth-login-content', $login.contents().detach());
+                            $login.append(response.challenge_html).fadeTo(200, 1);
+                            listdom_auth_security_links($login.find('.lsd-auth-challenge'));
+                            $login.find('input[name="code"], button[type="submit"]').first().trigger("focus");
+                            return;
+                        }
+
+                        if (response.challenge_url) {
+                            window.location.href = response.challenge_url;
+                            return;
+                        }
+
                         if (response.success === 1) {
-                            $messageTarget.html(listdom_alertify(response.message, "lsd-success"));
+                            $messageTarget.html(listdom_alertify(ListdomCountdown.message(response), "lsd-success"));
                             handleResendVisibility(false);
                             if (response.redirect) {
                                 setTimeout(() => {
@@ -12242,7 +12267,7 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
                                 }, 1000);
                             }
                         } else {
-                            $messageTarget.html(listdom_alertify(response.message, "lsd-error"));
+                            $messageTarget.html(listdom_alertify(ListdomCountdown.message(response), "lsd-error"));
                             handleResendVisibility(response.allow_resend === 1 || response.allow_resend === true, response.user_login);
                         }
                         $login.fadeTo(200, 1);
@@ -12280,7 +12305,7 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
                     dataType: "JSON",
                     success: function (response) {
                         const type = response.success === 1 ? "lsd-success" : "lsd-error";
-                        $messageTarget.html(listdom_alertify(response.message, type));
+                        $messageTarget.html(listdom_alertify(ListdomCountdown.message(response), type));
                         handleResendVisibility(response.allow_resend === 1 || response.allow_resend === true, response.user_login || userLogin);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -12359,7 +12384,7 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
                     switch (rule) {
                         case "length": {
                             const minLength = parseInt($rule.data("min-length"), 10) || 0;
-                            isMet = value.length >= minLength;
+                            isMet = Array.from(value).length >= minLength;
                             break;
                         }
 
@@ -12410,7 +12435,7 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
 
                         if (response.success === 1) {
                             // Show the message
-                            $message.html(listdom_alertify(response.message, "lsd-success"));
+                            $message.html(listdom_alertify(ListdomCountdown.message(response), "lsd-success"));
                             if (response.redirect) {
                                 setTimeout(() => {
                                     window.location.href = response.redirect;
@@ -12418,7 +12443,7 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
                             }
                         } else {
                             // Show the message
-                            $message.html(listdom_alertify(response.message, "lsd-error"));
+                            $message.html(listdom_alertify(ListdomCountdown.message(response), "lsd-error"));
                         }
                         // Loading Style
                         $register.fadeTo(200, 1);
@@ -12484,13 +12509,13 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
 
                         if (response.success === 1) {
                             // Show the message
-                            $message.html(listdom_alertify(response.message, "lsd-success"));
+                            $message.html(listdom_alertify(ListdomCountdown.message(response), "lsd-success"));
                             if (response.redirect) {
                                 window.location.href = response.redirect;
                             }
                         } else {
                             // Show the message
-                            $message.html(listdom_alertify(response.message, "lsd-error"));
+                            $message.html(listdom_alertify(ListdomCountdown.message(response), "lsd-error"));
                         }
                         // Loading Style
                         $register.fadeTo(200, 1);
@@ -12547,12 +12572,12 @@ window.lsdDashboardInitAdditionalCategories = function (root) {
                         $form.removeClass("lsd-loading");
 
                         if (response.success === 1) {
-                            $message.html(listdom_alertify(response.message, "lsd-success"));
+                            $message.html(listdom_alertify(ListdomCountdown.message(response), "lsd-success"));
                             if (response.redirect) {
                                 window.location.href = response.redirect;
                             }
                         } else {
-                            $message.html(listdom_alertify(response.message, "lsd-error"));
+                            $message.html(listdom_alertify(ListdomCountdown.message(response), "lsd-error"));
                         }
                         $wrapper.fadeTo(200, 1);
                     },
@@ -16190,5 +16215,217 @@ document.addEventListener("DOMContentLoaded", function () {
         queueImpression(card);
         flushImpressions();
         send("listing_card_click", [card.dataset.lsdStatsListing]);
+    });
+});
+
+// Shared account-security forms also work in dynamically loaded dashboard content.
+jQuery(document).on('submit', '.lsd-security-form', function (event) {
+    event.preventDefault();
+    const $form = jQuery(this);
+    const $message = $form.find('.lsd-security-message');
+    const $button = $form.find('button[type="submit"]');
+    if ($button.prop('disabled')) return;
+    $button.prop('disabled', true);
+    $form.addClass('lsd-loading');
+    $message.empty();
+    jQuery.ajax({
+        url: $form.attr('action'),
+        type: 'POST',
+        data: $form.serialize(),
+        dataType: 'json',
+    }).done(function (response) {
+        const $alert = jQuery('<div>').addClass('lsd-alert ' + (response.success ? 'lsd-success' : 'lsd-error')).text(response.message);
+        $message.append($alert);
+        ListdomCountdown.mount($alert[0], response.countdown);
+        if (!response.success) return;
+        $form.find('input[type="password"], input[name="code"], input[name="enrollment_code"]').val('');
+        if (response.setup) {
+            const $setup = $form.closest('.lsd-account-security').find('.lsd-security-setup');
+            $setup.removeClass('lsd-util-hide');
+            const qrCode = response.setup.qr_code || '';
+            const $qrImage = $setup.find('.lsd-security-qr-image');
+            if (qrCode) $qrImage.attr('src', qrCode);
+            else $qrImage.removeAttr('src');
+            $qrImage.toggleClass('lsd-util-hide', !qrCode);
+            $setup.find('.lsd-security-qr-instructions').toggleClass('lsd-util-hide', !qrCode);
+            $setup.find('.lsd-security-setup-key').text(response.setup.secret);
+            $setup.find('.lsd-security-setup-link').attr('href', response.setup.uri);
+        }
+        if (response.codes) $message.append(jQuery('<pre>').text(response.codes.join('\n')));
+        if (response.refresh) $message.append(jQuery('<button type="button" class="lsd-text-button">').text($form.closest('.lsd-account-security').data('refresh-label')).on('click', function () { window.location.reload(); }));
+        if (response.redirect) window.location.href = response.redirect;
+    }).fail(function () {
+        $message.append(jQuery('<div class="lsd-alert lsd-error">').text($form.closest('.lsd-account-security').data('error-label')));
+    }).always(function () {
+        $button.prop('disabled', false);
+        $form.removeClass('lsd-loading');
+    });
+});
+
+// Keep security navigation alongside the existing links in this auth instance.
+function listdom_auth_security_links($panel) {
+    const $content = $panel.closest('.lsd-auth-form-content');
+    const $links = $content.children('.lsd-auth-switcher-links').first();
+    if (!$links.length) return;
+    $links.children('.lsd-auth-security-link').remove();
+    const $navigation = $panel.children('.lsd-auth-switcher-links');
+    $links.prepend($navigation.children());
+    $navigation.remove();
+}
+jQuery(function () {
+    jQuery('.lsd-auth-challenge, .lsd-auth-recovery').each(function () {
+        listdom_auth_security_links(jQuery(this));
+    });
+});
+
+// Restore the initialized form for this instance without retaining a submitted password.
+jQuery(document).on('click.lsdAuthBack', '.lsd-auth-back-to-login', function (event) {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    const $link = jQuery(this);
+    let $panel = $link.closest('.lsd-auth-challenge, .lsd-auth-recovery');
+    if (!$panel.length) $panel = $link.closest('.lsd-auth-form-content').find('.lsd-auth-challenge, .lsd-auth-recovery').first();
+    const $login = $panel.closest('.lsd-login-wrapper');
+    const $interface = $panel.closest('.lsd-auth-security-interface');
+    const $backup = $interface.children('.lsd-auth-login-backup');
+    const $saved = $login.data('auth-login-content');
+    if (!$saved && !$backup.length) return;
+    event.preventDefault();
+    const $form = $panel.find('form');
+    if ($panel.data('recovery-busy') || $form.data('challenge-busy') || $form.data('recovery-busy')) return;
+    $link.closest('.lsd-auth-switcher-links').children('.lsd-auth-security-link').remove();
+    let $restored = $login;
+    if ($saved) {
+        $login.empty().append($saved).removeData('auth-login-content');
+    } else {
+        // The clicked link is removed; do not let the outside-click handler close the restored dropdown.
+        event.stopPropagation();
+        $restored = $backup.children().detach();
+        $interface.replaceWith($restored);
+        const $dropdown = $restored.filter('.lsd-auth-dropdown');
+        $dropdown.addClass('lsd-open');
+        $dropdown.children('.lsd-auth-dropdown-toggle').attr('aria-expanded', 'true');
+        $dropdown.children('.lsd-auth-dropdown-panel').attr('aria-hidden', 'false');
+        $dropdown.trigger('lsd:auth-dropdown-open');
+    }
+    $restored.find('input[type="password"]').val('');
+    $restored.find('input[autocomplete="username"], input[name="log"]').first().trigger('focus');
+    const page = new URL(window.location.href);
+    ['lsd_challenge', 'lsd_totp_recovery', 'lsd_recovery_key', 'lsd_recovery_dropdown'].forEach(function (key) {
+        page.searchParams.delete(key);
+    });
+    window.history.replaceState(window.history.state, '', page.href);
+});
+
+// Shared browser second-factor forms also work inside dynamically rendered login panels.
+jQuery(document).on('click.lsdAuthChallenge', '.lsd-auth-challenge-form button[type="submit"], .lsd-auth-challenge-form input[type="submit"]', function () {
+    jQuery(this).closest('form').data('challenge-operation', jQuery(this).data('operation') || '');
+});
+jQuery(document).on('submit.lsdAuthChallenge', '.lsd-auth-challenge-form', function (event) {
+    event.preventDefault();
+    const $form = jQuery(this);
+    if ($form.data('challenge-busy')) return;
+    const $panel = $form.closest('.lsd-auth-challenge');
+    const $message = $panel.find('.lsd-auth-challenge-message');
+    const submitter = event.originalEvent && event.originalEvent.submitter;
+    const operation = (submitter && jQuery(submitter).data('operation')) || $form.data('challenge-operation') || $form.find('[name="operation"]').val();
+    const fields = $form.serializeArray().filter(function (field) { return field.name !== 'operation'; });
+    fields.push({name: 'operation', value: operation}, {name: 'action', value: 'lsd_auth_challenge'});
+    $form.data('challenge-busy', true).addClass('lsd-loading').attr('aria-busy', 'true');
+    $message.empty().addClass('lsd-util-hide');
+    jQuery.ajax({
+        url: $panel.data('ajax-url'),
+        type: 'POST',
+        dataType: 'json',
+        data: fields,
+    }).done(function (response) {
+        if (response.challenge_html) {
+            const $next = jQuery(response.challenge_html);
+            $panel.replaceWith($next);
+            listdom_auth_security_links($next);
+            $next.find('input[name="code"], pre, button[type="submit"]').first().trigger('focus');
+        } else if (response.success === 1 && response.redirect) {
+            $message.removeClass('lsd-util-hide').html(listdom_alertify(ListdomCountdown.message(response), 'lsd-success'));
+            setTimeout(function () {
+                window.location.href = response.redirect;
+            }, 1000);
+        } else {
+            const $alert = jQuery('<div class="lsd-alert lsd-error">').text(response.message || $panel.data('error-label'));
+            $message.removeClass('lsd-util-hide').append($alert);
+            ListdomCountdown.mount($alert[0], response.countdown);
+            $form.find('input[name="code"]').val('').trigger('focus');
+        }
+    }).fail(function () {
+        $message.removeClass('lsd-util-hide').append(jQuery('<div class="lsd-alert lsd-error">').text($panel.data('error-label')));
+    }).always(function () {
+        $form.data('challenge-busy', false).removeData('challenge-operation').removeClass('lsd-loading').removeAttr('aria-busy');
+    });
+});
+
+// Email recovery uses the same Listdom login panel, including dropdown instances.
+jQuery(document).on('click.lsdAuthRecovery', '.lsd-totp-recovery-link', function (event) {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    const $link = jQuery(this);
+    let $panel = $link.closest('.lsd-auth-challenge');
+    if (!$panel.length) $panel = $link.closest('.lsd-auth-form-content').find('.lsd-auth-challenge').first();
+    if (!$panel.length) return;
+    event.preventDefault();
+    if ($panel.data('recovery-busy') || $panel.find('form').data('challenge-busy')) return;
+    const page = new URL(window.location.href);
+    page.searchParams.delete('lsd_challenge');
+    page.searchParams.delete('lsd_recovery_key');
+    if ($panel.closest('.lsd-auth-dropdown').length) page.searchParams.set('lsd_recovery_dropdown', '1');
+    else page.searchParams.delete('lsd_recovery_dropdown');
+    $panel.data('recovery-busy', true).addClass('lsd-loading').attr('aria-busy', 'true');
+    const $message = $panel.find('.lsd-auth-challenge-message');
+    jQuery.ajax({
+        url: $link.data('ajax-url'),
+        type: 'POST',
+        dataType: 'json',
+        data: {action: 'lsd_auth_recovery', operation: 'view', _wpnonce: $link.data('nonce'), return_url: page.href},
+    }).done(function (response) {
+        if (response.recovery_html) {
+            const $next = jQuery(response.recovery_html);
+            $panel.replaceWith($next);
+            listdom_auth_security_links($next);
+            $next.find('input[name="user_login"], button[type="submit"]').first().trigger('focus');
+        } else {
+            const $alert = jQuery('<div class="lsd-alert lsd-error">').text(response.message || $panel.data('error-label'));
+            $message.empty().removeClass('lsd-util-hide').append($alert);
+            ListdomCountdown.mount($alert[0], response.countdown);
+        }
+    }).fail(function () {
+        $message.empty().removeClass('lsd-util-hide').append(jQuery('<div class="lsd-alert lsd-error">').text($panel.data('error-label')));
+    }).always(function () {
+        $panel.removeData('recovery-busy').removeClass('lsd-loading').removeAttr('aria-busy');
+    });
+});
+jQuery(document).on('submit.lsdAuthRecovery', '.lsd-auth-recovery-form', function (event) {
+    event.preventDefault();
+    const $form = jQuery(this);
+    if ($form.data('recovery-busy')) return;
+    const $panel = $form.closest('.lsd-auth-recovery');
+    const $message = $panel.find('.lsd-auth-recovery-message');
+    $form.data('recovery-busy', true).addClass('lsd-loading').attr('aria-busy', 'true');
+    $message.empty().addClass('lsd-util-hide');
+    jQuery.ajax({
+        url: $panel.data('ajax-url'),
+        type: 'POST',
+        dataType: 'json',
+        data: $form.serialize() + '&action=lsd_auth_recovery&operation=submit',
+    }).done(function (response) {
+        if (response.recovery_html) {
+            const $next = jQuery(response.recovery_html);
+            $panel.replaceWith($next);
+            listdom_auth_security_links($next);
+            $next.find('[role="status"]').attr('tabindex', '-1').trigger('focus');
+        } else {
+            const $alert = jQuery('<div class="lsd-alert lsd-error">').text(response.message || $panel.data('error-label'));
+            $message.removeClass('lsd-util-hide').append($alert);
+            ListdomCountdown.mount($alert[0], response.countdown);
+        }
+    }).fail(function () {
+        $message.removeClass('lsd-util-hide').append(jQuery('<div class="lsd-alert lsd-error">').text($panel.data('error-label')));
+    }).always(function () {
+        $form.removeData('recovery-busy').removeClass('lsd-loading').removeAttr('aria-busy');
     });
 });

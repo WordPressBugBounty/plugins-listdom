@@ -25,6 +25,7 @@ $register_privacy_field = LSD_Privacy::consent_field([
     'context' => 'register',
 ]);
 $role_signature = trim($role) ? $this->role_signature('register', $role) : '';
+$login_url = LSD_Portal::is_page('register') && !LSD_Portal::is_page('login') ? LSD_Portal::url('login', $explicit_redirect ? $redirect : '') : '';
 
 $assets = new LSD_Assets();
 $assets->footer('<script>
@@ -154,6 +155,8 @@ jQuery(document).ready(function()
                         </div>
                     </div>
                 <?php endif; ?>
+            <?php else: ?>
+                <p class="lsd-fe-description-tiny lsd-password-policy"><?php echo esc_html(LSD_Security::password_description()); ?></p>
             <?php endif; ?>
         </div>
 
@@ -190,6 +193,7 @@ jQuery(document).ready(function()
             ]);
         }
         ?>
+        <?php LSD_Portal_Fields::registration($role); ?>
         <?php if ($register_privacy_field !== ''): ?>
             <div class="form-group lsd-register-privacy-consent">
                 <?php echo $register_privacy_field; ?>
@@ -205,4 +209,8 @@ jQuery(document).ready(function()
             ?>
         </div>
     </form>
+    <?php echo LSD_Auth::methods('register', $role, $redirect, $explicit_redirect); ?>
+    <?php if ($login_url !== ''): ?>
+        <p><a href="<?php echo esc_url($login_url); ?>"><?php esc_html_e('Already have an account? Sign in', 'listdom'); ?></a></p>
+    <?php endif; ?>
 </div>

@@ -15,6 +15,18 @@ class LSD_Upgrade extends LSD_Base
 
     public function upgrade()
     {
+        if (!get_option('lsd_email_change_templates_seeded'))
+        {
+            LSD_Notifications_Security::split_email_change_templates();
+            foreach (['confirmation', 'requested', 'completed'] as $event) $this->seed_notification('lsd_user_email_change_' . $event);
+            update_option('lsd_email_change_templates_seeded', 1, false);
+        }
+        if (!get_option('lsd_totp_recovery_templates_seeded'))
+        {
+            LSD_Notifications_Security::split_totp_templates();
+            foreach (['requested', 'completed'] as $event) $this->seed_notification('lsd_user_totp_recovery_' . $event);
+            update_option('lsd_totp_recovery_templates_seeded', 1, false);
+        }
         $this->seed_default_notifications();
 
         $version = get_option('lsd_version', '1.0.0');
@@ -48,6 +60,7 @@ class LSD_Upgrade extends LSD_Base
         if (version_compare($version, '5.3.1', '<')) $this->v531();
         if (version_compare($version, '5.4.0', '<')) $this->v540();
         if (version_compare($version, '5.7.0', '<')) $this->v570();
+        if (version_compare($version, '6.5.0', '<') && version_compare(LSD_VERSION, '6.5.0', '>=')) $this->v650();
 
         // Regenerate personalized CSS after any update
         LSD_Personalize::generate();
@@ -64,7 +77,7 @@ class LSD_Upgrade extends LSD_Base
 
     private function default_notifications(): array
     {
-        return [
+        return array_merge([
             'lsd_contact_owner' => [
                 'status' => 'publish',
                 'title' => 'New Contact By #name#!',
@@ -208,7 +221,7 @@ class LSD_Upgrade extends LSD_Base
                 Regards,
                 #site_name#',
             ],
-        ];
+        ], LSD_Notifications_Security::defaults());
     }
 
     private function seed_notification(string $hook)
@@ -1216,6 +1229,11 @@ class LSD_Upgrade extends LSD_Base
 
             update_post_meta($shortcode_id, 'lsd_display', $normalized);
         }
+    }
+
+    private function v650(): void
+    {
+        foreach (array_keys(LSD_Notifications_Security::defaults()) as $hook) $this->seed_notification($hook);
     }
 
     private function elementor(array &$data, array $map): bool

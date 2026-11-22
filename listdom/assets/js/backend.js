@@ -1284,6 +1284,12 @@ jQuery(document).ready(function ($)
     $(document).on('change', '#lsd_search_position, #lsd_search_sticky', lsdSyncSearchStickyOffsetVisibility);
     lsdSyncSearchStickyOffsetVisibility();
 
+    // Portal-only packages do not expose listing settings.
+    $('#lsd_portal_only').on('change', function ()
+    {
+        $('.lsd-package-listing-settings, #lsdaddsub_metabox_modules').toggleClass('lsd-util-hide', this.checked);
+    }).trigger('change');
+
     /**
      * Attributes Menu
      */
@@ -1952,6 +1958,15 @@ jQuery(document).ready(function ($)
 
         $contents.removeClass('lsd-tab-switcher-content-active');
         $(`#lsd-tab-switcher-${target}-content`).addClass('lsd-tab-switcher-content-active');
+
+        if ($tabs.hasClass('lsd-user-tabs'))
+        {
+            const url = new URL(window.location);
+            url.searchParams.set('tab', 'auth');
+            url.searchParams.set('subtab', $tabs.closest('[data-user-tab]').data('user-tab'));
+            url.searchParams.set('section', $tab.data('user-section'));
+            history.replaceState(null, '', url);
+        }
     });
 
     // Skin Switcher
@@ -1982,189 +1997,103 @@ jQuery(document).ready(function ($)
     /**
      * Listdom Additional Dashboard Menus
      */
-    $('.lsd-settings-dashboard-menus').sortable({
+    function dashboardEditorSettings(id)
+    {
+        const init = window.tinyMCEPreInit;
+        const source = init.mceInit[id] || init.qtInit[id] ? id : 'lsd_menu___lsd_menu_id___content';
+        const settings = {
+            tinymce: init.mceInit[source] ? $.extend({}, init.mceInit[source]) : false,
+            quicktags: init.qtInit[source] ? $.extend({}, init.qtInit[source]) : false,
+            mediaButtons: true
+        };
+        if (settings.tinymce && settings.tinymce.body_class)
+        {
+            settings.tinymce.body_class = settings.tinymce.body_class.replace(source, id);
+        }
+        return settings;
+    }
+
+    function saveDashboardEditors($scope, remove = false)
+    {
+        $scope.find('.lsd-dashboard-menu-editor').each(function ()
+        {
+            const editor = typeof tinymce !== 'undefined' ? tinymce.get(this.id) : null;
+            const $wrap = $(this).closest('.wp-editor-wrap');
+            // Code mode already holds the latest content in the textarea.
+            if (editor && !editor.isHidden()) editor.save();
+            if (remove && $wrap.length && dashboardEditorSettings(this.id).tinymce)
+            {
+                $(this).data('editor-mode', $wrap.hasClass('html-active') ? 'html' : 'tinymce');
+                wp.editor.remove(this.id);
+            }
+        });
+    }
+
+    function openDashboardEditors($scope)
+    {
+        if (!window.wp || !wp.editor || !wp.editor.initialize || !window.tinyMCEPreInit) return;
+        $scope.find('.lsd-dashboard-menu-content:visible .lsd-dashboard-menu-editor').each(function ()
+        {
+            if (typeof tinymce !== 'undefined' && tinymce.get(this.id)) return;
+            const settings = dashboardEditorSettings(this.id);
+            const $wrap = $(this).closest('.wp-editor-wrap');
+            const mode = $(this).data('editor-mode') || ($wrap.hasClass('html-active') ? 'html' : 'tinymce');
+
+            // Keep the native Quicktags-only markup for users without rich editing.
+            if (!settings.tinymce)
+            {
+                if (window.quicktags && !QTags.getInstance(this.id)) quicktags($.extend({}, settings.quicktags, {id: this.id}));
+                return;
+            }
+
+            if ($wrap.length) wp.editor.remove(this.id);
+            const initialized = settings.tinymce.init_instance_callback;
+            settings.tinymce.init_instance_callback = function (editor)
+            {
+                if (typeof initialized === 'function') initialized(editor);
+                if (mode === 'html') switchEditors.go(editor.id, 'html');
+            };
+            wp.editor.initialize(this.id, settings);
+        });
+    }
+
+    $('.lsd-settings-dashboard-menus').not('.lsd-security-sections').sortable({
         items: '> .lsd-dashboard-menu-item',
         cancel: '.lsd-dashboard-menu-content',
         tolerance: 'pointer',
-        helper: 'clone',
         appendTo: 'body',
-        start: function (e, ui) {
-            ui.helper
-            .addClass('lsd-sort-helper')
-            .css({
-                height: ui.item.outerHeight(),
-                zIndex: 999999
-            });
+        helper: function (_, $item)
+        {
+            saveDashboardEditors($item, true);
+            const $helper = $item.clone(false).addClass('lsd-sort-helper');
+            $helper.find('[id]').removeAttr('id');
+            return $helper.css({width: $item.outerWidth(), boxSizing: 'border-box'});
+        },
+        start: function (e, ui)
+        {
+            ui.helper.css({height: ui.item.outerHeight(), zIndex: 999999});
+        },
+        stop: function (e, ui)
+        {
+            openDashboardEditors(ui.item);
         }
     });
 
-    jQuery(function ($) {
+    $('#lsd_settings_form').on('lsd:save-dashboard-editors', function ()
+    {
+        saveDashboardEditors($(this));
+    });
 
-        $('body').on('click', '.lsd-custom-menu-btn', function ()
-        {
-            const defaultIcon = 'fas fa-tachometer-alt';
-            const $newMenuItem = $('<li class="lsd-dashboard-menu-item lsd-custom-menu-list">' +
-                '<p class="lsd-flex lsd-flex-content-between">' +
-                '<span>' +
-                '<i class="lsd-icon lsd-custom-menu-icon ' + defaultIcon + '"></i>' +
-                '<span class="lsd-custom-menu-label">' + lsd.i18n_field_label + '</span>' +
-                '</span>' +
-                '<span class="lsd-menu-actions">' +
-                '<i class="fas fa-trash"></i> ' +
-                '<button type="button" class="lsd-dashboard-menu-toggle" aria-pressed="true"><i class="fas fa-check-circle"></i></button> ' +
-                '<i class="fas fa-chevron-up lsd-dashboard-menu-chevron"></i>' +
-                '</span>' +
-                '</p>' +
-                '<div class="lsd-custom-menu-content lsd-dashboard-menu-content"></div>' +
-                '</li>');
-
-            $('.lsd-settings-dashboard-menus').append($newMenuItem);
-
-            const $labelGroup = $newMenuItem.find('.lsd-custom-menu-content');
-            const $inputHiddenMenu = $('<input>', {
-                type: 'hidden',
-                name: 'lsd[dashboard_menus][]',
-                class: 'custom-menu-slug'
-            });
-            const $inputMenuStatus = $('<input>', {
-                type: 'hidden',
-                name: '',
-                class: 'lsd-dashboard-menu-status',
-                'data-field': 'enabled',
-                value: '1',
-            });
-
-            const fields = ['Label', 'Slug', 'Icon', 'Login Status', 'Content'];
-
-            const placeholders = {
-                Label: lsd.i18n_placeholder_label,
-                Slug: lsd.i18n_placeholder_slug,
-                Icon: lsd.i18n_placeholder_icon,
-                'Login Status': '',
-                Content: ''
-            };
-
-            const descriptions = {
-                Label: lsd.i18n_description_label,
-                Slug: lsd.i18n_description_slug,
-                Icon: lsd.i18n_description_icon,
-                'Login Status': 'Choose whether this custom menu requires the user to be logged in.',
-                Content: lsd.i18n_description_content
-            };
-
-            $labelGroup.append($inputMenuStatus);
-
-            fields.forEach((field) =>
-            {
-                let uniqueName = field.toLowerCase().replace(/\s+/g, '_');
-                if (field === 'Login Status') {
-                    uniqueName = 'login_status';
-                }
-
-                const $fieldGroup = $('<div class="lsd-field-group"></div>');
-
-                const $label = $('<label class="lsd-fields-label-tiny"></label>').text(field);
-                $fieldGroup.append($label);
-
-                let $inputEl;
-                if (field === 'Icon')
-                {
-                    $inputEl = $('<select>', {
-                        name: '',
-                        required: true,
-                        'data-field': 'icon',
-                        class: 'lsd-iconpicker',
-                        id: 'lsd_icon'
-                    });
-
-                    lsd.icon_options.forEach(iconOption =>
-                    {
-                        $inputEl.append($('<option>', {
-                            value: iconOption.value,
-                            text: iconOption.label
-                        }));
-                    });
-
-                    $inputEl.val(defaultIcon);
-
-                    setTimeout(() => {
-                        if (typeof $.fn.fontIconPicker !== 'undefined') {
-                            $inputEl.fontIconPicker({
-                                emptyIcon: false,
-                                emptyIconValue: '',
-                                iconsPerPage: 16,
-                            });
-                        }
-                    }, 0);
-                }
-                else if (field === 'Content')
-                {
-                    const uniqueId = 'textarea_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-                    $inputEl = $('<textarea>', {
-                        name: '',
-                        id: uniqueId,
-                        'data-field': 'content'
-                    });
-
-                    setTimeout(() =>
-                    {
-                        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
-                            wp.editor.initialize(uniqueId, {
-                                tinymce: {
-                                    toolbar1: 'formatselect bold italic underline bullist numlist blockquote alignleft aligncenter alignright link unlink wp_more fullscreen',
-                                    plugins: 'lists paste link'
-                                },
-                                quicktags: true,
-                                mediaButtons: true
-                            });
-                        }
-                    }, 10);
-                }
-                else if (field === 'Login Status')
-                {
-                    // Select: required / optional, default = required
-                    $inputEl = $('<select>', {
-                        name: '',
-                        'data-field': uniqueName,
-                        class: 'lsd-admin-input'
-                    });
-
-                    $inputEl.append($('<option>', {
-                        value: 'required',
-                        text: 'Required (only logged-in users)'
-                    }));
-
-                    $inputEl.append($('<option>', {
-                        value: 'optional',
-                        text: 'Optional (visible to all users)'
-                    }));
-                }
-                else
-                {
-                    // Label / Slug
-                    $inputEl = $('<input>', {
-                        type: 'text',
-                        name: '',
-                        required: true,
-                        'data-field': uniqueName,
-                        placeholder: placeholders[field],
-                        class: 'lsd-admin-input'
-                    });
-                }
-
-                $fieldGroup.append($inputEl);
-                $fieldGroup.append(
-                    $('<p></p>')
-                    .text(descriptions[field] || '')
-                    .addClass('lsd-admin-description-tiny lsd-mb-0 lsd-mt-2')
-                );
-
-                $labelGroup.append($fieldGroup);
-            });
-
-            $newMenuItem.append($inputHiddenMenu);
-        });
-
+    let customMenuIndex = 0;
+    $('body').on('click', '.lsd-custom-menu-btn', function ()
+    {
+        const template = document.getElementById('lsd-dashboard-menu-custom-template');
+        const id = 'new_' + Date.now() + '_' + customMenuIndex++;
+        const $item = $(template.innerHTML.replace(/__lsd_menu_id__/g, id).trim());
+        $('.lsd-settings-dashboard-menus').not('.lsd-security-sections').append($item);
+        $item.find('.custom-menu-slug').val('');
+        if ($.fn.fontIconPicker) $item.find('select.lsd-iconpicker').fontIconPicker({emptyIcon: false, emptyIconValue: '', iconsPerPage: 16});
+        openDashboardEditors($item);
     });
 
     $(document).on('input', '.lsd-custom-menu-list input[data-field="slug"]', function ()
@@ -2194,7 +2123,8 @@ jQuery(document).ready(function ($)
         {
             const $field = $(this);
             const fieldName = $field.data('field');
-            $field.attr('name', `lsd[dashboard_menu_custom][${slugValueSanitize}][${fieldName}]`);
+            const suffix = fieldName === 'roles' ? '[]' : '';
+            $field.attr('name', `lsd[dashboard_menu_custom][${slugValueSanitize}][${fieldName}]${suffix}`);
         });
 
         // For login_status select (and other selects with data-field)
@@ -2224,7 +2154,7 @@ jQuery(document).ready(function ($)
     $(document).on('input', '.lsd-custom-menu-list input[data-field="label"]', function ()
     {
         const $thisList = $(this).closest('.lsd-custom-menu-list');
-        $thisList.find('.lsd-custom-menu-label').html($(this).val());
+        $thisList.find('.lsd-custom-menu-label').text($(this).val());
     });
 
     $(document).on('input', 'input[name^="lsd[dashboard_menu_builtin]"][name$="[label]"]', function ()
@@ -2276,6 +2206,7 @@ jQuery(document).ready(function ($)
 
         const $toggle = $(this);
         const $item = $toggle.closest('.lsd-dashboard-menu-item');
+        if ($item.closest('.lsd-security-sections').length) return;
         const $status = $item.find('.lsd-dashboard-menu-status').first();
 
         if (!$status.length) return;
@@ -2299,7 +2230,9 @@ jQuery(document).ready(function ($)
 
     $(document).on('click', '.lsd-custom-menu-list .fa-trash', function ()
     {
-        $(this).closest('.lsd-custom-menu-list').remove();
+        const $item = $(this).closest('.lsd-custom-menu-list');
+        saveDashboardEditors($item, true);
+        $item.remove();
     });
 
     $(document).on('click', '.lsd-dashboard-menu-item .lsd-dashboard-menu-chevron', function ()
@@ -2309,10 +2242,12 @@ jQuery(document).ready(function ($)
         if ($thisListContent.hasClass('lsd-util-hide'))
         {
             $thisListContent.removeClass('lsd-util-hide').show();
+            openDashboardEditors($chevron.closest('.lsd-dashboard-menu-item'));
             $chevron.removeClass('fa-chevron-down').addClass('fa-chevron-up');
         }
         else
         {
+            saveDashboardEditors($chevron.closest('.lsd-dashboard-menu-item'), true);
             $thisListContent.addClass('lsd-util-hide').hide();
             $chevron.removeClass('fa-chevron-up').addClass('fa-chevron-down');
         }
@@ -2688,6 +2623,12 @@ jQuery(function ($)
         const url = new URL(window.location);
         url.searchParams.set('tab', parent);
         url.searchParams.set('subtab', child);
+        if (parent === 'auth')
+        {
+            const section = $(`#${makeContentPanelId(parent, child)} .lsd-user-tabs .lsd-sub-tabs-active`).data('user-section');
+            if (section) url.searchParams.set('section', section);
+        }
+        else url.searchParams.delete('section');
         history.replaceState(null, '', url);
     }
 
@@ -4367,11 +4308,12 @@ jQuery(function ($)
 
         const getFocusTargetsFromSelector = function (selector)
         {
-            if (!selector) return $();
+            // Checklist targets are IDs/classes, optionally grouped or filtered by visibility.
+            if (!/^[#.][A-Za-z0-9_-]+(?::visible)?(?:\s*,\s*[#.][A-Za-z0-9_-]+(?::visible)?)*$/.test(selector)) return $();
 
             try
             {
-                return collectHighlightTargets($(selector), getSpecificHighlightTarget);
+                return collectHighlightTargets($(document).find(selector), getSpecificHighlightTarget);
             }
             catch (error)
             {
@@ -5629,3 +5571,135 @@ jQuery(function ($)
         sync_claim_payment_options();
     });
 })(jQuery);
+
+
+// Fixed account-security sections share dashboard-menu styling, with their own editor lifecycle.
+jQuery(function ($)
+{
+    const $list = $('.lsd-security-sections');
+    if (!$list.length) return;
+
+    function saveEditors($scope, remove = false)
+    {
+        $scope.find('.lsd-security-description-editor').each(function ()
+        {
+            const editor = typeof tinymce !== 'undefined' ? tinymce.get(this.id) : null;
+            if (editor) editor.save();
+            if (remove && editor && window.wp && wp.editor) wp.editor.remove(this.id);
+        });
+    }
+
+    function openEditors($scope)
+    {
+        if (!window.wp || !wp.editor || !wp.editor.initialize) return;
+        $scope.find('.lsd-dashboard-menu-content:visible .lsd-security-description-editor').each(function ()
+        {
+            if (typeof tinymce !== 'undefined' && tinymce.get(this.id)) return;
+            wp.editor.initialize(this.id, {
+                tinymce: {
+                    wpautop: true,
+                    menubar: false,
+                    toolbar1: 'bold italic bullist numlist link unlink undo redo',
+                    toolbar2: '',
+                    plugins: 'lists,wordpress,wplink',
+                    valid_elements: 'p,br,strong/b,em/i,ul,ol,li,a[href|title]',
+                    setup: function (editor)
+                    {
+                        editor.on('change', function ()
+                        {
+                            editor.save();
+                            $('#' + editor.id).trigger('change');
+                        });
+                    }
+                },
+                quicktags: false
+            });
+        });
+    }
+
+    $list.sortable({
+        items: '> .lsd-dashboard-menu-item',
+        cancel: 'button, input, textarea, .lsd-dashboard-menu-content',
+        tolerance: 'pointer',
+        appendTo: 'body',
+        helper: function (_, $item)
+        {
+            saveEditors($item, true);
+            const $helper = $item.clone(false).addClass('lsd-sort-helper');
+            $helper.find('[id]').removeAttr('id');
+            return $helper.css({width: $item.outerWidth(), boxSizing: 'border-box'});
+        },
+        start: function ()
+        {
+            saveEditors($list, true);
+        },
+        stop: function ()
+        {
+            openEditors($list);
+            $list.trigger('change');
+        }
+    });
+
+    $list.on('click', '.lsd-security-section-expand', function ()
+    {
+        const $button = $(this);
+        const $item = $button.closest('.lsd-dashboard-menu-item');
+        const $panel = $item.find('.lsd-dashboard-menu-content');
+        const open = $button.attr('aria-expanded') !== 'true';
+        if (!open) saveEditors($item, true);
+        $panel.toggleClass('lsd-util-hide', !open);
+        $button.attr('aria-expanded', open ? 'true' : 'false');
+        $button.find('i').toggleClass('fa-chevron-down', !open).toggleClass('fa-chevron-up', open);
+        if (open) openEditors($item);
+    });
+
+    $list.on('click', '.lsd-security-section-toggle', function ()
+    {
+        const $button = $(this);
+        const $item = $button.closest('.lsd-dashboard-menu-item');
+        const $status = $item.find('.lsd-dashboard-menu-status').first();
+        const enabled = $status.val() !== '1';
+        $status.val(enabled ? '1' : '0').trigger('change');
+        $button.attr('aria-pressed', enabled ? 'true' : 'false');
+        $button.find('i').toggleClass('fa-check-circle', enabled).toggleClass('fa-minus-circle', !enabled);
+        $item.toggleClass('lsd-dashboard-menu-item-disabled', !enabled);
+        $item.find('.lsd-security-feature-fields').toggleClass('lsd-util-hide', !enabled);
+    });
+
+    $list.on('input change', '.lsd-security-section-heading', function ()
+    {
+        const $item = $(this).closest('.lsd-dashboard-menu-item');
+        const original = $item.attr('data-default-heading');
+        const heading = $(this).val().trim() || original;
+        $item.find('.lsd-security-section-title').text(heading);
+        $item.find('.lsd-dashboard-menu-default-label').toggleClass('lsd-util-hide', heading === original);
+    });
+
+    $list.on('click', '.lsd-security-section-reset', function ()
+    {
+        const $item = $(this).closest('.lsd-dashboard-menu-item');
+        $item.find('.lsd-security-section-heading').val($item.attr('data-default-heading')).trigger('input');
+        const $description = $item.find('.lsd-security-description-editor');
+        const text = $item.attr('data-default-description');
+        $description.val(text).trigger('change');
+        const editor = typeof tinymce !== 'undefined' ? tinymce.get($description.attr('id')) : null;
+        if (editor)
+        {
+            editor.setContent(text);
+            editor.save();
+        }
+    });
+
+    window.listdomSecuritySections = {save: function () { saveEditors($list); }};
+});
+
+// Explain the optional authentication link only when its destination is selected.
+jQuery(function ($) {
+    const $page = $('#lsd_security_page');
+    if (!$page.length) return;
+    function syncSecurityLinkGuide() {
+        $('#lsd_security_link_guide').toggleClass('lsd-util-hide', !$page.val());
+    }
+    $page.on('change', syncSecurityLinkGuide);
+    syncSecurityLinkGuide();
+});

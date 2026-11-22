@@ -80,6 +80,9 @@ class LSD_Plugin_Hooks
      */
     public function install(int $blog_id = 1)
     {
+        // Mark new installations before settings are seeded; upgrades keep legacy registration.
+        if (!get_option('lsd_settings')) LSD_Security::upgrade();
+
         // Default Settings
         $settings = LSD_Options::defaults();
         add_option('lsd_settings', $settings);
@@ -181,6 +184,7 @@ class LSD_Plugin_Hooks
 
         dbDelta($sql);
 
+        LSD_Auth_Store::install();
         update_option('lsd_db_version', LSD_Base::DB_VERSION);
     }
 

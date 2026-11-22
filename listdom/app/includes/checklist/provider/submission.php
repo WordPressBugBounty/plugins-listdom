@@ -15,7 +15,7 @@ class LSD_Checklist_Provider_Submission extends LSD_Checklist_Provider_Base
                 'importance' => 'high',
                 'optional' => true,
                 'action_label' => esc_html__('Configure', 'listdom'),
-                'action_url' => $this->helper->settings_action_url('frontend-dashboard', 'general'),
+                'action_url' => LSD_Portal::admin_url('account-setup', 'pages'),
                 'action_focus_target' => '#lsd_settings_submission_page',
             ], [$this, 'dashboard_page']),
             $this->check([
@@ -26,7 +26,7 @@ class LSD_Checklist_Provider_Submission extends LSD_Checklist_Provider_Base
                 'importance' => 'medium',
                 'optional' => true,
                 'action_label' => esc_html__('Configure', 'listdom'),
-                'action_url' => $this->helper->settings_action_url('auth', 'authentication'),
+                'action_url' => LSD_Portal::admin_url('account-setup', 'pages'),
                 'action_focus_target' => '#lsd_auth_login_form',
             ], [$this, 'user_pages']),
             $this->check([

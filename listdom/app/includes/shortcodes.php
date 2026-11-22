@@ -33,6 +33,7 @@ class LSD_Shortcodes extends LSD_Base
 
         // Auth Shortcode
         (new LSD_Shortcodes_Auth())->init();
+        LSD_Portal_Access::init();
 
         // Profile Shortcode
         (new LSD_Shortcodes_Profile())->init();

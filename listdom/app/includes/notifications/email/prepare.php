@@ -18,7 +18,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         add_action('lsd_listing_report_abuse', [$this, 'abuse'], 10, 2);
 
         // User Email Verification
-        add_action('lsd_user_email_verification', [$this, 'user_email_verification'], 10, 3);
+        add_action('lsd_user_email_verification', [$this, 'user_email_verification'], 10, 4);
     }
 
     public function contact($args): array
@@ -152,7 +152,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
         return $this->form($args, 'lsd_listing_report_abuse');
     }
 
-    public function user_email_verification($user_id, $token, $verification_url): array
+    public function user_email_verification($user_id, $token, $verification_url, ?stdClass $delivery = null): array
     {
         $user = get_user_by('id', $user_id);
         if (!$user) return [];
@@ -170,6 +170,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             );
 
             $mails[] = wp_mail($user->user_email, $subject, $message);
+            if ($delivery) $delivery->sent = in_array(true, $mails, true);
             return $mails;
         }
 
@@ -211,6 +212,7 @@ class LSD_Notifications_Email_Prepare extends LSD_Notifications
             ], $notification->ID);
         }
 
+        if ($delivery) $delivery->sent = in_array(true, $mails, true);
         return $mails;
     }
 

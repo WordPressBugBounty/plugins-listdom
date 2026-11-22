@@ -13,6 +13,9 @@ class LSD_PTypes_Template extends LSD_PTypes
     public function init()
     {
         add_action('init', [$this, 'register_post_type']);
+        add_filter('use_block_editor_for_post', [$this, 'use_block_editor'], 100, 2);
+        add_action('enqueue_block_editor_assets', [$this, 'gutenberg_editor_assets']);
+        add_action('rest_api_init', [$this, 'gutenberg_editor_routes']);
         add_action('current_screen', [$this, 'customize_screen']);
         add_action('pre_get_posts', [$this, 'show_all_template_statuses']);
         add_filter('query_vars', [$this, 'add_query_vars']);
@@ -115,8 +118,8 @@ class LSD_PTypes_Template extends LSD_PTypes
             'has_archive' => false,
             'show_ui' => true,
             'show_in_menu' => false,
-            'show_in_rest' => false,
-            'supports' => ['title', 'editor', 'thumbnail'],
+            'show_in_rest' => true,
+            'supports' => ['title', 'editor', 'thumbnail', 'custom-fields'],
             'capabilities' => array_fill_keys([
                 'edit_post', 'read_post', 'delete_post',
                 'edit_posts', 'edit_others_posts',
@@ -126,6 +129,102 @@ class LSD_PTypes_Template extends LSD_PTypes
         ];
 
         register_post_type($this->PT, apply_filters('lsd_ptype_template_args', $args));
+
+        register_post_meta($this->PT, 'lsd_gutenberg_preview_listing', [
+            'type' => 'integer',
+            'single' => true,
+            'default' => 0,
+            'show_in_rest' => true,
+            'sanitize_callback' => 'absint',
+            'auth_callback' => function ($allowed, $meta_key, $post_id) {
+                return current_user_can('edit_post', $post_id);
+            },
+        ]);
+    }
+
+    public static function is_gutenberg_template(int $template_id): bool
+    {
+        return $template_id > 0
+            && get_post_type($template_id) === LSD_Base::PTYPE_TEMPLATE
+            && get_post_meta($template_id, '_lsd_template_builder', true) === 'gutenberg';
+    }
+
+    public function use_block_editor(bool $use_block_editor, WP_Post $post): bool
+    {
+        if ($post->post_type !== $this->PT) return $use_block_editor;
+        return self::is_gutenberg_template((int) $post->ID);
+    }
+
+    public function gutenberg_editor_assets(): void
+    {
+        $screen = get_current_screen();
+        if (!$screen || $screen->post_type !== $this->PT || !isset($_GET['post'])) return;
+
+        $template_id = absint(wp_unslash($_GET['post']));
+        if (!self::is_gutenberg_template($template_id)) return;
+
+        wp_enqueue_script(
+            'lsd-template-gutenberg',
+            $this->lsd_asset_url('js/template-gutenberg.min.js'),
+            ['wp-api-fetch', 'wp-components', 'wp-data', 'wp-edit-post', 'wp-element', 'wp-plugins'],
+            LSD_Assets::version(),
+            true
+        );
+        wp_localize_script('lsd-template-gutenberg', 'lsdTemplateGutenberg', [
+            'templateId' => $template_id,
+            'panelTitle' => esc_html__('Listdom Template', 'listdom'),
+            'sampleListing' => esc_html__('Sample Listing', 'listdom'),
+            'sampleHelp' => esc_html__('All listing blocks preview this listing. Published templates use the listing being displayed.', 'listdom'),
+            'searchListings' => esc_html__('Search listings', 'listdom'),
+            'chooseListing' => esc_html__('Choose a listing', 'listdom'),
+        ]);
+    }
+
+    public function gutenberg_editor_routes(): void
+    {
+        register_rest_route('listdom/v1', '/template-preview-listings', [
+            'methods' => 'GET',
+            'permission_callback' => function ($request) {
+                $template_id = absint($request->get_param('template_id'));
+                return self::is_gutenberg_template($template_id) && current_user_can('edit_post', $template_id);
+            },
+            'callback' => [$this, 'gutenberg_preview_listings'],
+            'args' => [
+                'template_id' => ['required' => true, 'sanitize_callback' => 'absint'],
+                'search' => ['sanitize_callback' => 'sanitize_text_field'],
+                'selected' => ['sanitize_callback' => 'absint'],
+            ],
+        ]);
+    }
+
+    public function gutenberg_preview_listings($request): array
+    {
+        $selected = absint($request->get_param('selected'));
+        $ids = get_posts([
+            'post_type' => LSD_Base::PTYPE_LISTING,
+            'post_status' => 'publish',
+            'posts_per_page' => 30,
+            's' => (string) $request->get_param('search'),
+            'fields' => 'ids',
+            'no_found_rows' => true,
+        ]);
+        if ($selected && !in_array($selected, $ids, true)) $ids[] = $selected;
+
+        $listings = [];
+        foreach ($ids as $id)
+        {
+            $post = get_post($id);
+            if (!$this->can_preview_listing($post)) continue;
+            $listings[] = ['value' => (int) $id, 'label' => get_the_title($id) ?: sprintf(esc_html__('Listing #%d', 'listdom'), $id)];
+        }
+
+        return $listings;
+    }
+
+    private function can_preview_listing($post): bool
+    {
+        if (!$post instanceof WP_Post || $post->post_type !== LSD_Base::PTYPE_LISTING) return false;
+        return ($post->post_status === 'publish' && $post->post_password === '') || current_user_can('edit_post', $post->ID);
     }
 
     protected function get_post_type_capability(string $capability, string $fallback = ''): string
@@ -202,6 +301,9 @@ class LSD_PTypes_Template extends LSD_PTypes
 
         if ($this->is_template_screen($screen, 'post'))
         {
+            $template_id = isset($_GET['post']) ? absint(wp_unslash($_GET['post'])) : 0;
+            if ($template_id && self::is_gutenberg_template($template_id)) return;
+
             add_filter('admin_body_class', function ($classes) {
                 return trim($classes . ' lsd-template-editor');
             });
@@ -213,6 +315,7 @@ class LSD_PTypes_Template extends LSD_PTypes
     public function editor_content($post)
     {
         if (!$post instanceof WP_Post || $post->post_type !== $this->PT) return;
+        if (self::is_gutenberg_template((int) $post->ID)) return;
 
         $this->include_html_file('template-builder/editor-workspace.php');
     }
@@ -282,6 +385,8 @@ class LSD_PTypes_Template extends LSD_PTypes
             $preview_listing_id = 0;
         }
 
+        if (self::is_gutenberg_template($template_id) && $preview_listing_id && !$this->can_preview_listing(get_post($preview_listing_id))) $preview_listing_id = 0;
+
         if (!$preview_listing_id) $preview_listing_id = $this->get_preview_listing_id($template_id);
 
         $template_type = $this->resolve_preview_template_type($template_id, $template_type);
@@ -305,6 +410,13 @@ class LSD_PTypes_Template extends LSD_PTypes
     {
         $template_id = absint($template_id);
         if (!$template_id) return '';
+
+        if (self::is_gutenberg_template($template_id))
+        {
+            if (!$preview_listing_id || !$this->can_preview_listing(get_post($preview_listing_id))) return '';
+            $listing = new LSD_Entity_Listing($preview_listing_id);
+            return (new LSD_Builders())->listing($listing)->template_type($template_type ?: 'single_listing')->build($template_id);
+        }
 
         $args = [
             'context' => $template_type !== '' ? 'preview' : 'frontend',
@@ -528,6 +640,7 @@ class LSD_PTypes_Template extends LSD_PTypes
     public function restore_template_layout_css(int $post_id, int $revision_id): void
     {
         if (get_post_type($post_id) !== $this->PT) return;
+        if (self::is_gutenberg_template($post_id)) return;
 
         if (metadata_exists('post', $revision_id, '_lsd_template_layout'))
         {
@@ -1045,10 +1158,12 @@ class LSD_PTypes_Template extends LSD_PTypes
 
         if ($template_id)
         {
-            $saved_listing_id = (int) get_post_meta($template_id, '_lsd_template_preview_listing', true);
+            $meta_key = self::is_gutenberg_template($template_id) ? 'lsd_gutenberg_preview_listing' : '_lsd_template_preview_listing';
+            $saved_listing_id = (int) get_post_meta($template_id, $meta_key, true);
 
             $saved_post = $saved_listing_id ? get_post($saved_listing_id) : null;
             if (!$saved_post instanceof WP_Post || $saved_post->post_type !== LSD_Base::PTYPE_LISTING) $saved_listing_id = 0;
+            if ($saved_listing_id && self::is_gutenberg_template($template_id) && !$this->can_preview_listing($saved_post)) $saved_listing_id = 0;
         }
 
         if (!$saved_listing_id)
@@ -1056,7 +1171,7 @@ class LSD_PTypes_Template extends LSD_PTypes
             $ids = get_posts([
                 'post_type'      => LSD_Base::PTYPE_LISTING,
                 'posts_per_page' => 1,
-                'post_status'    => ['publish', 'pending', 'draft', 'future'],
+                'post_status'    => self::is_gutenberg_template($template_id) ? ['publish'] : ['publish', 'pending', 'draft', 'future'],
                 'fields'         => 'ids',
                 'no_found_rows'  => true,
             ]);
@@ -1204,6 +1319,8 @@ class LSD_PTypes_Template extends LSD_PTypes
             'thumbnail' => $thumbnail,
             'preview_url' => $preview_url,
             'type' => $type_info['label'],
+            'builder' => self::is_gutenberg_template((int) $post->ID) ? esc_html__('Gutenberg', 'listdom') : esc_html__('Listdom', 'listdom'),
+            'builder_icon' => self::is_gutenberg_template((int) $post->ID) ? 'dashicons-block-default' : 'dashicons-layout',
             'type_icon' => $type_info['icon'],
             'status' => $post->post_status,
             'status_label' => $status_label,
@@ -1215,10 +1332,20 @@ class LSD_PTypes_Template extends LSD_PTypes
 
     protected function get_template_preview_url(WP_Post $post): string
     {
-        $layout_state = get_post_meta($post->ID, '_lsd_template_layout', true);
-        if (!$layout_state) return '';
+        if (self::is_gutenberg_template((int) $post->ID))
+        {
+            if (!has_blocks($post->post_content)) return '';
+        }
+        else
+        {
+            $layout_state = get_post_meta($post->ID, '_lsd_template_layout', true);
+            if (!$layout_state) return '';
+        }
 
-        $preview_listing_id = (int) get_post_meta($post->ID, '_lsd_template_preview_listing', true);
+        $preview_listing_id = self::is_gutenberg_template((int) $post->ID)
+            ? (int) get_post_meta($post->ID, 'lsd_gutenberg_preview_listing', true)
+            : (int) get_post_meta($post->ID, '_lsd_template_preview_listing', true);
+        if (self::is_gutenberg_template((int) $post->ID) && $preview_listing_id && !$this->can_preview_listing(get_post($preview_listing_id))) $preview_listing_id = 0;
         if (!$preview_listing_id) $preview_listing_id = $this->get_preview_listing_id($post->ID);
         if (!$preview_listing_id || get_post_type($preview_listing_id) !== LSD_Base::PTYPE_LISTING) return '';
 
@@ -1305,13 +1432,13 @@ class LSD_PTypes_Template extends LSD_PTypes
                 'types' => $this->template_types(),
                 'nonce' => $this->get_creation_nonce(),
                 'modal_id' => 'lsd-template-modal',
-                'default_type' => $this->default_template_type(),
             ],
         ]);
     }
 
     public function save_template_meta($post_id)
     {
+        if (self::is_gutenberg_template((int) $post_id)) return;
         $is_autosave = defined('DOING_AUTOSAVE') && DOING_AUTOSAVE;
 
         // Capability check
@@ -1388,6 +1515,8 @@ class LSD_PTypes_Template extends LSD_PTypes
         // Data
         $title = sanitize_text_field($post['title'] ?? '');
         $type  = sanitize_key($post['type'] ?? '');
+        $builder = sanitize_key($post['builder'] ?? 'listdom');
+        if ($builder !== 'gutenberg') $builder = 'listdom';
         $types = array_keys($this->template_types());
 
         if (!$type || !in_array($type, $types, true)) $type = reset($types);
@@ -1401,6 +1530,7 @@ class LSD_PTypes_Template extends LSD_PTypes
             'post_title' => $title,
             'meta_input' => [
                 '_lsd_template_type' => $type,
+                '_lsd_template_builder' => $builder,
             ],
         ], true);
 
@@ -1630,13 +1760,14 @@ class LSD_PTypes_Template extends LSD_PTypes
             'fields'         => 'ids',
         ]);
 
-        if ($skin === 'detail_types') $styles['template_builder'] = esc_html__('Template Builder', 'listdom');
+        if ($skin === 'detail_types') $styles['template_builder'] = esc_html__('Listdom Templates', 'listdom');
 
         foreach ($templates as $template_id)
         {
             $template_type = get_post_meta($template_id, '_lsd_template_type', true) ?: 'single_listing';
             $title         = get_the_title($template_id);
-            $label         = $title ? $title . ' (Template Builder)' : esc_html__('Template Builder', 'listdom');
+            $builder_label = self::is_gutenberg_template((int) $template_id) ? esc_html__('Gutenberg', 'listdom') : esc_html__('Template Builder', 'listdom');
+            $label         = $title ? sprintf('%s (%s)', $title, $builder_label) : $builder_label;
 
             // Give template builder a custom prefix, so we can detect it in JS
             $key = 'tb_' . $template_id;

@@ -51,8 +51,7 @@
   line-height: inherit;
 }
 
-[data-type="listdom/listing-address"] .lsd-listing-block.lsd-block-text-color.lsd-listing-address,
-[data-type="listdom/listing-price"] .lsd-listing-block.lsd-block-text-color.lsd-listing-price {
+[data-type^="listdom/listing-"] .lsd-listing-block.lsd-block-text-color {
   color: inherit;
 }
 

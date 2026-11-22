@@ -2548,6 +2548,12 @@ jQuery(function($)
                             $wrapper.removeClass('lsd-has-suggestions');
                         });
                     }
+                    else
+                    {
+                        $wrapper.removeClass('lsd-has-suggestions');
+                        $suggestions.empty();
+                        if(data.message) $suggestions.append($('<div class="lsd-alert lsd-error lsd-m-0" role="alert"></div>').text(data.message));
+                    }
                 }
             });
         });
@@ -4328,6 +4334,33 @@ function listdom_notify(message, type, options = {})
     if (window.lsdAuthDropdownInitialized) return;
     window.lsdAuthDropdownInitialized = true;
 
+    function positionPanel(dropdown) {
+        const panel = dropdown.children(".lsd-auth-dropdown-panel")[0];
+        if (!panel || !panel.getClientRects().length) return;
+
+        const gutter = 12;
+        const viewport = document.documentElement;
+        panel.style.removeProperty("--lsd-auth-panel-offset");
+        const rect = panel.getBoundingClientRect();
+        const offset = Math.max(gutter - rect.left, Math.min(0, viewport.clientWidth - gutter - rect.right));
+        panel.style.setProperty("--lsd-auth-panel-offset", offset + "px");
+
+        const top = dropdown[0].getBoundingClientRect().top + panel.offsetTop;
+        panel.style.setProperty("--lsd-auth-panel-height", Math.max(120, viewport.clientHeight - top - gutter) + "px");
+    }
+
+    function positionPanels() {
+        $(".lsd-auth-dropdown").each(function () {
+            positionPanel($(this));
+        });
+    }
+
+    $(positionPanels);
+    $(window).on("resize scroll", positionPanels);
+    $(document).on("lsd:auth-dropdown-open", ".lsd-auth-dropdown", function () {
+        positionPanel($(this));
+    });
+
     const closeAll = function (except) {
         $(".lsd-auth-dropdown").each(function () {
             const dropdown = $(this);
@@ -4351,6 +4384,7 @@ function listdom_notify(message, type, options = {})
 
         closeAll(dropdown);
         dropdown.addClass("lsd-open");
+        positionPanel(dropdown);
         dropdown.find(".lsd-auth-dropdown-panel").attr("aria-hidden", "false");
         dropdown.find(".lsd-auth-dropdown-toggle").attr("aria-expanded", "true");
     });
@@ -4360,7 +4394,10 @@ function listdom_notify(message, type, options = {})
     });
 
     $(document).on("keydown", function (e) {
-        if (e.key === "Escape") closeAll();
+        if (e.key !== "Escape") return;
+        const dropdown = $(e.target).closest(".lsd-auth-dropdown.lsd-open");
+        closeAll();
+        dropdown.children(".lsd-auth-dropdown-toggle").trigger("focus");
     });
 
     $(document).on("click", ".lsd-auth-dropdown-role-tab", function (e) {
@@ -4390,6 +4427,7 @@ function listdom_notify(message, type, options = {})
         const dropdown = $(this);
         closeAll(dropdown);
         dropdown.addClass("lsd-open");
+        positionPanel(dropdown);
         dropdown.find(".lsd-auth-dropdown-panel").attr("aria-hidden", "false");
         dropdown.find(".lsd-auth-dropdown-toggle").attr("aria-expanded", "true");
     });

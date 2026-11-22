@@ -455,6 +455,10 @@
   }
 }
 
+.rtl .lsd-listing-block.lsd-listing-availability .lsd-ava-weekday .lsd-col-8 {
+  text-align: left;
+}
+
 .lsd-grid-view-wrapper.lsd-style-style1 .lsd-grid-view-listings-wrapper .lsd-row > div .lsd-listing .lsd-listing-labels {
   left: auto;
   right: 16px;

@@ -4,7 +4,8 @@ class LSD_Payments_Recurrings extends LSD_Base
 {
     const STATUS_ACTIVE = 'lsd-recurring-active';
     const STATUS_CANCEL = 'lsd-recurring-cancel';
-    const STATUS_REFUNDED = 'lsd-recurring-refunded';
+    // WordPress stores post_status in a varchar(20) column.
+    const STATUS_REFUNDED = 'lsd-recurring-refund';
 
     protected static array $direct_gateway_meta_keys = [
         'stripe_customer_id',

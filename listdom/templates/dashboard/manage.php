@@ -59,7 +59,7 @@ $dashboard_wrapper = $this->get_dashboard_wrapper();
                         <i class="lsd-fe-icon fa-solid fa-list-dots"></i>
                         <h2 class="lsd-fe-title"><?php echo esc_html__('My Listings', 'listdom'); ?></h2>
                     </div>
-                    <p class="lsd-fe-description"><?php esc_html_e('Manage your listings and promot them', 'listdom'); ?></p>
+                    <p class="lsd-fe-description"><?php esc_html_e('Manage your listings and promote them.', 'listdom'); ?></p>
                 </div>
             </div>
             <div class="lsd-fe-box-white">

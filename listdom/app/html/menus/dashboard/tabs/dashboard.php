@@ -30,7 +30,7 @@ defined('ABSPATH') || die();
     <div class="lsd-welcome-panel-container welcome-panel-column-container">
         <div class="welcome-panel-column lsd-welcome-start">
             <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Start Your Directory Website', 'listdom'); ?></h3>
-            <p class="lsd-m-0"><?php esc_html_e('Thanks for using Listdom. Listdom is a great plugin for creating directory and listing websites. With Listdom you can show the listings in different skins and views such as List, Grid, Half Map etc.', 'listdom') ?></p>
+            <p class="lsd-m-0"><?php esc_html_e('Build your directory with listings, search, and maps. Connect your first website to Webilia to get 20 free credits for importing up to 100 business listings as drafts, even with Listdom Free.', 'listdom'); ?></p>
 
             <div class="lsd-get-start-section">
                 <a class="lsd-primary-button" href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_LISTING)); ?>" target="_blank">
@@ -46,10 +46,11 @@ defined('ABSPATH') || die();
 
         <div class="welcome-video">
             <iframe width="640" height="360"
-                src="https://www.youtube-nocookie.com/embed/du_96cv6BAw?rel=0&amp;vq=hd1080"
-                title="YouTube video player" frameborder="0"
+                src="https://www.youtube-nocookie.com/embed/_Jch4Zpa9_M?rel=0"
+                title="<?php esc_attr_e('Mark J Draper demonstrates Listdom, Claude and Business Data', 'listdom'); ?>" frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <p class="lsd-admin-description"><?php esc_html_e('Walkthrough by Mark J Draper: directory setup, editing with Claude and Easy MCP, and importing business listings as drafts.', 'listdom'); ?></p>
         </div>
     </div>
 
@@ -104,9 +105,23 @@ defined('ABSPATH') || die();
         <div class="lsd-icon-box">
             <div class="lsd-admin-section-heading">
                 <h3 class="lsd-m-0 lsd-admin-title"><?php esc_html_e('Build the Essentials', 'listdom'); ?></h3>
-                <p class="lsd-admin-description"><?php esc_html_e('Set up key features like search forms, login/register, and dashboards.', 'listdom'); ?></p>
+                <p class="lsd-admin-description"><?php esc_html_e('Set up search forms and dashboards. Connect your Webilia account to get full Stats and Analytics features for free, including with Listdom Free.', 'listdom'); ?></p>
             </div>
             <ul>
+                <li>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-analytics')); ?>" class="lsd-text-button">
+                        <i class="wui-icon wui-icon--chart-increase"></i>
+                        <?php esc_html_e('Open Analytics', 'listdom'); ?>
+                    </a>
+                </li>
+                <?php if (LSD_Webilia_Connect::enabled()): ?>
+                    <li>
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-ix&tab=business-data')); ?>" class="lsd-text-button">
+                            <i class="wui-icon wui-icon--database"></i>
+                            <?php esc_html_e('Find and Import Business Data', 'listdom'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <li>
                     <a href="<?php echo esc_url(admin_url('post-new.php?post_type=' . LSD_Base::PTYPE_SEARCH)); ?>" class="lsd-text-button">
                         <i class="wui-icon wui-icon--search-area"></i>
@@ -120,7 +135,7 @@ defined('ABSPATH') || die();
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth')); ?>" class="lsd-text-button">
+                    <a href="<?php echo esc_url(LSD_Portal::admin_url('account-setup', 'pages')); ?>" class="lsd-text-button">
                         <i class="wui-icon wui-icon--login-method"></i>
                         <?php esc_html_e('Authentication Page', 'listdom'); ?>
                     </a>
@@ -132,7 +147,7 @@ defined('ABSPATH') || die();
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=listdom-settings&tab=auth&subtab=profile')); ?>" class="lsd-text-button">
+                    <a href="<?php echo esc_url(LSD_Portal::admin_url('profiles-directory', 'profiles')); ?>" class="lsd-text-button">
                         <i class="wui-icon wui-icon--user-circle"></i>
                         <?php esc_html_e('Author Profile', 'listdom'); ?>
                     </a>

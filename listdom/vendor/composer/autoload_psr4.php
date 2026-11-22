@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'voku\\' => array($vendorDir . '/voku/portable-ascii/src/voku'),
+    'lbuchs\\WebAuthn\\' => array($vendorDir . '/lbuchs/webauthn/src'),
     'Webilia\\WP\\' => array($vendorDir . '/webilia/wp/src'),
     'Webilia\\UI\\' => array($vendorDir . '/webilia/ui/src'),
     'Webilia\\Connect\\' => array($vendorDir . '/webilia/connect/src'),
@@ -19,6 +20,8 @@ return array(
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'Psr\\Clock\\' => array($vendorDir . '/psr/clock/src'),
+    'Lcobucci\\JWT\\' => array($vendorDir . '/lcobucci/jwt/src'),
+    'Lcobucci\\Clock\\' => array($vendorDir . '/lcobucci/clock/src'),
     'LSDPACVIS\\' => array($vendorDir . '/webilia/listdom-p-visibility/app'),
     'Jenssegers\\Blade\\' => array($vendorDir . '/jenssegers/blade/src'),
     'Illuminate\\View\\' => array($vendorDir . '/illuminate/view'),
@@ -30,6 +33,8 @@ return array(
     'Illuminate\\Container\\' => array($vendorDir . '/illuminate/container'),
     'Illuminate\\Bus\\' => array($vendorDir . '/illuminate/bus'),
     'Doctrine\\Inflector\\' => array($vendorDir . '/doctrine/inflector/src'),
+    'DASPRiD\\Enum\\' => array($vendorDir . '/dasprid/enum/src'),
     'Carbon\\Doctrine\\' => array($vendorDir . '/carbonphp/carbon-doctrine-types/src/Carbon/Doctrine'),
     'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),
+    'BaconQrCode\\' => array($vendorDir . '/bacon/bacon-qr-code/src'),
 );

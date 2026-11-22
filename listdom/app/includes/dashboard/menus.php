@@ -45,10 +45,8 @@ class LSD_Dashboard_Menus extends LSD_Shortcodes
             if (!$slug) continue;
             if (!$enabled) continue;
 
+            if (!LSD_Dashboard_Access::allows($menu)) continue;
             $login_status = $menu['login_status'] ?? 'required';
-
-            // If login is required and user is NOT logged in, do not add this custom menu
-            if ($login_status === 'required' && !is_user_logged_in()) continue;
 
             $menus[$slug] = [
                 'label' => $label,
@@ -81,12 +79,9 @@ class LSD_Dashboard_Menus extends LSD_Shortcodes
 
             if ($dashboard->mode !== ($menu['slug'] ?? '')) continue;
 
-            $login_status = $menu['login_status'] ?? 'required';
+            if (!LSD_Dashboard_Access::allows($menu)) return $output;
 
-            // If login required and user is NOT logged in, do not show this custom content
-            if ($login_status === 'required' && !is_user_logged_in()) return $output;
-
-            $this->content = $menu['content'] ?? '';
+            $this->content = LSD_Dashboard_Access::locked($menu) ?? do_shortcode((string) ($menu['content'] ?? ''));
             return $this->output($dashboard);
         }
 

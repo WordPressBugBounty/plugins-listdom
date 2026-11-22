@@ -2572,7 +2572,7 @@
             const buttonWidth = Math.ceil($button.outerWidth() || $item.outerWidth() || 0);
             const buttonHeight = Math.ceil($button.outerHeight() || $item.outerHeight() || 42);
 
-            return $('<div class="lsd-template-editor-structure__sort-helper"></div>')
+            return $('<div class="lsd-template-editor-structure__sort-helper wui"></div>')
                 .append($button.clone())
                 .css({
                     width: buttonWidth ? buttonWidth + 'px' : '',
@@ -4682,8 +4682,8 @@
             const elementIcon = ($item.data('lsd-element-icon') || this.getIconForType(elementType) || '').toString();
             const isContainer = $item.is(this.containerSelector) || elementType === 'container';
             const helperClass = isContainer
-                ? 'lsd-template-editor-canvas__sort-helper lsd-template-editor-canvas__sort-helper--container lsd-template-editor-element-list__drag-helper'
-                : 'lsd-template-editor-canvas__sort-helper lsd-template-editor-canvas__sort-helper--element lsd-template-editor-element-list__drag-helper';
+                ? 'lsd-template-editor-canvas__sort-helper lsd-template-editor-canvas__sort-helper--container lsd-template-editor-element-list__drag-helper wui'
+                : 'lsd-template-editor-canvas__sort-helper lsd-template-editor-canvas__sort-helper--element lsd-template-editor-element-list__drag-helper wui';
             const iconHtml = elementIcon
                 ? '<i class="' + elementIcon.replace(/"/g, '&quot;') + '" aria-hidden="true"></i>'
                 : '<i class="wui-icon wui-icon--layout" aria-hidden="true"></i>';
@@ -4896,7 +4896,7 @@
                 : '<i class="wui-icon wui-icon--layout" aria-hidden="true"></i>';
 
             return $(
-                '<div class="lsd-template-editor-element-list__drag-helper">' +
+                '<div class="lsd-template-editor-element-list__drag-helper wui">' +
                     '<span class="lsd-template-editor-element-list__drag-helper-icon">' + iconHtml + '</span>' +
                     '<span class="lsd-template-editor-element-list__drag-helper-label"></span>' +
                 '</div>'
@@ -8036,6 +8036,9 @@
 
             const $error = $modal.find('.lsd-template-modal-error');
             const $nameField = $('#lsd-template-name');
+            const $builderField = $form.find('.lsd-template-builder-field');
+            const $typeField = $form.find('.lsd-template-type-field');
+            const getBuilderRadios = () => $form.find('input[name="lsd_template_builder"]');
             const getTypeRadios = () => $form.find('input[name="lsd_template_type"]');
             const $submitButton = $form.find('button[type="submit"]');
             const ajaxUrl = AjaxHelpers.getAjaxUrl();
@@ -8043,6 +8046,8 @@
 
             const messages = {
                 required: $form.data('requiredMessage'),
+                builder: $form.data('builderMessage'),
+                type: $form.data('typeMessage'),
                 failed:   $form.data('failedMessage')
             };
 
@@ -8060,14 +8065,30 @@
                 $error.text(text).addClass('is-visible');
             };
 
-            const resetForm = () => {
-                if ($form.length && typeof $form.get(0).reset === 'function') $form.get(0).reset();
-                ensureTypeSelection();
+            const setFieldActive = ($field, active) => {
+                $field.toggleClass('is-inactive', !active)
+                    .attr('aria-hidden', String(!active))
+                    .prop('inert', !active)
+                    .find('input, button').prop('disabled', !active);
             };
 
-            const ensureTypeSelection = () => {
-                const $radios = getTypeRadios();
-                if ($radios.length && !$radios.filter(':checked').length) $radios.first().prop('checked', true);
+            const resetForm = () => {
+                if ($form.length && typeof $form.get(0).reset === 'function') $form.get(0).reset();
+                setFieldActive($builderField, true);
+                setFieldActive($typeField, false);
+            };
+
+            const changeStep = ($current, $next, $focus) => {
+                if ($current.hasClass('is-inactive')) return;
+
+                setFieldActive($next, true);
+                setFieldActive($current, false);
+                $focus.trigger('focus');
+            };
+
+            const getSelectedBuilder = () => {
+                const $selected = getBuilderRadios().filter(':checked');
+                return $selected.length ? $selected.val() : '';
             };
 
             const getSelectedType = () => {
@@ -8076,8 +8097,8 @@
             };
 
             const openModal = () => {
+                resetForm();
                 hideError();
-                ensureTypeSelection();
                 $modal.addClass('is-open').attr('aria-hidden', 'false');
                 if ($nameField.length) $nameField.trigger('focus');
             };
@@ -8108,6 +8129,19 @@
                 if ($(event.target).is('.lsd-template-modal-backdrop')) closeModal();
             });
 
+            $form.on('click change', 'input[name="lsd_template_builder"]', function () {
+                if ($builderField.hasClass('is-inactive')) return;
+                getTypeRadios().prop('checked', false);
+                hideError();
+                changeStep($builderField, $typeField, getTypeRadios().first());
+            });
+
+            $form.on('click', '.lsd-template-change-builder', function () {
+                getTypeRadios().prop('checked', false);
+                hideError();
+                changeStep($typeField, $builderField, getBuilderRadios().filter(':checked'));
+            });
+
             // Change type clears error
             $form.on('change', 'input[name="lsd_template_type"]', hideError);
 
@@ -8125,10 +8159,27 @@
 
                 const title = jQuery.trim($nameField.val());
                 const type  = getSelectedType();
+                const builder = getSelectedBuilder();
 
                 if (!title) {
                     showError(messages.required);
                     $nameField.trigger('focus');
+                    return;
+                }
+
+                if (!builder) {
+                    showError(messages.builder);
+                    getBuilderRadios().first().trigger('focus');
+                    return;
+                }
+
+                if (!type) {
+                    if ($typeField.hasClass('is-inactive')) {
+                        changeStep($builderField, $typeField, getTypeRadios().first());
+                        return;
+                    }
+                    showError(messages.type);
+                    getTypeRadios().first().trigger('focus');
                     return;
                 }
 
@@ -8140,7 +8191,8 @@
                     action: 'lsd_create_template',
                     nonce,
                     title,
-                    type
+                    type,
+                    builder
                 };
 
                 if (!ajaxUrl || !nonce) {

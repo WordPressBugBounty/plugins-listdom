@@ -14,17 +14,19 @@ defined('ABSPATH') || die();
 /** @var string $form_type */
 /** @var array $attr */
 
+$show_security = $security_markup !== null;
 $is_logged_in = is_user_logged_in();
 $user_info = LSD_User::get_user_info();
 $avatar = $is_logged_in ? LSD_User::get_user_avatar('', 40) : '';
 $panel_id = $id . '-panel';
 $wrapper_classes = [
     'lsd-auth-dropdown',
+    $show_security ? 'lsd-open' : '',
     'lsd-auth-dropdown-align-'.$align,
 ];
 ?>
 <div class="<?php echo esc_attr(implode(' ', array_filter($wrapper_classes))); ?>" id="<?php echo esc_attr($id); ?>" data-hover="<?php echo $hover ? 1 : 0; ?>">
-    <button type="button" class="lsd-auth-dropdown-toggle" aria-label="<?php echo esc_attr($is_logged_in ? ($user_info['display_name'] ?? $button_label) : $button_label); ?>" aria-expanded="false" aria-controls="<?php echo esc_attr($panel_id); ?>">
+    <button type="button" class="lsd-auth-dropdown-toggle" aria-label="<?php echo esc_attr($is_logged_in ? ($user_info['display_name'] ?? $button_label) : $button_label); ?>" aria-expanded="<?php echo $show_security ? 'true' : 'false'; ?>" aria-controls="<?php echo esc_attr($panel_id); ?>">
         <span class="lsd-auth-dropdown-toggle-content">
             <?php if ($is_logged_in && $avatar): ?>
                 <span class="lsd-auth-dropdown-toggle-avatar"><?php echo wp_kses_post($avatar); ?></span>
@@ -39,8 +41,10 @@ $wrapper_classes = [
             <i class="fa-solid fa-chevron-down"></i>
         </span>
     </button>
-    <div class="lsd-auth-dropdown-panel" id="<?php echo esc_attr($panel_id); ?>" aria-hidden="true">
-        <?php if ($is_logged_in): ?>
+    <div class="lsd-auth-dropdown-panel" id="<?php echo esc_attr($panel_id); ?>" aria-hidden="<?php echo $show_security ? 'false' : 'true'; ?>">
+        <?php if ($show_security): ?>
+            <?php echo $security_markup; ?>
+        <?php elseif ($is_logged_in): ?>
             <div class="lsd-auth-dropdown-logged-in">
                 <div class="lsd-auth-dropdown-user">
                     <div class="lsd-auth-dropdown-avatar">
@@ -57,6 +61,9 @@ $wrapper_classes = [
                 </div>
                 <div class="lsd-auth-dropdown-actions">
                     <a href="<?php echo esc_url($account_redirect); ?>" class="lsd-auth-dropdown-link lsd-general-button"><?php esc_html_e('My Account', 'listdom'); ?></a>
+                    <?php if ($show_security_link && LSD_Security_Account::url() !== ''): ?>
+                        <a href="<?php echo esc_url(LSD_Security_Account::url()); ?>" class="lsd-auth-dropdown-link lsd-text-button"><?php esc_html_e('Account Security', 'listdom'); ?></a>
+                    <?php endif; ?>
                     <a href="<?php echo esc_url(wp_logout_url($logout_redirect)); ?>" class="lsd-auth-dropdown-link lsd-auth-dropdown-link-danger lsd-text-button"><?php esc_html_e('Logout', 'listdom'); ?></a>
                 </div>
             </div>

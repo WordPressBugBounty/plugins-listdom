@@ -38,6 +38,7 @@ class LSD_Notifications_Dispatcher extends LSD_Notifications
 
     public function profile()
     {
+        if (!LSD_Portal::public_profiles()) $this->response(['success' => 0, 'message' => esc_html__('Profile messaging is unavailable.', 'listdom')]);
         $name = isset($_POST['lsd_name']) ? sanitize_text_field(wp_unslash($_POST['lsd_name'])) : '';
         $email = isset($_POST['lsd_email']) ? sanitize_email(wp_unslash($_POST['lsd_email'])) : '';
         $phone = isset($_POST['lsd_phone']) ? sanitize_text_field(wp_unslash($_POST['lsd_phone'])) : '';

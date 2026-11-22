@@ -231,7 +231,7 @@ class LSD_Admin extends LSD_Base
 
     private function roles_notice_description(): string
     {
-        return __('Listdom adds two new WordPress roles. Listdom Authors can create listings and manage their own submissions, while Listdom Publishers can publish listings directly and manage published ones.', 'listdom');
+        return __('Listdom adds two new user roles. Listdom Authors can create listings and manage their own submissions, while Listdom Publishers can publish listings directly and manage published ones.', 'listdom');
     }
 
     public function dashboard_widget(): void

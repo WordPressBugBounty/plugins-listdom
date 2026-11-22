@@ -36,7 +36,7 @@ class LSD_API_Routes extends LSD_API
         register_rest_route($this->namespace, 'register', [
             'methods' => 'POST',
             'callback' => [$register, 'perform'],
-            'permission_callback' => [$register, 'guest'],
+            'permission_callback' => [$register, 'authentication_permission'],
         ]);
 
         // Login Controller
@@ -45,8 +45,17 @@ class LSD_API_Routes extends LSD_API
         register_rest_route($this->namespace, 'login', [
             'methods' => 'POST',
             'callback' => [$login, 'perform'],
-            'permission_callback' => [$login, 'guest'],
+            'permission_callback' => [$login, 'authentication_permission'],
         ]);
+
+        foreach (['login/challenge' => 'challenge', 'login/enroll' => 'enroll', 'login/enroll/confirm' => 'confirm_enrollment'] as $route => $callback)
+        {
+            register_rest_route($this->namespace, $route, [
+                'methods' => 'POST',
+                'callback' => [$login, $callback],
+                'permission_callback' => [$login, 'authentication_permission'],
+            ]);
+        }
 
         register_rest_route($this->namespace, 'login/key', [
             'methods' => 'POST',

@@ -29,7 +29,7 @@ $body_class = trim(($class ?? '') . ' lsd-template-editor-iframe-surface');
 <body <?php body_class($body_class); ?>>
     <?php wp_body_open(); ?>
 
-    <div id="<?php echo esc_attr($root_id); ?>">
+    <div id="<?php echo esc_attr($root_id); ?>" class="wui">
         <?php echo LSD_Kses::full(do_shortcode($body)); ?>
     </div>
 
